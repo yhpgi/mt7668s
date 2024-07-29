@@ -1,0 +1,36 @@
+menu "wifimtk"
+
+config MTK_COMBO_CHIP
+	string "MTK COMBO CHIP"
+	default "MT6632"
+
+config MTK_WIFI_ONLY
+	tristate "MTK WIFI ONLY"
+	default m
+
+config MTK_COMBO
+	tristate "MTK COMBO"
+	default m
+
+config MTK_COMBO_WIFI
+	tristate "MTK COMBO WIFI"
+	default m
+
+config MTK_COMBO_COMM
+	tristate "MTK COMBO COMM"
+	default m
+
+config MTK_COMBO_COMM_UART
+	tristate "MTK COMBO COMM UART"
+	default m
+
+config MTK_COMBO_COMM_SDIO
+	tristate "MTK COMBO COMM SDIO"
+	default m
+
+config MTK_MT_WIFI_CHRDEV
+	tristate "MTK MT WIFI CHRDEV"
+	default m
+
+
+endmenu
