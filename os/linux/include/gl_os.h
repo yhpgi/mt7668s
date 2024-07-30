@@ -509,13 +509,13 @@ struct _GLUE_INFO_T {
 	 * NOTE(Kevin): In Linux, we also use this variable as the threshold
 	 * for manipulating the netif_stop(wake)_queue() func.
 	 */
-	INT_32 ai4TxPendingFrameNumPerQueue[HW_BSSID_NUM][CFG_MAX_TXQ_NUM];
+	INT_32 ai4TxPendingFrameNumPerQueue[HW_BSSID_NUM+1][CFG_MAX_TXQ_NUM];
 	INT_32 i4TxPendingFrameNum;
 	INT_32 i4TxPendingSecurityFrameNum;
 	INT_32 i4TxPendingCmdNum;
 
 	/* Tx: for NetDev to BSS index mapping */
-	NET_INTERFACE_INFO_T arNetInterfaceInfo[HW_BSSID_NUM];
+	NET_INTERFACE_INFO_T arNetInterfaceInfo[HW_BSSID_NUM+1];
 
 	/* Rx: for BSS index to NetDev mapping */
 	/* P_NET_INTERFACE_INFO_T  aprBssIdxToNetInterfaceInfo[HW_BSSID_NUM]; */
