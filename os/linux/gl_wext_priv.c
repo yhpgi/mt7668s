@@ -8514,17 +8514,12 @@ int priv_driver_set_country(IN struct net_device *prNetDev, IN char *pcCommand, 
 		return 0;
 	}
 
+	/* command like "COUNTRY US", "COUNTRY EU" and "COUNTRY JP" */
+	aucCountry[0] = apcArgv[1][0];
+	aucCountry[1] = apcArgv[1][1];
 
-	if (i4Argc >= 2) {
-		/* command like "COUNTRY US", "COUNTRY EU" and "COUNTRY JP" */
-		aucCountry[0] = apcArgv[1][0];
-		aucCountry[1] = apcArgv[1][1];
+	rStatus = kalIoctl(prGlueInfo, wlanoidSetCountryCode, &aucCountry[0], 2, FALSE, FALSE, TRUE, &u4BufLen);
 
-		rStatus = kalIoctl(prGlueInfo, wlanoidSetCountryCode, &aucCountry[0], 2, FALSE, FALSE, TRUE, &u4BufLen);
-
-		if (rStatus != WLAN_STATUS_SUCCESS)
-			return -1;
-	}
 	return 0;
 }
 
@@ -9411,16 +9406,20 @@ static int priv_driver_set_wow_enable(IN struct net_device *prNetDev, IN char *p
 	}
 	DBGLOG(REQ, LOUD, "argc is %i\n", i4Argc);
 
-	u4Ret = kalkStrtou8(apcArgv[1], 0, &ucEnable);
+	if (i4Argc >= 2) {
+		u4Ret = kalkStrtou8(apcArgv[1], 0, &ucEnable);
 
-	if (u4Ret)
-		DBGLOG(REQ, LOUD, "parse bEnable error u4Ret=%d\n", u4Ret);
+		if (u4Ret)
+			DBGLOG(REQ, LOUD, "parse bEnable error u4Ret=%d\n", u4Ret);
 
-	pWOW_CTRL->fgWowEnable = ucEnable;
+		pWOW_CTRL->fgWowEnable = ucEnable;
 
-	DBGLOG(PF, INFO, "WOW enable %d\n", pWOW_CTRL->fgWowEnable);
+		DBGLOG(PF, INFO, "WOW enable %d\n", pWOW_CTRL->fgWowEnable);
 
-	return 0;
+		return 0;
+	} else {
+		return -1;
+	}
 }
 
 static int priv_driver_set_wow_par(IN struct net_device *prNetDev, IN char *pcCommand, IN int i4TotalLen)
@@ -9906,16 +9905,20 @@ static int priv_driver_set_adv_pws(IN struct net_device *prNetDev, IN char *pcCo
 		DBGLOG(REQ, WARN, "%s: argc is %d, need >=2\n", __func__, i4Argc);
 		return -1;
 	}
-	u4Ret = kalkStrtou8(apcArgv[1], 0, &ucAdvPws);
+	if (i4Argc >= 2) {
+		u4Ret = kalkStrtou8(apcArgv[1], 0, &ucAdvPws);
 
-	if (u4Ret)
-		DBGLOG(REQ, LOUD, "parse bEnable error u4Ret=%d\n", u4Ret);
+		if (u4Ret)
+			DBGLOG(REQ, LOUD, "parse bEnable error u4Ret=%d\n", u4Ret);
 
-	prGlueInfo->prAdapter->rWifiVar.ucAdvPws = ucAdvPws;
+		prGlueInfo->prAdapter->rWifiVar.ucAdvPws = ucAdvPws;
 
-	DBGLOG(INIT, INFO, "AdvPws:%d\n", &prGlueInfo->prAdapter->rWifiVar.ucAdvPws);
+		DBGLOG(INIT, INFO, "AdvPws:%d\n", &prGlueInfo->prAdapter->rWifiVar.ucAdvPws);
 
-	return 0;
+		return 0;
+	} else {
+		return -1;
+	}
 
 }
 
