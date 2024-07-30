@@ -85,6 +85,8 @@
 #endif
 #include "gl_vendor.h"
 
+#include <linux/reboot.h>
+
 /*******************************************************************************
 *                              C O N S T A N T S
 ********************************************************************************
@@ -3180,6 +3182,7 @@ INT_32 wlanProbe(PVOID pvData, PVOID pvDriverData)
 		prWaitForResetComp = NULL;
 	}
 
+	wlanRegisterRebootNotifier();
 	return i4Status;
 }				/* end of wlanProbe() */
 
@@ -3476,6 +3479,7 @@ static VOID mt76x8_wireless_exit(void)
 #if WLAN_INCLUDE_PROC
 	procUninitProcFs();
 #endif
+	wlanUnregisterRebootNotifier();
 }
 
 #ifdef CFG_SUPPORT_MT76X8_WIFI_PLATFORM_DRIVER
@@ -3681,6 +3685,41 @@ static VOID exitWlan(void)
 	unregisterDriver();
 	DBGLOG(INIT, STATE, "exitWlan end\n");
 }				/* end of exitWlan() */
+
+static int mt7668s_reboot_notify(struct notifier_block *nb,
+		unsigned long event, void *unused)
+{
+	if (event == SYS_DOWN || event == SYS_RESTART || event == SYS_POWER_OFF) {
+		DBGLOG(HAL, STATE, "Power down is detected. Cleaning MT7668S WiFi driver...\n");
+
+		glUnregisterBus(wlanRemove);
+		kalUninitIOBuffer();
+		wlanDestroyWirelessDevice();
+		glP2pDestroyWirelessDevice();
+#if WLAN_INCLUDE_PROC
+		procUninitProcFs();
+#endif
+
+		DBGLOG(HAL, STATE, "Cleaning MT7668S WiFi driver Finish!\n");
+	}
+	return 0;
+}
+
+static struct notifier_block mt7668s_reboot_notifier = {
+	.notifier_call = mt7668s_reboot_notify,
+	.next = NULL,
+	.priority = __INT_MAX__,
+};
+
+void wlanRegisterRebootNotifier(void)
+{
+	register_reboot_notifier(&mt7668s_reboot_notifier);
+}
+
+void wlanUnregisterRebootNotifier(void)
+{
+	unregister_reboot_notifier(&mt7668s_reboot_notifier);
+}
 
 #if ((MTK_WCN_HIF_SDIO == 1) && (CFG_BUILT_IN_DRIVER == 1))
 
