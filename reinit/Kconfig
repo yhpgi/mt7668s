@@ -1,0 +1,23 @@
+# SPDX-License-Identifier: GPL-2.0
+config MT7668S_WIFI_REINIT
+	tristate "MT7668S WiFi reinit support (Amlogic vendor kernel only)"
+	depends on MT7668S_WIFI
+	depends on AMLOGIC_WIFI
+	default n
+	help
+	  Enable support for reinitializing the MT7668S WiFi module
+	  in the Amlogic vendor kernel. This is particularly useful
+	  for systems that require the WiFi module to be reset without
+	  a full system reboot, such as in cases of WiFi module failure
+	  or dynamic reconfiguration.
+
+	  This option is dependent on the presence of the Amlogic driver,
+	  ensuring that the necessary infrastructure is available for
+	  reinitialization.
+
+	  To compile this support as a loadable kernel module, choose 'M'
+	  here. This will create a module named 'mt7668s_reinit.ko'.
+
+	  Select 'y' to enable reinitialization support, ensuring
+	  more robust WiFi operation in dynamic or fault-prone environments.
+	  Select 'n' to disable this feature if it is not needed.

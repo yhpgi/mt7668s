@@ -120,6 +120,7 @@ else
 endif
 
 obj-$(CONFIG_MT7668S_WIFI) := mt7668s.o
+obj-y += reinit/
 
 default:
 	$(MAKE) -C $(KERNELDIR) M=$(PWD) modules

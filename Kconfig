@@ -39,3 +39,5 @@ config MT7668S_WIFI_MESON_G12A_PATCH
 	  performance on the Meson G12A platform. Select 'n' to
 	  disable the workaround if it is not needed.
 
+source "drivers/mt7668s/reinit/Kconfig"
+# FIXME: Use the actual path
