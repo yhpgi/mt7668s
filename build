@@ -12,10 +12,11 @@ export CONFIG_MT7668S_WIFI_PREALLOC=n
 export CONFIG_MT7668S_WIFI_MESON_G12A_PATCH=y
 
 # disable if compiling with mainline kernel!
-export CONFIG_MT7668S_WIFI_REINIT=m
+export CONFIG_MT7668S_WIFI_REINIT=n
 
 # replace KERNELDIR with your kernel path
-export KERNELDIR=$HOME/project/linux-4.9.337/out
+# export KERNELDIR=$HOME/project/linux-4.9.337/out
+export KERNELDIR=$HOME/project/kcompiler/compile-kernel/kernel/linux-5.4.y
 
 ./clean
 make -j8 KERNELDIR=${KERNELDIR}

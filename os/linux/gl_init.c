@@ -1124,7 +1124,18 @@ VOID wlanSchedWDevLockWorkQueue(struct work_struct *work)
 			kalAcquireWDevMutex(prParamWDevLock->pDev);
 			switch(prParamWDevLock->fn) {
 				case CFG80211_RX_ASSOC_RESP:
-#if (KERNEL_VERSION(3, 18, 0) <= CFG80211_VERSION_CODE)
+#if (KERNEL_VERSION (5, 1, 0) <= CFG80211_VERSION_CODE)
+					cfg80211_rx_assoc_resp(prParamWDevLock->pDev,
+								prParamWDevLock->pBss,
+								prParamWDevLock->pFrameBuf,
+								prParamWDevLock->frameLen,
+								prParamWDevLock->uapsd_queues,
+								NULL, 0);
+								/*!FIXME
+								 * prParamWDevLock->req_ies,
+								 * prParamWDevLock->req_ies_len);
+								 */
+#elif (KERNEL_VERSION(3, 18, 0) <= CFG80211_VERSION_CODE)
 					cfg80211_rx_assoc_resp(prParamWDevLock->pDev,
 								prParamWDevLock->pBss,
 								prParamWDevLock->pFrameBuf,
