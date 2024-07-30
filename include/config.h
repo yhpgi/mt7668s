@@ -377,11 +377,19 @@
 /* 1(default): Enable SDIO ISR & TX/RX status enhance mode
  * 0: Disable
  */
+#if CFG_MESON_G12A_PATCH
+#define CFG_SDIO_RX_ENHANCE                          0
+#else
 #define CFG_SDIO_RX_ENHANCE                          1
+#endif
 /* 1: Enable SDIO TX enhance mode(Multiple frames in single BLOCK CMD)
  * 0(default): Disable
  */
+#if CFG_MESON_G12A_PATCH
+#define CFG_SDIO_TX_AGG                              0
+#else
 #define CFG_SDIO_TX_AGG                              1
+#endif
 
 /* 1: Enable SDIO RX enhance mode(Multiple frames in single BLOCK CMD)
  * 0(default): Disable
