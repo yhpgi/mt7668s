@@ -1379,31 +1379,27 @@ VOID kalP2PCacFinishedUpdate(IN P_GLUE_INFO_T prGlueInfo, IN UINT_8 ucRoleIndex)
 {
 	DBGLOG(INIT, INFO, "CAC Finished event\n");
 
-	do {
-		if (prGlueInfo == NULL)
-			ASSERT(FALSE);
+	if (prGlueInfo == NULL)
+		return;
 
-		if (prGlueInfo->prP2PInfo[ucRoleIndex]->chandef == NULL) {
-			ASSERT(FALSE);
-			break;
-		}
+	if (prGlueInfo->prP2PInfo[ucRoleIndex]->chandef == NULL)
+		return;
 
-		/* NL80211 event should send to p2p group netdevice.
-		 * Otherwise wpa_supplicant wouldn't perform beacon update.
-		 * Hostapd case: prDevHandler same with aprRoleHandler
-		 * P2P GO case: p2p0=>prDevHandler, p2p-xxx-x=> aprRoleHandler
-		 */
-		DBGLOG(INIT, INFO, "kalP2PCacFinishedUpdate: Update to OS\n");
+	/* NL80211 event should send to p2p group netdevice.
+	 * Otherwise wpa_supplicant wouldn't perform beacon update.
+	 * Hostapd case: prDevHandler same with aprRoleHandler
+	 * P2P GO case: p2p0=>prDevHandler, p2p-xxx-x=> aprRoleHandler
+	 */
+	DBGLOG(INIT, INFO, "kalP2PCacFinishedUpdate: Update to OS\n");
 #if KERNEL_VERSION(3, 14, 0) <= CFG80211_VERSION_CODE
-		cfg80211_cac_event(prGlueInfo->prP2PInfo[ucRoleIndex]->aprRoleHandler,
-				prGlueInfo->prP2PInfo[ucRoleIndex]->chandef, NL80211_RADAR_CAC_FINISHED, GFP_KERNEL);
+	cfg80211_cac_event(prGlueInfo->prP2PInfo[ucRoleIndex]->prDevHandler,
+		prGlueInfo->prP2PInfo[ucRoleIndex]->chandef, NL80211_RADAR_CAC_FINISHED, GFP_KERNEL);
 #else
-		cfg80211_cac_event(prGlueInfo->prP2PInfo[ucRoleIndex]->aprRoleHandler,
-				NL80211_RADAR_CAC_FINISHED, GFP_KERNEL);
+	cfg80211_cac_event(prGlueInfo->prP2PInfo[ucRoleIndex]->prDevHandler,
+		NL80211_RADAR_CAC_FINISHED, GFP_KERNEL);
 #endif
-		DBGLOG(INIT, INFO, "kalP2PCacFinishedUpdate: Update to OS Done\n");
+	DBGLOG(INIT, INFO, "kalP2PCacFinishedUpdate: Update to OS Done\n");
 
-	} while (FALSE);
 
 }				/* kalP2PRddDetectUpdate */
 #endif
