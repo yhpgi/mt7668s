@@ -961,6 +961,20 @@ VOID p2pRoleFsmRunEventStartAP(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMsgHdr
 		prP2pConnReqInfo->eConnRequest = P2P_CONNECTION_TYPE_GO;
 	}
 
+	/* Clear current AP's STA_RECORD_T and current AID to prevent
+	 * using previous p2p connection state. This is needed because
+	 * upper layer may add keys before we start SAP/GO.
+	 */
+	prP2pBssInfo->prStaRecOfAP = (P_STA_RECORD_T) NULL;
+	prP2pBssInfo->u2AssocId = 0;
+
+	/* Clear list to ensure no client staRec */
+	if (bssGetClientCount(prAdapter, prP2pBssInfo) != 0) {
+		DBGLOG(P2P, WARN,
+			"Clear list to ensure no empty/client staRec\n");
+		bssInitializeClientList(prAdapter, prP2pBssInfo);
+	}
+
 	/* The supplicant may start AP before rP2pRoleFsmTimeoutTimer is time out */
 	/* We need to make sure the BSS was deactivated and all StaRec can be free */
 	if (timerPendingTimer(&(prP2pRoleFsmInfo->rP2pRoleFsmTimeoutTimer))) {
