@@ -2232,6 +2232,10 @@ p2pFuncValidateAuth(IN P_ADAPTER_T prAdapter,
 			p2pFuncResetStaRecStatus(prAdapter, prStaRec);
 
 			bssRemoveClient(prAdapter, prP2pBssInfo, prStaRec);
+#if CFG_SUPPORT_802_11W
+			if (timerPendingTimer(&(prStaRec->rPmfCfg.rSAQueryTimer)))
+				cnmTimerStopTimer(prAdapter, &(prStaRec->rPmfCfg.rSAQueryTimer));
+#endif
 		}
 
 	}
