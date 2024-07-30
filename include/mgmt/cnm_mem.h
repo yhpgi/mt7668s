@@ -724,7 +724,10 @@ typedef struct _CMD_PEER_UPDATE_HT_CAP_MCS_INFO_T {
 } CMD_PEER_UPDATE_HT_CAP_MCS_INFO_T;
 
 typedef struct _CMD_PEER_UPDATE_VHT_CAP_MCS_INFO_T {
-	UINT_8 arRxMask[SUP_MCS_RX_BITMASK_OCTET_NUM];
+	UINT_16 u2RxMcsMap;
+	UINT_16 u2RxHighest;
+	UINT_16 u2TxMcsMap;
+	UINT_16 u2TxHighest;
 } CMD_PEER_UPDATE_VHT_CAP_MCS_INFO_T;
 
 typedef struct _CMD_PEER_UPDATE_HT_CAP_T {
@@ -740,7 +743,7 @@ typedef struct _CMD_PEER_UPDATE_HT_CAP_T {
 } CMD_PEER_UPDATE_HT_CAP_T;
 
 typedef struct _CMD_PEER_UPDATE_VHT_CAP_T {
-	UINT_16 u2CapInfo;
+	UINT_32 u4CapInfo;
 	/* 16 bytes MCS information */
 	CMD_PEER_UPDATE_VHT_CAP_MCS_INFO_T rVMCS;
 
@@ -771,6 +774,7 @@ typedef struct _CMD_PEER_UPDATE_T {
 	CMD_PEER_UPDATE_VHT_CAP_T rVHtCap;
 
 	BOOLEAN fgIsSupHt;
+	BOOLEAN fgIsSupVht;
 	ENUM_STA_TYPE_T eStaType;
 
 	/* TODO */
