@@ -315,6 +315,8 @@ p2pRoleStateAbort_GC_JOIN(IN P_ADAPTER_T prAdapter,
 
 		/* Release channel requested. */
 		p2pFuncReleaseCh(prAdapter, prP2pRoleFsmInfo->ucBssIndex, &(prP2pRoleFsmInfo->rChnlReqInfo));
+
+		prP2pRoleFsmInfo->rJoinInfo.prTargetStaRec = NULL;
 	} while (FALSE);
 }
 

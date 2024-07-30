@@ -1988,6 +1988,12 @@ p2pFuncDisconnect(IN P_ADAPTER_T prAdapter,
 
 			kalP2PGOStationUpdate(prAdapter->prGlueInfo, prP2pRoleFsmInfo->ucRoleIndex, prStaRec, FALSE);
 		} else {
+			P_P2P_ROLE_FSM_INFO_T prP2pRoleFsmInfo =
+			    P2P_ROLE_INDEX_2_ROLE_FSM_INFO(prAdapter, prP2pBssInfo->u4PrivateData);
+
+			prP2pRoleFsmInfo->rJoinInfo.prTargetBssDesc = NULL;
+			prP2pRoleFsmInfo->rJoinInfo.prTargetStaRec = NULL;
+
 			scanRemoveConnFlagOfBssDescByBssid(prAdapter, prP2pBssInfo->aucBSSID);
 		}
 

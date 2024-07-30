@@ -1906,6 +1906,11 @@ VOID p2pRoleFsmRunEventJoinComplete(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prM
 
 	prJoinInfo = &(prP2pRoleFsmInfo->rJoinInfo);
 
+	if (!prJoinInfo->prTargetStaRec) {
+		DBGLOG(P2P, ERROR, "prJoinInfo->prTargetStaRec is NULL!\n");
+		goto error;
+	}
+
 	/* Check SEQ NUM */
 	if (prJoinCompMsg->ucSeqNum == prJoinInfo->ucSeqNumOfReqMsg) {
 		ASSERT(prStaRec == prJoinInfo->prTargetStaRec);
@@ -1988,8 +1993,9 @@ VOID p2pRoleFsmRunEventJoinComplete(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prM
 
 				prBssDesc->fgIsConnecting = FALSE;
 
+				if (prStaRec->ucJoinFailureCount >= 3) {
 #if CFG_WPS_DISCONNECT || (KERNEL_VERSION(4, 4, 0) <= CFG80211_VERSION_CODE)
-				kalP2PGCIndicateConnectionStatus(prAdapter->prGlueInfo,
+					kalP2PGCIndicateConnectionStatus(prAdapter->prGlueInfo,
 						prP2pRoleFsmInfo->ucRoleIndex,
 						&prP2pRoleFsmInfo->rConnReqInfo,
 						prJoinInfo->aucIEBuf,
@@ -1997,13 +2003,17 @@ VOID p2pRoleFsmRunEventJoinComplete(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prM
 						prStaRec->u2StatusCode,
 						WLAN_STATUS_MEDIA_DISCONNECT);
 #else
-				kalP2PGCIndicateConnectionStatus(prAdapter->prGlueInfo,
+					kalP2PGCIndicateConnectionStatus(prAdapter->prGlueInfo,
 						prP2pRoleFsmInfo->ucRoleIndex,
 						&prP2pRoleFsmInfo->rConnReqInfo,
 						prJoinInfo->aucIEBuf,
 						prJoinInfo->u4BufLength,
 						prStaRec->u2StatusCode);
 #endif
+					/* Reset p2p state */
+					prJoinInfo->prTargetBssDesc = NULL;
+					prJoinInfo->prTargetStaRec = NULL;
+				}
 
 			}
 
