@@ -1495,6 +1495,9 @@ VOID halRxSDIOAggReceiveRFBs(IN P_ADAPTER_T prAdapter)
 
 VOID halProcessRxInterrupt(IN P_ADAPTER_T prAdapter)
 {
+#if CFG_MESON_G12A_PATCH
+	halRxSDIOEnhanceReceiveRFBs(prAdapter);
+#else
 #if CFG_SDIO_INTR_ENHANCE
 #if CFG_SDIO_RX_AGG
 	halRxSDIOAggReceiveRFBs(prAdapter);
@@ -1504,6 +1507,7 @@ VOID halProcessRxInterrupt(IN P_ADAPTER_T prAdapter)
 #else
 	halRxSDIOReceiveRFBs(prAdapter);
 #endif /* CFG_SDIO_INTR_ENHANCE */
+#endif
 }
 
 VOID halHifSwInfoInit(IN P_ADAPTER_T prAdapter)

@@ -24,3 +24,18 @@ config MT7668S_WIFI_PREALLOC
 	  by reducing dynamic memory allocation overhead during runtime.
 	  This is useful in memory-constrained environments or for
 	  improving latency.
+
+config MT7668S_WIFI_MESON_G12A_PATCH
+	bool "MT7668S WiFi Meson G12A workaround"
+	depends on MT7668S_WIFI
+	depends on PINCTRL_MESON_G12A
+	help
+	  Enable this option to apply a workaround specific to the
+	  Meson G12A platform. Due to buffer length constraints on
+	  G12A, this workaround reduces the overall buffer length
+	  to prevent issues with WiFi operation.
+
+	  Select 'y' to enable the workaround, ensuring stable
+	  performance on the Meson G12A platform. Select 'n' to
+	  disable the workaround if it is not needed.
+

@@ -1042,6 +1042,9 @@ BOOLEAN glRegisterP2P(P_GLUE_INFO_T prGlueInfo, const char *prDevName, const cha
 		kalMemCopy(prGlueInfo->prP2PInfo[i]->prDevHandler->perm_addr,
 			prGlueInfo->prP2PInfo[i]->prDevHandler->dev_addr,
 			   ETH_ALEN);
+#if CFG_MESON_G12A_PATCH
+		prGlueInfo->prP2PInfo[i]->prDevHandler->mtu = 1408;
+#endif
 
 		/* 4.3 register callback functions */
 		prGlueInfo->prP2PInfo[i]->prDevHandler->needed_headroom += NIC_TX_HEAD_ROOM;

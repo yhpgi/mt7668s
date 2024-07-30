@@ -87,7 +87,11 @@
 
 #define CMD_HDR_SIZE                        sizeof(WIFI_CMD_T)
 
+#if CFG_MESON_G12A_PATCH
+#define CMD_PKT_SIZE_FOR_IMAGE              1408
+#else
 #define CMD_PKT_SIZE_FOR_IMAGE              2048	/* !< 2048 Bytes CMD payload buffer */
+#endif
 
 /*! NIC_HIF_TX_HEADER_T (for short-header format) */
 /* DW 0, Byte 0,1 */

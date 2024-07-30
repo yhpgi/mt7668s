@@ -654,9 +654,12 @@ VOID kalUpdateMACAddress(IN P_GLUE_INFO_T prGlueInfo, IN PUINT_8 pucMacAddr)
 	ASSERT(prGlueInfo);
 	ASSERT(pucMacAddr);
 
-	if (UNEQUAL_MAC_ADDR(prGlueInfo->prDevHandler->dev_addr, pucMacAddr))
+	if (UNEQUAL_MAC_ADDR(prGlueInfo->prDevHandler->dev_addr, pucMacAddr)) {
 		memcpy(prGlueInfo->prDevHandler->dev_addr, pucMacAddr, PARAM_MAC_ADDR_LEN);
-
+#if CFG_MESON_G12A_PATCH
+		prGlueInfo->prDevHandler->mtu = 1408;
+#endif
+	}
 }
 
 #if CFG_TCP_IP_CHKSUM_OFFLOAD

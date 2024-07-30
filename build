@@ -8,6 +8,9 @@ export INSTALL_MOD_STRIP=1
 export CONFIG_MT7668S_WIFI=m
 export CONFIG_MT7668S_WIFI_PREALLOC=n
 
+# replace with n if your taget device isn't meson_g12a
+export CONFIG_MT7668S_WIFI_MESON_G12A_PATCH=y
+
 # replace KERNELDIR with your kernel path
 export KERNELDIR=$HOME/project/linux-4.9.337/out
 

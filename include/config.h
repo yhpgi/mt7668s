@@ -139,6 +139,9 @@
 #undef MT6632
 #define WLAN_INCLUDE_PROC                        1
 
+#ifndef CFG_MESON_G12A_PATCH
+#define CFG_MESON_G12A_PATCH 1
+#endif
 
 /* 2 Flags for OS capability */
 
@@ -320,7 +323,11 @@
 #ifdef NDIS60_MINIPORT
 #define CFG_NATIVE_802_11                       1
 
+#if CFG_MESON_G12A_PATCH
+#define CFG_TX_MAX_PKT_SIZE                     1408
+#else
 #define CFG_TX_MAX_PKT_SIZE                     2304
+#endif
 #define CFG_TCP_IP_CHKSUM_OFFLOAD_NDIS_60       0	/* !< 1: Enable TCP/IP header checksum offload */
 							/* 0: Disable */
 #define CFG_TCP_IP_CHKSUM_OFFLOAD               0
@@ -332,7 +339,11 @@
 #else
 #define CFG_TCP_IP_CHKSUM_OFFLOAD               1
 #define CFG_TCP_IP_CHKSUM_OFFLOAD_NDIS_60       0
+#if CFG_MESON_G12A_PATCH
+#define CFG_TX_MAX_PKT_SIZE                     1408
+#else
 #define CFG_TX_MAX_PKT_SIZE                     1600
+#endif
 #define CFG_NATIVE_802_11                       0
 #endif
 

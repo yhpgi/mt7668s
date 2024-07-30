@@ -1473,6 +1473,9 @@ static int wlanSetMacAddress(struct net_device *ndev, void *addr)
 
     COPY_MAC_ADDR(prAdapter->prAisBssInfo->aucOwnMacAddr, sa->sa_data);
     COPY_MAC_ADDR(prGlueInfo->prDevHandler->dev_addr, sa->sa_data);
+#if CFG_MESON_G12A_PATCH
+	prGlueInfo->prDevHandler->mtu = 1408;
+#endif
     DBGLOG(INIT, STATE, "Set connect random macaddr to " MACSTR ".\n",
            MAC2STR(prAdapter->prAisBssInfo->aucOwnMacAddr));
 
@@ -2946,6 +2949,9 @@ INT_32 wlanProbe(PVOID pvData, PVOID pvDriverData)
 				kalMemCopy(prGlueInfo->prDevHandler->dev_addr, &MacAddr.sa_data, ETH_ALEN);
 				kalMemCopy(prGlueInfo->prDevHandler->perm_addr,
 					   prGlueInfo->prDevHandler->dev_addr, ETH_ALEN);
+#if CFG_MESON_G12A_PATCH
+			prGlueInfo->prDevHandler->mtu = 1408;
+#endif
 
 				/* card is ready */
 				prGlueInfo->u4ReadyFlag = 1;

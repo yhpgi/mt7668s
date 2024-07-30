@@ -1091,6 +1091,9 @@ BOOLEAN kalInitBowDevice(IN P_GLUE_INFO_T prGlueInfo, IN const char *prDevName)
 		kalMemCopy(prGlueInfo->rBowInfo.prDevHandler->dev_addr, rMacAddr, ETH_ALEN);
 		kalMemCopy(prGlueInfo->rBowInfo.prDevHandler->perm_addr,
 			   prGlueInfo->rBowInfo.prDevHandler->dev_addr, ETH_ALEN);
+#if CFG_MESON_G12A_PATCH
+		prGlueInfo->rBowInfo.prDevHandler->mtu = 1408;
+#endif
 
 		/* 1.3 register callback functions */
 		prGlueInfo->rBowInfo.prDevHandler->needed_headroom += NIC_TX_HEAD_ROOM;

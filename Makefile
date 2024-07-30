@@ -113,6 +113,12 @@ ifneq ($(CFG_CFG80211_VERSION),)
     $(info DCFG_CFG80211_VERSION=$(VERSION))
 endif
 
+ifeq ($(CONFIG_MT7668S_WIFI_MESON_G12A_PATCH),y)
+    ccflags-y += -DCFG_MESON_G12A_PATCH=1
+else
+    ccflags-y += -DCFG_MESON_G12A_PATCH=0
+endif
+
 obj-$(CONFIG_MT7668S_WIFI) := mt7668s.o
 
 default:
