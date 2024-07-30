@@ -68,6 +68,8 @@
 ********************************************************************************
 */
 
+#define DBG                                      0
+
 #ifdef __GNUC__
 #if (DBG == 0)
 #pragma GCC diagnostic ignored "-Wformat"

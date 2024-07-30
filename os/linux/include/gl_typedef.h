@@ -63,6 +63,10 @@
 #ifndef _GL_TYPEDEF_H
 #define _GL_TYPEDEF_H
 
+#include <linux/mmc/ioctl.h>
+#include <linux/mmc/sdio.h>
+#include <linux/mmc/sdio_func.h>
+
 #if CFG_ENABLE_EARLY_SUSPEND
 #include <linux/earlysuspend.h>
 #endif

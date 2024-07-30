@@ -84,7 +84,6 @@
 #include "gl_kal.h"
 #endif
 #include "gl_vendor.h"
-#include "amazon_wifi_temp_sensor.h"
 
 /*******************************************************************************
 *                              C O N S T A N T S
@@ -137,11 +136,10 @@ struct delayed_work wdev_lock_workq;
 #define DRIVER_NAME "mt76x8_wifi_usb"
 #endif
 
-MODULE_AUTHOR(NIC_AUTHOR);
-MODULE_DESCRIPTION(NIC_DESC);
-MODULE_SUPPORTED_DEVICE(NIC_NAME);
-
-/* MODULE_LICENSE("MTK Propietary"); */
+MODULE_AUTHOR("Mediatek Ltd.");
+MODULE_AUTHOR("Yogi Hermawan");
+MODULE_DESCRIPTION("Mediatek MT7668S (SDIO) Wireleses Driver");
+MODULE_VERSION(NIC_DRIVER_VERSION_STRING);
 MODULE_LICENSE("Dual BSD/GPL");
 
 #ifdef CFG_DRIVER_INF_NAME_CHANGE
@@ -2309,8 +2307,13 @@ int set_p2p_mode_handler(struct net_device *netdev, PARAM_CUSTOM_P2P_SET_STRUCT_
 	rSetP2P.u4Enable = p2pmode.u4Enable;
 	rSetP2P.u4Mode = p2pmode.u4Mode;
 
-	if ((!rSetP2P.u4Enable) && (kalIsResetting() == FALSE))
+#if CFG_CHIP_RESET_SUPPORT
+	if ((!rSetP2P.u4Enable) && (kalIsResetting() == FALSE)) {
+#else
+	if (!rSetP2P.u4Enable) {
+#endif
 		p2pNetUnregister(prGlueInfo, FALSE);
+	}
 
 	if (((rSetP2P.u4Mode == RUNNING_DUAL_AP_MODE)||(rSetP2P.u4Mode == RUNNING_P2P_AP_MODE)) &&
 			(gprP2pRoleWdev[1] == NULL) && (rSetP2P.u4Enable)) {
@@ -2329,8 +2332,13 @@ int set_p2p_mode_handler(struct net_device *netdev, PARAM_CUSTOM_P2P_SET_STRUCT_
 	 * in this case, kalIOCTL return success always,
 	 * and prGlueInfo->prP2PInfo[0] may be NULL
 	 */
-	if ((rSetP2P.u4Enable) && (prGlueInfo->prAdapter->fgIsP2PRegistered) && (kalIsResetting() == FALSE))
+#if CFG_CHIP_RESET_SUPPORT
+	if ((rSetP2P.u4Enable) && (prGlueInfo->prAdapter->fgIsP2PRegistered) && (kalIsResetting() == FALSE)) {
+#else
+	if ((rSetP2P.u4Enable) && (prGlueInfo->prAdapter->fgIsP2PRegistered)) {
+#endif
 		ret = p2pNetRegister(prGlueInfo, FALSE);
+	}
 
 #if CFG_RESET_DUE_TO_REG_NETDEV_FAIL
 	if(ret == TRUE)
@@ -2724,14 +2732,14 @@ INT_32 wlanProbe(PVOID pvData, PVOID pvDriverData)
 	dev_warn("func->vendor=0x%x\n", func->vendor);
 	dev_warn("func->device=0x%x\n", func->device);
 #endif
-
+#if CFG_CHIP_RESET_SUPPORT
 	/* [RST] In case wlanRemove not finished yet normally,
 	 *       but wifi probe called directly.
 	 *       The IS_WLAN_REMOVING() and kalIsResetting() will return FALSE,
 	 *       so that IOCTL won't be skipped from now on.
 	 */
 	g_wlan_removing = 0;
-
+#endif
 	do {
 		/* 4 <1> Initialize the IO port of the interface */
 		/*  GeorgeKuo: pData has different meaning for _HIF_XXX:
@@ -3219,7 +3227,9 @@ VOID wlanRemove(VOID)
 		free_netdev(prDev);
 		return;
 	}
+#if CFG_CHIP_RESET_SUPPORT
 	g_wlan_removing = 1;
+#endif
 	prAdapter = prGlueInfo->prAdapter;
 
 #ifdef CONFIG_PM_SLEEP
@@ -3398,7 +3408,9 @@ VOID wlanRemove(VOID)
 
 	/* 4 <9> Unregister notifier callback */
 	wlanUnregisterNotifier();
+#if CFG_CHIP_RESET_SUPPORT
 	g_wlan_removing = 0;
+#endif
 	DBGLOG(INIT, STATE, "Remove wlan done\n");
 }				/* end of wlanRemove() */
 
@@ -3610,7 +3622,9 @@ static int initWlan(void)
 
 	wlanDebugInit();
 #ifdef _HIF_SDIO
+#if CFG_CHIP_RESET_SUPPORT
 	atomic_set(&g_fgBlockBTTriggerReset, 1);
+#endif
 #endif
 	DBGLOG(INIT, STATE, "initWlan..\n");
 

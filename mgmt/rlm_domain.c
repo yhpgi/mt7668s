@@ -2148,10 +2148,10 @@ BOOLEAN rlmDomainGetTxPwrLimit(u32 country_code,
 	}
 
 	kalMemFree(pTxPwrLimit->rChannelTxPwrLimit, VIR_MEM_TYPE,
-		sizeof(CHANNEL_TX_PWR_LIMIT) * pTxPwrLimit->ucChNum);
+		sizeof(struct CHANNEL_TX_PWR_LIMIT) * pTxPwrLimit->ucChNum);
 
 error:
-	kalMemFree(pTxPwrLimit, VIR_MEM_TYPE, sizeof(TX_PWR_LIMIT_DATA));
+	kalMemFree(pTxPwrLimit, VIR_MEM_TYPE, sizeof(struct TX_PWR_LIMIT_DATA));
 
 	return bRet;
 }

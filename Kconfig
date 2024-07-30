@@ -1,36 +1,26 @@
-menu "wifimtk"
+# SPDX-License-Identifier: GPL-2.0
 
-config MTK_COMBO_CHIP
-	string "MTK COMBO CHIP"
-	default "MT6632"
-
-config MTK_WIFI_ONLY
-	tristate "MTK WIFI ONLY"
+config MT7668S_WIFI
+	tristate "Mediatek MT7668S WiFi support"
+	depends on MMC
+	select CFG80211_WEXT
+	select CFG80211_WEXT_EXPORT
 	default m
+	help
+	  Enable support for the Mediatek MT7668S SDIO WiFi chipset.
+	  This driver provides the necessary functionality to operate
+	  the MT7668S chipset via SDIO interface.
 
-config MTK_COMBO
-	tristate "MTK COMBO"
-	default m
+	  To compile this driver as a loadable kernel module, choose 'M'
+	  here. This will create a module named 'mt7668s.ko'.
 
-config MTK_COMBO_WIFI
-	tristate "MTK COMBO WIFI"
-	default m
-
-config MTK_COMBO_COMM
-	tristate "MTK COMBO COMM"
-	default m
-
-config MTK_COMBO_COMM_UART
-	tristate "MTK COMBO COMM UART"
-	default m
-
-config MTK_COMBO_COMM_SDIO
-	tristate "MTK COMBO COMM SDIO"
-	default m
-
-config MTK_MT_WIFI_CHRDEV
-	tristate "MTK MT WIFI CHRDEV"
-	default m
-
-
-endmenu
+config MT7668S_WIFI_PREALLOC
+	bool "MT7668S WiFi Pre-alloc memory"
+	depends on MT7668S_WIFI
+	default n
+	help
+	  Enable this option to pre-allocate memory for MT7668S WiFi
+	  operations. Pre-allocating memory can improve performance
+	  by reducing dynamic memory allocation overhead during runtime.
+	  This is useful in memory-constrained environments or for
+	  improving latency.

@@ -1,0 +1,15 @@
+#!/bin/sh
+
+# export PATH="/home/yhpgi/toolchain/bin:$PATH"
+export ARCH="arm64"
+export CROSS_COMPILE="aarch64-none-linux-gnu-"
+export INSTALL_MOD_STRIP=1
+
+export CONFIG_MT7668S_WIFI=m
+export CONFIG_MT7668S_WIFI_PREALLOC=n
+
+# replace KERNELDIR with your kernel path
+export KERNELDIR=$HOME/project/linux-4.9.337/out
+
+./clean
+make -j8 KERNELDIR=${KERNELDIR}

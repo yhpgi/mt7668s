@@ -790,8 +790,6 @@ void RSTP2pDestroyWirelessDevice(void)
 
 #endif
 
-#endif /* CFG_CHIP_RESET_SUPPORT */
-
 /*----------------------------------------------------------------------------*/
 /*!
  * @brief This routine is called for checking if connectivity chip is resetting
@@ -808,3 +806,5 @@ BOOLEAN kalIsResetting(VOID)
 {
 	return IS_WLAN_REMOVING(); //FALSE;
 }
+
+#endif /* CFG_CHIP_RESET_SUPPORT */

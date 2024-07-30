@@ -369,12 +369,13 @@ BOOLEAN halSetDriverOwn(IN P_ADAPTER_T prAdapter)
 				DBGLOG(INIT, ERROR,
 				       "LP cannot be own back, Timeout[%u](%ums), BusAccessError[%u]",
 				       fgTimeout, kalGetTimeTick() - u4CurrTick, fgIsBusAccessFailed);
+#if CFG_CHIP_RESET_SUPPORT
 				DBGLOG(INIT, ERROR,
 				       "Resetting[%u], CardRemoved[%u] NoAck[%u] Cnt[%u]\n",
 				       kalIsResetting(),
 				       kalIsCardRemoved(prAdapter->prGlueInfo), wlanIsChipNoAck(prAdapter),
 				       prAdapter->u4OwnFailedCount);
-
+#endif
 				DBGLOG(INIT, INFO,
 				       "Skip LP own back failed log for next %ums\n", LP_OWN_BACK_FAILED_LOG_SKIP_MS);
 

@@ -76,6 +76,70 @@
 *                              C O N S T A N T S
 ********************************************************************************
 */
+
+#define BUILD_DBG_MSG                            1
+#define BUILD_QA_DBG                             1
+#define CFG_CHIP_RESET_SUPPORT                   0
+#define CFG_DEFAULT_DBG_LEVEL                    0xF
+#define CFG_DRIVER_INITIAL_RUNNING_MODE          3
+#define CFG_DUMP_TXPOWR_TABLE
+#define CFG_ENABLE_1RPD_MMPS_CTRL                1
+#define CFG_ENABLE_DEWEIGHTING_CTRL              1
+#define CFG_ENABLE_EFUSE_MAC_ADDR                1
+#define CFG_ENABLE_GTK_FRAME_FILTER              0
+#define CFG_ENABLE_PS_INTV_CTRL                  1
+#define CFG_ENABLE_WAKE_LOCK                     0
+#define CFG_GARP_KEEPALIVE                       0
+#define CFG_HS20_DEBUG                           0
+#define CFG_IPI_2CHAIN_SUPPORT                   1
+#define CFG_KEY_ERROR_STATISTIC_RECOVERY         1
+#define CFG_MET_PACKET_TRACE_SUPPORT             1
+#define CFG_MET_TAG_SUPPORT                      0
+#define CFG_NUM_DIFFERENT_CHANNELS_P2P           1
+#define CFG_NUM_DIFFERENT_CHANNELS_STA           1
+#define CFG_P2P_SCAN_REPORT_ALL_BSS              0
+#define CFG_RX_DIRECT_USB                        1
+#define CFG_RX_SINGLE_CHAIN_SUPPORT              1
+#define CFG_SCAN_CHANNEL_SPECIFIED               1
+#define CFG_SUPPORT_AEE                          0
+#define CFG_SUPPORT_AGPS_ASSIST                  1
+#define CFG_SUPPORT_CHNL_CONFLICT_REVISE         0
+#define CFG_SUPPORT_CFG80211_AUTH                1
+#define CFG_SUPPORT_DBDC_TC6                     1
+#define CFG_SUPPORT_DEBUG_FS                     1
+#define CFG_SUPPORT_DFS_MASTER                   1
+#define CFG_SUPPORT_DISABLE_BCN_HINTS
+#define CFG_SUPPORT_DISABLE_SAP_DFS_RDD
+#define CFG_SUPPORT_LARGE_TX_PWR_LIMIT_TABLE     0
+#define CFG_SUPPORT_MULTICAST_ENHANCEMENT
+#define CFG_SUPPORT_OWE                          0
+#define CFG_SUPPORT_PASSPOINT                    0
+#define CFG_SUPPORT_SAE                          1
+#define CFG_SUPPORT_SAP_DFS_CHANNEL              1
+#define CFG_SUPPORT_SAME_BSS_REASSOC             1
+#define CFG_SUPPORT_SINGLE_SKU_LOCAL_DB          0
+#define CFG_SUPPORT_SUITB                        0
+#define CFG_SUPPORT_TSF_USING_BOOTTIME           1
+#define CFG_TX_DIRECT_USB                        1
+#define CFG_TX_WMM_ENHANCE                       1
+#define CFG_USB_REQ_RX_DATA_CNT                  4
+#define CFG_USB_REQ_TX_DATA_CNT                  2
+#define CFG_USB_REQ_TX_DATA_FFA_CNT              6
+#ifndef DBG
+#define DBG                                      0
+#endif
+#define _HIF_SDIO                                1
+#define LINUX
+#define MT7668
+#define STA_P2P_MCC
+#undef MT6620
+#undef MT6628
+#undef MT5931
+#undef MT6630
+#undef MT6632
+#define WLAN_INCLUDE_PROC                        1
+
+
 /* 2 Flags for OS capability */
 
 #if defined(_HIF_SDIO)

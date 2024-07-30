@@ -8797,21 +8797,21 @@ int priv_driver_show_dfs_abd123_param(IN struct net_device *prNetDev, IN char *p
 	PCHAR apcArgv[WLAN_CFG_ARGV_MAX];
 	INT_32 i4BytesWritten = 0;
 	UINT_8 ucCnt = 0;
-	struct P2P_abd123_INFO *prP2pabd123Info = NULL;
+	struct P2P_RADAR_INFO *prP2pabd123Info = NULL;
 
 	ASSERT(prNetDev);
 	if (GLUE_CHK_PR2(prNetDev, pcCommand) == FALSE)
 		return -1;
 	prGlueInfo = *((P_GLUE_INFO_T *) netdev_priv(prNetDev));
 
-	prP2pabd123Info = (struct P2P_abd123_INFO *) cnmMemAlloc(prGlueInfo->prAdapter,
+	prP2pabd123Info = (struct P2P_RADAR_INFO *) cnmMemAlloc(prGlueInfo->prAdapter,
 		RAM_TYPE_MSG, sizeof(*prP2pabd123Info));
 
 	DBGLOG(REQ, LOUD, "command is %s\n", pcCommand);
 	wlanCfgParseArgument(pcCommand, &i4Argc, apcArgv);
 	DBGLOG(REQ, LOUD, "argc is %i\n", i4Argc);
 
-	p2pFuncGetabd123Info(prP2pabd123Info);
+	p2pFuncGetRadarInfo(prP2pabd123Info);
 
 	LOGBUF(pcCommand, i4TotalLen, i4BytesWritten, "\nRDD idx: %d\n",
 			prP2pabd123Info->ucRddIdx);
@@ -8971,7 +8971,7 @@ int priv_driver_clean_dfs_abd123_param(IN struct net_device *prNetDev, IN char *
        wlanCfgParseArgument(pcCommand, &i4Argc, apcArgv);
        DBGLOG(REQ, LOUD, "argc is %i\n", i4Argc);
 
-       p2pFuncabd123InfoInit();
+       p2pFuncRadarInfoInit();
 
        LOGBUF(pcCommand, i4TotalLen, i4BytesWritten, "\nClean up abd123 param\n");
        return  i4BytesWritten;
@@ -9042,9 +9042,9 @@ int priv_driver_set_abd123_detect_mode(IN struct net_device *prNetDev, IN char *
 			return -1;
 		}
 
-		p2pFuncSetabd123DetectMode(ucabd123DetectMode);
+		p2pFuncSetRadarDetectMode(ucabd123DetectMode);
 
-		if ( MT_ATESetabd123DetectMode(prNetDev, ucabd123DetectMode) != 0)
+		if ( MT_ATESetRadarDetectMode(prNetDev, ucabd123DetectMode) != 0)
 			return -1;
 	}
 

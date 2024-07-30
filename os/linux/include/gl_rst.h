@@ -139,9 +139,9 @@ extern int sdio_reset_comm(struct mmc_card *card);
 *                              F U N C T I O N S
 ********************************************************************************
 */
+#if CFG_CHIP_RESET_SUPPORT
 BOOLEAN kalIsResetting(VOID);
 
-#if CFG_CHIP_RESET_SUPPORT
 BOOLEAN checkResetState(void);
 VOID glResetTrigger(P_ADAPTER_T prAdapter, const UINT_8 *pucFile, UINT_32 u4Line);
 VOID glGetRstReason(enum _ENUM_CHIP_RESET_REASON_TYPE_T eReason);

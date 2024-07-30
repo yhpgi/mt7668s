@@ -1064,8 +1064,13 @@ int mtk_cfg80211_auth(struct wiphy *wiphy, struct net_device *ndev,
 	prGlueInfo = (P_GLUE_INFO_T) wiphy_priv(wiphy);
 	ASSERT(prGlueInfo);
 
+#if KERNEL_VERSION(4, 9, 113) >= CFG80211_VERSION_CODE
 	if (req->sae_data_len != 0)
 		DBGLOG(REQ, INFO, "[wlan] mtk_cfg80211_auth %p %zu\n", req->sae_data, req->sae_data_len);
+#else
+	if (req->auth_data_len != 0)
+		DBGLOG(REQ, INFO, "[wlan] mtk_cfg80211_auth %p %zu\n", req->auth_data, req->auth_data_len);
+#endif
 	DBGLOG(REQ, STATE, "auth to  BSS [" MACSTR "]\n", MAC2STR((PUINT_8)req->bss->bssid));
 	DBGLOG(REQ, STATE, "auth_type:%d\n", req->auth_type);
 
@@ -1088,7 +1093,7 @@ int mtk_cfg80211_auth(struct wiphy *wiphy, struct net_device *ndev,
 
 	/*<2> Set  Auth data */
 	prConnSettings->ucAuthDataLen = 0;
-#if KERNEL_VERSION(4, 10, 0) > CFG80211_VERSION_CODE
+#if KERNEL_VERSION(4, 9, 113) >= CFG80211_VERSION_CODE
 	if (req->sae_data_len != 0) {
 		if (req->sae_data_len > AUTH_DATA_MAX_LEN) {
 			DBGLOG(INIT, WARN, "request auth with unexpected length:%d\n", req->sae_data_len);
