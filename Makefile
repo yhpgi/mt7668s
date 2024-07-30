@@ -8,6 +8,8 @@ ccflags-y += -I$(src)/os \
              -I$(src)/include/chips \
              -I$(src)/os/linux/hif/sdio/include
 
+ldflags-y += --strip-debug
+
 mt7668s-objs := \
     common/dump.o \
     common/wlan_bow.o \
