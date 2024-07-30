@@ -3011,10 +3011,7 @@ P_SW_RFB_T qmHandleRxPackets(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfbList
 		if (prCurrSwRfb->fgDataFrame && prCurrSwRfb->prStaRec &&
 			qmAmsduAttackDetection(prAdapter, prCurrSwRfb)) {
 			prCurrSwRfb->eDst = RX_PKT_DESTINATION_NULL;
-			QUEUE_INSERT_TAIL(prReturnedQue,
-				(P_QUE_ENTRY_T) prCurrSwRfb);
-			DBGLOG(QM, INFO, "Drop by AMSDU attack packet\n");
-			continue;
+			DBGLOG(QM, INFO, "drop AMSDU attack packet SN:%d\n", prCurrSwRfb->u2SSN);
 		}
 #endif /* CFG_SUPPORT_AMSDU_ATTACK_DETECTION */
 
@@ -3358,6 +3355,9 @@ UINT_8 qmAmsduAttackDetection(IN P_ADAPTER_T prAdapter,
 		pucDaAddr = pucPaylod;
 		pucSaAddr = pucPaylod + MAC_ADDR_LEN;
 	}
+
+	/* record SSN */
+	prSwRfb->u2SSN = u2SSN;
 
 	/* 802.11 header RA */
 	ucBssIndex = prSwRfb->prStaRec->ucBssIndex;
