@@ -2565,7 +2565,7 @@ VOID bowDisconnectLink(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo, IN
 		if (kalIsConfigurationExist(prAdapter->prGlueInfo) == TRUE)
 			wlanLoadManufactureData(prAdapter, kalGetConfiguration(prAdapter->prGlueInfo));
 		else
-			DBGLOG(REQ, WARN, "%s: load manufacture data fail\n", __func__);
+			DBGLOG(REQ, INFO, "%s: load manufacture data fail\n", __func__);
 
 #endif
 		/*Uninit BoW Interface */

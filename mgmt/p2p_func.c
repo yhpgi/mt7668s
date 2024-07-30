@@ -1235,7 +1235,7 @@ VOID p2pFuncDfsSwitchCh(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prBssInfo, IN 
 	p2pFuncModifyChandef(prAdapter, prGlueP2pInfo, prBssInfo);
 	WARN_ON(!cfg80211_chandef_valid(prGlueP2pInfo->chandef));
 
-	DBGLOG(P2P, STATE,
+	DBGLOG(P2P, INFO,
 		"role(%d) b=%d f=%d w=%d s1=%d s2=%d\n",
 		prP2pRoleFsmInfo->ucRoleIndex,
 		prGlueP2pInfo->chandef->chan->band,

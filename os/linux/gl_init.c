@@ -1332,6 +1332,9 @@ VOID wlanDebugInit(VOID)
 #ifdef CFG_DEFAULT_DBG_LEVEL
 	for (i = 0; i < DBG_MODULE_NUM; i++)
 		aucDebugModule[i] = CFG_DEFAULT_DBG_LEVEL;
+
+	aucDebugModule[DBG_QM_IDX] &= ~(DBG_CLASS_EVENT | DBG_CLASS_INFO | DBG_CLASS_WARN);
+	aucDebugModule[DBG_RSN_IDX] &= ~(DBG_CLASS_EVENT | DBG_CLASS_INFO | DBG_CLASS_WARN);
 #else
 
 	for (i = 0; i < DBG_MODULE_NUM; i++) {
@@ -1928,7 +1931,7 @@ static void wlanCreateWirelessDevice(void)
 #ifdef STA_P2P_MCC
     prWiphy->iface_combinations =  iface_comb_mcc;
     prWiphy->n_iface_combinations = ARRAY_SIZE(iface_comb_mcc);
-    DBGLOG(INIT, ERROR, "The num_different_channels is %d\n",iface_comb_mcc[0].num_different_channels);
+    DBGLOG(INIT, INFO, "The num_different_channels is %d\n",iface_comb_mcc[0].num_different_channels);
 #endif
 	if (wiphy_register(prWiphy) < 0) {
 		DBGLOG(INIT, ERROR, "wiphy_register error\n");

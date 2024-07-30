@@ -3020,7 +3020,7 @@ VOID rlmFillSyncCmdParam(P_CMD_SET_BSS_RLM_PARAM_T prCmdBody, P_BSS_INFO_T prBss
 	prCmdBody->ucNss = prBssInfo->ucNss;
 
 	if (RLM_NET_PARAM_VALID(prBssInfo)) {
-		DBGLOG(RLM, WARN, "N=%d b=%d c=%d s=%d e=%d h=%d I=0x%02x l=%d p=%d w=%d s1=%d s2=%d n=%d\n",
+		DBGLOG(RLM, INFO, "N=%d b=%d c=%d s=%d e=%d h=%d I=0x%02x l=%d p=%d w=%d s1=%d s2=%d n=%d\n",
 		       prCmdBody->ucBssIndex, prCmdBody->ucRfBand,
 		       prCmdBody->ucPrimaryChannel, prCmdBody->ucRfSco,
 		       prCmdBody->ucErpProtectMode, prCmdBody->ucHtProtectMode,

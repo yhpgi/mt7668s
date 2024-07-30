@@ -4715,12 +4715,12 @@ DOMAIN_SEND_CMD:
 	 */
 	prGlueInfo = rlmDomainGetGlueInfo();
 	if (!prGlueInfo) {
-		DBGLOG(RLM, ERROR, "prGlueInfo is NULL!\n");
+		DBGLOG(RLM, INFO, "prGlueInfo is NULL!\n");
 		return; /*interface is not up yet.*/
 	}
 	prAdapter = prGlueInfo->prAdapter;
 	if (!prAdapter) {
-		DBGLOG(RLM, ERROR, "prGlueInfo is NULL!\n");
+		DBGLOG(RLM, INFO, "prGlueInfo is NULL!\n");
 		return; /*interface is not up yet.*/
 	}
 	/*

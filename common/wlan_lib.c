@@ -651,7 +651,7 @@ WLAN_STATUS wlanAdapterStart(IN P_ADAPTER_T prAdapter, IN P_REG_INFO_T prRegInfo
 		if (kalIsConfigurationExist(prAdapter->prGlueInfo) == TRUE)
 			wlanLoadManufactureData(prAdapter, prRegInfo);
 		else
-			DBGLOG(INIT, WARN, "%s: load manufacture data fail\n", __func__);
+			DBGLOG(INIT, INFO, "%s: load manufacture data fail\n", __func__);
 #endif
 
 #if 0
@@ -1020,7 +1020,7 @@ WLAN_STATUS wlanProcessCommandQueue(IN P_ADAPTER_T prAdapter, IN P_QUE_T prCmdQu
 
 			if (rStatus == WLAN_STATUS_RESOURCES) {
 				/* no more TC4 resource for further transmission */
-				DBGLOG(INIT, WARN, "NO Res CMD TYPE[%u] ID[0x%02X] SEQ[%u]\n",
+				DBGLOG(INIT, INFO, "NO Res CMD TYPE[%u] ID[0x%02X] SEQ[%u]\n",
 				       prCmdInfo->eCmdType, prCmdInfo->ucCID, prCmdInfo->ucCmdSeqNum);
 
 				set_bit(GLUE_FLAG_HIF_PRT_HIF_DBG_INFO_BIT, &(prAdapter->prGlueInfo->ulFlag));
@@ -7763,7 +7763,7 @@ WLAN_STATUS wlanCfgSet(IN P_ADAPTER_T prAdapter, const PCHAR pucKey, PCHAR pucVa
 			kalMemZero(prWlanCfgEntry, sizeof(WLAN_CFG_ENTRY_T));
 		} else {
 			prWlanCfgEntry = NULL;
-			DBGLOG(INIT, ERROR, "wifi config there is no empty entry\n");
+			DBGLOG(INIT, INFO, "wifi config there is no empty entry\n");
 		}
 	} /* !prWlanCfgEntry */
 	else
@@ -7799,10 +7799,10 @@ WLAN_STATUS wlanCfgSet(IN P_ADAPTER_T prAdapter, const PCHAR pucKey, PCHAR pucVa
 		return WLAN_STATUS_SUCCESS;
 	}
 		if (pucKey)
-			DBGLOG(INIT, ERROR, "Set wifi config error key \'%s\'\n", pucKey);
+			DBGLOG(INIT, INFO, "Set wifi config error key \'%s\'\n", pucKey);
 
 		if (pucValue)
-			DBGLOG(INIT, ERROR, "Set wifi config error value \'%s\'\n", pucValue);
+			DBGLOG(INIT, INFO, "Set wifi config error value \'%s\'\n", pucValue);
 
 		return WLAN_STATUS_FAILURE;
 

@@ -1950,7 +1950,7 @@ VOID halPrintMailbox(IN P_ADAPTER_T prAdapter)
 
 	halGetMailbox(prAdapter, 0, &u4MailBoxStatus0);
 	halGetMailbox(prAdapter, 1, &u4MailBoxStatus1);
-	DBGLOG(INIT, ERROR, "MailBox Status = 0x%08X, 0x%08X\n", u4MailBoxStatus0, u4MailBoxStatus1);
+	DBGLOG(INIT, INFO, "MailBox Status = 0x%08X, 0x%08X\n", u4MailBoxStatus0, u4MailBoxStatus1);
 }
 
 VOID halProcessSoftwareInterrupt(IN P_ADAPTER_T prAdapter)
@@ -2278,7 +2278,7 @@ VOID halPollDbgCr(IN P_ADAPTER_T prAdapter, IN UINT_32 u4LoopCount)
 
 	for (u4Loop = 0; u4Loop < u4LoopCount; u4Loop++) {
 		HAL_MCR_RD(prAdapter, MCR_SWPCDBGR, &u4Data);
-		DBGLOG(INIT, WARN, "SWPCDBGR 0x%08X\n", u4Data);
+		DBGLOG(INIT, INFO, "SWPCDBGR 0x%08X\n", u4Data);
 	}
 }
 

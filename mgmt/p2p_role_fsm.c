@@ -2651,7 +2651,7 @@ VOID p2pRoleFsmRunEventBeaconUpdate(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prM
 			prP2pBssInfo,
 			prBcnUpdateMsg->pucAssocRespIE,
 			prBcnUpdateMsg->u4AssocRespLen) == WLAN_STATUS_FAILURE)
-			DBGLOG(P2P, ERROR, "Update extra IEs for asso resp fail!\n");
+			DBGLOG(P2P, INFO, "Update extra IEs for asso resp fail!\n");
 
 	}
 
