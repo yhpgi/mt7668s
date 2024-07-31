@@ -113,7 +113,18 @@
 VOID scanP2pProcessBeaconAndProbeResp(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb, IN P_WLAN_STATUS prStatus,
 		IN P_BSS_DESC_T prBssDesc, IN P_WLAN_BEACON_FRAME_T prWlanBeaconFrame)
 {
-	BOOLEAN fgIsSkipThisBeacon = FALSE;
+	BOOLEAN fgIsSkipThisBeacon	 = FALSE;
+	BOOLEAN fgIsP2pNetRegistered = FALSE;
+
+	/* Sanity check for p2p net device state */
+	GLUE_SPIN_LOCK_DECLARATION();
+	GLUE_ACQUIRE_SPIN_LOCK(prAdapter->prGlueInfo, SPIN_LOCK_NET_DEV);
+	if (prAdapter->fgIsP2PRegistered && prAdapter->rP2PNetRegState == ENUM_NET_REG_STATE_REGISTERED)
+		fgIsP2pNetRegistered = TRUE;
+	GLUE_RELEASE_SPIN_LOCK(prAdapter->prGlueInfo, SPIN_LOCK_NET_DEV);
+
+	if (!fgIsP2pNetRegistered)
+		return;
 
 	/* Indicate network to kernel for P2P interface when:
 	 *     1. This is P2P network
