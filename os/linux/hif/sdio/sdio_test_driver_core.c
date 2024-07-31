@@ -1,18 +1,14 @@
+// SPDX-License-Identifier: GPL-2.0
+/*
+ * Copyright (C) 2003-2004 Russell King, All Rights Reserved.
+ * SD support Copyright (C) 2004 Ian Molton, All Rights Reserved.
+ * Copyright (C) 2005-2008 Pierre Ossman, All Rights Reserved.
+ * MMCv4 support Copyright (C) 2006 Philip Langdale, All Rights Reserved.
+ */
+
 #include "gl_os.h"
 
 #if (CFG_SDIO_1BIT_DATA_MODE == 1)
-/*
- *  linux/drivers/mmc/core/core.c
- *
- *  Copyright (C) 2003-2004 Russell King, All Rights Reserved.
- *  SD support Copyright (C) 2004 Ian Molton, All Rights Reserved.
- *  Copyright (C) 2005-2008 Pierre Ossman, All Rights Reserved.
- *  MMCv4 support Copyright (C) 2006 Philip Langdale, All Rights Reserved.
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation.
- */
 #include <linux/module.h>
 #include <linux/init.h>
 #include <linux/interrupt.h>
