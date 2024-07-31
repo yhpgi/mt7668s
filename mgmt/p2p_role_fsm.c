@@ -53,7 +53,7 @@
 #include "p2p_role_state.h"
 #include "gl_p2p_os.h"
 
-#if 1
+#if !DBG_DISABLE_ALL_LOG
 /*lint -save -e64 Type mismatch */
 static PUINT_8 apucDebugP2pRoleState[P2P_ROLE_STATE_NUM] = {
 	(PUINT_8)DISP_STRING("P2P_ROLE_STATE_IDLE"), (PUINT_8)DISP_STRING("P2P_ROLE_STATE_SCAN"),

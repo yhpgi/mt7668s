@@ -93,10 +93,12 @@ UINT_8 g_aucScanChannelMDRDY[SCN_SCAN_DONE_PRINT_BUFFER_LENGTH];
  *                           P R I V A T E   D A T A
  ********************************************************************************
  */
+#if !DBG_DISABLE_ALL_LOG
 static PUINT_8 apucDebugScanState[SCAN_STATE_NUM] = {
 	(PUINT_8)DISP_STRING("IDLE"),
 	(PUINT_8)DISP_STRING("SCANNING"),
 };
+#endif
 
 /*******************************************************************************
  *                                 M A C R O S

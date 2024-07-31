@@ -255,9 +255,11 @@ typedef enum _ENUM_DBG_ASSERT_PATH_T {
  *#endif
  */
 #if DBG_DISABLE_ALL_LOG
-#define DBGLOG(_Module, _Class, _Fmt)
-#define DBGLOG_MEM8(_Module, _Class, _StartAddr, _Length)
-#define DBGLOG_MEM32(_Module, _Class, _StartAddr, _Length)
+#define DBGLOG(_Module, _Class, _Fmt, ...)
+#define DBGLOG_RATELIMIT(_Module, _Class, _Fmt, ...)
+#define TOOL_PRINTLOG(_Module, _Class, _Fmt, ...)
+#define DBGLOG_MEM8(_Module, _Class, _StartAddr, _Length, ...)
+#define DBGLOG_MEM32(_Module, _Class, _StartAddr, _Length, ...)
 #else
 #define DBGLOG(_Module, _Class, _Fmt, ...) \
 	do { \

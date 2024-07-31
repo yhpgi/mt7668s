@@ -137,9 +137,11 @@ int mtk_cfg80211_change_iface(
 #endif
 {
 	P_GLUE_INFO_T		 prGlueInfo = NULL;
-	WLAN_STATUS			 rStatus	= WLAN_STATUS_SUCCESS;
 	ENUM_PARAM_OP_MODE_T eOpMode;
+#if !DBG_DISABLE_ALL_LOG
+	WLAN_STATUS			 rStatus	= WLAN_STATUS_SUCCESS;
 	UINT_32				 u4BufLen;
+#endif
 
 	prGlueInfo = (P_GLUE_INFO_T)wiphy_priv(wiphy);
 	ASSERT(prGlueInfo);
@@ -151,11 +153,13 @@ int mtk_cfg80211_change_iface(
 	else
 		return -EINVAL;
 
+#if !DBG_DISABLE_ALL_LOG
 	rStatus = kalIoctl(
 			prGlueInfo, wlanoidSetInfrastructureMode, &eOpMode, sizeof(eOpMode), FALSE, FALSE, TRUE, &u4BufLen);
 
 	if (rStatus != WLAN_STATUS_SUCCESS)
 		DBGLOG(REQ, WARN, "set infrastructure mode error:%lx\n", rStatus);
+#endif
 
 	/* reset wpa info */
 	prGlueInfo->rWpaInfo.u4WpaVersion	  = IW_AUTH_WPA_VERSION_DISABLED;
@@ -3656,7 +3660,9 @@ int mtk_cfg80211_testmode_get_scan_done(IN struct wiphy *wiphy, IN void *data, I
 #define NL80211_TESTMODE_P2P_SCANDONE_STATUS 1
 
 #ifdef CONFIG_NL80211_TESTMODE
+#if !DBG_DISABLE_ALL_LOG
 	WLAN_STATUS rStatus	 = WLAN_STATUS_SUCCESS;
+#endif
 	INT_32		i4Status = -EINVAL, READY_TO_BEAM = 0;
 
 	struct sk_buff *skb = NULL;

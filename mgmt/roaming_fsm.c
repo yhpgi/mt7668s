@@ -90,9 +90,10 @@
  *                           P R I V A T E   D A T A
  ********************************************************************************
  */
+#if !DBG_DISABLE_ALL_LOG
 static PUINT_8 apucDebugRoamingState[ROAMING_STATE_NUM] = { (PUINT_8)DISP_STRING("IDLE"),
 	(PUINT_8)DISP_STRING("DECISION"), (PUINT_8)DISP_STRING("DISCOVERY"), (PUINT_8)DISP_STRING("ROAM") };
-
+#endif
 #if 0
 static PUINT_8 apucDebugRoamingReason[ROAMING_REASON_NUM] = {
 	(PUINT_8) DISP_STRING("ROAMING_REASON_POOR_RCPI"),

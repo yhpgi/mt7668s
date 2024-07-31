@@ -89,13 +89,14 @@
  *                           P R I V A T E   D A T A
  ********************************************************************************
  */
+#if !DBG_DISABLE_ALL_LOG
 static PUINT_8 apucDebugAAState[AA_STATE_NUM] = { (PUINT_8)DISP_STRING("AA_IDLE"),
 	(PUINT_8)DISP_STRING("SAA_SEND_AUTH1"), (PUINT_8)DISP_STRING("SAA_WAIT_AUTH2"),
 	(PUINT_8)DISP_STRING("SAA_SEND_AUTH3"), (PUINT_8)DISP_STRING("SAA_WAIT_AUTH4"),
 	(PUINT_8)DISP_STRING("SAA_SEND_ASSOC1"), (PUINT_8)DISP_STRING("SAA_WAIT_ASSOC2"),
 	(PUINT_8)DISP_STRING("AAA_SEND_AUTH2"), (PUINT_8)DISP_STRING("AAA_SEND_AUTH4"),
 	(PUINT_8)DISP_STRING("AAA_SEND_ASSOC2"), (PUINT_8)DISP_STRING("AA_RESOURCE") };
-
+#endif
 /*******************************************************************************
  *                                 M A C R O S
  ********************************************************************************

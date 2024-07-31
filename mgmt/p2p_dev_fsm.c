@@ -53,14 +53,14 @@
 #include "p2p_dev_state.h"
 #if CFG_ENABLE_WIFI_DIRECT
 
-#if 1
+#if !DBG_DISABLE_ALL_LOG
 /*lint -save -e64 Type mismatch */
 static PUINT_8 apucDebugP2pDevState[P2P_DEV_STATE_NUM] = { (PUINT_8)DISP_STRING("P2P_DEV_STATE_IDLE"),
 	(PUINT_8)DISP_STRING("P2P_DEV_STATE_SCAN"), (PUINT_8)DISP_STRING("P2P_DEV_STATE_REQING_CHANNEL"),
 	(PUINT_8)DISP_STRING("P2P_DEV_STATE_CHNL_ON_HAND"), (PUINT_8)DISP_STRING("P2P_DEV_STATE_NUM") };
 
 /*lint -restore */
-#endif /* DBG */
+#endif
 
 UINT_8 p2pDevFsmInit(IN P_ADAPTER_T prAdapter)
 {

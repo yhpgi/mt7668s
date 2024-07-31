@@ -7507,6 +7507,7 @@ wlanoidSet802dot11PowerSaveProfile(
 	P_PARAM_POWER_MODE_T prPowerMode;
 	P_BSS_INFO_T		 prBssInfo;
 
+#if !DBG_DISABLE_ALL_LOG
 	const PUINT_8 apucPsMode[Param_PowerModeMax] = {
 		(PUINT_8) "CAM",
 		(PUINT_8) "MAX PS",
@@ -7515,6 +7516,7 @@ wlanoidSet802dot11PowerSaveProfile(
 		(PUINT_8) "PERIODICAL PS",
 #endif
 	};
+#endif
 
 	DEBUGFUNC("wlanoidSet802dot11PowerSaveProfile");
 

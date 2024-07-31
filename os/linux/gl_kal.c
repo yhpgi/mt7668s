@@ -142,7 +142,6 @@ const struct firmware *fw_entry;
 
 /* Default */
 static PUINT_8 apucFwName[] = { (PUINT_8)CFG_FW_FILENAME "_MT",
-
 	NULL };
 
 static PUINT_8 apucCr4FwName[] = { (PUINT_8)CFG_CR4_FW_FILENAME "_" HIF_NAME "_MT", (PUINT_8)CFG_CR4_FW_FILENAME "_MT",
@@ -150,7 +149,9 @@ static PUINT_8 apucCr4FwName[] = { (PUINT_8)CFG_CR4_FW_FILENAME "_" HIF_NAME "_M
 
 static PUINT_8 apucPatchName[] = { (PUINT_8) "mt6632_patch_e1_hdr.bin", (PUINT_8) "mt7666_patch_e1_hdr.bin", NULL };
 
+#if !DBG_DISABLE_ALL_LOG
 static PPUINT_8 appucFwNameTable[] = { apucFwName };
+#endif
 #if CFG_ASSERT_DUMP
 /* Core dump debug usage */
 #if MTK_WCN_HIF_SDIO
@@ -177,8 +178,10 @@ WLAN_STATUS kalFirmwareOpen(IN P_GLUE_INFO_T prGlueInfo, IN PPUINT_8 apucNameTab
 {
 	UINT_8 ucNameIdx;
 	/* PPUINT_8 apucNameTable; */
+#if !DBG_DISABLE_ALL_LOG
 	UINT_8	ucMaxEcoVer = (sizeof(appucFwNameTable) / sizeof(PPUINT_8));
 	UINT_8	ucCurEcoVer = wlanGetEcoVersion(prGlueInfo->prAdapter);
+#endif
 	BOOLEAN fgResult	= FALSE;
 	int		ret;
 
@@ -4409,7 +4412,6 @@ VOID kalIndicateBssInfo(IN P_GLUE_INFO_T prGlueInfo, IN PUINT_8 pucBeaconProbeRe
 				i4SignalStrength * 100, GFP_KERNEL);
 
 		if (!bss) {
-			/* ToDo:: DBGLOG */
 			DBGLOG(REQ, WARN, "cfg80211_inform_bss_frame() returned with NULL\n");
 		} else
 			cfg80211_put_bss(wiphy, bss);

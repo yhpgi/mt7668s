@@ -1647,7 +1647,9 @@ BOOL rlmDomainTxPwrLimitLoad(P_ADAPTER_T prAdapter, PUINT_8 pucBuf, UINT_32 u4Bu
 
 VOID rlmDomainTxPwrLimitSetChValues(P_CMD_CHANNEL_POWER_LIMIT_V2 pCmd, struct CHANNEL_TX_PWR_LIMIT *pChTxPwrLimit)
 {
+#if !DBG_DISABLE_ALL_LOG
 	UINT_8 section = 0, e = 0;
+#endif
 
 	pCmd->tx_pwr_dsss_cck  = pChTxPwrLimit->rTxPwrLimitValue[0][0];
 	pCmd->tx_pwr_dsss_bpsk = pChTxPwrLimit->rTxPwrLimitValue[0][1];
@@ -1688,11 +1690,13 @@ VOID rlmDomainTxPwrLimitSetChValues(P_CMD_CHANNEL_POWER_LIMIT_V2 pCmd, struct CH
 	pCmd->tx_pwr_lg_40	   = pChTxPwrLimit->rTxPwrLimitValue[4][0];
 	pCmd->tx_pwr_lg_80	   = pChTxPwrLimit->rTxPwrLimitValue[4][1];
 
+#if !DBG_DISABLE_ALL_LOG
 	DBGLOG(RLM, TRACE, "ch %d\n", pCmd->ucCentralCh);
 	for (section = 0; section < TX_PWR_LIMIT_SECTION_NUM; section++)
 		for (e = 0; e < gTx_Pwr_Limit_Element_Num[section]; e++)
 			DBGLOG(RLM, TRACE, "TxPwrLimit[%s][%s]= %d\n", gTx_Pwr_Limit_Section[section],
 					gTx_Pwr_Limit_Element[section][e], pChTxPwrLimit->rTxPwrLimitValue[section][e]);
+#endif
 }
 
 VOID rlmDomainTxPwrLimitSetValues(
@@ -2610,7 +2614,9 @@ void rlmDomainSetTempCountryCode(char *alpha2, u8 size_of_alpha2)
 enum regd_state rlmDomainStateTransition(enum regd_state request_state, struct regulatory_request *pRequest)
 {
 	enum regd_state next_state, old_state;
+#if !DBG_DISABLE_ALL_LOG
 	bool			the_same = 0;
+#endif
 
 	old_state  = g_mtk_regd_control.state;
 	next_state = REGD_STATE_INVALID;

@@ -95,13 +95,14 @@
  *                           P R I V A T E   D A T A
  ********************************************************************************
  */
+#if !DBG_DISABLE_ALL_LOG
 static PUINT_8 apucDebugAisState[AIS_STATE_NUM] = { (PUINT_8)DISP_STRING("IDLE"), (PUINT_8)DISP_STRING("SEARCH"),
 	(PUINT_8)DISP_STRING("SCAN"), (PUINT_8)DISP_STRING("ONLINE_SCAN"), (PUINT_8)DISP_STRING("LOOKING_FOR"),
 	(PUINT_8)DISP_STRING("WAIT_FOR_NEXT_SCAN"), (PUINT_8)DISP_STRING("REQ_CHANNEL_JOIN"), (PUINT_8)DISP_STRING("JOIN"),
 	(PUINT_8)DISP_STRING("JOIN_FAILURE"), (PUINT_8)DISP_STRING("IBSS_ALONE"), (PUINT_8)DISP_STRING("IBSS_MERGE"),
 	(PUINT_8)DISP_STRING("NORMAL_TR"), (PUINT_8)DISP_STRING("DISCONNECTING"),
 	(PUINT_8)DISP_STRING("REQ_REMAIN_ON_CHANNEL"), (PUINT_8)DISP_STRING("REMAIN_ON_CHANNEL") };
-
+#endif
 /*******************************************************************************
  *                                 M A C R O S
  ********************************************************************************
