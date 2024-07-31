@@ -17,7 +17,6 @@ This repository is an initiative to port the Android MT7668S driver into Linux.
 - [ ] Luci not showing connected devices
 - [ ] NULL MAC address in `/etc/config/wireless`
 - [ ] Need to specify interface `ap0` when creating Access Point
-- [ ] Need to restart wireless after configuration changes if interface are specified
 
 ### Armbian
 
@@ -25,7 +24,7 @@ This repository is an initiative to port the Android MT7668S driver into Linux.
 
 ### Other Linux Distros
 
-- [ ] Untested
+- [ ] Untested -->
 
 ## Installation
 
@@ -76,14 +75,17 @@ To install the MT7668S driver on your Linux system (as an external module), foll
 
 ## Compiling the Driver In-tree with Your Kernel
 
-1. **Clone the repository:**
+1. **Move working directory to `linux-x.y/drivers`**
+   ```sh
+   cd linux-x.y/drivers
+   ```
+
+2. **Clone the repository:**
    ```sh
    git clone https://github.com/yhpgi/mt7668s.git
    ```
 
-2. **Copy the cloned folder to `yourCompileKernelFolder/drivers`**
-
-3. **Edit `Makefile` and `Kconfig` in `yourCompileKernelFolder/drivers`:**
+3. **Edit `Makefile` and `Kconfig` in `linux-x.y/drivers`:**
 
    **Makefile:**
    ```makefile
@@ -97,7 +99,7 @@ To install the MT7668S driver on your Linux system (as an external module), foll
 
 4. **Run menuconfig:**
    ```sh
-   cd yourCompileKernelFolder
+   cd linux-x.y
 
    make menuconfig
    # or
@@ -106,7 +108,7 @@ To install the MT7668S driver on your Linux system (as an external module), foll
 
    Enable this driver in the `Device Driver` section.
 
-> [!TIP]
+> [!NOTE]
 > You must check the `MT7668S WiFi Meson G12A workaround` if your target device is Amlogic g12a. DO NOT CHECK FOR OTHER TARGETS as it will degrade WiFi performance.
 
 5. **Compile the kernel as usual.**
@@ -118,9 +120,6 @@ After installing and loading the driver, you can configure the WiFi settings usi
 ## Troubleshooting
 
 If you encounter any issues, please check the following:
-
-> [!NOTE]
-> Debugging log message are disabled by default. to enable, simply change `DBG_DISABLE_ALL_LOG` values from `1` to `0` in `include/debug.h` then please follow below steps after recompiling the driver with debugging enabled.
 
 - Ensure that your kernel version is compatible with the driver.
 - Check the system logs for any error messages related to the driver.
@@ -137,7 +136,7 @@ Special thanks to:
 - Amazon Inc.
 - [DBAI](https://github.com/armarchindo)
 - Everyone who is contributing to porting this driver to Linux
-- Everyone who is also trying to port this driver to Linux -->
+- Everyone who is also trying to port this driver to Linux
 
 ## License
 
