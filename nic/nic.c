@@ -3560,3 +3560,72 @@ BOOLEAN nicSerIsRxStop(IN P_ADAPTER_T prAdapter)
 		return FALSE;
 	}
 }
+
+VOID nicDumpMsduInfo(IN P_MSDU_INFO_T prMsduInfo)
+{
+	struct sk_buff *prSkb;
+
+	if (!prMsduInfo) {
+		DBGLOG(NIC, ERROR, "Invalid MsduInfo, skip dump.");
+		return;
+	}
+
+	/* [1]prPacket(txd)            [2]eSrc
+	 * [3]ucUserPriority           [4]ucTC
+	 * [5]ucPacketType             [6]ucStaRecIndex
+	 * [7]ucBssIndex               [8]ucWlanIndex
+	 * [9]ucPacketFormat           [10]fgIs802_1x
+	 * [11]fgIs802_1x_NonProtected [12]fgIs802_11
+	 * [13]fgIs802_3               [14]fgIsVlanExists
+	 * [15]u4Option                [16]cPowerOffset
+	 * [17]u2SwSN                  [18]ucRetryLimit
+	 * [19]u4RemainingLifetime     [20]ucControlFlag
+	 * [21]ucRateMode              [22]u4FixedRateOption
+	 * [23]fgIsTXDTemplateValid    [24]ucMacHeaderLength
+	 * [25]ucLlcLength             [26]u2FrameLength
+	 * [27]aucEthDestAddr          [28]u4PageCount
+	 * [29]ucTxSeqNum              [30]ucPID
+	 * [31]ucWmmQueSet             [32]pfTxDoneHandler
+	 * [33]u4TxDoneTag             [34]ucPktType
+	 */
+
+#define TEMP_LINE1 \
+	"[1][%p], [2][%u], [3][%u], [4][%u], [5][%u], " \
+	"[6][%u], [7][%u], [8][%u], [9][%u], [10][%u]\n"
+
+#define TEMP_LINE2 \
+	"[11][%u], [12][%u], [13][%u], [14][%u], [15][%u], " \
+	"[16][%d], [17][%u], [18][%u], [19][%u], [20][%u]\n"
+
+#define TEMP_LINE3 \
+	"[21][%u], [22][%u], [23][%u], [24][%u], [25][%u], " \
+	"[26][%u], [27][" MACSTR "], [28][%u], [29][%u], [30][%u]\n"
+
+#define TEMP_LINE4 "[31][%u], [32][%p], [33][%u], [34][%u]\n"
+
+	DBGLOG(NIC, INFO, TEMP_LINE1, prMsduInfo->prPacket, prMsduInfo->eSrc, prMsduInfo->ucUserPriority, prMsduInfo->ucTC,
+			prMsduInfo->ucPacketType, prMsduInfo->ucStaRecIndex, prMsduInfo->ucBssIndex, prMsduInfo->ucWlanIndex,
+			prMsduInfo->ucPacketFormat, prMsduInfo->fgIs802_1x);
+
+	DBGLOG(NIC, INFO, TEMP_LINE2, prMsduInfo->fgIs802_1x_NonProtected, prMsduInfo->fgIs802_11, prMsduInfo->fgIs802_3,
+			prMsduInfo->fgIsVlanExists, prMsduInfo->u4Option, prMsduInfo->cPowerOffset, prMsduInfo->u2SwSN,
+			prMsduInfo->ucRetryLimit, prMsduInfo->u4RemainingLifetime, prMsduInfo->ucControlFlag);
+
+	DBGLOG(NIC, INFO, TEMP_LINE3, prMsduInfo->ucRateMode, prMsduInfo->u4FixedRateOption,
+			prMsduInfo->fgIsTXDTemplateValid, prMsduInfo->ucMacHeaderLength, prMsduInfo->ucLlcLength,
+			prMsduInfo->u2FrameLength, prMsduInfo->aucEthDestAddr, prMsduInfo->u4PageCount, prMsduInfo->ucTxSeqNum,
+			prMsduInfo->ucPID);
+
+	DBGLOG(NIC, INFO, TEMP_LINE4, prMsduInfo->ucWmmQueSet, prMsduInfo->pfTxDoneHandler, prMsduInfo->u4TxDoneTag,
+			prMsduInfo->ucPacketType);
+#undef TEMP_LINE1
+#undef TEMP_LINE2
+#undef TEMP_LINE3
+#undef TEMP_LINE4
+
+	/* dump txd */
+	if (prMsduInfo->ucPacketType == TX_PACKET_TYPE_DATA && prMsduInfo->prPacket) {
+		prSkb = prMsduInfo->prPacket;
+		DBGLOG_MEM8(NIC, INFO, prSkb->data, 64);
+	}
+}

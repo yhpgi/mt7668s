@@ -533,6 +533,8 @@ typedef enum _ENUM_TX_STATISTIC_COUNTER_T {
 	TX_INACTIVE_STA_DROP,
 	TX_FORWARD_OVERFLOW_DROP,
 	TX_AP_BORADCAST_DROP,
+	TX_INVALID_MSDUINFO_COUNT,
+	TX_DROP_PID_COUNT,
 	TX_STATISTIC_COUNTER_NUM
 } ENUM_TX_STATISTIC_COUNTER_T;
 
@@ -736,11 +738,12 @@ struct _MSDU_INFO_T {
 	UINT_8				 ucUserPriority; /* QoS parameter, convert to TID */
 
 	/* For composing TX descriptor header */
-	UINT_8 ucTC;		  /* Traffic Class: 0~4 (HIF TX0), 5 (HIF TX1) */
-	UINT_8 ucPacketType;  /* 0: Data, 1: Management Frame */
-	UINT_8 ucStaRecIndex; /* STA_REC index */
-	UINT_8 ucBssIndex;	  /* BSS_INFO_T index */
-	UINT_8 ucWlanIndex;	  /* Wlan entry index */
+	UINT_8 ucTC;		   /* Traffic Class: 0~4 (HIF TX0), 5 (HIF TX1) */
+	UINT_8 ucPacketType;   /* 0: Data, 1: Management Frame */
+	UINT_8 ucStaRecIndex;  /* STA_REC index */
+	UINT_8 ucBssIndex;	   /* BSS_INFO_T index */
+	UINT_8 ucWlanIndex;	   /* Wlan entry index */
+	UINT_8 ucPacketFormat; /* TXD.DW1[25:24] Packet Format */
 
 	BOOLEAN fgIs802_1x;				 /* TRUE: 802.1x frame */
 	BOOLEAN fgIs802_1x_NonProtected; /* TRUE: 802.1x frame - Non-Protected */
@@ -807,6 +810,8 @@ struct _MSDU_INFO_T {
 #if defined(_HIF_PCIE)
 	P_MSDU_TOKEN_ENTRY_T prToken;
 #endif
+	/* sanity drop flag */
+	UINT_8 fgDrop;
 };
 
 #define HIT_PKT_FLAGS_CT_WITH_TXD BIT(0)
@@ -1380,6 +1385,8 @@ WLAN_STATUS nicTxAcquireResource(
 WLAN_STATUS nicTxPollingResource(IN P_ADAPTER_T prAdapter, IN UINT_8 ucTC);
 
 BOOLEAN nicTxReleaseResource(IN P_ADAPTER_T prAdapter, IN UINT_8 ucTc, IN UINT_32 u4PageCount, IN BOOLEAN fgReqLock);
+
+VOID nicTxDropInvalidMsduInfo(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo);
 
 VOID nicTxReleaseMsduResource(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfoListHead);
 

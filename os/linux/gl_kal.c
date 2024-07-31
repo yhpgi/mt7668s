@@ -2598,7 +2598,7 @@ VOID kalClearMgmtFramesByBssIdx(IN P_GLUE_INFO_T prGlueInfo, IN UINT_8 ucBssInde
  * \retval none
  */
 /*----------------------------------------------------------------------------*/
-VOID kalClearCommandQueue(IN P_GLUE_INFO_T prGlueInfo)
+VOID kalClearCommandQueue(IN P_GLUE_INFO_T prGlueInfo, IN UINT_8 fgIsNeedHandler)
 {
 	P_QUE_T		  prCmdQue;
 	QUE_T		  rTempCmdQue;
@@ -2628,7 +2628,7 @@ VOID kalClearCommandQueue(IN P_GLUE_INFO_T prGlueInfo)
 		if (prCmdInfo->pfCmdTimeoutHandler)
 			prCmdInfo->pfCmdTimeoutHandler(prGlueInfo->prAdapter, prCmdInfo);
 		else
-			wlanReleaseCommand(prGlueInfo->prAdapter, prCmdInfo, TX_RESULT_QUEUE_CLEARANCE);
+			wlanReleaseCommandEx(prGlueInfo->prAdapter, prCmdInfo, TX_RESULT_QUEUE_CLEARANCE, fgIsNeedHandler);
 
 		cmdBufFreeCmdInfo(prGlueInfo->prAdapter, prCmdInfo);
 		GLUE_DEC_REF_CNT(prGlueInfo->i4TxPendingCmdNum);

@@ -1026,6 +1026,9 @@ VOID wlanClearPendingCommandQueue(IN P_ADAPTER_T prAdapter);
 
 VOID wlanReleaseCommand(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo, IN ENUM_TX_RESULT_CODE_T rTxDoneStatus);
 
+VOID wlanReleaseCommandEx(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo, IN ENUM_TX_RESULT_CODE_T rTxDoneStatus,
+		IN UINT_8 fgIsNeedHandler);
+
 VOID wlanReleasePendingOid(IN P_ADAPTER_T prAdapter, IN ULONG ulParamPtr);
 
 VOID wlanReleasePendingCMDbyBssIdx(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex);

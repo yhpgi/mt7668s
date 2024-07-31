@@ -685,7 +685,7 @@ WLAN_STATUS wlanAdapterStop(IN P_ADAPTER_T prAdapter)
 	nicUninitMGMT(prAdapter);
 
 	/* Release all CMD/MGMT/SEC frame in command queue */
-	kalClearCommandQueue(prAdapter->prGlueInfo);
+	kalClearCommandQueue(prAdapter->prGlueInfo, TRUE);
 
 	/* Release all CMD in pending command queue */
 	wlanClearPendingCommandQueue(prAdapter);
@@ -1666,6 +1666,11 @@ void wlanClearPendingCommandQueue(IN P_ADAPTER_T prAdapter)
 	}
 }
 
+VOID wlanReleaseCommand(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo, IN ENUM_TX_RESULT_CODE_T rTxDoneStatus)
+{
+	wlanReleaseCommandEx(prAdapter, prCmdInfo, rTxDoneStatus, TRUE);
+}
+
 /*----------------------------------------------------------------------------*/
 /*!
  * \brief This function will release thd CMD_INFO upon its attribution
@@ -1677,7 +1682,8 @@ void wlanClearPendingCommandQueue(IN P_ADAPTER_T prAdapter)
  * \return (none)
  */
 /*----------------------------------------------------------------------------*/
-VOID wlanReleaseCommand(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo, IN ENUM_TX_RESULT_CODE_T rTxDoneStatus)
+VOID wlanReleaseCommandEx(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo, IN ENUM_TX_RESULT_CODE_T rTxDoneStatus,
+		IN UINT_8 fgIsNeedHandler)
 {
 	P_TX_CTRL_T	  prTxCtrl;
 	P_MSDU_INFO_T prMsduInfo;
@@ -1714,8 +1720,12 @@ VOID wlanReleaseCommand(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo, IN 
 				prMsduInfo->pfTxDoneHandler ? TRUE : FALSE, prCmdInfo->ucCmdSeqNum);
 
 		/* invoke callbacks */
-		if (prMsduInfo->pfTxDoneHandler != NULL)
-			prMsduInfo->pfTxDoneHandler(prAdapter, prMsduInfo, rTxDoneStatus);
+		if (fgIsNeedHandler) {
+			if (prMsduInfo->pfTxDoneHandler != NULL)
+				prMsduInfo->pfTxDoneHandler(prAdapter, prMsduInfo, rTxDoneStatus);
+		} else {
+			nicDumpMsduInfo(prMsduInfo);
+		}
 
 		if (prCmdInfo->eCmdType == COMMAND_TYPE_MANAGEMENT_FRAME)
 			GLUE_DEC_REF_CNT(prTxCtrl->i4TxMgmtPendingNum);

@@ -752,6 +752,39 @@ WLAN_STATUS nicTxMsduInfoList(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduI
 	return WLAN_STATUS_SUCCESS;
 }
 
+/*----------------------------------------------------------------------------*/
+/*!
+ * @brief In this function, we'll drop invalid MsduInfo and
+ * dump some debug log
+ *
+ * @param prAdapter              Pointer to the Adapter structure.
+ * @param prMsduInfo             Pointer of the invalid MsduInfo
+ *
+ */
+/*----------------------------------------------------------------------------*/
+VOID nicTxDropInvalidMsduInfo(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo)
+{
+	/* Dump mem for debugging */
+	DBGLOG(TX, ERROR, "[B] Dump invalid prMsduInfo & StaRec.\n");
+	nicDumpMsduInfo(prMsduInfo);
+	cnmDumpStaRec(prAdapter, prMsduInfo->ucStaRecIndex);
+	DBGLOG(TX, ERROR, "[E] Dump invalid prMsduInfo & StaRec.\n");
+
+	TX_INC_CNT(&prAdapter->rTxCtrl, TX_INVALID_MSDUINFO_COUNT);
+	if (prMsduInfo->ucPacketType == TX_PACKET_TYPE_DATA) {
+		if (prMsduInfo->pfTxDoneHandler)
+			prMsduInfo->pfTxDoneHandler(prAdapter, prMsduInfo, TX_RESULT_DROPPED_IN_DRIVER);
+	}
+
+	/* Remove next link */
+	QM_TX_SET_NEXT_MSDU_INFO(prMsduInfo, NULL);
+
+	/* Release Tx resource */
+	nicTxReleaseResource(prAdapter, prMsduInfo->ucTC, nicTxGetPageCount(prMsduInfo->u2FrameLength, TRUE), TRUE);
+	nicTxFreePacket(prAdapter, prMsduInfo, TRUE);
+	nicTxReturnMsduInfo(prAdapter, prMsduInfo);
+}
+
 #if CFG_SUPPORT_MULTITHREAD
 /*----------------------------------------------------------------------------*/
 /*!
@@ -788,6 +821,15 @@ WLAN_STATUS nicTxMsduInfoListMthread(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T 
 	/* Separate MSDU_INFO_T lists into 2 categories: for Port#0 & Port#1 */
 	while (prMsduInfo) {
 		prNextMsduInfo = (P_MSDU_INFO_T)QUEUE_GET_NEXT_ENTRY((P_QUE_ENTRY_T)prMsduInfo);
+
+		nicTxFillDataDesc(prAdapter, prMsduInfo);
+
+		/* Drop invalid MsduInfo */
+		if (unlikely(prMsduInfo->fgDrop)) {
+			nicTxDropInvalidMsduInfo(prAdapter, prMsduInfo);
+			prMsduInfo = prNextMsduInfo;
+			continue;
+		}
 
 		switch (prMsduInfo->ucTC) {
 		case TC0_INDEX:
@@ -858,6 +900,13 @@ WLAN_STATUS nicTxMsduInfoListMthread(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T 
 				ASSERT(0);
 		}
 		nicTxFillDataDesc(prAdapter, prMsduInfo);
+
+		/* Drop invalid MsduInfo */
+		if (unlikely(prMsduInfo->fgDrop)) {
+			nicTxDropInvalidMsduInfo(prAdapter, prMsduInfo);
+			prMsduInfo = prNextMsduInfo;
+			continue;
+		}
 
 		prMsduInfo = prNextMsduInfo;
 	}
@@ -1834,6 +1883,12 @@ WLAN_STATUS nicTxMsduQueue(IN P_ADAPTER_T prAdapter, UINT_8 ucPortIdx, P_QUE_T p
 
 #if !CFG_SUPPORT_MULTITHREAD
 		nicTxFillDataDesc(prAdapter, prMsduInfo);
+
+		/* Drop invalid MsduInfo */
+		if (unlikely(prMsduInfo->fgDrop)) {
+			nicTxDropInvalidMsduInfo(prAdapter, prMsduInfo);
+			continue;
+		}
 #endif
 
 		if (prMsduInfo->pfTxDoneHandler) {
@@ -3764,6 +3819,12 @@ static WLAN_STATUS nicTxDirectStartXmitMain(struct sk_buff *prSkb, P_MSDU_INFO_T
 		}
 
 		nicTxFillDataDesc(prAdapter, prMsduInfo);
+
+		/* Drop invalid MsduInfo */
+		if (unlikely(prMsduInfo->fgDrop)) {
+			nicTxDropInvalidMsduInfo(prAdapter, prMsduInfo);
+			return WLAN_STATUS_FAILURE;
+		}
 
 		prStaRec = cnmGetStaRecByIndex(prAdapter, prMsduInfo->ucStaRecIndex);
 

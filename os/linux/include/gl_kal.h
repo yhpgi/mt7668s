@@ -1035,7 +1035,7 @@ UINT_32 kalGetTxPendingFrameCount(IN P_GLUE_INFO_T prGlueInfo);
 
 UINT_32 kalGetTxPendingCmdCount(IN P_GLUE_INFO_T prGlueInfo);
 
-VOID kalClearCommandQueue(IN P_GLUE_INFO_T prGlueInfo);
+VOID kalClearCommandQueue(IN P_GLUE_INFO_T prGlueInfo, IN UINT_8 fgIsNeedHandler);
 
 BOOLEAN kalSetTimer(IN P_GLUE_INFO_T prGlueInfo, IN UINT_32 u4Interval);
 

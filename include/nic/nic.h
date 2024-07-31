@@ -354,4 +354,6 @@ BOOLEAN nicSerIsWaitingReset(IN P_ADAPTER_T prAdapter);
 BOOLEAN nicSerIsTxStop(IN P_ADAPTER_T prAdapter);
 BOOLEAN nicSerIsRxStop(IN P_ADAPTER_T prAdapter);
 
+VOID nicDumpMsduInfo(IN P_MSDU_INFO_T prMsduInfo);
+
 #endif /* _NIC_H */
