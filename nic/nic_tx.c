@@ -54,22 +54,21 @@
 */
 
 /*! \file   nic_tx.c
-*    \brief  Functions that provide TX operation in NIC Layer.
-*
-*    This file provides TX functions which are responsible for both Hardware and
-*    Software Resource Management and keep their Synchronization.
-*/
-
-
-/*******************************************************************************
-*                         C O M P I L E R   F L A G S
-********************************************************************************
-*/
+ *    \brief  Functions that provide TX operation in NIC Layer.
+ *
+ *    This file provides TX functions which are responsible for both Hardware and
+ *    Software Resource Management and keep their Synchronization.
+ */
 
 /*******************************************************************************
-*                    E X T E R N A L   R E F E R E N C E S
-********************************************************************************
-*/
+ *                         C O M P I L E R   F L A G S
+ ********************************************************************************
+ */
+
+/*******************************************************************************
+ *                    E X T E R N A L   R E F E R E N C E S
+ ********************************************************************************
+ */
 #include "precomp.h"
 #include "que_mgt.h"
 
@@ -78,56 +77,55 @@
 #endif
 
 /*******************************************************************************
-*                              C O N S T A N T S
-********************************************************************************
-*/
+ *                              C O N S T A N T S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                             D A T A   T Y P E S
-********************************************************************************
-*/
+ *                             D A T A   T Y P E S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                            P U B L I C   D A T A
-********************************************************************************
-*/
+ *                            P U B L I C   D A T A
+ ********************************************************************************
+ */
 
 PFN_TX_DATA_DONE_CB g_pfTxDataDoneCb = nicTxMsduDoneCb;
 
 static const TX_RESOURCE_CONTROL_T arTcResourceControl[TC_NUM] = {
 	/* dest port index, dest queue index,   HIF TX queue index */
 	/* First HW queue */
-	{PORT_INDEX_LMAC, MAC_TXQ_AC0_INDEX, HIF_TX_AC0_INDEX},
-	{PORT_INDEX_LMAC, MAC_TXQ_AC1_INDEX, HIF_TX_AC1_INDEX},
-	{PORT_INDEX_LMAC, MAC_TXQ_AC2_INDEX, HIF_TX_AC2_INDEX},
-	{PORT_INDEX_LMAC, MAC_TXQ_AC3_INDEX, HIF_TX_AC3_INDEX},
-	{PORT_INDEX_MCU, MCU_Q1_INDEX, HIF_TX_CPU_INDEX},
-	{PORT_INDEX_LMAC, MAC_TXQ_AC1_INDEX, HIF_TX_AC1_INDEX},
+	{ PORT_INDEX_LMAC, MAC_TXQ_AC0_INDEX, HIF_TX_AC0_INDEX },
+	{ PORT_INDEX_LMAC, MAC_TXQ_AC1_INDEX, HIF_TX_AC1_INDEX },
+	{ PORT_INDEX_LMAC, MAC_TXQ_AC2_INDEX, HIF_TX_AC2_INDEX },
+	{ PORT_INDEX_LMAC, MAC_TXQ_AC3_INDEX, HIF_TX_AC3_INDEX },
+	{ PORT_INDEX_MCU, MCU_Q1_INDEX, HIF_TX_CPU_INDEX },
+	{ PORT_INDEX_LMAC, MAC_TXQ_AC1_INDEX, HIF_TX_AC1_INDEX },
 
 #if (HIF_TX_RSRC_WMM_ENHANCE == 1)
-	{PORT_INDEX_LMAC, MAC_TXQ_AC10_INDEX, HIF_TX_AC10_INDEX},
-	{PORT_INDEX_LMAC, MAC_TXQ_AC11_INDEX, HIF_TX_AC11_INDEX},
-	{PORT_INDEX_LMAC, MAC_TXQ_AC12_INDEX, HIF_TX_AC12_INDEX},
-	{PORT_INDEX_LMAC, MAC_TXQ_AC13_INDEX, HIF_TX_AC13_INDEX},
-	{PORT_INDEX_LMAC, MAC_TXQ_AC11_INDEX, HIF_TX_AC11_INDEX},
+	{ PORT_INDEX_LMAC, MAC_TXQ_AC10_INDEX, HIF_TX_AC10_INDEX },
+	{ PORT_INDEX_LMAC, MAC_TXQ_AC11_INDEX, HIF_TX_AC11_INDEX },
+	{ PORT_INDEX_LMAC, MAC_TXQ_AC12_INDEX, HIF_TX_AC12_INDEX },
+	{ PORT_INDEX_LMAC, MAC_TXQ_AC13_INDEX, HIF_TX_AC13_INDEX },
+	{ PORT_INDEX_LMAC, MAC_TXQ_AC11_INDEX, HIF_TX_AC11_INDEX },
 
+	{ PORT_INDEX_LMAC, MAC_TXQ_AC20_INDEX, HIF_TX_AC20_INDEX },
+	{ PORT_INDEX_LMAC, MAC_TXQ_AC21_INDEX, HIF_TX_AC21_INDEX },
+	{ PORT_INDEX_LMAC, MAC_TXQ_AC22_INDEX, HIF_TX_AC22_INDEX },
+	{ PORT_INDEX_LMAC, MAC_TXQ_AC23_INDEX, HIF_TX_AC23_INDEX },
+	{ PORT_INDEX_LMAC, MAC_TXQ_AC21_INDEX, HIF_TX_AC21_INDEX },
 
-	{PORT_INDEX_LMAC, MAC_TXQ_AC20_INDEX, HIF_TX_AC20_INDEX},
-	{PORT_INDEX_LMAC, MAC_TXQ_AC21_INDEX, HIF_TX_AC21_INDEX},
-	{PORT_INDEX_LMAC, MAC_TXQ_AC22_INDEX, HIF_TX_AC22_INDEX},
-	{PORT_INDEX_LMAC, MAC_TXQ_AC23_INDEX, HIF_TX_AC23_INDEX},
-	{PORT_INDEX_LMAC, MAC_TXQ_AC21_INDEX, HIF_TX_AC21_INDEX},
-
-	{PORT_INDEX_LMAC, MAC_TXQ_AC30_INDEX, HIF_TX_AC3X_INDEX},
+	{ PORT_INDEX_LMAC, MAC_TXQ_AC30_INDEX, HIF_TX_AC3X_INDEX },
 #endif
 
 #if NIC_TX_ENABLE_SECOND_HW_QUEUE
 	/* Second HW queue */
-	{PORT_INDEX_LMAC, MAC_TXQ_AC10_INDEX, HIF_TX_AC10_INDEX},
-	{PORT_INDEX_LMAC, MAC_TXQ_AC11_INDEX, HIF_TX_AC11_INDEX},
-	{PORT_INDEX_LMAC, MAC_TXQ_AC12_INDEX, HIF_TX_AC12_INDEX},
-	{PORT_INDEX_LMAC, MAC_TXQ_AC13_INDEX, HIF_TX_AC13_INDEX},
-	{PORT_INDEX_LMAC, MAC_TXQ_AC11_INDEX, HIF_TX_AC11_INDEX},
+	{ PORT_INDEX_LMAC, MAC_TXQ_AC10_INDEX, HIF_TX_AC10_INDEX },
+	{ PORT_INDEX_LMAC, MAC_TXQ_AC11_INDEX, HIF_TX_AC11_INDEX },
+	{ PORT_INDEX_LMAC, MAC_TXQ_AC12_INDEX, HIF_TX_AC12_INDEX },
+	{ PORT_INDEX_LMAC, MAC_TXQ_AC13_INDEX, HIF_TX_AC13_INDEX },
+	{ PORT_INDEX_LMAC, MAC_TXQ_AC11_INDEX, HIF_TX_AC11_INDEX },
 #endif
 };
 
@@ -135,59 +133,53 @@ static const TX_RESOURCE_CONTROL_T arTcResourceControl[TC_NUM] = {
 static const TX_TC_TRAFFIC_SETTING_T arTcTrafficSettings[NET_TC_NUM] = {
 	/* Tx desc template format,                    Remaining Tx time,                               Retry count */
 	/* For Data frame with StaRec, set Long Format to enable the following settings */
-	{NIC_TX_DESC_LONG_FORMAT_LENGTH, NIC_TX_AC_BE_REMAINING_TX_TIME,
-	 NIC_TX_DATA_DEFAULT_RETRY_COUNT_LIMIT},
-	{NIC_TX_DESC_LONG_FORMAT_LENGTH, NIC_TX_AC_BK_REMAINING_TX_TIME,
-	 NIC_TX_DATA_DEFAULT_RETRY_COUNT_LIMIT},
-	{NIC_TX_DESC_LONG_FORMAT_LENGTH, NIC_TX_AC_VI_REMAINING_TX_TIME,
-	 NIC_TX_DATA_DEFAULT_RETRY_COUNT_LIMIT},
-	{NIC_TX_DESC_LONG_FORMAT_LENGTH, NIC_TX_AC_VO_REMAINING_TX_TIME,
-	 NIC_TX_DATA_DEFAULT_RETRY_COUNT_LIMIT},
+	{ NIC_TX_DESC_LONG_FORMAT_LENGTH, NIC_TX_AC_BE_REMAINING_TX_TIME, NIC_TX_DATA_DEFAULT_RETRY_COUNT_LIMIT },
+	{ NIC_TX_DESC_LONG_FORMAT_LENGTH, NIC_TX_AC_BK_REMAINING_TX_TIME, NIC_TX_DATA_DEFAULT_RETRY_COUNT_LIMIT },
+	{ NIC_TX_DESC_LONG_FORMAT_LENGTH, NIC_TX_AC_VI_REMAINING_TX_TIME, NIC_TX_DATA_DEFAULT_RETRY_COUNT_LIMIT },
+	{ NIC_TX_DESC_LONG_FORMAT_LENGTH, NIC_TX_AC_VO_REMAINING_TX_TIME, NIC_TX_DATA_DEFAULT_RETRY_COUNT_LIMIT },
 
 	/* MGMT frame */
-	{NIC_TX_DESC_LONG_FORMAT_LENGTH, NIC_TX_MGMT_REMAINING_TX_TIME,
-	 NIC_TX_MGMT_DEFAULT_RETRY_COUNT_LIMIT},
+	{ NIC_TX_DESC_LONG_FORMAT_LENGTH, NIC_TX_MGMT_REMAINING_TX_TIME, NIC_TX_MGMT_DEFAULT_RETRY_COUNT_LIMIT },
 
 	/* non-StaRec frame (BMC, etc...) */
-	{NIC_TX_DESC_LONG_FORMAT_LENGTH, TX_DESC_TX_TIME_NO_LIMIT,
-	 NIC_TX_DATA_DEFAULT_RETRY_COUNT_LIMIT},
+	{ NIC_TX_DESC_LONG_FORMAT_LENGTH, TX_DESC_TX_TIME_NO_LIMIT, NIC_TX_DATA_DEFAULT_RETRY_COUNT_LIMIT },
 };
 
 /*******************************************************************************
-*                           P R I V A T E   D A T A
-********************************************************************************
-*/
+ *                           P R I V A T E   D A T A
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                                 M A C R O S
-********************************************************************************
-*/
+ *                                 M A C R O S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                  F U N C T I O N   D E C L A R A T I O N S
-********************************************************************************
-*/
+ *                  F U N C T I O N   D E C L A R A T I O N S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                              F U N C T I O N S
-********************************************************************************
-*/
+ *                              F U N C T I O N S
+ ********************************************************************************
+ */
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief This function will initial all variables in regard to SW TX Queues and
-*        all free lists of MSDU_INFO_T and SW_TFCB_T.
-*
-* @param prAdapter  Pointer to the Adapter structure.
-*
-* @return (none)
-*/
+ * @brief This function will initial all variables in regard to SW TX Queues and
+ *        all free lists of MSDU_INFO_T and SW_TFCB_T.
+ *
+ * @param prAdapter  Pointer to the Adapter structure.
+ *
+ * @return (none)
+ */
 /*----------------------------------------------------------------------------*/
 VOID nicTxInitialize(IN P_ADAPTER_T prAdapter)
 {
-	P_TX_CTRL_T prTxCtrl;
-	PUINT_8 pucMemHandle;
+	P_TX_CTRL_T	  prTxCtrl;
+	PUINT_8		  pucMemHandle;
 	P_MSDU_INFO_T prMsduInfo;
-	UINT_32 i;
+	UINT_32		  i;
 
 	KAL_SPIN_LOCK_DECLARATION();
 
@@ -208,11 +200,11 @@ VOID nicTxInitialize(IN P_ADAPTER_T prAdapter)
 
 	pucMemHandle = prTxCtrl->pucTxCached;
 	for (i = 0; i < CFG_TX_MAX_PKT_NUM; i++) {
-		prMsduInfo = (P_MSDU_INFO_T) pucMemHandle;
+		prMsduInfo = (P_MSDU_INFO_T)pucMemHandle;
 		kalMemZero(prMsduInfo, sizeof(MSDU_INFO_T));
 
 		KAL_ACQUIRE_SPIN_LOCK(prAdapter, SPIN_LOCK_TX_MSDU_INFO_LIST);
-		QUEUE_INSERT_TAIL(&prTxCtrl->rFreeMsduInfoList, (P_QUE_ENTRY_T) prMsduInfo);
+		QUEUE_INSERT_TAIL(&prTxCtrl->rFreeMsduInfoList, (P_QUE_ENTRY_T)prMsduInfo);
 		KAL_RELEASE_SPIN_LOCK(prAdapter, SPIN_LOCK_TX_MSDU_INFO_LIST);
 
 		pucMemHandle += ALIGN_4(sizeof(MSDU_INFO_T));
@@ -220,7 +212,7 @@ VOID nicTxInitialize(IN P_ADAPTER_T prAdapter)
 
 	ASSERT(prTxCtrl->rFreeMsduInfoList.u4NumElem == CFG_TX_MAX_PKT_NUM);
 	/* Check if the memory allocation consist with this initialization function */
-	ASSERT((UINT_32) (pucMemHandle - prTxCtrl->pucTxCached) == prTxCtrl->u4TxCachedSize);
+	ASSERT((UINT_32)(pucMemHandle - prTxCtrl->pucTxCached) == prTxCtrl->u4TxCachedSize);
 
 	QUEUE_INITIALIZE(&prTxCtrl->rTxMgmtTxingQueue);
 	prTxCtrl->i4TxMgmtPendingNum = 0;
@@ -248,15 +240,15 @@ VOID nicTxInitialize(IN P_ADAPTER_T prAdapter)
 
 	TX_RESET_ALL_CNTS(prTxCtrl);
 
-}				/* end of nicTxInitialize() */
+} /* end of nicTxInitialize() */
 
 BOOLEAN nicTxSanityCheckResource(IN P_ADAPTER_T prAdapter)
 {
 	P_TX_CTRL_T prTxCtrl;
-	UINT_8 ucTC;
-	UINT_32 ucTotalMaxResource = 0;
-	UINT_32 ucTotalFreeResource = 0;
-	BOOLEAN fgError = FALSE;
+	UINT_8		ucTC;
+	UINT_32		ucTotalMaxResource	= 0;
+	UINT_32		ucTotalFreeResource = 0;
+	BOOLEAN		fgError				= FALSE;
 
 	if (prAdapter->rWifiVar.ucTxDbg & BIT(0)) {
 		prTxCtrl = &prAdapter->rTxCtrl;
@@ -307,23 +299,22 @@ BOOLEAN nicTxSanityCheckResource(IN P_ADAPTER_T prAdapter)
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief Driver maintain a variable that is synchronous with the usage of individual
-*        TC Buffer Count. This function will check if has enough TC Buffer for incoming
-*        packet and then update the value after promise to provide the resources.
-*
-* \param[in] prAdapter              Pointer to the Adapter structure.
-* \param[in] ucTC                   Specify the resource of TC
-*
-* \retval WLAN_STATUS_SUCCESS   Resource is available and been assigned.
-* \retval WLAN_STATUS_RESOURCES Resource is not available.
-*/
+ * \brief Driver maintain a variable that is synchronous with the usage of individual
+ *        TC Buffer Count. This function will check if has enough TC Buffer for incoming
+ *        packet and then update the value after promise to provide the resources.
+ *
+ * \param[in] prAdapter              Pointer to the Adapter structure.
+ * \param[in] ucTC                   Specify the resource of TC
+ *
+ * \retval WLAN_STATUS_SUCCESS   Resource is available and been assigned.
+ * \retval WLAN_STATUS_RESOURCES Resource is not available.
+ */
 /*----------------------------------------------------------------------------*/
-WLAN_STATUS nicTxAcquireResource(IN P_ADAPTER_T prAdapter, IN UINT_8 ucTC, IN UINT_32 u4PageCount,
-	IN BOOLEAN fgReqLock)
+WLAN_STATUS nicTxAcquireResource(IN P_ADAPTER_T prAdapter, IN UINT_8 ucTC, IN UINT_32 u4PageCount, IN BOOLEAN fgReqLock)
 {
-	P_TX_CTRL_T prTxCtrl;
+	P_TX_CTRL_T		  prTxCtrl;
 	P_TX_TCQ_STATUS_T prTc;
-	WLAN_STATUS u4Status = WLAN_STATUS_RESOURCES;
+	WLAN_STATUS		  u4Status = WLAN_STATUS_RESOURCES;
 
 	KAL_SPIN_LOCK_DECLARATION();
 
@@ -333,7 +324,7 @@ WLAN_STATUS nicTxAcquireResource(IN P_ADAPTER_T prAdapter, IN UINT_8 ucTC, IN UI
 
 	ASSERT(prAdapter);
 	prTxCtrl = &prAdapter->rTxCtrl;
-	prTc = &prTxCtrl->rTc;
+	prTc	 = &prTxCtrl->rTc;
 
 	if (fgReqLock)
 		KAL_ACQUIRE_SPIN_LOCK(prAdapter, SPIN_LOCK_TX_RESOURCE);
@@ -342,14 +333,13 @@ WLAN_STATUS nicTxAcquireResource(IN P_ADAPTER_T prAdapter, IN UINT_8 ucTC, IN UI
 		prTc->au4FreePageCount[ucTC] -= u4PageCount;
 		prTc->au4FreeBufferCount[ucTC] = (prTc->au4FreePageCount[ucTC] / NIC_TX_MAX_PAGE_PER_FRAME);
 
-		DBGLOG(TX, LOUD, "Acquire: TC%d AcquirePageCnt[%u] FreeBufferCnt[%u] FreePageCnt[%u]\n",
-			ucTC, u4PageCount, prTc->au4FreeBufferCount[ucTC], prTc->au4FreePageCount[ucTC]);
+		DBGLOG(TX, LOUD, "Acquire: TC%d AcquirePageCnt[%u] FreeBufferCnt[%u] FreePageCnt[%u]\n", ucTC, u4PageCount,
+				prTc->au4FreeBufferCount[ucTC], prTc->au4FreePageCount[ucTC]);
 
 		u4Status = WLAN_STATUS_SUCCESS;
 	}
 #else
 	if (prTxCtrl->rTc.au4FreePageCount[ucTC] > 0) {
-
 		prTxCtrl->rTc.au4FreePageCount[ucTC] -= 1;
 
 		u4Status = WLAN_STATUS_SUCCESS;
@@ -363,22 +353,22 @@ WLAN_STATUS nicTxAcquireResource(IN P_ADAPTER_T prAdapter, IN UINT_8 ucTC, IN UI
 
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief Driver maintain a variable that is synchronous with the usage of individual
-*        TC Buffer Count. This function will do polling if FW has return the resource.
-*        Used when driver start up before enable interrupt.
-*
-* @param prAdapter      Pointer to the Adapter structure.
-* @param ucTC           Specify the resource of TC
-*
-* @retval WLAN_STATUS_SUCCESS   Resource is available.
-* @retval WLAN_STATUS_FAILURE   Resource is not available.
-*/
+ * @brief Driver maintain a variable that is synchronous with the usage of individual
+ *        TC Buffer Count. This function will do polling if FW has return the resource.
+ *        Used when driver start up before enable interrupt.
+ *
+ * @param prAdapter      Pointer to the Adapter structure.
+ * @param ucTC           Specify the resource of TC
+ *
+ * @retval WLAN_STATUS_SUCCESS   Resource is available.
+ * @retval WLAN_STATUS_FAILURE   Resource is not available.
+ */
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS nicTxPollingResource(IN P_ADAPTER_T prAdapter, IN UINT_8 ucTC)
 {
 	P_TX_CTRL_T prTxCtrl;
 	WLAN_STATUS u4Status = WLAN_STATUS_FAILURE;
-	INT_32 i = NIC_TX_RESOURCE_POLLING_TIMEOUT;
+	INT_32		i		 = NIC_TX_RESOURCE_POLLING_TIMEOUT;
 	/*UINT_32 au4WTSR[8];*/
 
 	ASSERT(prAdapter);
@@ -403,12 +393,12 @@ WLAN_STATUS nicTxPollingResource(IN P_ADAPTER_T prAdapter, IN UINT_8 ucTC)
 		if (kalIsCardRemoved(prAdapter->prGlueInfo) == TRUE || fgIsBusAccessFailed == TRUE) {
 			u4Status = WLAN_STATUS_FAILURE;
 			break;
-		} else if (halTxReleaseResource(prAdapter, (PUINT_16) au4WTSR)) {
+		} else if (halTxReleaseResource(prAdapter, (PUINT_16)au4WTSR)) {
 			if (prTxCtrl->rTc.au4FreeBufferCount[ucTC] > 0) {
 				u4Status = WLAN_STATUS_SUCCESS;
 				break;
 			}
-				kalMsleep(NIC_TX_RESOURCE_POLLING_DELAY_MSEC);
+			kalMsleep(NIC_TX_RESOURCE_POLLING_DELAY_MSEC);
 		} else {
 			kalMsleep(NIC_TX_RESOURCE_POLLING_DELAY_MSEC);
 		}
@@ -420,30 +410,29 @@ WLAN_STATUS nicTxPollingResource(IN P_ADAPTER_T prAdapter, IN UINT_8 ucTC)
 		INT_32 i4Times = NIC_TX_RESOURCE_POLLING_TIMEOUT - (i + 1);
 
 		if (i4Times) {
-			DBGLOG(TX, TRACE, "Polling MCR_WTSR delay %ld times, %ld msec\n",
-			       i4Times, (i4Times * NIC_TX_RESOURCE_POLLING_DELAY_MSEC));
+			DBGLOG(TX, TRACE, "Polling MCR_WTSR delay %ld times, %ld msec\n", i4Times,
+					(i4Times * NIC_TX_RESOURCE_POLLING_DELAY_MSEC));
 		}
 	}
 #endif /* DBG */
 
 	return u4Status;
 
-}				/* end of nicTxPollingResource() */
+} /* end of nicTxPollingResource() */
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief Driver maintain a variable that is synchronous with the usage of individual
-*        TC Buffer Count. This function will release TC Buffer count according to
-*        the given TX_STATUS COUNTER after TX Done.
-*
-* @return (none)
-*/
+ * \brief Driver maintain a variable that is synchronous with the usage of individual
+ *        TC Buffer Count. This function will release TC Buffer count according to
+ *        the given TX_STATUS COUNTER after TX Done.
+ *
+ * @return (none)
+ */
 /*----------------------------------------------------------------------------*/
-BOOLEAN nicTxReleaseResource(IN P_ADAPTER_T prAdapter, IN UINT_8 ucTc, IN UINT_32 u4PageCount,
-	IN BOOLEAN fgReqLock)
+BOOLEAN nicTxReleaseResource(IN P_ADAPTER_T prAdapter, IN UINT_8 ucTc, IN UINT_32 u4PageCount, IN BOOLEAN fgReqLock)
 {
 	P_TX_TCQ_STATUS_T prTcqStatus;
-	BOOLEAN bStatus = FALSE;
+	BOOLEAN			  bStatus = FALSE;
 
 	KAL_SPIN_LOCK_DECLARATION();
 
@@ -467,16 +456,16 @@ BOOLEAN nicTxReleaseResource(IN P_ADAPTER_T prAdapter, IN UINT_8 ucTc, IN UINT_3
 	bStatus = TRUE;
 
 	return bStatus;
-}				/* end of nicTxReleaseResource() */
+} /* end of nicTxReleaseResource() */
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief Driver maintain a variable that is synchronous with the usage of individual
-*        TC Buffer Count. This function will release TC Buffer count for resource
-*        allocated but un-Tx MSDU_INFO
-*
-* @return (none)
-*/
+ * \brief Driver maintain a variable that is synchronous with the usage of individual
+ *        TC Buffer Count. This function will release TC Buffer count for resource
+ *        allocated but un-Tx MSDU_INFO
+ *
+ * @return (none)
+ */
 /*----------------------------------------------------------------------------*/
 VOID nicTxReleaseMsduResource(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfoListHead)
 {
@@ -487,10 +476,9 @@ VOID nicTxReleaseMsduResource(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduI
 	KAL_ACQUIRE_SPIN_LOCK(prAdapter, SPIN_LOCK_TX_RESOURCE);
 
 	while (prMsduInfo) {
-		prNextMsduInfo = (P_MSDU_INFO_T) QUEUE_GET_NEXT_ENTRY((P_QUE_ENTRY_T) prMsduInfo);
+		prNextMsduInfo = (P_MSDU_INFO_T)QUEUE_GET_NEXT_ENTRY((P_QUE_ENTRY_T)prMsduInfo);
 
-		nicTxReleaseResource(prAdapter, prMsduInfo->ucTC,
-			nicTxGetPageCount(prMsduInfo->u2FrameLength, FALSE), FALSE);
+		nicTxReleaseResource(prAdapter, prMsduInfo->ucTC, nicTxGetPageCount(prMsduInfo->u2FrameLength, FALSE), FALSE);
 
 		prMsduInfo = prNextMsduInfo;
 	};
@@ -500,17 +488,17 @@ VOID nicTxReleaseMsduResource(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduI
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief Reset TC Buffer Count to initialized value
-*
-* \param[in] prAdapter              Pointer to the Adapter structure.
-*
-* @return WLAN_STATUS_SUCCESS
-*/
+ * \brief Reset TC Buffer Count to initialized value
+ *
+ * \param[in] prAdapter              Pointer to the Adapter structure.
+ *
+ * @return WLAN_STATUS_SUCCESS
+ */
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS nicTxResetResource(IN P_ADAPTER_T prAdapter)
 {
 	P_TX_CTRL_T prTxCtrl;
-	UINT_8 ucIdx;
+	UINT_8		ucIdx;
 
 	KAL_SPIN_LOCK_DECLARATION();
 
@@ -525,39 +513,32 @@ WLAN_STATUS nicTxResetResource(IN P_ADAPTER_T prAdapter)
 	kalMemZero(prTxCtrl->rTc.au4TxDonePageCount, sizeof(prTxCtrl->rTc.au4TxDonePageCount));
 	kalMemZero(prTxCtrl->rTc.au4PreUsedPageCount, sizeof(prTxCtrl->rTc.au4PreUsedPageCount));
 
-	prTxCtrl->rTc.ucNextTcIdx = TC0_INDEX;
+	prTxCtrl->rTc.ucNextTcIdx		   = TC0_INDEX;
 	prTxCtrl->rTc.u4AvaliablePageCount = 0;
 
-	DBGLOG(TX, TRACE, "Default TCQ free resource [%u %u %u %u %u %u]\n",
-	       prAdapter->rWifiVar.au4TcPageCount[TC0_INDEX],
-	       prAdapter->rWifiVar.au4TcPageCount[TC1_INDEX],
-	       prAdapter->rWifiVar.au4TcPageCount[TC2_INDEX],
-	       prAdapter->rWifiVar.au4TcPageCount[TC3_INDEX],
-	       prAdapter->rWifiVar.au4TcPageCount[TC4_INDEX], prAdapter->rWifiVar.au4TcPageCount[TC5_INDEX]);
+	DBGLOG(TX, TRACE, "Default TCQ free resource [%u %u %u %u %u %u]\n", prAdapter->rWifiVar.au4TcPageCount[TC0_INDEX],
+			prAdapter->rWifiVar.au4TcPageCount[TC1_INDEX], prAdapter->rWifiVar.au4TcPageCount[TC2_INDEX],
+			prAdapter->rWifiVar.au4TcPageCount[TC3_INDEX], prAdapter->rWifiVar.au4TcPageCount[TC4_INDEX],
+			prAdapter->rWifiVar.au4TcPageCount[TC5_INDEX]);
 
-	prAdapter->rTxCtrl.u4TotalPageNum = 0;
+	prAdapter->rTxCtrl.u4TotalPageNum	   = 0;
 	prAdapter->rTxCtrl.u4TotalTxRsvPageNum = 0;
 
 	for (ucIdx = TC0_INDEX; ucIdx < TC_NUM; ucIdx++) {
 		/* Page Count */
-		prTxCtrl->rTc.au4MaxNumOfPage[ucIdx] = prAdapter->rWifiVar.au4TcPageCount[ucIdx];
+		prTxCtrl->rTc.au4MaxNumOfPage[ucIdx]  = prAdapter->rWifiVar.au4TcPageCount[ucIdx];
 		prTxCtrl->rTc.au4FreePageCount[ucIdx] = prAdapter->rWifiVar.au4TcPageCount[ucIdx];
 
-		DBGLOG(TX, TRACE, "Set TC%u Default[%u] Max[%u] Free[%u]\n",
-		       ucIdx,
-		       prAdapter->rWifiVar.au4TcPageCount[ucIdx],
-		       prTxCtrl->rTc.au4MaxNumOfPage[ucIdx], prTxCtrl->rTc.au4FreePageCount[ucIdx]);
+		DBGLOG(TX, TRACE, "Set TC%u Default[%u] Max[%u] Free[%u]\n", ucIdx, prAdapter->rWifiVar.au4TcPageCount[ucIdx],
+				prTxCtrl->rTc.au4MaxNumOfPage[ucIdx], prTxCtrl->rTc.au4FreePageCount[ucIdx]);
 
 		/* Buffer count */
-		prTxCtrl->rTc.au4MaxNumOfBuffer[ucIdx] =
-		    (prTxCtrl->rTc.au4MaxNumOfPage[ucIdx] / NIC_TX_MAX_PAGE_PER_FRAME);
-		prTxCtrl->rTc.au4FreeBufferCount[ucIdx] =
-		    (prTxCtrl->rTc.au4FreePageCount[ucIdx] / NIC_TX_MAX_PAGE_PER_FRAME);
+		prTxCtrl->rTc.au4MaxNumOfBuffer[ucIdx]	= (prTxCtrl->rTc.au4MaxNumOfPage[ucIdx] / NIC_TX_MAX_PAGE_PER_FRAME);
+		prTxCtrl->rTc.au4FreeBufferCount[ucIdx] = (prTxCtrl->rTc.au4FreePageCount[ucIdx] / NIC_TX_MAX_PAGE_PER_FRAME);
 
-		DBGLOG(TX, TRACE, "Set TC%u Default[%u] Buffer Max[%u] Free[%u]\n",
-		       ucIdx,
-		       prAdapter->rWifiVar.au4TcPageCount[ucIdx],
-		       prTxCtrl->rTc.au4MaxNumOfBuffer[ucIdx], prTxCtrl->rTc.au4FreeBufferCount[ucIdx]);
+		DBGLOG(TX, TRACE, "Set TC%u Default[%u] Buffer Max[%u] Free[%u]\n", ucIdx,
+				prAdapter->rWifiVar.au4TcPageCount[ucIdx], prTxCtrl->rTc.au4MaxNumOfBuffer[ucIdx],
+				prTxCtrl->rTc.au4FreeBufferCount[ucIdx]);
 
 		prAdapter->rTxCtrl.u4TotalPageNum += prTxCtrl->rTc.au4MaxNumOfPage[ucIdx];
 	}
@@ -565,46 +546,35 @@ WLAN_STATUS nicTxResetResource(IN P_ADAPTER_T prAdapter)
 	KAL_RELEASE_SPIN_LOCK(prAdapter, SPIN_LOCK_TX_RESOURCE);
 
 	DBGLOG(TX, TRACE, "Reset TCQ free resource to Page:Buf [%u:%u %u:%u %u:%u %u:%u %u:%u %u:%u ]\n",
-	       prTxCtrl->rTc.au4FreePageCount[TC0_INDEX],
-	       prTxCtrl->rTc.au4FreeBufferCount[TC0_INDEX],
-	       prTxCtrl->rTc.au4FreePageCount[TC1_INDEX],
-	       prTxCtrl->rTc.au4FreeBufferCount[TC1_INDEX],
-	       prTxCtrl->rTc.au4FreePageCount[TC2_INDEX],
-	       prTxCtrl->rTc.au4FreeBufferCount[TC2_INDEX],
-	       prTxCtrl->rTc.au4FreePageCount[TC3_INDEX],
-	       prTxCtrl->rTc.au4FreeBufferCount[TC3_INDEX],
-	       prTxCtrl->rTc.au4FreePageCount[TC4_INDEX],
-	       prTxCtrl->rTc.au4FreeBufferCount[TC4_INDEX],
-	       prTxCtrl->rTc.au4FreePageCount[TC5_INDEX], prTxCtrl->rTc.au4FreeBufferCount[TC5_INDEX]);
+			prTxCtrl->rTc.au4FreePageCount[TC0_INDEX], prTxCtrl->rTc.au4FreeBufferCount[TC0_INDEX],
+			prTxCtrl->rTc.au4FreePageCount[TC1_INDEX], prTxCtrl->rTc.au4FreeBufferCount[TC1_INDEX],
+			prTxCtrl->rTc.au4FreePageCount[TC2_INDEX], prTxCtrl->rTc.au4FreeBufferCount[TC2_INDEX],
+			prTxCtrl->rTc.au4FreePageCount[TC3_INDEX], prTxCtrl->rTc.au4FreeBufferCount[TC3_INDEX],
+			prTxCtrl->rTc.au4FreePageCount[TC4_INDEX], prTxCtrl->rTc.au4FreeBufferCount[TC4_INDEX],
+			prTxCtrl->rTc.au4FreePageCount[TC5_INDEX], prTxCtrl->rTc.au4FreeBufferCount[TC5_INDEX]);
 
 	DBGLOG(TX, TRACE, "Reset TCQ MAX resource to Page:Buf [%u:%u %u:%u %u:%u %u:%u %u:%u %u:%u]\n",
-	       prTxCtrl->rTc.au4MaxNumOfPage[TC0_INDEX],
-	       prTxCtrl->rTc.au4MaxNumOfBuffer[TC0_INDEX],
-	       prTxCtrl->rTc.au4MaxNumOfPage[TC1_INDEX],
-	       prTxCtrl->rTc.au4MaxNumOfBuffer[TC1_INDEX],
-	       prTxCtrl->rTc.au4MaxNumOfPage[TC2_INDEX],
-	       prTxCtrl->rTc.au4MaxNumOfBuffer[TC2_INDEX],
-	       prTxCtrl->rTc.au4MaxNumOfPage[TC3_INDEX],
-	       prTxCtrl->rTc.au4MaxNumOfBuffer[TC3_INDEX],
-	       prTxCtrl->rTc.au4MaxNumOfPage[TC4_INDEX],
-	       prTxCtrl->rTc.au4MaxNumOfBuffer[TC4_INDEX],
-	       prTxCtrl->rTc.au4MaxNumOfPage[TC5_INDEX], prTxCtrl->rTc.au4MaxNumOfBuffer[TC5_INDEX]);
+			prTxCtrl->rTc.au4MaxNumOfPage[TC0_INDEX], prTxCtrl->rTc.au4MaxNumOfBuffer[TC0_INDEX],
+			prTxCtrl->rTc.au4MaxNumOfPage[TC1_INDEX], prTxCtrl->rTc.au4MaxNumOfBuffer[TC1_INDEX],
+			prTxCtrl->rTc.au4MaxNumOfPage[TC2_INDEX], prTxCtrl->rTc.au4MaxNumOfBuffer[TC2_INDEX],
+			prTxCtrl->rTc.au4MaxNumOfPage[TC3_INDEX], prTxCtrl->rTc.au4MaxNumOfBuffer[TC3_INDEX],
+			prTxCtrl->rTc.au4MaxNumOfPage[TC4_INDEX], prTxCtrl->rTc.au4MaxNumOfBuffer[TC4_INDEX],
+			prTxCtrl->rTc.au4MaxNumOfPage[TC5_INDEX], prTxCtrl->rTc.au4MaxNumOfBuffer[TC5_INDEX]);
 
 	return WLAN_STATUS_SUCCESS;
 }
-
 
 #if QM_FAST_TC_RESOURCE_CTRL
 UINT_32
 nicTxGetAdjustableResourceCnt(IN P_ADAPTER_T prAdapter)
 {
 	P_TX_CTRL_T prTxCtrl;
-	UINT_8 ucIdx;
-	UINT_32 u4TotAdjCnt = 0;
-	UINT_32 u4AdjCnt;
+	UINT_8		ucIdx;
+	UINT_32		u4TotAdjCnt = 0;
+	UINT_32		u4AdjCnt;
 	P_QUE_MGT_T prQm = NULL;
 
-	prQm = &prAdapter->rQM;
+	prQm	 = &prAdapter->rQM;
 	prTxCtrl = &prAdapter->rTxCtrl;
 
 	for (ucIdx = TC0_INDEX; ucIdx < TC_NUM; ucIdx++) {
@@ -625,15 +595,15 @@ nicTxGetAdjustableResourceCnt(IN P_ADAPTER_T prAdapter)
 
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief Driver maintain a variable that is synchronous with the usage of individual
-*        TC Buffer Count. This function will return the value for other component
-*        which needs this information for making decisions
-*
-* @param prAdapter      Pointer to the Adapter structure.
-* @param ucTC           Specify the resource of TC
-*
-* @retval UINT_8        The number of corresponding TC number
-*/
+ * @brief Driver maintain a variable that is synchronous with the usage of individual
+ *        TC Buffer Count. This function will return the value for other component
+ *        which needs this information for making decisions
+ *
+ * @param prAdapter      Pointer to the Adapter structure.
+ * @param ucTC           Specify the resource of TC
+ *
+ * @retval UINT_8        The number of corresponding TC number
+ */
 /*----------------------------------------------------------------------------*/
 UINT_16 nicTxGetResource(IN P_ADAPTER_T prAdapter, IN UINT_8 ucTC)
 {
@@ -709,22 +679,22 @@ UINT_8 nicTxGetTxQByTc(IN P_ADAPTER_T prAdapter, IN UINT_8 ucTc)
 
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief In this function, we'll aggregate frame(PACKET_INFO_T)
-* corresponding to HIF TX port
-*
-* @param prAdapter              Pointer to the Adapter structure.
-* @param prMsduInfoListHead     a link list of P_MSDU_INFO_T
-*
-* @retval WLAN_STATUS_SUCCESS   Bus access ok.
-* @retval WLAN_STATUS_FAILURE   Bus access fail.
-*/
+ * @brief In this function, we'll aggregate frame(PACKET_INFO_T)
+ * corresponding to HIF TX port
+ *
+ * @param prAdapter              Pointer to the Adapter structure.
+ * @param prMsduInfoListHead     a link list of P_MSDU_INFO_T
+ *
+ * @retval WLAN_STATUS_SUCCESS   Bus access ok.
+ * @retval WLAN_STATUS_FAILURE   Bus access fail.
+ */
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS nicTxMsduInfoList(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfoListHead)
 {
 	P_MSDU_INFO_T prMsduInfo, prNextMsduInfo;
-	QUE_T qDataPort0, qDataPort1;
-	P_QUE_T prDataPort0, prDataPort1;
-	WLAN_STATUS status;
+	QUE_T		  qDataPort0, qDataPort1;
+	P_QUE_T		  prDataPort0, prDataPort1;
+	WLAN_STATUS	  status;
 
 	ASSERT(prAdapter);
 	ASSERT(prMsduInfoListHead);
@@ -739,28 +709,28 @@ WLAN_STATUS nicTxMsduInfoList(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduI
 
 	/* Separate MSDU_INFO_T lists into 2 categories: for Port#0 & Port#1 */
 	while (prMsduInfo) {
-		prNextMsduInfo = (P_MSDU_INFO_T) QUEUE_GET_NEXT_ENTRY((P_QUE_ENTRY_T) prMsduInfo);
+		prNextMsduInfo = (P_MSDU_INFO_T)QUEUE_GET_NEXT_ENTRY((P_QUE_ENTRY_T)prMsduInfo);
 
 		switch (prMsduInfo->ucTC) {
 		case TC0_INDEX:
 		case TC1_INDEX:
 		case TC2_INDEX:
 		case TC3_INDEX:
-		case TC5_INDEX:	/* Broadcast/multicast data packets */
-			QUEUE_GET_NEXT_ENTRY((P_QUE_ENTRY_T) prMsduInfo) = NULL;
-			QUEUE_INSERT_TAIL(prDataPort0, (P_QUE_ENTRY_T) prMsduInfo);
-			status = nicTxAcquireResource(prAdapter, prMsduInfo->ucTC,
-				nicTxGetPageCount(prMsduInfo->u2FrameLength, FALSE), TRUE);
+		case TC5_INDEX: /* Broadcast/multicast data packets */
+			QUEUE_GET_NEXT_ENTRY((P_QUE_ENTRY_T)prMsduInfo) = NULL;
+			QUEUE_INSERT_TAIL(prDataPort0, (P_QUE_ENTRY_T)prMsduInfo);
+			status = nicTxAcquireResource(
+					prAdapter, prMsduInfo->ucTC, nicTxGetPageCount(prMsduInfo->u2FrameLength, FALSE), TRUE);
 			ASSERT(status == WLAN_STATUS_SUCCESS);
 
 			break;
 
-		case TC4_INDEX:	/* Management packets */
-			QUEUE_GET_NEXT_ENTRY((P_QUE_ENTRY_T) prMsduInfo) = NULL;
-			QUEUE_INSERT_TAIL(prDataPort1, (P_QUE_ENTRY_T) prMsduInfo);
+		case TC4_INDEX: /* Management packets */
+			QUEUE_GET_NEXT_ENTRY((P_QUE_ENTRY_T)prMsduInfo) = NULL;
+			QUEUE_INSERT_TAIL(prDataPort1, (P_QUE_ENTRY_T)prMsduInfo);
 
-			status = nicTxAcquireResource(prAdapter, prMsduInfo->ucTC,
-				nicTxGetPageCount(prMsduInfo->u2FrameLength, FALSE), TRUE);
+			status = nicTxAcquireResource(
+					prAdapter, prMsduInfo->ucTC, nicTxGetPageCount(prMsduInfo->u2FrameLength, FALSE), TRUE);
 			ASSERT(status == WLAN_STATUS_SUCCESS);
 
 			break;
@@ -785,22 +755,22 @@ WLAN_STATUS nicTxMsduInfoList(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduI
 #if CFG_SUPPORT_MULTITHREAD
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief In this function, we'll aggregate frame(PACKET_INFO_T)
-* corresponding to HIF TX port
-*
-* @param prAdapter              Pointer to the Adapter structure.
-* @param prMsduInfoListHead     a link list of P_MSDU_INFO_T
-*
-* @retval WLAN_STATUS_SUCCESS   Bus access ok.
-* @retval WLAN_STATUS_FAILURE   Bus access fail.
-*/
+ * @brief In this function, we'll aggregate frame(PACKET_INFO_T)
+ * corresponding to HIF TX port
+ *
+ * @param prAdapter              Pointer to the Adapter structure.
+ * @param prMsduInfoListHead     a link list of P_MSDU_INFO_T
+ *
+ * @retval WLAN_STATUS_SUCCESS   Bus access ok.
+ * @retval WLAN_STATUS_FAILURE   Bus access fail.
+ */
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS nicTxMsduInfoListMthread(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfoListHead)
 {
 #if CFG_FIX_2_TX_PORT
 	P_MSDU_INFO_T prMsduInfo, prNextMsduInfo;
-	QUE_T qDataPort0, qDataPort1;
-	P_QUE_T prDataPort0, prDataPort1;
+	QUE_T		  qDataPort0, qDataPort1;
+	P_QUE_T		  prDataPort0, prDataPort1;
 
 	KAL_SPIN_LOCK_DECLARATION();
 
@@ -817,21 +787,21 @@ WLAN_STATUS nicTxMsduInfoListMthread(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T 
 
 	/* Separate MSDU_INFO_T lists into 2 categories: for Port#0 & Port#1 */
 	while (prMsduInfo) {
-		prNextMsduInfo = (P_MSDU_INFO_T) QUEUE_GET_NEXT_ENTRY((P_QUE_ENTRY_T) prMsduInfo);
+		prNextMsduInfo = (P_MSDU_INFO_T)QUEUE_GET_NEXT_ENTRY((P_QUE_ENTRY_T)prMsduInfo);
 
 		switch (prMsduInfo->ucTC) {
 		case TC0_INDEX:
 		case TC1_INDEX:
 		case TC2_INDEX:
 		case TC3_INDEX:
-		case TC5_INDEX:	/* Broadcast/multicast data packets */
-			QUEUE_GET_NEXT_ENTRY((P_QUE_ENTRY_T) prMsduInfo) = NULL;
-			QUEUE_INSERT_TAIL(prDataPort0, (P_QUE_ENTRY_T) prMsduInfo);
+		case TC5_INDEX: /* Broadcast/multicast data packets */
+			QUEUE_GET_NEXT_ENTRY((P_QUE_ENTRY_T)prMsduInfo) = NULL;
+			QUEUE_INSERT_TAIL(prDataPort0, (P_QUE_ENTRY_T)prMsduInfo);
 			break;
 
-		case TC4_INDEX:	/* Management packets */
-			QUEUE_GET_NEXT_ENTRY((P_QUE_ENTRY_T) prMsduInfo) = NULL;
-			QUEUE_INSERT_TAIL(prDataPort1, (P_QUE_ENTRY_T) prMsduInfo);
+		case TC4_INDEX: /* Management packets */
+			QUEUE_GET_NEXT_ENTRY((P_QUE_ENTRY_T)prMsduInfo) = NULL;
+			QUEUE_INSERT_TAIL(prDataPort1, (P_QUE_ENTRY_T)prMsduInfo);
 			break;
 
 		default:
@@ -845,7 +815,6 @@ WLAN_STATUS nicTxMsduInfoListMthread(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T 
 	}
 
 	if (prDataPort0->u4NumElem > 0 || prDataPort1->u4NumElem > 0) {
-
 		KAL_ACQUIRE_SPIN_LOCK(prAdapter, SPIN_LOCK_TX_PORT_QUE);
 		QUEUE_CONCATENATE_QUEUES((&(prAdapter->rTxP0Queue)), (prDataPort0));
 		QUEUE_CONCATENATE_QUEUES((&(prAdapter->rTxP1Queue)), (prDataPort1));
@@ -856,10 +825,10 @@ WLAN_STATUS nicTxMsduInfoListMthread(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T 
 #else
 
 	P_MSDU_INFO_T prMsduInfo, prNextMsduInfo;
-	QUE_T qDataPort[TX_PORT_NUM];
-	P_QUE_T prDataPort[TX_PORT_NUM];
-	INT_32 i;
-	BOOLEAN fgSetTx2Hif = FALSE;
+	QUE_T		  qDataPort[TX_PORT_NUM];
+	P_QUE_T		  prDataPort[TX_PORT_NUM];
+	INT_32		  i;
+	BOOLEAN		  fgSetTx2Hif = FALSE;
 
 	KAL_SPIN_LOCK_DECLARATION();
 
@@ -875,18 +844,16 @@ WLAN_STATUS nicTxMsduInfoListMthread(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T 
 
 	/* Separate MSDU_INFO_T lists into 2 categories: for Port#0 & Port#1 */
 	while (prMsduInfo) {
-
-		fgSetTx2Hif = TRUE;
-		prNextMsduInfo = (P_MSDU_INFO_T) QUEUE_GET_NEXT_ENTRY((P_QUE_ENTRY_T) prMsduInfo);
+		fgSetTx2Hif	   = TRUE;
+		prNextMsduInfo = (P_MSDU_INFO_T)QUEUE_GET_NEXT_ENTRY((P_QUE_ENTRY_T)prMsduInfo);
 
 		if (prMsduInfo->ucWmmQueSet != DBDC_5G_WMM_INDEX) {
-			QUEUE_GET_NEXT_ENTRY((P_QUE_ENTRY_T) prMsduInfo) = NULL;
-			QUEUE_INSERT_TAIL(prDataPort[TX_2G_WMM_PORT_NUM], (P_QUE_ENTRY_T) prMsduInfo);
+			QUEUE_GET_NEXT_ENTRY((P_QUE_ENTRY_T)prMsduInfo) = NULL;
+			QUEUE_INSERT_TAIL(prDataPort[TX_2G_WMM_PORT_NUM], (P_QUE_ENTRY_T)prMsduInfo);
 		} else {
-			if (prMsduInfo->ucTC >= 0 &&
-				prMsduInfo->ucTC < TC_NUM) {
-				QUEUE_GET_NEXT_ENTRY((P_QUE_ENTRY_T) prMsduInfo) = NULL;
-				QUEUE_INSERT_TAIL(prDataPort[prMsduInfo->ucTC], (P_QUE_ENTRY_T) prMsduInfo);
+			if (prMsduInfo->ucTC >= 0 && prMsduInfo->ucTC < TC_NUM) {
+				QUEUE_GET_NEXT_ENTRY((P_QUE_ENTRY_T)prMsduInfo) = NULL;
+				QUEUE_INSERT_TAIL(prDataPort[prMsduInfo->ucTC], (P_QUE_ENTRY_T)prMsduInfo);
 			} else
 				ASSERT(0);
 		}
@@ -909,18 +876,18 @@ WLAN_STATUS nicTxMsduInfoListMthread(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T 
 
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief In this function, we'll write frame(PACKET_INFO_T) into HIF when apply multithread.
-*
-* @param prAdapter              Pointer to the Adapter structure.
-*
-* @retval WLAN_STATUS_SUCCESS   Bus access ok.
-* @retval WLAN_STATUS_FAILURE   Bus access fail.
-*/
+ * @brief In this function, we'll write frame(PACKET_INFO_T) into HIF when apply multithread.
+ *
+ * @param prAdapter              Pointer to the Adapter structure.
+ *
+ * @retval WLAN_STATUS_SUCCESS   Bus access ok.
+ * @retval WLAN_STATUS_FAILURE   Bus access fail.
+ */
 /*----------------------------------------------------------------------------*/
 UINT_32 nicTxMsduQueueMthread(IN P_ADAPTER_T prAdapter)
 {
 #if CFG_FIX_2_TX_PORT
-	QUE_T qDataPort0, qDataPort1;
+	QUE_T	qDataPort0, qDataPort1;
 	P_QUE_T prDataPort0, prDataPort1;
 	UINT_32 u4TxLoopCount;
 
@@ -970,9 +937,9 @@ UINT_32 nicTxMsduQueueMthread(IN P_ADAPTER_T prAdapter)
 #else
 
 	UINT_32 u4TxLoopCount;
-	QUE_T qDataPort[TX_PORT_NUM];
+	QUE_T	qDataPort[TX_PORT_NUM];
 	P_QUE_T prDataPort[TX_PORT_NUM];
-	INT_32 i;
+	INT_32	i;
 
 	KAL_SPIN_LOCK_DECLARATION();
 
@@ -1011,7 +978,7 @@ UINT_32 nicTxGetMsduPendingCnt(IN P_ADAPTER_T prAdapter)
 #if CFG_FIX_2_TX_PORT
 	return prAdapter->rTxP0Queue.u4NumElem + prAdapter->rTxP1Queue.u4NumElem;
 #else
-	INT_32 i;
+	INT_32	i;
 	UINT_32 retValue = 0;
 
 	for (i = 0; i < TX_PORT_NUM; i++)
@@ -1022,8 +989,7 @@ UINT_32 nicTxGetMsduPendingCnt(IN P_ADAPTER_T prAdapter)
 
 #endif
 
-VOID nicTxComposeDescAppend(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo,
-	OUT PUINT_8 prTxDescBuffer)
+VOID nicTxComposeDescAppend(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo, OUT PUINT_8 prTxDescBuffer)
 {
 	P_HW_MAC_TX_DESC_APPEND_T prHwTxDescAppend;
 
@@ -1036,25 +1002,24 @@ VOID nicTxComposeDescAppend(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInf
 
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief In this function, we'll compose the Tx descriptor of the MSDU.
-*
-* @param prAdapter              Pointer to the Adapter structure.
-* @param prMsduInfo             Pointer to the Msdu info
-* @param prTxDesc               Pointer to the Tx descriptor buffer
-*
-* @retval VOID
-*/
+ * @brief In this function, we'll compose the Tx descriptor of the MSDU.
+ *
+ * @param prAdapter              Pointer to the Adapter structure.
+ * @param prMsduInfo             Pointer to the Msdu info
+ * @param prTxDesc               Pointer to the Tx descriptor buffer
+ *
+ * @retval VOID
+ */
 /*----------------------------------------------------------------------------*/
-VOID
-nicTxComposeDesc(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo,
-	IN UINT_32 u4TxDescLength, IN BOOLEAN fgIsTemplate, OUT PUINT_8 prTxDescBuffer)
+VOID nicTxComposeDesc(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo, IN UINT_32 u4TxDescLength,
+		IN BOOLEAN fgIsTemplate, OUT PUINT_8 prTxDescBuffer)
 {
 	P_HW_MAC_TX_DESC_T prTxDesc;
-	P_STA_RECORD_T prStaRec;
-	P_BSS_INFO_T prBssInfo;
-	UINT_8 ucEtherTypeOffsetInWord;
-	UINT_32 u4TxDescAndPaddingLength;
-	UINT_8 ucTarPort, ucTarQueue;
+	P_STA_RECORD_T	   prStaRec;
+	P_BSS_INFO_T	   prBssInfo;
+	UINT_8			   ucEtherTypeOffsetInWord;
+	UINT_32			   u4TxDescAndPaddingLength;
+	UINT_8			   ucTarPort, ucTarQueue;
 #if ((CFG_SISO_SW_DEVELOP == 1) || (CFG_SUPPORT_ANT_SELECT == 1))
 	enum ENUM_WF_PATH_FAVOR_T eWfPathFavor;
 #endif
@@ -1062,9 +1027,9 @@ nicTxComposeDesc(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo,
 	UINT_8 ucRefTc, ucWmm;
 #endif
 
-	prTxDesc = (P_HW_MAC_TX_DESC_T) prTxDescBuffer;
+	prTxDesc  = (P_HW_MAC_TX_DESC_T)prTxDescBuffer;
 	prBssInfo = GET_BSS_INFO_BY_INDEX(prAdapter, prMsduInfo->ucBssIndex);
-	prStaRec = cnmGetStaRecByIndex(prAdapter, prMsduInfo->ucStaRecIndex);
+	prStaRec  = cnmGetStaRecByIndex(prAdapter, prMsduInfo->ucStaRecIndex);
 
 	u4TxDescAndPaddingLength = u4TxDescLength + NIC_TX_DESC_PADDING_LENGTH;
 
@@ -1077,7 +1042,7 @@ nicTxComposeDesc(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo,
 	/* Ether-type offset */
 	if (prMsduInfo->fgIs802_11) {
 		ucEtherTypeOffsetInWord =
-		    (NIC_TX_PSE_HEADER_LENGTH + prMsduInfo->ucMacHeaderLength + prMsduInfo->ucLlcLength) >> 1;
+				(NIC_TX_PSE_HEADER_LENGTH + prMsduInfo->ucMacHeaderLength + prMsduInfo->ucLlcLength) >> 1;
 	} else {
 		ucEtherTypeOffsetInWord = ((ETHER_HEADER_LEN - ETHER_TYPE_LEN) + NIC_TX_PSE_HEADER_LENGTH) >> 1;
 	}
@@ -1093,18 +1058,15 @@ nicTxComposeDesc(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo,
 		/*try to find refTc*/
 		ucWmm = nicTxGetWmmIdxByTc(prMsduInfo->ucTC);
 		if (arTcRemapTable[ucWmm][ucRefTc] == (prMsduInfo->ucTC)) {
-			ucTarQueue =
-			arTcResourceControl[ucRefTc].ucDestQueueIndex;
+			ucTarQueue = arTcResourceControl[ucRefTc].ucDestQueueIndex;
 			break;
 		}
 	}
 	if (ucTarQueue == 0xFF) {
-		DBGLOG(TX, WARN, "Cannot find refTc. (%d, %d))\n\n",
-		(prMsduInfo->ucTC), nicTxGetWmmIdxByTc(prMsduInfo->ucTC));
+		DBGLOG(TX, WARN, "Cannot find refTc. (%d, %d))\n\n", (prMsduInfo->ucTC), nicTxGetWmmIdxByTc(prMsduInfo->ucTC));
 
 		/*whatever, go ahead*/
-		ucTarQueue =
-		arTcResourceControl[prMsduInfo->ucTC].ucDestQueueIndex;
+		ucTarQueue = arTcResourceControl[prMsduInfo->ucTC].ucDestQueueIndex;
 	}
 
 #else
@@ -1127,7 +1089,7 @@ nicTxComposeDesc(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo,
 			/* Fixed M rate for choosing first unicast sta */
 			DBGLOG(TX, LOUD, "Force Mcast index to used Sta index\n");
 			prMsduInfo->u4FixedRateOption = prAdapter->rWifiVar.u4DataTxRateCode;
-			//nicTxSetPktFixedRateOption(prMsduInfo, prMsduInfo->u4FixedRateOption, FIX_BW_NO_FIXED, FALSE, FALSE);
+			// nicTxSetPktFixedRateOption(prMsduInfo, prMsduInfo->u4FixedRateOption, FIX_BW_NO_FIXED, FALSE, FALSE);
 			DBGLOG(TX, LOUD, "nicTxFillDesc:  multicast fixed rate : (%02x) \n", prMsduInfo->u4FixedRateOption);
 			/* Update rate here if BMC force rate */
 			HAL_MAC_TX_DESC_SET_DW(prTxDesc, 6, 1, &prMsduInfo->u4FixedRateOption);
@@ -1140,10 +1102,10 @@ nicTxComposeDesc(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo,
 	/* WLAN index */
 	prMsduInfo->ucWlanIndex = nicTxGetWlanIdx(prAdapter, prMsduInfo->ucBssIndex, prMsduInfo->ucStaRecIndex);
 
-#if 0				/* DBG */
+#if 0 /* DBG */
 	DBGLOG(RSN, INFO,
-	       "Tx WlanIndex = %d eAuthMode = %d\n", prMsduInfo->ucWlanIndex,
-	       prAdapter->rWifiVar.rConnSettings.eAuthMode);
+			"Tx WlanIndex = %d eAuthMode = %d\n", prMsduInfo->ucWlanIndex,
+			prAdapter->rWifiVar.rConnSettings.eAuthMode);
 #endif
 	HAL_MAC_TX_DESC_SET_WLAN_INDEX(prTxDesc, prMsduInfo->ucWlanIndex);
 
@@ -1172,7 +1134,7 @@ nicTxComposeDesc(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo,
 				nicTxConfigPktOption(prMsduInfo, MSDU_OPT_PROTECTED_FRAME, FALSE);
 				DBGLOG(RSN, LOUD, "Pairwise EAPoL not protect!\n");
 			}
-		} else if (prMsduInfo->ucStaRecIndex == STA_REC_INDEX_BMCAST) {/* BMC packet */
+		} else if (prMsduInfo->ucStaRecIndex == STA_REC_INDEX_BMCAST) { /* BMC packet */
 			nicTxConfigPktOption(prMsduInfo, MSDU_OPT_PROTECTED_FRAME, TRUE);
 			DBGLOG(RSN, LOUD, "Protect BMC frame!\n");
 		}
@@ -1196,21 +1158,19 @@ nicTxComposeDesc(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo,
 		/* Short format, Skip DW 2~6 */
 		return;
 	}
-		HAL_MAC_TX_DESC_SET_LONG_FORMAT(prTxDesc);
+	HAL_MAC_TX_DESC_SET_LONG_FORMAT(prTxDesc);
 
-		/* Update Packet option */
-		nicTxFillDescByPktOption(prMsduInfo, prTxDesc);
+	/* Update Packet option */
+	nicTxFillDescByPktOption(prMsduInfo, prTxDesc);
 
-		nicTxFillDescByPktControl(prMsduInfo, prTxDesc);
+	nicTxFillDescByPktControl(prMsduInfo, prTxDesc);
 
 	/* Type */
 	if (prMsduInfo->fgIs802_11) {
-		P_WLAN_MAC_HEADER_T prWlanHeader =
-		    (P_WLAN_MAC_HEADER_T) ((ULONG) (prMsduInfo->prPacket) + MAC_TX_RESERVED_FIELD);
+		P_WLAN_MAC_HEADER_T prWlanHeader = (P_WLAN_MAC_HEADER_T)((ULONG)(prMsduInfo->prPacket) + MAC_TX_RESERVED_FIELD);
 
 		HAL_MAC_TX_DESC_SET_TYPE(prTxDesc, (prWlanHeader->u2FrameCtrl & MASK_FC_TYPE) >> 2);
-		HAL_MAC_TX_DESC_SET_SUB_TYPE(prTxDesc,
-					     (prWlanHeader->u2FrameCtrl & MASK_FC_SUBTYPE) >> OFFSET_OF_FC_SUBTYPE);
+		HAL_MAC_TX_DESC_SET_SUB_TYPE(prTxDesc, (prWlanHeader->u2FrameCtrl & MASK_FC_SUBTYPE) >> OFFSET_OF_FC_SUBTYPE);
 	}
 	/* PID */
 	if (prMsduInfo->pfTxDoneHandler) {
@@ -1225,11 +1185,9 @@ nicTxComposeDesc(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo,
 
 	/* Remaining TX time */
 	if (!(prMsduInfo->u4Option & MSDU_OPT_MANUAL_LIFE_TIME)) {
-
 #if (HIF_TX_RSRC_WMM_ENHANCE == 1)
-		ucRefTc = aucTid2ACI[prMsduInfo->ucUserPriority];
-		prMsduInfo->u4RemainingLifetime =
-			arTcTrafficSettings[ucRefTc].u4RemainingTxTime;
+		ucRefTc							= aucTid2ACI[prMsduInfo->ucUserPriority];
+		prMsduInfo->u4RemainingLifetime = arTcTrafficSettings[ucRefTc].u4RemainingTxTime;
 #else
 		prMsduInfo->u4RemainingLifetime = arTcTrafficSettings[prMsduInfo->ucTC].u4RemainingTxTime;
 #endif
@@ -1241,11 +1199,10 @@ nicTxComposeDesc(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo,
 	if (!(prMsduInfo->u4Option & MSDU_OPT_MANUAL_RETRY_LIMIT)) {
 		/* Note: BMC packet retry limit is set to unlimited */
 #if (HIF_TX_RSRC_WMM_ENHANCE == 1)
-		ucRefTc = aucTid2ACI[prMsduInfo->ucUserPriority];
-		prMsduInfo->ucRetryLimit =
-			arTcTrafficSettings[ucRefTc].ucTxCountLimit;
+		ucRefTc					 = aucTid2ACI[prMsduInfo->ucUserPriority];
+		prMsduInfo->ucRetryLimit = arTcTrafficSettings[ucRefTc].ucTxCountLimit;
 #else
-		prMsduInfo->ucRetryLimit = arTcTrafficSettings[prMsduInfo->ucTC].ucTxCountLimit;
+		prMsduInfo->ucRetryLimit		= arTcTrafficSettings[prMsduInfo->ucTC].ucTxCountLimit;
 #endif
 	}
 	HAL_MAC_TX_DESC_SET_REMAINING_TX_COUNT(prTxDesc, prMsduInfo->ucRetryLimit);
@@ -1281,33 +1238,31 @@ nicTxComposeDesc(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo,
 	default:
 		break;
 	}
-		if (prMsduInfo->fgIs802_1x) {
-			if (prAdapter->fgIsTest1xTx == 2) {
-				DBGLOG(RSN, STATE, "%s: (fgIsTest1xTx == 2) test 1XTX frame stuck in queue\n", __func__);
-				HAL_MAC_TX_DESC_SET_FR_RATE(prTxDesc, 0xff);
-				HAL_MAC_TX_DESC_SET_FIXED_RATE_MODE_TO_DESC(prTxDesc);
-				HAL_MAC_TX_DESC_SET_FIXED_RATE_ENABLE(prTxDesc);
-			}
+	if (prMsduInfo->fgIs802_1x) {
+		if (prAdapter->fgIsTest1xTx == 2) {
+			DBGLOG(RSN, STATE, "%s: (fgIsTest1xTx == 2) test 1XTX frame stuck in queue\n", __func__);
+			HAL_MAC_TX_DESC_SET_FR_RATE(prTxDesc, 0xff);
+			HAL_MAC_TX_DESC_SET_FIXED_RATE_MODE_TO_DESC(prTxDesc);
+			HAL_MAC_TX_DESC_SET_FIXED_RATE_ENABLE(prTxDesc);
 		}
-
+	}
 }
 
-VOID
-nicTxComposeSecurityFrameDesc(IN P_ADAPTER_T prAdapter,
-			      IN P_CMD_INFO_T prCmdInfo, OUT PUINT_8 prTxDescBuffer, OUT PUINT_8 pucTxDescLength)
+VOID nicTxComposeSecurityFrameDesc(
+		IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo, OUT PUINT_8 prTxDescBuffer, OUT PUINT_8 pucTxDescLength)
 {
-	P_HW_MAC_TX_DESC_T prTxDesc = (P_HW_MAC_TX_DESC_T) prTxDescBuffer;
-	UINT_8 ucTxDescAndPaddingLength = NIC_TX_DESC_LONG_FORMAT_LENGTH + NIC_TX_DESC_PADDING_LENGTH;
+	P_HW_MAC_TX_DESC_T prTxDesc					= (P_HW_MAC_TX_DESC_T)prTxDescBuffer;
+	UINT_8			   ucTxDescAndPaddingLength = NIC_TX_DESC_LONG_FORMAT_LENGTH + NIC_TX_DESC_PADDING_LENGTH;
 	/* P_STA_RECORD_T prStaRec = cnmGetStaRecByIndex(prAdapter, prCmdInfo->ucStaRecIndex); */
-	P_BSS_INFO_T prBssInfo;
-	UINT_8 ucTid = 0;
-	UINT_8 ucTempTC = TC4_INDEX;
+	P_BSS_INFO_T	prBssInfo;
+	UINT_8			ucTid	 = 0;
+	UINT_8			ucTempTC = TC4_INDEX;
 	P_NATIVE_PACKET prNativePacket;
-	UINT_8 ucEtherTypeOffsetInWord;
-	P_MSDU_INFO_T prMsduInfo;
+	UINT_8			ucEtherTypeOffsetInWord;
+	P_MSDU_INFO_T	prMsduInfo;
 
-	prMsduInfo = prCmdInfo->prMsduInfo;
-	prBssInfo = GET_BSS_INFO_BY_INDEX(prAdapter, prMsduInfo->ucBssIndex);
+	prMsduInfo	   = prCmdInfo->prMsduInfo;
+	prBssInfo	   = GET_BSS_INFO_BY_INDEX(prAdapter, prMsduInfo->ucBssIndex);
 	prNativePacket = prMsduInfo->prPacket;
 
 	ASSERT(prNativePacket);
@@ -1408,23 +1363,22 @@ BOOLEAN nicTxIsTXDTemplateAllowed(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prM
 
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief In this function, we'll compose the Tx descriptor of the MSDU.
-*
-* @param prAdapter              Pointer to the Adapter structure.
-* @param prMsduInfo             Pointer to the Msdu info
-* @param prTxDesc               Pointer to the Tx descriptor buffer
-*
-* @retval VOID
-*/
+ * @brief In this function, we'll compose the Tx descriptor of the MSDU.
+ *
+ * @param prAdapter              Pointer to the Adapter structure.
+ * @param prMsduInfo             Pointer to the Msdu info
+ * @param prTxDesc               Pointer to the Tx descriptor buffer
+ *
+ * @retval VOID
+ */
 /*----------------------------------------------------------------------------*/
-VOID
-nicTxFillDesc(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo,
-	OUT PUINT_8 prTxDescBuffer, OUT PUINT_32 pu4TxDescLength)
+VOID nicTxFillDesc(
+		IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo, OUT PUINT_8 prTxDescBuffer, OUT PUINT_32 pu4TxDescLength)
 {
-	P_HW_MAC_TX_DESC_T prTxDesc = (P_HW_MAC_TX_DESC_T) prTxDescBuffer;
+	P_HW_MAC_TX_DESC_T prTxDesc			= (P_HW_MAC_TX_DESC_T)prTxDescBuffer;
 	P_HW_MAC_TX_DESC_T prTxDescTemplate = NULL;
-	P_STA_RECORD_T prStaRec = cnmGetStaRecByIndex(prAdapter, prMsduInfo->ucStaRecIndex);
-	UINT_32 u4TxDescLength, u4TxDescAppendLength;
+	P_STA_RECORD_T	   prStaRec			= cnmGetStaRecByIndex(prAdapter, prMsduInfo->ucStaRecIndex);
+	UINT_32			   u4TxDescLength, u4TxDescAppendLength;
 #if CFG_TCP_IP_CHKSUM_OFFLOAD
 	UINT_8 ucChksumFlag = 0;
 #endif
@@ -1434,11 +1388,11 @@ nicTxFillDesc(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo,
 	KAL_SPIN_LOCK_DECLARATION();
 	KAL_ACQUIRE_SPIN_LOCK(prAdapter, SPIN_LOCK_TX_DESC);
 
-/*
-*------------------------------------------------------------------------------
-* Fill up common fileds
-*------------------------------------------------------------------------------
-*/
+	/*
+	 *------------------------------------------------------------------------------
+	 * Fill up common fileds
+	 *------------------------------------------------------------------------------
+	 */
 	/* Decide TxD append length */
 	if (prMsduInfo->ucPacketType == TX_PACKET_TYPE_DATA)
 		u4TxDescAppendLength = HW_MAC_TX_DESC_APPEND_T_LENGTH;
@@ -1447,7 +1401,7 @@ nicTxFillDesc(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo,
 
 	/* Get TXD from pre-allocated template */
 	if (nicTxIsTXDTemplateAllowed(prAdapter, prMsduInfo, prStaRec) &&
-		prStaRec->aprTxDescTemplate[prMsduInfo->ucUserPriority]) {
+			prStaRec->aprTxDescTemplate[prMsduInfo->ucUserPriority]) {
 		prTxDescTemplate = prStaRec->aprTxDescTemplate[prMsduInfo->ucUserPriority];
 #if 1
 		u4TxDescLength = NIC_TX_DESC_LONG_FORMAT_LENGTH;
@@ -1464,11 +1418,11 @@ nicTxFillDesc(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo,
 		nicTxFillDescByPktOption(prMsduInfo, prTxDesc);
 #ifdef CFG_SUPPORT_MULTICAST_ENHANCEMENT
 		/* Set no ack here and no enable BMC in Burst mode*/
-		if(IS_BMCAST_MAC_ADDR(prMsduInfo->aucEthDestAddr)) {
+		if (IS_BMCAST_MAC_ADDR(prMsduInfo->aucEthDestAddr)) {
 			/* Force mcast rate here   */
-			if(prAdapter->fgIsFixedMRate) {
+			if (prAdapter->fgIsFixedMRate) {
 				prMsduInfo->u4FixedRateOption = prAdapter->rWifiVar.u4DataTxRateCode;
-				//nicTxSetPktFixedRateOption(prMsduInfo, prMsduInfo->u4FixedRateOption, FIX_BW_NO_FIXED, FALSE, FALSE);
+				// nicTxSetPktFixedRateOption(prMsduInfo, prMsduInfo->u4FixedRateOption, FIX_BW_NO_FIXED, FALSE, FALSE);
 				DBGLOG(QM, LOUD, "nicTxFillDesc:  multicast fixed rate : (%02x) \n", prMsduInfo->u4FixedRateOption);
 				/* Update rate here if BMC force rate */
 				HAL_MAC_TX_DESC_SET_DW(prTxDesc, 6, 1, &prMsduInfo->u4FixedRateOption);
@@ -1488,19 +1442,18 @@ nicTxFillDesc(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo,
 			nicTxComposeDescAppend(prAdapter, prMsduInfo, prTxDescBuffer + u4TxDescLength);
 	}
 
-/*
-*------------------------------------------------------------------------------
-* Fill up remaining parts, per-packet variant fields
-*------------------------------------------------------------------------------
-*/
+	/*
+	 *------------------------------------------------------------------------------
+	 * Fill up remaining parts, per-packet variant fields
+	 *------------------------------------------------------------------------------
+	 */
 	/* Calculate Tx byte count */
 	HAL_MAC_TX_DESC_SET_TX_BYTE_COUNT(prTxDesc, u4TxDescLength + u4TxDescAppendLength + prMsduInfo->u2FrameLength);
 
 	/* Checksum offload */
 #if CFG_TCP_IP_CHKSUM_OFFLOAD
 	if (prAdapter->fgIsSupportCsumOffload && prMsduInfo->eSrc == TX_PACKET_OS) {
-		if (prAdapter->u4CSUMFlags &
-				(CSUM_OFFLOAD_EN_TX_TCP | CSUM_OFFLOAD_EN_TX_UDP | CSUM_OFFLOAD_EN_TX_IP)) {
+		if (prAdapter->u4CSUMFlags & (CSUM_OFFLOAD_EN_TX_TCP | CSUM_OFFLOAD_EN_TX_UDP | CSUM_OFFLOAD_EN_TX_IP)) {
 			ASSERT(prMsduInfo->prPacket);
 			kalQueryTxChksumOffloadParam(prMsduInfo->prPacket, &ucChksumFlag);
 			if ((ucChksumFlag & TX_CS_IP_GEN))
@@ -1525,8 +1478,7 @@ nicTxFillDesc(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo,
 	KAL_RELEASE_SPIN_LOCK(prAdapter, SPIN_LOCK_TX_DESC);
 }
 
-VOID
-nicTxFillDataDesc(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo)
+VOID nicTxFillDataDesc(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo)
 {
 	PUINT_8 pucOutputBuf;
 
@@ -1535,12 +1487,12 @@ nicTxFillDataDesc(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo)
 	nicTxFillDesc(prAdapter, prMsduInfo, pucOutputBuf, NULL);
 }
 
-VOID
-nicTxCopyDesc(IN P_ADAPTER_T prAdapter, IN PUINT_8 pucTarTxDesc, IN PUINT_8 pucSrcTxDesc, OUT PUINT_8 pucTxDescLength)
+VOID nicTxCopyDesc(
+		IN P_ADAPTER_T prAdapter, IN PUINT_8 pucTarTxDesc, IN PUINT_8 pucSrcTxDesc, OUT PUINT_8 pucTxDescLength)
 {
 	UINT_8 ucTxDescLength;
 
-	if (HAL_MAC_TX_DESC_IS_LONG_FORMAT((P_HW_MAC_TX_DESC_T) pucSrcTxDesc))
+	if (HAL_MAC_TX_DESC_IS_LONG_FORMAT((P_HW_MAC_TX_DESC_T)pucSrcTxDesc))
 		ucTxDescLength = NIC_TX_DESC_LONG_FORMAT_LENGTH;
 	else
 		ucTxDescLength = NIC_TX_DESC_SHORT_FORMAT_LENGTH;
@@ -1553,25 +1505,25 @@ nicTxCopyDesc(IN P_ADAPTER_T prAdapter, IN PUINT_8 pucTarTxDesc, IN PUINT_8 pucS
 
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief In this function, we'll generate Tx descriptor template for each TID.
-*
-* @param prAdapter              Pointer to the Adapter structure.
-* @param prStaRec              Pointer to the StaRec structure.
-*
-* @retval VOID
-*/
+ * @brief In this function, we'll generate Tx descriptor template for each TID.
+ *
+ * @param prAdapter              Pointer to the Adapter structure.
+ * @param prStaRec              Pointer to the StaRec structure.
+ *
+ * @retval VOID
+ */
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS nicTxGenerateDescTemplate(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec)
 {
-	UINT_8 ucTid;
-	UINT_8 ucTc;
-	UINT_32 u4TxDescSize, u4TxDescAppendSize;
+	UINT_8			   ucTid;
+	UINT_8			   ucTc;
+	UINT_32			   u4TxDescSize, u4TxDescAppendSize;
 	P_HW_MAC_TX_DESC_T prTxDesc;
-	P_MSDU_INFO_T prMsduInfo;
-	WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
+	P_MSDU_INFO_T	   prMsduInfo;
+	WLAN_STATUS		   rStatus = WLAN_STATUS_SUCCESS;
 #if (HIF_TX_RSRC_WMM_ENHANCE == 1)
-	UINT_8 ucRefTc;
-	P_BSS_INFO_T	prBssInfo;
+	UINT_8		 ucRefTc;
+	P_BSS_INFO_T prBssInfo;
 #endif
 
 	ASSERT(prAdapter);
@@ -1587,24 +1539,24 @@ WLAN_STATUS nicTxGenerateDescTemplate(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_
 		return WLAN_STATUS_RESOURCES;
 
 	/* Fill up MsduInfo template */
-	prMsduInfo->eSrc = TX_PACKET_OS;
-	prMsduInfo->fgIs802_11 = FALSE;
-	prMsduInfo->fgIs802_1x = FALSE;
+	prMsduInfo->eSrc					= TX_PACKET_OS;
+	prMsduInfo->fgIs802_11				= FALSE;
+	prMsduInfo->fgIs802_1x				= FALSE;
 	prMsduInfo->fgIs802_1x_NonProtected = FALSE;
-	prMsduInfo->fgIs802_3 = FALSE;
-	prMsduInfo->fgIsVlanExists = FALSE;
-	prMsduInfo->pfTxDoneHandler = NULL;
-	prMsduInfo->prPacket = NULL;
-	prMsduInfo->u2FrameLength = 0;
-	prMsduInfo->u4Option = 0;
-	prMsduInfo->u4FixedRateOption = 0;
-	prMsduInfo->ucRateMode = MSDU_RATE_MODE_AUTO;
-	prMsduInfo->ucBssIndex = prStaRec->ucBssIndex;
-	prMsduInfo->ucPacketType = TX_PACKET_TYPE_DATA;
-	prMsduInfo->ucStaRecIndex = prStaRec->ucIndex;
-	prMsduInfo->ucPID = NIC_TX_DESC_PID_RESERVED;
+	prMsduInfo->fgIs802_3				= FALSE;
+	prMsduInfo->fgIsVlanExists			= FALSE;
+	prMsduInfo->pfTxDoneHandler			= NULL;
+	prMsduInfo->prPacket				= NULL;
+	prMsduInfo->u2FrameLength			= 0;
+	prMsduInfo->u4Option				= 0;
+	prMsduInfo->u4FixedRateOption		= 0;
+	prMsduInfo->ucRateMode				= MSDU_RATE_MODE_AUTO;
+	prMsduInfo->ucBssIndex				= prStaRec->ucBssIndex;
+	prMsduInfo->ucPacketType			= TX_PACKET_TYPE_DATA;
+	prMsduInfo->ucStaRecIndex			= prStaRec->ucIndex;
+	prMsduInfo->ucPID					= NIC_TX_DESC_PID_RESERVED;
 
-	u4TxDescSize = NIC_TX_DESC_LONG_FORMAT_LENGTH;
+	u4TxDescSize	   = NIC_TX_DESC_LONG_FORMAT_LENGTH;
 	u4TxDescAppendSize = HW_MAC_TX_DESC_APPEND_T_LENGTH;
 
 	DBGLOG(QM, INFO, "Generate TXD template for STA[%u] QoS[%u]\n", prStaRec->ucIndex, prStaRec->fgIsQoS);
@@ -1613,7 +1565,6 @@ WLAN_STATUS nicTxGenerateDescTemplate(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_
 	if (prStaRec->fgIsQoS) {
 		/* For QoS STA, generate 8 TXD template (TID0~TID7) */
 		for (ucTid = 0; ucTid < TX_DESC_TID_NUM; ucTid++) {
-
 			if (prAdapter->rWifiVar.ucTcRestrict < TC_NUM) {
 				ucTc = prAdapter->rWifiVar.ucTcRestrict;
 
@@ -1626,20 +1577,16 @@ WLAN_STATUS nicTxGenerateDescTemplate(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_
 #if (HIF_TX_RSRC_WMM_ENHANCE == 1)
 				ucRefTc = ucTc;
 
-				prBssInfo = GET_BSS_INFO_BY_INDEX(prAdapter,
-						prStaRec->ucBssIndex);
-				ucTc =
-				arTcRemapTable[prBssInfo->ucWmmQueSet][ucTc];
+				prBssInfo = GET_BSS_INFO_BY_INDEX(prAdapter, prStaRec->ucBssIndex);
+				ucTc	  = arTcRemapTable[prBssInfo->ucWmmQueSet][ucTc];
 #endif
 			}
 
 #if (HIF_TX_RSRC_WMM_ENHANCE == 1)
-			u4TxDescSize =
-				arTcTrafficSettings[ucRefTc].u4TxDescLength;
+			u4TxDescSize = arTcTrafficSettings[ucRefTc].u4TxDescLength;
 #else
-			u4TxDescSize = arTcTrafficSettings[ucTc].u4TxDescLength;
+			u4TxDescSize   = arTcTrafficSettings[ucTc].u4TxDescLength;
 #endif
-
 
 			/* Include TxD append */
 			prTxDesc = kalMemAlloc(u4TxDescSize + u4TxDescAppendSize, VIR_MEM_TYPE);
@@ -1651,10 +1598,10 @@ WLAN_STATUS nicTxGenerateDescTemplate(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_
 
 			/* Update MsduInfo TID & TC */
 			prMsduInfo->ucUserPriority = ucTid;
-			prMsduInfo->ucTC = ucTc;
+			prMsduInfo->ucTC		   = ucTc;
 
 			/* Compose Tx desc template */
-			nicTxComposeDesc(prAdapter, prMsduInfo, u4TxDescSize, TRUE, (PUINT_8) prTxDesc);
+			nicTxComposeDesc(prAdapter, prMsduInfo, u4TxDescSize, TRUE, (PUINT_8)prTxDesc);
 
 			/* Fill TxD append */
 			nicTxComposeDescAppend(prAdapter, prMsduInfo, ((PUINT_8)prTxDesc + u4TxDescSize));
@@ -1666,16 +1613,14 @@ WLAN_STATUS nicTxGenerateDescTemplate(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_
 		do {
 			if (prAdapter->rWifiVar.ucTcRestrict < TC_NUM)
 				ucTc = prAdapter->rWifiVar.ucTcRestrict;
-			else{
+			else {
 				/*get TC index*/
 				ucTc = arNetwork2TcResource[prStaRec->ucBssIndex][NET_TC_WMM_AC_BE_INDEX];
 
 #if (HIF_TX_RSRC_WMM_ENHANCE == 1)
-				prBssInfo = GET_BSS_INFO_BY_INDEX(prAdapter,
-						prStaRec->ucBssIndex);
+				prBssInfo = GET_BSS_INFO_BY_INDEX(prAdapter, prStaRec->ucBssIndex);
 
-				ucTc =
-				arTcRemapTable[prBssInfo->ucWmmQueSet][ucTc];
+				ucTc = arTcRemapTable[prBssInfo->ucWmmQueSet][ucTc];
 #endif
 			}
 
@@ -1689,17 +1634,17 @@ WLAN_STATUS nicTxGenerateDescTemplate(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_
 			}
 			/* Update MsduInfo TID & TC */
 			prMsduInfo->ucUserPriority = 0;
-			prMsduInfo->ucTC = ucTc;
+			prMsduInfo->ucTC		   = ucTc;
 
 			/* Compose Tx desc template */
-			nicTxComposeDesc(prAdapter, prMsduInfo, u4TxDescSize, TRUE, (PUINT_8) prTxDesc);
+			nicTxComposeDesc(prAdapter, prMsduInfo, u4TxDescSize, TRUE, (PUINT_8)prTxDesc);
 
 			/* Fill TxD append */
 			nicTxComposeDescAppend(prAdapter, prMsduInfo, ((PUINT_8)prTxDesc + u4TxDescSize));
 
 			for (ucTid = 0; ucTid < TX_DESC_TID_NUM; ucTid++) {
 				prStaRec->aprTxDescTemplate[ucTid] = prTxDesc;
-				DBGLOG(QM, TRACE, "TXD template: TID[%u] Ptr[0x%x]\n", ucTid, (ULONG) prTxDesc);
+				DBGLOG(QM, TRACE, "TXD template: TID[%u] Ptr[0x%x]\n", ucTid, (ULONG)prTxDesc);
 			}
 		} while (FALSE);
 	}
@@ -1711,20 +1656,20 @@ WLAN_STATUS nicTxGenerateDescTemplate(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_
 
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief In this function, we'll free Tx descriptor template for each TID.
-*
-* @param prAdapter              Pointer to the Adapter structure.
-* @param prStaRec              Pointer to the StaRec structure.
-*
-* @retval VOID
-*/
+ * @brief In this function, we'll free Tx descriptor template for each TID.
+ *
+ * @param prAdapter              Pointer to the Adapter structure.
+ * @param prStaRec              Pointer to the StaRec structure.
+ *
+ * @retval VOID
+ */
 /*----------------------------------------------------------------------------*/
 #if KERNEL_VERSION(4, 19, 0) <= LINUX_VERSION_CODE
 VOID nicTxFreeDescTemplate(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec)
 {
-	UINT_8 ucTid;
-	UINT_8 ucTxDescSizeList[TX_DESC_TID_NUM] = {0};
-	P_HW_MAC_TX_DESC_T prTxDescList[TX_DESC_TID_NUM] = {NULL};
+	UINT_8			   ucTid;
+	UINT_8			   ucTxDescSizeList[TX_DESC_TID_NUM] = { 0 };
+	P_HW_MAC_TX_DESC_T prTxDescList[TX_DESC_TID_NUM]	 = { NULL };
 
 	/* This is to lock the process to preventing */
 	/* nicTxFreeDescTemplate while Filling it */
@@ -1734,8 +1679,7 @@ VOID nicTxFreeDescTemplate(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec)
 	DBGLOG(QM, INFO, "Free TXD template for STA[%u] QoS[%u]\n", prStaRec->ucIndex, prStaRec->fgIsQoS);
 
 	for (ucTid = 0; ucTid < TX_DESC_TID_NUM; ucTid++) {
-		prTxDescList[ucTid] =
-			(P_HW_MAC_TX_DESC_T) prStaRec->aprTxDescTemplate[ucTid];
+		prTxDescList[ucTid] = (P_HW_MAC_TX_DESC_T)prStaRec->aprTxDescTemplate[ucTid];
 
 		if (prTxDescList[ucTid]) {
 			if (HAL_MAC_TX_DESC_IS_LONG_FORMAT(prTxDescList[ucTid]))
@@ -1750,12 +1694,11 @@ VOID nicTxFreeDescTemplate(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec)
 	KAL_RELEASE_SPIN_LOCK(prAdapter, SPIN_LOCK_TX_DESC);
 
 	for (ucTid = 0; ucTid < TX_DESC_TID_NUM; ucTid++) {
-		if (ucTid > 0 && prTxDescList[ucTid] == prTxDescList[ucTid-1])
+		if (ucTid > 0 && prTxDescList[ucTid] == prTxDescList[ucTid - 1])
 			break;
 
 		if (prTxDescList[ucTid]) {
-			kalMemFree(prTxDescList[ucTid],
-				VIR_MEM_TYPE, ucTxDescSizeList[ucTid]);
+			kalMemFree(prTxDescList[ucTid], VIR_MEM_TYPE, ucTxDescSizeList[ucTid]);
 		}
 	}
 }
@@ -1774,7 +1717,7 @@ VOID nicTxFreeDescTemplate(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec)
 
 	prFirstTxDesc = prStaRec->aprTxDescTemplate[0];
 	for (ucTid = 0; ucTid < TX_DESC_TID_NUM; ucTid++) {
-		prTxDesc = (P_HW_MAC_TX_DESC_T) prStaRec->aprTxDescTemplate[ucTid];
+		prTxDesc = (P_HW_MAC_TX_DESC_T)prStaRec->aprTxDescTemplate[ucTid];
 		if (prTxDesc) {
 			/* For non-QoS STA, all share 1 TXD template (TID0) */
 			/* refer to nicTxGenerateDescTemplate */
@@ -1799,20 +1742,20 @@ VOID nicTxFreeDescTemplate(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec)
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief Write data to device done
-*
-* \param[in] prGlueInfo         Pointer to the GLUE_INFO_T structure.
-* \param[in] prQue              msdu info que to be free
-*
-* \retval TRUE          operation success
-* \retval FALSE         operation fail
-*/
+ * \brief Write data to device done
+ *
+ * \param[in] prGlueInfo         Pointer to the GLUE_INFO_T structure.
+ * \param[in] prQue              msdu info que to be free
+ *
+ * \retval TRUE          operation success
+ * \retval FALSE         operation fail
+ */
 /*----------------------------------------------------------------------------*/
 void nicTxMsduDoneCb(IN P_GLUE_INFO_T prGlueInfo, IN P_QUE_T prQue)
 {
 	P_MSDU_INFO_T prMsduInfo, prNextMsduInfo;
-	QUE_T rFreeQueue;
-	P_QUE_T prFreeQueue;
+	QUE_T		  rFreeQueue;
+	P_QUE_T		  prFreeQueue;
 	/* P_NATIVE_PACKET prNativePacket; */
 	P_TX_CTRL_T prTxCtrl;
 	P_ADAPTER_T prAdapter = prGlueInfo->prAdapter;
@@ -1825,10 +1768,10 @@ void nicTxMsduDoneCb(IN P_GLUE_INFO_T prGlueInfo, IN P_QUE_T prQue)
 	QUEUE_INITIALIZE(prFreeQueue);
 
 	if (prQue && prQue->u4NumElem > 0) {
-		prMsduInfo = (P_MSDU_INFO_T) QUEUE_GET_HEAD(prQue);
+		prMsduInfo = (P_MSDU_INFO_T)QUEUE_GET_HEAD(prQue);
 
 		while (prMsduInfo) {
-			prNextMsduInfo = (P_MSDU_INFO_T) QUEUE_GET_NEXT_ENTRY(&prMsduInfo->rQueEntry);
+			prNextMsduInfo = (P_MSDU_INFO_T)QUEUE_GET_NEXT_ENTRY(&prMsduInfo->rQueEntry);
 
 #if 1
 			nicTxFreePacket(prAdapter, prMsduInfo, FALSE);
@@ -1846,30 +1789,30 @@ void nicTxMsduDoneCb(IN P_GLUE_INFO_T prGlueInfo, IN P_QUE_T prQue)
 #endif
 
 			if (!prMsduInfo->pfTxDoneHandler)
-				QUEUE_INSERT_TAIL(prFreeQueue, (P_QUE_ENTRY_T) prMsduInfo);
+				QUEUE_INSERT_TAIL(prFreeQueue, (P_QUE_ENTRY_T)prMsduInfo);
 
 			prMsduInfo = prNextMsduInfo;
 		}
-		nicTxReturnMsduInfo(prAdapter, (P_MSDU_INFO_T) QUEUE_GET_HEAD(&rFreeQueue));
+		nicTxReturnMsduInfo(prAdapter, (P_MSDU_INFO_T)QUEUE_GET_HEAD(&rFreeQueue));
 	}
 }
 
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief In this function, we'll write frame(PACKET_INFO_T) into HIF.
-*
-* @param prAdapter              Pointer to the Adapter structure.
-* @param ucPortIdx              Port Number
-* @param prQue                  a link list of P_MSDU_INFO_T
-*
-* @retval WLAN_STATUS_SUCCESS   Bus access ok.
-* @retval WLAN_STATUS_FAILURE   Bus access fail.
-*/
+ * @brief In this function, we'll write frame(PACKET_INFO_T) into HIF.
+ *
+ * @param prAdapter              Pointer to the Adapter structure.
+ * @param ucPortIdx              Port Number
+ * @param prQue                  a link list of P_MSDU_INFO_T
+ *
+ * @retval WLAN_STATUS_SUCCESS   Bus access ok.
+ * @retval WLAN_STATUS_FAILURE   Bus access fail.
+ */
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS nicTxMsduQueue(IN P_ADAPTER_T prAdapter, UINT_8 ucPortIdx, P_QUE_T prQue)
 {
 	P_MSDU_INFO_T prMsduInfo;
-	P_TX_CTRL_T prTxCtrl;
+	P_TX_CTRL_T	  prTxCtrl;
 
 	ASSERT(prAdapter);
 	ASSERT(prQue);
@@ -1885,7 +1828,7 @@ WLAN_STATUS nicTxMsduQueue(IN P_ADAPTER_T prAdapter, UINT_8 ucPortIdx, P_QUE_T p
 		QUEUE_REMOVE_HEAD(prQue, prMsduInfo, P_MSDU_INFO_T);
 
 		if (!halTxIsDataBufEnough(prAdapter, prMsduInfo)) {
-			QUEUE_INSERT_HEAD(prQue, (P_QUE_ENTRY_T) prMsduInfo);
+			QUEUE_INSERT_HEAD(prQue, (P_QUE_ENTRY_T)prMsduInfo);
 			break;
 		}
 
@@ -1900,7 +1843,7 @@ WLAN_STATUS nicTxMsduQueue(IN P_ADAPTER_T prAdapter, UINT_8 ucPortIdx, P_QUE_T p
 			WLAN_GET_FIELD_32(&prMsduInfo->prPacket, &prMsduInfo->u4TxDoneTag);
 
 			KAL_ACQUIRE_SPIN_LOCK(prAdapter, SPIN_LOCK_TXING_MGMT_LIST);
-			QUEUE_INSERT_TAIL(&(prTxCtrl->rTxMgmtTxingQueue), (P_QUE_ENTRY_T) prMsduInfo);
+			QUEUE_INSERT_TAIL(&(prTxCtrl->rTxMgmtTxingQueue), (P_QUE_ENTRY_T)prMsduInfo);
 			KAL_RELEASE_SPIN_LOCK(prAdapter, SPIN_LOCK_TXING_MGMT_LIST);
 		}
 
@@ -1914,21 +1857,21 @@ WLAN_STATUS nicTxMsduQueue(IN P_ADAPTER_T prAdapter, UINT_8 ucPortIdx, P_QUE_T p
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief In this function, we'll write Command(CMD_INFO_T) into HIF.
-*
-* @param prAdapter      Pointer to the Adapter structure.
-* @param prPacketInfo   Pointer of CMD_INFO_T
-* @param ucTC           Specify the resource of TC
-*
-* @retval WLAN_STATUS_SUCCESS   Bus access ok.
-* @retval WLAN_STATUS_FAILURE   Bus access fail.
-*/
+ * \brief In this function, we'll write Command(CMD_INFO_T) into HIF.
+ *
+ * @param prAdapter      Pointer to the Adapter structure.
+ * @param prPacketInfo   Pointer of CMD_INFO_T
+ * @param ucTC           Specify the resource of TC
+ *
+ * @retval WLAN_STATUS_SUCCESS   Bus access ok.
+ * @retval WLAN_STATUS_FAILURE   Bus access fail.
+ */
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS nicTxCmd(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo, IN UINT_8 ucTC)
 {
-	P_WIFI_CMD_T prWifiCmd;
-	P_MSDU_INFO_T prMsduInfo;
-	P_TX_CTRL_T prTxCtrl;
+	P_WIFI_CMD_T	prWifiCmd;
+	P_MSDU_INFO_T	prMsduInfo;
+	P_TX_CTRL_T		prTxCtrl;
 	struct sk_buff *skb;
 #if CFG_FTV_62866_PATCH
 	uint32_t ret = WLAN_STATUS_SUCCESS;
@@ -1945,13 +1888,13 @@ WLAN_STATUS nicTxCmd(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo, IN UIN
 		prMsduInfo = prCmdInfo->prMsduInfo;
 
 		prCmdInfo->pucTxd = prMsduInfo->aucTxDescBuffer;
-		if (HAL_MAC_TX_DESC_IS_LONG_FORMAT((P_HW_MAC_TX_DESC_T) prMsduInfo->aucTxDescBuffer))
+		if (HAL_MAC_TX_DESC_IS_LONG_FORMAT((P_HW_MAC_TX_DESC_T)prMsduInfo->aucTxDescBuffer))
 			prCmdInfo->u4TxdLen = NIC_TX_DESC_LONG_FORMAT_LENGTH;
 		else
 			prCmdInfo->u4TxdLen = NIC_TX_DESC_SHORT_FORMAT_LENGTH;
 
-		skb = (struct sk_buff *)prMsduInfo->prPacket;
-		prCmdInfo->pucTxp = skb->data;
+		skb					= (struct sk_buff *)prMsduInfo->prPacket;
+		prCmdInfo->pucTxp	= skb->data;
 		prCmdInfo->u4TxpLen = skb->len;
 
 #if CFG_FTV_62866_PATCH
@@ -1965,7 +1908,7 @@ WLAN_STATUS nicTxCmd(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo, IN UIN
 		if (prMsduInfo->pfTxDoneHandler) {
 			/* DBGLOG(INIT, TRACE,("Wait Cmd TxSeqNum:%d\n", prMsduInfo->ucTxSeqNum)); */
 			KAL_ACQUIRE_SPIN_LOCK(prAdapter, SPIN_LOCK_TXING_MGMT_LIST);
-			QUEUE_INSERT_TAIL(&(prTxCtrl->rTxMgmtTxingQueue), (P_QUE_ENTRY_T) prMsduInfo);
+			QUEUE_INSERT_TAIL(&(prTxCtrl->rTxMgmtTxingQueue), (P_QUE_ENTRY_T)prMsduInfo);
 			KAL_RELEASE_SPIN_LOCK(prAdapter, SPIN_LOCK_TXING_MGMT_LIST);
 		} else {
 			/* Only return MSDU_INFO */
@@ -1980,12 +1923,12 @@ WLAN_STATUS nicTxCmd(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo, IN UIN
 		ASSERT(prMsduInfo->eSrc == TX_PACKET_MGMT);
 
 		prCmdInfo->pucTxd = prMsduInfo->aucTxDescBuffer;
-		if (HAL_MAC_TX_DESC_IS_LONG_FORMAT((P_HW_MAC_TX_DESC_T) prMsduInfo->aucTxDescBuffer))
+		if (HAL_MAC_TX_DESC_IS_LONG_FORMAT((P_HW_MAC_TX_DESC_T)prMsduInfo->aucTxDescBuffer))
 			prCmdInfo->u4TxdLen = NIC_TX_DESC_LONG_FORMAT_LENGTH;
 		else
 			prCmdInfo->u4TxdLen = NIC_TX_DESC_SHORT_FORMAT_LENGTH;
 
-		prCmdInfo->pucTxp = prMsduInfo->prPacket;
+		prCmdInfo->pucTxp	= prMsduInfo->prPacket;
 		prCmdInfo->u4TxpLen = prMsduInfo->u2FrameLength;
 
 #if CFG_FTV_62866_PATCH
@@ -1996,14 +1939,14 @@ WLAN_STATUS nicTxCmd(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo, IN UIN
 		/* <4> Management Frame Post-Processing */
 		GLUE_DEC_REF_CNT(prTxCtrl->i4TxMgmtPendingNum);
 
-		DBGLOG(INIT, INFO, "TX MGMT Frame: BSS[%u] WIDX:PID[%u:%u] SEQ[%u] STA[%u] RSP[%u]\n",
-			prMsduInfo->ucBssIndex, prMsduInfo->ucWlanIndex, prMsduInfo->ucPID,
-			prMsduInfo->ucTxSeqNum, prMsduInfo->ucStaRecIndex, prMsduInfo->pfTxDoneHandler ? TRUE : FALSE);
+		DBGLOG(INIT, INFO, "TX MGMT Frame: BSS[%u] WIDX:PID[%u:%u] SEQ[%u] STA[%u] RSP[%u]\n", prMsduInfo->ucBssIndex,
+				prMsduInfo->ucWlanIndex, prMsduInfo->ucPID, prMsduInfo->ucTxSeqNum, prMsduInfo->ucStaRecIndex,
+				prMsduInfo->pfTxDoneHandler ? TRUE : FALSE);
 
 		if (prMsduInfo->pfTxDoneHandler) {
 			/* DBGLOG(INIT, TRACE,("Wait Cmd TxSeqNum:%d\n", prMsduInfo->ucTxSeqNum)); */
 			KAL_ACQUIRE_SPIN_LOCK(prAdapter, SPIN_LOCK_TXING_MGMT_LIST);
-			QUEUE_INSERT_TAIL(&(prTxCtrl->rTxMgmtTxingQueue), (P_QUE_ENTRY_T) prMsduInfo);
+			QUEUE_INSERT_TAIL(&(prTxCtrl->rTxMgmtTxingQueue), (P_QUE_ENTRY_T)prMsduInfo);
 			KAL_RELEASE_SPIN_LOCK(prAdapter, SPIN_LOCK_TXING_MGMT_LIST);
 		} else {
 			cnmMgtPktFree(prAdapter, prMsduInfo);
@@ -2012,13 +1955,13 @@ WLAN_STATUS nicTxCmd(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo, IN UIN
 	} else {
 		P_PSE_CMD_HDR_T prPseCmdHdr;
 
-		prWifiCmd = (P_WIFI_CMD_T) prCmdInfo->pucInfoBuffer;
+		prWifiCmd = (P_WIFI_CMD_T)prCmdInfo->pucInfoBuffer;
 
-		prPseCmdHdr = (P_PSE_CMD_HDR_T) (prCmdInfo->pucInfoBuffer);
-		prPseCmdHdr->u2Qidx = TXD_Q_IDX_MCU_RQ0;
-		prPseCmdHdr->u2Pidx = TXD_P_IDX_MCU;
-		prPseCmdHdr->u2Hf = TXD_HF_CMD;
-		prPseCmdHdr->u2Ft = TXD_FT_LONG_FORMAT;
+		prPseCmdHdr			 = (P_PSE_CMD_HDR_T)(prCmdInfo->pucInfoBuffer);
+		prPseCmdHdr->u2Qidx	 = TXD_Q_IDX_MCU_RQ0;
+		prPseCmdHdr->u2Pidx	 = TXD_P_IDX_MCU;
+		prPseCmdHdr->u2Hf	 = TXD_HF_CMD;
+		prPseCmdHdr->u2Ft	 = TXD_FT_LONG_FORMAT;
 		prPseCmdHdr->u2PktFt = TXD_PKT_FT_CMD;
 
 		prWifiCmd->u2Length = prWifiCmd->u2TxByteCount - sizeof(PSE_CMD_HDR_T);
@@ -2029,27 +1972,25 @@ WLAN_STATUS nicTxCmd(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo, IN UIN
 		/* prWifiCmd->u2TxByteCount = u2OverallBufferLength - sizeof(PSE_CMD_HDR_T); */
 #else
 		prWifiCmd->u2TxByteCount =
-		    TFCB_FRAME_PAD_TO_DW((prCmdInfo->u2InfoBufLen) & (UINT_16) HIF_TX_HDR_TX_BYTE_COUNT_MASK);
+				TFCB_FRAME_PAD_TO_DW((prCmdInfo->u2InfoBufLen) & (UINT_16)HIF_TX_HDR_TX_BYTE_COUNT_MASK);
 #endif
-		prWifiCmd->u2PQ_ID = CMD_PQ_ID;
+		prWifiCmd->u2PQ_ID	   = CMD_PQ_ID;
 		prWifiCmd->ucPktTypeID = CMD_PACKET_TYPE_ID;
-		prWifiCmd->ucS2DIndex = S2D_INDEX_CMD_H2N_H2C;
-		prCmdInfo->pucTxd = prCmdInfo->pucInfoBuffer;
-		prCmdInfo->u4TxdLen = prCmdInfo->u2InfoBufLen;
-		prCmdInfo->pucTxp = NULL;
-		prCmdInfo->u4TxpLen = 0;
+		prWifiCmd->ucS2DIndex  = S2D_INDEX_CMD_H2N_H2C;
+		prCmdInfo->pucTxd	   = prCmdInfo->pucInfoBuffer;
+		prCmdInfo->u4TxdLen	   = prCmdInfo->u2InfoBufLen;
+		prCmdInfo->pucTxp	   = NULL;
+		prCmdInfo->u4TxpLen	   = 0;
 
 #if CFG_FTV_62866_PATCH
 		ret = HAL_WRITE_TX_CMD(prAdapter, prCmdInfo, ucTC);
-		DBGLOG(INIT, TRACE,
-		       "TX CMD: ID[0x%02X] SEQ[%u] SET[%u] LEN[%u] status[%x]\n",
-		       prWifiCmd->ucCID, prWifiCmd->ucSeqNum,
-		       prWifiCmd->ucSetQuery, prWifiCmd->u2Length, ret);
+		DBGLOG(INIT, TRACE, "TX CMD: ID[0x%02X] SEQ[%u] SET[%u] LEN[%u] status[%x]\n", prWifiCmd->ucCID,
+				prWifiCmd->ucSeqNum, prWifiCmd->ucSetQuery, prWifiCmd->u2Length, ret);
 #else
 		HAL_WRITE_TX_CMD(prAdapter, prCmdInfo, ucTC);
 
-		DBGLOG(INIT, INFO, "TX CMD: ID[0x%02X] SEQ[%u] SET[%u] LEN[%u]\n",
-			prWifiCmd->ucCID, prWifiCmd->ucSeqNum, prWifiCmd->ucSetQuery, prWifiCmd->u2Length);
+		DBGLOG(INIT, INFO, "TX CMD: ID[0x%02X] SEQ[%u] SET[%u] LEN[%u]\n", prWifiCmd->ucCID, prWifiCmd->ucSeqNum,
+				prWifiCmd->ucSetQuery, prWifiCmd->u2Length);
 #endif
 	}
 
@@ -2058,21 +1999,21 @@ WLAN_STATUS nicTxCmd(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo, IN UIN
 #else
 	return WLAN_STATUS_SUCCESS;
 #endif
-}				/* end of nicTxCmd() */
+} /* end of nicTxCmd() */
 
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief This function will clean up all the pending frames in internal SW Queues
-*        by return the pending TX packet to the system.
-*
-* @param prAdapter  Pointer to the Adapter structure.
-*
-* @return (none)
-*/
+ * @brief This function will clean up all the pending frames in internal SW Queues
+ *        by return the pending TX packet to the system.
+ *
+ * @param prAdapter  Pointer to the Adapter structure.
+ *
+ * @return (none)
+ */
 /*----------------------------------------------------------------------------*/
 VOID nicTxRelease(IN P_ADAPTER_T prAdapter, IN BOOLEAN fgProcTxDoneHandler)
 {
-	P_TX_CTRL_T prTxCtrl;
+	P_TX_CTRL_T	  prTxCtrl;
 	P_MSDU_INFO_T prMsduInfo;
 
 	KAL_SPIN_LOCK_DECLARATION();
@@ -2090,8 +2031,8 @@ VOID nicTxRelease(IN P_ADAPTER_T prAdapter, IN BOOLEAN fgProcTxDoneHandler)
 		KAL_RELEASE_SPIN_LOCK(prAdapter, SPIN_LOCK_TXING_MGMT_LIST);
 
 		if (prMsduInfo) {
-			DBGLOG(TX, TRACE, "%s: Get Msdu WIDX:PID[%u:%u] SEQ[%u] from Pending Q\n",
-			       __func__, prMsduInfo->ucWlanIndex, prMsduInfo->ucPID, prMsduInfo->ucTxSeqNum);
+			DBGLOG(TX, TRACE, "%s: Get Msdu WIDX:PID[%u:%u] SEQ[%u] from Pending Q\n", __func__,
+					prMsduInfo->ucWlanIndex, prMsduInfo->ucPID, prMsduInfo->ucTxSeqNum);
 
 			/* invoke done handler */
 			if (prMsduInfo->pfTxDoneHandler && fgProcTxDoneHandler)
@@ -2104,17 +2045,17 @@ VOID nicTxRelease(IN P_ADAPTER_T prAdapter, IN BOOLEAN fgProcTxDoneHandler)
 		}
 	} while (TRUE);
 
-}				/* end of nicTxRelease() */
+} /* end of nicTxRelease() */
 
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief Process the TX Done interrupt and pull in more pending frames in SW
-*        Queues for transmission.
-*
-* @param prAdapter  Pointer to the Adapter structure.
-*
-* @return (none)
-*/
+ * @brief Process the TX Done interrupt and pull in more pending frames in SW
+ *        Queues for transmission.
+ *
+ * @param prAdapter  Pointer to the Adapter structure.
+ *
+ * @return (none)
+ */
 /*----------------------------------------------------------------------------*/
 VOID nicProcessTxInterrupt(IN P_ADAPTER_T prAdapter)
 {
@@ -2144,8 +2085,8 @@ VOID nicProcessTxInterrupt(IN P_ADAPTER_T prAdapter)
 VOID nicTxFreePacket(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo, IN BOOLEAN fgDrop)
 {
 	P_NATIVE_PACKET prNativePacket;
-	P_TX_CTRL_T prTxCtrl;
-	WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
+	P_TX_CTRL_T		prTxCtrl;
+	WLAN_STATUS		rStatus = WLAN_STATUS_SUCCESS;
 
 	ASSERT(prAdapter);
 
@@ -2173,19 +2114,19 @@ VOID nicTxFreePacket(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo, IN B
 
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief this function frees packet of P_MSDU_INFO_T linked-list
-*
-* @param prAdapter              Pointer to the Adapter structure.
-* @param prMsduInfoList         a link list of P_MSDU_INFO_T
-*
-* @return (none)
-*/
+ * @brief this function frees packet of P_MSDU_INFO_T linked-list
+ *
+ * @param prAdapter              Pointer to the Adapter structure.
+ * @param prMsduInfoList         a link list of P_MSDU_INFO_T
+ *
+ * @return (none)
+ */
 /*----------------------------------------------------------------------------*/
 VOID nicTxFreeMsduInfoPacket(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfoListHead)
 {
 	P_NATIVE_PACKET prNativePacket;
-	P_MSDU_INFO_T prMsduInfo = prMsduInfoListHead;
-	P_TX_CTRL_T prTxCtrl;
+	P_MSDU_INFO_T	prMsduInfo = prMsduInfoListHead;
+	P_TX_CTRL_T		prTxCtrl;
 
 	ASSERT(prAdapter);
 	ASSERT(prMsduInfoListHead);
@@ -2212,24 +2153,23 @@ VOID nicTxFreeMsduInfoPacket(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduIn
 			GLUE_DEC_REF_CNT(prTxCtrl->i4PendingFwdFrameCount);
 		}
 #endif
-		prMsduInfo = (P_MSDU_INFO_T) QUEUE_GET_NEXT_ENTRY((P_QUE_ENTRY_T) prMsduInfo);
+		prMsduInfo = (P_MSDU_INFO_T)QUEUE_GET_NEXT_ENTRY((P_QUE_ENTRY_T)prMsduInfo);
 	}
-
 }
 
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief this function returns P_MSDU_INFO_T of MsduInfoList to TxCtrl->rfreeMsduInfoList
-*
-* @param prAdapter              Pointer to the Adapter structure.
-* @param prMsduInfoList         a link list of P_MSDU_INFO_T
-*
-* @return (none)
-*/
+ * @brief this function returns P_MSDU_INFO_T of MsduInfoList to TxCtrl->rfreeMsduInfoList
+ *
+ * @param prAdapter              Pointer to the Adapter structure.
+ * @param prMsduInfoList         a link list of P_MSDU_INFO_T
+ *
+ * @return (none)
+ */
 /*----------------------------------------------------------------------------*/
 VOID nicTxReturnMsduInfo(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfoListHead)
 {
-	P_TX_CTRL_T prTxCtrl;
+	P_TX_CTRL_T	  prTxCtrl;
 	P_MSDU_INFO_T prMsduInfo = prMsduInfoListHead, prNextMsduInfo;
 
 	KAL_SPIN_LOCK_DECLARATION();
@@ -2240,7 +2180,7 @@ VOID nicTxReturnMsduInfo(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfoLi
 	ASSERT(prTxCtrl);
 
 	while (prMsduInfo) {
-		prNextMsduInfo = (P_MSDU_INFO_T) QUEUE_GET_NEXT_ENTRY((P_QUE_ENTRY_T) prMsduInfo);
+		prNextMsduInfo = (P_MSDU_INFO_T)QUEUE_GET_NEXT_ENTRY((P_QUE_ENTRY_T)prMsduInfo);
 
 		switch (prMsduInfo->eSrc) {
 		case TX_PACKET_FORWARDING:
@@ -2257,24 +2197,23 @@ VOID nicTxReturnMsduInfo(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfoLi
 		kalMemZero(prMsduInfo, sizeof(MSDU_INFO_T));
 
 		KAL_ACQUIRE_SPIN_LOCK(prAdapter, SPIN_LOCK_TX_MSDU_INFO_LIST);
-		QUEUE_INSERT_TAIL(&prTxCtrl->rFreeMsduInfoList, (P_QUE_ENTRY_T) prMsduInfo);
+		QUEUE_INSERT_TAIL(&prTxCtrl->rFreeMsduInfoList, (P_QUE_ENTRY_T)prMsduInfo);
 		KAL_RELEASE_SPIN_LOCK(prAdapter, SPIN_LOCK_TX_MSDU_INFO_LIST);
 		prMsduInfo = prNextMsduInfo;
 	};
-
 }
 
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief this function fills packet information to P_MSDU_INFO_T
-*
-* @param prAdapter              Pointer to the Adapter structure.
-* @param prMsduInfo             P_MSDU_INFO_T
-* @param prPacket               P_NATIVE_PACKET
-*
-* @retval TRUE      Success to extract information
-* @retval FALSE     Fail to extract correct information
-*/
+ * @brief this function fills packet information to P_MSDU_INFO_T
+ *
+ * @param prAdapter              Pointer to the Adapter structure.
+ * @param prMsduInfo             P_MSDU_INFO_T
+ * @param prPacket               P_NATIVE_PACKET
+ *
+ * @retval TRUE      Success to extract information
+ * @retval FALSE     Fail to extract correct information
+ */
 /*----------------------------------------------------------------------------*/
 BOOLEAN nicTxFillMsduInfo(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo, IN P_NATIVE_PACKET prPacket)
 {
@@ -2289,26 +2228,24 @@ BOOLEAN nicTxFillMsduInfo(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo,
 
 	kalGetEthDestAddr(prAdapter->prGlueInfo, prPacket, prMsduInfo->aucEthDestAddr);
 
-	prMsduInfo->prPacket = prPacket;
-	prMsduInfo->ucBssIndex = GLUE_GET_PKT_BSS_IDX(prPacket);
-	prMsduInfo->ucUserPriority = GLUE_GET_PKT_TID(prPacket);
+	prMsduInfo->prPacket		  = prPacket;
+	prMsduInfo->ucBssIndex		  = GLUE_GET_PKT_BSS_IDX(prPacket);
+	prMsduInfo->ucUserPriority	  = GLUE_GET_PKT_TID(prPacket);
 	prMsduInfo->ucMacHeaderLength = GLUE_GET_PKT_HEADER_LEN(prPacket);
-	prMsduInfo->u2FrameLength = (UINT_16) GLUE_GET_PKT_FRAME_LEN(prPacket);
-	prMsduInfo->u4PageCount = nicTxGetPageCount(prMsduInfo->u2FrameLength, FALSE);
+	prMsduInfo->u2FrameLength	  = (UINT_16)GLUE_GET_PKT_FRAME_LEN(prPacket);
+	prMsduInfo->u4PageCount		  = nicTxGetPageCount(prMsduInfo->u2FrameLength, FALSE);
 
 #ifdef CFG_SUPPORT_MULTICAST_ENHANCEMENT
-	if (IS_BMCAST_MAC_ADDR(prMsduInfo->aucEthDestAddr) &&
-		prAdapter->fgIsMcastBurstMode) {
+	if (IS_BMCAST_MAC_ADDR(prMsduInfo->aucEthDestAddr) && prAdapter->fgIsMcastBurstMode) {
 		/* Force Multicast Burst mode set VI queue */
-		prMsduInfo->ucUserPriority = NIC_TX_AC_VI_TID;// VI
+		prMsduInfo->ucUserPriority = NIC_TX_AC_VI_TID; // VI
 	}
 #endif
 	if (GLUE_IS_PKT_FLAG_SET(prPacket)) {
-		prMsduInfo->fgIs802_1x = GLUE_TEST_PKT_FLAG(prPacket, ENUM_PKT_1X) ? TRUE:FALSE;
-		prMsduInfo->fgIs802_1x_NonProtected =
-				GLUE_TEST_PKT_FLAG(prPacket, ENUM_PKT_NON_PROTECTED_1X) ? TRUE:FALSE;
-		prMsduInfo->fgIs802_3 = GLUE_TEST_PKT_FLAG(prPacket, ENUM_PKT_802_3) ? TRUE:FALSE;
-		prMsduInfo->fgIsVlanExists = GLUE_TEST_PKT_FLAG(prPacket, ENUM_PKT_VLAN_EXIST) ? TRUE:FALSE;
+		prMsduInfo->fgIs802_1x				= GLUE_TEST_PKT_FLAG(prPacket, ENUM_PKT_1X) ? TRUE : FALSE;
+		prMsduInfo->fgIs802_1x_NonProtected = GLUE_TEST_PKT_FLAG(prPacket, ENUM_PKT_NON_PROTECTED_1X) ? TRUE : FALSE;
+		prMsduInfo->fgIs802_3				= GLUE_TEST_PKT_FLAG(prPacket, ENUM_PKT_802_3) ? TRUE : FALSE;
+		prMsduInfo->fgIsVlanExists			= GLUE_TEST_PKT_FLAG(prPacket, ENUM_PKT_VLAN_EXIST) ? TRUE : FALSE;
 
 		if (GLUE_TEST_PKT_FLAG(prPacket, ENUM_PKT_DHCP) && prAdapter->rWifiVar.ucDhcpTxDone)
 			prMsduInfo->pfTxDoneHandler = wlanDhcpTxDone;
@@ -2320,9 +2257,8 @@ BOOLEAN nicTxFillMsduInfo(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo,
 			nicTxSetPktRetryLimit(prMsduInfo, TX_DESC_TX_COUNT_NO_LIMIT);
 		}
 
-		if (GLUE_TEST_PKT_FLAG(prPacket, ENUM_PKT_DHCP) ||
-			GLUE_TEST_PKT_FLAG(prPacket, ENUM_PKT_ARP) ||
-			GLUE_TEST_PKT_FLAG(prPacket, ENUM_PKT_1X)) {
+		if (GLUE_TEST_PKT_FLAG(prPacket, ENUM_PKT_DHCP) || GLUE_TEST_PKT_FLAG(prPacket, ENUM_PKT_ARP) ||
+				GLUE_TEST_PKT_FLAG(prPacket, ENUM_PKT_1X)) {
 			/* Set BSS/STA lowest basic rate */
 			prMsduInfo->ucRateMode = MSDU_RATE_MODE_LOWEST_RATE;
 
@@ -2340,18 +2276,18 @@ BOOLEAN nicTxFillMsduInfo(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief this function update TCQ values by passing current status to txAdjustTcQuotas
-*
-* @param prAdapter              Pointer to the Adapter structure.
-*
-* @retval WLAN_STATUS_SUCCESS   Updated successfully
-*/
+ * @brief this function update TCQ values by passing current status to txAdjustTcQuotas
+ *
+ * @param prAdapter              Pointer to the Adapter structure.
+ *
+ * @retval WLAN_STATUS_SUCCESS   Updated successfully
+ */
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS nicTxAdjustTcq(IN P_ADAPTER_T prAdapter)
 {
 #if CFG_SUPPORT_MULTITHREAD
 	TX_TCQ_ADJUST_T rTcqAdjust;
-	P_TX_CTRL_T prTxCtrl;
+	P_TX_CTRL_T		prTxCtrl;
 
 	ASSERT(prAdapter);
 
@@ -2376,15 +2312,12 @@ WLAN_STATUS nicTxAdjustTcq(IN P_ADAPTER_T prAdapter)
 	ASSERT(prTxCtrl);
 
 	if (qmAdjustTcQuotas(prAdapter, &rTcqAdjust, &prTxCtrl->rTc)) {
-
 		KAL_ACQUIRE_SPIN_LOCK(prAdapter, SPIN_LOCK_TX_RESOURCE);
 
 		for (u4Num = 0; u4Num < TC_NUM; u4Num++) {
 			/* Page count */
-			prTxCtrl->rTc.au4FreePageCount[u4Num] +=
-			    (rTcqAdjust.ai4Variation[u4Num] * NIC_TX_MAX_PAGE_PER_FRAME);
-			prTxCtrl->rTc.au4MaxNumOfPage[u4Num] +=
-			    (rTcqAdjust.ai4Variation[u4Num] * NIC_TX_MAX_PAGE_PER_FRAME);
+			prTxCtrl->rTc.au4FreePageCount[u4Num] += (rTcqAdjust.ai4Variation[u4Num] * NIC_TX_MAX_PAGE_PER_FRAME);
+			prTxCtrl->rTc.au4MaxNumOfPage[u4Num] += (rTcqAdjust.ai4Variation[u4Num] * NIC_TX_MAX_PAGE_PER_FRAME);
 
 			/* Buffer count */
 			prTxCtrl->rTc.au4FreeBufferCount[u4Num] += rTcqAdjust.ai4Variation[u4Num];
@@ -2397,33 +2330,26 @@ WLAN_STATUS nicTxAdjustTcq(IN P_ADAPTER_T prAdapter)
 		KAL_RELEASE_SPIN_LOCK(prAdapter, SPIN_LOCK_TX_RESOURCE);
 #if 0
 		DBGLOG(TX, LOUD,
-		       "TCQ Status Free Page:Buf[%03u:%02u, %03u:%02u, %03u:%02u, %03u:%02u, %03u:%02u, %03u:%02u]\n",
-		       prTcqStatus->au4FreePageCount[TC0_INDEX],
-		       prTcqStatus->au4FreeBufferCount[TC0_INDEX],
-		       prTcqStatus->au4FreePageCount[TC1_INDEX],
-		       prTcqStatus->au4FreeBufferCount[TC1_INDEX],
-		       prTcqStatus->au4FreePageCount[TC2_INDEX],
-		       prTcqStatus->au4FreeBufferCount[TC2_INDEX],
-		       prTcqStatus->au4FreePageCount[TC3_INDEX],
-		       prTcqStatus->au4FreeBufferCount[TC3_INDEX],
-		       prTcqStatus->au4FreePageCount[TC4_INDEX],
-		       prTcqStatus->au4FreeBufferCount[TC4_INDEX],
-		       prTcqStatus->au4FreePageCount[TC5_INDEX], prTcqStatus->au4FreeBufferCount[TC5_INDEX]);
+				"TCQ Status Free Page:Buf[%03u:%02u, %03u:%02u, %03u:%02u, %03u:%02u, %03u:%02u, %03u:%02u]\n",
+				prTcqStatus->au4FreePageCount[TC0_INDEX],
+				prTcqStatus->au4FreeBufferCount[TC0_INDEX],
+				prTcqStatus->au4FreePageCount[TC1_INDEX],
+				prTcqStatus->au4FreeBufferCount[TC1_INDEX],
+				prTcqStatus->au4FreePageCount[TC2_INDEX],
+				prTcqStatus->au4FreeBufferCount[TC2_INDEX],
+				prTcqStatus->au4FreePageCount[TC3_INDEX],
+				prTcqStatus->au4FreeBufferCount[TC3_INDEX],
+				prTcqStatus->au4FreePageCount[TC4_INDEX],
+				prTcqStatus->au4FreeBufferCount[TC4_INDEX],
+				prTcqStatus->au4FreePageCount[TC5_INDEX], prTcqStatus->au4FreeBufferCount[TC5_INDEX]);
 #endif
-		DBGLOG(TX, LOUD,
-		       "TCQ Status Max Page:Buf[%03u:%02u, %03u:%02u, %03u:%02u, %03u:%02u, %03u:%02u, %03u:%02u]\n",
-		       prTcqStatus->au4MaxNumOfPage[TC0_INDEX],
-		       prTcqStatus->au4MaxNumOfBuffer[TC0_INDEX],
-		       prTcqStatus->au4MaxNumOfPage[TC1_INDEX],
-		       prTcqStatus->au4MaxNumOfBuffer[TC1_INDEX],
-		       prTcqStatus->au4MaxNumOfPage[TC2_INDEX],
-		       prTcqStatus->au4MaxNumOfBuffer[TC2_INDEX],
-		       prTcqStatus->au4MaxNumOfPage[TC3_INDEX],
-		       prTcqStatus->au4MaxNumOfBuffer[TC3_INDEX],
-		       prTcqStatus->au4MaxNumOfPage[TC4_INDEX],
-		       prTcqStatus->au4MaxNumOfBuffer[TC4_INDEX],
-		       prTcqStatus->au4MaxNumOfPage[TC5_INDEX], prTcqStatus->au4MaxNumOfBuffer[TC5_INDEX]);
-
+		DBGLOG(TX, LOUD, "TCQ Status Max Page:Buf[%03u:%02u, %03u:%02u, %03u:%02u, %03u:%02u, %03u:%02u, %03u:%02u]\n",
+				prTcqStatus->au4MaxNumOfPage[TC0_INDEX], prTcqStatus->au4MaxNumOfBuffer[TC0_INDEX],
+				prTcqStatus->au4MaxNumOfPage[TC1_INDEX], prTcqStatus->au4MaxNumOfBuffer[TC1_INDEX],
+				prTcqStatus->au4MaxNumOfPage[TC2_INDEX], prTcqStatus->au4MaxNumOfBuffer[TC2_INDEX],
+				prTcqStatus->au4MaxNumOfPage[TC3_INDEX], prTcqStatus->au4MaxNumOfBuffer[TC3_INDEX],
+				prTcqStatus->au4MaxNumOfPage[TC4_INDEX], prTcqStatus->au4MaxNumOfBuffer[TC4_INDEX],
+				prTcqStatus->au4MaxNumOfPage[TC5_INDEX], prTcqStatus->au4MaxNumOfBuffer[TC5_INDEX]);
 	}
 #endif
 	return WLAN_STATUS_SUCCESS;
@@ -2431,12 +2357,12 @@ WLAN_STATUS nicTxAdjustTcq(IN P_ADAPTER_T prAdapter)
 
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief this function flushes all packets queued in STA/AC queue
-*
-* @param prAdapter              Pointer to the Adapter structure.
-*
-* @retval WLAN_STATUS_SUCCESS   Flushed successfully
-*/
+ * @brief this function flushes all packets queued in STA/AC queue
+ *
+ * @param prAdapter              Pointer to the Adapter structure.
+ *
+ * @retval WLAN_STATUS_SUCCESS   Flushed successfully
+ */
 /*----------------------------------------------------------------------------*/
 
 WLAN_STATUS nicTxFlush(IN P_ADAPTER_T prAdapter)
@@ -2467,60 +2393,58 @@ WLAN_STATUS nicTxFlush(IN P_ADAPTER_T prAdapter)
 #if CFG_ENABLE_FW_DOWNLOAD
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief In this function, we'll write Command(CMD_INFO_T) into HIF.
-*        However this function is used for INIT_CMD.
-*
-*        In order to avoid further maintenance issues, these 2 functions are separated
-*
-* @param prAdapter      Pointer to the Adapter structure.
-* @param prPacketInfo   Pointer of CMD_INFO_T
-* @param ucTC           Specify the resource of TC
-*
-* @retval WLAN_STATUS_SUCCESS   Bus access ok.
-* @retval WLAN_STATUS_FAILURE   Bus access fail.
-*/
+ * \brief In this function, we'll write Command(CMD_INFO_T) into HIF.
+ *        However this function is used for INIT_CMD.
+ *
+ *        In order to avoid further maintenance issues, these 2 functions are separated
+ *
+ * @param prAdapter      Pointer to the Adapter structure.
+ * @param prPacketInfo   Pointer of CMD_INFO_T
+ * @param ucTC           Specify the resource of TC
+ *
+ * @retval WLAN_STATUS_SUCCESS   Bus access ok.
+ * @retval WLAN_STATUS_FAILURE   Bus access fail.
+ */
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS nicTxInitCmd(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo)
 {
-	UINT_16 u2OverallBufferLength;
-	PUINT_8 pucOutputBuf = (PUINT_8) NULL;	/* Pointer to Transmit Data Structure Frame */
+	UINT_16		u2OverallBufferLength;
+	PUINT_8		pucOutputBuf = (PUINT_8)NULL; /* Pointer to Transmit Data Structure Frame */
 	P_TX_CTRL_T prTxCtrl;
 
 	ASSERT(prAdapter);
 	ASSERT(prCmdInfo);
 
-	prTxCtrl = &prAdapter->rTxCtrl;
-	pucOutputBuf = prTxCtrl->pucTxCoalescingBufPtr;
-	u2OverallBufferLength = TFCB_FRAME_PAD_TO_DW((prCmdInfo->u2InfoBufLen) & (UINT_16)
-						     HIF_TX_HDR_TX_BYTE_COUNT_MASK);
+	prTxCtrl			  = &prAdapter->rTxCtrl;
+	pucOutputBuf		  = prTxCtrl->pucTxCoalescingBufPtr;
+	u2OverallBufferLength = TFCB_FRAME_PAD_TO_DW((prCmdInfo->u2InfoBufLen) & (UINT_16)HIF_TX_HDR_TX_BYTE_COUNT_MASK);
 
 	/* <1> Copy CMD Header to command buffer (by using pucCoalescingBufCached) */
-	kalMemCopy((PVOID)&pucOutputBuf[0], (PVOID) prCmdInfo->pucInfoBuffer, prCmdInfo->u2InfoBufLen);
+	kalMemCopy((PVOID)&pucOutputBuf[0], (PVOID)prCmdInfo->pucInfoBuffer, prCmdInfo->u2InfoBufLen);
 
 	ASSERT(u2OverallBufferLength <= prAdapter->u4CoalescingBufCachedSize);
 
 	/* <2> Write frame to data port */
-	HAL_WRITE_TX_PORT(prAdapter, NIC_TX_INIT_CMD_PORT,
-			  (UINT_32) u2OverallBufferLength,
-			  (PUINT_8) pucOutputBuf, (UINT_32) prAdapter->u4CoalescingBufCachedSize);
+	HAL_WRITE_TX_PORT(prAdapter, NIC_TX_INIT_CMD_PORT, (UINT_32)u2OverallBufferLength, (PUINT_8)pucOutputBuf,
+			(UINT_32)prAdapter->u4CoalescingBufCachedSize);
 
 	return WLAN_STATUS_SUCCESS;
 }
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief In this function, we'll reset TX resource counter to initial value used
-*        in F/W download state
-*
-* @param prAdapter      Pointer to the Adapter structure.
-*
-* @retval WLAN_STATUS_SUCCESS   Reset is done successfully.
-*/
+ * \brief In this function, we'll reset TX resource counter to initial value used
+ *        in F/W download state
+ *
+ * @param prAdapter      Pointer to the Adapter structure.
+ *
+ * @retval WLAN_STATUS_SUCCESS   Reset is done successfully.
+ */
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS nicTxInitResetResource(IN P_ADAPTER_T prAdapter)
 {
 	P_TX_CTRL_T prTxCtrl;
-	UINT_8 ucIdx;
+	UINT_8		ucIdx;
 
 	DEBUGFUNC("nicTxInitResetResource");
 
@@ -2530,38 +2454,35 @@ WLAN_STATUS nicTxInitResetResource(IN P_ADAPTER_T prAdapter)
 	/* Delta page count */
 	kalMemZero(prTxCtrl->rTc.au4TxDonePageCount, sizeof(prTxCtrl->rTc.au4TxDonePageCount));
 	kalMemZero(prTxCtrl->rTc.au4PreUsedPageCount, sizeof(prTxCtrl->rTc.au4PreUsedPageCount));
-	prTxCtrl->rTc.ucNextTcIdx = TC0_INDEX;
+	prTxCtrl->rTc.ucNextTcIdx		   = TC0_INDEX;
 	prTxCtrl->rTc.u4AvaliablePageCount = 0;
 
 	/* Page count */
-	prTxCtrl->rTc.au4MaxNumOfPage[TC0_INDEX] = NIC_TX_INIT_PAGE_COUNT_TC0;
+	prTxCtrl->rTc.au4MaxNumOfPage[TC0_INDEX]  = NIC_TX_INIT_PAGE_COUNT_TC0;
 	prTxCtrl->rTc.au4FreePageCount[TC0_INDEX] = NIC_TX_INIT_PAGE_COUNT_TC0;
 
-	prTxCtrl->rTc.au4MaxNumOfPage[TC1_INDEX] = NIC_TX_INIT_PAGE_COUNT_TC1;
+	prTxCtrl->rTc.au4MaxNumOfPage[TC1_INDEX]  = NIC_TX_INIT_PAGE_COUNT_TC1;
 	prTxCtrl->rTc.au4FreePageCount[TC1_INDEX] = NIC_TX_INIT_PAGE_COUNT_TC1;
 
-	prTxCtrl->rTc.au4MaxNumOfPage[TC2_INDEX] = NIC_TX_INIT_PAGE_COUNT_TC2;
+	prTxCtrl->rTc.au4MaxNumOfPage[TC2_INDEX]  = NIC_TX_INIT_PAGE_COUNT_TC2;
 	prTxCtrl->rTc.au4FreePageCount[TC2_INDEX] = NIC_TX_INIT_PAGE_COUNT_TC2;
 
-	prTxCtrl->rTc.au4MaxNumOfPage[TC3_INDEX] = NIC_TX_INIT_PAGE_COUNT_TC3;
+	prTxCtrl->rTc.au4MaxNumOfPage[TC3_INDEX]  = NIC_TX_INIT_PAGE_COUNT_TC3;
 	prTxCtrl->rTc.au4FreePageCount[TC3_INDEX] = NIC_TX_INIT_PAGE_COUNT_TC3;
 
-	prTxCtrl->rTc.au4MaxNumOfPage[TC4_INDEX] = NIC_TX_INIT_PAGE_COUNT_TC4;
+	prTxCtrl->rTc.au4MaxNumOfPage[TC4_INDEX]  = NIC_TX_INIT_PAGE_COUNT_TC4;
 	prTxCtrl->rTc.au4FreePageCount[TC4_INDEX] = NIC_TX_INIT_PAGE_COUNT_TC4;
 
-	prTxCtrl->rTc.au4MaxNumOfPage[TC5_INDEX] = NIC_TX_INIT_PAGE_COUNT_TC5;
+	prTxCtrl->rTc.au4MaxNumOfPage[TC5_INDEX]  = NIC_TX_INIT_PAGE_COUNT_TC5;
 	prTxCtrl->rTc.au4FreePageCount[TC5_INDEX] = NIC_TX_INIT_PAGE_COUNT_TC5;
 
 	/* Buffer count */
 	for (ucIdx = TC0_INDEX; ucIdx < TC_NUM; ucIdx++) {
-		prTxCtrl->rTc.au4MaxNumOfBuffer[ucIdx] =
-		    prTxCtrl->rTc.au4MaxNumOfPage[ucIdx] / NIC_TX_MAX_PAGE_PER_FRAME;
-		prTxCtrl->rTc.au4FreeBufferCount[ucIdx] =
-		    prTxCtrl->rTc.au4FreePageCount[ucIdx] / NIC_TX_MAX_PAGE_PER_FRAME;
+		prTxCtrl->rTc.au4MaxNumOfBuffer[ucIdx]	= prTxCtrl->rTc.au4MaxNumOfPage[ucIdx] / NIC_TX_MAX_PAGE_PER_FRAME;
+		prTxCtrl->rTc.au4FreeBufferCount[ucIdx] = prTxCtrl->rTc.au4FreePageCount[ucIdx] / NIC_TX_MAX_PAGE_PER_FRAME;
 	}
 
 	return WLAN_STATUS_SUCCESS;
-
 }
 
 #endif
@@ -2571,7 +2492,7 @@ BOOLEAN nicTxProcessMngPacket(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduI
 #if 0
 	UINT_16 u2RateCode;
 #endif
-	P_BSS_INFO_T prBssInfo;
+	P_BSS_INFO_T   prBssInfo;
 	P_STA_RECORD_T prStaRec;
 
 	if (prMsduInfo->eSrc != TX_PACKET_MGMT)
@@ -2588,7 +2509,7 @@ BOOLEAN nicTxProcessMngPacket(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduI
 		return FALSE;
 
 	prBssInfo = GET_BSS_INFO_BY_INDEX(prAdapter, prMsduInfo->ucBssIndex);
-	prStaRec = cnmGetStaRecByIndex(prAdapter, prMsduInfo->ucStaRecIndex);
+	prStaRec  = cnmGetStaRecByIndex(prAdapter, prMsduInfo->ucStaRecIndex);
 
 	/* MMPDU: force stick to TC4 */
 	prMsduInfo->ucTC = TC4_INDEX;
@@ -2621,71 +2542,68 @@ BOOLEAN nicTxProcessMngPacket(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduI
 VOID nicTxProcessTxDoneEvent(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent, IN UINT_32 u4EventBufLen)
 {
 	P_EVENT_TX_DONE_T prTxDone;
-	P_MSDU_INFO_T prMsduInfo;
-	PUINT_8 apucBandwidt[4] = {(PUINT_8)"20", (PUINT_8)"40", (PUINT_8)"80", (PUINT_8)"160/80+80"};
-	if (u4EventBufLen < sizeof(EVENT_TX_DONE_T))
-	{
+	P_MSDU_INFO_T	  prMsduInfo;
+	PUINT_8			  apucBandwidt[4] = { (PUINT_8) "20", (PUINT_8) "40", (PUINT_8) "80", (PUINT_8) "160/80+80" };
+	if (u4EventBufLen < sizeof(EVENT_TX_DONE_T)) {
 		DBGLOG(INIT, ERROR, "%s: Invalid event length: %d < %d\n", __func__, u4EventBufLen, sizeof(EVENT_TX_DONE_T));
 		return;
 	}
-	prTxDone = (P_EVENT_TX_DONE_T) (prEvent->aucBuffer);
+	prTxDone = (P_EVENT_TX_DONE_T)(prEvent->aucBuffer);
 
 	if (prTxDone->ucFlag & BIT(TXS_WITH_ADVANCED_INFO)) {
 		/* Tx Done with advanced info */
 		DBGLOG(NIC, INFO, "EVENT_ID_TX_DONE WIDX:PID[%u:%u] Status[%u] TID[%u] SN[%u] CNT[%u] RATE[0x%04x]\n",
-			prTxDone->ucWlanIndex, prTxDone->ucPacketSeq, prTxDone->ucStatus, prTxDone->ucTid,
-			prTxDone->u2SequenceNumber, prTxDone->ucTxCount, prTxDone->u2TxRate);
+				prTxDone->ucWlanIndex, prTxDone->ucPacketSeq, prTxDone->ucStatus, prTxDone->ucTid,
+				prTxDone->u2SequenceNumber, prTxDone->ucTxCount, prTxDone->u2TxRate);
 
 		if (prTxDone->ucFlag & BIT(TXS_IS_EXIST)) {
 			UINT_8 ucNss, ucStbc;
-			INT_8 icTxPwr;
+			INT_8  icTxPwr;
 
 			ucNss = (prTxDone->u2TxRate & TX_DESC_NSTS_MASK) >> TX_DESC_NSTS_OFFSET;
 			ucNss += 1;
-			ucStbc = (prTxDone->u2TxRate & TX_DESC_STBC) ? TRUE:FALSE;
+			ucStbc = (prTxDone->u2TxRate & TX_DESC_STBC) ? TRUE : FALSE;
 
 			if (ucStbc)
 				ucNss /= 2;
 
-			DBGLOG(NIC, INFO, "||BW[%s] NSS[%u] ArIdx[%u] RspRate[0x%02x]\n",
-				apucBandwidt[prTxDone->ucBandwidth], ucNss, prTxDone->ucRateTableIdx,
-				prTxDone->ucRspRate);
+			DBGLOG(NIC, INFO, "||BW[%s] NSS[%u] ArIdx[%u] RspRate[0x%02x]\n", apucBandwidt[prTxDone->ucBandwidth],
+					ucNss, prTxDone->ucRateTableIdx, prTxDone->ucRspRate);
 
 			icTxPwr = (INT_8)prTxDone->ucTxPower;
 			if (icTxPwr & BIT(6))
 				icTxPwr |= BIT(7);
 
 			DBGLOG(NIC, INFO, "||AMPDU[%u] PS[%u] IBF[%u] EBF[%u] TxPwr[%d%sdBm] TSF[%u] TxDelay[%uus]\n",
-				prTxDone->u4AppliedFlag & BIT(TX_FRAME_IN_AMPDU_FORMAT) ? TRUE:FALSE,
-				prTxDone->u4AppliedFlag & BIT(TX_FRAME_PS_BIT) ? TRUE:FALSE,
-				prTxDone->u4AppliedFlag & BIT(TX_FRAME_IMP_BF) ? TRUE:FALSE,
-				prTxDone->u4AppliedFlag & BIT(TX_FRAME_EXP_BF) ? TRUE:FALSE,
-				icTxPwr / 2, icTxPwr & BIT(0) ? ".5" : "",
-				prTxDone->u4Timestamp, prTxDone->u4TxDelay);
+					prTxDone->u4AppliedFlag & BIT(TX_FRAME_IN_AMPDU_FORMAT) ? TRUE : FALSE,
+					prTxDone->u4AppliedFlag & BIT(TX_FRAME_PS_BIT) ? TRUE : FALSE,
+					prTxDone->u4AppliedFlag & BIT(TX_FRAME_IMP_BF) ? TRUE : FALSE,
+					prTxDone->u4AppliedFlag & BIT(TX_FRAME_EXP_BF) ? TRUE : FALSE, icTxPwr / 2,
+					icTxPwr & BIT(0) ? ".5" : "", prTxDone->u4Timestamp, prTxDone->u4TxDelay);
 		}
 	} else {
-		DBGLOG(NIC, INFO, "EVENT_ID_TX_DONE WIDX:PID[%u:%u] Status[%u] SN[%u]\n",
-			prTxDone->ucWlanIndex, prTxDone->ucPacketSeq, prTxDone->ucStatus, prTxDone->u2SequenceNumber);
+		DBGLOG(NIC, INFO, "EVENT_ID_TX_DONE WIDX:PID[%u:%u] Status[%u] SN[%u]\n", prTxDone->ucWlanIndex,
+				prTxDone->ucPacketSeq, prTxDone->ucStatus, prTxDone->u2SequenceNumber);
 	}
 
 	/* call related TX Done Handler */
 	prMsduInfo = nicGetPendingTxMsduInfo(prAdapter, prTxDone->ucWlanIndex, prTxDone->ucPacketSeq);
 
 #if CFG_SUPPORT_802_11V_TIMING_MEASUREMENT
-	DBGLOG(NIC, TRACE, "EVENT_ID_TX_DONE u4TimeStamp = %x u2AirDelay = %x\n",
-		prTxDone->au4Reserved1, prTxDone->au4Reserved2);
+	DBGLOG(NIC, TRACE, "EVENT_ID_TX_DONE u4TimeStamp = %x u2AirDelay = %x\n", prTxDone->au4Reserved1,
+			prTxDone->au4Reserved2);
 
-	wnmReportTimingMeas(prAdapter, prMsduInfo->ucStaRecIndex,
-		prTxDone->au4Reserved1, prTxDone->au4Reserved1 + prTxDone->au4Reserved2);
+	wnmReportTimingMeas(prAdapter, prMsduInfo->ucStaRecIndex, prTxDone->au4Reserved1,
+			prTxDone->au4Reserved1 + prTxDone->au4Reserved2);
 #endif
 
 	if (prMsduInfo) {
-		prMsduInfo->pfTxDoneHandler(prAdapter, prMsduInfo, (ENUM_TX_RESULT_CODE_T) (prTxDone->ucStatus));
+		prMsduInfo->pfTxDoneHandler(prAdapter, prMsduInfo, (ENUM_TX_RESULT_CODE_T)(prTxDone->ucStatus));
 
 		if (prMsduInfo->eSrc == TX_PACKET_MGMT) {
 			if (prTxDone->ucStatus != TX_RESULT_SUCCESS)
-				DBGLOG(NIC, WARN, "TX MGMT Frame Failed: WIDX:PID[%u:%u] Status[%u] SN[%u]\n",
-					prTxDone->ucWlanIndex, prTxDone->ucPacketSeq, prTxDone->ucStatus, prTxDone->u2SequenceNumber);
+				DBGLOG(NIC, WARN, "TX MGMT Frame Failed: WIDX:PID[%u:%u] Status[%u] SN[%u]\n", prTxDone->ucWlanIndex,
+						prTxDone->ucPacketSeq, prTxDone->ucStatus, prTxDone->u2SequenceNumber);
 
 			cnmMgtPktFree(prAdapter, prMsduInfo);
 		}
@@ -2702,23 +2620,23 @@ VOID nicTxProcessTxDoneEvent(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief this function enqueues MSDU_INFO_T into queue management,
-*        or command queue
-*
-* @param prAdapter      Pointer to the Adapter structure.
-*        prMsduInfo     Pointer to MSDU
-*
-* @retval WLAN_STATUS_SUCCESS   Reset is done successfully.
-*/
+ * \brief this function enqueues MSDU_INFO_T into queue management,
+ *        or command queue
+ *
+ * @param prAdapter      Pointer to the Adapter structure.
+ *        prMsduInfo     Pointer to MSDU
+ *
+ * @retval WLAN_STATUS_SUCCESS   Reset is done successfully.
+ */
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS nicTxEnqueueMsdu(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo)
 {
-	P_TX_CTRL_T prTxCtrl;
+	P_TX_CTRL_T	  prTxCtrl;
 	P_MSDU_INFO_T prNextMsduInfo, prRetMsduInfo, prMsduInfoHead;
-	QUE_T qDataPort0, qDataPort1;
-	P_QUE_T prDataPort0, prDataPort1;
-	P_CMD_INFO_T prCmdInfo;
-	WLAN_STATUS u4Status = WLAN_STATUS_SUCCESS;
+	QUE_T		  qDataPort0, qDataPort1;
+	P_QUE_T		  prDataPort0, prDataPort1;
+	P_CMD_INFO_T  prCmdInfo;
+	WLAN_STATUS	  u4Status = WLAN_STATUS_SUCCESS;
 
 	KAL_SPIN_LOCK_DECLARATION();
 
@@ -2736,23 +2654,23 @@ WLAN_STATUS nicTxEnqueueMsdu(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduIn
 
 	/* check how many management frame are being queued */
 	while (prMsduInfo) {
-		prNextMsduInfo = (P_MSDU_INFO_T) QUEUE_GET_NEXT_ENTRY((P_QUE_ENTRY_T) prMsduInfo);
+		prNextMsduInfo = (P_MSDU_INFO_T)QUEUE_GET_NEXT_ENTRY((P_QUE_ENTRY_T)prMsduInfo);
 
-		QUEUE_GET_NEXT_ENTRY((P_QUE_ENTRY_T) prMsduInfo) = NULL;
+		QUEUE_GET_NEXT_ENTRY((P_QUE_ENTRY_T)prMsduInfo) = NULL;
 
 		if (prMsduInfo->eSrc == TX_PACKET_MGMT) {
 			if (nicTxProcessMngPacket(prAdapter, prMsduInfo)) {
 				/* Valid MGMT */
-				QUEUE_INSERT_TAIL(prDataPort1, (P_QUE_ENTRY_T) prMsduInfo);
+				QUEUE_INSERT_TAIL(prDataPort1, (P_QUE_ENTRY_T)prMsduInfo);
 			} else {
 				/* Invalid MGMT */
-				DBGLOG(TX, WARN, "Invalid MGMT[0x%p] BSS[%u] STA[%u],free it\n",
-				       prMsduInfo, prMsduInfo->ucBssIndex, prMsduInfo->ucStaRecIndex);
+				DBGLOG(TX, WARN, "Invalid MGMT[0x%p] BSS[%u] STA[%u],free it\n", prMsduInfo, prMsduInfo->ucBssIndex,
+						prMsduInfo->ucStaRecIndex);
 
 				cnmMgtPktFree(prAdapter, prMsduInfo);
 			}
 		} else {
-			QUEUE_INSERT_TAIL(prDataPort0, (P_QUE_ENTRY_T) prMsduInfo);
+			QUEUE_INSERT_TAIL(prDataPort0, (P_QUE_ENTRY_T)prMsduInfo);
 		}
 
 		prMsduInfo = prNextMsduInfo;
@@ -2762,18 +2680,18 @@ WLAN_STATUS nicTxEnqueueMsdu(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduIn
 		/* send to QM */
 		KAL_SPIN_LOCK_DECLARATION();
 		KAL_ACQUIRE_SPIN_LOCK(prAdapter, SPIN_LOCK_QM_TX_QUEUE);
-		prRetMsduInfo = qmEnqueueTxPackets(prAdapter, (P_MSDU_INFO_T) QUEUE_GET_HEAD(prDataPort0));
+		prRetMsduInfo = qmEnqueueTxPackets(prAdapter, (P_MSDU_INFO_T)QUEUE_GET_HEAD(prDataPort0));
 		KAL_RELEASE_SPIN_LOCK(prAdapter, SPIN_LOCK_QM_TX_QUEUE);
 
 		/* post-process for dropped packets */
-		if (prRetMsduInfo) {	/* unable to enqueue */
+		if (prRetMsduInfo) { /* unable to enqueue */
 			nicTxFreeMsduInfoPacket(prAdapter, prRetMsduInfo);
 			nicTxReturnMsduInfo(prAdapter, prRetMsduInfo);
 		}
 	}
 
 	if (prDataPort1->u4NumElem) {
-		prMsduInfoHead = (P_MSDU_INFO_T) QUEUE_GET_HEAD(prDataPort1);
+		prMsduInfoHead = (P_MSDU_INFO_T)QUEUE_GET_HEAD(prDataPort1);
 
 		if (nicTxGetFreeCmdCount(prAdapter) < NIC_TX_CMD_INFO_RESERVED_COUNT) {
 			/* not enough descriptors for sending */
@@ -2781,11 +2699,10 @@ WLAN_STATUS nicTxEnqueueMsdu(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduIn
 
 			/* free all MSDUs */
 			while (prMsduInfoHead) {
-				prNextMsduInfo = (P_MSDU_INFO_T) QUEUE_GET_NEXT_ENTRY(&prMsduInfoHead->rQueEntry);
+				prNextMsduInfo = (P_MSDU_INFO_T)QUEUE_GET_NEXT_ENTRY(&prMsduInfoHead->rQueEntry);
 
 				if (prMsduInfoHead->pfTxDoneHandler != NULL) {
-					prMsduInfoHead->pfTxDoneHandler(prAdapter, prMsduInfoHead,
-									TX_RESULT_DROPPED_IN_DRIVER);
+					prMsduInfoHead->pfTxDoneHandler(prAdapter, prMsduInfoHead, TX_RESULT_DROPPED_IN_DRIVER);
 				}
 
 				cnmMgtPktFree(prAdapter, prMsduInfoHead);
@@ -2795,7 +2712,7 @@ WLAN_STATUS nicTxEnqueueMsdu(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduIn
 		} else {
 			/* send to command queue */
 			while (prMsduInfoHead) {
-				prNextMsduInfo = (P_MSDU_INFO_T) QUEUE_GET_NEXT_ENTRY(&prMsduInfoHead->rQueEntry);
+				prNextMsduInfo = (P_MSDU_INFO_T)QUEUE_GET_NEXT_ENTRY(&prMsduInfoHead->rQueEntry);
 
 				KAL_ACQUIRE_SPIN_LOCK(prAdapter, SPIN_LOCK_CMD_RESOURCE);
 				QUEUE_REMOVE_HEAD(&prAdapter->rFreeCmdList, prCmdInfo, P_CMD_INFO_T);
@@ -2810,31 +2727,28 @@ WLAN_STATUS nicTxEnqueueMsdu(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduIn
 					/* Tag MGMT enqueue time */
 					GET_CURRENT_SYSTIME(&prMsduInfoHead->rPktProfile.rEnqueueTimestamp);
 #endif
-					prCmdInfo->eCmdType = COMMAND_TYPE_MANAGEMENT_FRAME;
-					prCmdInfo->u2InfoBufLen = prMsduInfoHead->u2FrameLength;
-					prCmdInfo->pucInfoBuffer = NULL;
-					prCmdInfo->prMsduInfo = prMsduInfoHead;
-					prCmdInfo->pfCmdDoneHandler = NULL;
+					prCmdInfo->eCmdType			   = COMMAND_TYPE_MANAGEMENT_FRAME;
+					prCmdInfo->u2InfoBufLen		   = prMsduInfoHead->u2FrameLength;
+					prCmdInfo->pucInfoBuffer	   = NULL;
+					prCmdInfo->prMsduInfo		   = prMsduInfoHead;
+					prCmdInfo->pfCmdDoneHandler	   = NULL;
 					prCmdInfo->pfCmdTimeoutHandler = NULL;
-					prCmdInfo->fgIsOid = FALSE;
-					prCmdInfo->fgSetQuery = TRUE;
-					prCmdInfo->fgNeedResp = FALSE;
-					prCmdInfo->ucCmdSeqNum = prMsduInfoHead->ucTxSeqNum;
+					prCmdInfo->fgIsOid			   = FALSE;
+					prCmdInfo->fgSetQuery		   = TRUE;
+					prCmdInfo->fgNeedResp		   = FALSE;
+					prCmdInfo->ucCmdSeqNum		   = prMsduInfoHead->ucTxSeqNum;
 
-					DBGLOG(TX, TRACE, "%s: EN-Q MSDU[0x%p] SEQ[%u] BSS[%u] STA[%u] to CMD Q\n",
-					       __func__, prMsduInfoHead,
-					       prMsduInfoHead->ucTxSeqNum, prMsduInfoHead->ucBssIndex,
-					       prMsduInfoHead->ucStaRecIndex);
+					DBGLOG(TX, TRACE, "%s: EN-Q MSDU[0x%p] SEQ[%u] BSS[%u] STA[%u] to CMD Q\n", __func__,
+							prMsduInfoHead, prMsduInfoHead->ucTxSeqNum, prMsduInfoHead->ucBssIndex,
+							prMsduInfoHead->ucStaRecIndex);
 
-					kalEnqueueCommand(prAdapter->prGlueInfo, (P_QUE_ENTRY_T) prCmdInfo);
+					kalEnqueueCommand(prAdapter->prGlueInfo, (P_QUE_ENTRY_T)prCmdInfo);
 				} else {
 					/* Cmd free count is larger than expected, but allocation fail. */
 					u4Status = WLAN_STATUS_FAILURE;
 
 					if (prMsduInfoHead->pfTxDoneHandler != NULL) {
-						prMsduInfoHead->pfTxDoneHandler(prAdapter,
-										prMsduInfoHead,
-										TX_RESULT_DROPPED_IN_DRIVER);
+						prMsduInfoHead->pfTxDoneHandler(prAdapter, prMsduInfoHead, TX_RESULT_DROPPED_IN_DRIVER);
 					}
 
 					cnmMgtPktFree(prAdapter, prMsduInfoHead);
@@ -2854,20 +2768,20 @@ WLAN_STATUS nicTxEnqueueMsdu(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduIn
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief this function returns WLAN index
-*
-* @param prAdapter      Pointer to the Adapter structure.
-*
-* @retval
-*/
+ * \brief this function returns WLAN index
+ *
+ * @param prAdapter      Pointer to the Adapter structure.
+ *
+ * @retval
+ */
 /*----------------------------------------------------------------------------*/
 UINT_8 nicTxGetWlanIdx(P_ADAPTER_T prAdapter, UINT_8 ucBssIdx, UINT_8 ucStaRecIdx)
 {
 	P_STA_RECORD_T prStaRec;
-	P_BSS_INFO_T prBssInfo;
-	UINT_8 ucWlanIndex = NIC_TX_DEFAULT_WLAN_INDEX;
+	P_BSS_INFO_T   prBssInfo;
+	UINT_8		   ucWlanIndex = NIC_TX_DEFAULT_WLAN_INDEX;
 
-	prStaRec = cnmGetStaRecByIndex(prAdapter, ucStaRecIdx);
+	prStaRec  = cnmGetStaRecByIndex(prAdapter, ucStaRecIdx);
 	prBssInfo = GET_BSS_INFO_BY_INDEX(prAdapter, ucBssIdx);
 
 	if (prStaRec)
@@ -2875,7 +2789,7 @@ UINT_8 nicTxGetWlanIdx(P_ADAPTER_T prAdapter, UINT_8 ucBssIdx, UINT_8 ucStaRecId
 	else if ((ucStaRecIdx == STA_REC_INDEX_BMCAST) && prBssInfo->fgIsInUse) {
 		if (prBssInfo->fgBcDefaultKeyExist) {
 			if (prBssInfo->wepkeyUsed[prBssInfo->ucBcDefaultKeyIdx] &&
-				prBssInfo->wepkeyWlanIdx < NIC_TX_DEFAULT_WLAN_INDEX)
+					prBssInfo->wepkeyWlanIdx < NIC_TX_DEFAULT_WLAN_INDEX)
 				ucWlanIndex = prBssInfo->wepkeyWlanIdx;
 			else if (prBssInfo->ucBMCWlanIndexSUsed[prBssInfo->ucBcDefaultKeyIdx])
 				ucWlanIndex = prBssInfo->ucBMCWlanIndexS[prBssInfo->ucBcDefaultKeyIdx];
@@ -2884,8 +2798,8 @@ UINT_8 nicTxGetWlanIdx(P_ADAPTER_T prAdapter, UINT_8 ucBssIdx, UINT_8 ucStaRecId
 	}
 
 	if (ucWlanIndex >= WTBL_SIZE) {
-		DBGLOG(TX, WARN, "%s: Unexpected WIDX[%u] BSS[%u] STA[%u], set WIDX to default value[%u]\n",
-		       ucWlanIndex, ucBssIdx, ucStaRecIdx, NIC_TX_DEFAULT_WLAN_INDEX);
+		DBGLOG(TX, WARN, "%s: Unexpected WIDX[%u] BSS[%u] STA[%u], set WIDX to default value[%u]\n", ucWlanIndex,
+				ucBssIdx, ucStaRecIdx, NIC_TX_DEFAULT_WLAN_INDEX);
 
 		ucWlanIndex = NIC_TX_DEFAULT_WLAN_INDEX;
 	}
@@ -2895,12 +2809,12 @@ UINT_8 nicTxGetWlanIdx(P_ADAPTER_T prAdapter, UINT_8 ucBssIdx, UINT_8 ucStaRecId
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief
-*
-* @param prAdapter      Pointer to the Adapter structure.
-*
-* @retval
-*/
+ * \brief
+ *
+ * @param prAdapter      Pointer to the Adapter structure.
+ *
+ * @retval
+ */
 /*----------------------------------------------------------------------------*/
 BOOLEAN nicTxIsMgmtResourceEnough(IN P_ADAPTER_T prAdapter)
 {
@@ -2912,12 +2826,12 @@ BOOLEAN nicTxIsMgmtResourceEnough(IN P_ADAPTER_T prAdapter)
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief this function returns available count in command queue
-*
-* @param prAdapter      Pointer to the Adapter structure.
-*
-* @retval
-*/
+ * \brief this function returns available count in command queue
+ *
+ * @param prAdapter      Pointer to the Adapter structure.
+ *
+ * @retval
+ */
 /*----------------------------------------------------------------------------*/
 UINT_32 nicTxGetFreeCmdCount(IN P_ADAPTER_T prAdapter)
 {
@@ -2928,12 +2842,12 @@ UINT_32 nicTxGetFreeCmdCount(IN P_ADAPTER_T prAdapter)
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief this function returns page count of frame
-*
-* @param u4FrameLength      frame length
-*
-* @retval page count of this frame
-*/
+ * \brief this function returns page count of frame
+ *
+ * @param u4FrameLength      frame length
+ *
+ * @retval page count of this frame
+ */
 /*----------------------------------------------------------------------------*/
 UINT_32 nicTxGetPageCount(IN UINT_32 u4FrameLength, IN BOOLEAN fgIncludeDesc)
 {
@@ -2965,59 +2879,56 @@ UINT_32 nicTxGetCmdPageCount(IN P_CMD_INFO_T prCmdInfo)
 	return u4PageCount;
 }
 
-VOID nicTxSetMngPacket(P_ADAPTER_T prAdapter, P_MSDU_INFO_T prMsduInfo,
-		       UINT_8 ucBssIndex, UINT_8 ucStaRecIndex, UINT_8 ucMacHeaderLength,
-		       UINT_16 u2FrameLength, PFN_TX_DONE_HANDLER pfTxDoneHandler, UINT_8 ucRateMode)
+VOID nicTxSetMngPacket(P_ADAPTER_T prAdapter, P_MSDU_INFO_T prMsduInfo, UINT_8 ucBssIndex, UINT_8 ucStaRecIndex,
+		UINT_8 ucMacHeaderLength, UINT_16 u2FrameLength, PFN_TX_DONE_HANDLER pfTxDoneHandler, UINT_8 ucRateMode)
 {
 	ASSERT(prMsduInfo);
 
-	prMsduInfo->ucBssIndex = ucBssIndex;
-	prMsduInfo->ucStaRecIndex = ucStaRecIndex;
+	prMsduInfo->ucBssIndex		  = ucBssIndex;
+	prMsduInfo->ucStaRecIndex	  = ucStaRecIndex;
 	prMsduInfo->ucMacHeaderLength = ucMacHeaderLength;
-	prMsduInfo->u2FrameLength = u2FrameLength;
-	prMsduInfo->pfTxDoneHandler = pfTxDoneHandler;
-	prMsduInfo->ucRateMode = ucRateMode;
+	prMsduInfo->u2FrameLength	  = u2FrameLength;
+	prMsduInfo->pfTxDoneHandler	  = pfTxDoneHandler;
+	prMsduInfo->ucRateMode		  = ucRateMode;
 
 	/* Reset default value for MMPDU */
-	prMsduInfo->fgIs802_11 = TRUE;
-	prMsduInfo->fgIs802_1x = FALSE;
+	prMsduInfo->fgIs802_11				= TRUE;
+	prMsduInfo->fgIs802_1x				= FALSE;
 	prMsduInfo->fgIs802_1x_NonProtected = TRUE; /*For data frame only, no sense for management frame*/
-	prMsduInfo->u4FixedRateOption = 0;
-	prMsduInfo->cPowerOffset = 0;
-	prMsduInfo->u4Option = 0;
-	prMsduInfo->ucTxSeqNum = nicIncreaseTxSeqNum(prAdapter);
-	prMsduInfo->ucPID = NIC_TX_DESC_PID_RESERVED;
-	prMsduInfo->ucPacketType = TX_PACKET_TYPE_MGMT;
-	prMsduInfo->ucUserPriority = 0;
-	prMsduInfo->eSrc = TX_PACKET_MGMT;
+	prMsduInfo->u4FixedRateOption		= 0;
+	prMsduInfo->cPowerOffset			= 0;
+	prMsduInfo->u4Option				= 0;
+	prMsduInfo->ucTxSeqNum				= nicIncreaseTxSeqNum(prAdapter);
+	prMsduInfo->ucPID					= NIC_TX_DESC_PID_RESERVED;
+	prMsduInfo->ucPacketType			= TX_PACKET_TYPE_MGMT;
+	prMsduInfo->ucUserPriority			= 0;
+	prMsduInfo->eSrc					= TX_PACKET_MGMT;
 }
 
-VOID nicTxSetDataPacket(P_ADAPTER_T prAdapter, P_MSDU_INFO_T prMsduInfo,
-			UINT_8 ucBssIndex, UINT_8 ucStaRecIndex, UINT_8 ucMacHeaderLength,
-			UINT_16 u2FrameLength, PFN_TX_DONE_HANDLER pfTxDoneHandler,
-			UINT_8 ucRateMode, ENUM_TX_PACKET_SRC_T eSrc, UINT_8 ucTID,
-			BOOLEAN fgIs802_11Frame, BOOLEAN fgIs1xFrame)
+VOID nicTxSetDataPacket(P_ADAPTER_T prAdapter, P_MSDU_INFO_T prMsduInfo, UINT_8 ucBssIndex, UINT_8 ucStaRecIndex,
+		UINT_8 ucMacHeaderLength, UINT_16 u2FrameLength, PFN_TX_DONE_HANDLER pfTxDoneHandler, UINT_8 ucRateMode,
+		ENUM_TX_PACKET_SRC_T eSrc, UINT_8 ucTID, BOOLEAN fgIs802_11Frame, BOOLEAN fgIs1xFrame)
 {
 	ASSERT(prMsduInfo);
 
-	prMsduInfo->ucBssIndex = ucBssIndex;
-	prMsduInfo->ucStaRecIndex = ucStaRecIndex;
+	prMsduInfo->ucBssIndex		  = ucBssIndex;
+	prMsduInfo->ucStaRecIndex	  = ucStaRecIndex;
 	prMsduInfo->ucMacHeaderLength = ucMacHeaderLength;
-	prMsduInfo->u2FrameLength = u2FrameLength;
-	prMsduInfo->pfTxDoneHandler = pfTxDoneHandler;
-	prMsduInfo->ucRateMode = ucRateMode;
-	prMsduInfo->ucUserPriority = ucTID;
-	prMsduInfo->fgIs802_11 = fgIs802_11Frame;
-	prMsduInfo->eSrc = eSrc;
-	prMsduInfo->fgIs802_1x = fgIs1xFrame;
+	prMsduInfo->u2FrameLength	  = u2FrameLength;
+	prMsduInfo->pfTxDoneHandler	  = pfTxDoneHandler;
+	prMsduInfo->ucRateMode		  = ucRateMode;
+	prMsduInfo->ucUserPriority	  = ucTID;
+	prMsduInfo->fgIs802_11		  = fgIs802_11Frame;
+	prMsduInfo->eSrc			  = eSrc;
+	prMsduInfo->fgIs802_1x		  = fgIs1xFrame;
 
 	/* Reset default value for data packet */
 	prMsduInfo->u4FixedRateOption = 0;
-	prMsduInfo->cPowerOffset = 0;
-	prMsduInfo->u4Option = 0;
-	prMsduInfo->ucTxSeqNum = nicIncreaseTxSeqNum(prAdapter);
-	prMsduInfo->ucPID = NIC_TX_DESC_PID_RESERVED;
-	prMsduInfo->ucPacketType = TX_PACKET_TYPE_DATA;
+	prMsduInfo->cPowerOffset	  = 0;
+	prMsduInfo->u4Option		  = 0;
+	prMsduInfo->ucTxSeqNum		  = nicIncreaseTxSeqNum(prAdapter);
+	prMsduInfo->ucPID			  = NIC_TX_DESC_PID_RESERVED;
+	prMsduInfo->ucPacketType	  = TX_PACKET_TYPE_DATA;
 }
 
 VOID nicTxFillDescByPktOption(P_MSDU_INFO_T prMsduInfo, P_HW_MAC_TX_DESC_T prTxDesc)
@@ -3065,7 +2976,7 @@ VOID nicTxFillDescByPktOption(P_MSDU_INFO_T prMsduInfo, P_HW_MAC_TX_DESC_T prTxD
 	case HEADER_FORMAT_802_11_NORMAL_MODE:
 		if (fgProtected && prMsduInfo->prPacket) {
 			P_WLAN_MAC_HEADER_T prWlanHeader =
-			    (P_WLAN_MAC_HEADER_T) ((ULONG) (prMsduInfo->prPacket) + MAC_TX_RESERVED_FIELD);
+					(P_WLAN_MAC_HEADER_T)((ULONG)(prMsduInfo->prPacket) + MAC_TX_RESERVED_FIELD);
 
 			prWlanHeader->u2FrameCtrl |= MASK_FC_PROTECTED_FRAME;
 		}
@@ -3117,15 +3028,14 @@ VOID nicTxFillDescByPktOption(P_MSDU_INFO_T prMsduInfo, P_HW_MAC_TX_DESC_T prTxD
 		HAL_MAC_TX_DESC_SET_TXD_SN_VALID(prTxDesc);
 		HAL_MAC_TX_DESC_SET_SEQUENCE_NUMBER(prTxDesc, prMsduInfo->u2SwSN);
 	}
-
 }
 
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief Extra configuration for Tx packet
-*
-* @retval
-*/
+ * @brief Extra configuration for Tx packet
+ *
+ * @retval
+ */
 /*----------------------------------------------------------------------------*/
 VOID nicTxConfigPktOption(P_MSDU_INFO_T prMsduInfo, UINT_32 u4OptionMask, BOOLEAN fgSetOption)
 {
@@ -3160,7 +3070,7 @@ VOID nicTxConfigPktControlFlag(P_MSDU_INFO_T prMsduInfo, UINT_8 ucControlFlagMas
 	if (fgSetFlag)
 		prMsduInfo->ucControlFlag |= ucControlFlagMask;
 	else
-		prMsduInfo->ucControlFlag &= ~ucControlFlagMask;	/* Clear control flag */
+		prMsduInfo->ucControlFlag &= ~ucControlFlagMask; /* Clear control flag */
 }
 
 VOID nicTxSetPktLifeTime(P_MSDU_INFO_T prMsduInfo, UINT_32 u4TxLifeTimeInMs)
@@ -3202,14 +3112,10 @@ VOID nicTxSetPktMacTxQue(P_MSDU_INFO_T prMsduInfo, UINT_8 ucMacTxQue)
 	}
 }
 
-VOID nicTxSetPktFixedRateOptionFull(P_MSDU_INFO_T prMsduInfo,
-				    UINT_16 u2RateCode,
-				    UINT_8 ucBandwidth,
-				    BOOLEAN fgShortGI,
-				    BOOLEAN fgLDPC,
-				    BOOLEAN fgDynamicBwRts, BOOLEAN fgBeamforming, UINT_8 ucAntennaIndex)
+VOID nicTxSetPktFixedRateOptionFull(P_MSDU_INFO_T prMsduInfo, UINT_16 u2RateCode, UINT_8 ucBandwidth, BOOLEAN fgShortGI,
+		BOOLEAN fgLDPC, BOOLEAN fgDynamicBwRts, BOOLEAN fgBeamforming, UINT_8 ucAntennaIndex)
 {
-	HW_MAC_TX_DESC_T rTxDesc;
+	HW_MAC_TX_DESC_T   rTxDesc;
 	P_HW_MAC_TX_DESC_T prTxDesc = &rTxDesc;
 
 	kalMemZero(prTxDesc, NIC_TX_DESC_LONG_FORMAT_LENGTH);
@@ -3238,13 +3144,12 @@ VOID nicTxSetPktFixedRateOptionFull(P_MSDU_INFO_T prMsduInfo,
 	HAL_MAC_TX_DESC_GET_DW(prTxDesc, 6, 1, &prMsduInfo->u4FixedRateOption);
 
 	prMsduInfo->ucRateMode = MSDU_RATE_MODE_MANUAL_DESC;
-
 }
 
-VOID nicTxSetPktFixedRateOption(P_MSDU_INFO_T prMsduInfo,
-				UINT_16 u2RateCode, UINT_8 ucBandwidth, BOOLEAN fgShortGI, BOOLEAN fgDynamicBwRts)
+VOID nicTxSetPktFixedRateOption(
+		P_MSDU_INFO_T prMsduInfo, UINT_16 u2RateCode, UINT_8 ucBandwidth, BOOLEAN fgShortGI, BOOLEAN fgDynamicBwRts)
 {
-	HW_MAC_TX_DESC_T rTxDesc;
+	HW_MAC_TX_DESC_T   rTxDesc;
 	P_HW_MAC_TX_DESC_T prTxDesc = &rTxDesc;
 
 	kalMemZero(prTxDesc, NIC_TX_DESC_LONG_FORMAT_LENGTH);
@@ -3265,16 +3170,15 @@ VOID nicTxSetPktFixedRateOption(P_MSDU_INFO_T prMsduInfo,
 	HAL_MAC_TX_DESC_GET_DW(prTxDesc, 6, 1, &prMsduInfo->u4FixedRateOption);
 
 	prMsduInfo->ucRateMode = MSDU_RATE_MODE_MANUAL_DESC;
-
 }
 
 VOID nicTxSetPktLowestFixedRate(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo)
 {
-	P_BSS_INFO_T prBssInfo = GET_BSS_INFO_BY_INDEX(prAdapter, prMsduInfo->ucBssIndex);
-	P_STA_RECORD_T prStaRec = cnmGetStaRecByIndex(prAdapter, prMsduInfo->ucStaRecIndex);
-	UINT_8 ucRateSwIndex, ucRateIndex, ucRatePreamble;
-	UINT_16 u2RateCode, u2RateCodeLimit, u2OperationalRateSet;
-	UINT_32 u4CurrentPhyRate, u4Status;
+	P_BSS_INFO_T   prBssInfo = GET_BSS_INFO_BY_INDEX(prAdapter, prMsduInfo->ucBssIndex);
+	P_STA_RECORD_T prStaRec	 = cnmGetStaRecByIndex(prAdapter, prMsduInfo->ucStaRecIndex);
+	UINT_8		   ucRateSwIndex, ucRateIndex, ucRatePreamble;
+	UINT_16		   u2RateCode, u2RateCodeLimit, u2OperationalRateSet;
+	UINT_32		   u4CurrentPhyRate, u4Status;
 
 	/* Not to use TxD template for fixed rate */
 	prMsduInfo->fgIsTXDTemplateValid = FALSE;
@@ -3283,22 +3187,20 @@ VOID nicTxSetPktLowestFixedRate(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsd
 	prMsduInfo->ucRateMode = MSDU_RATE_MODE_MANUAL_DESC;
 
 	if (prStaRec) {
-		u2RateCode = prStaRec->u2HwDefaultFixedRateCode;
+		u2RateCode			 = prStaRec->u2HwDefaultFixedRateCode;
 		u2OperationalRateSet = prStaRec->u2OperationalRateSet;
 	} else {
-		u2RateCode = prBssInfo->u2HwDefaultFixedRateCode;
+		u2RateCode			 = prBssInfo->u2HwDefaultFixedRateCode;
 		u2OperationalRateSet = prBssInfo->u2OperationalRateSet;
 	}
 
 	/* CoexPhyRateLimit is 0 means phy rate is unlimited */
 	if (prBssInfo->u4CoexPhyRateLimit != 0) {
-
 		u4CurrentPhyRate = nicRateCode2PhyRate(u2RateCode, FIX_BW_NO_FIXED, MAC_GI_NORMAL, AR_SS_NULL);
 
 		if (prBssInfo->u4CoexPhyRateLimit > u4CurrentPhyRate) {
 			nicGetRateIndexFromRateSetWithLimit(
-				u2OperationalRateSet,
-				prBssInfo->u4CoexPhyRateLimit, TRUE, &ucRateSwIndex);
+					u2OperationalRateSet, prBssInfo->u4CoexPhyRateLimit, TRUE, &ucRateSwIndex);
 
 			/* Convert SW rate index to rate code */
 			nicSwIndex2RateIndex(ucRateSwIndex, &ucRateIndex, &ucRatePreamble);
@@ -3306,8 +3208,8 @@ VOID nicTxSetPktLowestFixedRate(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsd
 			if (u4Status == WLAN_STATUS_SUCCESS) {
 				/* Replace by limitation rate */
 				u2RateCode = u2RateCodeLimit;
-				DBGLOG(NIC, INFO, "Coex RatePreamble=%d, R_SW_IDX:%d, R_CODE:0x%x\n",
-						ucRatePreamble, ucRateIndex, u2RateCode);
+				DBGLOG(NIC, INFO, "Coex RatePreamble=%d, R_SW_IDX:%d, R_CODE:0x%x\n", ucRatePreamble, ucRateIndex,
+						u2RateCode);
 			}
 		}
 	}
@@ -3319,8 +3221,7 @@ VOID nicTxSetPktMoreData(P_MSDU_INFO_T prCurrentMsduInfo, BOOLEAN fgSetMoreDataB
 	P_WLAN_MAC_HEADER_T prWlanMacHeader = NULL;
 
 	if (prCurrentMsduInfo->fgIs802_11) {
-		prWlanMacHeader =
-		    (P_WLAN_MAC_HEADER_T) (((PUINT_8) (prCurrentMsduInfo->prPacket)) + MAC_TX_RESERVED_FIELD);
+		prWlanMacHeader = (P_WLAN_MAC_HEADER_T)(((PUINT_8)(prCurrentMsduInfo->prPacket)) + MAC_TX_RESERVED_FIELD);
 	}
 
 	if (fgSetMoreDataBit) {
@@ -3338,7 +3239,7 @@ VOID nicTxSetPktMoreData(P_MSDU_INFO_T prCurrentMsduInfo, BOOLEAN fgSetMoreDataB
 
 UINT_8 nicTxAssignPID(IN P_ADAPTER_T prAdapter, IN UINT_8 ucWlanIndex)
 {
-	UINT_8 ucRetval;
+	UINT_8	ucRetval;
 	PUINT_8 pucPidPool;
 
 	ASSERT(prAdapter);
@@ -3359,12 +3260,11 @@ UINT_8 nicTxAssignPID(IN P_ADAPTER_T prAdapter, IN UINT_8 ucWlanIndex)
 VOID nicTxSetPktEOSP(P_MSDU_INFO_T prCurrentMsduInfo, BOOLEAN fgSetEOSPBit)
 {
 	P_WLAN_MAC_HEADER_QOS_T prWlanMacHeader = NULL;
-	BOOLEAN fgWriteToDesc = TRUE;
+	BOOLEAN					fgWriteToDesc	= TRUE;
 
 	if (prCurrentMsduInfo->fgIs802_11) {
-		prWlanMacHeader =
-		    (P_WLAN_MAC_HEADER_QOS_T) (((PUINT_8) (prCurrentMsduInfo->prPacket)) + MAC_TX_RESERVED_FIELD);
-		fgWriteToDesc = FALSE;
+		prWlanMacHeader = (P_WLAN_MAC_HEADER_QOS_T)(((PUINT_8)(prCurrentMsduInfo->prPacket)) + MAC_TX_RESERVED_FIELD);
+		fgWriteToDesc	= FALSE;
 	}
 
 	if (fgSetEOSPBit) {
@@ -3383,20 +3283,20 @@ VOID nicTxSetPktEOSP(P_MSDU_INFO_T prCurrentMsduInfo, BOOLEAN fgSetEOSPBit)
 WLAN_STATUS
 nicTxDummyTxDone(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo, IN ENUM_TX_RESULT_CODE_T rTxDoneStatus)
 {
-	DBGLOG(TX, TRACE, "Msdu WIDX:PID[%u:%u] SEQ[%u] Tx Status[%u]\n",
-	       prMsduInfo->ucWlanIndex, prMsduInfo->ucPID, prMsduInfo->ucTxSeqNum, rTxDoneStatus);
+	DBGLOG(TX, TRACE, "Msdu WIDX:PID[%u:%u] SEQ[%u] Tx Status[%u]\n", prMsduInfo->ucWlanIndex, prMsduInfo->ucPID,
+			prMsduInfo->ucTxSeqNum, rTxDoneStatus);
 
 	return WLAN_STATUS_SUCCESS;
 }
 
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief Update BSS Tx Params
-*
-* @param prStaRec The peer
-*
-* @return (none)
-*/
+ * @brief Update BSS Tx Params
+ *
+ * @param prStaRec The peer
+ *
+ * @return (none)
+ */
 /*----------------------------------------------------------------------------*/
 VOID nicTxUpdateBssDefaultRate(P_BSS_INFO_T prBssInfo)
 {
@@ -3406,8 +3306,7 @@ VOID nicTxUpdateBssDefaultRate(P_BSS_INFO_T prBssInfo)
 
 	/* 4 <1> Find Lowest Basic Rate Index for default TX Rate of MMPDU */
 	if (rateGetLowestRateIndexFromRateSet(prBssInfo->u2BSSBasicRateSet, &ucLowestBasicRateIndex)) {
-		nicRateIndex2RateCode(PREAMBLE_DEFAULT_LONG_NONE, ucLowestBasicRateIndex,
-				      &prBssInfo->u2HwDefaultFixedRateCode);
+		nicRateIndex2RateCode(PREAMBLE_DEFAULT_LONG_NONE, ucLowestBasicRateIndex, &prBssInfo->u2HwDefaultFixedRateCode);
 	} else {
 		switch (prBssInfo->ucNonHTBasicPhyType) {
 		case PHY_TYPE_ERP_INDEX:
@@ -3424,12 +3323,12 @@ VOID nicTxUpdateBssDefaultRate(P_BSS_INFO_T prBssInfo)
 
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief Update StaRec Tx parameters
-*
-* @param prStaRec The peer
-*
-* @return (none)
-*/
+ * @brief Update StaRec Tx parameters
+ *
+ * @param prStaRec The peer
+ *
+ * @return (none)
+ */
 /*----------------------------------------------------------------------------*/
 VOID nicTxUpdateStaRecDefaultRate(P_STA_RECORD_T prStaRec)
 {
@@ -3439,8 +3338,7 @@ VOID nicTxUpdateStaRecDefaultRate(P_STA_RECORD_T prStaRec)
 
 	/* 4 <1> Find Lowest Basic Rate Index for default TX Rate of MMPDU */
 	if (rateGetLowestRateIndexFromRateSet(prStaRec->u2BSSBasicRateSet, &ucLowestBasicRateIndex)) {
-		nicRateIndex2RateCode(PREAMBLE_DEFAULT_LONG_NONE,
-				      ucLowestBasicRateIndex, &prStaRec->u2HwDefaultFixedRateCode);
+		nicRateIndex2RateCode(PREAMBLE_DEFAULT_LONG_NONE, ucLowestBasicRateIndex, &prStaRec->u2HwDefaultFixedRateCode);
 	} else {
 		if (prStaRec->ucDesiredPhyTypeSet & PHY_TYPE_SET_802_11B)
 			prStaRec->u2HwDefaultFixedRateCode = RATE_CCK_1M_LONG;
@@ -3462,13 +3360,13 @@ VOID nicTxCancelSendingCmd(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo)
 
 /*----------------------------------------------------------------------------*/
 /*
-* \brief This function is to start rTxDirectHifTimer to try to send out packets in
-*        rStaPsQueue[], rBssAbsentQueue[], rTxDirectHifQueue[].
-*
-* \param[in] prAdapter   Pointer of Adapter
-*
-* \retval none
-*/
+ * \brief This function is to start rTxDirectHifTimer to try to send out packets in
+ *        rStaPsQueue[], rBssAbsentQueue[], rTxDirectHifQueue[].
+ *
+ * \param[in] prAdapter   Pointer of Adapter
+ *
+ * \retval none
+ */
 /*----------------------------------------------------------------------------*/
 VOID nicTxDirectStartCheckQTimer(IN P_ADAPTER_T prAdapter)
 {
@@ -3477,7 +3375,7 @@ VOID nicTxDirectStartCheckQTimer(IN P_ADAPTER_T prAdapter)
 
 VOID nicTxDirectClearSkbQ(IN P_ADAPTER_T prAdapter)
 {
-	P_GLUE_INFO_T prGlueInfo = prAdapter->prGlueInfo;
+	P_GLUE_INFO_T	prGlueInfo = prAdapter->prGlueInfo;
 	struct sk_buff *prSkb;
 
 	while (TRUE) {
@@ -3494,9 +3392,9 @@ VOID nicTxDirectClearSkbQ(IN P_ADAPTER_T prAdapter)
 VOID nicTxDirectClearHifQ(IN P_ADAPTER_T prAdapter)
 {
 	P_GLUE_INFO_T prGlueInfo = prAdapter->prGlueInfo;
-	UINT_8 ucHifTc = 0;
-	QUE_T rNeedToFreeQue;
-	P_QUE_T prNeedToFreeQue = &rNeedToFreeQue;
+	UINT_8		  ucHifTc	 = 0;
+	QUE_T		  rNeedToFreeQue;
+	P_QUE_T		  prNeedToFreeQue = &rNeedToFreeQue;
 
 	QUEUE_INITIALIZE(prNeedToFreeQue);
 
@@ -3506,7 +3404,7 @@ VOID nicTxDirectClearHifQ(IN P_ADAPTER_T prAdapter)
 			QUEUE_MOVE_ALL(prNeedToFreeQue, &prAdapter->rTxDirectHifQueue[ucHifTc]);
 			spin_unlock_bh(&prGlueInfo->rSpinLock[SPIN_LOCK_TX_DIRECT]);
 
-			wlanProcessQueuedMsduInfo(prAdapter, (P_MSDU_INFO_T) QUEUE_GET_HEAD(prNeedToFreeQue));
+			wlanProcessQueuedMsduInfo(prAdapter, (P_MSDU_INFO_T)QUEUE_GET_HEAD(prNeedToFreeQue));
 		}
 	}
 }
@@ -3514,8 +3412,8 @@ VOID nicTxDirectClearHifQ(IN P_ADAPTER_T prAdapter)
 VOID nicTxDirectClearStaPsQ(IN P_ADAPTER_T prAdapter, UINT_8 ucStaRecIndex)
 {
 	P_GLUE_INFO_T prGlueInfo = prAdapter->prGlueInfo;
-	QUE_T rNeedToFreeQue;
-	P_QUE_T prNeedToFreeQue = &rNeedToFreeQue;
+	QUE_T		  rNeedToFreeQue;
+	P_QUE_T		  prNeedToFreeQue = &rNeedToFreeQue;
 
 	QUEUE_INITIALIZE(prNeedToFreeQue);
 
@@ -3524,15 +3422,15 @@ VOID nicTxDirectClearStaPsQ(IN P_ADAPTER_T prAdapter, UINT_8 ucStaRecIndex)
 		QUEUE_MOVE_ALL(prNeedToFreeQue, &prAdapter->rStaPsQueue[ucStaRecIndex]);
 		spin_unlock_bh(&prGlueInfo->rSpinLock[SPIN_LOCK_TX_DIRECT]);
 
-		wlanProcessQueuedMsduInfo(prAdapter, (P_MSDU_INFO_T) QUEUE_GET_HEAD(prNeedToFreeQue));
+		wlanProcessQueuedMsduInfo(prAdapter, (P_MSDU_INFO_T)QUEUE_GET_HEAD(prNeedToFreeQue));
 	}
 }
 
 VOID nicTxDirectClearBssAbsentQ(IN P_ADAPTER_T prAdapter, UINT_8 ucBssIndex)
 {
 	P_GLUE_INFO_T prGlueInfo = prAdapter->prGlueInfo;
-	QUE_T rNeedToFreeQue;
-	P_QUE_T prNeedToFreeQue = &rNeedToFreeQue;
+	QUE_T		  rNeedToFreeQue;
+	P_QUE_T		  prNeedToFreeQue = &rNeedToFreeQue;
 
 	QUEUE_INITIALIZE(prNeedToFreeQue);
 
@@ -3541,13 +3439,13 @@ VOID nicTxDirectClearBssAbsentQ(IN P_ADAPTER_T prAdapter, UINT_8 ucBssIndex)
 		QUEUE_MOVE_ALL(prNeedToFreeQue, &prAdapter->rBssAbsentQueue[ucBssIndex]);
 		spin_unlock_bh(&prGlueInfo->rSpinLock[SPIN_LOCK_TX_DIRECT]);
 
-		wlanProcessQueuedMsduInfo(prAdapter, (P_MSDU_INFO_T) QUEUE_GET_HEAD(prNeedToFreeQue));
+		wlanProcessQueuedMsduInfo(prAdapter, (P_MSDU_INFO_T)QUEUE_GET_HEAD(prNeedToFreeQue));
 	}
 }
 
 VOID nicTxDirectClearAllStaPsQ(IN P_ADAPTER_T prAdapter)
 {
-	UINT_8 ucStaRecIndex;
+	UINT_8	ucStaRecIndex;
 	UINT_32 u4StaPsBitmap;
 
 	u4StaPsBitmap = prAdapter->u4StaPsBitmap;
@@ -3566,28 +3464,28 @@ VOID nicTxDirectClearAllStaPsQ(IN P_ADAPTER_T prAdapter)
 
 /*----------------------------------------------------------------------------*/
 /*
-* \brief This function is to check the StaRec is in Ps or not,
-*        and store MsduInfo(s) or sent MsduInfo(s) to the next stage respectively.
-*
-* \param[in] prAdapter   Pointer of Adapter
-* \param[in] ucStaRecIndex  Indictate which StaRec to be checked
-* \param[in] prQue       Pointer of MsduInfo queue which to be processed
-*
-* \retval none
-*/
+ * \brief This function is to check the StaRec is in Ps or not,
+ *        and store MsduInfo(s) or sent MsduInfo(s) to the next stage respectively.
+ *
+ * \param[in] prAdapter   Pointer of Adapter
+ * \param[in] ucStaRecIndex  Indictate which StaRec to be checked
+ * \param[in] prQue       Pointer of MsduInfo queue which to be processed
+ *
+ * \retval none
+ */
 /*----------------------------------------------------------------------------*/
 static VOID nicTxDirectCheckStaPsQ(IN P_ADAPTER_T prAdapter, UINT_8 ucStaRecIndex, P_QUE_T prQue)
 {
-	P_STA_RECORD_T prStaRec;	/* The current focused STA */
-	P_MSDU_INFO_T prMsduInfo = (P_MSDU_INFO_T)QUEUE_GET_HEAD(prQue);   /* For checking if new coming 1x frame. */
-	P_QUE_ENTRY_T prQueueEntry = (P_QUE_ENTRY_T) NULL;
-	BOOLEAN fgReturnStaPsQ = FALSE;
+	P_STA_RECORD_T prStaRec;											  /* The current focused STA */
+	P_MSDU_INFO_T  prMsduInfo	  = (P_MSDU_INFO_T)QUEUE_GET_HEAD(prQue); /* For checking if new coming 1x frame. */
+	P_QUE_ENTRY_T  prQueueEntry	  = (P_QUE_ENTRY_T)NULL;
+	BOOLEAN		   fgReturnStaPsQ = FALSE;
 
 	if (ucStaRecIndex >= CFG_STA_REC_NUM)
 		return;
 
 	prStaRec = cnmGetStaRecByIndex(prAdapter, ucStaRecIndex);
-	if(!prStaRec) {
+	if (!prStaRec) {
 		DBGLOG(TX, WARN, "prStaRec is NULL!\n");
 		return;
 	}
@@ -3596,13 +3494,12 @@ static VOID nicTxDirectCheckStaPsQ(IN P_ADAPTER_T prAdapter, UINT_8 ucStaRecInde
 		/* No new coming frame or non-1x frame would start from rStaPsQueue. */
 		QUEUE_CONCATENATE_QUEUES(&prAdapter->rStaPsQueue[ucStaRecIndex], prQue);
 		QUEUE_REMOVE_HEAD(&prAdapter->rStaPsQueue[ucStaRecIndex], prQueueEntry, P_QUE_ENTRY_T);
-	}
-	else {
+	} else {
 		/* New coming 1x frame has higher priority than packets in rStaPsQueue. */
 		QUEUE_REMOVE_HEAD(prQue, prQueueEntry, P_QUE_ENTRY_T);
 	}
 
-	prMsduInfo = (P_MSDU_INFO_T) prQueueEntry;
+	prMsduInfo = (P_MSDU_INFO_T)prQueueEntry;
 
 	if (prMsduInfo == NULL) {
 		DBGLOG(TX, INFO, "prMsduInfo empty\n");
@@ -3611,19 +3508,19 @@ static VOID nicTxDirectCheckStaPsQ(IN P_ADAPTER_T prAdapter, UINT_8 ucStaRecInde
 
 	if ((prStaRec->fgIsInPS) || ((!prStaRec->fgIsTxAllowed) && (!prMsduInfo->fgIs802_1x))) {
 		/* Buffer packet if:
-                 *    1. STA is under PS mode or
-                 *    2. Non 1x frame not allowed to TX. (E.X.: Key invalid. Station record state incorrect)
-                 */
+		 *    1. STA is under PS mode or
+		 *    2. Non 1x frame not allowed to TX. (E.X.: Key invalid. Station record state incorrect)
+		 */
 		KAL_SPIN_LOCK_DECLARATION();
 
 		KAL_ACQUIRE_SPIN_LOCK(prAdapter, SPIN_LOCK_TX_RESOURCE);
 		DBGLOG(TX, INFO, "fgIsInPS!\n");
 		while (1) {
 			if (prStaRec->fgIsQoS && prStaRec->fgIsUapsdSupported &&
-				(prStaRec->ucBmpTriggerAC & BIT(prMsduInfo->ucTC))) {
+					(prStaRec->ucBmpTriggerAC & BIT(prMsduInfo->ucTC))) {
 				if (prStaRec->ucFreeQuotaForDelivery > 0) {
 					prStaRec->ucFreeQuotaForDelivery--;
-					QUEUE_INSERT_TAIL(prQue, (P_QUE_ENTRY_T) prMsduInfo);
+					QUEUE_INSERT_TAIL(prQue, (P_QUE_ENTRY_T)prMsduInfo);
 				} else {
 					fgReturnStaPsQ = TRUE;
 					break;
@@ -3631,7 +3528,7 @@ static VOID nicTxDirectCheckStaPsQ(IN P_ADAPTER_T prAdapter, UINT_8 ucStaRecInde
 			} else {
 				if (prStaRec->ucFreeQuotaForNonDelivery > 0) {
 					prStaRec->ucFreeQuotaForNonDelivery--;
-					QUEUE_INSERT_TAIL(prQue, (P_QUE_ENTRY_T) prMsduInfo);
+					QUEUE_INSERT_TAIL(prQue, (P_QUE_ENTRY_T)prMsduInfo);
 				} else {
 					fgReturnStaPsQ = TRUE;
 					break;
@@ -3639,26 +3536,24 @@ static VOID nicTxDirectCheckStaPsQ(IN P_ADAPTER_T prAdapter, UINT_8 ucStaRecInde
 			}
 			if (QUEUE_IS_NOT_EMPTY(&prAdapter->rStaPsQueue[ucStaRecIndex])) {
 				QUEUE_REMOVE_HEAD(&prAdapter->rStaPsQueue[ucStaRecIndex], prQueueEntry, P_QUE_ENTRY_T);
-				prMsduInfo = (P_MSDU_INFO_T) prQueueEntry;
+				prMsduInfo = (P_MSDU_INFO_T)prQueueEntry;
 			} else {
 				break;
 			}
 		}
 		KAL_RELEASE_SPIN_LOCK(prAdapter, SPIN_LOCK_TX_RESOURCE);
 		if (fgReturnStaPsQ) {
-			QUEUE_INSERT_HEAD(&prAdapter->rStaPsQueue[ucStaRecIndex], (P_QUE_ENTRY_T) prMsduInfo);
+			QUEUE_INSERT_HEAD(&prAdapter->rStaPsQueue[ucStaRecIndex], (P_QUE_ENTRY_T)prMsduInfo);
 			prAdapter->u4StaPsBitmap |= BIT(ucStaRecIndex);
 			return;
 		}
-	}
-	else if (prMsduInfo->fgIs802_1x) {
+	} else if (prMsduInfo->fgIs802_1x) {
 		/* For 1x frame, STA not is PS case, we only TX 1x frame, not the whole queue. */
-		QUEUE_INSERT_TAIL(prQue, (P_QUE_ENTRY_T) prMsduInfo);
+		QUEUE_INSERT_TAIL(prQue, (P_QUE_ENTRY_T)prMsduInfo);
 		/* Leave the bitmap, it might be cleared in next round of check. */
 		return;
-	}
-	else {
-		QUEUE_INSERT_TAIL(prQue, (P_QUE_ENTRY_T) prMsduInfo);
+	} else {
+		QUEUE_INSERT_TAIL(prQue, (P_QUE_ENTRY_T)prMsduInfo);
 		if (QUEUE_IS_NOT_EMPTY(&prAdapter->rStaPsQueue[ucStaRecIndex]))
 			QUEUE_CONCATENATE_QUEUES(prQue, &prAdapter->rStaPsQueue[ucStaRecIndex]);
 	}
@@ -3667,28 +3562,28 @@ static VOID nicTxDirectCheckStaPsQ(IN P_ADAPTER_T prAdapter, UINT_8 ucStaRecInde
 
 /*----------------------------------------------------------------------------*/
 /*
-* \brief This function is to check the Bss is net absent or not,
-*        and store MsduInfo(s) or sent MsduInfo(s) to the next stage respectively.
-*
-* \param[in] prAdapter   Pointer of Adapter
-* \param[in] ucBssIndex  Indictate which Bss to be checked
-* \param[in] prQue       Pointer of MsduInfo queue which to be processed
-*
-* \retval none
-*/
+ * \brief This function is to check the Bss is net absent or not,
+ *        and store MsduInfo(s) or sent MsduInfo(s) to the next stage respectively.
+ *
+ * \param[in] prAdapter   Pointer of Adapter
+ * \param[in] ucBssIndex  Indictate which Bss to be checked
+ * \param[in] prQue       Pointer of MsduInfo queue which to be processed
+ *
+ * \retval none
+ */
 /*----------------------------------------------------------------------------*/
 static VOID nicTxDirectCheckBssAbsentQ(IN P_ADAPTER_T prAdapter, UINT_8 ucBssIndex, P_QUE_T prQue)
 {
-	P_BSS_INFO_T prBssInfo;
+	P_BSS_INFO_T  prBssInfo;
 	P_MSDU_INFO_T prMsduInfo;
-	P_QUE_ENTRY_T prQueueEntry = (P_QUE_ENTRY_T) NULL;
-	BOOLEAN fgReturnBssAbsentQ = FALSE;
+	P_QUE_ENTRY_T prQueueEntry		 = (P_QUE_ENTRY_T)NULL;
+	BOOLEAN		  fgReturnBssAbsentQ = FALSE;
 
 	prBssInfo = GET_BSS_INFO_BY_INDEX(prAdapter, ucBssIndex);
 
 	QUEUE_CONCATENATE_QUEUES(&prAdapter->rBssAbsentQueue[ucBssIndex], prQue);
 	QUEUE_REMOVE_HEAD(&prAdapter->rBssAbsentQueue[ucBssIndex], prQueueEntry, P_QUE_ENTRY_T);
-	prMsduInfo = (P_MSDU_INFO_T) prQueueEntry;
+	prMsduInfo = (P_MSDU_INFO_T)prQueueEntry;
 
 	if (prMsduInfo == NULL) {
 		DBGLOG(TX, INFO, "prMsduInfo empty\n");
@@ -3703,7 +3598,7 @@ static VOID nicTxDirectCheckBssAbsentQ(IN P_ADAPTER_T prAdapter, UINT_8 ucBssInd
 		while (1) {
 			if (prBssInfo->ucBssFreeQuota > 0) {
 				prBssInfo->ucBssFreeQuota--;
-				QUEUE_INSERT_TAIL(prQue, (P_QUE_ENTRY_T) prMsduInfo);
+				QUEUE_INSERT_TAIL(prQue, (P_QUE_ENTRY_T)prMsduInfo);
 				DBGLOG(TX, INFO, "fgIsNetAbsent Quota Availalbe\n");
 			} else {
 				fgReturnBssAbsentQ = TRUE;
@@ -3711,23 +3606,22 @@ static VOID nicTxDirectCheckBssAbsentQ(IN P_ADAPTER_T prAdapter, UINT_8 ucBssInd
 				break;
 			}
 			if (QUEUE_IS_NOT_EMPTY(&prAdapter->rBssAbsentQueue[ucBssIndex])) {
-				QUEUE_REMOVE_HEAD(&prAdapter->rBssAbsentQueue[ucBssIndex],
-						  prQueueEntry, P_QUE_ENTRY_T);
-				prMsduInfo = (P_MSDU_INFO_T) prQueueEntry;
+				QUEUE_REMOVE_HEAD(&prAdapter->rBssAbsentQueue[ucBssIndex], prQueueEntry, P_QUE_ENTRY_T);
+				prMsduInfo = (P_MSDU_INFO_T)prQueueEntry;
 			} else {
 				break;
 			}
 		}
 		KAL_RELEASE_SPIN_LOCK(prAdapter, SPIN_LOCK_TX_RESOURCE);
 		if (fgReturnBssAbsentQ) {
-			QUEUE_INSERT_HEAD(&prAdapter->rBssAbsentQueue[ucBssIndex], (P_QUE_ENTRY_T) prMsduInfo);
+			QUEUE_INSERT_HEAD(&prAdapter->rBssAbsentQueue[ucBssIndex], (P_QUE_ENTRY_T)prMsduInfo);
 			prAdapter->u4BssAbsentBitmap |= BIT(ucBssIndex);
 			return;
 		}
 	} else {
 		if (prAdapter->u4BssAbsentBitmap)
 			DBGLOG(TX, INFO, "fgIsNetAbsent END!\n");
-		QUEUE_INSERT_TAIL(prQue, (P_QUE_ENTRY_T) prMsduInfo);
+		QUEUE_INSERT_TAIL(prQue, (P_QUE_ENTRY_T)prMsduInfo);
 		if (QUEUE_IS_NOT_EMPTY(&prAdapter->rBssAbsentQueue[ucBssIndex]))
 			QUEUE_CONCATENATE_QUEUES(prQue, &prAdapter->rBssAbsentQueue[ucBssIndex]);
 	}
@@ -3736,12 +3630,12 @@ static VOID nicTxDirectCheckBssAbsentQ(IN P_ADAPTER_T prAdapter, UINT_8 ucBssInd
 
 /*----------------------------------------------------------------------------*/
 /*
-* \brief Get Tc for hif port mapping.
-*
-* \param[in] prMsduInfo  Pointer of the MsduInfo
-*
-* \retval Tc which maps to hif port.
-*/
+ * \brief Get Tc for hif port mapping.
+ *
+ * \param[in] prMsduInfo  Pointer of the MsduInfo
+ *
+ * \retval Tc which maps to hif port.
+ */
 /*----------------------------------------------------------------------------*/
 static UINT_8 nicTxDirectGetHifTc(P_MSDU_INFO_T prMsduInfo)
 {
@@ -3760,30 +3654,30 @@ static UINT_8 nicTxDirectGetHifTc(P_MSDU_INFO_T prMsduInfo)
 
 /*----------------------------------------------------------------------------*/
 /*
-* \brief This function is called by nicTxDirectStartXmit() and nicTxDirectTimerCheckHifQ().
-*        It is the main function to send skb out on HIF bus.
-*
-* \param[in] prSkb  Pointer of the sk_buff to be sent
-* \param[in] prMsduInfo  Pointer of the MsduInfo
-* \param[in] prAdapter   Pointer of Adapter
-* \param[in] ucCheckTc   Indictate which Tc HifQ to be checked
-* \param[in] ucStaRecIndex  Indictate which StaPsQ to be checked
-* \param[in] ucBssIndex  Indictate which BssAbsentQ to be checked
-*
-* \retval WLAN_STATUS
-*/
+ * \brief This function is called by nicTxDirectStartXmit() and nicTxDirectTimerCheckHifQ().
+ *        It is the main function to send skb out on HIF bus.
+ *
+ * \param[in] prSkb  Pointer of the sk_buff to be sent
+ * \param[in] prMsduInfo  Pointer of the MsduInfo
+ * \param[in] prAdapter   Pointer of Adapter
+ * \param[in] ucCheckTc   Indictate which Tc HifQ to be checked
+ * \param[in] ucStaRecIndex  Indictate which StaPsQ to be checked
+ * \param[in] ucBssIndex  Indictate which BssAbsentQ to be checked
+ *
+ * \retval WLAN_STATUS
+ */
 /*----------------------------------------------------------------------------*/
 static WLAN_STATUS nicTxDirectStartXmitMain(struct sk_buff *prSkb, P_MSDU_INFO_T prMsduInfo, P_ADAPTER_T prAdapter,
-					  UINT_8 ucCheckTc, UINT_8 ucStaRecIndex, UINT_8 ucBssIndex)
+		UINT_8 ucCheckTc, UINT_8 ucStaRecIndex, UINT_8 ucBssIndex)
 {
-	P_STA_RECORD_T prStaRec;	/* The current focused STA */
-	P_BSS_INFO_T prBssInfo;
-	UINT_8 ucTC = 0, ucHifTc = 0;
-	P_QUE_T prTxQue;
-	BOOLEAN fgDropPacket = FALSE;
-	P_QUE_ENTRY_T prQueueEntry = (P_QUE_ENTRY_T) NULL;
-	QUE_T rProcessingQue;
-	P_QUE_T prProcessingQue = &rProcessingQue;
+	P_STA_RECORD_T prStaRec; /* The current focused STA */
+	P_BSS_INFO_T   prBssInfo;
+	UINT_8		   ucTC = 0, ucHifTc = 0;
+	P_QUE_T		   prTxQue;
+	BOOLEAN		   fgDropPacket = FALSE;
+	P_QUE_ENTRY_T  prQueueEntry = (P_QUE_ENTRY_T)NULL;
+	QUE_T		   rProcessingQue;
+	P_QUE_T		   prProcessingQue = &rProcessingQue;
 
 	QUEUE_INITIALIZE(prProcessingQue);
 
@@ -3817,7 +3711,7 @@ static WLAN_STATUS nicTxDirectStartXmitMain(struct sk_buff *prSkb, P_MSDU_INFO_T
 
 		qmDetermineStaRecIndex(prAdapter, prMsduInfo);
 
-		wlanUpdateTxStatistics(prAdapter, prMsduInfo, FALSE);	/*get per-AC Tx packets */
+		wlanUpdateTxStatistics(prAdapter, prMsduInfo, FALSE); /*get per-AC Tx packets */
 
 		switch (prMsduInfo->ucStaRecIndex) {
 		case STA_REC_INDEX_BMCAST:
@@ -3839,10 +3733,10 @@ static WLAN_STATUS nicTxDirectStartXmitMain(struct sk_buff *prSkb, P_MSDU_INFO_T
 			return WLAN_STATUS_FAILURE;
 		default:
 			prTxQue = qmDetermineStaTxQueue(prAdapter, prMsduInfo, &ucTC);
-			break;	/*default */
-		}	/* switch (prMsduInfo->ucStaRecIndex) */
+			break; /*default */
+		}		   /* switch (prMsduInfo->ucStaRecIndex) */
 
-		prMsduInfo->ucTC = ucTC;
+		prMsduInfo->ucTC		= ucTC;
 		prMsduInfo->ucWmmQueSet = prBssInfo->ucWmmQueSet; /* to record WMM Set */
 
 		/* Check the Tx descriptor template is valid */
@@ -3871,7 +3765,7 @@ static WLAN_STATUS nicTxDirectStartXmitMain(struct sk_buff *prSkb, P_MSDU_INFO_T
 
 		prStaRec = cnmGetStaRecByIndex(prAdapter, prMsduInfo->ucStaRecIndex);
 
-		QUEUE_INSERT_TAIL(prProcessingQue, (P_QUE_ENTRY_T) prMsduInfo);
+		QUEUE_INSERT_TAIL(prProcessingQue, (P_QUE_ENTRY_T)prMsduInfo);
 
 		/* Power-save STA handling */
 		nicTxDirectCheckStaPsQ(prAdapter, prMsduInfo->ucStaRecIndex, prProcessingQue);
@@ -3887,22 +3781,22 @@ static WLAN_STATUS nicTxDirectStartXmitMain(struct sk_buff *prSkb, P_MSDU_INFO_T
 				QUEUE_REMOVE_HEAD(prProcessingQue, prQueueEntry, P_QUE_ENTRY_T);
 				if (prQueueEntry == NULL)
 					break;
-				prMsduInfo = (P_MSDU_INFO_T) prQueueEntry;
-				ucHifTc = nicTxDirectGetHifTc(prMsduInfo);
-				QUEUE_INSERT_TAIL(&prAdapter->rTxDirectHifQueue[ucHifTc], (P_QUE_ENTRY_T) prMsduInfo);
+				prMsduInfo = (P_MSDU_INFO_T)prQueueEntry;
+				ucHifTc	   = nicTxDirectGetHifTc(prMsduInfo);
+				QUEUE_INSERT_TAIL(&prAdapter->rTxDirectHifQueue[ucHifTc], (P_QUE_ENTRY_T)prMsduInfo);
 			}
 			nicTxDirectStartCheckQTimer(prAdapter);
 			return WLAN_STATUS_SUCCESS;
 		}
 
 		QUEUE_REMOVE_HEAD(prProcessingQue, prQueueEntry, P_QUE_ENTRY_T);
-		prMsduInfo = (P_MSDU_INFO_T) prQueueEntry;
-		ucHifTc = nicTxDirectGetHifTc(prMsduInfo);
+		prMsduInfo = (P_MSDU_INFO_T)prQueueEntry;
+		ucHifTc	   = nicTxDirectGetHifTc(prMsduInfo);
 
 		if (QUEUE_IS_NOT_EMPTY(&prAdapter->rTxDirectHifQueue[ucHifTc])) {
-			QUEUE_INSERT_TAIL(&prAdapter->rTxDirectHifQueue[ucHifTc], (P_QUE_ENTRY_T) prMsduInfo);
+			QUEUE_INSERT_TAIL(&prAdapter->rTxDirectHifQueue[ucHifTc], (P_QUE_ENTRY_T)prMsduInfo);
 			QUEUE_REMOVE_HEAD(&prAdapter->rTxDirectHifQueue[ucHifTc], prQueueEntry, P_QUE_ENTRY_T);
-			prMsduInfo = (P_MSDU_INFO_T) prQueueEntry;
+			prMsduInfo = (P_MSDU_INFO_T)prQueueEntry;
 		}
 	} else {
 		if (ucStaRecIndex != 0xff || ucBssIndex != 0xff) {
@@ -3922,18 +3816,17 @@ static WLAN_STATUS nicTxDirectStartXmitMain(struct sk_buff *prSkb, P_MSDU_INFO_T
 					QUEUE_REMOVE_HEAD(prProcessingQue, prQueueEntry, P_QUE_ENTRY_T);
 					if (prQueueEntry == NULL)
 						break;
-					prMsduInfo = (P_MSDU_INFO_T) prQueueEntry;
-					ucHifTc = nicTxDirectGetHifTc(prMsduInfo);
-					QUEUE_INSERT_TAIL(&prAdapter->rTxDirectHifQueue[ucHifTc],
-							  (P_QUE_ENTRY_T) prMsduInfo);
+					prMsduInfo = (P_MSDU_INFO_T)prQueueEntry;
+					ucHifTc	   = nicTxDirectGetHifTc(prMsduInfo);
+					QUEUE_INSERT_TAIL(&prAdapter->rTxDirectHifQueue[ucHifTc], (P_QUE_ENTRY_T)prMsduInfo);
 				}
 				nicTxDirectStartCheckQTimer(prAdapter);
 				return WLAN_STATUS_SUCCESS;
 			}
 
 			QUEUE_REMOVE_HEAD(prProcessingQue, prQueueEntry, P_QUE_ENTRY_T);
-			prMsduInfo = (P_MSDU_INFO_T) prQueueEntry;
-			ucHifTc = nicTxDirectGetHifTc(prMsduInfo);
+			prMsduInfo = (P_MSDU_INFO_T)prQueueEntry;
+			ucHifTc	   = nicTxDirectGetHifTc(prMsduInfo);
 		} else {
 			if (ucCheckTc != 0xff)
 				ucHifTc = ucCheckTc;
@@ -3943,14 +3836,13 @@ static WLAN_STATUS nicTxDirectStartXmitMain(struct sk_buff *prSkb, P_MSDU_INFO_T
 				return WLAN_STATUS_FAILURE;
 			}
 			QUEUE_REMOVE_HEAD(&prAdapter->rTxDirectHifQueue[ucHifTc], prQueueEntry, P_QUE_ENTRY_T);
-			prMsduInfo = (P_MSDU_INFO_T) prQueueEntry;
+			prMsduInfo = (P_MSDU_INFO_T)prQueueEntry;
 		}
 	}
 
 	while (1) {
 		if (!halTxIsDataBufEnough(prAdapter, prMsduInfo)) {
-			QUEUE_INSERT_HEAD(&prAdapter->rTxDirectHifQueue[ucHifTc],
-					  (P_QUE_ENTRY_T) prMsduInfo);
+			QUEUE_INSERT_HEAD(&prAdapter->rTxDirectHifQueue[ucHifTc], (P_QUE_ENTRY_T)prMsduInfo);
 			mod_timer(&prAdapter->rTxDirectHifTimer, jiffies + TX_DIRECT_CHECK_INTERVAL);
 
 			return WLAN_STATUS_SUCCESS;
@@ -3963,14 +3855,14 @@ static WLAN_STATUS nicTxDirectStartXmitMain(struct sk_buff *prSkb, P_MSDU_INFO_T
 			WLAN_GET_FIELD_32(&prMsduInfo->prPacket, &prMsduInfo->u4TxDoneTag);
 
 			KAL_ACQUIRE_SPIN_LOCK(prAdapter, SPIN_LOCK_TXING_MGMT_LIST);
-			QUEUE_INSERT_TAIL(&(prAdapter->rTxCtrl.rTxMgmtTxingQueue), (P_QUE_ENTRY_T) prMsduInfo);
+			QUEUE_INSERT_TAIL(&(prAdapter->rTxCtrl.rTxMgmtTxingQueue), (P_QUE_ENTRY_T)prMsduInfo);
 			KAL_RELEASE_SPIN_LOCK(prAdapter, SPIN_LOCK_TXING_MGMT_LIST);
 		}
 		HAL_WRITE_TX_DATA(prAdapter, prMsduInfo);
 
 		if (QUEUE_IS_NOT_EMPTY(&prAdapter->rTxDirectHifQueue[ucHifTc])) {
 			QUEUE_REMOVE_HEAD(&prAdapter->rTxDirectHifQueue[ucHifTc], prQueueEntry, P_QUE_ENTRY_T);
-			prMsduInfo = (P_MSDU_INFO_T) prQueueEntry;
+			prMsduInfo = (P_MSDU_INFO_T)prQueueEntry;
 		} else {
 			break;
 		}
@@ -3981,13 +3873,13 @@ static WLAN_STATUS nicTxDirectStartXmitMain(struct sk_buff *prSkb, P_MSDU_INFO_T
 
 /*----------------------------------------------------------------------------*/
 /*
-* \brief This function is the timeout function of timer rTxDirectSkbTimer.
-*        The purpose is to check if rTxDirectSkbQueue has any skb to be sent.
-*
-* \param[in] data  Pointer of GlueInfo
-*
-* \retval none
-*/
+ * \brief This function is the timeout function of timer rTxDirectSkbTimer.
+ *        The purpose is to check if rTxDirectSkbQueue has any skb to be sent.
+ *
+ * \param[in] data  Pointer of GlueInfo
+ *
+ * \retval none
+ */
 /*----------------------------------------------------------------------------*/
 #if KERNEL_VERSION(4, 14, 0) <= LINUX_VERSION_CODE
 void nicTxDirectTimerCheckSkbQ(struct timer_list *timer)
@@ -3996,8 +3888,7 @@ void nicTxDirectTimerCheckSkbQ(unsigned long data)
 #endif
 {
 #if KERNEL_VERSION(4, 14, 0) <= LINUX_VERSION_CODE
-	struct _ADAPTER_T *prAdapter =
-		from_timer(prAdapter, timer, rTxDirectSkbTimer);
+	struct _ADAPTER_T	  *prAdapter	= from_timer(prAdapter, timer, rTxDirectSkbTimer);
 	struct _GLUE_INFO_T *prGlueInfo = prAdapter->prGlueInfo;
 #else
 	P_GLUE_INFO_T prGlueInfo = (P_GLUE_INFO_T)data;
@@ -4012,13 +3903,13 @@ void nicTxDirectTimerCheckSkbQ(unsigned long data)
 
 /*----------------------------------------------------------------------------*/
 /*
-* \brief This function is the timeout function of timer rTxDirectHifTimer.
-*        The purpose is to check if rStaPsQueue, rBssAbsentQueue, and rTxDirectHifQueue has any MsduInfo to be sent.
-*
-* \param[in] data  Pointer of GlueInfo
-*
-* \retval none
-*/
+ * \brief This function is the timeout function of timer rTxDirectHifTimer.
+ *        The purpose is to check if rStaPsQueue, rBssAbsentQueue, and rTxDirectHifQueue has any MsduInfo to be sent.
+ *
+ * \param[in] data  Pointer of GlueInfo
+ *
+ * \retval none
+ */
 /*----------------------------------------------------------------------------*/
 #if KERNEL_VERSION(4, 14, 0) <= LINUX_VERSION_CODE
 void nicTxDirectTimerCheckHifQ(struct timer_list *timer)
@@ -4027,20 +3918,19 @@ void nicTxDirectTimerCheckHifQ(unsigned long data)
 #endif
 {
 #if KERNEL_VERSION(4, 14, 0) <= LINUX_VERSION_CODE
-	struct _ADAPTER_T *prAdapter =
-		from_timer(prAdapter, timer, rTxDirectHifTimer);
+	struct _ADAPTER_T	  *prAdapter	= from_timer(prAdapter, timer, rTxDirectHifTimer);
 	struct _GLUE_INFO_T *prGlueInfo = prAdapter->prGlueInfo;
 #else
 	P_GLUE_INFO_T prGlueInfo = (P_GLUE_INFO_T)data;
 	P_ADAPTER_T prAdapter = prGlueInfo->prAdapter;
 #endif
-	UINT_8 ucHifTc = 0;
+	UINT_8	ucHifTc = 0;
 	UINT_32 u4StaPsBitmap, u4BssAbsentBitmap;
-	UINT_8 ucStaRecIndex, ucBssIndex;
+	UINT_8	ucStaRecIndex, ucBssIndex;
 
 	spin_lock_bh(&prGlueInfo->rSpinLock[SPIN_LOCK_TX_DIRECT]);
 
-	u4StaPsBitmap = prAdapter->u4StaPsBitmap;
+	u4StaPsBitmap	  = prAdapter->u4StaPsBitmap;
 	u4BssAbsentBitmap = prAdapter->u4BssAbsentBitmap;
 
 	if (u4StaPsBitmap)
@@ -4065,7 +3955,6 @@ void nicTxDirectTimerCheckHifQ(unsigned long data)
 				break;
 		}
 
-
 	for (ucHifTc = 0; ucHifTc < TX_PORT_NUM; ucHifTc++)
 		if (QUEUE_IS_NOT_EMPTY(&prAdapter->rTxDirectHifQueue[ucHifTc]))
 			nicTxDirectStartXmitMain(NULL, NULL, prAdapter, ucHifTc, 0xff, 0xff);
@@ -4075,22 +3964,22 @@ void nicTxDirectTimerCheckHifQ(unsigned long data)
 
 /*----------------------------------------------------------------------------*/
 /*
-* \brief This function is have to called by kalHardStartXmit(). The purpose is
-*        to let as many as possible TX processing in softirq instead of in
-*        kernel thread to reduce TX CPU usage.
-*        NOTE: Currently only USB interface can use this function.
-*
-* \param[in] prSkb  Pointer of the sk_buff to be sent
-* \param[in] prGlueInfo  Pointer of prGlueInfo
-*
-* \retval WLAN_STATUS
-*/
+ * \brief This function is have to called by kalHardStartXmit(). The purpose is
+ *        to let as many as possible TX processing in softirq instead of in
+ *        kernel thread to reduce TX CPU usage.
+ *        NOTE: Currently only USB interface can use this function.
+ *
+ * \param[in] prSkb  Pointer of the sk_buff to be sent
+ * \param[in] prGlueInfo  Pointer of prGlueInfo
+ *
+ * \retval WLAN_STATUS
+ */
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS nicTxDirectStartXmit(struct sk_buff *prSkb, P_GLUE_INFO_T prGlueInfo)
 {
-	P_ADAPTER_T prAdapter = prGlueInfo->prAdapter;
+	P_ADAPTER_T	  prAdapter = prGlueInfo->prAdapter;
 	P_MSDU_INFO_T prMsduInfo;
-	WLAN_STATUS ret = WLAN_STATUS_SUCCESS;
+	WLAN_STATUS	  ret = WLAN_STATUS_SUCCESS;
 
 	spin_lock_bh(&prGlueInfo->rSpinLock[SPIN_LOCK_TX_DIRECT]);
 
@@ -4153,6 +4042,6 @@ UINT_8 nicTxGetWmmIdxByTc(UINT_8 ucTC)
 
 	/*get wmm set idex*/
 	ucAc = arTcResourceControl[ucTC].ucDestQueueIndex;
-	return (ucAc/WMM_AC_INDEX_NUM);
+	return (ucAc / WMM_AC_INDEX_NUM);
 }
 #endif

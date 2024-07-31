@@ -1,5 +1,4 @@
 # SPDX-License-Identifier: GPL-2.0
-
 ccflags-y += -I$(src)/os \
              -I$(src)/os/linux/include \
              -I$(src)/include \

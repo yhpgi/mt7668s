@@ -59,7 +59,6 @@
  *  Declaration of functions and finite state machine for P2P Module.
  */
 
-
 #ifndef _P2P_FSM_H
 #define _P2P_FSM_H
 
@@ -76,6 +75,5 @@ VOID p2pFsmRunEventWfdSettingUpdate(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prM
 #endif
 
 VOID p2pFsmRunEventScanDone(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMsgHdr);
-
 
 #endif /* _P2P_FSM_H */

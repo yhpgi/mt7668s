@@ -50,45 +50,45 @@
  *
  *****************************************************************************/
 /*! \file   gl_ate_agent.h
-*    \brief  This file includes private ioctl support.
-*/
+ *    \brief  This file includes private ioctl support.
+ */
 
 #ifndef _GL_ATE_AGENT_H
 #define _GL_ATE_AGENT_H
 #if CFG_SUPPORT_QA_TOOL
 /*******************************************************************************
-*                         C O M P I L E R   F L A G S
-********************************************************************************
-*/
+ *                         C O M P I L E R   F L A G S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                    E X T E R N A L   R E F E R E N C E S
-********************************************************************************
-*/
+ *                    E X T E R N A L   R E F E R E N C E S
+ ********************************************************************************
+ */
 
 extern UINT_32 u4RxStatSeqNum;
 
 #if CFG_SUPPORT_TX_BF
 extern PFMU_PROFILE_TAG1 g_rPfmuTag1;
 extern PFMU_PROFILE_TAG2 g_rPfmuTag2;
-extern PFMU_DATA g_rPfmuData;
+extern PFMU_DATA		 g_rPfmuData;
 #endif
 extern BOOLEAN g_bCaptureDone;
 
 /*******************************************************************************
-*                              C O N S T A N T S
-********************************************************************************
-*/
+ *                              C O N S T A N T S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                                 M A C R O S
-********************************************************************************
-*/
+ *                                 M A C R O S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                             D A T A   T Y P E S
-********************************************************************************
-*/
+ *                             D A T A   T Y P E S
+ ********************************************************************************
+ */
 
 typedef struct _STA_REC_BF_UPD_ARGUMENT {
 	UINT_32 u4WlanId;
@@ -111,9 +111,9 @@ typedef struct _STA_REC_BF_UPD_ARGUMENT {
 } STA_REC_BF_UPD_ARGUMENT, *P_STA_REC_BF_UPD_ARGUMENT;
 
 /*******************************************************************************
-*                  F U N C T I O N   D E C L A R A T I O N S
-********************************************************************************
-*/
+ *                  F U N C T I O N   D E C L A R A T I O N S
+ ********************************************************************************
+ */
 
 int Set_ResetStatCounter_Proc(struct net_device *prNetDev, UINT_8 *prInBuf);
 int SetATE(struct net_device *prNetDev, UINT_8 *prInBuf);
@@ -183,7 +183,6 @@ int Set_MUTriggerTx(struct net_device *prNetDev, UINT_8 *prInBuf);
 #endif
 #endif
 
-
 int WriteEfuse(struct net_device *prNetDev, UINT_8 *prInBuf);
 int SetTxTargetPower(struct net_device *prNetDev, UINT_8 *prInBuf);
 
@@ -192,7 +191,6 @@ int SetRddReport(struct net_device *prNetDev, UINT_8 *prInBuf);
 int SetByPassCac(struct net_device *prNetDev, UINT_8 *prInBuf);
 int SetRadarDetectMode(struct net_device *prNetDev, UINT_8 *prInBuf);
 #endif
-
 
 int AteCmdSetHandle(struct net_device *prNetDev, UINT_8 *prInBuf, UINT_32 u4InBufLen);
 #endif /*CFG_SUPPORT_QA_TOOL */

@@ -54,29 +54,28 @@
 */
 
 /*! \file   "nic.h"
-*    \brief  The declaration of nic functions
-*
-*    Detail description.
-*/
-
+ *    \brief  The declaration of nic functions
+ *
+ *    Detail description.
+ */
 
 #ifndef _NIC_H
 #define _NIC_H
 
 /*******************************************************************************
-*                         C O M P I L E R   F L A G S
-********************************************************************************
-*/
+ *                         C O M P I L E R   F L A G S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                              C O N S T A N T S
-********************************************************************************
-*/
+ *                              C O N S T A N T S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                             D A T A   T Y P E S
-********************************************************************************
-*/
+ *                             D A T A   T Y P E S
+ ********************************************************************************
+ */
 
 struct _REG_ENTRY_T {
 	UINT_32 u4Offset;
@@ -85,7 +84,7 @@ struct _REG_ENTRY_T {
 
 struct _TABLE_ENTRY_T {
 	P_REG_ENTRY_T pu4TablePtr;
-	UINT_16 u2Size;
+	UINT_16		  u2Size;
 };
 
 /*! INT status to event map */
@@ -101,68 +100,62 @@ typedef struct _ECO_INFO_T {
 	UINT_8 ucEcoVer;
 } ECO_INFO_T, *P_ECO_INFO_T;
 
-enum ENUM_INT_EVENT_T {
-	INT_EVENT_ABNORMAL,
-	INT_EVENT_SW_INT,
-	INT_EVENT_TX,
-	INT_EVENT_RX,
-	INT_EVENT_NUM
-};
+enum ENUM_INT_EVENT_T { INT_EVENT_ABNORMAL, INT_EVENT_SW_INT, INT_EVENT_TX, INT_EVENT_RX, INT_EVENT_NUM };
 
 typedef enum _ENUM_IE_UPD_METHOD_T {
 	IE_UPD_METHOD_UPDATE_RANDOM,
 	IE_UPD_METHOD_UPDATE_ALL,
 	IE_UPD_METHOD_DELETE_ALL,
-} ENUM_IE_UPD_METHOD_T, *P_ENUM_IE_UPD_METHOD_T;
+} ENUM_IE_UPD_METHOD_T,
+		*P_ENUM_IE_UPD_METHOD_T;
 
 typedef enum _ENUM_SER_STATE_T {
-	SER_IDLE_DONE,       /* SER is idle or done */
-	SER_STOP_HOST_TX,    /* Host HIF Tx is stopped */
+	SER_IDLE_DONE,		 /* SER is idle or done */
+	SER_STOP_HOST_TX,	 /* Host HIF Tx is stopped */
 	SER_STOP_HOST_TX_RX, /* Host HIF Tx/Rx is stopped */
-	SER_REINIT_HIF,      /* Host HIF is reinit */
+	SER_REINIT_HIF,		 /* Host HIF is reinit */
 
 	SER_STATE_NUM
-} ENUM_SER_STATE_T, *P_ENUM_SER_STATE_T;
+} ENUM_SER_STATE_T,
+		*P_ENUM_SER_STATE_T;
 
 /* Test mode bitmask of disable flag */
-#define TEST_MODE_DISABLE_ONLINE_SCAN  BIT(0)
-#define TEST_MODE_DISABLE_ROAMING      BIT(1)
-#define TEST_MODE_FIXED_CAM_MODE       BIT(2)
+#define TEST_MODE_DISABLE_ONLINE_SCAN BIT(0)
+#define TEST_MODE_DISABLE_ROAMING BIT(1)
+#define TEST_MODE_FIXED_CAM_MODE BIT(2)
 #define TEST_MODE_DISABLE_BCN_LOST_DET BIT(3)
-#define TEST_MODE_NONE                0
+#define TEST_MODE_NONE 0
 #define TEST_MODE_THROUGHPUT \
-		(TEST_MODE_DISABLE_ONLINE_SCAN | TEST_MODE_DISABLE_ROAMING | \
-		TEST_MODE_FIXED_CAM_MODE | TEST_MODE_DISABLE_BCN_LOST_DET)
+	(TEST_MODE_DISABLE_ONLINE_SCAN | TEST_MODE_DISABLE_ROAMING | TEST_MODE_FIXED_CAM_MODE | \
+			TEST_MODE_DISABLE_BCN_LOST_DET)
 #define TEST_MODE_SIGMA_AC_N_PMF (TEST_MODE_DISABLE_ONLINE_SCAN | TEST_MODE_FIXED_CAM_MODE)
 #define TEST_MODE_SIGMA_WMM_PS (TEST_MODE_DISABLE_ONLINE_SCAN)
-#define TEST_MODE_AUDIO_MRM \
-		(TEST_MODE_DISABLE_ONLINE_SCAN | TEST_MODE_DISABLE_ROAMING | \
-		TEST_MODE_FIXED_CAM_MODE)
+#define TEST_MODE_AUDIO_MRM (TEST_MODE_DISABLE_ONLINE_SCAN | TEST_MODE_DISABLE_ROAMING | TEST_MODE_FIXED_CAM_MODE)
 
 /*******************************************************************************
-*                    E X T E R N A L   R E F E R E N C E S
-********************************************************************************
-*/
+ *                    E X T E R N A L   R E F E R E N C E S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                            P U B L I C   D A T A
-********************************************************************************
-*/
+ *                            P U B L I C   D A T A
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                           P R I V A T E   D A T A
-********************************************************************************
-*/
+ *                           P R I V A T E   D A T A
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                                 M A C R O S
-********************************************************************************
-*/
+ *                                 M A C R O S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                   F U N C T I O N   D E C L A R A T I O N S
-********************************************************************************
-*/
+ *                   F U N C T I O N   D E C L A R A T I O N S
+ ********************************************************************************
+ */
 /*----------------------------------------------------------------------------*/
 /* Routines in nic.c                                                          */
 /*----------------------------------------------------------------------------*/
@@ -228,26 +221,25 @@ UINT_32 nicFreq2ChannelNum(IN UINT_32 u4FreqInKHz);
 UINT_8 nicGetVhtS1(IN UINT_8 ucPrimaryChannel, IN UINT_8 ucBandwidth);
 
 /* firmware command wrapper */
-    /* NETWORK (WIFISYS) */
+/* NETWORK (WIFISYS) */
 WLAN_STATUS nicActivateNetwork(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex);
 
 WLAN_STATUS nicDeactivateNetwork(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex);
 
-    /* BSS-INFO */
+/* BSS-INFO */
 WLAN_STATUS nicUpdateBss(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex);
 
-    /* BSS-INFO Indication (PM) */
+/* BSS-INFO Indication (PM) */
 WLAN_STATUS nicPmIndicateBssCreated(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex);
 
 WLAN_STATUS nicPmIndicateBssConnected(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex);
 
 WLAN_STATUS nicPmIndicateBssAbort(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex);
 
-    /* Beacon Template Update */
+/* Beacon Template Update */
 WLAN_STATUS
-nicUpdateBeaconIETemplate(IN P_ADAPTER_T prAdapter,
-			  IN ENUM_IE_UPD_METHOD_T eIeUpdMethod,
-			  IN UINT_8 ucBssIndex, IN UINT_16 u2Capability, IN PUINT_8 aucIe, IN UINT_16 u2IELen);
+nicUpdateBeaconIETemplate(IN P_ADAPTER_T prAdapter, IN ENUM_IE_UPD_METHOD_T eIeUpdMethod, IN UINT_8 ucBssIndex,
+		IN UINT_16 u2Capability, IN PUINT_8 aucIe, IN UINT_16 u2IELen);
 
 WLAN_STATUS nicQmUpdateWmmParms(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex);
 
@@ -285,7 +277,7 @@ nicConfigPowerSaveProfile(IN P_ADAPTER_T prAdapter, UINT_8 ucBssIndex, PARAM_POW
 
 WLAN_STATUS
 nicConfigPowerSaveWowProfile(IN P_ADAPTER_T prAdapter, UINT_8 ucBssIndex, PARAM_POWER_MODE ePwrMode,
-	BOOLEAN fgEnCmdEvent, BOOLEAN fgSuspend);
+		BOOLEAN fgEnCmdEvent, BOOLEAN fgSuspend);
 
 WLAN_STATUS nicEnterCtiaMode(IN P_ADAPTER_T prAdapter, BOOLEAN fgEnterCtia, BOOLEAN fgEnCmdEvent);
 WLAN_STATUS nicEnterTPTestMode(IN P_ADAPTER_T prAdapter, IN UINT_8 ucFuncMask);
@@ -293,16 +285,10 @@ WLAN_STATUS nicEnterTPTestMode(IN P_ADAPTER_T prAdapter, IN UINT_8 ucFuncMask);
 /*----------------------------------------------------------------------------*/
 /* Scan Result Processing                                                     */
 /*----------------------------------------------------------------------------*/
-VOID
-nicAddScanResult(IN P_ADAPTER_T prAdapter,
-		 IN PARAM_MAC_ADDRESS rMacAddr,
-		 IN P_PARAM_SSID_T prSsid,
-		 IN UINT_32 u4Privacy,
-		 IN PARAM_RSSI rRssi,
-		 IN ENUM_PARAM_NETWORK_TYPE_T eNetworkType,
-		 IN P_PARAM_802_11_CONFIG_T prConfiguration,
-		 IN ENUM_PARAM_OP_MODE_T eOpMode,
-		 IN PARAM_RATES_EX rSupportedRates, IN UINT_16 u2IELength, IN PUINT_8 pucIEBuf);
+VOID nicAddScanResult(IN P_ADAPTER_T prAdapter, IN PARAM_MAC_ADDRESS rMacAddr, IN P_PARAM_SSID_T prSsid,
+		IN UINT_32 u4Privacy, IN PARAM_RSSI rRssi, IN ENUM_PARAM_NETWORK_TYPE_T eNetworkType,
+		IN P_PARAM_802_11_CONFIG_T prConfiguration, IN ENUM_PARAM_OP_MODE_T eOpMode, IN PARAM_RATES_EX rSupportedRates,
+		IN UINT_16 u2IELength, IN PUINT_8 pucIEBuf);
 
 VOID nicFreeScanResultIE(IN P_ADAPTER_T prAdapter, IN UINT_32 u4Idx);
 
@@ -310,12 +296,9 @@ VOID nicFreeScanResultIE(IN P_ADAPTER_T prAdapter, IN UINT_32 u4Idx);
 /* Fixed Rate Hacking                                                         */
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS
-nicUpdateRateParams(IN P_ADAPTER_T prAdapter,
-		    IN ENUM_REGISTRY_FIXED_RATE_T eRateSetting,
-		    IN PUINT_8 pucDesiredPhyTypeSet,
-		    IN PUINT_16 pu2DesiredNonHTRateSet,
-		    IN PUINT_16 pu2BSSBasicRateSet,
-		    IN PUINT_8 pucMcsSet, IN PUINT_8 pucSupMcs32, IN PUINT_16 u2HtCapInfo);
+nicUpdateRateParams(IN P_ADAPTER_T prAdapter, IN ENUM_REGISTRY_FIXED_RATE_T eRateSetting,
+		IN PUINT_8 pucDesiredPhyTypeSet, IN PUINT_16 pu2DesiredNonHTRateSet, IN PUINT_16 pu2BSSBasicRateSet,
+		IN PUINT_8 pucMcsSet, IN PUINT_8 pucSupMcs32, IN PUINT_16 u2HtCapInfo);
 
 /*----------------------------------------------------------------------------*/
 /* Write registers                                                            */
@@ -326,9 +309,8 @@ WLAN_STATUS nicWriteMcr(IN P_ADAPTER_T prAdapter, IN UINT_32 u4Address, IN UINT_
 /* Update auto rate                                                           */
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS
-nicRlmArUpdateParms(IN P_ADAPTER_T prAdapter,
-		    IN UINT_32 u4ArSysParam0,
-		    IN UINT_32 u4ArSysParam1, IN UINT_32 u4ArSysParam2, IN UINT_32 u4ArSysParam3);
+nicRlmArUpdateParms(IN P_ADAPTER_T prAdapter, IN UINT_32 u4ArSysParam0, IN UINT_32 u4ArSysParam1,
+		IN UINT_32 u4ArSysParam2, IN UINT_32 u4ArSysParam3);
 
 /*----------------------------------------------------------------------------*/
 /* Enable/Disable Roaming                                                     */
@@ -338,8 +320,8 @@ WLAN_STATUS nicRoamingUpdateParams(IN P_ADAPTER_T prAdapter, IN UINT_32 u4Enable
 /*----------------------------------------------------------------------------*/
 /* Link Quality Updating                                                      */
 /*----------------------------------------------------------------------------*/
-VOID
-nicUpdateLinkQuality(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex, IN P_EVENT_LINK_QUALITY_V2 prEventLinkQuality);
+VOID nicUpdateLinkQuality(
+		IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex, IN P_EVENT_LINK_QUALITY_V2 prEventLinkQuality);
 
 VOID nicUpdateRSSI(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex, IN INT_8 cRssi, IN INT_8 cLinkQuality);
 
@@ -357,17 +339,17 @@ WLAN_STATUS nicApplyNetworkAddress(IN P_ADAPTER_T prAdapter);
 /*----------------------------------------------------------------------------*/
 /* ECO Version                                                                */
 /*----------------------------------------------------------------------------*/
-UINT_8 nicGetChipSwVer(void);
-UINT_8 nicGetChipEcoVer(IN P_ADAPTER_T prAdapter);
+UINT_8	nicGetChipSwVer(void);
+UINT_8	nicGetChipEcoVer(IN P_ADAPTER_T prAdapter);
 BOOLEAN nicIsEcoVerEqualTo(IN P_ADAPTER_T prAdapter, UINT_8 ucEcoVer);
 BOOLEAN nicIsEcoVerEqualOrLaterTo(IN P_ADAPTER_T prAdapter, UINT_8 ucEcoVer);
-UINT_8 nicSetChipHwVer(UINT_8 value);
-UINT_8 nicSetChipSwVer(UINT_8 value);
-UINT_8 nicSetChipFactoryVer(UINT_8 value);
+UINT_8	nicSetChipHwVer(UINT_8 value);
+UINT_8	nicSetChipSwVer(UINT_8 value);
+UINT_8	nicSetChipFactoryVer(UINT_8 value);
 
-VOID nicSerStopTxRx(IN P_ADAPTER_T prAdapter);
-VOID nicSerStopTx(IN P_ADAPTER_T prAdapter);
-VOID nicSerStartTxRx(IN P_ADAPTER_T prAdapter);
+VOID	nicSerStopTxRx(IN P_ADAPTER_T prAdapter);
+VOID	nicSerStopTx(IN P_ADAPTER_T prAdapter);
+VOID	nicSerStartTxRx(IN P_ADAPTER_T prAdapter);
 BOOLEAN nicSerIsWaitingReset(IN P_ADAPTER_T prAdapter);
 BOOLEAN nicSerIsTxStop(IN P_ADAPTER_T prAdapter);
 BOOLEAN nicSerIsRxStop(IN P_ADAPTER_T prAdapter);

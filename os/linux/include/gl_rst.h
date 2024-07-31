@@ -54,53 +54,53 @@
 */
 
 /*! \file   gl_rst.h
-*    \brief  Declaration of functions and finite state machine for
-*	    MT6620 Whole-Chip Reset Mechanism
-*/
+ *    \brief  Declaration of functions and finite state machine for
+ *	    MT6620 Whole-Chip Reset Mechanism
+ */
 
 #ifndef _GL_RST_H
 #define _GL_RST_H
 
 /*******************************************************************************
-*                         C O M P I L E R   F L A G S
-********************************************************************************
-*/
+ *                         C O M P I L E R   F L A G S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                    E X T E R N A L   R E F E R E N C E S
-********************************************************************************
-*/
+ *                    E X T E R N A L   R E F E R E N C E S
+ ********************************************************************************
+ */
 #include "gl_typedef.h"
 #include <linux/of_gpio.h>
 #include <linux/mmc/host.h>
 /*******************************************************************************
-*                              C O N S T A N T S
-********************************************************************************
-*/
+ *                              C O N S T A N T S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                             D A T A   T Y P E S
-********************************************************************************
-*/
+ *                             D A T A   T Y P E S
+ ********************************************************************************
+ */
 
 struct rst_struct {
 #ifdef _HIF_SDIO
-	struct sdio_func *func;
+	struct sdio_func	 *func;
 	struct work_struct rst_work;
 #endif
 	struct mutex rst_mutex;
-	int entry_conut;
+	int			 entry_conut;
 };
 
 /*******************************************************************************
-*                    E X T E R N A L   F U N C T I O N S
-********************************************************************************
-*/
+ *                    E X T E R N A L   F U N C T I O N S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                            P U B L I C   D A T A
-********************************************************************************
-*/
+ *                            P U B L I C   D A T A
+ ********************************************************************************
+ */
 extern struct rst_struct rst_data;
 
 #ifdef _HIF_SDIO
@@ -120,45 +120,40 @@ enum _ENUM_CHIP_RESET_REASON_TYPE_T {
 	RST_REASON_MAX
 };
 
+/*******************************************************************************
+ *                                 M A C R O S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                                 M A C R O S
-********************************************************************************
-*/
-
-/*******************************************************************************
-*                  F U N C T I O N   D E C L A R A T I O N S
-********************************************************************************
-*/
+ *                  F U N C T I O N   D E C L A R A T I O N S
+ ********************************************************************************
+ */
 #ifdef _HIF_SDIO
 extern int sdio_reset_comm(struct mmc_card *card);
 #endif
 
-
 /*******************************************************************************
-*                              F U N C T I O N S
-********************************************************************************
-*/
+ *                              F U N C T I O N S
+ ********************************************************************************
+ */
 #if CFG_CHIP_RESET_SUPPORT
 BOOLEAN kalIsResetting(VOID);
 
 BOOLEAN checkResetState(void);
-VOID glResetTrigger(P_ADAPTER_T prAdapter, const UINT_8 *pucFile, UINT_32 u4Line);
-VOID glGetRstReason(enum _ENUM_CHIP_RESET_REASON_TYPE_T eReason);
+VOID	glResetTrigger(P_ADAPTER_T prAdapter, const UINT_8 *pucFile, UINT_32 u4Line);
+VOID	glGetRstReason(enum _ENUM_CHIP_RESET_REASON_TYPE_T eReason);
 #ifdef _HIF_SDIO
 extern atomic_t g_fgBlockBTTriggerReset;
 #endif
 extern enum _ENUM_CHIP_RESET_REASON_TYPE_T eResetReason;
-extern uint64_t u8ResetTime;
-
-
+extern uint64_t							   u8ResetTime;
 
 #define GL_RESET_TRIGGER(_prAdapter, _eReason) \
-{ \
-    glGetRstReason(_eReason); \
-    glResetTrigger(_prAdapter, \
-    (const uint8_t *)__FILE__, __LINE__); \
-}
+	{ \
+		glGetRstReason(_eReason); \
+		glResetTrigger(_prAdapter, (const uint8_t *)__FILE__, __LINE__); \
+	}
 
 #else
 #define glResetTrigger(A, B)

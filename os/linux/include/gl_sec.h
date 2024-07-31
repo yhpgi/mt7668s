@@ -54,10 +54,10 @@
 */
 
 /*! \file   p2p_fsm.h
-*    \brief  Declaration of functions and finite state machine for P2P Module.
-*
-*    Declaration of functions and finite state machine for P2P Module.
-*/
+ *    \brief  Declaration of functions and finite state machine for P2P Module.
+ *
+ *    Declaration of functions and finite state machine for P2P Module.
+ */
 
 #ifndef _GL_SEC_H
 #define _GL_SEC_H

@@ -54,71 +54,70 @@
 */
 
 /*! \file   "cnm_timer.c"
-*    \brief
-*
-*/
-
-
-/*******************************************************************************
-*                         C O M P I L E R   F L A G S
-********************************************************************************
-*/
+ *    \brief
+ *
+ */
 
 /*******************************************************************************
-*                    E X T E R N A L   R E F E R E N C E S
-********************************************************************************
-*/
+ *                         C O M P I L E R   F L A G S
+ ********************************************************************************
+ */
+
+/*******************************************************************************
+ *                    E X T E R N A L   R E F E R E N C E S
+ ********************************************************************************
+ */
 #include "precomp.h"
 
 /*******************************************************************************
-*                              C O N S T A N T S
-********************************************************************************
-*/
+ *                              C O N S T A N T S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                             D A T A   T Y P E S
-********************************************************************************
-*/
+ *                             D A T A   T Y P E S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                            P U B L I C   D A T A
-********************************************************************************
-*/
+ *                            P U B L I C   D A T A
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                           P R I V A T E   D A T A
-********************************************************************************
-*/
+ *                           P R I V A T E   D A T A
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                                 M A C R O S
-********************************************************************************
-*/
+ *                                 M A C R O S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                   F U N C T I O N   D E C L A R A T I O N S
-********************************************************************************
-*/
+ *                   F U N C T I O N   D E C L A R A T I O N S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                              F U N C T I O N S
-********************************************************************************
-*/
+ *                              F U N C T I O N S
+ ********************************************************************************
+ */
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief This routine is called to set the time to do the time out check.
-*
-* \param[in] rTimeout Time out interval from current time.
-*
-* \retval TRUE Success.
-*
-*/
+ * \brief This routine is called to set the time to do the time out check.
+ *
+ * \param[in] rTimeout Time out interval from current time.
+ *
+ * \retval TRUE Success.
+ *
+ */
 /*----------------------------------------------------------------------------*/
 static BOOLEAN cnmTimerSetTimer(IN P_ADAPTER_T prAdapter, IN OS_SYSTIME rTimeout)
 {
 	P_ROOT_TIMER prRootTimer;
-	BOOLEAN fgNeedWakeLock;
+	BOOLEAN		 fgNeedWakeLock;
 
 	ASSERT(prAdapter);
 
@@ -142,12 +141,12 @@ static BOOLEAN cnmTimerSetTimer(IN P_ADAPTER_T prAdapter, IN OS_SYSTIME rTimeout
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief This routines is called to initialize a root timer.
-*
-* \param[in] prAdapter
-*
-* \return (none)
-*/
+ * \brief This routines is called to initialize a root timer.
+ *
+ * \param[in] prAdapter
+ *
+ * \return (none)
+ */
 /*----------------------------------------------------------------------------*/
 VOID cnmTimerInitialize(IN P_ADAPTER_T prAdapter)
 {
@@ -171,13 +170,13 @@ VOID cnmTimerInitialize(IN P_ADAPTER_T prAdapter)
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief This routines is called to destroy a root timer.
-*        When WIFI is off, the token shall be returned back to system.
-*
-* \param[in]
-*
-* \return (none)
-*/
+ * \brief This routines is called to destroy a root timer.
+ *        When WIFI is off, the token shall be returned back to system.
+ *
+ * \param[in]
+ *
+ * \return (none)
+ */
 /*----------------------------------------------------------------------------*/
 VOID cnmTimerDestroy(IN P_ADAPTER_T prAdapter)
 {
@@ -204,17 +203,17 @@ VOID cnmTimerDestroy(IN P_ADAPTER_T prAdapter)
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief This routines is called to initialize a timer.
-*
-* \param[in] prTimer Pointer to a timer structure.
-* \param[in] pfnFunc Pointer to the call back function.
-* \param[in] u4Data Parameter for call back function.
-*
-* \return (none)
-*/
+ * \brief This routines is called to initialize a timer.
+ *
+ * \param[in] prTimer Pointer to a timer structure.
+ * \param[in] pfnFunc Pointer to the call back function.
+ * \param[in] u4Data Parameter for call back function.
+ *
+ * \return (none)
+ */
 /*----------------------------------------------------------------------------*/
-VOID
-cnmTimerInitTimer(IN P_ADAPTER_T prAdapter, IN P_TIMER_T prTimer, IN PFN_MGMT_TIMEOUT_FUNC pfFunc, IN ULONG ulDataPtr)
+VOID cnmTimerInitTimer(
+		IN P_ADAPTER_T prAdapter, IN P_TIMER_T prTimer, IN PFN_MGMT_TIMEOUT_FUNC pfFunc, IN ULONG ulDataPtr)
 {
 	ASSERT(prAdapter);
 
@@ -228,13 +227,14 @@ cnmTimerInitTimer(IN P_ADAPTER_T prAdapter, IN P_TIMER_T prTimer, IN PFN_MGMT_TI
 
 	ASSERT(prAdapter->rRootTimer.rLinkHead.prNext);
 	{
-		P_LINK_T prTimerList;
+		P_LINK_T	   prTimerList;
 		P_LINK_ENTRY_T prLinkEntry;
-		P_TIMER_T prPendingTimer;
+		P_TIMER_T	   prPendingTimer;
 
 		prTimerList = &(prAdapter->rRootTimer.rLinkHead);
 
-		LINK_FOR_EACH(prLinkEntry, prTimerList) {
+		LINK_FOR_EACH(prLinkEntry, prTimerList)
+		{
 			prPendingTimer = LINK_ENTRY(prLinkEntry, TIMER_T, rLinkEntry);
 			ASSERT(prPendingTimer);
 			ASSERT(prPendingTimer != prTimer);
@@ -244,17 +244,17 @@ cnmTimerInitTimer(IN P_ADAPTER_T prAdapter, IN P_TIMER_T prTimer, IN PFN_MGMT_TI
 	LINK_ENTRY_INITIALIZE(&prTimer->rLinkEntry);
 
 	prTimer->pfMgmtTimeOutFunc = pfFunc;
-	prTimer->ulDataPtr = ulDataPtr;
+	prTimer->ulDataPtr		   = ulDataPtr;
 }
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief This routines is called to stop a timer.
-*
-* \param[in] prTimer Pointer to a timer structure.
-*
-* \return (none)
-*/
+ * \brief This routines is called to stop a timer.
+ *
+ * \param[in] prTimer Pointer to a timer structure.
+ *
+ * \return (none)
+ */
 /*----------------------------------------------------------------------------*/
 static VOID cnmTimerStopTimer_impl(IN P_ADAPTER_T prAdapter, IN P_TIMER_T prTimer, IN BOOLEAN fgAcquireSpinlock)
 {
@@ -293,12 +293,12 @@ static VOID cnmTimerStopTimer_impl(IN P_ADAPTER_T prAdapter, IN P_TIMER_T prTime
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief This routines is called to stop a timer.
-*
-* \param[in] prTimer Pointer to a timer structure.
-*
-* \return (none)
-*/
+ * \brief This routines is called to stop a timer.
+ *
+ * \param[in] prTimer Pointer to a timer structure.
+ *
+ * \return (none)
+ */
 /*----------------------------------------------------------------------------*/
 VOID cnmTimerStopTimer(IN P_ADAPTER_T prAdapter, IN P_TIMER_T prTimer)
 {
@@ -310,20 +310,20 @@ VOID cnmTimerStopTimer(IN P_ADAPTER_T prAdapter, IN P_TIMER_T prTimer)
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief This routines is called to start a timer with wake_lock.
-*
-* \param[in] prTimer Pointer to a timer structure.
-* \param[in] u4TimeoutMs Timeout to issue the timer and call back function
-*                        (unit: ms).
-*
-* \return (none)
-*/
+ * \brief This routines is called to start a timer with wake_lock.
+ *
+ * \param[in] prTimer Pointer to a timer structure.
+ * \param[in] u4TimeoutMs Timeout to issue the timer and call back function
+ *                        (unit: ms).
+ *
+ * \return (none)
+ */
 /*----------------------------------------------------------------------------*/
 VOID cnmTimerStartTimer(IN P_ADAPTER_T prAdapter, IN P_TIMER_T prTimer, IN UINT_32 u4TimeoutMs)
 {
 	P_ROOT_TIMER prRootTimer;
-	P_LINK_T prTimerList;
-	OS_SYSTIME rExpiredSysTime, rTimeoutSystime;
+	P_LINK_T	 prTimerList;
+	OS_SYSTIME	 rExpiredSysTime, rTimeoutSystime;
 
 	KAL_SPIN_LOCK_DECLARATION();
 
@@ -339,9 +339,9 @@ VOID cnmTimerStartTimer(IN P_ADAPTER_T prAdapter, IN P_TIMER_T prTimer, IN UINT_
 	 * to the timeout value first, then per minutue.
 	 */
 	if (u4TimeoutMs > MSEC_PER_MIN) {
-		ASSERT(u4TimeoutMs <= ((UINT_32) 0xFFFF * MSEC_PER_MIN));
+		ASSERT(u4TimeoutMs <= ((UINT_32)0xFFFF * MSEC_PER_MIN));
 
-		prTimer->u2Minutes = (UINT_16) (u4TimeoutMs / MSEC_PER_MIN);
+		prTimer->u2Minutes = (UINT_16)(u4TimeoutMs / MSEC_PER_MIN);
 		u4TimeoutMs -= (prTimer->u2Minutes * MSEC_PER_MIN);
 		if (u4TimeoutMs == 0) {
 			u4TimeoutMs = MSEC_PER_MIN;
@@ -352,7 +352,7 @@ VOID cnmTimerStartTimer(IN P_ADAPTER_T prAdapter, IN P_TIMER_T prTimer, IN UINT_
 	}
 
 	/* The assertion check if MSEC_TO_SYSTIME() may be overflow. */
-	ASSERT(u4TimeoutMs < (((UINT_32) 0x80000000 - MSEC_PER_SEC) / KAL_HZ));
+	ASSERT(u4TimeoutMs < (((UINT_32)0x80000000 - MSEC_PER_SEC) / KAL_HZ));
 	rTimeoutSystime = MSEC_TO_SYSTIME(u4TimeoutMs);
 	if (rTimeoutSystime == 0)
 		rTimeoutSystime = 1;
@@ -360,7 +360,6 @@ VOID cnmTimerStartTimer(IN P_ADAPTER_T prAdapter, IN P_TIMER_T prTimer, IN UINT_
 
 	/* If no timer pending or the fast time interval is used. */
 	if (LINK_IS_EMPTY(prTimerList) || TIME_BEFORE(rExpiredSysTime, prRootTimer->rNextExpiredSysTime)) {
-
 		prRootTimer->rNextExpiredSysTime = rExpiredSysTime;
 		cnmTimerSetTimer(prAdapter, rTimeoutSystime);
 	}
@@ -376,23 +375,23 @@ VOID cnmTimerStartTimer(IN P_ADAPTER_T prAdapter, IN P_TIMER_T prTimer, IN UINT_
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief This routines is called to check the timer list.
-*
-* \param[in]
-*
-* \return (none)
-*/
+ * \brief This routines is called to check the timer list.
+ *
+ * \param[in]
+ *
+ * \return (none)
+ */
 /*----------------------------------------------------------------------------*/
 VOID cnmTimerDoTimeOutCheck(IN P_ADAPTER_T prAdapter)
 {
-	P_ROOT_TIMER prRootTimer;
-	P_LINK_T prTimerList;
-	P_LINK_ENTRY_T prLinkEntry;
-	P_TIMER_T prTimer;
-	OS_SYSTIME rCurSysTime;
+	P_ROOT_TIMER		  prRootTimer;
+	P_LINK_T			  prTimerList;
+	P_LINK_ENTRY_T		  prLinkEntry;
+	P_TIMER_T			  prTimer;
+	OS_SYSTIME			  rCurSysTime;
 	PFN_MGMT_TIMEOUT_FUNC pfMgmtTimeOutFunc;
-	ULONG ulTimeoutDataPtr;
-	BOOLEAN fgNeedWakeLock;
+	ULONG				  ulTimeoutDataPtr;
+	BOOLEAN				  fgNeedWakeLock;
 
 	KAL_SPIN_LOCK_DECLARATION();
 
@@ -409,7 +408,8 @@ VOID cnmTimerDoTimeOutCheck(IN P_ADAPTER_T prAdapter)
 	/* Set the permitted max timeout value for new one */
 	prRootTimer->rNextExpiredSysTime = rCurSysTime + MGMT_MAX_TIMEOUT_INTERVAL;
 
-	LINK_FOR_EACH(prLinkEntry, prTimerList) {
+	LINK_FOR_EACH(prLinkEntry, prTimerList)
+	{
 		prTimer = LINK_ENTRY(prLinkEntry, TIMER_T, rLinkEntry);
 		ASSERT(prTimer);
 
@@ -418,7 +418,7 @@ VOID cnmTimerDoTimeOutCheck(IN P_ADAPTER_T prAdapter)
 			cnmTimerStopTimer_impl(prAdapter, prTimer, FALSE);
 
 			pfMgmtTimeOutFunc = prTimer->pfMgmtTimeOutFunc;
-			ulTimeoutDataPtr = prTimer->ulDataPtr;
+			ulTimeoutDataPtr  = prTimer->ulDataPtr;
 
 			if (prTimer->u2Minutes > 0) {
 				prTimer->u2Minutes--;
@@ -426,20 +426,20 @@ VOID cnmTimerDoTimeOutCheck(IN P_ADAPTER_T prAdapter)
 				LINK_INSERT_TAIL(prTimerList, &prTimer->rLinkEntry);
 			} else if (pfMgmtTimeOutFunc) {
 				KAL_RELEASE_SPIN_LOCK(prAdapter, SPIN_LOCK_TIMER);
-				(pfMgmtTimeOutFunc) (prAdapter, ulTimeoutDataPtr);
+				(pfMgmtTimeOutFunc)(prAdapter, ulTimeoutDataPtr);
 				KAL_ACQUIRE_SPIN_LOCK(prAdapter, SPIN_LOCK_TIMER);
 			}
 
 			/* Search entire list again because of nest del and add timers
 			 * and current MGMT_TIMER could be volatile after stopped
 			 */
-			prLinkEntry = (P_LINK_ENTRY_T) prTimerList;
+			prLinkEntry = (P_LINK_ENTRY_T)prTimerList;
 
 			prRootTimer->rNextExpiredSysTime = rCurSysTime + MGMT_MAX_TIMEOUT_INTERVAL;
 		} else if (TIME_BEFORE(prTimer->rExpiredSysTime, prRootTimer->rNextExpiredSysTime)) {
 			prRootTimer->rNextExpiredSysTime = prTimer->rExpiredSysTime;
 		}
-	}			/* end of for loop */
+	} /* end of for loop */
 
 	/* Setup the prNext timeout event. It is possible the timer was already
 	 * set in the above timeout callback function.
@@ -448,8 +448,8 @@ VOID cnmTimerDoTimeOutCheck(IN P_ADAPTER_T prAdapter)
 	if (!LINK_IS_EMPTY(prTimerList)) {
 		ASSERT(TIME_AFTER(prRootTimer->rNextExpiredSysTime, rCurSysTime));
 
-		fgNeedWakeLock = cnmTimerSetTimer(prAdapter, (OS_SYSTIME)
-						  ((INT_32) prRootTimer->rNextExpiredSysTime - (INT_32) rCurSysTime));
+		fgNeedWakeLock = cnmTimerSetTimer(
+				prAdapter, (OS_SYSTIME)((INT_32)prRootTimer->rNextExpiredSysTime - (INT_32)rCurSysTime));
 	}
 
 	if (prRootTimer->fgWakeLocked && !fgNeedWakeLock) {

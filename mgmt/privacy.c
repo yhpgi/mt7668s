@@ -54,91 +54,90 @@
 */
 
 /*! \file   "privacy.c"
-*    \brief  This file including the protocol layer privacy function.
-*
-*    This file provided the macros and functions library support for the
-*    protocol layer security setting from rsn.c and nic_privacy.c
-*
-*/
-
-
-/*******************************************************************************
-*                         C O M P I L E R   F L A G S
-********************************************************************************
-*/
+ *    \brief  This file including the protocol layer privacy function.
+ *
+ *    This file provided the macros and functions library support for the
+ *    protocol layer security setting from rsn.c and nic_privacy.c
+ *
+ */
 
 /*******************************************************************************
-*                    E X T E R N A L   R E F E R E N C E S
-********************************************************************************
-*/
+ *                         C O M P I L E R   F L A G S
+ ********************************************************************************
+ */
+
+/*******************************************************************************
+ *                    E X T E R N A L   R E F E R E N C E S
+ ********************************************************************************
+ */
 #include "precomp.h"
 
 /*******************************************************************************
-*                              C O N S T A N T S
-********************************************************************************
-*/
+ *                              C O N S T A N T S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                             D A T A   T Y P E S
-********************************************************************************
-*/
+ *                             D A T A   T Y P E S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                            P U B L I C   D A T A
-********************************************************************************
-*/
+ *                            P U B L I C   D A T A
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                           P R I V A T E   D A T A
-********************************************************************************
-*/
+ *                           P R I V A T E   D A T A
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                                 M A C R O S
-********************************************************************************
-*/
+ *                                 M A C R O S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                   F U N C T I O N   D E C L A R A T I O N S
-********************************************************************************
-*/
+ *                   F U N C T I O N   D E C L A R A T I O N S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                              F U N C T I O N S
-********************************************************************************
-*/
+ *                              F U N C T I O N S
+ ********************************************************************************
+ */
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief This routine is called to initialize the privacy-related
-*        parameters.
-*
-* \param[in] prAdapter Pointer to the Adapter structure
-* \param[in] ucNetTypeIdx  Pointer to netowrk type index
-*
-* \retval NONE
-*/
+ * \brief This routine is called to initialize the privacy-related
+ *        parameters.
+ *
+ * \param[in] prAdapter Pointer to the Adapter structure
+ * \param[in] ucNetTypeIdx  Pointer to netowrk type index
+ *
+ * \retval NONE
+ */
 /*----------------------------------------------------------------------------*/
 VOID secInit(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex)
 {
-	UINT_8 i;
-	P_CONNECTION_SETTINGS_T prConnSettings;
-	P_BSS_INFO_T prBssInfo;
+	UINT_8					  i;
+	P_CONNECTION_SETTINGS_T	  prConnSettings;
+	P_BSS_INFO_T			  prBssInfo;
 	P_AIS_SPECIFIC_BSS_INFO_T prAisSpecBssInfo;
 
 	DEBUGFUNC("secInit");
 
 	ASSERT(prAdapter);
 
-	prConnSettings = &prAdapter->rWifiVar.rConnSettings;
-	prBssInfo = GET_BSS_INFO_BY_INDEX(prAdapter, ucBssIndex);
+	prConnSettings	 = &prAdapter->rWifiVar.rConnSettings;
+	prBssInfo		 = GET_BSS_INFO_BY_INDEX(prAdapter, ucBssIndex);
 	prAisSpecBssInfo = &prAdapter->rWifiVar.rAisSpecificBssInfo;
 
-	prBssInfo->u4RsnSelectedGroupCipher = 0;
+	prBssInfo->u4RsnSelectedGroupCipher	   = 0;
 	prBssInfo->u4RsnSelectedPairwiseCipher = 0;
-	prBssInfo->u4RsnSelectedAKMSuite = 0;
+	prBssInfo->u4RsnSelectedAKMSuite	   = 0;
 
-#if 0				/* CFG_ENABLE_WIFI_DIRECT */
+#if 0 /* CFG_ENABLE_WIFI_DIRECT */
 	prBssInfo = &prAdapter->rWifiVar.arBssInfo[NETWORK_TYPE_P2P];
 
 	prBssInfo->u4RsnSelectedGroupCipher = RSN_CIPHER_SUITE_CCMP;
@@ -146,7 +145,7 @@ VOID secInit(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex)
 	prBssInfo->u4RsnSelectedAKMSuite = RSN_AKM_SUITE_PSK;
 #endif
 
-#if 0				/* CFG_ENABLE_BT_OVER_WIFI */
+#if 0 /* CFG_ENABLE_BT_OVER_WIFI */
 	prBssInfo = &prAdapter->rWifiVar.arBssInfo[NETWORK_TYPE_BOW];
 
 	prBssInfo->u4RsnSelectedGroupCipher = RSN_CIPHER_SUITE_CCMP;
@@ -164,61 +163,54 @@ VOID secInit(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex)
 	prAdapter->rMib.dot11RSNAConfigPairwiseCiphersTable[6].dot11RSNAConfigPairwiseCipher = RSN_CIPHER_SUITE_CCMP;
 	prAdapter->rMib.dot11RSNAConfigPairwiseCiphersTable[7].dot11RSNAConfigPairwiseCipher = RSN_CIPHER_SUITE_WEP104;
 #if CFG_SUPPORT_CFG80211_AUTH
-	prAdapter->rMib.dot11RSNAConfigPairwiseCiphersTable[8].dot11RSNAConfigPairwiseCipher = RSN_CIPHER_SUITE_GROUP_NOT_USED;
+	prAdapter->rMib.dot11RSNAConfigPairwiseCiphersTable[8].dot11RSNAConfigPairwiseCipher =
+			RSN_CIPHER_SUITE_GROUP_NOT_USED;
 	prAdapter->rMib.dot11RSNAConfigPairwiseCiphersTable[9].dot11RSNAConfigPairwiseCipher = RSN_CIPHER_SUITE_GCMP_256;
 #endif
 
 	for (i = 0; i < MAX_NUM_SUPPORTED_CIPHER_SUITES; i++)
 		prAdapter->rMib.dot11RSNAConfigPairwiseCiphersTable[i].dot11RSNAConfigPairwiseCipherEnabled = FALSE;
 
-	prAdapter->rMib.dot11RSNAConfigAuthenticationSuitesTable[0].dot11RSNAConfigAuthenticationSuite =
-	    WPA_AKM_SUITE_NONE;
+	prAdapter->rMib.dot11RSNAConfigAuthenticationSuitesTable[0].dot11RSNAConfigAuthenticationSuite = WPA_AKM_SUITE_NONE;
 	prAdapter->rMib.dot11RSNAConfigAuthenticationSuitesTable[1].dot11RSNAConfigAuthenticationSuite =
-	    WPA_AKM_SUITE_802_1X;
-	prAdapter->rMib.dot11RSNAConfigAuthenticationSuitesTable[2].dot11RSNAConfigAuthenticationSuite =
-	    WPA_AKM_SUITE_PSK;
-	prAdapter->rMib.dot11RSNAConfigAuthenticationSuitesTable[3].dot11RSNAConfigAuthenticationSuite =
-	    RSN_AKM_SUITE_NONE;
+			WPA_AKM_SUITE_802_1X;
+	prAdapter->rMib.dot11RSNAConfigAuthenticationSuitesTable[2].dot11RSNAConfigAuthenticationSuite = WPA_AKM_SUITE_PSK;
+	prAdapter->rMib.dot11RSNAConfigAuthenticationSuitesTable[3].dot11RSNAConfigAuthenticationSuite = RSN_AKM_SUITE_NONE;
 	prAdapter->rMib.dot11RSNAConfigAuthenticationSuitesTable[4].dot11RSNAConfigAuthenticationSuite =
-	    RSN_AKM_SUITE_802_1X;
-	prAdapter->rMib.dot11RSNAConfigAuthenticationSuitesTable[5].dot11RSNAConfigAuthenticationSuite =
-	    RSN_AKM_SUITE_PSK;
+			RSN_AKM_SUITE_802_1X;
+	prAdapter->rMib.dot11RSNAConfigAuthenticationSuitesTable[5].dot11RSNAConfigAuthenticationSuite = RSN_AKM_SUITE_PSK;
 
 #if CFG_SUPPORT_802_11W
 	prAdapter->rMib.dot11RSNAConfigAuthenticationSuitesTable[6].dot11RSNAConfigAuthenticationSuite =
-	    RSN_AKM_SUITE_802_1X_SHA256;
+			RSN_AKM_SUITE_802_1X_SHA256;
 	prAdapter->rMib.dot11RSNAConfigAuthenticationSuitesTable[7].dot11RSNAConfigAuthenticationSuite =
-	    RSN_AKM_SUITE_PSK_SHA256;
+			RSN_AKM_SUITE_PSK_SHA256;
 #endif
 #if CFG_SUPPORT_CFG80211_AUTH
 	prAdapter->rMib.dot11RSNAConfigAuthenticationSuitesTable[8].dot11RSNAConfigAuthenticationSuite =
-		RSN_AKM_SUITE_8021X_SUITE_B;
+			RSN_AKM_SUITE_8021X_SUITE_B;
 	prAdapter->rMib.dot11RSNAConfigAuthenticationSuitesTable[9].dot11RSNAConfigAuthenticationSuite =
-		RSN_AKM_SUITE_8021X_SUITE_B_192;
-	prAdapter->rMib.dot11RSNAConfigAuthenticationSuitesTable[10].dot11RSNAConfigAuthenticationSuite =
-		RSN_AKM_SUITE_SAE;
-	prAdapter->rMib.dot11RSNAConfigAuthenticationSuitesTable[11].dot11RSNAConfigAuthenticationSuite	=
-		RSN_AKM_SUITE_OWE;
+			RSN_AKM_SUITE_8021X_SUITE_B_192;
+	prAdapter->rMib.dot11RSNAConfigAuthenticationSuitesTable[10].dot11RSNAConfigAuthenticationSuite = RSN_AKM_SUITE_SAE;
+	prAdapter->rMib.dot11RSNAConfigAuthenticationSuitesTable[11].dot11RSNAConfigAuthenticationSuite = RSN_AKM_SUITE_OWE;
 #endif
 
 	for (i = 0; i < MAX_NUM_SUPPORTED_AKM_SUITES; i++) {
-		prAdapter->rMib.dot11RSNAConfigAuthenticationSuitesTable[i].dot11RSNAConfigAuthenticationSuiteEnabled =
-		    FALSE;
+		prAdapter->rMib.dot11RSNAConfigAuthenticationSuitesTable[i].dot11RSNAConfigAuthenticationSuiteEnabled = FALSE;
 	}
 
 	secClearPmkid(prAdapter);
 
-	cnmTimerInitTimer(prAdapter,
-			  &prAisSpecBssInfo->rPreauthenticationTimer,
-			  (PFN_MGMT_TIMEOUT_FUNC) rsnIndicatePmkidCand, (ULONG) NULL);
+	cnmTimerInitTimer(prAdapter, &prAisSpecBssInfo->rPreauthenticationTimer,
+			(PFN_MGMT_TIMEOUT_FUNC)rsnIndicatePmkidCand, (ULONG)NULL);
 
 #if CFG_SUPPORT_802_11W
-	cnmTimerInitTimer(prAdapter,
-			  &prAisSpecBssInfo->rSaQueryTimer, (PFN_MGMT_TIMEOUT_FUNC) rsnStartSaQueryTimer, (ULONG) NULL);
+	cnmTimerInitTimer(
+			prAdapter, &prAisSpecBssInfo->rSaQueryTimer, (PFN_MGMT_TIMEOUT_FUNC)rsnStartSaQueryTimer, (ULONG)NULL);
 #endif
 
-	prAisSpecBssInfo->fgCounterMeasure = FALSE;
-	prAdapter->prAisBssInfo->ucBcDefaultKeyIdx = 0xff;
+	prAisSpecBssInfo->fgCounterMeasure			 = FALSE;
+	prAdapter->prAisBssInfo->ucBcDefaultKeyIdx	 = 0xff;
 	prAdapter->prAisBssInfo->fgBcDefaultKeyExist = FALSE;
 
 #if 0
@@ -231,18 +223,18 @@ VOID secInit(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex)
 	nicPrivacyInitialize((UINT_8) NETWORK_TYPE_INDEX_NUM);
 #endif
 
-}				/* secInit */
+} /* secInit */
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief This function will indicate an Event of "Rx Class Error" to SEC_FSM for
-*        JOIN Module.
-*
-* \param[in] prAdapter     Pointer to the Adapter structure
-* \param[in] prSwRfb       Pointer to the SW RFB.
-*
-* \return FALSE                Class Error
-*/
+ * \brief This function will indicate an Event of "Rx Class Error" to SEC_FSM for
+ *        JOIN Module.
+ *
+ * \param[in] prAdapter     Pointer to the Adapter structure
+ * \param[in] prSwRfb       Pointer to the SW RFB.
+ *
+ * \return FALSE                Class Error
+ */
 /*----------------------------------------------------------------------------*/
 BOOL secCheckClassError(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb, IN P_STA_RECORD_T prStaRec)
 {
@@ -255,13 +247,10 @@ BOOL secCheckClassError(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb, IN P_ST
 
 #if 1
 	if (!prStaRec || (prRxStatus->u2StatusFlag & RXS_DW2_RX_CLASSERR_BITMAP) == RXS_DW2_RX_CLASSERR_VALUE) {
-
-		DBGLOG(RSN, ERROR,
-		       "prStaRec=%x RX Status = %x RX_CLASSERR check!\n", prStaRec, prRxStatus->u2StatusFlag);
+		DBGLOG(RSN, ERROR, "prStaRec=%x RX Status = %x RX_CLASSERR check!\n", prStaRec, prRxStatus->u2StatusFlag);
 
 		/* if (IS_NET_ACTIVE(prAdapter, ucBssIndex)) { */
-		authSendDeauthFrame(prAdapter,
-				    NULL, NULL, prSwRfb, REASON_CODE_CLASS_3_ERR, (PFN_TX_DONE_HANDLER) NULL);
+		authSendDeauthFrame(prAdapter, NULL, NULL, prSwRfb, REASON_CODE_CLASS_3_ERR, (PFN_TX_DONE_HANDLER)NULL);
 		return FALSE;
 		/* } */
 	}
@@ -279,15 +268,10 @@ BOOL secCheckClassError(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb, IN P_ST
 				 * prBssInfo->fgIsNetAbsent == FALSE) {
 				 * (IS_AP_STA(prStaRec) || IS_CLIENT_STA(prStaRec))) {
 				 */
-				if (authSendDeauthFrame(prAdapter,
-						       prStaRec,
-						       NULL,
-						       REASON_CODE_CLASS_3_ERR,
-						       (PFN_TX_DONE_HANDLER)
-						       NULL) == WLAN_STATUS_SUCCESS) {
+				if (authSendDeauthFrame(prAdapter, prStaRec, NULL, REASON_CODE_CLASS_3_ERR,
+							(PFN_TX_DONE_HANDLER)NULL) == WLAN_STATUS_SUCCESS) {
 					DBGLOG(RSN, TRACE,
-					       ("Send Deauth to MAC:[" MACSTR
-						"] for Rx Class 3 Error.\n", MAC2STR(prStaRec->aucMacAddr)));
+							("Send Deauth to MAC:[" MACSTR "] for Rx Class 3 Error.\n", MAC2STR(prStaRec->aucMacAddr)));
 				}
 
 				return FALSE;
@@ -299,34 +283,34 @@ BOOL secCheckClassError(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb, IN P_ST
 #endif
 	return TRUE;
 
-}				/* end of secCheckClassError() */
+} /* end of secCheckClassError() */
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief This routine is used to setting the sta port status.
-*
-* \param[in]  prAdapter Pointer to the Adapter structure
-* \param[in]  prSta Pointer to the sta
-* \param[in]  fgPortBlock The port status
-*
-* \retval none
-*
-*/
+ * \brief This routine is used to setting the sta port status.
+ *
+ * \param[in]  prAdapter Pointer to the Adapter structure
+ * \param[in]  prSta Pointer to the sta
+ * \param[in]  fgPortBlock The port status
+ *
+ * \retval none
+ *
+ */
 /*----------------------------------------------------------------------------*/
 VOID secSetPortBlocked(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prSta, IN BOOLEAN fgPortBlock)
 {
-#if 0				/* Marked for MT6630 */
+#if 0 /* Marked for MT6630 */
 	if (prSta == NULL)
 		return;
 
 	prSta->fgPortBlock = fgPortBlock;
 
 	DBGLOG(RSN, TRACE,
-	       "The STA " MACSTR " port %s\n", MAC2STR(prSta->aucMacAddr), fgPortBlock == TRUE ? "BLOCK" : " OPEN");
+			"The STA " MACSTR " port %s\n", MAC2STR(prSta->aucMacAddr), fgPortBlock == TRUE ? "BLOCK" : " OPEN");
 #endif
 }
 
-#if 0				/* Marked for MT6630 */
+#if 0 /* Marked for MT6630 */
 
 /*----------------------------------------------------------------------------*/
 /*!
@@ -384,7 +368,7 @@ secTxPortControlCheck(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo, IN 
 #endif
 		if (IS_STA_IN_AIS(prStaRec)) {
 			if (!prAdapter->rWifiVar.rAisSpecificBssInfo.fgTransmitKeyExist &&
-			    (prAdapter->rWifiVar.rConnSettings.eEncStatus == ENUM_ENCRYPTION1_ENABLED)) {
+				(prAdapter->rWifiVar.rConnSettings.eEncStatus == ENUM_ENCRYPTION1_ENABLED)) {
 				DBGLOG(INIT, TRACE, "Drop Tx packet due the key is removed!!!\n");
 				return FALSE;
 			}
@@ -397,14 +381,14 @@ secTxPortControlCheck(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo, IN 
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief This routine is called to handle The Rx Security process MSDU.
-*
-* \param[in] prAdapter Pointer to the Adapter structure
-* \param[in] prSWRfb SW rfb pinter
-*
-* \retval TRUE Accept the packet
-* \retval FALSE Refuse the MSDU packet due port control
-*/
+ * \brief This routine is called to handle The Rx Security process MSDU.
+ *
+ * \param[in] prAdapter Pointer to the Adapter structure
+ * \param[in] prSWRfb SW rfb pinter
+ *
+ * \retval TRUE Accept the packet
+ * \retval FALSE Refuse the MSDU packet due port control
+ */
 /*----------------------------------------------------------------------------*/
 BOOLEAN secRxPortControlCheck(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSWRfb)
 {
@@ -415,7 +399,7 @@ BOOLEAN secRxPortControlCheck(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSWRfb)
 	if (prSWRfb->prStaRec) {
 		if (prSWRfb->prStaRec->fgPortBlock == TRUE) {
 			if (1 /* prSWRfb->fgIsDataFrame and not 1x */  &&
-			    (g_prWifiVar->rConnSettings.eAuthMode >= AUTH_MODE_WPA)) {
+				(g_prWifiVar->rConnSettings.eAuthMode >= AUTH_MODE_WPA)) {
 				/* DBGLOG(SEC, WARN, ("Drop Rx data due port control !\r\n")); */
 				return TRUE;	/* Todo: whsu FALSE; */
 			}
@@ -432,20 +416,19 @@ BOOLEAN secRxPortControlCheck(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSWRfb)
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief This routine will enable/disable the cipher suite
-*
-* \param[in] prAdapter Pointer to the adapter object data area.
-* \param[in] u4CipherSuitesFlags flag for cipher suite
-*
-* \retval none
-*/
+ * \brief This routine will enable/disable the cipher suite
+ *
+ * \param[in] prAdapter Pointer to the adapter object data area.
+ * \param[in] u4CipherSuitesFlags flag for cipher suite
+ *
+ * \retval none
+ */
 /*----------------------------------------------------------------------------*/
 VOID secSetCipherSuite(IN P_ADAPTER_T prAdapter, IN UINT_32 u4CipherSuitesFlags)
 {
-
-	UINT_32 i;
+	UINT_32									   i;
 	P_DOT11_RSNA_CONFIG_PAIRWISE_CIPHERS_ENTRY prEntry;
-	P_IEEE_802_11_MIB_T prMib;
+	P_IEEE_802_11_MIB_T						   prMib;
 
 	ASSERT(prAdapter);
 
@@ -530,16 +513,16 @@ VOID secSetCipherSuite(IN P_ADAPTER_T prAdapter, IN UINT_32 u4CipherSuitesFlags)
 	else
 		prMib->dot11RSNAConfigGroupCipher = WPA_CIPHER_SUITE_NONE;
 
-}				/* secSetCipherSuite */
+} /* secSetCipherSuite */
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief This routine is called to initialize the pmkid parameters.
-*
-* \param[in] prAdapter Pointer to the Adapter structure
-*
-* \retval NONE
-*/
+ * \brief This routine is called to initialize the pmkid parameters.
+ *
+ * \param[in] prAdapter Pointer to the Adapter structure
+ *
+ * \retval NONE
+ */
 /*----------------------------------------------------------------------------*/
 VOID secClearPmkid(IN P_ADAPTER_T prAdapter)
 {
@@ -550,19 +533,19 @@ VOID secClearPmkid(IN P_ADAPTER_T prAdapter)
 	prAisSpecBssInfo = &prAdapter->rWifiVar.rAisSpecificBssInfo;
 	DBGLOG(RSN, TRACE, "secClearPmkid\n");
 	prAisSpecBssInfo->u4PmkidCandicateCount = 0;
-	prAisSpecBssInfo->u4PmkidCacheCount = 0;
-	kalMemZero((PVOID) prAisSpecBssInfo->arPmkidCandicate, sizeof(PMKID_CANDICATE_T) * CFG_MAX_PMKID_CACHE);
-	kalMemZero((PVOID) prAisSpecBssInfo->arPmkidCache, sizeof(PMKID_ENTRY_T) * CFG_MAX_PMKID_CACHE);
+	prAisSpecBssInfo->u4PmkidCacheCount		= 0;
+	kalMemZero((PVOID)prAisSpecBssInfo->arPmkidCandicate, sizeof(PMKID_CANDICATE_T) * CFG_MAX_PMKID_CACHE);
+	kalMemZero((PVOID)prAisSpecBssInfo->arPmkidCache, sizeof(PMKID_ENTRY_T) * CFG_MAX_PMKID_CACHE);
 }
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief Whether 802.11 privacy is enabled.
-*
-* \param[in] prAdapter Pointer to the Adapter structure
-*
-* \retval BOOLEAN
-*/
+ * \brief Whether 802.11 privacy is enabled.
+ *
+ * \param[in] prAdapter Pointer to the Adapter structure
+ *
+ * \retval BOOLEAN
+ */
 /*----------------------------------------------------------------------------*/
 BOOLEAN secEnabledInAis(IN P_ADAPTER_T prAdapter)
 {
@@ -570,19 +553,18 @@ BOOLEAN secEnabledInAis(IN P_ADAPTER_T prAdapter)
 
 	ASSERT(prAdapter->rWifiVar.rConnSettings.eEncStatus < ENUM_ENCRYPTION_NUM);
 
-	if ((prAdapter->rWifiVar.rConnSettings.eEncStatus == ENUM_ENCRYPTION1_ENABLED)
-		|| (prAdapter->rWifiVar.rConnSettings.eEncStatus == ENUM_ENCRYPTION2_ENABLED)
-		|| (prAdapter->rWifiVar.rConnSettings.eEncStatus == ENUM_ENCRYPTION3_ENABLED)
+	if ((prAdapter->rWifiVar.rConnSettings.eEncStatus == ENUM_ENCRYPTION1_ENABLED) ||
+			(prAdapter->rWifiVar.rConnSettings.eEncStatus == ENUM_ENCRYPTION2_ENABLED) ||
+			(prAdapter->rWifiVar.rConnSettings.eEncStatus == ENUM_ENCRYPTION3_ENABLED)
 #if CFG_SUPPORT_SUITB
-		|| (prAdapter->rWifiVar.rConnSettings.eEncStatus == ENUM_ENCRYPTION4_ENABLED)
+			|| (prAdapter->rWifiVar.rConnSettings.eEncStatus == ENUM_ENCRYPTION4_ENABLED)
 #endif
-		)
+	)
 		return TRUE;
 	else if ((prAdapter->rWifiVar.rConnSettings.eEncStatus == ENUM_ENCRYPTION_DISABLED))
-		DBGLOG(RSN, TRACE, "Unknown encryption setting %d\n",
-			prAdapter->rWifiVar.rConnSettings.eEncStatus);
+		DBGLOG(RSN, TRACE, "Unknown encryption setting %d\n", prAdapter->rWifiVar.rConnSettings.eEncStatus);
 	return FALSE;
-}				/* secEnabledInAis */
+} /* secEnabledInAis */
 
 BOOLEAN secIsProtected1xFrame(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec)
 {
@@ -606,14 +588,14 @@ BOOLEAN secIsProtected1xFrame(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaR
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief This routine is called to set the privacy bit at mac header for TxM
-*
-* \param[in] prAdapter Pointer to the Adapter structure
-* \param[in] prMsdu the msdu for known the sta record
-*
-* \return TRUE the privacy need to set
-*            FALSE the privacy no need to set
-*/
+ * \brief This routine is called to set the privacy bit at mac header for TxM
+ *
+ * \param[in] prAdapter Pointer to the Adapter structure
+ * \param[in] prMsdu the msdu for known the sta record
+ *
+ * \return TRUE the privacy need to set
+ *            FALSE the privacy no need to set
+ */
 /*----------------------------------------------------------------------------*/
 BOOLEAN secIsProtectedFrame(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsdu, IN P_STA_RECORD_T prStaRec)
 {
@@ -625,7 +607,7 @@ BOOLEAN secIsProtectedFrame(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsdu, I
 
 #if CFG_SUPPORT_802_11W
 	if (prMsdu->ucPacketType == TX_PACKET_TYPE_MGMT) {
-#if 0				/* Decide by Compose module */
+#if 0 /* Decide by Compose module */
 		BOOL fgRobustActionWithProtect = FALSE;
 		P_BSS_INFO_T prBssInfo;
 
@@ -633,7 +615,7 @@ BOOLEAN secIsProtectedFrame(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsdu, I
 			prBssInfo = GET_BSS_INFO_BY_INDEX(prAdapter, prStaRec->ucBssIndex);
 			ASSERT(prBssInfo);
 			if ((prBssInfo->eNetworkType == NETWORK_TYPE_AIS) &&
-			    prAdapter->rWifiVar.rAisSpecificBssInfo.fgMgmtProtection /* Use MFP */) {
+				prAdapter->rWifiVar.rAisSpecificBssInfo.fgMgmtProtection /* Use MFP */) {
 
 				fgRobustActionWithProtect = TRUE;
 				return TRUE; /* AIS & Robust action frame */
@@ -663,7 +645,7 @@ BOOLEAN secIsProtectedBss(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prBssInfo)
 	}
 #if CFG_ENABLE_WIFI_DIRECT
 	else if (prBssInfo->eNetworkType == NETWORK_TYPE_P2P)
-		return kalP2PGetCipher(prAdapter->prGlueInfo, (UINT_8) prBssInfo->u4PrivateData);
+		return kalP2PGetCipher(prAdapter->prGlueInfo, (UINT_8)prBssInfo->u4PrivateData);
 #endif
 	else if (prBssInfo->eNetworkType == NETWORK_TYPE_BOW)
 		return TRUE;
@@ -674,26 +656,26 @@ BOOLEAN secIsProtectedBss(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prBssInfo)
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief This routine is used before add/update a WLAN entry.
-*        Info the WLAN Table has available entry for this request
-*
-* \param[in] prAdapter Pointer to the Adapter structure
-* \param[in]  prSta the P_STA_RECORD_T for store
-*
-* \return TRUE Free Wlan table is reserved for this request
-*            FALSE No free entry for this request
-*
-* \note
-*/
+ * \brief This routine is used before add/update a WLAN entry.
+ *        Info the WLAN Table has available entry for this request
+ *
+ * \param[in] prAdapter Pointer to the Adapter structure
+ * \param[in]  prSta the P_STA_RECORD_T for store
+ *
+ * \return TRUE Free Wlan table is reserved for this request
+ *            FALSE No free entry for this request
+ *
+ * \note
+ */
 /*----------------------------------------------------------------------------*/
 BOOL secPrivacySeekForEntry(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prSta)
 {
-	P_BSS_INFO_T prP2pBssInfo;
-	UINT_8 ucEntry = WTBL_RESERVED_ENTRY;
-	UINT_8 i;
-	UINT_8 ucStartIDX = 0, ucMaxIDX = 0;
+	P_BSS_INFO_T   prP2pBssInfo;
+	UINT_8		   ucEntry = WTBL_RESERVED_ENTRY;
+	UINT_8		   i;
+	UINT_8		   ucStartIDX = 0, ucMaxIDX = 0;
 	P_WLAN_TABLE_T prWtbl;
-	UINT_8 ucRoleIdx = 0;
+	UINT_8		   ucRoleIdx = 0;
 
 	ASSERT(prSta);
 
@@ -701,18 +683,18 @@ BOOL secPrivacySeekForEntry(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prSta)
 		ASSERT(FALSE);
 
 	prP2pBssInfo = GET_BSS_INFO_BY_INDEX(prAdapter, prSta->ucBssIndex);
-	ucRoleIdx = prP2pBssInfo->u4PrivateData;
+	ucRoleIdx	 = prP2pBssInfo->u4PrivateData;
 
 	prWtbl = prAdapter->rWifiVar.arWtbl;
 
 	ucStartIDX = 1;
-	ucMaxIDX = NIC_TX_DEFAULT_WLAN_INDEX - 1;
+	ucMaxIDX   = NIC_TX_DEFAULT_WLAN_INDEX - 1;
 
 	DBGLOG(RSN, INFO, "secPrivacySeekForEntry\n");
 
 	for (i = ucStartIDX; i <= ucMaxIDX; i++) {
-		if (prWtbl[i].ucUsed && EQUAL_MAC_ADDR(prSta->aucMacAddr, prWtbl[i].aucMacAddr)
-		    && prWtbl[i].ucPairwise /* This function for ucPairwise only */) {
+		if (prWtbl[i].ucUsed && EQUAL_MAC_ADDR(prSta->aucMacAddr, prWtbl[i].aucMacAddr) &&
+				prWtbl[i].ucPairwise /* This function for ucPairwise only */) {
 			ucEntry = i;
 			DBGLOG(RSN, INFO, "[Wlan index]: Reuse entry #%d\n", i);
 			break;
@@ -731,10 +713,9 @@ BOOL secPrivacySeekForEntry(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prSta)
 
 	/* Save to the driver maintain table */
 	if (ucEntry < NIC_TX_DEFAULT_WLAN_INDEX) {
-
-		prWtbl[ucEntry].ucUsed = TRUE;
+		prWtbl[ucEntry].ucUsed	   = TRUE;
 		prWtbl[ucEntry].ucBssIndex = prSta->ucBssIndex;
-		prWtbl[ucEntry].ucKeyId = 0xFF;
+		prWtbl[ucEntry].ucKeyId	   = 0xFF;
 		prWtbl[ucEntry].ucPairwise = 1;
 		COPY_MAC_ADDR(prWtbl[ucEntry].aucMacAddr, prSta->aucMacAddr);
 		prWtbl[ucEntry].ucStaIndex = prSta->ucIndex;
@@ -745,21 +726,19 @@ BOOL secPrivacySeekForEntry(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prSta)
 			P_BSS_INFO_T prBssInfo = GET_BSS_INFO_BY_INDEX(prAdapter, prSta->ucBssIndex);
 			/* for AP mode , if wep key exist, peer sta should also fgTransmitKeyExist */
 			if (IS_BSS_P2P(prBssInfo) && kalP2PGetRole(prAdapter->prGlueInfo, ucRoleIdx) == 2) {
-				if (prBssInfo->fgBcDefaultKeyExist &&
-				    !(kalP2PGetCcmpCipher(prAdapter->prGlueInfo, ucRoleIdx) ||
-				      kalP2PGetTkipCipher(prAdapter->prGlueInfo, ucRoleIdx))) {
+				if (prBssInfo->fgBcDefaultKeyExist && !(kalP2PGetCcmpCipher(prAdapter->prGlueInfo, ucRoleIdx) ||
+															  kalP2PGetTkipCipher(prAdapter->prGlueInfo, ucRoleIdx))) {
 					prSta->fgTransmitKeyExist = TRUE;
-					prWtbl[ucEntry].ucKeyId = prBssInfo->ucBcDefaultKeyIdx;
+					prWtbl[ucEntry].ucKeyId	  = prBssInfo->ucBcDefaultKeyIdx;
 					DBGLOG(RSN, INFO, "peer sta set fgTransmitKeyExist\n");
 				}
 			}
 		}
 
-		DBGLOG(RSN, INFO,
-		       "[Wlan index] BSS#%d keyid#%d P=%d use WlanIndex#%d STAIdx=%d " MACSTR
-		       " staType=%x\n", prSta->ucBssIndex, 0, prWtbl[ucEntry].ucPairwise, ucEntry,
-		       prSta->ucIndex, MAC2STR(prSta->aucMacAddr), prSta->eStaType);
-#if 1				/* DBG */
+		DBGLOG(RSN, INFO, "[Wlan index] BSS#%d keyid#%d P=%d use WlanIndex#%d STAIdx=%d " MACSTR " staType=%x\n",
+				prSta->ucBssIndex, 0, prWtbl[ucEntry].ucPairwise, ucEntry, prSta->ucIndex, MAC2STR(prSta->aucMacAddr),
+				prSta->eStaType);
+#if 1 /* DBG */
 		secCheckWTBLAssign(prAdapter);
 #endif
 		return TRUE;
@@ -773,13 +752,13 @@ BOOL secPrivacySeekForEntry(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prSta)
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief This routine is used free a WLAN entry.
-*
-* \param[in] prAdapter Pointer to the Adapter structure
-* \param[in]  ucEntry the wlan table index to free
-*
-* \return none
-*/
+ * \brief This routine is used free a WLAN entry.
+ *
+ * \param[in] prAdapter Pointer to the Adapter structure
+ * \param[in]  ucEntry the wlan table index to free
+ *
+ * \return none
+ */
 /*----------------------------------------------------------------------------*/
 VOID secPrivacyFreeForEntry(IN P_ADAPTER_T prAdapter, IN UINT_8 ucEntry)
 {
@@ -795,29 +774,28 @@ VOID secPrivacyFreeForEntry(IN P_ADAPTER_T prAdapter, IN UINT_8 ucEntry)
 	prWtbl = prAdapter->rWifiVar.arWtbl;
 
 	if (prWtbl[ucEntry].ucUsed) {
-		prWtbl[ucEntry].ucUsed = FALSE;
-		prWtbl[ucEntry].ucKeyId = 0xff;
+		prWtbl[ucEntry].ucUsed	   = FALSE;
+		prWtbl[ucEntry].ucKeyId	   = 0xff;
 		prWtbl[ucEntry].ucBssIndex = MAX_BSS_INDEX + 1;
 		prWtbl[ucEntry].ucPairwise = 0;
 		kalMemZero(prWtbl[ucEntry].aucMacAddr, MAC_ADDR_LEN);
 		prWtbl[ucEntry].ucStaIndex = STA_REC_INDEX_NOT_FOUND;
 	}
-
 }
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief This routine is used free a STA WLAN entry.
-*
-* \param[in] prAdapter Pointer to the Adapter structure
-* \param[in]  prStaRec the sta which want to free
-*
-* \return none
-*/
+ * \brief This routine is used free a STA WLAN entry.
+ *
+ * \param[in] prAdapter Pointer to the Adapter structure
+ * \param[in]  prStaRec the sta which want to free
+ *
+ * \return none
+ */
 /*----------------------------------------------------------------------------*/
 VOID secPrivacyFreeSta(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec)
 {
-	UINT_32 entry;
+	UINT_32		   entry;
 	P_WLAN_TABLE_T prWtbl;
 
 	if (!prStaRec)
@@ -827,9 +805,9 @@ VOID secPrivacyFreeSta(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec)
 
 	for (entry = 0; entry < WTBL_SIZE; entry++) {
 		/* Consider GTK case !! */
-		if (prWtbl[entry].ucUsed &&
-		    EQUAL_MAC_ADDR(prStaRec->aucMacAddr, prWtbl[entry].aucMacAddr) && prWtbl[entry].ucPairwise) {
-#if 1				/* DBG */
+		if (prWtbl[entry].ucUsed && EQUAL_MAC_ADDR(prStaRec->aucMacAddr, prWtbl[entry].aucMacAddr) &&
+				prWtbl[entry].ucPairwise) {
+#if 1 /* DBG */
 			DBGLOG(RSN, INFO, "Free STA entry (%lu)!\n", entry);
 #endif
 			secPrivacyFreeForEntry(prAdapter, entry);
@@ -851,20 +829,17 @@ VOID secPrivacyFreeSta(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec)
  */
 /*----------------------------------------------------------------------------*/
 
-static inline UINT_32 secRemoveBmcWepKey(IN P_ADAPTER_T prAdapter,
-					  IN UINT_8 ucBssIndex,
-					  IN UINT_32 u4KeyId)
+static inline UINT_32 secRemoveBmcWepKey(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex, IN UINT_32 u4KeyId)
 {
 	PARAM_REMOVE_KEY_T rRemoveKey;
-	UINT_32 u4SetLen = 0;
-	UINT_32 u4Ret;
+	UINT_32			   u4SetLen = 0;
+	UINT_32			   u4Ret;
 
 	DBGLOG(RSN, INFO, "BssIdx=%d, KeyId=%d\n", ucBssIndex, u4KeyId);
 
 	if (prAdapter->rAcpiState == ACPI_STATE_D3) {
-		DBGLOG(REQ, WARN,
-		       "Fail in set remove WEP! (Adapter not ready). ACPI=D%d, Radio=%d\n",
-		       prAdapter->rAcpiState, prAdapter->fgIsRadioOff);
+		DBGLOG(REQ, WARN, "Fail in set remove WEP! (Adapter not ready). ACPI=D%d, Radio=%d\n", prAdapter->rAcpiState,
+				prAdapter->fgIsRadioOff);
 		return WLAN_STATUS_ADAPTER_NOT_READY;
 	}
 
@@ -874,14 +849,13 @@ static inline UINT_32 secRemoveBmcWepKey(IN P_ADAPTER_T prAdapter,
 	}
 
 	kalMemZero(&rRemoveKey, sizeof(PARAM_REMOVE_KEY_T));
-	rRemoveKey.u4Length = sizeof(PARAM_REMOVE_KEY_T);
+	rRemoveKey.u4Length	  = sizeof(PARAM_REMOVE_KEY_T);
 	rRemoveKey.u4KeyIndex = u4KeyId;
-	rRemoveKey.ucBssIdx = ucBssIndex;
+	rRemoveKey.ucBssIdx	  = ucBssIndex;
 	/* Should set FLAG_RM_KEY_CTRL_WO_OID for not OID operation */
 	rRemoveKey.ucCtrlFlag = FLAG_RM_KEY_CTRL_WO_OID;
 
-	u4Ret = wlanoidSetRemoveKey(prAdapter, (void *)&rRemoveKey,
-			    sizeof(PARAM_REMOVE_KEY_T), &u4SetLen);
+	u4Ret = wlanoidSetRemoveKey(prAdapter, (void *)&rRemoveKey, sizeof(PARAM_REMOVE_KEY_T), &u4SetLen);
 
 	if (u4Ret != WLAN_STATUS_PENDING)
 		DBGLOG(RSN, WARN, "Can't send remove bmc wep key cmd\n");
@@ -889,20 +863,19 @@ static inline UINT_32 secRemoveBmcWepKey(IN P_ADAPTER_T prAdapter,
 	return u4Ret;
 }
 
-
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief This routine is used for remove the BC entry of the BSS
-*
-* \param[in] prAdapter Pointer to the Adapter structure
-* \param[in] ucBssIndex The BSS index
-*
-* \note
-*/
+ * \brief This routine is used for remove the BC entry of the BSS
+ *
+ * \param[in] prAdapter Pointer to the Adapter structure
+ * \param[in] ucBssIndex The BSS index
+ *
+ * \note
+ */
 /*----------------------------------------------------------------------------*/
 VOID secRemoveBssBcEntry(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prBssInfo, IN BOOL fgRoam)
 {
-	int i;
+	int						i;
 	P_CONNECTION_SETTINGS_T prConnSettings = &(prAdapter->rWifiVar.rConnSettings);
 
 	if (!prBssInfo)
@@ -911,16 +884,14 @@ VOID secRemoveBssBcEntry(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prBssInfo, IN
 	DBGLOG(RSN, INFO, "remove all the key related with BSS!");
 
 	if (fgRoam) {
-		if (IS_BSS_AIS(prBssInfo) &&
-		    prBssInfo->prStaRecOfAP && (prConnSettings->eAuthMode >= AUTH_MODE_WPA &&
-						prConnSettings->eAuthMode != AUTH_MODE_WPA_NONE)) {
-
+		if (IS_BSS_AIS(prBssInfo) && prBssInfo->prStaRecOfAP &&
+				(prConnSettings->eAuthMode >= AUTH_MODE_WPA && prConnSettings->eAuthMode != AUTH_MODE_WPA_NONE)) {
 			for (i = 0; i < MAX_KEY_NUM; i++) {
 				if (prBssInfo->ucBMCWlanIndexSUsed[i])
 					secPrivacyFreeForEntry(prAdapter, prBssInfo->ucBMCWlanIndexS[i]);
 			}
 			prBssInfo->fgBcDefaultKeyExist = FALSE;
-			prBssInfo->ucBcDefaultKeyIdx = 0xff;
+			prBssInfo->ucBcDefaultKeyIdx   = 0xff;
 		}
 	} else {
 		prBssInfo->ucBMCWlanIndex = WTBL_RESERVED_ENTRY;
@@ -944,58 +915,55 @@ VOID secRemoveBssBcEntry(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prBssInfo, IN
 			prBssInfo->wepkeyUsed[i] = FALSE;
 		}
 		/* wlanoidSetRemoveKey would clear prBssInfo->wepkeyUsed[],
-		* but won't call secPrivacyFreeForEntry.
-		* For the case that the cfg80211_del_key is called before
-		* nicDeactivateNetwork, check wepkeyWlanIdx to do
-		* secPrivacyFreeForEntry.
-		*/
+		 * but won't call secPrivacyFreeForEntry.
+		 * For the case that the cfg80211_del_key is called before
+		 * nicDeactivateNetwork, check wepkeyWlanIdx to do
+		 * secPrivacyFreeForEntry.
+		 */
 		if (prBssInfo->wepkeyWlanIdx != WTBL_RESERVED_ENTRY)
-			secPrivacyFreeForEntry(prAdapter,
-				prBssInfo->wepkeyWlanIdx);
+			secPrivacyFreeForEntry(prAdapter, prBssInfo->wepkeyWlanIdx);
 
-		prBssInfo->wepkeyWlanIdx = WTBL_RESERVED_ENTRY;
+		prBssInfo->wepkeyWlanIdx	   = WTBL_RESERVED_ENTRY;
 		prBssInfo->fgBcDefaultKeyExist = FALSE;
-		prBssInfo->ucBcDefaultKeyIdx = 0xff;
+		prBssInfo->ucBcDefaultKeyIdx   = 0xff;
 	}
-
 }
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief This routine is used for adding the broadcast key used, to assign a wlan table entry
-*         for reserved the specific entry for these key for
-*
-* \param[in] prAdapter Pointer to the Adapter structure
-* \param[in] ucBssIndex The BSS index
-* \param[in] ucNetTypeIdx The Network index
-* \param[in] ucAlg the entry assign related with algorithm
-* \param[in] ucKeyId The key id
-* \param[in] ucTxRx The Type of the key
-*
-* \return ucEntryIndex The entry to be used, WTBL_ALLOC_FAIL for allocation fail
-*
-* \note
-*/
+ * \brief This routine is used for adding the broadcast key used, to assign a wlan table entry
+ *         for reserved the specific entry for these key for
+ *
+ * \param[in] prAdapter Pointer to the Adapter structure
+ * \param[in] ucBssIndex The BSS index
+ * \param[in] ucNetTypeIdx The Network index
+ * \param[in] ucAlg the entry assign related with algorithm
+ * \param[in] ucKeyId The key id
+ * \param[in] ucTxRx The Type of the key
+ *
+ * \return ucEntryIndex The entry to be used, WTBL_ALLOC_FAIL for allocation fail
+ *
+ * \note
+ */
 /*----------------------------------------------------------------------------*/
 UINT_8
-secPrivacySeekForBcEntry(IN P_ADAPTER_T prAdapter,
-			 IN UINT_8 ucBssIndex,
-			 IN PUINT_8 pucAddr, IN UINT_8 ucStaIdx, IN UINT_8 ucAlg, IN UINT_8 ucKeyId)
+secPrivacySeekForBcEntry(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex, IN PUINT_8 pucAddr, IN UINT_8 ucStaIdx,
+		IN UINT_8 ucAlg, IN UINT_8 ucKeyId)
 {
-	UINT_8 ucEntry = WTBL_ALLOC_FAIL;
-	UINT_8 ucStartIDX = 0, ucMaxIDX = 0;
-	UINT_8 i = 0;
-	BOOLEAN fgCheckKeyId = TRUE;
+	UINT_8		   ucEntry	  = WTBL_ALLOC_FAIL;
+	UINT_8		   ucStartIDX = 0, ucMaxIDX = 0;
+	UINT_8		   i			= 0;
+	BOOLEAN		   fgCheckKeyId = TRUE;
 	P_WLAN_TABLE_T prWtbl;
-	P_BSS_INFO_T prBSSInfo = GET_BSS_INFO_BY_INDEX(prAdapter, ucBssIndex);
+	P_BSS_INFO_T   prBSSInfo = GET_BSS_INFO_BY_INDEX(prAdapter, ucBssIndex);
 
 	prWtbl = prAdapter->rWifiVar.arWtbl;
 	ASSERT(prAdapter);
 	ASSERT(pucAddr);
 
-	if (ucAlg == CIPHER_SUITE_WPI ||	/* CIPHER_SUITE_GCM_WPI || */
-	    ucAlg == CIPHER_SUITE_WEP40 ||
-	    ucAlg == CIPHER_SUITE_WEP104 || ucAlg == CIPHER_SUITE_WEP128 || ucAlg == CIPHER_SUITE_NONE)
+	if (ucAlg == CIPHER_SUITE_WPI || /* CIPHER_SUITE_GCM_WPI || */
+			ucAlg == CIPHER_SUITE_WEP40 || ucAlg == CIPHER_SUITE_WEP104 || ucAlg == CIPHER_SUITE_WEP128 ||
+			ucAlg == CIPHER_SUITE_NONE)
 		fgCheckKeyId = FALSE;
 
 	if (ucKeyId == 0xFF || ucAlg == CIPHER_SUITE_BIP)
@@ -1005,21 +973,18 @@ secPrivacySeekForBcEntry(IN P_ADAPTER_T prAdapter,
 		fgCheckKeyId = FALSE;
 
 	ucStartIDX = 1;
-	ucMaxIDX = NIC_TX_DEFAULT_WLAN_INDEX - 1;
+	ucMaxIDX   = NIC_TX_DEFAULT_WLAN_INDEX - 1;
 
 	DBGLOG(INIT, INFO, "secPrivacySeekForBcEntry\n");
-	DBGLOG(INIT, INFO, "OpMode:%d, NetworkType:%d, CheckKeyId:%d\n",
-		prBSSInfo->eCurrentOPMode, prBSSInfo->eNetworkType, fgCheckKeyId);
+	DBGLOG(INIT, INFO, "OpMode:%d, NetworkType:%d, CheckKeyId:%d\n", prBSSInfo->eCurrentOPMode, prBSSInfo->eNetworkType,
+			fgCheckKeyId);
 
 	/*always use index 0 for BIP*/
 	if (ucAlg == CIPHER_SUITE_BIP) {
 		ucEntry = 0;
-	}
-	else {
+	} else {
 		for (i = ucStartIDX; i <= ucMaxIDX; i++) {
-
 			if (prWtbl[i].ucUsed && !prWtbl[i].ucPairwise && prWtbl[i].ucBssIndex == ucBssIndex) {
-
 				if (!fgCheckKeyId) {
 					ucEntry = i;
 					DBGLOG(RSN, INFO, "[Wlan index]: Reuse entry #%d for open/wep/wpi\n", i);
@@ -1046,16 +1011,15 @@ secPrivacySeekForBcEntry(IN P_ADAPTER_T prAdapter,
 	}
 
 	if (ucEntry < NIC_TX_DEFAULT_WLAN_INDEX) {
-		prWtbl[ucEntry].ucUsed = TRUE;
-		prWtbl[ucEntry].ucKeyId = ucKeyId;
+		prWtbl[ucEntry].ucUsed	   = TRUE;
+		prWtbl[ucEntry].ucKeyId	   = ucKeyId;
 		prWtbl[ucEntry].ucBssIndex = ucBssIndex;
 		prWtbl[ucEntry].ucPairwise = 0;
 		kalMemCopy(prWtbl[ucEntry].aucMacAddr, pucAddr, MAC_ADDR_LEN);
 		prWtbl[ucEntry].ucStaIndex = ucStaIdx;
 
-		DBGLOG(RSN, INFO,
-		       "[Wlan index] BSS#%d keyid#%d P=%d use WlanIndex#%d STAIdx=%d " MACSTR
-		       "\n", ucBssIndex, ucKeyId, prWtbl[ucEntry].ucPairwise, ucEntry, ucStaIdx, MAC2STR(pucAddr));
+		DBGLOG(RSN, INFO, "[Wlan index] BSS#%d keyid#%d P=%d use WlanIndex#%d STAIdx=%d " MACSTR "\n", ucBssIndex,
+				ucKeyId, prWtbl[ucEntry].ucPairwise, ucEntry, ucStaIdx, MAC2STR(pucAddr));
 
 		/* DBG */
 		secCheckWTBLAssign(prAdapter);
@@ -1070,18 +1034,17 @@ secPrivacySeekForBcEntry(IN P_ADAPTER_T prAdapter,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief
-*
-* \param[in] prAdapter Pointer to the Adapter structure
-*
-* \return ucEntryIndex The entry to be used, WTBL_ALLOC_FAIL for allocation fail
-*
-* \note
-*/
+ * \brief
+ *
+ * \param[in] prAdapter Pointer to the Adapter structure
+ *
+ * \return ucEntryIndex The entry to be used, WTBL_ALLOC_FAIL for allocation fail
+ *
+ * \note
+ */
 /*----------------------------------------------------------------------------*/
 BOOLEAN secCheckWTBLAssign(IN P_ADAPTER_T prAdapter)
 {
-
 	BOOLEAN fgCheckFail = FALSE;
 
 	secPrivacyDumpWTBL(prAdapter);
@@ -1096,13 +1059,13 @@ BOOLEAN secCheckWTBLAssign(IN P_ADAPTER_T prAdapter)
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  Got the STA record index by wlan index
-*
-* \param[in] prAdapter Pointer to the Adapter structure
-* \param[in] ucWlanIdx The Rx wlan index
-*
-* \return The STA record index, 0xff for invalid sta index
-*/
+ * \brief  Got the STA record index by wlan index
+ *
+ * \param[in] prAdapter Pointer to the Adapter structure
+ * \param[in] ucWlanIdx The Rx wlan index
+ *
+ * \return The STA record index, 0xff for invalid sta index
+ */
 /*----------------------------------------------------------------------------*/
 UINT_8 secGetStaIdxByWlanIdx(P_ADAPTER_T prAdapter, UINT_8 ucWlanIdx)
 {
@@ -1116,8 +1079,8 @@ UINT_8 secGetStaIdxByWlanIdx(P_ADAPTER_T prAdapter, UINT_8 ucWlanIdx)
 	prWtbl = prAdapter->rWifiVar.arWtbl;
 
 	/* DBGLOG(RSN, TRACE, ("secGetStaIdxByWlanIdx=%d "MACSTR" used=%d\n", ucWlanIdx,
-	*			MAC2STR(prWtbl[ucWlanIdx].aucMacAddr), prWtbl[ucWlanIdx].ucUsed));
-	*/
+	 *			MAC2STR(prWtbl[ucWlanIdx].aucMacAddr), prWtbl[ucWlanIdx].ucUsed));
+	 */
 
 	if (prWtbl[ucWlanIdx].ucUsed)
 		return prWtbl[ucWlanIdx].ucStaIndex;
@@ -1127,13 +1090,13 @@ UINT_8 secGetStaIdxByWlanIdx(P_ADAPTER_T prAdapter, UINT_8 ucWlanIdx)
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  At Sw wlan table, got the BSS index by wlan index
-*
-* \param[in] prAdapter Pointer to the Adapter structure
-* \param[in] ucWlanIdx The Rx wlan index
-*
-* \return The BSS index, 0xff for invalid bss index
-*/
+ * \brief  At Sw wlan table, got the BSS index by wlan index
+ *
+ * \param[in] prAdapter Pointer to the Adapter structure
+ * \param[in] ucWlanIdx The Rx wlan index
+ *
+ * \return The BSS index, 0xff for invalid bss index
+ */
 /*----------------------------------------------------------------------------*/
 UINT_8 secGetBssIdxByWlanIdx(P_ADAPTER_T prAdapter, UINT_8 ucWlanIdx)
 {
@@ -1154,17 +1117,17 @@ UINT_8 secGetBssIdxByWlanIdx(P_ADAPTER_T prAdapter, UINT_8 ucWlanIdx)
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  Got the STA record index by mac addr
-*
-* \param[in] prAdapter Pointer to the Adapter structure
-* \param[in] pucMacAddress MAC Addr
-*
-* \return The STA record index, 0xff for invalid sta index
-*/
+ * \brief  Got the STA record index by mac addr
+ *
+ * \param[in] prAdapter Pointer to the Adapter structure
+ * \param[in] pucMacAddress MAC Addr
+ *
+ * \return The STA record index, 0xff for invalid sta index
+ */
 /*----------------------------------------------------------------------------*/
 UINT_8 secLookupStaRecIndexFromTA(P_ADAPTER_T prAdapter, PUINT_8 pucMacAddress)
 {
-	int i;
+	int			   i;
 	P_WLAN_TABLE_T prWtbl;
 
 	ASSERT(prAdapter);
@@ -1182,17 +1145,17 @@ UINT_8 secLookupStaRecIndexFromTA(P_ADAPTER_T prAdapter, PUINT_8 pucMacAddress)
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief
-*
-* \param[in] prAdapter Pointer to the Adapter structure
-*
-* \note
-*/
+ * \brief
+ *
+ * \param[in] prAdapter Pointer to the Adapter structure
+ *
+ * \note
+ */
 /*----------------------------------------------------------------------------*/
 void secPrivacyDumpWTBL(IN P_ADAPTER_T prAdapter)
 {
 	P_WLAN_TABLE_T prWtbl;
-	UINT_8 i;
+	UINT_8		   i;
 
 	prWtbl = prAdapter->rWifiVar.arWtbl;
 
@@ -1200,43 +1163,38 @@ void secPrivacyDumpWTBL(IN P_ADAPTER_T prAdapter)
 
 	for (i = 0; i < WTBL_SIZE; i++) {
 		if (prWtbl[i].ucUsed)
-			DBGLOG(RSN, INFO,
-				"#%d Used=%d  BSSIdx=%d keyid=%d P=%d STA=%d Addr=" MACSTR "\n", i,
-				prWtbl[i].ucUsed, prWtbl[i].ucBssIndex, prWtbl[i].ucKeyId,
-				prWtbl[i].ucPairwise, prWtbl[i].ucStaIndex, MAC2STR(prWtbl[i].aucMacAddr));
+			DBGLOG(RSN, INFO, "#%d Used=%d  BSSIdx=%d keyid=%d P=%d STA=%d Addr=" MACSTR "\n", i, prWtbl[i].ucUsed,
+					prWtbl[i].ucBssIndex, prWtbl[i].ucKeyId, prWtbl[i].ucPairwise, prWtbl[i].ucStaIndex,
+					MAC2STR(prWtbl[i].aucMacAddr));
 	}
 }
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief Assin the wlan table with the join AP info
-*
-* \param[in] prAdapter Pointer to the Adapter structure
-*
-* \note
-*/
+ * \brief Assin the wlan table with the join AP info
+ *
+ * \param[in] prAdapter Pointer to the Adapter structure
+ *
+ * \note
+ */
 /*----------------------------------------------------------------------------*/
 void secPostUpdateAddr(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prBssInfo)
 {
 	P_CONNECTION_SETTINGS_T prConnSettings = &(prAdapter->rWifiVar.rConnSettings);
-	P_WLAN_TABLE_T prWtbl;
+	P_WLAN_TABLE_T			prWtbl;
 
 	if (IS_BSS_AIS(prBssInfo) && prBssInfo->prStaRecOfAP) {
-
 		if (prConnSettings->eEncStatus == ENUM_ENCRYPTION1_ENABLED) {
-
 			if (prBssInfo->fgBcDefaultKeyExist) {
-
 				prWtbl = &prAdapter->rWifiVar.arWtbl[prBssInfo->wepkeyWlanIdx];
 
 				kalMemCopy(prWtbl->aucMacAddr, prBssInfo->prStaRecOfAP->aucMacAddr, MAC_ADDR_LEN);
 				prWtbl->ucStaIndex = prBssInfo->prStaRecOfAP->ucIndex;
-				DBGLOG(RSN, INFO, "secPostUpdateAddr at [%d] " MACSTR "= STA Index=%d\n",
-				       prBssInfo->wepkeyWlanIdx, MAC2STR(prWtbl->aucMacAddr),
-				       prBssInfo->prStaRecOfAP->ucIndex);
+				DBGLOG(RSN, INFO, "secPostUpdateAddr at [%d] " MACSTR "= STA Index=%d\n", prBssInfo->wepkeyWlanIdx,
+						MAC2STR(prWtbl->aucMacAddr), prBssInfo->prStaRecOfAP->ucIndex);
 
 				/* Update the wlan table of the prStaRecOfAP */
-				prWtbl = &prAdapter->rWifiVar.arWtbl[prBssInfo->prStaRecOfAP->ucWlanIndex];
+				prWtbl			= &prAdapter->rWifiVar.arWtbl[prBssInfo->prStaRecOfAP->ucWlanIndex];
 				prWtbl->ucKeyId = prBssInfo->ucBcDefaultKeyIdx;
 				prBssInfo->prStaRecOfAP->fgTransmitKeyExist = TRUE;
 			}
@@ -1246,9 +1204,8 @@ void secPostUpdateAddr(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prBssInfo)
 
 			kalMemCopy(prWtbl->aucMacAddr, prBssInfo->prStaRecOfAP->aucMacAddr, MAC_ADDR_LEN);
 			prWtbl->ucStaIndex = prBssInfo->prStaRecOfAP->ucIndex;
-			DBGLOG(RSN, INFO, "secPostUpdateAddr at [%d] " MACSTR "= STA Index=%d\n",
-			       prBssInfo->ucBMCWlanIndex, MAC2STR(prWtbl->aucMacAddr),
-			       prBssInfo->prStaRecOfAP->ucIndex);
+			DBGLOG(RSN, INFO, "secPostUpdateAddr at [%d] " MACSTR "= STA Index=%d\n", prBssInfo->ucBMCWlanIndex,
+					MAC2STR(prWtbl->aucMacAddr), prBssInfo->prStaRecOfAP->ucIndex);
 		}
 	}
 }

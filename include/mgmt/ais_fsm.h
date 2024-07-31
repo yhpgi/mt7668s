@@ -57,66 +57,67 @@
  *  \brief  Declaration of functions and finite state machine for AIS Module.
  *
  *  Declaration of functions and finite state machine for AIS Module.
-*/
-
+ */
 
 #ifndef _AIS_FSM_H
 #define _AIS_FSM_H
 
 /*******************************************************************************
-*                         C O M P I L E R   F L A G S
-********************************************************************************
-*/
+ *                         C O M P I L E R   F L A G S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                    E X T E R N A L   R E F E R E N C E S
-********************************************************************************
-*/
+ *                    E X T E R N A L   R E F E R E N C E S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                              C O N S T A N T S
-********************************************************************************
-*/
-#define AIS_BG_SCAN_INTERVAL_MIN_SEC        2	/* 30 // exponential to 960 */
-#define AIS_BG_SCAN_INTERVAL_MAX_SEC        2	/* 960 // 16min */
+ *                              C O N S T A N T S
+ ********************************************************************************
+ */
+#define AIS_BG_SCAN_INTERVAL_MIN_SEC 2 /* 30 // exponential to 960 */
+#define AIS_BG_SCAN_INTERVAL_MAX_SEC 2 /* 960 // 16min */
 #if CFG_SUPPORT_ROAMING
-#define AIS_DELAY_TIME_OF_DISCONNECT_SEC    0	/* 100 Milli-seconds - Immediate indication to reduce inter-SSID roam time */
+#define AIS_DELAY_TIME_OF_DISCONNECT_SEC \
+	0 /* 100 Milli-seconds - Immediate indication to reduce inter-SSID roam time \
+	   */
 #else
-#define AIS_DELAY_TIME_OF_DISCONNECT_SEC    5	/* 10 */
-#endif				/* CFG_SUPPORT_ROAMING */
-#define AIS_IBSS_ALONE_TIMEOUT_SEC          20	/* seconds */
+#define AIS_DELAY_TIME_OF_DISCONNECT_SEC 5 /* 10 */
+#endif									   /* CFG_SUPPORT_ROAMING */
+#define AIS_IBSS_ALONE_TIMEOUT_SEC 20	   /* seconds */
 
-#define AIS_BEACON_TIMEOUT_COUNT_ADHOC      30
-#define AIS_BEACON_TIMEOUT_COUNT_INFRA      10
-#define AIS_BEACON_TIMEOUT_GUARD_TIME_SEC   1	/* Second */
+#define AIS_BEACON_TIMEOUT_COUNT_ADHOC 30
+#define AIS_BEACON_TIMEOUT_COUNT_INFRA 10
+#define AIS_BEACON_TIMEOUT_GUARD_TIME_SEC 1 /* Second */
 
-#define AIS_BEACON_MAX_TIMEOUT_TU           100
-#define AIS_BEACON_MIN_TIMEOUT_TU           5
-#define AIS_BEACON_MAX_TIMEOUT_VALID        TRUE
-#define AIS_BEACON_MIN_TIMEOUT_VALID        TRUE
+#define AIS_BEACON_MAX_TIMEOUT_TU 100
+#define AIS_BEACON_MIN_TIMEOUT_TU 5
+#define AIS_BEACON_MAX_TIMEOUT_VALID TRUE
+#define AIS_BEACON_MIN_TIMEOUT_VALID TRUE
 
-#define AIS_BMC_MAX_TIMEOUT_TU              100
-#define AIS_BMC_MIN_TIMEOUT_TU              5
-#define AIS_BMC_MAX_TIMEOUT_VALID           TRUE
-#define AIS_BMC_MIN_TIMEOUT_VALID           TRUE
+#define AIS_BMC_MAX_TIMEOUT_TU 100
+#define AIS_BMC_MIN_TIMEOUT_TU 5
+#define AIS_BMC_MAX_TIMEOUT_VALID TRUE
+#define AIS_BMC_MIN_TIMEOUT_VALID TRUE
 
-#define AIS_JOIN_CH_GRANT_THRESHOLD         10
+#define AIS_JOIN_CH_GRANT_THRESHOLD 10
 #if CFG_SUPPORT_CFG80211_AUTH
 /* expand 4000 to 6000 to improve SAE connection success probability */
-#define AIS_JOIN_CH_REQUEST_INTERVAL        6000
+#define AIS_JOIN_CH_REQUEST_INTERVAL 6000
 #else
-#define AIS_JOIN_CH_REQUEST_INTERVAL        4000
+#define AIS_JOIN_CH_REQUEST_INTERVAL 4000
 #endif
 #ifdef CFG_SUPPORT_ADJUST_JOIN_CH_REQ_INTERVAL
-#define AIS_JOIN_CH_REQUEST_MAX_INTERVAL    4000
+#define AIS_JOIN_CH_REQUEST_MAX_INTERVAL 4000
 #endif
 
-#define AIS_SCN_DONE_TIMEOUT_SEC            15 /* 15 for 2.4G + 5G */	/* 5 */
+#define AIS_SCN_DONE_TIMEOUT_SEC 15 /* 15 for 2.4G + 5G */ /* 5 */
 
 /*******************************************************************************
-*                             D A T A   T Y P E S
-********************************************************************************
-*/
+ *                             D A T A   T Y P E S
+ ********************************************************************************
+ */
 typedef enum _ENUM_AIS_STATE_T {
 	AIS_STATE_IDLE = 0,
 	AIS_STATE_SEARCH,
@@ -137,15 +138,15 @@ typedef enum _ENUM_AIS_STATE_T {
 } ENUM_AIS_STATE_T;
 
 typedef struct _MSG_AIS_ABORT_T {
-	MSG_HDR_T rMsgHdr;	/* Must be the first member */
-	UINT_8 ucReasonOfDisconnect;
-	BOOLEAN fgDelayIndication;
+	MSG_HDR_T rMsgHdr; /* Must be the first member */
+	UINT_8	  ucReasonOfDisconnect;
+	BOOLEAN	  fgDelayIndication;
 } MSG_AIS_ABORT_T, *P_MSG_AIS_ABORT_T;
 
 typedef struct _MSG_AIS_IBSS_PEER_FOUND_T {
-	MSG_HDR_T rMsgHdr;	/* Must be the first member */
-	UINT_8 ucBssIndex;
-	BOOLEAN fgIsMergeIn;	/* TRUE: Merge In, FALSE: Merge Out */
+	MSG_HDR_T	   rMsgHdr; /* Must be the first member */
+	UINT_8		   ucBssIndex;
+	BOOLEAN		   fgIsMergeIn; /* TRUE: Merge In, FALSE: Merge Out */
 	P_STA_RECORD_T prStaRec;
 } MSG_AIS_IBSS_PEER_FOUND_T, *P_MSG_AIS_IBSS_PEER_FOUND_T;
 
@@ -159,22 +160,22 @@ typedef enum _ENUM_AIS_REQUEST_TYPE_T {
 } ENUM_AIS_REQUEST_TYPE_T;
 
 typedef struct _AIS_REQ_HDR_T {
-	LINK_ENTRY_T rLinkEntry;
+	LINK_ENTRY_T			rLinkEntry;
 	ENUM_AIS_REQUEST_TYPE_T eReqType;
 } AIS_REQ_HDR_T, *P_AIS_REQ_HDR_T;
 
 typedef struct _AIS_REQ_CHNL_INFO {
-	ENUM_BAND_T eBand;
+	ENUM_BAND_T		eBand;
 	ENUM_CHNL_EXT_T eSco;
-	UINT_8 ucChannelNum;
-	UINT_32 u4DurationMs;
-	UINT_64 u8Cookie;
+	UINT_8			ucChannelNum;
+	UINT_32			u4DurationMs;
+	UINT_64			u8Cookie;
 } AIS_REQ_CHNL_INFO, *P_AIS_REQ_CHNL_INFO;
 
 typedef struct _AIS_MGMT_TX_REQ_INFO_T {
-	BOOLEAN fgIsMgmtTxRequested;
+	BOOLEAN		  fgIsMgmtTxRequested;
 	P_MSDU_INFO_T prMgmtTxMsdu;
-	UINT_64 u8Cookie;
+	UINT_64		  u8Cookie;
 } AIS_MGMT_TX_REQ_INFO_T, *P_AIS_MGMT_TX_REQ_INFO_T;
 
 typedef struct _AIS_FSM_INFO_T {
@@ -189,13 +190,13 @@ typedef struct _AIS_FSM_INFO_T {
 
 #if CFG_SUPPORT_ROAMING
 	BOOLEAN fgIsRoamingScanPending;
-#endif				/* CFG_SUPPORT_ROAMING */
+#endif /* CFG_SUPPORT_ROAMING */
 
-	UINT_8 ucAvailableAuthTypes;	/* Used for AUTH_MODE_AUTO_SWITCH */
+	UINT_8 ucAvailableAuthTypes; /* Used for AUTH_MODE_AUTO_SWITCH */
 
-	P_BSS_DESC_T prTargetBssDesc;	/* For destination */
+	P_BSS_DESC_T prTargetBssDesc; /* For destination */
 
-	P_STA_RECORD_T prTargetStaRec;	/* For JOIN Abort */
+	P_STA_RECORD_T prTargetStaRec; /* For JOIN Abort */
 
 	UINT_32 u4SleepInterval;
 
@@ -225,14 +226,14 @@ typedef struct _AIS_FSM_INFO_T {
 
 	UINT_8 ucConnTrialCount;
 
-	UINT_8 ucScanSSIDNum;
+	UINT_8		 ucScanSSIDNum;
 	PARAM_SSID_T arScanSSID[SCN_SSID_MAX_NUM];
 
 	UINT_32 u4ScanIELength;
-	UINT_8 aucScanIEBuf[MAX_IE_LENGTH];
+	UINT_8	aucScanIEBuf[MAX_IE_LENGTH];
 
 #if CFG_SCAN_CHANNEL_SPECIFIED
-	UINT_8 ucScanChannelListNum;
+	UINT_8			  ucScanChannelListNum;
 	RF_CHANNEL_INFO_T arScanChnlInfoList[MAXIMUM_OPERATION_CHANNEL_LIST];
 #endif
 	UINT_8 fgIsScanOidAborted;
@@ -264,36 +265,36 @@ enum WNM_AIS_BSS_TRANSITION {
 };
 
 typedef struct _MSG_AIS_BSS_TRANSITION_T {
-	MSG_HDR_T rMsgHdr;	/* Must be the first member */
-	UINT_8 ucToken;
-	BOOLEAN fgNeedResponse;
-	UINT_8 ucValidityInterval;
+	MSG_HDR_T					rMsgHdr; /* Must be the first member */
+	UINT_8						ucToken;
+	BOOLEAN						fgNeedResponse;
+	UINT_8						ucValidityInterval;
 	enum WNM_AIS_BSS_TRANSITION eTransitionType;
-	UINT_16 u2CandListLen;
-	PUINT_8 pucCandList;
+	UINT_16						u2CandListLen;
+	PUINT_8						pucCandList;
 } MSG_AIS_BSS_TRANSITION_T, *P_MSG_AIS_BSS_TRANSITION_T;
 
 /*******************************************************************************
-*                            P U B L I C   D A T A
-********************************************************************************
-*/
+ *                            P U B L I C   D A T A
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                           P R I V A T E   D A T A
-********************************************************************************
-*/
+ *                           P R I V A T E   D A T A
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                                 M A C R O S
-********************************************************************************
-*/
+ *                                 M A C R O S
+ ********************************************************************************
+ */
 #define aisChangeMediaState(_prAdapter, _eNewMediaState) \
 	(_prAdapter->prAisBssInfo->eConnectionState = (_eNewMediaState))
 
 /*******************************************************************************
-*                  F U N C T I O N   D E C L A R A T I O N S
-********************************************************************************
-*/
+ *                  F U N C T I O N   D E C L A R A T I O N S
+ ********************************************************************************
+ */
 VOID aisInitializeConnectionSettings(IN P_ADAPTER_T prAdapter, IN P_REG_INFO_T prRegInfo);
 
 VOID aisFsmInit(IN P_ADAPTER_T prAdapter);
@@ -357,9 +358,8 @@ VOID aisFsmReleaseCh(IN P_ADAPTER_T prAdapter);
 /*----------------------------------------------------------------------------*/
 /* Event Indication                                                           */
 /*----------------------------------------------------------------------------*/
-VOID
-aisIndicationOfMediaStateToHost(IN P_ADAPTER_T prAdapter,
-				ENUM_PARAM_MEDIA_STATE_T eConnectionState, BOOLEAN fgDelayIndication);
+VOID aisIndicationOfMediaStateToHost(
+		IN P_ADAPTER_T prAdapter, ENUM_PARAM_MEDIA_STATE_T eConnectionState, BOOLEAN fgDelayIndication);
 
 VOID aisPostponedEventOfDisconnTimeout(IN P_ADAPTER_T prAdapter, ULONG ulParamPtr);
 
@@ -372,8 +372,8 @@ VOID aisUpdateBssInfoForMergeIBSS(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T pr
 BOOLEAN aisValidateProbeReq(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb, OUT PUINT_32 pu4ControlFlags);
 
 WLAN_STATUS
-aisFsmRunEventMgmtFrameTxDone(IN P_ADAPTER_T prAdapter,
-			      IN P_MSDU_INFO_T prMsduInfo, IN ENUM_TX_RESULT_CODE_T rTxDoneStatus);
+aisFsmRunEventMgmtFrameTxDone(
+		IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo, IN ENUM_TX_RESULT_CODE_T rTxDoneStatus);
 
 /*----------------------------------------------------------------------------*/
 /* Disconnection Handling                                                     */
@@ -432,11 +432,8 @@ VOID aisRxMcsCollectionTimeout(IN P_ADAPTER_T prAdapter, ULONG ulParamPtr);
 /*----------------------------------------------------------------------------*/
 VOID aisFsmScanRequest(IN P_ADAPTER_T prAdapter, IN P_PARAM_SSID_T prSsid, IN PUINT_8 pucIe, IN UINT_32 u4IeLength);
 
-VOID
-aisFsmScanRequestAdv(IN P_ADAPTER_T prAdapter,
-	IN UINT_8 ucSsidNum, IN P_PARAM_SSID_T prSsid,
-	IN UINT_8 ucChannelListNum, IN P_RF_CHANNEL_INFO_T prChnlInfoList,
-	IN PUINT_8 pucIe, IN UINT_32 u4IeLength);
+VOID aisFsmScanRequestAdv(IN P_ADAPTER_T prAdapter, IN UINT_8 ucSsidNum, IN P_PARAM_SSID_T prSsid,
+		IN UINT_8 ucChannelListNum, IN P_RF_CHANNEL_INFO_T prChnlInfoList, IN PUINT_8 pucIe, IN UINT_32 u4IeLength);
 
 /*----------------------------------------------------------------------------*/
 /* Internal State Checking                                                    */
@@ -450,16 +447,15 @@ BOOLEAN aisFsmInsertRequest(IN P_ADAPTER_T prAdapter, IN ENUM_AIS_REQUEST_TYPE_T
 VOID aisFsmFlushRequest(IN P_ADAPTER_T prAdapter);
 
 WLAN_STATUS
-aisFuncTxMgmtFrame(IN P_ADAPTER_T prAdapter,
-		   IN P_AIS_MGMT_TX_REQ_INFO_T prMgmtTxReqInfo, IN P_MSDU_INFO_T prMgmtTxMsdu, IN UINT_64 u8Cookie);
+aisFuncTxMgmtFrame(IN P_ADAPTER_T prAdapter, IN P_AIS_MGMT_TX_REQ_INFO_T prMgmtTxReqInfo, IN P_MSDU_INFO_T prMgmtTxMsdu,
+		IN UINT_64 u8Cookie);
 
 VOID aisFsmRunEventMgmtFrameTx(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMsgHdr);
 
 VOID aisFuncValidateRxActionFrame(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb);
 
 #if CFG_SUPPORT_802_11V_BSS_TRANSITION_MGT
-VOID aisFsmRunEventBssTransition(IN P_ADAPTER_T prAdapter,
-				 IN P_MSG_HDR_T prMsgHdr);
+VOID aisFsmRunEventBssTransition(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMsgHdr);
 #endif
 
 #if CFG_SUPPORT_802_11K
@@ -469,8 +465,7 @@ VOID aisSendNeighborRequest(IN P_ADAPTER_T prAdapter);
 #if CFG_SUPPORT_802_11K || CFG_SUPPORT_802_11V_BSS_TRANSITION_MGT
 VOID aisResetNeighborApList(IN P_ADAPTER_T prAdapter);
 
-VOID aisCollectNeighborAP(IN P_ADAPTER_T prAdapter, UINT_8 *pucApBuf,
-			  UINT_16 u2ApBufLen, UINT_8 ucValidInterval);
+VOID aisCollectNeighborAP(IN P_ADAPTER_T prAdapter, UINT_8 *pucApBuf, UINT_16 u2ApBufLen, UINT_8 ucValidInterval);
 #endif
 
 enum _ENUM_AIS_STATE_T aisFsmStateSearchAction(IN struct _ADAPTER_T *prAdapter, UINT_8 ucPhase);
@@ -478,8 +473,8 @@ enum _ENUM_AIS_STATE_T aisFsmStateSearchAction(IN struct _ADAPTER_T *prAdapter, 
 VOID aisTest(VOID);
 #endif /* CFG_TEST_MGMT_FSM */
 /*******************************************************************************
-*                              F U N C T I O N S
-********************************************************************************
-*/
+ *                              F U N C T I O N S
+ ********************************************************************************
+ */
 
 #endif /* _AIS_FSM_H */

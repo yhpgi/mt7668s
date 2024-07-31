@@ -32,9 +32,7 @@
 #include <linux/mmc/sd.h>
 #include <linux/mmc/sdio.h>
 
-
 #include "test_driver_sdio_ops.h"
-
 
 /*
  * Internal function that does the actual ios call to the host driver,
@@ -44,10 +42,8 @@ static inline void mmc_set_ios(struct mmc_host *host)
 {
 	struct mmc_ios *ios = &host->ios;
 
-	pr_debug("%s: clock %uHz busmode %u powermode %u cs %u Vdd %u width %u timing %u\n",
-		 mmc_hostname(host), ios->clock, ios->bus_mode,
-		 ios->power_mode, ios->chip_select, ios->vdd,
-		 ios->bus_width, ios->timing);
+	pr_debug("%s: clock %uHz busmode %u powermode %u cs %u Vdd %u width %u timing %u\n", mmc_hostname(host), ios->clock,
+			ios->bus_mode, ios->power_mode, ios->chip_select, ios->vdd, ios->bus_width, ios->timing);
 
 	host->ops->set_ios(host, ios);
 }
@@ -72,9 +68,9 @@ void mmc_set_clock(struct mmc_host *host, unsigned int hz)
 	if (hz > host->f_max)
 		hz = host->f_max;
 
-	#if 1
+#if 1
 	pr_debug("%s(): %dHz\n", __func__, hz);
-	#endif
+#endif
 
 	host->ios.clock = hz;
 	mmc_set_ios(host);
@@ -117,8 +113,7 @@ u32 mmc_select_voltage(struct mmc_host *host, u32 ocr)
 		host->ios.vdd = bit;
 		mmc_set_ios(host);
 	} else {
-		pr_warn("%s: host doesn't support card's voltages\n",
-				mmc_hostname(host));
+		pr_warn("%s: host doesn't support card's voltages\n", mmc_hostname(host));
 		ocr = 0;
 	}
 
@@ -134,18 +129,17 @@ void mmc_set_timing(struct mmc_host *host, unsigned int timing)
 	mmc_set_ios(host);
 }
 
-
 static void mmc_power_off(struct mmc_host *host)
 {
 	host->ios.clock = 0;
-	host->ios.vdd = 0;
+	host->ios.vdd	= 0;
 	if (!mmc_host_is_spi(host)) {
-		host->ios.bus_mode = MMC_BUSMODE_OPENDRAIN;
+		host->ios.bus_mode	  = MMC_BUSMODE_OPENDRAIN;
 		host->ios.chip_select = MMC_CS_DONTCARE;
 	}
 	host->ios.power_mode = MMC_POWER_OFF;
-	host->ios.bus_width = MMC_BUS_WIDTH_1;
-	host->ios.timing = MMC_TIMING_LEGACY;
+	host->ios.bus_width	 = MMC_BUS_WIDTH_1;
+	host->ios.timing	 = MMC_TIMING_LEGACY;
 	mmc_set_ios(host);
 }
 
@@ -206,7 +200,7 @@ void mmc_attach_bus(struct mmc_host *host, const struct mmc_bus_ops *ops)
 	BUG_ON(host->bus_ops);
 	BUG_ON(host->bus_refs);
 
-	host->bus_ops = ops;
+	host->bus_ops  = ops;
 	host->bus_refs = 1;
 	host->bus_dead = 0;
 
@@ -239,7 +233,7 @@ void mmc_detach_bus(struct mmc_host *host)
 
 int mmc_app_set_bus_width(struct mmc_card *card, int width)
 {
-	int err;
+	int				   err;
 	struct mmc_command cmd;
 
 	BUG_ON(!card);
@@ -248,7 +242,7 @@ int mmc_app_set_bus_width(struct mmc_card *card, int width)
 	memset(&cmd, 0, sizeof(struct mmc_command));
 
 	cmd.opcode = SD_APP_SET_BUS_WIDTH;
-	cmd.flags = MMC_RSP_R1 | MMC_CMD_AC;
+	cmd.flags  = MMC_RSP_R1 | MMC_CMD_AC;
 
 	switch (width) {
 	case MMC_BUS_WIDTH_1:
@@ -271,7 +265,7 @@ int mmc_app_set_bus_width(struct mmc_card *card, int width)
 int mmc_send_app_op_cond(struct mmc_host *host, u32 ocr, u32 *rocr)
 {
 	struct mmc_command cmd;
-	int i, err = 0;
+	int				   i, err = 0;
 
 	BUG_ON(!host);
 
@@ -316,9 +310,9 @@ int mmc_send_app_op_cond(struct mmc_host *host, u32 ocr, u32 *rocr)
 int mmc_send_if_cond(struct mmc_host *host, u32 ocr)
 {
 	struct mmc_command cmd;
-	int err;
-	static const u8 test_pattern = 0xAA;
-	u8 result_pattern;
+	int				   err;
+	static const u8	   test_pattern = 0xAA;
+	u8				   result_pattern;
 
 	/*
 	 * To support SD 2.0 cards, we must always invoke SD_SEND_IF_COND
@@ -326,8 +320,8 @@ int mmc_send_if_cond(struct mmc_host *host, u32 ocr)
 	 * SD 1.0 cards.
 	 */
 	cmd.opcode = SD_SEND_IF_COND;
-	cmd.arg = ((ocr & 0xFF8000) != 0) << 8 | test_pattern;
-	cmd.flags = MMC_RSP_SPI_R7 | MMC_RSP_R7 | MMC_CMD_BCR;
+	cmd.arg	   = ((ocr & 0xFF8000) != 0) << 8 | test_pattern;
+	cmd.flags  = MMC_RSP_SPI_R7 | MMC_RSP_R7 | MMC_CMD_BCR;
 
 	err = mmc_wait_for_cmd(host, &cmd, 0);
 	if (err)
@@ -344,29 +338,23 @@ int mmc_send_if_cond(struct mmc_host *host, u32 ocr)
 	return 0;
 }
 
-
-
 static int sdio_enable_wide(struct mmc_card *card)
 {
 	int ret;
-	u8 ctrl;
+	u8	ctrl;
 
 	if (!(card->host->caps & MMC_CAP_4_BIT_DATA))
 		return 0;
 
-
 	if (card->cccr.low_speed && !card->cccr.wide_bus)
 		return 0;
-
 
 	ret = mmc_io_rw_direct(card, 0, 0, SDIO_CCCR_IF, 0, &ctrl);
 	if (ret)
 		return ret;
 
-
 	if ((ctrl & SDIO_BUS_WIDTH_MASK) == SDIO_BUS_WIDTH_RESERVED)
-		pr_warn("%s: SDIO_CCCR_IF is invalid: 0x%02x\n",
-			mmc_hostname(card->host), ctrl);
+		pr_warn("%s: SDIO_CCCR_IF is invalid: 0x%02x\n", mmc_hostname(card->host), ctrl);
 
 	/* set as 4-bit bus width */
 	ctrl &= ~SDIO_BUS_WIDTH_MASK;
@@ -379,8 +367,6 @@ static int sdio_enable_wide(struct mmc_card *card)
 	return 1;
 }
 
-
-
 /*
  * Devices that remain active during a system suspend are
  * put back into 1-bit mode.
@@ -388,24 +374,20 @@ static int sdio_enable_wide(struct mmc_card *card)
 int sdio_disable_wide(struct mmc_card *card)
 {
 	int ret;
-	u8 ctrl;
+	u8	ctrl;
 
 	if (!(card->host->caps & MMC_CAP_4_BIT_DATA))
 		return 0;
 
-
 	if (card->cccr.low_speed && !card->cccr.wide_bus)
 		return 0;
-
 
 	ret = mmc_io_rw_direct(card, 0, 0, SDIO_CCCR_IF, 0, &ctrl);
 	if (ret)
 		return ret;
 
-
 	if (!(ctrl & SDIO_BUS_WIDTH_4BIT))
 		return 0;
-
 
 	ctrl &= ~SDIO_BUS_WIDTH_4BIT;
 	ctrl |= SDIO_BUS_ASYNC_INT;
@@ -414,12 +396,10 @@ int sdio_disable_wide(struct mmc_card *card)
 	if (ret)
 		return ret;
 
-
 	mmc_set_bus_width(card->host, MMC_BUS_WIDTH_1);
 
 	return 0;
 }
-
 
 int sdio_enable_4bit_bus(struct mmc_card *card)
 {
@@ -428,16 +408,12 @@ int sdio_enable_4bit_bus(struct mmc_card *card)
 	if (card->type == MMC_TYPE_SDIO)
 		return sdio_enable_wide(card);
 
-
-	if ((card->host->caps & MMC_CAP_4_BIT_DATA) &&
-		(card->scr.bus_widths & SD_SCR_BUS_WIDTH_4)) {
-
+	if ((card->host->caps & MMC_CAP_4_BIT_DATA) && (card->scr.bus_widths & SD_SCR_BUS_WIDTH_4)) {
 		err = mmc_app_set_bus_width(card, MMC_BUS_WIDTH_4);
 		if (err)
 			return err;
 	} else
 		return 0;
-
 
 	err = sdio_enable_wide(card);
 	if (err <= 0)

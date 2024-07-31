@@ -54,83 +54,82 @@
 */
 
 /*! \file   p2p_nic.c
-*    \brief  Wi-Fi Direct Functions that provide operation in NIC's (Network Interface Card) point of view.
-*
-*    This file includes functions which unite multiple hal(Hardware) operations
-*    and also take the responsibility of Software Resource Management in order
-*    to keep the synchronization with Hardware Manipulation.
-*/
+ *    \brief  Wi-Fi Direct Functions that provide operation in NIC's (Network Interface Card) point of view.
+ *
+ *    This file includes functions which unite multiple hal(Hardware) operations
+ *    and also take the responsibility of Software Resource Management in order
+ *    to keep the synchronization with Hardware Manipulation.
+ */
 
 /*******************************************************************************
-*                         C O M P I L E R   F L A G S
-********************************************************************************
-*/
+ *                         C O M P I L E R   F L A G S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                    E X T E R N A L   R E F E R E N C E S
-********************************************************************************
-*/
+ *                    E X T E R N A L   R E F E R E N C E S
+ ********************************************************************************
+ */
 
 #include "precomp.h"
 
 /*******************************************************************************
-*                              C O N S T A N T S
-********************************************************************************
-*/
+ *                              C O N S T A N T S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                             D A T A   T Y P E S
-********************************************************************************
-*/
+ *                             D A T A   T Y P E S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                            P U B L I C   D A T A
-********************************************************************************
-*/
+ *                            P U B L I C   D A T A
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                           P R I V A T E   D A T A
-********************************************************************************
-*/
+ *                           P R I V A T E   D A T A
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                                 M A C R O S
-********************************************************************************
-*/
+ *                                 M A C R O S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                   F U N C T I O N   D E C L A R A T I O N S
-********************************************************************************
-*/
+ *                   F U N C T I O N   D E C L A R A T I O N S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                              F U N C T I O N S
-********************************************************************************
-*/
+ *                              F U N C T I O N S
+ ********************************************************************************
+ */
 
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief When Probe Rsp & Beacon frame is received and decide a P2P device,
-*        this function will be invoked to buffer scan result
-*
-* @param prAdapter              Pointer to the Adapter structure.
-* @param prEventScanResult      Pointer of EVENT_SCAN_RESULT_T.
-*
-* @return (none)
-*/
+ * @brief When Probe Rsp & Beacon frame is received and decide a P2P device,
+ *        this function will be invoked to buffer scan result
+ *
+ * @param prAdapter              Pointer to the Adapter structure.
+ * @param prEventScanResult      Pointer of EVENT_SCAN_RESULT_T.
+ *
+ * @return (none)
+ */
 /*----------------------------------------------------------------------------*/
-VOID
-nicRxAddP2pDevice(IN P_ADAPTER_T prAdapter,
-		  IN P_EVENT_P2P_DEV_DISCOVER_RESULT_T prP2pResult, IN PUINT_8 pucRxIEBuf, IN UINT_16 u2RxIELength)
+VOID nicRxAddP2pDevice(IN P_ADAPTER_T prAdapter, IN P_EVENT_P2P_DEV_DISCOVER_RESULT_T prP2pResult,
+		IN PUINT_8 pucRxIEBuf, IN UINT_16 u2RxIELength)
 {
-	P_P2P_INFO_T prP2pInfo = (P_P2P_INFO_T) NULL;
-	P_EVENT_P2P_DEV_DISCOVER_RESULT_T prTargetResult = (P_EVENT_P2P_DEV_DISCOVER_RESULT_T) NULL;
-	UINT_32 u4Idx = 0;
-	BOOLEAN bUpdate = FALSE;
+	P_P2P_INFO_T					  prP2pInfo		 = (P_P2P_INFO_T)NULL;
+	P_EVENT_P2P_DEV_DISCOVER_RESULT_T prTargetResult = (P_EVENT_P2P_DEV_DISCOVER_RESULT_T)NULL;
+	UINT_32							  u4Idx			 = 0;
+	BOOLEAN							  bUpdate		 = FALSE;
 
-	PUINT_8 pucIeBuf = (PUINT_8) NULL;
+	PUINT_8 pucIeBuf   = (PUINT_8)NULL;
 	UINT_16 u2IELength = 0;
-	UINT_8 zeroMac[] = { 0x0, 0x0, 0x0, 0x0, 0x0, 0x0 };
+	UINT_8	zeroMac[]  = { 0x0, 0x0, 0x0, 0x0, 0x0, 0x0 };
 
 	ASSERT(prAdapter);
 
@@ -143,7 +142,7 @@ nicRxAddP2pDevice(IN P_ADAPTER_T prAdapter,
 			bUpdate = TRUE;
 
 			/* Backup OLD buffer result. */
-			pucIeBuf = prTargetResult->pucIeBuf;
+			pucIeBuf   = prTargetResult->pucIeBuf;
 			u2IELength = prTargetResult->u2IELength;
 
 			/* Update Device Info. */
@@ -151,7 +150,7 @@ nicRxAddP2pDevice(IN P_ADAPTER_T prAdapter,
 			kalMemZero(prTargetResult, sizeof(EVENT_P2P_DEV_DISCOVER_RESULT_T));
 
 			/* then buffer */
-			kalMemCopy(prTargetResult, (PVOID) prP2pResult, sizeof(EVENT_P2P_DEV_DISCOVER_RESULT_T));
+			kalMemCopy(prTargetResult, (PVOID)prP2pResult, sizeof(EVENT_P2P_DEV_DISCOVER_RESULT_T));
 
 			/* See if new IE length is longer or not. */
 			if ((u2RxIELength > u2IELength) && (u2IELength != 0)) {
@@ -162,17 +161,15 @@ nicRxAddP2pDevice(IN P_ADAPTER_T prAdapter,
 				ASSERT(pucIeBuf == NULL);
 				pucIeBuf = prP2pInfo->pucCurrIePtr;
 
-				if (((ULONG) prP2pInfo->pucCurrIePtr + (ULONG) u2RxIELength) >
-				    (ULONG)&prP2pInfo->aucCommIePool[CFG_MAX_COMMON_IE_BUF_LEN]) {
+				if (((ULONG)prP2pInfo->pucCurrIePtr + (ULONG)u2RxIELength) >
+						(ULONG)&prP2pInfo->aucCommIePool[CFG_MAX_COMMON_IE_BUF_LEN]) {
 					/* Common Buffer is no enough. */
-					u2RxIELength =
-					    (UINT_16) ((ULONG)&prP2pInfo->aucCommIePool[CFG_MAX_COMMON_IE_BUF_LEN] -
-						       (ULONG) prP2pInfo->pucCurrIePtr);
+					u2RxIELength = (UINT_16)((ULONG)&prP2pInfo->aucCommIePool[CFG_MAX_COMMON_IE_BUF_LEN] -
+											 (ULONG)prP2pInfo->pucCurrIePtr);
 				}
 
 				/* Step to next buffer address. */
-				prP2pInfo->pucCurrIePtr =
-				    (PUINT_8) ((ULONG) prP2pInfo->pucCurrIePtr + (ULONG) u2RxIELength);
+				prP2pInfo->pucCurrIePtr = (PUINT_8)((ULONG)prP2pInfo->pucCurrIePtr + (ULONG)u2RxIELength);
 			}
 
 			/* Restore buffer pointer. */
@@ -202,7 +199,7 @@ nicRxAddP2pDevice(IN P_ADAPTER_T prAdapter,
 			kalMemZero(prTargetResult, sizeof(EVENT_P2P_DEV_DISCOVER_RESULT_T));
 
 			/* then buffer */
-			kalMemCopy(prTargetResult, (PVOID) prP2pResult, sizeof(EVENT_P2P_DEV_DISCOVER_RESULT_T));
+			kalMemCopy(prTargetResult, (PVOID)prP2pResult, sizeof(EVENT_P2P_DEV_DISCOVER_RESULT_T));
 
 			/* printk("DVC FND %d " MACSTR", " MACSTR "\n",
 			 * prP2pInfo->u4DeviceNum, MAC2STR(prP2pResult->aucDeviceAddr),
@@ -212,23 +209,21 @@ nicRxAddP2pDevice(IN P_ADAPTER_T prAdapter,
 			if (u2RxIELength) {
 				prTargetResult->pucIeBuf = prP2pInfo->pucCurrIePtr;
 
-				if (((ULONG) prP2pInfo->pucCurrIePtr + (ULONG) u2RxIELength) >
-				    (ULONG)&prP2pInfo->aucCommIePool[CFG_MAX_COMMON_IE_BUF_LEN]) {
+				if (((ULONG)prP2pInfo->pucCurrIePtr + (ULONG)u2RxIELength) >
+						(ULONG)&prP2pInfo->aucCommIePool[CFG_MAX_COMMON_IE_BUF_LEN]) {
 					/* Common Buffer is no enough. */
-					u2IELength =
-					    (UINT_16) ((ULONG)&prP2pInfo->aucCommIePool[CFG_MAX_COMMON_IE_BUF_LEN] -
-						       (ULONG) prP2pInfo->pucCurrIePtr);
+					u2IELength = (UINT_16)((ULONG)&prP2pInfo->aucCommIePool[CFG_MAX_COMMON_IE_BUF_LEN] -
+										   (ULONG)prP2pInfo->pucCurrIePtr);
 				} else {
 					u2IELength = u2RxIELength;
 				}
 
-				prP2pInfo->pucCurrIePtr =
-				    (PUINT_8) ((ULONG) prP2pInfo->pucCurrIePtr + (ULONG) u2IELength);
+				prP2pInfo->pucCurrIePtr = (PUINT_8)((ULONG)prP2pInfo->pucCurrIePtr + (ULONG)u2IELength);
 
-				kalMemCopy((PVOID) prTargetResult->pucIeBuf, (PVOID) pucRxIEBuf, (UINT_32) u2IELength);
+				kalMemCopy((PVOID)prTargetResult->pucIeBuf, (PVOID)pucRxIEBuf, (UINT_32)u2IELength);
 				prTargetResult->u2IELength = u2IELength;
 			} else {
-				prTargetResult->pucIeBuf = NULL;
+				prTargetResult->pucIeBuf   = NULL;
 				prTargetResult->u2IELength = 0;
 			}
 
@@ -239,4 +234,4 @@ nicRxAddP2pDevice(IN P_ADAPTER_T prAdapter,
 			ASSERT(FALSE);
 		}
 	}
-}				/* nicRxAddP2pDevice */
+} /* nicRxAddP2pDevice */

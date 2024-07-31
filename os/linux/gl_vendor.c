@@ -56,14 +56,14 @@
 */
 
 /*******************************************************************************
-*                         C O M P I L E R   F L A G S
-********************************************************************************
-*/
+ *                         C O M P I L E R   F L A G S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                    E X T E R N A L   R E F E R E N C E S
-********************************************************************************
-*/
+ *                    E X T E R N A L   R E F E R E N C E S
+ ********************************************************************************
+ */
 #include "gl_os.h"
 #include "debug.h"
 #include "wlan_lib.h"
@@ -77,45 +77,45 @@
 #include "wlan_oid.h"
 
 /*******************************************************************************
-*                              C O N S T A N T S
-********************************************************************************
-*/
+ *                              C O N S T A N T S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                             D A T A   T Y P E S
-********************************************************************************
-*/
+ *                             D A T A   T Y P E S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                            P U B L I C   D A T A
-********************************************************************************
-*/
+ *                            P U B L I C   D A T A
+ ********************************************************************************
+ */
 
 P_SW_RFB_T g_arGscnResultsTempBuffer[MAX_BUFFERED_GSCN_RESULTS];
-UINT_8 g_GscanResultsTempBufferIndex;
-UINT_8 g_arGscanResultsIndicateNumber[MAX_BUFFERED_GSCN_RESULTS] = { 0, 0, 0, 0, 0 };
+UINT_8	   g_GscanResultsTempBufferIndex;
+UINT_8	   g_arGscanResultsIndicateNumber[MAX_BUFFERED_GSCN_RESULTS] = { 0, 0, 0, 0, 0 };
 
 extern struct wireless_dev *gprWdev;
 
 /*******************************************************************************
-*                           P R I V A T E   D A T A
-********************************************************************************
-*/
+ *                           P R I V A T E   D A T A
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                                 M A C R O S
-********************************************************************************
-*/
+ *                                 M A C R O S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                   F U N C T I O N   D E C L A R A T I O N S
-********************************************************************************
-*/
+ *                   F U N C T I O N   D E C L A R A T I O N S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                              F U N C T I O N S
-********************************************************************************
-*/
+ *                              F U N C T I O N S
+ ********************************************************************************
+ */
 #if KERNEL_VERSION(3, 17, 0) <= CFG80211_VERSION_CODE
 
 int mtk_cfg80211_NLA_PUT(struct sk_buff *skb, int attrtype, int attrlen, const void *data)
@@ -127,7 +127,7 @@ int mtk_cfg80211_NLA_PUT(struct sk_buff *skb, int attrtype, int attrlen, const v
 
 int mtk_cfg80211_nla_put_type(struct sk_buff *skb, ENUM_NLA_PUT_DATE_TYPE type, int attrtype, const void *value)
 {
-	u8 u8data = 0;
+	u8	u8data	= 0;
 	u16 u16data = 0;
 	u32 u32data = 0;
 	u64 u64data = 0;
@@ -289,8 +289,8 @@ int mtk_cfg80211_vendor_set_config(struct wiphy *wiphy, struct wireless_dev *wde
 					prWifiScanCmd->buckets[i].num_channels = nla_get_u32(attr[k]);
 					len_bucket += NLA_ALIGN(attr[k]->nla_len);
 					DBGLOG(REQ, TRACE,
-					       "bucket%d: attr=0x%x, num_channels=%d nla_len=%d\r\n",
-					       i, *(UINT_32 *) attr[k], nla_get_u32(attr[k]), attr[k]->nla_len);
+							"bucket%d: attr=0x%x, num_channels=%d nla_len=%d\r\n",
+							i, *(UINT_32 *) attr[k], nla_get_u32(attr[k]), attr[k]->nla_len);
 					break;
 				}
 			}
@@ -330,8 +330,8 @@ int mtk_cfg80211_vendor_set_config(struct wiphy *wiphy, struct wireless_dev *wde
 	ASSERT(prGlueInfo);
 
 	rStatus = kalIoctl(prGlueInfo,
-			   wlanoidSetGSCNAParam,
-			   prWifiScanCmd, sizeof(PARAM_WIFI_GSCAN_CMD_PARAMS), FALSE, FALSE, TRUE, &u4BufLen);
+				wlanoidSetGSCNAParam,
+				prWifiScanCmd, sizeof(PARAM_WIFI_GSCAN_CMD_PARAMS), FALSE, FALSE, TRUE, &u4BufLen);
 
 	return 0;
 
@@ -387,14 +387,14 @@ int mtk_cfg80211_vendor_set_scan_config(struct wiphy *wiphy, struct wireless_dev
 		*(UINT_32 *)attr[GSCAN_ATTRIBUTE_REPORT_THRESHOLD]);
 
 	DBGLOG(REQ, TRACE, "max_ap_per_scan=%d, report_threshold=%d num_scans=%d\r\n",
-	       rWifiScanCmd.max_ap_per_scan, rWifiScanCmd.report_threshold, rWifiScanCmd.num_scans);
+			rWifiScanCmd.max_ap_per_scan, rWifiScanCmd.report_threshold, rWifiScanCmd.num_scans);
 
 	prGlueInfo = (P_GLUE_INFO_T) wiphy_priv(wiphy);
 	ASSERT(prGlueInfo);
 
 	rStatus = kalIoctl(prGlueInfo,
-			   wlanoidSetGSCNAConfig,
-			   &rWifiScanCmd, sizeof(PARAM_WIFI_GSCAN_CMD_PARAMS), FALSE, FALSE, TRUE, &u4BufLen);
+				wlanoidSetGSCNAConfig,
+				&rWifiScanCmd, sizeof(PARAM_WIFI_GSCAN_CMD_PARAMS), FALSE, FALSE, TRUE, &u4BufLen);
 
 	return 0;
 
@@ -403,7 +403,7 @@ nla_put_failure:
 }
 
 int mtk_cfg80211_vendor_set_significant_change(struct wiphy *wiphy, struct wireless_dev *wdev,
-					       const void *data, int data_len)
+							const void *data, int data_len)
 {
 	PARAM_WIFI_SIGNIFICANT_CHANGE rWifiChangeCmd;
 	UINT_8 flush = 0;
@@ -636,7 +636,7 @@ int mtk_cfg80211_vendor_enable_scan(struct wiphy *wiphy, struct wireless_dev *wd
 	if ((data == NULL) || !data_len)
 		goto nla_put_failure;
 	DBGLOG(REQ, INFO, "%s for vendor command: data_len=%d, data=0x%x 0x%x\r\n",
-	       __func__, data_len, *((UINT_32 *) data), *((UINT_32 *) data + 1));
+			__func__, data_len, *((UINT_32 *) data), *((UINT_32 *) data + 1));
 
 	attr = (struct nlattr *)data;
 	if (attr->nla_type == GSCAN_ATTRIBUTE_ENABLE_FEATURE)
@@ -651,9 +651,9 @@ int mtk_cfg80211_vendor_enable_scan(struct wiphy *wiphy, struct wireless_dev *wd
 		rWifiScanActionCmd.ucPscanAct = DISABLE;
 
 	rStatus = kalIoctl(prGlueInfo,
-			   wlanoidSetGSCNAction,
-			   &rWifiScanActionCmd,
-			   sizeof(PARAM_WIFI_GSCAN_ACTION_CMD_PARAMS), FALSE, FALSE, TRUE, &u4BufLen);
+				wlanoidSetGSCNAction,
+				&rWifiScanActionCmd,
+				sizeof(PARAM_WIFI_GSCAN_ACTION_CMD_PARAMS), FALSE, FALSE, TRUE, &u4BufLen);
 
 	/* mtk_cfg80211_vendor_get_scan_results(wiphy, wdev, data, data_len ); */
 
@@ -664,7 +664,7 @@ nla_put_failure:
 }
 
 int mtk_cfg80211_vendor_enable_full_scan_results(struct wiphy *wiphy, struct wireless_dev *wdev,
-						 const void *data, int data_len)
+						const void *data, int data_len)
 {
 	struct nlattr *attr;
 	UINT_8 gFullScanResultsEn = 0;
@@ -674,7 +674,7 @@ int mtk_cfg80211_vendor_enable_full_scan_results(struct wiphy *wiphy, struct wir
 	if ((data == NULL) || !data_len)
 		goto nla_put_failure;
 	DBGLOG(REQ, INFO, "%s for vendor command: data_len=%d, data=0x%x 0x%x\r\n",
-	       __func__, data_len, *((UINT_32 *) data), *((UINT_32 *) data + 1));
+			__func__, data_len, *((UINT_32 *) data), *((UINT_32 *) data + 1));
 
 	attr = (struct nlattr *)data;
 	if (attr->nla_type == GSCAN_ENABLE_FULL_SCAN_RESULTS)
@@ -743,99 +743,94 @@ nla_put_failure:
 }
 #endif
 int mtk_cfg80211_vendor_get_channel_list(struct wiphy *wiphy, struct wireless_dev *wdev, const void *data, int data_len)
-	{
-		P_GLUE_INFO_T prGlueInfo;
-		struct nlattr *attr;
-		UINT_32 band = 0;
-		UINT_8 ucNumOfChannel, i, j;
-		RF_CHANNEL_INFO_T aucChannelList[MAX_CHN_NUM];
-		UINT_32 num_channels;
-		wifi_channel channels[MAX_CHN_NUM];
-		struct sk_buff *skb;
+{
+	P_GLUE_INFO_T	  prGlueInfo;
+	struct nlattr	  *attr;
+	UINT_32			  band = 0;
+	UINT_8			  ucNumOfChannel, i, j;
+	RF_CHANNEL_INFO_T aucChannelList[MAX_CHN_NUM];
+	UINT_32			  num_channels;
+	wifi_channel	  channels[MAX_CHN_NUM];
+	struct sk_buff   *skb;
 
-		ASSERT(wiphy && wdev);
-		if ((data == NULL) || !data_len)
-			return -EINVAL;
+	ASSERT(wiphy && wdev);
+	if ((data == NULL) || !data_len)
+		return -EINVAL;
 
-		DBGLOG(REQ, INFO, "vendor command: data_len=%d\n", data_len);
+	DBGLOG(REQ, INFO, "vendor command: data_len=%d\n", data_len);
 
-		attr = (struct nlattr *)data;
-		if (attr->nla_type == WIFI_ATTRIBUTE_BAND)
-			band = nla_get_u32(attr);
+	attr = (struct nlattr *)data;
+	if (attr->nla_type == WIFI_ATTRIBUTE_BAND)
+		band = nla_get_u32(attr);
 
-		DBGLOG(REQ, INFO, "Get channel list for band: %d\n", band);
+	DBGLOG(REQ, INFO, "Get channel list for band: %d\n", band);
 
-		if (wlanGetWirelessDevice() == wdev)
-			prGlueInfo = (P_GLUE_INFO_T) wiphy_priv(wiphy);
-		else {
-			prGlueInfo = *((P_GLUE_INFO_T *) wiphy_priv(wiphy));
-		}
+	if (wlanGetWirelessDevice() == wdev)
+		prGlueInfo = (P_GLUE_INFO_T)wiphy_priv(wiphy);
+	else {
+		prGlueInfo = *((P_GLUE_INFO_T *)wiphy_priv(wiphy));
+	}
 
-		if (!prGlueInfo)
-			return -EFAULT;
+	if (!prGlueInfo)
+		return -EFAULT;
 
-		if (prGlueInfo->u4ReadyFlag == 0) {
-			DBGLOG(REQ, WARN, "driver is not ready\n");
-			return -EFAULT;
-		}
-
-		if (band == 0) { /* 2.4G band */
-			rlmDomainGetChnlList(prGlueInfo->prAdapter, BAND_2G4, TRUE,
-					 MAX_CHN_NUM, &ucNumOfChannel, aucChannelList);
-		} else { /* 5G band */
-			rlmDomainGetChnlList(prGlueInfo->prAdapter, BAND_5G, TRUE,
-					 MAX_CHN_NUM, &ucNumOfChannel, aucChannelList);
-		}
-
-		kalMemZero(channels, sizeof(channels));
-		for (i = 0, j = 0; i < ucNumOfChannel; i++) {
-			/* We need to report frequency list to HAL */
-			channels[j] = nicChannelNum2Freq(aucChannelList[i].ucChannelNum) / 1000;
-			if (channels[j] == 0)
-				continue;
-			else if ((prGlueInfo->prAdapter->rWifiVar.rConnSettings.u2CountryCode == COUNTRY_CODE_TW) &&
-				(channels[j] >= 5180 && channels[j] <= 5260)) {
-				/* Taiwan NCC has resolution to follow FCC spec to support 5G Band 1/2/3/4
-				 * (CH36~CH48, CH52~CH64, CH100~CH140, CH149~CH165)
-				 * Filter CH36~CH52 for compatible with some old devices.
-				 */
-				continue;
-			} else {
-				DBGLOG(REQ, INFO, "channels[%d] = %d\n", j, channels[j]);
-				j++;
-			}
-		}
-		num_channels = j;
-
-		skb = cfg80211_vendor_cmd_alloc_reply_skb(wiphy, sizeof(channels));
-		if (!skb) {
-			DBGLOG(REQ, ERROR, "Allocate skb failed\n");
-			return -ENOMEM;
-		}
-
-		if (unlikely(nla_put_u32(skb, WIFI_ATTRIBUTE_NUM_CHANNELS, num_channels) < 0))
-			goto nla_put_failure;
-
-		if (unlikely(nla_put(skb, WIFI_ATTRIBUTE_CHANNEL_LIST,
-			(sizeof(wifi_channel) * num_channels), channels) < 0))
-			goto nla_put_failure;
-
-		return cfg80211_vendor_cmd_reply(skb);
-
-nla_put_failure:
-		kfree_skb(skb);
+	if (prGlueInfo->u4ReadyFlag == 0) {
+		DBGLOG(REQ, WARN, "driver is not ready\n");
 		return -EFAULT;
 	}
 
+	if (band == 0) { /* 2.4G band */
+		rlmDomainGetChnlList(prGlueInfo->prAdapter, BAND_2G4, TRUE, MAX_CHN_NUM, &ucNumOfChannel, aucChannelList);
+	} else { /* 5G band */
+		rlmDomainGetChnlList(prGlueInfo->prAdapter, BAND_5G, TRUE, MAX_CHN_NUM, &ucNumOfChannel, aucChannelList);
+	}
 
+	kalMemZero(channels, sizeof(channels));
+	for (i = 0, j = 0; i < ucNumOfChannel; i++) {
+		/* We need to report frequency list to HAL */
+		channels[j] = nicChannelNum2Freq(aucChannelList[i].ucChannelNum) / 1000;
+		if (channels[j] == 0)
+			continue;
+		else if ((prGlueInfo->prAdapter->rWifiVar.rConnSettings.u2CountryCode == COUNTRY_CODE_TW) &&
+				 (channels[j] >= 5180 && channels[j] <= 5260)) {
+			/* Taiwan NCC has resolution to follow FCC spec to support 5G Band 1/2/3/4
+			 * (CH36~CH48, CH52~CH64, CH100~CH140, CH149~CH165)
+			 * Filter CH36~CH52 for compatible with some old devices.
+			 */
+			continue;
+		} else {
+			DBGLOG(REQ, INFO, "channels[%d] = %d\n", j, channels[j]);
+			j++;
+		}
+	}
+	num_channels = j;
+
+	skb = cfg80211_vendor_cmd_alloc_reply_skb(wiphy, sizeof(channels));
+	if (!skb) {
+		DBGLOG(REQ, ERROR, "Allocate skb failed\n");
+		return -ENOMEM;
+	}
+
+	if (unlikely(nla_put_u32(skb, WIFI_ATTRIBUTE_NUM_CHANNELS, num_channels) < 0))
+		goto nla_put_failure;
+
+	if (unlikely(nla_put(skb, WIFI_ATTRIBUTE_CHANNEL_LIST, (sizeof(wifi_channel) * num_channels), channels) < 0))
+		goto nla_put_failure;
+
+	return cfg80211_vendor_cmd_reply(skb);
+
+nla_put_failure:
+	kfree_skb(skb);
+	return -EFAULT;
+}
 
 int mtk_cfg80211_vendor_set_country_code(struct wiphy *wiphy, struct wireless_dev *wdev, const void *data, int data_len)
 {
-	P_GLUE_INFO_T prGlueInfo;
-	WLAN_STATUS rStatus;
-	UINT_32 u4BufLen;
+	P_GLUE_INFO_T  prGlueInfo;
+	WLAN_STATUS	   rStatus;
+	UINT_32		   u4BufLen;
 	struct nlattr *attr;
-	UINT_8 country[2];
+	UINT_8		   country[2];
 
 	ASSERT(wiphy && wdev);
 	if ((data == NULL) || (data_len == 0))
@@ -856,9 +851,9 @@ int mtk_cfg80211_vendor_set_country_code(struct wiphy *wiphy, struct wireless_de
 	DBGLOG(REQ, INFO, "Set country code: %c%c\n", country[0], country[1]);
 
 	if (wlanGetWirelessDevice() == wdev)
-		prGlueInfo = (P_GLUE_INFO_T) wiphy_priv(wiphy);
+		prGlueInfo = (P_GLUE_INFO_T)wiphy_priv(wiphy);
 	else {
-		prGlueInfo = *((P_GLUE_INFO_T *) wiphy_priv(wiphy));
+		prGlueInfo = *((P_GLUE_INFO_T *)wiphy_priv(wiphy));
 	}
 
 	if (!prGlueInfo)
@@ -878,16 +873,14 @@ int mtk_cfg80211_vendor_set_country_code(struct wiphy *wiphy, struct wireless_de
 	return 0;
 }
 
-int mtk_cfg80211_vendor_get_version(struct wiphy *wiphy,
-                    struct wireless_dev *wdev,
-                    const void *data, int data_len)
+int mtk_cfg80211_vendor_get_version(struct wiphy *wiphy, struct wireless_dev *wdev, const void *data, int data_len)
 {
-	P_GLUE_INFO_T prGlueInfo = NULL;
-	struct sk_buff *skb = NULL;
-	struct nlattr *attrlist = NULL;
-	char aucVersionBuf[256];
-	uint16_t u2CopySize = 0;
-	uint16_t u2Len = 0;
+	P_GLUE_INFO_T	  prGlueInfo = NULL;
+	struct sk_buff   *skb		 = NULL;
+	struct nlattr	  *attrlist	 = NULL;
+	char			  aucVersionBuf[256];
+	uint16_t		  u2CopySize = 0;
+	uint16_t		  u2Len		 = 0;
 	P_WIFI_VER_INFO_T prVerInfo;
 
 	ASSERT(wiphy);
@@ -897,7 +890,7 @@ int mtk_cfg80211_vendor_get_version(struct wiphy *wiphy,
 		return -ENOMEM;
 
 	kalMemZero(aucVersionBuf, 256);
-	attrlist = (struct nlattr *)((uint8_t *) data);
+	attrlist = (struct nlattr *)((uint8_t *)data);
 	if (attrlist->nla_type == LOGGER_ATTRIBUTE_DRIVER_VER) {
 		char aucDriverVersionStr[] = NIC_DRIVER_VERSION_STRING "_2024062603000003";
 
@@ -906,21 +899,18 @@ int mtk_cfg80211_vendor_get_version(struct wiphy *wiphy,
 		u2CopySize = (u2Len >= 256) ? 255 : u2Len;
 
 		if (u2CopySize > 0)
-			kalMemCopy(aucVersionBuf, &aucDriverVersionStr[0],
-					u2CopySize);
+			kalMemCopy(aucVersionBuf, &aucDriverVersionStr[0], u2CopySize);
 
 	} else if (attrlist->nla_type == LOGGER_ATTRIBUTE_FW_VER) {
 		P_ADAPTER_T prAdapter;
 
-		prGlueInfo = (P_GLUE_INFO_T) wiphy_priv(wiphy);
+		prGlueInfo = (P_GLUE_INFO_T)wiphy_priv(wiphy);
 		ASSERT(prGlueInfo);
 		prAdapter = prGlueInfo->prAdapter;
 		if (prAdapter) {
 			u2CopySize = 16;
-			prVerInfo = &prAdapter->rVerInfo;
-			kalStrnCpy(aucVersionBuf,
-						prVerInfo->rPatchHeader.aucBuildDate,
-						u2CopySize);
+			prVerInfo  = &prAdapter->rVerInfo;
+			kalStrnCpy(aucVersionBuf, prVerInfo->rPatchHeader.aucBuildDate, u2CopySize);
 			aucVersionBuf[u2CopySize] = '\0';
 		}
 	}
@@ -945,20 +935,20 @@ nla_put_failure:
 	return -EFAULT;
 }
 
-int mtk_cfg80211_vendor_get_supported_feature_set(struct wiphy *wiphy,
-		struct wireless_dev *wdev, const void *data, int data_len)
+int mtk_cfg80211_vendor_get_supported_feature_set(
+		struct wiphy *wiphy, struct wireless_dev *wdev, const void *data, int data_len)
 {
-	uint32_t u4FeatureSet;
-	P_GLUE_INFO_T prGlueInfo;
+	uint32_t		u4FeatureSet;
+	P_GLUE_INFO_T	prGlueInfo;
 	struct sk_buff *skb;
 
 	ASSERT(wiphy);
 	ASSERT(wdev);
 
-	if (wdev == gprWdev)	/* wlan0 */
-		prGlueInfo = (P_GLUE_INFO_T) wiphy_priv(wiphy);
+	if (wdev == gprWdev) /* wlan0 */
+		prGlueInfo = (P_GLUE_INFO_T)wiphy_priv(wiphy);
 	else
-		prGlueInfo = *((P_GLUE_INFO_T *) wiphy_priv(wiphy));
+		prGlueInfo = *((P_GLUE_INFO_T *)wiphy_priv(wiphy));
 
 	if (!prGlueInfo)
 		return -EFAULT;
@@ -976,8 +966,7 @@ int mtk_cfg80211_vendor_get_supported_feature_set(struct wiphy *wiphy,
 		return -ENOMEM;
 	}
 
-	if (unlikely(
-	    nla_put_nohdr(skb, sizeof(u4FeatureSet), &u4FeatureSet) < 0)) {
+	if (unlikely(nla_put_nohdr(skb, sizeof(u4FeatureSet), &u4FeatureSet) < 0)) {
 		DBGLOG(REQ, ERROR, "nla_put_nohdr failed\n");
 		goto nla_put_failure;
 	}
@@ -990,7 +979,6 @@ nla_put_failure:
 	kfree_skb(skb);
 	return -EFAULT;
 }
-
 
 #if 0
 int mtk_cfg80211_vendor_llstats_get_info(struct wiphy *wiphy, struct wireless_dev *wdev, const void *data, int data_len)
@@ -1123,8 +1111,8 @@ int mtk_cfg80211_vendor_event_full_scan_results(struct wiphy *wiphy, struct wire
 }
 
 int mtk_cfg80211_vendor_event_significant_change_results(struct wiphy *wiphy,
-							 struct wireless_dev *wdev,
-							 P_PARAM_WIFI_CHANGE_RESULT pdata, UINT_32 data_len)
+							struct wireless_dev *wdev,
+							P_PARAM_WIFI_CHANGE_RESULT pdata, UINT_32 data_len)
 {
 	struct sk_buff *skb;
 	PARAM_WIFI_CHANGE_RESULT result[2], *presult;
@@ -1134,7 +1122,7 @@ int mtk_cfg80211_vendor_event_significant_change_results(struct wiphy *wiphy,
 	DBGLOG(REQ, INFO, "%s for vendor command\r\n", __func__);
 
 	skb = cfg80211_vendor_event_alloc(wiphy, sizeof(PARAM_WIFI_CHANGE_RESULT),
-					  GSCAN_EVENT_SIGNIFICANT_CHANGE_RESULTS, GFP_KERNEL);
+					GSCAN_EVENT_SIGNIFICANT_CHANGE_RESULTS, GFP_KERNEL);
 	if (!skb) {
 		DBGLOG(REQ, ERROR, "%s allocate skb failed\n", __func__);
 		return -ENOMEM;
@@ -1148,7 +1136,7 @@ int mtk_cfg80211_vendor_event_significant_change_results(struct wiphy *wiphy,
 }
 
 int mtk_cfg80211_vendor_event_hotlist_ap_found(struct wiphy *wiphy, struct wireless_dev *wdev,
-					       P_PARAM_WIFI_GSCAN_RESULT pdata, UINT_32 data_len)
+							P_PARAM_WIFI_GSCAN_RESULT pdata, UINT_32 data_len)
 {
 	struct sk_buff *skb;
 	PARAM_WIFI_GSCAN_RESULT result[2], *presult;
@@ -1158,7 +1146,7 @@ int mtk_cfg80211_vendor_event_hotlist_ap_found(struct wiphy *wiphy, struct wirel
 	DBGLOG(REQ, INFO, "%s for vendor command\r\n", __func__);
 
 	skb = cfg80211_vendor_event_alloc(wiphy, sizeof(PARAM_WIFI_GSCAN_RESULT),
-					 GSCAN_EVENT_HOTLIST_RESULTS_FOUND, GFP_KERNEL);
+					GSCAN_EVENT_HOTLIST_RESULTS_FOUND, GFP_KERNEL);
 	if (!skb) {
 		DBGLOG(REQ, ERROR, "%s allocate skb failed\n", __func__);
 		return -ENOMEM;
@@ -1172,7 +1160,7 @@ int mtk_cfg80211_vendor_event_hotlist_ap_found(struct wiphy *wiphy, struct wirel
 }
 
 int mtk_cfg80211_vendor_event_hotlist_ap_lost(struct wiphy *wiphy, struct wireless_dev *wdev,
-					      P_PARAM_WIFI_GSCAN_RESULT pdata, UINT_32 data_len)
+							P_PARAM_WIFI_GSCAN_RESULT pdata, UINT_32 data_len)
 {
 	struct sk_buff *skb;
 	PARAM_WIFI_GSCAN_RESULT result[2], *presult;
@@ -1182,7 +1170,7 @@ int mtk_cfg80211_vendor_event_hotlist_ap_lost(struct wiphy *wiphy, struct wirele
 	DBGLOG(REQ, INFO, "%s for vendor command\r\n", __func__);
 
 	skb = cfg80211_vendor_event_alloc(wiphy, sizeof(PARAM_WIFI_GSCAN_RESULT),
-					  GSCAN_EVENT_HOTLIST_RESULTS_LOST, GFP_KERNEL);
+					GSCAN_EVENT_HOTLIST_RESULTS_LOST, GFP_KERNEL);
 	if (!skb) {
 		DBGLOG(REQ, ERROR, "%s allocate skb failed\n", __func__);
 		return -ENOMEM;
@@ -1196,4 +1184,3 @@ int mtk_cfg80211_vendor_event_hotlist_ap_lost(struct wiphy *wiphy, struct wirele
 
 #endif
 #endif
-

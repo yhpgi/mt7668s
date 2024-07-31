@@ -54,56 +54,55 @@
 */
 
 /*! \file   "rate.c"
-*    \brief  This file contains the transmission rate handling routines.
-*
-*    This file contains the transmission rate handling routines for setting up
-*    ACK/CTS Rate, Highest Tx Rate, Lowest Tx Rate, Initial Tx Rate and do
-*    conversion between Rate Set and Data Rates.
-*/
-
-
-/*******************************************************************************
-*                         C O M P I L E R   F L A G S
-********************************************************************************
-*/
+ *    \brief  This file contains the transmission rate handling routines.
+ *
+ *    This file contains the transmission rate handling routines for setting up
+ *    ACK/CTS Rate, Highest Tx Rate, Lowest Tx Rate, Initial Tx Rate and do
+ *    conversion between Rate Set and Data Rates.
+ */
 
 /*******************************************************************************
-*                    E X T E R N A L   R E F E R E N C E S
-********************************************************************************
-*/
+ *                         C O M P I L E R   F L A G S
+ ********************************************************************************
+ */
+
+/*******************************************************************************
+ *                    E X T E R N A L   R E F E R E N C E S
+ ********************************************************************************
+ */
 #include "precomp.h"
 
 /*******************************************************************************
-*                              C O N S T A N T S
-********************************************************************************
-*/
+ *                              C O N S T A N T S
+ ********************************************************************************
+ */
 /* The list of valid data rates. */
 const UINT_8 aucDataRate[] = {
-	RATE_1M,		/* RATE_1M_INDEX = 0 */
-	RATE_2M,		/* RATE_2M_INDEX */
-	RATE_5_5M,		/* RATE_5_5M_INDEX */
-	RATE_11M,		/* RATE_11M_INDEX */
-	RATE_22M,		/* RATE_22M_INDEX */
-	RATE_33M,		/* RATE_33M_INDEX */
-	RATE_6M,		/* RATE_6M_INDEX */
-	RATE_9M,		/* RATE_9M_INDEX */
-	RATE_12M,		/* RATE_12M_INDEX */
-	RATE_18M,		/* RATE_18M_INDEX */
-	RATE_24M,		/* RATE_24M_INDEX */
-	RATE_36M,		/* RATE_36M_INDEX */
-	RATE_48M,		/* RATE_48M_INDEX */
-	RATE_54M,		/* RATE_54M_INDEX */
-	RATE_VHT_PHY,	/* RATE_VHT_PHY_INDEX */
-	RATE_HT_PHY,	/* RATE_HT_PHY_INDEX */
+	RATE_1M,	  /* RATE_1M_INDEX = 0 */
+	RATE_2M,	  /* RATE_2M_INDEX */
+	RATE_5_5M,	  /* RATE_5_5M_INDEX */
+	RATE_11M,	  /* RATE_11M_INDEX */
+	RATE_22M,	  /* RATE_22M_INDEX */
+	RATE_33M,	  /* RATE_33M_INDEX */
+	RATE_6M,	  /* RATE_6M_INDEX */
+	RATE_9M,	  /* RATE_9M_INDEX */
+	RATE_12M,	  /* RATE_12M_INDEX */
+	RATE_18M,	  /* RATE_18M_INDEX */
+	RATE_24M,	  /* RATE_24M_INDEX */
+	RATE_36M,	  /* RATE_36M_INDEX */
+	RATE_48M,	  /* RATE_48M_INDEX */
+	RATE_54M,	  /* RATE_54M_INDEX */
+	RATE_VHT_PHY, /* RATE_VHT_PHY_INDEX */
+	RATE_HT_PHY,  /* RATE_HT_PHY_INDEX */
 #if CFG_SUPPORT_H2E
-	RATE_H2E_ONLY	/* RATE_H2E_ONLY_INDEX */
+	RATE_H2E_ONLY /* RATE_H2E_ONLY_INDEX */
 #endif
 };
 
 static const UINT_8 aucDefaultAckCtsRateIndex[RATE_NUM_SW] = {
 	RATE_1M_SW_INDEX,	/* RATE_1M_SW_INDEX = 0 */
 	RATE_2M_SW_INDEX,	/* RATE_2M_SW_INDEX */
-	RATE_5_5M_SW_INDEX,	/* RATE_5_5M_SW_INDEX */
+	RATE_5_5M_SW_INDEX, /* RATE_5_5M_SW_INDEX */
 	RATE_11M_SW_INDEX,	/* RATE_11M_SW_INDEX */
 	RATE_1M_SW_INDEX,	/* RATE_22M_SW_INDEX - Not supported */
 	RATE_1M_SW_INDEX,	/* RATE_33M_SW_INDEX - Not supported */
@@ -118,77 +117,75 @@ static const UINT_8 aucDefaultAckCtsRateIndex[RATE_NUM_SW] = {
 };
 
 const BOOLEAN afgIsOFDMRate[RATE_NUM_SW] = {
-	FALSE,			/* RATE_1M_INDEX = 0 */
-	FALSE,			/* RATE_2M_INDEX */
-	FALSE,			/* RATE_5_5M_INDEX */
-	FALSE,			/* RATE_11M_INDEX */
-	FALSE,			/* RATE_22M_INDEX - Not supported */
-	FALSE,			/* RATE_33M_INDEX - Not supported */
-	TRUE,			/* RATE_6M_INDEX */
-	TRUE,			/* RATE_9M_INDEX */
-	TRUE,			/* RATE_12M_INDEX */
-	TRUE,			/* RATE_18M_INDEX */
-	TRUE,			/* RATE_24M_INDEX */
-	TRUE,			/* RATE_36M_INDEX */
-	TRUE,			/* RATE_48M_INDEX */
-	TRUE			/* RATE_54M_INDEX */
+	FALSE, /* RATE_1M_INDEX = 0 */
+	FALSE, /* RATE_2M_INDEX */
+	FALSE, /* RATE_5_5M_INDEX */
+	FALSE, /* RATE_11M_INDEX */
+	FALSE, /* RATE_22M_INDEX - Not supported */
+	FALSE, /* RATE_33M_INDEX - Not supported */
+	TRUE,  /* RATE_6M_INDEX */
+	TRUE,  /* RATE_9M_INDEX */
+	TRUE,  /* RATE_12M_INDEX */
+	TRUE,  /* RATE_18M_INDEX */
+	TRUE,  /* RATE_24M_INDEX */
+	TRUE,  /* RATE_36M_INDEX */
+	TRUE,  /* RATE_48M_INDEX */
+	TRUE   /* RATE_54M_INDEX */
 };
 
 /*******************************************************************************
-*                             D A T A   T Y P E S
-********************************************************************************
-*/
+ *                             D A T A   T Y P E S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                            P U B L I C   D A T A
-********************************************************************************
-*/
+ *                            P U B L I C   D A T A
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                           P R I V A T E   D A T A
-********************************************************************************
-*/
+ *                           P R I V A T E   D A T A
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                                 M A C R O S
-********************************************************************************
-*/
+ *                                 M A C R O S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                   F U N C T I O N   D E C L A R A T I O N S
-********************************************************************************
-*/
+ *                   F U N C T I O N   D E C L A R A T I O N S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                              F U N C T I O N S
-********************************************************************************
-*/
+ *                              F U N C T I O N S
+ ********************************************************************************
+ */
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief Convert the given Supported Rate & Extended Supported Rate IE to the
-*        Operational Rate Set and Basic Rate Set, and also check if any Basic
-*        Rate Code is unknown by driver.
-*
-* @param[in] prIeSupportedRate          Pointer to the Supported Rate IE
-* @param[in] prIeExtSupportedRate       Pointer to the Ext Supported Rate IE
-* @param[out] pu2OperationalRateSet     Pointer to the Operational Rate Set
-* @param[out] pu2BSSBasicRateSet        Pointer to the Basic Rate Set
-* @param[out] pfgIsUnknownBSSBasicRate  Pointer to a Flag to indicate that Basic
-*                                       Rate Set has unknown Rate Code
-*
-* \return (none)
-*/
+ * @brief Convert the given Supported Rate & Extended Supported Rate IE to the
+ *        Operational Rate Set and Basic Rate Set, and also check if any Basic
+ *        Rate Code is unknown by driver.
+ *
+ * @param[in] prIeSupportedRate          Pointer to the Supported Rate IE
+ * @param[in] prIeExtSupportedRate       Pointer to the Ext Supported Rate IE
+ * @param[out] pu2OperationalRateSet     Pointer to the Operational Rate Set
+ * @param[out] pu2BSSBasicRateSet        Pointer to the Basic Rate Set
+ * @param[out] pfgIsUnknownBSSBasicRate  Pointer to a Flag to indicate that Basic
+ *                                       Rate Set has unknown Rate Code
+ *
+ * \return (none)
+ */
 /*----------------------------------------------------------------------------*/
-VOID
-rateGetRateSetFromIEs(IN P_IE_SUPPORTED_RATE_IOT_T prIeSupportedRate,
-		      IN P_IE_EXT_SUPPORTED_RATE_T prIeExtSupportedRate,
-		      OUT PUINT_16 pu2OperationalRateSet,
-		      OUT PUINT_16 pu2BSSBasicRateSet, OUT PBOOLEAN pfgIsUnknownBSSBasicRate)
+VOID rateGetRateSetFromIEs(IN P_IE_SUPPORTED_RATE_IOT_T prIeSupportedRate,
+		IN P_IE_EXT_SUPPORTED_RATE_T prIeExtSupportedRate, OUT PUINT_16 pu2OperationalRateSet,
+		OUT PUINT_16 pu2BSSBasicRateSet, OUT PBOOLEAN pfgIsUnknownBSSBasicRate)
 {
-	UINT_16 u2OperationalRateSet = 0;
-	UINT_16 u2BSSBasicRateSet = 0;
+	UINT_16 u2OperationalRateSet	= 0;
+	UINT_16 u2BSSBasicRateSet		= 0;
 	BOOLEAN fgIsUnknownBSSBasicRate = FALSE;
-	UINT_8 ucRate;
+	UINT_8	ucRate;
 	UINT_32 i, j;
 
 	ASSERT(pu2OperationalRateSet);
@@ -202,8 +199,8 @@ rateGetRateSetFromIEs(IN P_IE_SUPPORTED_RATE_IOT_T prIeSupportedRate,
 		 */
 		/* ASSERT(prIeSupportedRate->ucLength <= ELEM_MAX_LEN_SUP_RATES); */
 		if (prIeSupportedRate->ucLength > ELEM_MAX_LEN_SUP_RATES_IOT) {
-			*pu2OperationalRateSet = 0;
-			*pu2BSSBasicRateSet = 0;
+			*pu2OperationalRateSet	  = 0;
+			*pu2BSSBasicRateSet		  = 0;
 			*pfgIsUnknownBSSBasicRate = TRUE;
 			return;
 		}
@@ -224,8 +221,8 @@ rateGetRateSetFromIEs(IN P_IE_SUPPORTED_RATE_IOT_T prIeSupportedRate,
 			}
 
 			if ((j == sizeof(aucDataRate) / sizeof(UINT_8)) &&
-			    (prIeSupportedRate->aucSupportedRates[i] & RATE_BASIC_BIT)) {
-				fgIsUnknownBSSBasicRate = TRUE;	/* A data rate not list in the aucDataRate[] */
+					(prIeSupportedRate->aucSupportedRates[i] & RATE_BASIC_BIT)) {
+				fgIsUnknownBSSBasicRate = TRUE; /* A data rate not list in the aucDataRate[] */
 			}
 		}
 	}
@@ -248,36 +245,35 @@ rateGetRateSetFromIEs(IN P_IE_SUPPORTED_RATE_IOT_T prIeSupportedRate,
 			}
 
 			if ((j == sizeof(aucDataRate) / sizeof(UINT_8)) &&
-			    (prIeExtSupportedRate->aucExtSupportedRates[i] & RATE_BASIC_BIT)) {
-				fgIsUnknownBSSBasicRate = TRUE;	/* A data rate not list in the aucDataRate[] */
+					(prIeExtSupportedRate->aucExtSupportedRates[i] & RATE_BASIC_BIT)) {
+				fgIsUnknownBSSBasicRate = TRUE; /* A data rate not list in the aucDataRate[] */
 			}
 		}
 	}
 
-	*pu2OperationalRateSet = u2OperationalRateSet;
-	*pu2BSSBasicRateSet = u2BSSBasicRateSet;
+	*pu2OperationalRateSet	  = u2OperationalRateSet;
+	*pu2BSSBasicRateSet		  = u2BSSBasicRateSet;
 	*pfgIsUnknownBSSBasicRate = fgIsUnknownBSSBasicRate;
 
 	return;
 
-}				/* end of rateGetRateSetFromIEs() */
+} /* end of rateGetRateSetFromIEs() */
 
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief Convert the given Operational Rate Set & Basic Rate Set to the Rate Code
-*        Format for used in (Ext)Supportec Rate IE.
-*
-* @param[in] u2OperationalRateSet   Operational Rate Set
-* @param[in] u2BSSBasicRateSet      Basic Rate Set
-* @param[out] pucDataRates          Pointer to the Data Rate Buffer
-* @param[out] pucDataRatesLen       Pointer to the Data Rate Buffer Length
-*
-* @return (none)
-*/
+ * @brief Convert the given Operational Rate Set & Basic Rate Set to the Rate Code
+ *        Format for used in (Ext)Supportec Rate IE.
+ *
+ * @param[in] u2OperationalRateSet   Operational Rate Set
+ * @param[in] u2BSSBasicRateSet      Basic Rate Set
+ * @param[out] pucDataRates          Pointer to the Data Rate Buffer
+ * @param[out] pucDataRatesLen       Pointer to the Data Rate Buffer Length
+ *
+ * @return (none)
+ */
 /*----------------------------------------------------------------------------*/
-VOID
-rateGetDataRatesFromRateSet(IN UINT_16 u2OperationalRateSet,
-			    IN UINT_16 u2BSSBasicRateSet, OUT PUINT_8 pucDataRates, OUT PUINT_8 pucDataRatesLen)
+VOID rateGetDataRatesFromRateSet(IN UINT_16 u2OperationalRateSet, IN UINT_16 u2BSSBasicRateSet,
+		OUT PUINT_8 pucDataRates, OUT PUINT_8 pucDataRatesLen)
 {
 	UINT_32 i, j;
 
@@ -288,7 +284,6 @@ rateGetDataRatesFromRateSet(IN UINT_16 u2OperationalRateSet,
 
 	for (i = RATE_1M_SW_INDEX, j = 0; i < RATE_NUM_SW; i++) {
 		if (u2OperationalRateSet & BIT(i)) {
-
 			*(pucDataRates + j) = aucDataRate[i];
 
 			if (u2BSSBasicRateSet & BIT(i))
@@ -298,22 +293,22 @@ rateGetDataRatesFromRateSet(IN UINT_16 u2OperationalRateSet,
 		}
 	}
 
-	*pucDataRatesLen = (UINT_8) j;
+	*pucDataRatesLen = (UINT_8)j;
 
 	return;
 
-}				/* end of rateGetDataRatesFromRateSet() */
+} /* end of rateGetDataRatesFromRateSet() */
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief Get the highest rate from given Rate Set.
-*
-* \param[in] u2RateSet              Rate Set
-* \param[out] pucHighestRateIndex   Pointer to buffer of the Highest Rate Index
-*
-* \retval TRUE  Highest Rate Index was found
-* \retval FALSE Highest Rate Index was not found
-*/
+ * \brief Get the highest rate from given Rate Set.
+ *
+ * \param[in] u2RateSet              Rate Set
+ * \param[out] pucHighestRateIndex   Pointer to buffer of the Highest Rate Index
+ *
+ * \retval TRUE  Highest Rate Index was found
+ * \retval FALSE Highest Rate Index was not found
+ */
 /*----------------------------------------------------------------------------*/
 BOOLEAN rateGetHighestRateIndexFromRateSet(IN UINT_16 u2RateSet, OUT PUINT_8 pucHighestRateIndex)
 {
@@ -323,25 +318,25 @@ BOOLEAN rateGetHighestRateIndexFromRateSet(IN UINT_16 u2RateSet, OUT PUINT_8 puc
 
 	for (i = RATE_54M_SW_INDEX; i >= RATE_1M_SW_INDEX; i--) {
 		if (u2RateSet & BIT(i)) {
-			*pucHighestRateIndex = (UINT_8) i;
+			*pucHighestRateIndex = (UINT_8)i;
 			return TRUE;
 		}
 	}
 
 	return FALSE;
 
-}				/* end of rateGetHighestRateIndexFromRateSet() */
+} /* end of rateGetHighestRateIndexFromRateSet() */
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief Get the lowest rate from given Rate Set.
-*
-* \param[in] u2RateSet              Rate Set
-* \param[out] pucLowestRateIndex    Pointer to buffer of the Lowest Rate Index
-*
-* \retval TRUE  Lowest Rate Index was found
-* \retval FALSE Lowest Rate Index was not found
-*/
+ * \brief Get the lowest rate from given Rate Set.
+ *
+ * \param[in] u2RateSet              Rate Set
+ * \param[out] pucLowestRateIndex    Pointer to buffer of the Lowest Rate Index
+ *
+ * \retval TRUE  Lowest Rate Index was found
+ * \retval FALSE Lowest Rate Index was not found
+ */
 /*----------------------------------------------------------------------------*/
 BOOLEAN rateGetLowestRateIndexFromRateSet(IN UINT_16 u2RateSet, OUT PUINT_8 pucLowestRateIndex)
 {
@@ -351,16 +346,16 @@ BOOLEAN rateGetLowestRateIndexFromRateSet(IN UINT_16 u2RateSet, OUT PUINT_8 pucL
 
 	for (i = RATE_1M_SW_INDEX; i <= RATE_54M_SW_INDEX; i++) {
 		if (u2RateSet & BIT(i)) {
-			*pucLowestRateIndex = (UINT_8) i;
+			*pucLowestRateIndex = (UINT_8)i;
 			return TRUE;
 		}
 	}
 
 	return FALSE;
 
-}				/* end of rateGetLowestRateIndexFromRateSet() */
+} /* end of rateGetLowestRateIndexFromRateSet() */
 
-#if 0				/* NOTE(Kevin): For reference */
+#if 0 /* NOTE(Kevin): For reference */
 /*----------------------------------------------------------------------------*/
 /*!
 * \brief Convert the given Data Rates to the Rate Set.
@@ -415,7 +410,7 @@ VOID rateGetRateSetFromDataRates(IN PUINT_8 pucDataRates, IN UINT_8 ucDataRatesL
 /*----------------------------------------------------------------------------*/
 VOID
 rateSetAckCtsDataRatesFromRateSet(IN UINT_16 u2OperationalRateSet,
-				  IN UINT_16 u2BSSBasicRateSet, IN OUT UINT_8 aucAckCtsRateIndex[])
+				IN UINT_16 u2BSSBasicRateSet, IN OUT UINT_8 aucAckCtsRateIndex[])
 {
 	INT_32 i, j;
 
@@ -431,7 +426,7 @@ rateSetAckCtsDataRatesFromRateSet(IN UINT_16 u2OperationalRateSet,
 				if (u2BSSBasicRateSet & BIT(j)) {
 					/* Reply ACK Frame at the same Modulation Scheme. */
 					if ((afgIsOFDMRate[i] && afgIsOFDMRate[j]) ||
-					    (!afgIsOFDMRate[i] && !afgIsOFDMRate[j]))
+						(!afgIsOFDMRate[i] && !afgIsOFDMRate[j]))
 						aucAckCtsRateIndex[i] = (UINT_8) j;
 					break;
 				}

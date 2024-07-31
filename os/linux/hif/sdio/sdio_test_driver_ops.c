@@ -28,15 +28,15 @@
 int mmc_send_io_op_cond(struct mmc_host *host, u32 ocr, u32 *rocr)
 {
 	struct mmc_command cmd;
-	int i, err = 0;
+	int				   i, err = 0;
 
 	BUG_ON(!host);
 
 	memset(&cmd, 0, sizeof(struct mmc_command));
 
 	cmd.opcode = SD_IO_SEND_OP_COND;
-	cmd.arg = ocr;
-	cmd.flags = MMC_RSP_SPI_R4 | MMC_RSP_R4 | MMC_CMD_BCR;
+	cmd.arg	   = ocr;
+	cmd.flags  = MMC_RSP_SPI_R4 | MMC_RSP_R4 | MMC_CMD_BCR;
 
 	for (i = 100; i; i--) {
 		err = mmc_wait_for_cmd(host, &cmd, MMC_CMD_RETRIES);
@@ -75,11 +75,10 @@ int mmc_send_io_op_cond(struct mmc_host *host, u32 ocr, u32 *rocr)
 	return err;
 }
 
-int mmc_io_rw_direct(struct mmc_card *card, int write, unsigned fn,
-	unsigned addr, u8 in, u8 *out)
+int mmc_io_rw_direct(struct mmc_card *card, int write, unsigned fn, unsigned addr, u8 in, u8 *out)
 {
 	struct mmc_command cmd;
-	int err;
+	int				   err;
 
 	BUG_ON(!card);
 	BUG_ON(fn > 7);
@@ -91,7 +90,7 @@ int mmc_io_rw_direct(struct mmc_card *card, int write, unsigned fn,
 	memset(&cmd, 0, sizeof(struct mmc_command));
 
 	cmd.opcode = SD_IO_RW_DIRECT;
-	cmd.arg = write ? 0x80000000 : 0x00000000;
+	cmd.arg	   = write ? 0x80000000 : 0x00000000;
 	cmd.arg |= fn << 28;
 	cmd.arg |= (write && out) ? 0x08000000 : 0x00000000;
 	cmd.arg |= addr << 9;
@@ -123,12 +122,12 @@ int mmc_io_rw_direct(struct mmc_card *card, int write, unsigned fn,
 	return 0;
 }
 
-int mmc_io_rw_extended(struct mmc_card *card, int write, unsigned fn,
-	unsigned addr, int incr_addr, u8 *buf, unsigned blocks, unsigned blksz)
+int mmc_io_rw_extended(struct mmc_card *card, int write, unsigned fn, unsigned addr, int incr_addr, u8 *buf,
+		unsigned blocks, unsigned blksz)
 {
 	struct mmc_request mrq;
 	struct mmc_command cmd;
-	struct mmc_data data;
+	struct mmc_data	   data;
 	struct scatterlist sg;
 
 	BUG_ON(!card);
@@ -145,24 +144,24 @@ int mmc_io_rw_extended(struct mmc_card *card, int write, unsigned fn,
 	memset(&cmd, 0, sizeof(struct mmc_command));
 	memset(&data, 0, sizeof(struct mmc_data));
 
-	mrq.cmd = &cmd;
+	mrq.cmd	 = &cmd;
 	mrq.data = &data;
 
 	cmd.opcode = SD_IO_RW_EXTENDED;
-	cmd.arg = write ? 0x80000000 : 0x00000000;
+	cmd.arg	   = write ? 0x80000000 : 0x00000000;
 	cmd.arg |= fn << 28;
 	cmd.arg |= incr_addr ? 0x04000000 : 0x00000000;
 	cmd.arg |= addr << 9;
 	if (blocks == 1 && blksz <= 512)
-		cmd.arg |= (blksz == 512) ? 0 : blksz;	/* byte mode */
+		cmd.arg |= (blksz == 512) ? 0 : blksz; /* byte mode */
 	else
-		cmd.arg |= 0x08000000 | blocks;		/* block mode */
+		cmd.arg |= 0x08000000 | blocks; /* block mode */
 	cmd.flags = MMC_RSP_SPI_R5 | MMC_RSP_R5 | MMC_CMD_ADTC;
 
-	data.blksz = blksz;
+	data.blksz	= blksz;
 	data.blocks = blocks;
-	data.flags = write ? MMC_DATA_WRITE : MMC_DATA_READ;
-	data.sg = &sg;
+	data.flags	= write ? MMC_DATA_WRITE : MMC_DATA_READ;
+	data.sg		= &sg;
 	data.sg_len = 1;
 
 	sg_init_one(&sg, buf, blksz * blocks);
@@ -191,4 +190,3 @@ int mmc_io_rw_extended(struct mmc_card *card, int write, unsigned fn,
 }
 
 #endif
-

@@ -57,7 +57,6 @@
  *  \brief This file contains the function declaration for privacy.c.
  */
 
-
 #ifndef _PRIVACY_H
 #define _PRIVACY_H
 
@@ -75,53 +74,53 @@
  *                              C O N S T A N T S
  ********************************************************************************
  */
-#define MAX_KEY_NUM                             4
-#define WEP_40_LEN                              5
-#define WEP_104_LEN                             13
-#define WEP_128_LEN                             16
-#define LEGACY_KEY_MAX_LEN                      16
-#define CCMP_KEY_LEN                            16
-#define TKIP_KEY_LEN                            32
-#define MAX_KEY_LEN                             32
-#define MIC_RX_KEY_OFFSET                       16
-#define MIC_TX_KEY_OFFSET                       24
-#define MIC_KEY_LEN                             8
+#define MAX_KEY_NUM 4
+#define WEP_40_LEN 5
+#define WEP_104_LEN 13
+#define WEP_128_LEN 16
+#define LEGACY_KEY_MAX_LEN 16
+#define CCMP_KEY_LEN 16
+#define TKIP_KEY_LEN 32
+#define MAX_KEY_LEN 32
+#define MIC_RX_KEY_OFFSET 16
+#define MIC_TX_KEY_OFFSET 24
+#define MIC_KEY_LEN 8
 
-#define WEP_KEY_ID_FIELD      BITS(0, 29)
-#define KEY_ID_FIELD          BITS(0, 7)
+#define WEP_KEY_ID_FIELD BITS(0, 29)
+#define KEY_ID_FIELD BITS(0, 7)
 
-#define IS_TRANSMIT_KEY       BIT(31)
-#define IS_UNICAST_KEY        BIT(30)
-#define IS_AUTHENTICATOR      BIT(28)
+#define IS_TRANSMIT_KEY BIT(31)
+#define IS_UNICAST_KEY BIT(30)
+#define IS_AUTHENTICATOR BIT(28)
 
-#define CIPHER_SUITE_NONE               0
-#define CIPHER_SUITE_WEP40              1
-#define CIPHER_SUITE_TKIP               2
-#define CIPHER_SUITE_TKIP_WO_MIC        3
-#define CIPHER_SUITE_CCMP               4
-#define CIPHER_SUITE_WEP104             5
-#define CIPHER_SUITE_BIP                6
-#define CIPHER_SUITE_WEP128             7
-#define CIPHER_SUITE_WPI                8
-#define CIPHER_SUITE_CCMP_W_CCX         9
-#define CIPHER_SUITE_CCMP_256           10
-#define CIPHER_SUITE_GCMP_128           11
-#define CIPHER_SUITE_GCMP_256           12
-#define CIPHER_SUITE_GCM_WPI_128        13
+#define CIPHER_SUITE_NONE 0
+#define CIPHER_SUITE_WEP40 1
+#define CIPHER_SUITE_TKIP 2
+#define CIPHER_SUITE_TKIP_WO_MIC 3
+#define CIPHER_SUITE_CCMP 4
+#define CIPHER_SUITE_WEP104 5
+#define CIPHER_SUITE_BIP 6
+#define CIPHER_SUITE_WEP128 7
+#define CIPHER_SUITE_WPI 8
+#define CIPHER_SUITE_CCMP_W_CCX 9
+#define CIPHER_SUITE_CCMP_256 10
+#define CIPHER_SUITE_GCMP_128 11
+#define CIPHER_SUITE_GCMP_256 12
+#define CIPHER_SUITE_GCM_WPI_128 13
 
 /* Todo:: Move to register */
 #if defined(MT6630)
-#define WTBL_RESERVED_ENTRY             255
+#define WTBL_RESERVED_ENTRY 255
 #else
-#define WTBL_RESERVED_ENTRY             255
+#define WTBL_RESERVED_ENTRY 255
 #endif
 /* Todo:: By chip capability */
 /* Max wlan table size, the max+1 used for probe request,... mgmt frame */
 /*sending use basic rate and no security */
-#define WTBL_SIZE                       32
+#define WTBL_SIZE 32
 
-#define WTBL_ALLOC_FAIL                 WTBL_RESERVED_ENTRY
-#define WTBL_DEFAULT_ENTRY              0
+#define WTBL_ALLOC_FAIL WTBL_RESERVED_ENTRY
+#define WTBL_DEFAULT_ENTRY 0
 
 /*******************************************************************************
  *                         D A T A   T Y P E S
@@ -129,8 +128,8 @@
  */
 
 typedef struct _IEEE_802_1X_HDR {
-	UINT_8 ucVersion;
-	UINT_8 ucType;
+	UINT_8	ucVersion;
+	UINT_8	ucType;
 	UINT_16 u2Length;
 	/* followed by length octets of data */
 } IEEE_802_1X_HDR, *P_IEEE_802_1X_HDR;
@@ -139,20 +138,20 @@ typedef struct _EAPOL_KEY {
 	UINT_8 ucType;
 	/* Note: key_info, key_length, and key_data_length are unaligned */
 	UINT_8 aucKeyInfo[2];	/* big endian */
-	UINT_8 aucKeyLength[2];	/* big endian */
+	UINT_8 aucKeyLength[2]; /* big endian */
 	UINT_8 aucReplayCounter[8];
 	UINT_8 aucKeyNonce[16];
 	UINT_8 aucKeyIv[16];
 	UINT_8 aucKeyRsc[8];
-	UINT_8 aucKeyId[8];	/* Reserved in IEEE 802.11i/RSN */
+	UINT_8 aucKeyId[8]; /* Reserved in IEEE 802.11i/RSN */
 	UINT_8 aucKeyMic[16];
-	UINT_8 aucKeyDataLength[2];	/* big endian */
-	/* followed by key_data_length bytes of key_data */
+	UINT_8 aucKeyDataLength[2]; /* big endian */
+								/* followed by key_data_length bytes of key_data */
 } EAPOL_KEY, *P_EAPOL_KEY;
 
 /* WPA2 PMKID candicate structure */
 typedef struct _PMKID_CANDICATE_T {
-	UINT_8 aucBssid[MAC_ADDR_LEN];
+	UINT_8	aucBssid[MAC_ADDR_LEN];
 	UINT_32 u4PreAuthFlags;
 } PMKID_CANDICATE_T, *P_PMKID_CANDICATE_T;
 
@@ -217,9 +216,8 @@ VOID secPrivacyFreeSta(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec);
 VOID secRemoveBssBcEntry(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prBssInfo, IN BOOL fgRoam);
 
 UINT_8
-secPrivacySeekForBcEntry(IN P_ADAPTER_T prAdapter,
-			 IN UINT_8 ucBssIndex,
-			 IN PUINT_8 pucAddr, IN UINT_8 ucStaIdx, IN UINT_8 ucAlg, IN UINT_8 ucKeyId);
+secPrivacySeekForBcEntry(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex, IN PUINT_8 pucAddr, IN UINT_8 ucStaIdx,
+		IN UINT_8 ucAlg, IN UINT_8 ucKeyId);
 
 UINT_8 secGetStaIdxByWlanIdx(IN P_ADAPTER_T prAdapter, IN UINT_8 ucWlanIdx);
 

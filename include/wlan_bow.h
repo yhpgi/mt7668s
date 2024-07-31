@@ -54,24 +54,23 @@
 */
 
 /*! \file   "wlan_bow.h"
-*    \brief This file contains the declairations of 802.11 PAL
-*	   command processing routines for
-*	   MediaTek Inc. 802.11 Wireless LAN Adapters.
-*/
-
+ *    \brief This file contains the declairations of 802.11 PAL
+ *	   command processing routines for
+ *	   MediaTek Inc. 802.11 Wireless LAN Adapters.
+ */
 
 #ifndef _WLAN_BOW_H
 #define _WLAN_BOW_H
 
 /*******************************************************************************
-*                         C O M P I L E R   F L A G S
-********************************************************************************
-*/
+ *                         C O M P I L E R   F L A G S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                    E X T E R N A L   R E F E R E N C E S
-********************************************************************************
-*/
+ *                    E X T E R N A L   R E F E R E N C E S
+ ********************************************************************************
+ */
 #include "nic/bow.h"
 #include "nic/cmd_buf.h"
 
@@ -80,46 +79,46 @@
 extern UINT_32 g_arBowRevPalPacketTime[32];
 
 /*******************************************************************************
-*                              C O N S T A N T S
-********************************************************************************
-*/
-#define BOWCMD_STATUS_SUCCESS       0
-#define BOWCMD_STATUS_FAILURE       1
-#define BOWCMD_STATUS_UNACCEPTED    2
-#define BOWCMD_STATUS_INVALID       3
-#define BOWCMD_STATUS_TIMEOUT       4
+ *                              C O N S T A N T S
+ ********************************************************************************
+ */
+#define BOWCMD_STATUS_SUCCESS 0
+#define BOWCMD_STATUS_FAILURE 1
+#define BOWCMD_STATUS_UNACCEPTED 2
+#define BOWCMD_STATUS_INVALID 3
+#define BOWCMD_STATUS_TIMEOUT 4
 
-#define BOW_WILDCARD_SSID               "AMP"
-#define BOW_WILDCARD_SSID_LEN       3
-#define BOW_SSID_LEN                            21
+#define BOW_WILDCARD_SSID "AMP"
+#define BOW_WILDCARD_SSID_LEN 3
+#define BOW_SSID_LEN 21
 
- /* 0: query, 1: setup, 2: destroy */
-#define BOW_QUERY_CMD                   0
-#define BOW_SETUP_CMD                   1
-#define BOW_DESTROY_CMD               2
+/* 0: query, 1: setup, 2: destroy */
+#define BOW_QUERY_CMD 0
+#define BOW_SETUP_CMD 1
+#define BOW_DESTROY_CMD 2
 
-#define BOW_INITIATOR                   0
-#define BOW_RESPONDER                  1
+#define BOW_INITIATOR 0
+#define BOW_RESPONDER 1
 
 /*******************************************************************************
-*                            P U B L I C   D A T A
-********************************************************************************
-*/
+ *                            P U B L I C   D A T A
+ ********************************************************************************
+ */
 
 typedef struct _BOW_TABLE_T {
-	UINT_8 ucAcquireID;
-	BOOLEAN fgIsValid;
+	UINT_8				  ucAcquireID;
+	BOOLEAN				  fgIsValid;
 	ENUM_BOW_DEVICE_STATE eState;
-	UINT_8 aucPeerAddress[6];
+	UINT_8				  aucPeerAddress[6];
 	/* UINT_8                      ucRole; */
 	/* UINT_8                      ucChannelNum; */
 	UINT_16 u2Reserved;
 } BOW_TABLE_T, *P_BOW_TABLE_T;
 
-typedef WLAN_STATUS(*PFN_BOW_CMD_HANDLE) (P_ADAPTER_T, P_AMPC_COMMAND);
+typedef WLAN_STATUS (*PFN_BOW_CMD_HANDLE)(P_ADAPTER_T, P_AMPC_COMMAND);
 
 typedef struct _BOW_CMD_T {
-	UINT_8 uCmdID;
+	UINT_8			   uCmdID;
 	PFN_BOW_CMD_HANDLE pfCmdHandle;
 } BOW_CMD_T, *P_BOW_CMD_T;
 
@@ -130,11 +129,11 @@ typedef struct _BOW_EVENT_ACTIVITY_REPORT_T {
 } BOW_EVENT_ACTIVITY_REPORT_T, *P_BOW_EVENT_ACTIVITY_REPORT_T;
 
 /*
-*ucReason:	0: success
-*	1: general failure
-*	2: too much time (> 2/3 second totally) requested for scheduling.
-*	Others: reserved.
-*/
+ *ucReason:	0: success
+ *	1: general failure
+ *	2: too much time (> 2/3 second totally) requested for scheduling.
+ *	Others: reserved.
+ */
 
 typedef struct _BOW_EVENT_SYNC_TSF_T {
 	UINT_64 u4TsfTime;
@@ -150,38 +149,33 @@ typedef struct _BOW_ACTIVITY_REPORT_BODY_T {
 } BOW_ACTIVITY_REPORT_BODY_T, *P_BOW_ACTIVITY_REPORT_BODY_T;
 
 typedef struct _BOW_ACTIVITY_REPORT_T {
-	UINT_8 aucPeerAddress[6];
-	UINT_8 ucScheduleKnown;
-	UINT_8 ucNumReports;
+	UINT_8					   aucPeerAddress[6];
+	UINT_8					   ucScheduleKnown;
+	UINT_8					   ucNumReports;
 	BOW_ACTIVITY_REPORT_BODY_T arBowActivityReportBody[MAX_ACTIVITY_REPORT];
 } BOW_ACTIVITY_REPORT_T, *P_BOW_ACTIVITY_REPORT_T;
 
 /*******************************************************************************
-*                           P R I V A T E   D A T A
-********************************************************************************
-*/
+ *                           P R I V A T E   D A T A
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                                 M A C R O S
-********************************************************************************
-*/
+ *                                 M A C R O S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                   F U N C T I O N   D E C L A R A T I O N S
-********************************************************************************
-*/
+ *                   F U N C T I O N   D E C L A R A T I O N S
+ ********************************************************************************
+ */
 /*--------------------------------------------------------------*/
 /* Firmware Command Packer                                      */
 /*--------------------------------------------------------------*/
 WLAN_STATUS
-wlanoidSendSetQueryBowCmd(IN P_ADAPTER_T prAdapter,
-			  UINT_8 ucCID,
-			  IN UINT_8 ucBssIdx,
-			  BOOLEAN fgSetQuery,
-			  BOOLEAN fgNeedResp,
-			  PFN_CMD_DONE_HANDLER pfCmdDoneHandler,
-			  PFN_CMD_TIMEOUT_HANDLER pfCmdTimeoutHandler,
-			  UINT_32 u4SetQueryInfoLen, PUINT_8 pucInfoBuffer, IN UINT_8 ucSeqNumber);
+wlanoidSendSetQueryBowCmd(IN P_ADAPTER_T prAdapter, UINT_8 ucCID, IN UINT_8 ucBssIdx, BOOLEAN fgSetQuery,
+		BOOLEAN fgNeedResp, PFN_CMD_DONE_HANDLER pfCmdDoneHandler, PFN_CMD_TIMEOUT_HANDLER pfCmdTimeoutHandler,
+		UINT_32 u4SetQueryInfoLen, PUINT_8 pucInfoBuffer, IN UINT_8 ucSeqNumber);
 
 /*--------------------------------------------------------------*/
 /* Command Dispatcher                                           */
@@ -212,17 +206,22 @@ VOID wlanbowCmdEventSetStatus(IN P_ADAPTER_T prAdapter, IN P_AMPC_COMMAND prCmd,
 /*--------------------------------------------------------------*/
 /* Callbacks for event indication                               */
 /*--------------------------------------------------------------*/
-VOID wlanbowCmdEventSetCommon(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo, IN PUINT_8 pucEventBuf, UINT_32 u4EventBufLen);
+VOID wlanbowCmdEventSetCommon(
+		IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo, IN PUINT_8 pucEventBuf, UINT_32 u4EventBufLen);
 
-VOID wlanbowCmdEventLinkConnected(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo, IN PUINT_8 pucEventBuf, UINT_32 u4EventBufLen);
+VOID wlanbowCmdEventLinkConnected(
+		IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo, IN PUINT_8 pucEventBuf, UINT_32 u4EventBufLen);
 
-VOID wlanbowCmdEventLinkDisconnected(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo, IN PUINT_8 pucEventBuf, UINT_32 u4EventBufLen);
+VOID wlanbowCmdEventLinkDisconnected(
+		IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo, IN PUINT_8 pucEventBuf, UINT_32 u4EventBufLen);
 
 VOID wlanbowCmdEventSetSetupConnection(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo, IN PUINT_8 pucEventBuf);
 
-VOID wlanbowCmdEventReadLinkQuality(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo, IN PUINT_8 pucEventBuf, UINT_32 u4EventBufLen);
+VOID wlanbowCmdEventReadLinkQuality(
+		IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo, IN PUINT_8 pucEventBuf, UINT_32 u4EventBufLen);
 
-VOID wlanbowCmdEventReadRssi(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo, IN PUINT_8 pucEventBuf, UINT_32 u4EventBufLen);
+VOID wlanbowCmdEventReadRssi(
+		IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo, IN PUINT_8 pucEventBuf, UINT_32 u4EventBufLen);
 
 UINT_8 bowInit(IN P_ADAPTER_T prAdapter);
 
@@ -250,9 +249,8 @@ VOID bowResponderJoin(IN P_ADAPTER_T prAdapter, P_BSS_DESC_T prBssDesc);
 
 VOID bowFsmRunEventJoinComplete(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMsgHdr);
 
-VOID
-bowIndicationOfMediaStateToHost(IN P_ADAPTER_T prAdapter,
-				ENUM_PARAM_MEDIA_STATE_T eConnectionState, BOOLEAN fgDelayIndication);
+VOID bowIndicationOfMediaStateToHost(
+		IN P_ADAPTER_T prAdapter, ENUM_PARAM_MEDIA_STATE_T eConnectionState, BOOLEAN fgDelayIndication);
 
 VOID bowRunEventAAATxFail(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec);
 
@@ -265,8 +263,8 @@ VOID bowDisconnectLink(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo, IN
 BOOLEAN bowValidateAssocReq(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb, OUT PUINT_16 pu2StatusCode);
 
 BOOLEAN
-bowValidateAuth(IN P_ADAPTER_T prAdapter,
-		IN P_SW_RFB_T prSwRfb, IN PP_STA_RECORD_T pprStaRec, OUT PUINT_16 pu2StatusCode);
+bowValidateAuth(
+		IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb, IN PP_STA_RECORD_T pprStaRec, OUT PUINT_16 pu2StatusCode);
 
 VOID bowRunEventChGrant(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMsgHdr);
 
@@ -294,9 +292,9 @@ BOOLEAN bowSetBowTableState(IN P_ADAPTER_T prAdapter, IN UINT_8 aucPeerAddress[6
 BOOLEAN bowSetBowTableContent(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBowTableIdx, IN P_BOW_TABLE_T prBowTable);
 
 /*******************************************************************************
-*                              F U N C T I O N S
-********************************************************************************
-*/
+ *                              F U N C T I O N S
+ ********************************************************************************
+ */
 
 #endif
 #endif /* _WLAN_BOW_H */

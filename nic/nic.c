@@ -54,80 +54,72 @@
 */
 
 /*! \file   nic.c
-*    \brief  Functions that provide operation in NIC's (Network Interface Card) point of view.
-*
-*    This file includes functions which unite multiple hal(Hardware) operations
-*    and also take the responsibility of Software Resource Management in order
-*    to keep the synchronization with Hardware Manipulation.
-*/
-
-
-/*******************************************************************************
-*                         C O M P I L E R   F L A G S
-********************************************************************************
-*/
+ *    \brief  Functions that provide operation in NIC's (Network Interface Card) point of view.
+ *
+ *    This file includes functions which unite multiple hal(Hardware) operations
+ *    and also take the responsibility of Software Resource Management in order
+ *    to keep the synchronization with Hardware Manipulation.
+ */
 
 /*******************************************************************************
-*                    E X T E R N A L   R E F E R E N C E S
-********************************************************************************
-*/
+ *                         C O M P I L E R   F L A G S
+ ********************************************************************************
+ */
+
+/*******************************************************************************
+ *                    E X T E R N A L   R E F E R E N C E S
+ ********************************************************************************
+ */
 #include "precomp.h"
 
 /*******************************************************************************
-*                              C O N S T A N T S
-********************************************************************************
-*/
-const UINT_8 aucPhyCfg2PhyTypeSet[PHY_CONFIG_NUM] = {
-	PHY_TYPE_SET_802_11ABG,	/* PHY_CONFIG_802_11ABG */
-	PHY_TYPE_SET_802_11BG,	/* PHY_CONFIG_802_11BG */
-	PHY_TYPE_SET_802_11G,	/* PHY_CONFIG_802_11G */
-	PHY_TYPE_SET_802_11A,	/* PHY_CONFIG_802_11A */
-	PHY_TYPE_SET_802_11B,	/* PHY_CONFIG_802_11B */
-	PHY_TYPE_SET_802_11ABGN,	/* PHY_CONFIG_802_11ABGN */
-	PHY_TYPE_SET_802_11BGN,	/* PHY_CONFIG_802_11BGN */
-	PHY_TYPE_SET_802_11AN,	/* PHY_CONFIG_802_11AN */
-	PHY_TYPE_SET_802_11GN,	/* PHY_CONFIG_802_11GN */
-	PHY_TYPE_SET_802_11AC,
-	PHY_TYPE_SET_802_11ANAC,
-	PHY_TYPE_SET_802_11ABGNAC
-};
+ *                              C O N S T A N T S
+ ********************************************************************************
+ */
+const UINT_8 aucPhyCfg2PhyTypeSet[PHY_CONFIG_NUM] = { PHY_TYPE_SET_802_11ABG, /* PHY_CONFIG_802_11ABG */
+	PHY_TYPE_SET_802_11BG,													  /* PHY_CONFIG_802_11BG */
+	PHY_TYPE_SET_802_11G,													  /* PHY_CONFIG_802_11G */
+	PHY_TYPE_SET_802_11A,													  /* PHY_CONFIG_802_11A */
+	PHY_TYPE_SET_802_11B,													  /* PHY_CONFIG_802_11B */
+	PHY_TYPE_SET_802_11ABGN,												  /* PHY_CONFIG_802_11ABGN */
+	PHY_TYPE_SET_802_11BGN,													  /* PHY_CONFIG_802_11BGN */
+	PHY_TYPE_SET_802_11AN,													  /* PHY_CONFIG_802_11AN */
+	PHY_TYPE_SET_802_11GN,													  /* PHY_CONFIG_802_11GN */
+	PHY_TYPE_SET_802_11AC, PHY_TYPE_SET_802_11ANAC, PHY_TYPE_SET_802_11ABGNAC };
 
 /*******************************************************************************
-*                             D A T A   T Y P E S
-********************************************************************************
-*/
+ *                             D A T A   T Y P E S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                            P U B L I C   D A T A
-********************************************************************************
-*/
+ *                            P U B L I C   D A T A
+ ********************************************************************************
+ */
 
-static INT_EVENT_MAP_T arIntEventMapTable[] = {
-	{WHISR_ABNORMAL_INT, INT_EVENT_ABNORMAL},
-	{WHISR_D2H_SW_INT, INT_EVENT_SW_INT},
-	{WHISR_TX_DONE_INT, INT_EVENT_TX},
-	{(WHISR_RX0_DONE_INT | WHISR_RX1_DONE_INT), INT_EVENT_RX}
-};
+static INT_EVENT_MAP_T arIntEventMapTable[] = { { WHISR_ABNORMAL_INT, INT_EVENT_ABNORMAL },
+	{ WHISR_D2H_SW_INT, INT_EVENT_SW_INT }, { WHISR_TX_DONE_INT, INT_EVENT_TX },
+	{ (WHISR_RX0_DONE_INT | WHISR_RX1_DONE_INT), INT_EVENT_RX } };
 
 static const UINT_8 ucIntEventMapSize = (sizeof(arIntEventMapTable) / sizeof(INT_EVENT_MAP_T));
 
 static IST_EVENT_FUNCTION apfnEventFuncTable[] = {
-	nicProcessAbnormalInterrupt,	/*!< INT_EVENT_ABNORMAL */
-	nicProcessSoftwareInterrupt,	/*!< INT_EVENT_SW_INT   */
-	nicProcessTxInterrupt,	/*!< INT_EVENT_TX       */
-	nicProcessRxInterrupt,	/*!< INT_EVENT_RX       */
+	nicProcessAbnormalInterrupt, /*!< INT_EVENT_ABNORMAL */
+	nicProcessSoftwareInterrupt, /*!< INT_EVENT_SW_INT	*/
+	nicProcessTxInterrupt,		 /*!< INT_EVENT_TX		*/
+	nicProcessRxInterrupt,		 /*!< INT_EVENT_RX		*/
 };
 
-ECO_INFO_T g_eco_info = {0xFF};
+ECO_INFO_T g_eco_info = { 0xFF };
 /*******************************************************************************
-*                           P R I V A T E   D A T A
-********************************************************************************
-*/
+ *                           P R I V A T E   D A T A
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                                 M A C R O S
-********************************************************************************
-*/
+ *                                 M A C R O S
+ ********************************************************************************
+ */
 /*! This macro is used to reduce coding errors inside nicAllocateAdapterMemory()
  * and also enhance the readability.
  */
@@ -144,27 +136,27 @@ ECO_INFO_T g_eco_info = {0xFF};
 	}
 
 /*******************************************************************************
-*                   F U N C T I O N   D E C L A R A T I O N S
-********************************************************************************
-*/
+ *                   F U N C T I O N   D E C L A R A T I O N S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                              F U N C T I O N S
-********************************************************************************
-*/
+ *                              F U N C T I O N S
+ ********************************************************************************
+ */
 
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief This routine is responsible for the allocation of the data structures
-*        inside the Adapter structure, include:
-*        1. SW_RFB_Ts
-*        2. Common coalescing buffer for TX PATH.
-*
-* @param prAdapter Pointer of Adapter Data Structure
-*
-* @retval WLAN_STATUS_SUCCESS - Has enough memory.
-* @retval WLAN_STATUS_RESOURCES - Memory is not enough.
-*/
+ * @brief This routine is responsible for the allocation of the data structures
+ *        inside the Adapter structure, include:
+ *        1. SW_RFB_Ts
+ *        2. Common coalescing buffer for TX PATH.
+ *
+ * @param prAdapter Pointer of Adapter Data Structure
+ *
+ * @retval WLAN_STATUS_SUCCESS - Has enough memory.
+ * @retval WLAN_STATUS_RESOURCES - Memory is not enough.
+ */
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS nicAllocateAdapterMemory(IN P_ADAPTER_T prAdapter)
 {
@@ -181,11 +173,11 @@ WLAN_STATUS nicAllocateAdapterMemory(IN P_ADAPTER_T prAdapter)
 	do {
 		/* 4 <0> Reset all Memory Handler */
 #if CFG_DBG_MGT_BUF
-		prAdapter->u4MemFreeDynamicCount = 0;
+		prAdapter->u4MemFreeDynamicCount  = 0;
 		prAdapter->u4MemAllocDynamicCount = 0;
 #endif
-		prAdapter->pucMgtBufCached = (PUINT_8) NULL;
-		prRxCtrl->pucRxCached = (PUINT_8) NULL;
+		prAdapter->pucMgtBufCached = (PUINT_8)NULL;
+		prRxCtrl->pucRxCached	   = (PUINT_8)NULL;
 
 		/* 4 <1> Memory for Management Memory Pool and CMD_INFO_T */
 		/* Allocate memory for the CMD_INFO_T and its MGMT memory pool. */
@@ -196,14 +188,14 @@ WLAN_STATUS nicAllocateAdapterMemory(IN P_ADAPTER_T prAdapter)
 #if defined(_HIF_USB)
 		prAdapter->pucMgtBufCached = preallocGetMemUSB(MEM_ID_NIC_ADAPTER);
 #else
-  		prAdapter->pucMgtBufCached = preallocGetMem(MEM_ID_NIC_ADAPTER);
+		prAdapter->pucMgtBufCached		  = preallocGetMem(MEM_ID_NIC_ADAPTER);
 #endif
 #else
-		prAdapter->pucMgtBufCached = preallocGetMem(MEM_ID_NIC_ADAPTER);
+		prAdapter->pucMgtBufCached		  = preallocGetMem(MEM_ID_NIC_ADAPTER);
 #endif
 #else
-		LOCAL_NIC_ALLOCATE_MEMORY(prAdapter->pucMgtBufCached,
-					  prAdapter->u4MgtBufCachedSize, PHY_MEM_TYPE, "COMMON MGMT MEMORY POOL");
+		LOCAL_NIC_ALLOCATE_MEMORY(
+				prAdapter->pucMgtBufCached, prAdapter->u4MgtBufCachedSize, PHY_MEM_TYPE, "COMMON MGMT MEMORY POOL");
 #endif
 
 		/* 4 <2> Memory for RX Descriptor */
@@ -230,15 +222,12 @@ WLAN_STATUS nicAllocateAdapterMemory(IN P_ADAPTER_T prAdapter)
 #ifdef CFG_PREALLOC_MEMORY
 #ifdef CFG_SUPPORT_DUAL_CARD_DUAL_DRIVER
 #if defined(_HIF_USB)
-		prAdapter->pucCoalescingBufCached =
-                        preallocGetMemUSB(MEM_ID_IO_BUFFER);
+		prAdapter->pucCoalescingBufCached = preallocGetMemUSB(MEM_ID_IO_BUFFER);
 #else
-		prAdapter->pucCoalescingBufCached =
-                        preallocGetMem(MEM_ID_IO_BUFFER);
+		prAdapter->pucCoalescingBufCached = preallocGetMem(MEM_ID_IO_BUFFER);
 #endif
 #else
-		prAdapter->pucCoalescingBufCached =
-			preallocGetMem(MEM_ID_IO_BUFFER);
+		prAdapter->pucCoalescingBufCached = preallocGetMem(MEM_ID_IO_BUFFER);
 #endif
 #else
 		prAdapter->pucCoalescingBufCached = kalAllocateIOBuffer(prAdapter->u4CoalescingBufCachedSize);
@@ -246,7 +235,7 @@ WLAN_STATUS nicAllocateAdapterMemory(IN P_ADAPTER_T prAdapter)
 
 		if (prAdapter->pucCoalescingBufCached == NULL) {
 			DBGLOG(INIT, ERROR, "Could not allocate %ld bytes for coalescing buffer.\n",
-				prAdapter->u4CoalescingBufCachedSize);
+					prAdapter->u4CoalescingBufCachedSize);
 			break;
 		}
 
@@ -263,23 +252,23 @@ WLAN_STATUS nicAllocateAdapterMemory(IN P_ADAPTER_T prAdapter)
 
 	return status;
 
-}				/* end of nicAllocateAdapterMemory() */
+} /* end of nicAllocateAdapterMemory() */
 
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief This routine is responsible for releasing the allocated memory by
-*        nicAllocatedAdapterMemory().
-*
-* @param prAdapter Pointer of Adapter Data Structure
-*
-* @return (none)
-*/
+ * @brief This routine is responsible for releasing the allocated memory by
+ *        nicAllocatedAdapterMemory().
+ *
+ * @param prAdapter Pointer of Adapter Data Structure
+ *
+ * @return (none)
+ */
 /*----------------------------------------------------------------------------*/
 VOID nicReleaseAdapterMemory(IN P_ADAPTER_T prAdapter)
 {
 	P_TX_CTRL_T prTxCtrl;
 	P_RX_CTRL_T prRxCtrl;
-	UINT_32 u4Idx;
+	UINT_32		u4Idx;
 
 	ASSERT(prAdapter);
 	prTxCtrl = &prAdapter->rTxCtrl;
@@ -291,27 +280,27 @@ VOID nicReleaseAdapterMemory(IN P_ADAPTER_T prAdapter)
 	/* 4 <4> Memory for Common Coalescing Buffer */
 	if (prAdapter->pucCoalescingBufCached) {
 #ifndef CFG_PREALLOC_MEMORY
-		kalReleaseIOBuffer((PVOID) prAdapter->pucCoalescingBufCached, prAdapter->u4CoalescingBufCachedSize);
+		kalReleaseIOBuffer((PVOID)prAdapter->pucCoalescingBufCached, prAdapter->u4CoalescingBufCachedSize);
 #endif
-		prAdapter->pucCoalescingBufCached = (PUINT_8) NULL;
+		prAdapter->pucCoalescingBufCached = (PUINT_8)NULL;
 	}
 
 	/* 4 <3> Memory for TX Descriptor */
 	if (prTxCtrl->pucTxCached) {
-		kalMemFree((PVOID) prTxCtrl->pucTxCached, VIR_MEM_TYPE, prTxCtrl->u4TxCachedSize);
-		prTxCtrl->pucTxCached = (PUINT_8) NULL;
+		kalMemFree((PVOID)prTxCtrl->pucTxCached, VIR_MEM_TYPE, prTxCtrl->u4TxCachedSize);
+		prTxCtrl->pucTxCached = (PUINT_8)NULL;
 	}
 	/* 4 <2> Memory for RX Descriptor */
 	if (prRxCtrl->pucRxCached) {
-		kalMemFree((PVOID) prRxCtrl->pucRxCached, VIR_MEM_TYPE, prRxCtrl->u4RxCachedSize);
-		prRxCtrl->pucRxCached = (PUINT_8) NULL;
+		kalMemFree((PVOID)prRxCtrl->pucRxCached, VIR_MEM_TYPE, prRxCtrl->u4RxCachedSize);
+		prRxCtrl->pucRxCached = (PUINT_8)NULL;
 	}
 	/* 4 <1> Memory for Management Memory Pool */
 	if (prAdapter->pucMgtBufCached) {
 #ifndef CFG_PREALLOC_MEMORY
-		kalMemFree((PVOID) prAdapter->pucMgtBufCached, PHY_MEM_TYPE, prAdapter->u4MgtBufCachedSize);
+		kalMemFree((PVOID)prAdapter->pucMgtBufCached, PHY_MEM_TYPE, prAdapter->u4MgtBufCachedSize);
 #endif
-		prAdapter->pucMgtBufCached = (PUINT_8) NULL;
+		prAdapter->pucMgtBufCached = (PUINT_8)NULL;
 	}
 
 	/* Memory for TX Desc Template */
@@ -320,7 +309,7 @@ VOID nicReleaseAdapterMemory(IN P_ADAPTER_T prAdapter)
 
 #if CFG_DBG_MGT_BUF
 	do {
-		BOOLEAN fgUnfreedMem = FALSE;
+		BOOLEAN		 fgUnfreedMem = FALSE;
 		P_BUF_INFO_T prBufInfo;
 
 		/* Dynamic allocated memory from OS */
@@ -351,17 +340,16 @@ VOID nicReleaseAdapterMemory(IN P_ADAPTER_T prAdapter)
 		}
 	} while (FALSE);
 #endif
-
 }
 
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief disable global interrupt
-*
-* @param prAdapter pointer to the Adapter handler
-*
-* @return (none)
-*/
+ * @brief disable global interrupt
+ *
+ * @param prAdapter pointer to the Adapter handler
+ *
+ * @return (none)
+ */
 /*----------------------------------------------------------------------------*/
 VOID nicDisableInterrupt(IN P_ADAPTER_T prAdapter)
 {
@@ -370,20 +358,20 @@ VOID nicDisableInterrupt(IN P_ADAPTER_T prAdapter)
 
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief enable global interrupt
-*
-* @param prAdapter pointer to the Adapter handler
-*
-* @return (none)
-*/
+ * @brief enable global interrupt
+ *
+ * @param prAdapter pointer to the Adapter handler
+ *
+ * @return (none)
+ */
 /*----------------------------------------------------------------------------*/
 VOID nicEnableInterrupt(IN P_ADAPTER_T prAdapter)
 {
 	halEnableInterrupt(prAdapter);
 
-}				/* end of nicEnableInterrupt() */
+} /* end of nicEnableInterrupt() */
 
-#if 0				/* CFG_SDIO_INTR_ENHANCE */
+#if 0 /* CFG_SDIO_INTR_ENHANCE */
 /*----------------------------------------------------------------------------*/
 /*!
 * @brief Read interrupt status from hardware
@@ -408,8 +396,8 @@ VOID nicSDIOReadIntStatus(IN P_ADAPTER_T prAdapter, OUT PUINT_32 pu4IntStatus)
 	ASSERT(prSDIOCtrl);
 
 	HAL_PORT_RD(prAdapter,
-		    MCR_WHISR,
-		    sizeof(ENHANCE_MODE_DATA_STRUCT_T), (PUINT_8) prSDIOCtrl, sizeof(ENHANCE_MODE_DATA_STRUCT_T));
+			MCR_WHISR,
+			sizeof(ENHANCE_MODE_DATA_STRUCT_T), (PUINT_8) prSDIOCtrl, sizeof(ENHANCE_MODE_DATA_STRUCT_T));
 
 	if (kalIsCardRemoved(prAdapter->prGlueInfo) == TRUE || fgIsBusAccessFailed == TRUE) {
 		*pu4IntStatus = 0;
@@ -418,19 +406,19 @@ VOID nicSDIOReadIntStatus(IN P_ADAPTER_T prAdapter, OUT PUINT_32 pu4IntStatus)
 
 	/* workaround */
 	if ((prSDIOCtrl->u4WHISR & WHISR_TX_DONE_INT) == 0 && (prSDIOCtrl->rTxInfo.au4WTSR[0]
-							       | prSDIOCtrl->rTxInfo.au4WTSR[1]
-							       | prSDIOCtrl->rTxInfo.au4WTSR[2]
-							       | prSDIOCtrl->rTxInfo.au4WTSR[3]
-							       | prSDIOCtrl->rTxInfo.au4WTSR[4]
-							       | prSDIOCtrl->rTxInfo.au4WTSR[5]
-							       | prSDIOCtrl->rTxInfo.au4WTSR[6]
-							       | prSDIOCtrl->rTxInfo.au4WTSR[7])) {
+									| prSDIOCtrl->rTxInfo.au4WTSR[1]
+									| prSDIOCtrl->rTxInfo.au4WTSR[2]
+									| prSDIOCtrl->rTxInfo.au4WTSR[3]
+									| prSDIOCtrl->rTxInfo.au4WTSR[4]
+									| prSDIOCtrl->rTxInfo.au4WTSR[5]
+									| prSDIOCtrl->rTxInfo.au4WTSR[6]
+									| prSDIOCtrl->rTxInfo.au4WTSR[7])) {
 		prSDIOCtrl->u4WHISR |= WHISR_TX_DONE_INT;
 	}
 
 	if ((prSDIOCtrl->u4WHISR & BIT(31)) == 0 &&
-	    HAL_GET_MAILBOX_READ_CLEAR(prAdapter) == TRUE &&
-	    (prSDIOCtrl->u4RcvMailbox0 != 0 || prSDIOCtrl->u4RcvMailbox1 != 0)) {
+		HAL_GET_MAILBOX_READ_CLEAR(prAdapter) == TRUE &&
+		(prSDIOCtrl->u4RcvMailbox0 != 0 || prSDIOCtrl->u4RcvMailbox1 != 0)) {
 		prSDIOCtrl->u4WHISR |= BIT(31);
 	}
 
@@ -439,7 +427,7 @@ VOID nicSDIOReadIntStatus(IN P_ADAPTER_T prAdapter, OUT PUINT_32 pu4IntStatus)
 }				/* end of nicSDIOReadIntStatus() */
 #endif
 
-#if 0				/*defined(_HIF_PCIE) */
+#if 0 /*defined(_HIF_PCIE) */
 VOID nicPCIEReadIntStatus(IN P_ADAPTER_T prAdapter, OUT PUINT_32 pu4IntStatus)
 {
 	UINT_32 u4RegValue;
@@ -462,33 +450,31 @@ VOID nicPCIEReadIntStatus(IN P_ADAPTER_T prAdapter, OUT PUINT_32 pu4IntStatus)
 
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief The function used to read interrupt status and then invoking
-*        dispatching procedure for the appropriate functions
-*        corresponding to specific interrupt bits
-*
-* @param prAdapter pointer to the Adapter handler
-*
-* @retval WLAN_STATUS_SUCCESS
-* @retval WLAN_STATUS_ADAPTER_NOT_READY
-*/
+ * @brief The function used to read interrupt status and then invoking
+ *        dispatching procedure for the appropriate functions
+ *        corresponding to specific interrupt bits
+ *
+ * @param prAdapter pointer to the Adapter handler
+ *
+ * @retval WLAN_STATUS_SUCCESS
+ * @retval WLAN_STATUS_ADAPTER_NOT_READY
+ */
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS nicProcessIST(IN P_ADAPTER_T prAdapter)
 {
-	WLAN_STATUS u4Status = WLAN_STATUS_SUCCESS;
-	UINT_32 u4IntStatus = 0;
-	UINT_32 i;
+	WLAN_STATUS u4Status	= WLAN_STATUS_SUCCESS;
+	UINT_32		u4IntStatus = 0;
+	UINT_32		i;
 
 	ASSERT(prAdapter);
 
 	if (prAdapter->rAcpiState == ACPI_STATE_D3) {
-		DBGLOG(REQ, WARN,
-		       "Fail in set nicProcessIST! (Adapter not ready). ACPI=D%d, Radio=%d\n",
-		       prAdapter->rAcpiState, prAdapter->fgIsRadioOff);
+		DBGLOG(REQ, WARN, "Fail in set nicProcessIST! (Adapter not ready). ACPI=D%d, Radio=%d\n", prAdapter->rAcpiState,
+				prAdapter->fgIsRadioOff);
 		return WLAN_STATUS_ADAPTER_NOT_READY;
 	}
 
 	for (i = 0; i < prAdapter->rWifiVar.u4HifIstLoopCount; i++) {
-
 		HAL_READ_INT_STATUS(prAdapter, &u4IntStatus);
 		/* DBGLOG(INIT, TRACE, ("u4IntStatus: 0x%x\n", u4IntStatus)); */
 
@@ -501,30 +487,30 @@ WLAN_STATUS nicProcessIST(IN P_ADAPTER_T prAdapter)
 		nicProcessIST_impl(prAdapter, u4IntStatus);
 
 		/* Have to TX now. Skip RX polling ASAP */
-		if (test_bit(GLUE_FLAG_HIF_TX_CMD_BIT, &prAdapter->prGlueInfo->ulFlag)
-			|| test_bit(GLUE_FLAG_HIF_TX_BIT, &prAdapter->prGlueInfo->ulFlag)) {
+		if (test_bit(GLUE_FLAG_HIF_TX_CMD_BIT, &prAdapter->prGlueInfo->ulFlag) ||
+				test_bit(GLUE_FLAG_HIF_TX_BIT, &prAdapter->prGlueInfo->ulFlag)) {
 			i *= 2;
 		}
 	}
 
 	return u4Status;
-}				/* end of nicProcessIST() */
+} /* end of nicProcessIST() */
 
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief The function used to dispatch the appropriate functions for specific
-*        interrupt bits
-*
-* @param prAdapter   pointer to the Adapter handler
-*        u4IntStatus interrupt status bits
-*
-* @retval WLAN_STATUS_SUCCESS
-* @retval WLAN_STATUS_ADAPTER_NOT_READY
-*/
+ * @brief The function used to dispatch the appropriate functions for specific
+ *        interrupt bits
+ *
+ * @param prAdapter   pointer to the Adapter handler
+ *        u4IntStatus interrupt status bits
+ *
+ * @retval WLAN_STATUS_SUCCESS
+ * @retval WLAN_STATUS_ADAPTER_NOT_READY
+ */
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS nicProcessIST_impl(IN P_ADAPTER_T prAdapter, IN UINT_32 u4IntStatus)
 {
-	UINT_32 u4IntCount = 0;
+	UINT_32			  u4IntCount	= 0;
 	P_INT_EVENT_MAP_T prIntEventMap = NULL;
 
 	ASSERT(prAdapter);
@@ -535,35 +521,33 @@ WLAN_STATUS nicProcessIST_impl(IN P_ADAPTER_T prAdapter, IN UINT_32 u4IntStatus)
 	prIntEventMap = &arIntEventMapTable[0];
 	for (u4IntCount = 0; u4IntCount < ucIntEventMapSize; prIntEventMap++, u4IntCount++) {
 		if (prIntEventMap->u4Int & prAdapter->u4IntStatus) {
-			if (0/*prIntEventMap->u4Event == INT_EVENT_RX && prAdapter->fgIsEnterD3ReqIssued == TRUE*/) {
+			if (0 /*prIntEventMap->u4Event == INT_EVENT_RX && prAdapter->fgIsEnterD3ReqIssued == TRUE*/) {
 				/* ignore */
 			} else if (apfnEventFuncTable[prIntEventMap->u4Event] != NULL) {
-				apfnEventFuncTable[prIntEventMap->u4Event] (prAdapter);
+				apfnEventFuncTable[prIntEventMap->u4Event](prAdapter);
 			} else {
-				DBGLOG(INTR, WARN,
-				       "Empty INTR handler! ISAR bit#: %ld, event:%lu, func: 0x%x\n",
-				       prIntEventMap->u4Int, prIntEventMap->u4Event,
-				       apfnEventFuncTable[prIntEventMap->u4Event]);
+				DBGLOG(INTR, WARN, "Empty INTR handler! ISAR bit#: %ld, event:%lu, func: 0x%x\n", prIntEventMap->u4Int,
+						prIntEventMap->u4Event, apfnEventFuncTable[prIntEventMap->u4Event]);
 
-				ASSERT(0);	/* to trap any NULL interrupt handler */
+				ASSERT(0); /* to trap any NULL interrupt handler */
 			}
 			prAdapter->u4IntStatus &= ~prIntEventMap->u4Int;
 		}
 	}
 
 	return WLAN_STATUS_SUCCESS;
-}				/* end of nicProcessIST_impl() */
+} /* end of nicProcessIST_impl() */
 
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief Verify the CHIP ID
-*
-* @param prAdapter      a pointer to adapter private data structure.
-*
-*
-* @retval TRUE          CHIP ID is the same as the setting compiled
-* @retval FALSE         CHIP ID is different from the setting compiled
-*/
+ * @brief Verify the CHIP ID
+ *
+ * @param prAdapter      a pointer to adapter private data structure.
+ *
+ *
+ * @retval TRUE          CHIP ID is the same as the setting compiled
+ * @retval FALSE         CHIP ID is different from the setting compiled
+ */
 /*----------------------------------------------------------------------------*/
 BOOL nicVerifyChipID(IN P_ADAPTER_T prAdapter)
 {
@@ -572,17 +556,16 @@ BOOL nicVerifyChipID(IN P_ADAPTER_T prAdapter)
 
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief Initialize the MCR to the appropriate init value, and verify the init
-*        value
-*
-* @param prAdapter      a pointer to adapter private data structure.
-*
-* @return -
-*/
+ * @brief Initialize the MCR to the appropriate init value, and verify the init
+ *        value
+ *
+ * @param prAdapter      a pointer to adapter private data structure.
+ *
+ * @return -
+ */
 /*----------------------------------------------------------------------------*/
 VOID nicMCRInit(IN P_ADAPTER_T prAdapter)
 {
-
 	ASSERT(prAdapter);
 
 	/* 4 <0> Initial value */
@@ -590,7 +573,6 @@ VOID nicMCRInit(IN P_ADAPTER_T prAdapter)
 
 VOID nicHifInit(IN P_ADAPTER_T prAdapter)
 {
-
 	ASSERT(prAdapter);
 #if 0
 	/* reset event */
@@ -602,13 +584,13 @@ VOID nicHifInit(IN P_ADAPTER_T prAdapter)
 
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief Initialize the Adapter soft variable
-*
-* @param prAdapter pointer to the Adapter handler
-*
-* @return (none)
-*
-*/
+ * @brief Initialize the Adapter soft variable
+ *
+ * @param prAdapter pointer to the Adapter handler
+ *
+ * @return (none)
+ *
+ */
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS nicInitializeAdapter(IN P_ADAPTER_T prAdapter)
 {
@@ -617,7 +599,7 @@ WLAN_STATUS nicInitializeAdapter(IN P_ADAPTER_T prAdapter)
 	ASSERT(prAdapter);
 
 	prAdapter->fgIsIntEnableWithLPOwnSet = FALSE;
-	prAdapter->fgIsReadRevID = FALSE;
+	prAdapter->fgIsReadRevID			 = FALSE;
 
 #if (CFG_EFUSE_BUFFER_MODE_DELAY_CAL == 1)
 	prAdapter->fgIsBufferBinExtract = FALSE;
@@ -645,34 +627,33 @@ WLAN_STATUS nicInitializeAdapter(IN P_ADAPTER_T prAdapter)
 #if defined(_HIF_SPI)
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief Restore the SPI Mode Select to default mode,
-*        this is important while driver is unload, and this must be last mcr
-*        since the operation will let the hif use 8bit mode access
-*
-* \param[in] prAdapter      a pointer to adapter private data structure.
-* \param[in] eGPIO2_Mode    GPIO2 operation mode
-*
-* \return (none)
-*/
+ * \brief Restore the SPI Mode Select to default mode,
+ *        this is important while driver is unload, and this must be last mcr
+ *        since the operation will let the hif use 8bit mode access
+ *
+ * \param[in] prAdapter      a pointer to adapter private data structure.
+ * \param[in] eGPIO2_Mode    GPIO2 operation mode
+ *
+ * \return (none)
+ */
 /*----------------------------------------------------------------------------*/
 void nicRestoreSpiDefMode(IN P_ADAPTER_T prAdapter)
 {
 	ASSERT(prAdapter);
 
 	HAL_MCR_WR(prAdapter, MCR_WCSR, SPICSR_8BIT_MODE_DATA);
-
 }
 #endif
 
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief Process rx interrupt. When the rx
-*        Interrupt is asserted, it means there are frames in queue.
-*
-* @param prAdapter      Pointer to the Adapter structure.
-*
-* @return (none)
-*/
+ * @brief Process rx interrupt. When the rx
+ *        Interrupt is asserted, it means there are frames in queue.
+ *
+ * @param prAdapter      Pointer to the Adapter structure.
+ *
+ * @return (none)
+ */
 /*----------------------------------------------------------------------------*/
 VOID nicProcessAbnormalInterrupt(IN P_ADAPTER_T prAdapter)
 {
@@ -687,31 +668,30 @@ VOID nicProcessAbnormalInterrupt(IN P_ADAPTER_T prAdapter)
 
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief .
-*
-* @param prAdapter  Pointer to the Adapter structure.
-*
-* @return (none)
-*/
+ * @brief .
+ *
+ * @param prAdapter  Pointer to the Adapter structure.
+ *
+ * @return (none)
+ */
 /*----------------------------------------------------------------------------*/
 VOID nicProcessFwOwnBackInterrupt(IN P_ADAPTER_T prAdapter)
 {
-
-}				/* end of nicProcessFwOwnBackInterrupt() */
+} /* end of nicProcessFwOwnBackInterrupt() */
 
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief .
-*
-* @param prAdapter  Pointer to the Adapter structure.
-*
-* @return (none)
-*/
+ * @brief .
+ *
+ * @param prAdapter  Pointer to the Adapter structure.
+ *
+ * @return (none)
+ */
 /*----------------------------------------------------------------------------*/
 VOID nicProcessSoftwareInterrupt(IN P_ADAPTER_T prAdapter)
 {
 	halProcessSoftwareInterrupt(prAdapter);
-}				/* end of nicProcessSoftwareInterrupt() */
+} /* end of nicProcessSoftwareInterrupt() */
 
 VOID nicSetSwIntr(IN P_ADAPTER_T prAdapter, IN UINT_32 u4SwIntrBitmap)
 {
@@ -720,29 +700,29 @@ VOID nicSetSwIntr(IN P_ADAPTER_T prAdapter, IN UINT_32 u4SwIntrBitmap)
 	 *  SW interrupt valid from b0~b15
 	 */
 	ASSERT((u4SwIntrBitmap & BITS(0, 15)) == 0);
-/* DBGLOG(INIT, TRACE, ("u4SwIntrBitmap: 0x%08x\n", u4SwIntrBitmap)); */
+	/* DBGLOG(INIT, TRACE, ("u4SwIntrBitmap: 0x%08x\n", u4SwIntrBitmap)); */
 
 	HAL_MCR_WR(prAdapter, MCR_WSICR, u4SwIntrBitmap);
 }
 
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief This procedure is used to dequeue from prAdapter->rPendingCmdQueue
-*        with specified sequential number
-*
-* @param    prAdapter   Pointer of ADAPTER_T
-*           ucSeqNum    Sequential Number
-*
-* @retval - P_CMD_INFO_T
-*/
+ * @brief This procedure is used to dequeue from prAdapter->rPendingCmdQueue
+ *        with specified sequential number
+ *
+ * @param    prAdapter   Pointer of ADAPTER_T
+ *           ucSeqNum    Sequential Number
+ *
+ * @retval - P_CMD_INFO_T
+ */
 /*----------------------------------------------------------------------------*/
 P_CMD_INFO_T nicGetPendingCmdInfo(IN P_ADAPTER_T prAdapter, IN UINT_8 ucSeqNum)
 {
-	P_QUE_T prCmdQue;
-	QUE_T rTempCmdQue;
-	P_QUE_T prTempCmdQue = &rTempCmdQue;
-	P_QUE_ENTRY_T prQueueEntry = (P_QUE_ENTRY_T) NULL;
-	P_CMD_INFO_T prCmdInfo = (P_CMD_INFO_T) NULL;
+	P_QUE_T		  prCmdQue;
+	QUE_T		  rTempCmdQue;
+	P_QUE_T		  prTempCmdQue = &rTempCmdQue;
+	P_QUE_ENTRY_T prQueueEntry = (P_QUE_ENTRY_T)NULL;
+	P_CMD_INFO_T  prCmdInfo	   = (P_CMD_INFO_T)NULL;
 
 	GLUE_SPIN_LOCK_DECLARATION();
 
@@ -755,14 +735,14 @@ P_CMD_INFO_T nicGetPendingCmdInfo(IN P_ADAPTER_T prAdapter, IN UINT_8 ucSeqNum)
 
 	QUEUE_REMOVE_HEAD(prTempCmdQue, prQueueEntry, P_QUE_ENTRY_T);
 	while (prQueueEntry) {
-		prCmdInfo = (P_CMD_INFO_T) prQueueEntry;
+		prCmdInfo = (P_CMD_INFO_T)prQueueEntry;
 
 		if (prCmdInfo->ucCmdSeqNum == ucSeqNum)
 			break;
 
-			QUEUE_INSERT_TAIL(prCmdQue, prQueueEntry);
+		QUEUE_INSERT_TAIL(prCmdQue, prQueueEntry);
 
-			prCmdInfo = NULL;
+		prCmdInfo = NULL;
 
 		QUEUE_REMOVE_HEAD(prTempCmdQue, prQueueEntry, P_QUE_ENTRY_T);
 	}
@@ -775,22 +755,22 @@ P_CMD_INFO_T nicGetPendingCmdInfo(IN P_ADAPTER_T prAdapter, IN UINT_8 ucSeqNum)
 
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief This procedure is used to dequeue from prAdapter->rTxCtrl.rTxMgmtTxingQueue
-*        with specified sequential number
-*
-* @param    prAdapter   Pointer of ADAPTER_T
-*           ucSeqNum    Sequential Number
-*
-* @retval - P_MSDU_INFO_T
-*/
+ * @brief This procedure is used to dequeue from prAdapter->rTxCtrl.rTxMgmtTxingQueue
+ *        with specified sequential number
+ *
+ * @param    prAdapter   Pointer of ADAPTER_T
+ *           ucSeqNum    Sequential Number
+ *
+ * @retval - P_MSDU_INFO_T
+ */
 /*----------------------------------------------------------------------------*/
 P_MSDU_INFO_T nicGetPendingTxMsduInfo(IN P_ADAPTER_T prAdapter, IN UINT_8 ucWlanIndex, IN UINT_8 ucPID)
 {
-	P_QUE_T prTxingQue;
-	QUE_T rTempQue;
-	P_QUE_T prTempQue = &rTempQue;
-	P_QUE_ENTRY_T prQueueEntry = (P_QUE_ENTRY_T) NULL;
-	P_MSDU_INFO_T prMsduInfo = (P_MSDU_INFO_T) NULL;
+	P_QUE_T		  prTxingQue;
+	QUE_T		  rTempQue;
+	P_QUE_T		  prTempQue	   = &rTempQue;
+	P_QUE_ENTRY_T prQueueEntry = (P_QUE_ENTRY_T)NULL;
+	P_MSDU_INFO_T prMsduInfo   = (P_MSDU_INFO_T)NULL;
 
 	GLUE_SPIN_LOCK_DECLARATION();
 
@@ -803,14 +783,14 @@ P_MSDU_INFO_T nicGetPendingTxMsduInfo(IN P_ADAPTER_T prAdapter, IN UINT_8 ucWlan
 
 	QUEUE_REMOVE_HEAD(prTempQue, prQueueEntry, P_QUE_ENTRY_T);
 	while (prQueueEntry) {
-		prMsduInfo = (P_MSDU_INFO_T) prQueueEntry;
+		prMsduInfo = (P_MSDU_INFO_T)prQueueEntry;
 
 		if ((prMsduInfo->ucPID == ucPID) && (prMsduInfo->ucWlanIndex == ucWlanIndex))
 			break;
 
-			QUEUE_INSERT_TAIL(prTxingQue, prQueueEntry);
+		QUEUE_INSERT_TAIL(prTxingQue, prQueueEntry);
 
-			prMsduInfo = NULL;
+		prMsduInfo = NULL;
 
 		QUEUE_REMOVE_HEAD(prTempQue, prQueueEntry, P_QUE_ENTRY_T);
 	}
@@ -819,8 +799,8 @@ P_MSDU_INFO_T nicGetPendingTxMsduInfo(IN P_ADAPTER_T prAdapter, IN UINT_8 ucWlan
 	KAL_RELEASE_SPIN_LOCK(prAdapter, SPIN_LOCK_TXING_MGMT_LIST);
 
 	if (prMsduInfo) {
-		DBGLOG(TX, TRACE, "Get Msdu WIDX:PID[%u:%u] SEQ[%u] from Pending Q\n",
-		       prMsduInfo->ucWlanIndex, prMsduInfo->ucPID, prMsduInfo->ucTxSeqNum);
+		DBGLOG(TX, TRACE, "Get Msdu WIDX:PID[%u:%u] SEQ[%u] from Pending Q\n", prMsduInfo->ucWlanIndex,
+				prMsduInfo->ucPID, prMsduInfo->ucTxSeqNum);
 	} else {
 		DBGLOG(TX, WARN, "Cannot get Target Msdu WIDX:PID[%u:%u] from Pending Q\n", ucWlanIndex, ucPID);
 	}
@@ -830,13 +810,13 @@ P_MSDU_INFO_T nicGetPendingTxMsduInfo(IN P_ADAPTER_T prAdapter, IN UINT_8 ucWlan
 
 VOID nicFreePendingTxMsduInfoByBssIdx(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex)
 {
-	P_QUE_T prTxingQue;
-	QUE_T rTempQue;
-	P_QUE_T prTempQue = &rTempQue;
-	P_QUE_ENTRY_T prQueueEntry = (P_QUE_ENTRY_T) NULL;
-	P_MSDU_INFO_T prMsduInfoListHead = (P_MSDU_INFO_T) NULL;
-	P_MSDU_INFO_T prMsduInfoListTail = (P_MSDU_INFO_T) NULL;
-	P_MSDU_INFO_T prMsduInfo = (P_MSDU_INFO_T) NULL;
+	P_QUE_T		  prTxingQue;
+	QUE_T		  rTempQue;
+	P_QUE_T		  prTempQue			 = &rTempQue;
+	P_QUE_ENTRY_T prQueueEntry		 = (P_QUE_ENTRY_T)NULL;
+	P_MSDU_INFO_T prMsduInfoListHead = (P_MSDU_INFO_T)NULL;
+	P_MSDU_INFO_T prMsduInfoListTail = (P_MSDU_INFO_T)NULL;
+	P_MSDU_INFO_T prMsduInfo		 = (P_MSDU_INFO_T)NULL;
 
 	GLUE_SPIN_LOCK_DECLARATION();
 
@@ -849,11 +829,11 @@ VOID nicFreePendingTxMsduInfoByBssIdx(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssI
 
 	QUEUE_REMOVE_HEAD(prTempQue, prQueueEntry, P_QUE_ENTRY_T);
 	while (prQueueEntry) {
-		prMsduInfo = (P_MSDU_INFO_T) prQueueEntry;
+		prMsduInfo = (P_MSDU_INFO_T)prQueueEntry;
 
 		if (prMsduInfo->ucBssIndex == ucBssIndex) {
-			DBGLOG(TX, TRACE, "%s: Get Msdu WIDX:PID[%u:%u] SEQ[%u] from Pending Q\n",
-			       __func__, prMsduInfo->ucWlanIndex, prMsduInfo->ucPID, prMsduInfo->ucTxSeqNum);
+			DBGLOG(TX, TRACE, "%s: Get Msdu WIDX:PID[%u:%u] SEQ[%u] from Pending Q\n", __func__,
+					prMsduInfo->ucWlanIndex, prMsduInfo->ucPID, prMsduInfo->ucTxSeqNum);
 
 			if (prMsduInfoListHead == NULL) {
 				prMsduInfoListHead = prMsduInfoListTail = prMsduInfo;
@@ -881,16 +861,16 @@ VOID nicFreePendingTxMsduInfoByBssIdx(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssI
 
 	return;
 
-}				/* end of nicFreePendingTxMsduInfoByBssIdx() */
+} /* end of nicFreePendingTxMsduInfoByBssIdx() */
 
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief This procedure is used to retrieve a CMD sequence number atomically
-*
-* @param    prAdapter   Pointer of ADAPTER_T
-*
-* @retval - UINT_8
-*/
+ * @brief This procedure is used to retrieve a CMD sequence number atomically
+ *
+ * @param    prAdapter   Pointer of ADAPTER_T
+ *
+ * @retval - UINT_8
+ */
 /*----------------------------------------------------------------------------*/
 UINT_8 nicIncreaseCmdSeqNum(IN P_ADAPTER_T prAdapter)
 {
@@ -912,12 +892,12 @@ UINT_8 nicIncreaseCmdSeqNum(IN P_ADAPTER_T prAdapter)
 
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief This procedure is used to retrieve a TX sequence number atomically
-*
-* @param    prAdapter   Pointer of ADAPTER_T
-*
-* @retval - UINT_8
-*/
+ * @brief This procedure is used to retrieve a TX sequence number atomically
+ *
+ * @param    prAdapter   Pointer of ADAPTER_T
+ *
+ * @retval - UINT_8
+ */
 /*----------------------------------------------------------------------------*/
 UINT_8 nicIncreaseTxSeqNum(IN P_ADAPTER_T prAdapter)
 {
@@ -940,13 +920,13 @@ UINT_8 nicIncreaseTxSeqNum(IN P_ADAPTER_T prAdapter)
 
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief This utility function is used to handle
-*        media state change event
-*
-* @param
-*
-* @retval
-*/
+ * @brief This utility function is used to handle
+ *        media state change event
+ *
+ * @param
+ *
+ * @retval
+ */
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS
 nicMediaStateChange(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex, IN P_EVENT_CONNECTION_STATUS prConnectionStatus)
@@ -958,9 +938,8 @@ nicMediaStateChange(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex, IN P_EVENT_C
 
 	switch (GET_BSS_INFO_BY_INDEX(prAdapter, ucBssIndex)->eNetworkType) {
 	case NETWORK_TYPE_AIS:
-		if (prConnectionStatus->ucMediaStatus == PARAM_MEDIA_STATE_DISCONNECTED) {	/* disconnected */
+		if (prConnectionStatus->ucMediaStatus == PARAM_MEDIA_STATE_DISCONNECTED) { /* disconnected */
 			if (kalGetMediaStateIndicated(prGlueInfo) != PARAM_MEDIA_STATE_DISCONNECTED) {
-
 				kalIndicateStatusAndComplete(prGlueInfo, WLAN_STATUS_MEDIA_DISCONNECT, NULL, 0);
 
 				prAdapter->rWlanInfo.u4SysTime = kalGetTimeTick();
@@ -968,26 +947,23 @@ nicMediaStateChange(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex, IN P_EVENT_C
 
 			/* reset buffered link quality information */
 			prAdapter->fgIsLinkQualityValid = FALSE;
-			prAdapter->fgIsLinkRateValid = FALSE;
-		} else if (prConnectionStatus->ucMediaStatus == PARAM_MEDIA_STATE_CONNECTED) {	/* connected */
+			prAdapter->fgIsLinkRateValid	= FALSE;
+		} else if (prConnectionStatus->ucMediaStatus == PARAM_MEDIA_STATE_CONNECTED) { /* connected */
 			prAdapter->rWlanInfo.u4SysTime = kalGetTimeTick();
 
 			/* fill information for association result */
 			prAdapter->rWlanInfo.rCurrBssId.rSsid.u4SsidLen = prConnectionStatus->ucSsidLen;
-			kalMemCopy(prAdapter->rWlanInfo.rCurrBssId.rSsid.aucSsid,
-				   prConnectionStatus->aucSsid, prConnectionStatus->ucSsidLen);
-			kalMemCopy(prAdapter->rWlanInfo.rCurrBssId.arMacAddress,
-				   prConnectionStatus->aucBssid, MAC_ADDR_LEN);
-			prAdapter->rWlanInfo.rCurrBssId.u4Privacy = prConnectionStatus->ucEncryptStatus;/* @FIXME */
-			prAdapter->rWlanInfo.rCurrBssId.rRssi = 0;	/* @FIXME */
-			prAdapter->rWlanInfo.rCurrBssId.eNetworkTypeInUse = PARAM_NETWORK_TYPE_AUTOMODE;/* @FIXME */
-			prAdapter->rWlanInfo.rCurrBssId.rConfiguration.u4BeaconPeriod
-			    = prConnectionStatus->u2BeaconPeriod;
-			prAdapter->rWlanInfo.rCurrBssId.rConfiguration.u4ATIMWindow = prConnectionStatus->u2ATIMWindow;
-			prAdapter->rWlanInfo.rCurrBssId.rConfiguration.u4DSConfig = prConnectionStatus->u4FreqInKHz;
-			prAdapter->rWlanInfo.ucNetworkType = prConnectionStatus->ucNetworkType;
-			prAdapter->rWlanInfo.rCurrBssId.eOpMode
-			    = (ENUM_PARAM_OP_MODE_T) prConnectionStatus->ucInfraMode;
+			kalMemCopy(prAdapter->rWlanInfo.rCurrBssId.rSsid.aucSsid, prConnectionStatus->aucSsid,
+					prConnectionStatus->ucSsidLen);
+			kalMemCopy(prAdapter->rWlanInfo.rCurrBssId.arMacAddress, prConnectionStatus->aucBssid, MAC_ADDR_LEN);
+			prAdapter->rWlanInfo.rCurrBssId.u4Privacy		  = prConnectionStatus->ucEncryptStatus; /* @FIXME */
+			prAdapter->rWlanInfo.rCurrBssId.rRssi			  = 0;									 /* @FIXME */
+			prAdapter->rWlanInfo.rCurrBssId.eNetworkTypeInUse = PARAM_NETWORK_TYPE_AUTOMODE;		 /* @FIXME */
+			prAdapter->rWlanInfo.rCurrBssId.rConfiguration.u4BeaconPeriod = prConnectionStatus->u2BeaconPeriod;
+			prAdapter->rWlanInfo.rCurrBssId.rConfiguration.u4ATIMWindow	  = prConnectionStatus->u2ATIMWindow;
+			prAdapter->rWlanInfo.rCurrBssId.rConfiguration.u4DSConfig	  = prConnectionStatus->u4FreqInKHz;
+			prAdapter->rWlanInfo.ucNetworkType							  = prConnectionStatus->ucNetworkType;
+			prAdapter->rWlanInfo.rCurrBssId.eOpMode = (ENUM_PARAM_OP_MODE_T)prConnectionStatus->ucInfraMode;
 
 			/* always indicate to OS according to MSDN (re-association/roaming) */
 			if (kalGetMediaStateIndicated(prGlueInfo) != PARAM_MEDIA_STATE_CONNECTED) {
@@ -1013,16 +989,16 @@ nicMediaStateChange(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex, IN P_EVENT_C
 	}
 
 	return WLAN_STATUS_SUCCESS;
-}				/* nicMediaStateChange */
+} /* nicMediaStateChange */
 
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief This utility function is used to generate a join failure event to OS
-*
-* @param
-*
-* @retval
-*/
+ * @brief This utility function is used to generate a join failure event to OS
+ *
+ * @param
+ *
+ * @retval
+ */
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS nicMediaJoinFailure(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex, IN WLAN_STATUS rStatus)
 {
@@ -1044,17 +1020,17 @@ WLAN_STATUS nicMediaJoinFailure(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex, 
 	}
 
 	return WLAN_STATUS_SUCCESS;
-}				/* end of nicMediaJoinFailure() */
+} /* end of nicMediaJoinFailure() */
 
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief This utility function is used to convert between
-*        frequency and channel number
-*
-* @param u4ChannelNum
-*
-* @retval - Frequency in unit of KHz, 0 for invalid channel number
-*/
+ * @brief This utility function is used to convert between
+ *        frequency and channel number
+ *
+ * @param u4ChannelNum
+ *
+ * @retval - Frequency in unit of KHz, 0 for invalid channel number
+ */
 /*----------------------------------------------------------------------------*/
 UINT_32 nicChannelNum2Freq(UINT_32 u4ChannelNum)
 {
@@ -1065,9 +1041,9 @@ UINT_32 nicChannelNum2Freq(UINT_32 u4ChannelNum)
 	else if (u4ChannelNum == 14)
 		u4ChannelInMHz = 2484;
 	else if (u4ChannelNum == 133)
-		u4ChannelInMHz = 3665;	/* 802.11y */
+		u4ChannelInMHz = 3665; /* 802.11y */
 	else if (u4ChannelNum == 137)
-		u4ChannelInMHz = 3685;	/* 802.11y */
+		u4ChannelInMHz = 3685; /* 802.11y */
 	else if ((u4ChannelNum >= 34 && u4ChannelNum <= 181) || (u4ChannelNum == 16))
 		u4ChannelInMHz = 5000 + u4ChannelNum * 5;
 	else if (u4ChannelNum >= 182 && u4ChannelNum <= 196)
@@ -1084,13 +1060,13 @@ UINT_32 nicChannelNum2Freq(UINT_32 u4ChannelNum)
 
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief This utility function is used to convert between
-*        frequency and channel number
-*
-* @param u4FreqInKHz
-*
-* @retval - Frequency Number, 0 for invalid freqency
-*/
+ * @brief This utility function is used to convert between
+ *        frequency and channel number
+ *
+ * @param u4FreqInKHz
+ *
+ * @retval - Frequency Number, 0 for invalid freqency
+ */
 /*----------------------------------------------------------------------------*/
 UINT_32 nicFreq2ChannelNum(UINT_32 u4FreqInKHz)
 {
@@ -1124,9 +1100,9 @@ UINT_32 nicFreq2ChannelNum(UINT_32 u4FreqInKHz)
 	case 2484000:
 		return 14;
 	case 3665000:
-		return 133;	/* 802.11y */
+		return 133; /* 802.11y */
 	case 3685000:
-		return 137;	/* 802.11y */
+		return 137; /* 802.11y */
 	case 4915000:
 		return 183;
 	case 4920000:
@@ -1252,7 +1228,6 @@ UINT_8 nicGetVhtS1(UINT_8 ucPrimaryChannel, UINT_8 ucBandwidth)
 	/* find S1 (central channel 42, 58, 106, 122, and 155) */
 
 	if ((ucBandwidth == VHT_OP_CHANNEL_WIDTH_80) || (ucBandwidth == VHT_OP_CHANNEL_WIDTH_80P80)) {
-
 		if (ucPrimaryChannel >= 36 && ucPrimaryChannel <= 48)
 			return 42;
 		else if (ucPrimaryChannel >= 52 && ucPrimaryChannel <= 64)
@@ -1267,56 +1242,52 @@ UINT_8 nicGetVhtS1(UINT_8 ucPrimaryChannel, UINT_8 ucBandwidth)
 			return 155;
 
 	} else if (ucBandwidth == VHT_OP_CHANNEL_WIDTH_160) {
-
 		if (ucPrimaryChannel >= 36 && ucPrimaryChannel <= 64)
 			return 50;
 		else if (ucPrimaryChannel >= 100 && ucPrimaryChannel <= 128)
 			return 114;
 
 	} else {
-
 		return 0;
 	}
 
 	return 0;
-
 }
 
 /* firmware command wrapper */
 /* NETWORK (WIFISYS) */
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief This utility function is used to activate WIFISYS for specified network
-*
-* @param prAdapter          Pointer of ADAPTER_T
-*        eNetworkTypeIdx    Index of network type
-*
-* @retval -
-*/
+ * @brief This utility function is used to activate WIFISYS for specified network
+ *
+ * @param prAdapter          Pointer of ADAPTER_T
+ *        eNetworkTypeIdx    Index of network type
+ *
+ * @retval -
+ */
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS nicActivateNetwork(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex)
 {
 	CMD_BSS_ACTIVATE_CTRL rCmdActivateCtrl;
-	P_BSS_INFO_T prBssInfo;
-/*	const UINT_8 aucZeroMacAddr[] = NULL_MAC_ADDR; */
+	P_BSS_INFO_T		  prBssInfo;
+	/*	const UINT_8 aucZeroMacAddr[] = NULL_MAC_ADDR; */
 
 	ASSERT(prAdapter);
 	ASSERT(IS_BSS_INDEX_VALID(ucBssIndex));
 
 	prBssInfo = GET_BSS_INFO_BY_INDEX(prAdapter, ucBssIndex);
 
-	prBssInfo->fg40mBwAllowed = FALSE;
+	prBssInfo->fg40mBwAllowed	   = FALSE;
 	prBssInfo->fgAssoc40mBwAllowed = FALSE;
 
-	rCmdActivateCtrl.ucBssIndex = ucBssIndex;
-	rCmdActivateCtrl.ucActive = 1;
-	rCmdActivateCtrl.ucNetworkType = (UINT_8) prBssInfo->eNetworkType;
+	rCmdActivateCtrl.ucBssIndex		   = ucBssIndex;
+	rCmdActivateCtrl.ucActive		   = 1;
+	rCmdActivateCtrl.ucNetworkType	   = (UINT_8)prBssInfo->eNetworkType;
 	rCmdActivateCtrl.ucOwnMacAddrIndex = prBssInfo->ucOwnMacIndex;
 	COPY_MAC_ADDR(rCmdActivateCtrl.aucBssMacAddr, prBssInfo->aucOwnMacAddr);
 
-	prBssInfo->ucBMCWlanIndex =
-	    secPrivacySeekForBcEntry(prAdapter, prBssInfo->ucBssIndex,
-				     prBssInfo->aucOwnMacAddr, STA_REC_INDEX_NOT_FOUND, CIPHER_SUITE_NONE, 0xFF);
+	prBssInfo->ucBMCWlanIndex = secPrivacySeekForBcEntry(prAdapter, prBssInfo->ucBssIndex, prBssInfo->aucOwnMacAddr,
+			STA_REC_INDEX_NOT_FOUND, CIPHER_SUITE_NONE, 0xFF);
 
 	prBssInfo->ucBMCWlanIndexSUsed[0] = TRUE;
 
@@ -1324,37 +1295,32 @@ WLAN_STATUS nicActivateNetwork(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex)
 
 	kalMemZero(&rCmdActivateCtrl.ucReserved, sizeof(rCmdActivateCtrl.ucReserved));
 
-#if 1				/* DBG */
+#if 1 /* DBG */
 	DBGLOG(RSN, INFO, "[wlan index][Network]=%d activate=%d\n", ucBssIndex, 1);
-	DBGLOG(RSN, INFO,
-	       "[wlan index][Network] OwnMac=" MACSTR " BSSID=" MACSTR " BMCIndex = %d NetType=%d\n",
-	       MAC2STR(prBssInfo->aucOwnMacAddr), MAC2STR(prBssInfo->aucBSSID),
-	       prBssInfo->ucBMCWlanIndex, prBssInfo->eNetworkType);
+	DBGLOG(RSN, INFO, "[wlan index][Network] OwnMac=" MACSTR " BSSID=" MACSTR " BMCIndex = %d NetType=%d\n",
+			MAC2STR(prBssInfo->aucOwnMacAddr), MAC2STR(prBssInfo->aucBSSID), prBssInfo->ucBMCWlanIndex,
+			prBssInfo->eNetworkType);
 #endif
 
-	return wlanSendSetQueryCmd(prAdapter,
-				   CMD_ID_BSS_ACTIVATE_CTRL,
-				   TRUE,
-				   FALSE,
-				   FALSE,
-				   NULL, NULL, sizeof(CMD_BSS_ACTIVATE_CTRL), (PUINT_8)&rCmdActivateCtrl, NULL, 0);
+	return wlanSendSetQueryCmd(prAdapter, CMD_ID_BSS_ACTIVATE_CTRL, TRUE, FALSE, FALSE, NULL, NULL,
+			sizeof(CMD_BSS_ACTIVATE_CTRL), (PUINT_8)&rCmdActivateCtrl, NULL, 0);
 }
 
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief This utility function is used to deactivate WIFISYS for specified network
-*
-* @param prAdapter          Pointer of ADAPTER_T
-*        eNetworkTypeIdx    Index of network type
-*
-* @retval -
-*/
+ * @brief This utility function is used to deactivate WIFISYS for specified network
+ *
+ * @param prAdapter          Pointer of ADAPTER_T
+ *        eNetworkTypeIdx    Index of network type
+ *
+ * @retval -
+ */
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS nicDeactivateNetwork(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex)
 {
-	WLAN_STATUS u4Status;
+	WLAN_STATUS			  u4Status;
 	CMD_BSS_ACTIVATE_CTRL rCmdActivateCtrl;
-	P_BSS_INFO_T prBssInfo;
+	P_BSS_INFO_T		  prBssInfo;
 
 	ASSERT(prAdapter);
 	ASSERT(IS_BSS_INDEX_VALID(ucBssIndex));
@@ -1364,30 +1330,24 @@ WLAN_STATUS nicDeactivateNetwork(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex)
 	kalMemZero(&rCmdActivateCtrl, sizeof(CMD_BSS_ACTIVATE_CTRL));
 
 	rCmdActivateCtrl.ucBssIndex = ucBssIndex;
-	rCmdActivateCtrl.ucActive = 0;
+	rCmdActivateCtrl.ucActive	= 0;
 
-#if 1				/* DBG */
+#if 1 /* DBG */
 	DBGLOG(RSN, INFO, "[wlan index][Network]=%d activate=%d\n", ucBssIndex, 0);
-	DBGLOG(RSN, INFO,
-	       "[wlan index][Network] OwnMac=" MACSTR " BSSID=" MACSTR " BMCIndex = %d\n",
-	       MAC2STR(prBssInfo->aucOwnMacAddr), MAC2STR(prBssInfo->aucBSSID), prBssInfo->ucBMCWlanIndex);
+	DBGLOG(RSN, INFO, "[wlan index][Network] OwnMac=" MACSTR " BSSID=" MACSTR " BMCIndex = %d\n",
+			MAC2STR(prBssInfo->aucOwnMacAddr), MAC2STR(prBssInfo->aucBSSID), prBssInfo->ucBMCWlanIndex);
 #endif
 	rCmdActivateCtrl.ucOwnMacAddrIndex = prBssInfo->ucOwnMacIndex;
 	/* 20170628, if deactive bssid, do not reset NetworkType, otherwise we cannot free bcn */
-	rCmdActivateCtrl.ucNetworkType = (UINT_8) prBssInfo->eNetworkType;
+	rCmdActivateCtrl.ucNetworkType = (UINT_8)prBssInfo->eNetworkType;
 
-	u4Status = wlanSendSetQueryCmd(prAdapter,
-				       CMD_ID_BSS_ACTIVATE_CTRL,
-				       TRUE,
-				       FALSE,
-				       FALSE,
-				       NULL,
-				       NULL, sizeof(CMD_BSS_ACTIVATE_CTRL), (PUINT_8)&rCmdActivateCtrl, NULL, 0);
+	u4Status = wlanSendSetQueryCmd(prAdapter, CMD_ID_BSS_ACTIVATE_CTRL, TRUE, FALSE, FALSE, NULL, NULL,
+			sizeof(CMD_BSS_ACTIVATE_CTRL), (PUINT_8)&rCmdActivateCtrl, NULL, 0);
 
 	secRemoveBssBcEntry(prAdapter, prBssInfo, FALSE);
 
 	/* 20190301 To free all the correlated StaRec,
-        clients (StaRec) in BSS client list also need to be removed from list */
+		clients (StaRec) in BSS client list also need to be removed from list */
 	bssInitializeClientList(prAdapter, prBssInfo);
 
 	/* free all correlated station records */
@@ -1407,21 +1367,21 @@ WLAN_STATUS nicDeactivateNetwork(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex)
 /* BSS-INFO */
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief This utility function is used to sync bss info with firmware
-*        when a new BSS has been connected or disconnected
-*
-* @param prAdapter          Pointer of ADAPTER_T
-*        ucBssIndex         Index of BSS-INFO
-*
-* @retval -
-*/
+ * @brief This utility function is used to sync bss info with firmware
+ *        when a new BSS has been connected or disconnected
+ *
+ * @param prAdapter          Pointer of ADAPTER_T
+ *        ucBssIndex         Index of BSS-INFO
+ *
+ * @retval -
+ */
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS nicUpdateBss(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex)
 {
-	WLAN_STATUS u4Status = WLAN_STATUS_NOT_ACCEPTED;
-	P_BSS_INFO_T prBssInfo;
+	WLAN_STATUS		 u4Status = WLAN_STATUS_NOT_ACCEPTED;
+	P_BSS_INFO_T	 prBssInfo;
 	CMD_SET_BSS_INFO rCmdSetBssInfo;
-	P_WIFI_VAR_T prWifiVar = &prAdapter->rWifiVar;
+	P_WIFI_VAR_T	 prWifiVar = &prAdapter->rWifiVar;
 
 	ASSERT(prAdapter);
 	ASSERT(ucBssIndex <= MAX_BSS_INDEX);
@@ -1431,33 +1391,32 @@ WLAN_STATUS nicUpdateBss(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex)
 	if ((prBssInfo->eDBDCBand != ENUM_BAND_0) && (prBssInfo->eDBDCBand != ENUM_BAND_1)) {
 		DBGLOG(BSS, ERROR, "Wrong eDBDCBand - [%u]\n", prBssInfo->eDBDCBand);
 		prBssInfo->eDBDCBand = ENUM_BAND_0; /* Work around : temp solution */
-		/*ASSERT(0);*/ /* FATAL ERROR */
+		/*ASSERT(0);*/						/* FATAL ERROR */
 	}
 
 	kalMemZero(&rCmdSetBssInfo, sizeof(CMD_SET_BSS_INFO));
 
-	rCmdSetBssInfo.ucBssIndex = ucBssIndex;
-	rCmdSetBssInfo.ucConnectionState = (UINT_8) prBssInfo->eConnectionState;
-	rCmdSetBssInfo.ucCurrentOPMode = (UINT_8) prBssInfo->eCurrentOPMode;
-	rCmdSetBssInfo.ucSSIDLen = (UINT_8) prBssInfo->ucSSIDLen;
+	rCmdSetBssInfo.ucBssIndex		 = ucBssIndex;
+	rCmdSetBssInfo.ucConnectionState = (UINT_8)prBssInfo->eConnectionState;
+	rCmdSetBssInfo.ucCurrentOPMode	 = (UINT_8)prBssInfo->eCurrentOPMode;
+	rCmdSetBssInfo.ucSSIDLen		 = (UINT_8)prBssInfo->ucSSIDLen;
 	kalMemCopy(rCmdSetBssInfo.aucSSID, prBssInfo->aucSSID, prBssInfo->ucSSIDLen);
 	COPY_MAC_ADDR(rCmdSetBssInfo.aucBSSID, prBssInfo->aucBSSID);
-	rCmdSetBssInfo.ucIsQBSS = (UINT_8) prBssInfo->fgIsQBSS;
-	rCmdSetBssInfo.ucNonHTBasicPhyType = prBssInfo->ucNonHTBasicPhyType;
-	rCmdSetBssInfo.u2OperationalRateSet = prBssInfo->u2OperationalRateSet;
-	rCmdSetBssInfo.u2BSSBasicRateSet = prBssInfo->u2BSSBasicRateSet;
+	rCmdSetBssInfo.ucIsQBSS					= (UINT_8)prBssInfo->fgIsQBSS;
+	rCmdSetBssInfo.ucNonHTBasicPhyType		= prBssInfo->ucNonHTBasicPhyType;
+	rCmdSetBssInfo.u2OperationalRateSet		= prBssInfo->u2OperationalRateSet;
+	rCmdSetBssInfo.u2BSSBasicRateSet		= prBssInfo->u2BSSBasicRateSet;
 	rCmdSetBssInfo.u2HwDefaultFixedRateCode = prBssInfo->u2HwDefaultFixedRateCode;
-	rCmdSetBssInfo.ucPhyTypeSet = prBssInfo->ucPhyTypeSet;
-	rCmdSetBssInfo.u4PrivateData = prBssInfo->u4PrivateData;
-#if	CFG_SUPPORT_DBDC
+	rCmdSetBssInfo.ucPhyTypeSet				= prBssInfo->ucPhyTypeSet;
+	rCmdSetBssInfo.u4PrivateData			= prBssInfo->u4PrivateData;
+#if CFG_SUPPORT_DBDC
 	rCmdSetBssInfo.ucDBDCBand = prBssInfo->eDBDCBand;
 #endif
 	rCmdSetBssInfo.ucWmmSet = prBssInfo->ucWmmQueSet;
-	rCmdSetBssInfo.ucNss = prBssInfo->ucNss;
+	rCmdSetBssInfo.ucNss	= prBssInfo->ucNss;
 
 	if (prBssInfo->fgBcDefaultKeyExist) {
-		if (prBssInfo->wepkeyUsed[prBssInfo->ucBcDefaultKeyIdx] &&
-			prBssInfo->wepkeyWlanIdx < NIC_TX_DEFAULT_WLAN_INDEX)
+		if (prBssInfo->wepkeyUsed[prBssInfo->ucBcDefaultKeyIdx] && prBssInfo->wepkeyWlanIdx < NIC_TX_DEFAULT_WLAN_INDEX)
 			rCmdSetBssInfo.ucBMCWlanIndex = prBssInfo->wepkeyWlanIdx;
 		else if (prBssInfo->ucBMCWlanIndexSUsed[prBssInfo->ucBcDefaultKeyIdx])
 			rCmdSetBssInfo.ucBMCWlanIndex = prBssInfo->ucBMCWlanIndexS[prBssInfo->ucBcDefaultKeyIdx];
@@ -1465,53 +1424,52 @@ WLAN_STATUS nicUpdateBss(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex)
 		rCmdSetBssInfo.ucBMCWlanIndex = prBssInfo->ucBMCWlanIndex;
 	DBGLOG(RSN, TRACE, "Update BSS BMC WlanIdx %u\n", rCmdSetBssInfo.ucBMCWlanIndex);
 
-
 #ifdef CFG_ENABLE_WIFI_DIRECT
 	rCmdSetBssInfo.ucHiddenSsidMode = prBssInfo->eHiddenSsidType;
 #endif
 	rlmFillSyncCmdParam(&rCmdSetBssInfo.rBssRlmParam, prBssInfo);
 
-	rCmdSetBssInfo.ucWapiMode = (UINT_8) FALSE;
+	rCmdSetBssInfo.ucWapiMode = (UINT_8)FALSE;
 
 	if (rCmdSetBssInfo.ucBssIndex == prAdapter->prAisBssInfo->ucBssIndex) {
 		P_CONNECTION_SETTINGS_T prConnSettings = &(prAdapter->rWifiVar.rConnSettings);
 
-		rCmdSetBssInfo.ucAuthMode = (UINT_8) prConnSettings->eAuthMode;
-		rCmdSetBssInfo.ucEncStatus = (UINT_8) prConnSettings->eEncStatus;
-		rCmdSetBssInfo.ucWapiMode = (UINT_8) prConnSettings->fgWapiMode;
+		rCmdSetBssInfo.ucAuthMode			= (UINT_8)prConnSettings->eAuthMode;
+		rCmdSetBssInfo.ucEncStatus			= (UINT_8)prConnSettings->eEncStatus;
+		rCmdSetBssInfo.ucWapiMode			= (UINT_8)prConnSettings->fgWapiMode;
 		rCmdSetBssInfo.ucDisconnectDetectTh = prWifiVar->ucStaDisconnectDetectTh;
 	}
 #if CFG_ENABLE_BT_OVER_WIFI
 	else if (IS_BSS_BOW(prBssInfo)) {
-		rCmdSetBssInfo.ucAuthMode = (UINT_8) AUTH_MODE_WPA2_PSK;
-		rCmdSetBssInfo.ucEncStatus = (UINT_8) ENUM_ENCRYPTION3_KEY_ABSENT;
+		rCmdSetBssInfo.ucAuthMode  = (UINT_8)AUTH_MODE_WPA2_PSK;
+		rCmdSetBssInfo.ucEncStatus = (UINT_8)ENUM_ENCRYPTION3_KEY_ABSENT;
 	}
 #endif
 	else {
 #if CFG_ENABLE_WIFI_DIRECT
 		if (prAdapter->fgIsP2PRegistered) {
 #if CFG_SUPPORT_SUITB
-			if (kalP2PGetGcmp256Cipher(prAdapter->prGlueInfo, (UINT_8) prBssInfo->u4PrivateData)) {
-				rCmdSetBssInfo.ucAuthMode = (UINT_8) AUTH_MODE_WPA2_PSK;
-				rCmdSetBssInfo.ucEncStatus = (UINT_8) ENUM_ENCRYPTION4_ENABLED;
+			if (kalP2PGetGcmp256Cipher(prAdapter->prGlueInfo, (UINT_8)prBssInfo->u4PrivateData)) {
+				rCmdSetBssInfo.ucAuthMode  = (UINT_8)AUTH_MODE_WPA2_PSK;
+				rCmdSetBssInfo.ucEncStatus = (UINT_8)ENUM_ENCRYPTION4_ENABLED;
 			} else
 #endif
-			if (kalP2PGetCcmpCipher(prAdapter->prGlueInfo, (UINT_8) prBssInfo->u4PrivateData)) {
-				rCmdSetBssInfo.ucAuthMode = (UINT_8) AUTH_MODE_WPA2_PSK;
-				rCmdSetBssInfo.ucEncStatus = (UINT_8) ENUM_ENCRYPTION3_ENABLED;
-			} else if (kalP2PGetTkipCipher(prAdapter->prGlueInfo, (UINT_8) prBssInfo->u4PrivateData)) {
-				rCmdSetBssInfo.ucAuthMode = (UINT_8) AUTH_MODE_WPA_PSK;
-				rCmdSetBssInfo.ucEncStatus = (UINT_8) ENUM_ENCRYPTION2_ENABLED;
-			} else if (kalP2PGetWepCipher(prAdapter->prGlueInfo, (UINT_8) prBssInfo->u4PrivateData)) {
-				rCmdSetBssInfo.ucAuthMode = (UINT_8) AUTH_MODE_OPEN;
-				rCmdSetBssInfo.ucEncStatus = (UINT_8) ENUM_ENCRYPTION1_ENABLED;
+					if (kalP2PGetCcmpCipher(prAdapter->prGlueInfo, (UINT_8)prBssInfo->u4PrivateData)) {
+				rCmdSetBssInfo.ucAuthMode  = (UINT_8)AUTH_MODE_WPA2_PSK;
+				rCmdSetBssInfo.ucEncStatus = (UINT_8)ENUM_ENCRYPTION3_ENABLED;
+			} else if (kalP2PGetTkipCipher(prAdapter->prGlueInfo, (UINT_8)prBssInfo->u4PrivateData)) {
+				rCmdSetBssInfo.ucAuthMode  = (UINT_8)AUTH_MODE_WPA_PSK;
+				rCmdSetBssInfo.ucEncStatus = (UINT_8)ENUM_ENCRYPTION2_ENABLED;
+			} else if (kalP2PGetWepCipher(prAdapter->prGlueInfo, (UINT_8)prBssInfo->u4PrivateData)) {
+				rCmdSetBssInfo.ucAuthMode  = (UINT_8)AUTH_MODE_OPEN;
+				rCmdSetBssInfo.ucEncStatus = (UINT_8)ENUM_ENCRYPTION1_ENABLED;
 			} else {
-				rCmdSetBssInfo.ucAuthMode = (UINT_8) AUTH_MODE_OPEN;
-				rCmdSetBssInfo.ucEncStatus = (UINT_8) ENUM_ENCRYPTION_DISABLED;
+				rCmdSetBssInfo.ucAuthMode  = (UINT_8)AUTH_MODE_OPEN;
+				rCmdSetBssInfo.ucEncStatus = (UINT_8)ENUM_ENCRYPTION_DISABLED;
 			}
 			/* Need the probe response to detect the PBC overlap */
 			rCmdSetBssInfo.ucIsApMode =
-				p2pFuncIsAPMode(prAdapter->rWifiVar.prP2PConnSettings[prBssInfo->u4PrivateData]);
+					p2pFuncIsAPMode(prAdapter->rWifiVar.prP2PConnSettings[prBssInfo->u4PrivateData]);
 
 			if (rCmdSetBssInfo.ucIsApMode)
 				rCmdSetBssInfo.ucDisconnectDetectTh = prWifiVar->ucApDisconnectDetectTh;
@@ -1519,46 +1477,39 @@ WLAN_STATUS nicUpdateBss(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex)
 				rCmdSetBssInfo.ucDisconnectDetectTh = prWifiVar->ucP2pDisconnectDetectTh;
 		}
 #else
-		rCmdSetBssInfo.ucAuthMode = (UINT_8) AUTH_MODE_WPA2_PSK;
-		rCmdSetBssInfo.ucEncStatus = (UINT_8) ENUM_ENCRYPTION3_KEY_ABSENT;
+		rCmdSetBssInfo.ucAuthMode		  = (UINT_8)AUTH_MODE_WPA2_PSK;
+		rCmdSetBssInfo.ucEncStatus		  = (UINT_8)ENUM_ENCRYPTION3_KEY_ABSENT;
 #endif
 	}
 
-	if (ucBssIndex == prAdapter->prAisBssInfo->ucBssIndex &&
-	    prBssInfo->eCurrentOPMode == OP_MODE_INFRASTRUCTURE && prBssInfo->prStaRecOfAP != NULL) {
+	if (ucBssIndex == prAdapter->prAisBssInfo->ucBssIndex && prBssInfo->eCurrentOPMode == OP_MODE_INFRASTRUCTURE &&
+			prBssInfo->prStaRecOfAP != NULL) {
 		rCmdSetBssInfo.ucStaRecIdxOfAP = prBssInfo->prStaRecOfAP->ucIndex;
 
 		cnmAisInfraConnectNotify(prAdapter);
 	}
 #if CFG_ENABLE_WIFI_DIRECT
-	else if ((prAdapter->fgIsP2PRegistered) &&
-		 (prBssInfo->eNetworkType == NETWORK_TYPE_P2P) &&
-		 (prBssInfo->eCurrentOPMode == OP_MODE_INFRASTRUCTURE) && (prBssInfo->prStaRecOfAP != NULL)) {
+	else if ((prAdapter->fgIsP2PRegistered) && (prBssInfo->eNetworkType == NETWORK_TYPE_P2P) &&
+			 (prBssInfo->eCurrentOPMode == OP_MODE_INFRASTRUCTURE) && (prBssInfo->prStaRecOfAP != NULL)) {
 		rCmdSetBssInfo.ucStaRecIdxOfAP = prBssInfo->prStaRecOfAP->ucIndex;
 	}
 #endif
 
-#if CFG_ENABLE_BT_OVER_WIFI	/* disabled for BOW to finish ucBssIndex migration */
-	else if (prBssInfo->eNetworkType == NETWORK_TYPE_BOW &&
-		 prBssInfo->eCurrentOPMode == OP_MODE_BOW && prBssInfo->prStaRecOfAP != NULL) {
+#if CFG_ENABLE_BT_OVER_WIFI /* disabled for BOW to finish ucBssIndex migration */
+	else if (prBssInfo->eNetworkType == NETWORK_TYPE_BOW && prBssInfo->eCurrentOPMode == OP_MODE_BOW &&
+			 prBssInfo->prStaRecOfAP != NULL) {
 		rCmdSetBssInfo.ucStaRecIdxOfAP = prBssInfo->prStaRecOfAP->ucIndex;
 	}
 #endif
 	else
 		rCmdSetBssInfo.ucStaRecIdxOfAP = STA_REC_INDEX_NOT_FOUND;
 
-	DBGLOG(BSS, INFO,
-	       "Update Bss[%u] ConnState[%u] OPmode[%u] BSSID[" MACSTR
-	       "] AuthMode[%u] EncStatus[%u]\n", ucBssIndex, prBssInfo->eConnectionState,
-	       prBssInfo->eCurrentOPMode, MAC2STR(prBssInfo->aucBSSID), rCmdSetBssInfo.ucAuthMode,
-	       rCmdSetBssInfo.ucEncStatus);
+	DBGLOG(BSS, INFO, "Update Bss[%u] ConnState[%u] OPmode[%u] BSSID[" MACSTR "] AuthMode[%u] EncStatus[%u]\n",
+			ucBssIndex, prBssInfo->eConnectionState, prBssInfo->eCurrentOPMode, MAC2STR(prBssInfo->aucBSSID),
+			rCmdSetBssInfo.ucAuthMode, rCmdSetBssInfo.ucEncStatus);
 
-	u4Status = wlanSendSetQueryCmd(prAdapter,
-				       CMD_ID_SET_BSS_INFO,
-				       TRUE,
-				       FALSE,
-				       FALSE,
-				       NULL, NULL, sizeof(CMD_SET_BSS_INFO), (PUINT_8)&rCmdSetBssInfo, NULL, 0);
+	u4Status = wlanSendSetQueryCmd(prAdapter, CMD_ID_SET_BSS_INFO, TRUE, FALSE, FALSE, NULL, NULL,
+			sizeof(CMD_SET_BSS_INFO), (PUINT_8)&rCmdSetBssInfo, NULL, 0);
 
 	/* if BSS-INFO is going to be disconnected state, free all correlated station records */
 	if (prBssInfo->eConnectionState == PARAM_MEDIA_STATE_DISCONNECTED) {
@@ -1590,18 +1541,18 @@ WLAN_STATUS nicUpdateBss(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex)
 /* BSS-INFO Indication (PM) */
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief This utility function is used to indicate PM that
-*        a BSS has been created. (for AdHoc / P2P-GO)
-*
-* @param prAdapter          Pointer of ADAPTER_T
-*        ucBssIndex         Index of BSS-INFO
-*
-* @retval -
-*/
+ * @brief This utility function is used to indicate PM that
+ *        a BSS has been created. (for AdHoc / P2P-GO)
+ *
+ * @param prAdapter          Pointer of ADAPTER_T
+ *        ucBssIndex         Index of BSS-INFO
+ *
+ * @retval -
+ */
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS nicPmIndicateBssCreated(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex)
 {
-	P_BSS_INFO_T prBssInfo;
+	P_BSS_INFO_T				prBssInfo;
 	CMD_INDICATE_PM_BSS_CREATED rCmdIndicatePmBssCreated;
 
 	kalMemZero(&rCmdIndicatePmBssCreated, sizeof(CMD_INDICATE_PM_BSS_CREATED));
@@ -1611,35 +1562,29 @@ WLAN_STATUS nicPmIndicateBssCreated(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssInd
 
 	prBssInfo = GET_BSS_INFO_BY_INDEX(prAdapter, ucBssIndex);
 
-	rCmdIndicatePmBssCreated.ucBssIndex = ucBssIndex;
-	rCmdIndicatePmBssCreated.ucDtimPeriod = prBssInfo->ucDTIMPeriod;
+	rCmdIndicatePmBssCreated.ucBssIndex		  = ucBssIndex;
+	rCmdIndicatePmBssCreated.ucDtimPeriod	  = prBssInfo->ucDTIMPeriod;
 	rCmdIndicatePmBssCreated.u2BeaconInterval = prBssInfo->u2BeaconInterval;
-	rCmdIndicatePmBssCreated.u2AtimWindow = prBssInfo->u2ATIMWindow;
+	rCmdIndicatePmBssCreated.u2AtimWindow	  = prBssInfo->u2ATIMWindow;
 
-	return wlanSendSetQueryCmd(prAdapter,
-				   CMD_ID_INDICATE_PM_BSS_CREATED,
-				   TRUE,
-				   FALSE,
-				   FALSE,
-				   NULL,
-				   NULL,
-				   sizeof(CMD_INDICATE_PM_BSS_CREATED), (PUINT_8)&rCmdIndicatePmBssCreated, NULL, 0);
+	return wlanSendSetQueryCmd(prAdapter, CMD_ID_INDICATE_PM_BSS_CREATED, TRUE, FALSE, FALSE, NULL, NULL,
+			sizeof(CMD_INDICATE_PM_BSS_CREATED), (PUINT_8)&rCmdIndicatePmBssCreated, NULL, 0);
 }
 
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief This utility function is used to indicate PM that
-*        a BSS has been connected
-*
-* @param prAdapter          Pointer of ADAPTER_T
-*        eNetworkTypeIdx    Index of BSS-INFO
-*
-* @retval -
-*/
+ * @brief This utility function is used to indicate PM that
+ *        a BSS has been connected
+ *
+ * @param prAdapter          Pointer of ADAPTER_T
+ *        eNetworkTypeIdx    Index of BSS-INFO
+ *
+ * @retval -
+ */
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS nicPmIndicateBssConnected(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex)
 {
-	P_BSS_INFO_T prBssInfo;
+	P_BSS_INFO_T				  prBssInfo;
 	CMD_INDICATE_PM_BSS_CONNECTED rCmdIndicatePmBssConnected;
 
 	kalMemZero(&rCmdIndicatePmBssConnected, sizeof(CMD_INDICATE_PM_BSS_CONNECTED));
@@ -1649,14 +1594,14 @@ WLAN_STATUS nicPmIndicateBssConnected(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssI
 
 	prBssInfo = GET_BSS_INFO_BY_INDEX(prAdapter, ucBssIndex);
 
-	rCmdIndicatePmBssConnected.ucBssIndex = ucBssIndex;
-	rCmdIndicatePmBssConnected.ucDtimPeriod = prBssInfo->ucDTIMPeriod;
-	rCmdIndicatePmBssConnected.u2AssocId = prBssInfo->u2AssocId;
+	rCmdIndicatePmBssConnected.ucBssIndex		= ucBssIndex;
+	rCmdIndicatePmBssConnected.ucDtimPeriod		= prBssInfo->ucDTIMPeriod;
+	rCmdIndicatePmBssConnected.u2AssocId		= prBssInfo->u2AssocId;
 	rCmdIndicatePmBssConnected.u2BeaconInterval = prBssInfo->u2BeaconInterval;
-	rCmdIndicatePmBssConnected.u2AtimWindow = prBssInfo->u2ATIMWindow;
+	rCmdIndicatePmBssConnected.u2AtimWindow		= prBssInfo->u2ATIMWindow;
 
 	rCmdIndicatePmBssConnected.ucBmpDeliveryAC = prBssInfo->rPmProfSetupInfo.ucBmpDeliveryAC;
-	rCmdIndicatePmBssConnected.ucBmpTriggerAC = prBssInfo->rPmProfSetupInfo.ucBmpTriggerAC;
+	rCmdIndicatePmBssConnected.ucBmpTriggerAC  = prBssInfo->rPmProfSetupInfo.ucBmpTriggerAC;
 
 	/* DBGPRINTF("nicPmIndicateBssConnected: ucBmpDeliveryAC:0x%x, ucBmpTriggerAC:0x%x", */
 	/* rCmdIndicatePmBssConnected.ucBmpDeliveryAC, */
@@ -1664,41 +1609,33 @@ WLAN_STATUS nicPmIndicateBssConnected(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssI
 
 	if ((GET_BSS_INFO_BY_INDEX(prAdapter, ucBssIndex)->eNetworkType == NETWORK_TYPE_AIS)
 #if CFG_ENABLE_WIFI_DIRECT
-	    || ((GET_BSS_INFO_BY_INDEX(prAdapter, ucBssIndex)->eNetworkType == NETWORK_TYPE_P2P)
-		&& (prAdapter->fgIsP2PRegistered))
+			|| ((GET_BSS_INFO_BY_INDEX(prAdapter, ucBssIndex)->eNetworkType == NETWORK_TYPE_P2P) &&
+					   (prAdapter->fgIsP2PRegistered))
 #endif
-	    ) {
+	) {
 		if (prBssInfo->eCurrentOPMode == OP_MODE_INFRASTRUCTURE) {
-			rCmdIndicatePmBssConnected.fgIsUapsdConnection =
-			    (UINT_8) prBssInfo->prStaRecOfAP->fgIsUapsdSupported;
+			rCmdIndicatePmBssConnected.fgIsUapsdConnection = (UINT_8)prBssInfo->prStaRecOfAP->fgIsUapsdSupported;
 		} else {
-			rCmdIndicatePmBssConnected.fgIsUapsdConnection = 0;	/* @FIXME */
+			rCmdIndicatePmBssConnected.fgIsUapsdConnection = 0; /* @FIXME */
 		}
 	} else {
 		rCmdIndicatePmBssConnected.fgIsUapsdConnection = 0;
 	}
 
-	return wlanSendSetQueryCmd(prAdapter,
-				   CMD_ID_INDICATE_PM_BSS_CONNECTED,
-				   TRUE,
-				   FALSE,
-				   FALSE,
-				   NULL,
-				   NULL,
-				   sizeof(CMD_INDICATE_PM_BSS_CONNECTED),
-				   (PUINT_8)&rCmdIndicatePmBssConnected, NULL, 0);
+	return wlanSendSetQueryCmd(prAdapter, CMD_ID_INDICATE_PM_BSS_CONNECTED, TRUE, FALSE, FALSE, NULL, NULL,
+			sizeof(CMD_INDICATE_PM_BSS_CONNECTED), (PUINT_8)&rCmdIndicatePmBssConnected, NULL, 0);
 }
 
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief This utility function is used to indicate PM that
-*        a BSS has been disconnected
-*
-* @param prAdapter          Pointer of ADAPTER_T
-*        ucBssIndex         Index of BSS-INFO
-*
-* @retval -
-*/
+ * @brief This utility function is used to indicate PM that
+ *        a BSS has been disconnected
+ *
+ * @param prAdapter          Pointer of ADAPTER_T
+ *        ucBssIndex         Index of BSS-INFO
+ *
+ * @retval -
+ */
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS nicPmIndicateBssAbort(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex)
 {
@@ -1711,19 +1648,13 @@ WLAN_STATUS nicPmIndicateBssAbort(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex
 
 	rCmdIndicatePmBssAbort.ucBssIndex = ucBssIndex;
 
-	return wlanSendSetQueryCmd(prAdapter,
-				   CMD_ID_INDICATE_PM_BSS_ABORT,
-				   TRUE,
-				   FALSE,
-				   FALSE,
-				   NULL,
-				   NULL,
-				   sizeof(CMD_INDICATE_PM_BSS_ABORT), (PUINT_8)&rCmdIndicatePmBssAbort, NULL, 0);
+	return wlanSendSetQueryCmd(prAdapter, CMD_ID_INDICATE_PM_BSS_ABORT, TRUE, FALSE, FALSE, NULL, NULL,
+			sizeof(CMD_INDICATE_PM_BSS_ABORT), (PUINT_8)&rCmdIndicatePmBssAbort, NULL, 0);
 }
 
 WLAN_STATUS
-nicConfigPowerSaveProfile(IN P_ADAPTER_T prAdapter,
-			  IN UINT_8 ucBssIndex, IN PARAM_POWER_MODE ePwrMode, IN BOOLEAN fgEnCmdEvent)
+nicConfigPowerSaveProfile(
+		IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex, IN PARAM_POWER_MODE ePwrMode, IN BOOLEAN fgEnCmdEvent)
 {
 	DEBUGFUNC("nicConfigPowerSaveProfile");
 	DBGLOG(INIT, TRACE, "ucBssIndex:%d, ePwrMode:%d, fgEnCmdEvent:%d\n", ucBssIndex, ePwrMode, fgEnCmdEvent);
@@ -1735,69 +1666,47 @@ nicConfigPowerSaveProfile(IN P_ADAPTER_T prAdapter,
 		return WLAN_STATUS_NOT_SUPPORTED;
 	}
 
-	prAdapter->rWlanInfo.arPowerSaveMode[ucBssIndex].ucBssIndex = ucBssIndex;
-	prAdapter->rWlanInfo.arPowerSaveMode[ucBssIndex].ucPsProfile = (UINT_8) ePwrMode;
+	prAdapter->rWlanInfo.arPowerSaveMode[ucBssIndex].ucBssIndex	 = ucBssIndex;
+	prAdapter->rWlanInfo.arPowerSaveMode[ucBssIndex].ucPsProfile = (UINT_8)ePwrMode;
 #ifdef SUPPORT_PERIODIC_PS
 	/* Always given these two field should be fine for other PSP. */
 	prAdapter->rWlanInfo.arPowerSaveMode[ucBssIndex].ucPspCAMInt = prAdapter->rWifiVar.ucAwakePspCAMInt;
-	prAdapter->rWlanInfo.arPowerSaveMode[ucBssIndex].ucPspPSInt = prAdapter->rWifiVar.ucAwakePspPSInt;
+	prAdapter->rWlanInfo.arPowerSaveMode[ucBssIndex].ucPspPSInt	 = prAdapter->rWifiVar.ucAwakePspPSInt;
 #endif
 
-	return wlanSendSetQueryCmd(prAdapter,
-				CMD_ID_POWER_SAVE_MODE,
-				TRUE,
-				FALSE,
-				TRUE,
-				(fgEnCmdEvent ? nicCmdEventSetCommon : NULL),
-				(fgEnCmdEvent ? nicOidCmdTimeoutCommon : NULL),
-				sizeof(CMD_PS_PROFILE_T),
-				(PUINT_8)&(prAdapter->rWlanInfo.arPowerSaveMode[ucBssIndex]),
-				NULL, sizeof(PARAM_POWER_MODE)
-				);
+	return wlanSendSetQueryCmd(prAdapter, CMD_ID_POWER_SAVE_MODE, TRUE, FALSE, TRUE,
+			(fgEnCmdEvent ? nicCmdEventSetCommon : NULL), (fgEnCmdEvent ? nicOidCmdTimeoutCommon : NULL),
+			sizeof(CMD_PS_PROFILE_T), (PUINT_8) & (prAdapter->rWlanInfo.arPowerSaveMode[ucBssIndex]), NULL,
+			sizeof(PARAM_POWER_MODE));
 
-}				/* end of wlanoidSetAcpiDevicePowerStateMode() */
+} /* end of wlanoidSetAcpiDevicePowerStateMode() */
 
 WLAN_STATUS
-nicConfigPowerSaveWowProfile(IN P_ADAPTER_T prAdapter, UINT_8 ucBssIndex, PARAM_POWER_MODE ePwrMode,
-	BOOLEAN fgEnCmdEvent, BOOLEAN fgSuspend) {
-
+nicConfigPowerSaveWowProfile(
+		IN P_ADAPTER_T prAdapter, UINT_8 ucBssIndex, PARAM_POWER_MODE ePwrMode, BOOLEAN fgEnCmdEvent, BOOLEAN fgSuspend)
+{
 	CMD_PS_PROFILE_T rPowerSaveMode;
 
 	kalMemZero(&rPowerSaveMode, sizeof(CMD_PS_PROFILE_T));
 
 	if (fgSuspend) {
-
-		rPowerSaveMode.ucBssIndex = ucBssIndex;
+		rPowerSaveMode.ucBssIndex  = ucBssIndex;
 		rPowerSaveMode.ucPsProfile = ePwrMode;
 #ifdef SUPPORT_PERIODIC_PS
-		rPowerSaveMode.ucPspCAMInt =
-						prAdapter->rWifiVar.ucPspCAMInt;
-		rPowerSaveMode.ucPspPSInt  =
-						prAdapter->rWifiVar.ucPspPSInt;
+		rPowerSaveMode.ucPspCAMInt = prAdapter->rWifiVar.ucPspCAMInt;
+		rPowerSaveMode.ucPspPSInt  = prAdapter->rWifiVar.ucPspPSInt;
 #endif
-	}
-	else {
+	} else {
 		/* if resume, restore power save profile */
-                DBGLOG(HAL, STATE, "Resume wow power save idx:%d, mode:%d\n",
-                       ucBssIndex, prAdapter->rWlanInfo.arPowerSaveMode[ucBssIndex].ucPsProfile);
-		kalMemCopy(&rPowerSaveMode,
-			&(prAdapter->rWlanInfo.arPowerSaveMode[ucBssIndex]),
-			sizeof(rPowerSaveMode));
+		DBGLOG(HAL, STATE, "Resume wow power save idx:%d, mode:%d\n", ucBssIndex,
+				prAdapter->rWlanInfo.arPowerSaveMode[ucBssIndex].ucPsProfile);
+		kalMemCopy(&rPowerSaveMode, &(prAdapter->rWlanInfo.arPowerSaveMode[ucBssIndex]), sizeof(rPowerSaveMode));
 	}
 
 	/* if suspend, config power save mode w/o update arPowerSaveMode[ucBssIndex] */
-	return wlanSendSetQueryCmd(prAdapter,
-			CMD_ID_POWER_SAVE_MODE,
-			TRUE,
-			FALSE,
-			TRUE,
-			(fgEnCmdEvent ? nicCmdEventSetCommon : NULL),
-			(fgEnCmdEvent ? nicOidCmdTimeoutCommon : NULL),
-			sizeof(CMD_PS_PROFILE_T),
-			(PUINT_8)&rPowerSaveMode,
-			NULL, sizeof(PARAM_POWER_MODE)
-			);
-
+	return wlanSendSetQueryCmd(prAdapter, CMD_ID_POWER_SAVE_MODE, TRUE, FALSE, TRUE,
+			(fgEnCmdEvent ? nicCmdEventSetCommon : NULL), (fgEnCmdEvent ? nicOidCmdTimeoutCommon : NULL),
+			sizeof(CMD_PS_PROFILE_T), (PUINT_8)&rPowerSaveMode, NULL, sizeof(PARAM_POWER_MODE));
 }
 
 WLAN_STATUS nicEnterCtiaMode(IN P_ADAPTER_T prAdapter, BOOLEAN fgEnterCtia, BOOLEAN fgEnCmdEvent)
@@ -1822,25 +1731,21 @@ WLAN_STATUS nicEnterCtiaMode(IN P_ADAPTER_T prAdapter, BOOLEAN fgEnterCtia, BOOL
 		/* 2. Disable FIFO FULL no ack */
 		/* 3. Disable Roaming */
 		/* 4. Disalbe auto tx power */
-		rCmdSwCtrl.u4Id = 0xa0100003;
+		rCmdSwCtrl.u4Id	  = 0xa0100003;
 		rCmdSwCtrl.u4Data = 0x0;
-		wlanSendSetQueryCmd(prAdapter,
-				    CMD_ID_SW_DBG_CTRL,
-				    TRUE,
-				    FALSE,
-				    FALSE, NULL, NULL, sizeof(CMD_SW_DBG_CTRL_T), (PUINT_8)&rCmdSwCtrl, NULL, 0);
+		wlanSendSetQueryCmd(prAdapter, CMD_ID_SW_DBG_CTRL, TRUE, FALSE, FALSE, NULL, NULL, sizeof(CMD_SW_DBG_CTRL_T),
+				(PUINT_8)&rCmdSwCtrl, NULL, 0);
 
 		/* 2. Keep at CAM mode */
 		{
 			PARAM_POWER_MODE ePowerMode;
 
-			prAdapter->u4CtiaPowerMode = 0;
+			prAdapter->u4CtiaPowerMode	 = 0;
 			prAdapter->fgEnCtiaPowerMode = TRUE;
 
 			ePowerMode = Param_PowerModeCAM;
-			rWlanStatus = nicConfigPowerSaveProfile(prAdapter,
-								prAdapter->prAisBssInfo->ucBssIndex,
-								ePowerMode, fgEnCmdEvent);
+			rWlanStatus =
+					nicConfigPowerSaveProfile(prAdapter, prAdapter->prAisBssInfo->ucBssIndex, ePowerMode, fgEnCmdEvent);
 		}
 
 		/* 5. Disable Beacon Timeout Detection */
@@ -1854,41 +1759,36 @@ WLAN_STATUS nicEnterCtiaMode(IN P_ADAPTER_T prAdapter, BOOLEAN fgEnterCtia, BOOL
 		/* 4. Enable auto tx power */
 		/*  */
 
-		rCmdSwCtrl.u4Id = 0xa0100003;
+		rCmdSwCtrl.u4Id	  = 0xa0100003;
 		rCmdSwCtrl.u4Data = 0x1;
-		wlanSendSetQueryCmd(prAdapter,
-				    CMD_ID_SW_DBG_CTRL,
-				    TRUE,
-				    FALSE,
-				    FALSE, NULL, NULL, sizeof(CMD_SW_DBG_CTRL_T), (PUINT_8)&rCmdSwCtrl, NULL, 0);
+		wlanSendSetQueryCmd(prAdapter, CMD_ID_SW_DBG_CTRL, TRUE, FALSE, FALSE, NULL, NULL, sizeof(CMD_SW_DBG_CTRL_T),
+				(PUINT_8)&rCmdSwCtrl, NULL, 0);
 
 		/* 2. Keep at Fast PS */
 		{
 			PARAM_POWER_MODE ePowerMode;
 
-			prAdapter->u4CtiaPowerMode = 2;
+			prAdapter->u4CtiaPowerMode	 = 2;
 			prAdapter->fgEnCtiaPowerMode = TRUE;
 
 			ePowerMode = Param_PowerModeFast_PSP;
-			rWlanStatus = nicConfigPowerSaveProfile(prAdapter,
-								prAdapter->prAisBssInfo->ucBssIndex,
-								ePowerMode, fgEnCmdEvent);
+			rWlanStatus =
+					nicConfigPowerSaveProfile(prAdapter, prAdapter->prAisBssInfo->ucBssIndex, ePowerMode, fgEnCmdEvent);
 		}
 
 		/* 5. Enable Beacon Timeout Detection */
 		prAdapter->fgDisBcnLostDetection = FALSE;
-
 	}
 
 	return rWlanStatus;
-}				/* end of nicEnterCtiaMode() */
+} /* end of nicEnterCtiaMode() */
 
 WLAN_STATUS nicEnterTPTestMode(IN P_ADAPTER_T prAdapter, IN UINT_8 ucFuncMask)
 {
 	CMD_SW_DBG_CTRL_T rCmdSwCtrl;
-	WLAN_STATUS rWlanStatus;
-	UINT_8 ucBssIdx;
-	P_BSS_INFO_T prBssInfo;
+	WLAN_STATUS		  rWlanStatus;
+	UINT_8			  ucBssIdx;
+	P_BSS_INFO_T	  prBssInfo;
 
 	kalMemZero(&rCmdSwCtrl, sizeof(CMD_SW_DBG_CTRL_T));
 
@@ -1903,10 +1803,10 @@ WLAN_STATUS nicEnterTPTestMode(IN P_ADAPTER_T prAdapter, IN UINT_8 ucFuncMask)
 
 		/* 2. Disable Roaming */
 		if (ucFuncMask & TEST_MODE_DISABLE_ROAMING) {
-			rCmdSwCtrl.u4Id = 0xa0210000;
+			rCmdSwCtrl.u4Id	  = 0xa0210000;
 			rCmdSwCtrl.u4Data = 0x0;
-			wlanSendSetQueryCmd(prAdapter, CMD_ID_SW_DBG_CTRL, TRUE, FALSE, FALSE,
-				NULL, NULL, sizeof(CMD_SW_DBG_CTRL_T), (PUINT_8)&rCmdSwCtrl, NULL, 0);
+			wlanSendSetQueryCmd(prAdapter, CMD_ID_SW_DBG_CTRL, TRUE, FALSE, FALSE, NULL, NULL,
+					sizeof(CMD_SW_DBG_CTRL_T), (PUINT_8)&rCmdSwCtrl, NULL, 0);
 		}
 		/* 3. Keep at CAM mode */
 		if (ucFuncMask & TEST_MODE_FIXED_CAM_MODE)
@@ -1924,10 +1824,10 @@ WLAN_STATUS nicEnterTPTestMode(IN P_ADAPTER_T prAdapter, IN UINT_8 ucFuncMask)
 		prAdapter->fgEnOnlineScan = TRUE;
 
 		/* 2. Enable Roaming */
-		rCmdSwCtrl.u4Id = 0xa0210000;
+		rCmdSwCtrl.u4Id	  = 0xa0210000;
 		rCmdSwCtrl.u4Data = 0x1;
-		wlanSendSetQueryCmd(prAdapter, CMD_ID_SW_DBG_CTRL, TRUE, FALSE, FALSE,
-			NULL, NULL, sizeof(CMD_SW_DBG_CTRL_T), (PUINT_8)&rCmdSwCtrl, NULL, 0);
+		wlanSendSetQueryCmd(prAdapter, CMD_ID_SW_DBG_CTRL, TRUE, FALSE, FALSE, NULL, NULL, sizeof(CMD_SW_DBG_CTRL_T),
+				(PUINT_8)&rCmdSwCtrl, NULL, 0);
 
 		/* 3. Keep at Fast PS */
 		for (ucBssIdx = 0; ucBssIdx < BSS_INFO_NUM; ucBssIdx++) {
@@ -1945,33 +1845,32 @@ WLAN_STATUS nicEnterTPTestMode(IN P_ADAPTER_T prAdapter, IN UINT_8 ucFuncMask)
 
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief This utility function is used to indicate firmware domain
-*        for beacon generation parameters
-*
-* @param prAdapter          Pointer of ADAPTER_T
-*        eIeUpdMethod,      Update Method
-*        ucBssIndex         Index of BSS-INFO
-*        u2Capability       Capability
-*        aucIe              Pointer to buffer of IEs
-*        u2IELen            Length of IEs
-*
-* @retval - WLAN_STATUS_SUCCESS
-*           WLAN_STATUS_FAILURE
-*           WLAN_STATUS_PENDING
-*           WLAN_STATUS_INVALID_DATA
-*/
+ * @brief This utility function is used to indicate firmware domain
+ *        for beacon generation parameters
+ *
+ * @param prAdapter          Pointer of ADAPTER_T
+ *        eIeUpdMethod,      Update Method
+ *        ucBssIndex         Index of BSS-INFO
+ *        u2Capability       Capability
+ *        aucIe              Pointer to buffer of IEs
+ *        u2IELen            Length of IEs
+ *
+ * @retval - WLAN_STATUS_SUCCESS
+ *           WLAN_STATUS_FAILURE
+ *           WLAN_STATUS_PENDING
+ *           WLAN_STATUS_INVALID_DATA
+ */
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS
-nicUpdateBeaconIETemplate(IN P_ADAPTER_T prAdapter,
-			  IN ENUM_IE_UPD_METHOD_T eIeUpdMethod,
-			  IN UINT_8 ucBssIndex, IN UINT_16 u2Capability, IN PUINT_8 aucIe, IN UINT_16 u2IELen)
+nicUpdateBeaconIETemplate(IN P_ADAPTER_T prAdapter, IN ENUM_IE_UPD_METHOD_T eIeUpdMethod, IN UINT_8 ucBssIndex,
+		IN UINT_16 u2Capability, IN PUINT_8 aucIe, IN UINT_16 u2IELen)
 {
 	P_CMD_BEACON_TEMPLATE_UPDATE prCmdBcnUpdate;
-	UINT_16 u2CmdBufLen = 0;
-	P_GLUE_INFO_T prGlueInfo;
-	P_CMD_INFO_T prCmdInfo;
-	P_WIFI_CMD_T prWifiCmd;
-	UINT_8 ucCmdSeqNum;
+	UINT_16						 u2CmdBufLen = 0;
+	P_GLUE_INFO_T				 prGlueInfo;
+	P_CMD_INFO_T				 prCmdInfo;
+	P_WIFI_CMD_T				 prWifiCmd;
+	UINT_8						 ucCmdSeqNum;
 
 	DEBUGFUNC("wlanUpdateBeaconIETemplate");
 	DBGLOG(INIT, LOUD, "\n");
@@ -2002,39 +1901,39 @@ nicUpdateBeaconIETemplate(IN P_ADAPTER_T prAdapter,
 	DBGLOG(REQ, TRACE, "ucCmdSeqNum =%d\n", ucCmdSeqNum);
 
 	/* Setup common CMD Info Packet */
-	prCmdInfo->eCmdType = COMMAND_TYPE_NETWORK_IOCTL;
-	prCmdInfo->u2InfoBufLen = (UINT_16) (CMD_HDR_SIZE + u2CmdBufLen);
-	prCmdInfo->pfCmdDoneHandler = NULL;	/* @FIXME */
-	prCmdInfo->pfCmdTimeoutHandler = NULL;	/* @FIXME */
-	prCmdInfo->fgIsOid = FALSE;
-	prCmdInfo->ucCID = CMD_ID_UPDATE_BEACON_CONTENT;
-	prCmdInfo->fgSetQuery = TRUE;
-	prCmdInfo->fgNeedResp = FALSE;
-	prCmdInfo->ucCmdSeqNum = ucCmdSeqNum;
-	prCmdInfo->u4SetInfoLen = u2CmdBufLen;
-	prCmdInfo->pvInformationBuffer = NULL;
+	prCmdInfo->eCmdType					 = COMMAND_TYPE_NETWORK_IOCTL;
+	prCmdInfo->u2InfoBufLen				 = (UINT_16)(CMD_HDR_SIZE + u2CmdBufLen);
+	prCmdInfo->pfCmdDoneHandler			 = NULL; /* @FIXME */
+	prCmdInfo->pfCmdTimeoutHandler		 = NULL; /* @FIXME */
+	prCmdInfo->fgIsOid					 = FALSE;
+	prCmdInfo->ucCID					 = CMD_ID_UPDATE_BEACON_CONTENT;
+	prCmdInfo->fgSetQuery				 = TRUE;
+	prCmdInfo->fgNeedResp				 = FALSE;
+	prCmdInfo->ucCmdSeqNum				 = ucCmdSeqNum;
+	prCmdInfo->u4SetInfoLen				 = u2CmdBufLen;
+	prCmdInfo->pvInformationBuffer		 = NULL;
 	prCmdInfo->u4InformationBufferLength = 0;
 
 	/* Setup WIFI_CMD_T (no payload) */
-	prWifiCmd = (P_WIFI_CMD_T) (prCmdInfo->pucInfoBuffer);
+	prWifiCmd				 = (P_WIFI_CMD_T)(prCmdInfo->pucInfoBuffer);
 	prWifiCmd->u2TxByteCount = prCmdInfo->u2InfoBufLen;
-	prWifiCmd->u2PQ_ID = CMD_PQ_ID;
-	prWifiCmd->ucPktTypeID = CMD_PACKET_TYPE_ID;
-	prWifiCmd->ucCID = prCmdInfo->ucCID;
-	prWifiCmd->ucSetQuery = prCmdInfo->fgSetQuery;
-	prWifiCmd->ucSeqNum = prCmdInfo->ucCmdSeqNum;
+	prWifiCmd->u2PQ_ID		 = CMD_PQ_ID;
+	prWifiCmd->ucPktTypeID	 = CMD_PACKET_TYPE_ID;
+	prWifiCmd->ucCID		 = prCmdInfo->ucCID;
+	prWifiCmd->ucSetQuery	 = prCmdInfo->fgSetQuery;
+	prWifiCmd->ucSeqNum		 = prCmdInfo->ucCmdSeqNum;
 
-	prCmdBcnUpdate = (P_CMD_BEACON_TEMPLATE_UPDATE) (prWifiCmd->aucBuffer);
+	prCmdBcnUpdate = (P_CMD_BEACON_TEMPLATE_UPDATE)(prWifiCmd->aucBuffer);
 
 	/* fill beacon updating command */
-	prCmdBcnUpdate->ucUpdateMethod = (UINT_8) eIeUpdMethod;
-	prCmdBcnUpdate->ucBssIndex = ucBssIndex;
-	prCmdBcnUpdate->u2Capability = u2Capability;
-	prCmdBcnUpdate->u2IELen = u2IELen;
+	prCmdBcnUpdate->ucUpdateMethod = (UINT_8)eIeUpdMethod;
+	prCmdBcnUpdate->ucBssIndex	   = ucBssIndex;
+	prCmdBcnUpdate->u2Capability   = u2Capability;
+	prCmdBcnUpdate->u2IELen		   = u2IELen;
 	if (u2IELen > 0)
 		kalMemCopy(prCmdBcnUpdate->aucIE, aucIe, u2IELen);
 	/* insert into prCmdQueue */
-	kalEnqueueCommand(prGlueInfo, (P_QUE_ENTRY_T) prCmdInfo);
+	kalEnqueueCommand(prGlueInfo, (P_QUE_ENTRY_T)prCmdInfo);
 
 	/* wakeup txServiceThread later */
 	GLUE_SET_EVENT(prGlueInfo);
@@ -2043,13 +1942,13 @@ nicUpdateBeaconIETemplate(IN P_ADAPTER_T prAdapter,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief This utility function is used to initialization PHY related
-*        varaibles
-*
-* @param prAdapter  Pointer of ADAPTER_T
-*
-* @retval none
-*/
+ * @brief This utility function is used to initialization PHY related
+ *        varaibles
+ *
+ * @param prAdapter  Pointer of ADAPTER_T
+ *
+ * @retval none
+ */
 /*----------------------------------------------------------------------------*/
 VOID nicSetAvailablePhyTypeSet(IN P_ADAPTER_T prAdapter)
 {
@@ -2069,24 +1968,23 @@ VOID nicSetAvailablePhyTypeSet(IN P_ADAPTER_T prAdapter)
 	if (prAdapter->rWifiVar.ucAvailablePhyTypeSet & PHY_TYPE_BIT_ERP)
 		prAdapter->rWifiVar.eNonHTBasicPhyType2G4 = PHY_TYPE_ERP_INDEX;
 	/* NOTE(Kevin): Because we don't have N only mode, TBD */
-	else			/* if (ucNonHTPhyTypeSet & PHY_TYPE_HR_DSSS_INDEX) */
+	else /* if (ucNonHTPhyTypeSet & PHY_TYPE_HR_DSSS_INDEX) */
 		prAdapter->rWifiVar.eNonHTBasicPhyType2G4 = PHY_TYPE_HR_DSSS_INDEX;
-
 }
 
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief This utility function is used to update WMM Parms
-*
-* @param prAdapter          Pointer of ADAPTER_T
-*        ucBssIndex         Index of BSS-INFO
-*
-* @retval -
-*/
+ * @brief This utility function is used to update WMM Parms
+ *
+ * @param prAdapter          Pointer of ADAPTER_T
+ *        ucBssIndex         Index of BSS-INFO
+ *
+ * @retval -
+ */
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS nicQmUpdateWmmParms(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex)
 {
-	P_BSS_INFO_T prBssInfo;
+	P_BSS_INFO_T		   prBssInfo;
 	CMD_UPDATE_WMM_PARMS_T rCmdUpdateWmmParms;
 
 	kalMemZero(&rCmdUpdateWmmParms, sizeof(CMD_UPDATE_WMM_PARMS_T));
@@ -2099,32 +1997,28 @@ WLAN_STATUS nicQmUpdateWmmParms(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex)
 	DBGLOG(QM, EVENT, "sizeof(CMD_UPDATE_WMM_PARMS): %d\n", sizeof(CMD_UPDATE_WMM_PARMS_T));
 	DBGLOG(QM, EVENT, "sizeof(WIFI_CMD_T): %d\n", sizeof(WIFI_CMD_T));
 
-	prBssInfo = GET_BSS_INFO_BY_INDEX(prAdapter, ucBssIndex);
-	rCmdUpdateWmmParms.ucBssIndex = (UINT_8) ucBssIndex;
+	prBssInfo					  = GET_BSS_INFO_BY_INDEX(prAdapter, ucBssIndex);
+	rCmdUpdateWmmParms.ucBssIndex = (UINT_8)ucBssIndex;
 	kalMemCopy(&rCmdUpdateWmmParms.arACQueParms[0], &prBssInfo->arACQueParms[0], (sizeof(AC_QUE_PARMS_T) * AC_NUM));
 
 	rCmdUpdateWmmParms.fgIsQBSS = prBssInfo->fgIsQBSS;
-	rCmdUpdateWmmParms.ucWmmSet = (UINT_8) prBssInfo->ucWmmQueSet;
+	rCmdUpdateWmmParms.ucWmmSet = (UINT_8)prBssInfo->ucWmmQueSet;
 
-	return wlanSendSetQueryCmd(prAdapter,
-				   CMD_ID_UPDATE_WMM_PARMS,
-				   TRUE,
-				   FALSE,
-				   FALSE,
-				   NULL, NULL, sizeof(CMD_UPDATE_WMM_PARMS_T), (PUINT_8)&rCmdUpdateWmmParms, NULL, 0);
+	return wlanSendSetQueryCmd(prAdapter, CMD_ID_UPDATE_WMM_PARMS, TRUE, FALSE, FALSE, NULL, NULL,
+			sizeof(CMD_UPDATE_WMM_PARMS_T), (PUINT_8)&rCmdUpdateWmmParms, NULL, 0);
 }
 
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief This utility function is used to update TX power gain corresponding to
-*        each band/modulation combination
-*
-* @param prAdapter          Pointer of ADAPTER_T
-*        prTxPwrParam       Pointer of TX power parameters
-*
-* @retval WLAN_STATUS_PENDING
-*         WLAN_STATUS_FAILURE
-*/
+ * @brief This utility function is used to update TX power gain corresponding to
+ *        each band/modulation combination
+ *
+ * @param prAdapter          Pointer of ADAPTER_T
+ *        prTxPwrParam       Pointer of TX power parameters
+ *
+ * @retval WLAN_STATUS_PENDING
+ *         WLAN_STATUS_FAILURE
+ */
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS nicUpdateTxPower(IN P_ADAPTER_T prAdapter, IN P_CMD_TX_PWR_T prTxPwrParam)
 {
@@ -2132,22 +2026,20 @@ WLAN_STATUS nicUpdateTxPower(IN P_ADAPTER_T prAdapter, IN P_CMD_TX_PWR_T prTxPwr
 
 	ASSERT(prAdapter);
 
-	return wlanSendSetQueryCmd(prAdapter,
-				   CMD_ID_SET_TX_PWR,
-				   TRUE,
-				   FALSE, FALSE, NULL, NULL, sizeof(CMD_TX_PWR_T), (PUINT_8) prTxPwrParam, NULL, 0);
+	return wlanSendSetQueryCmd(prAdapter, CMD_ID_SET_TX_PWR, TRUE, FALSE, FALSE, NULL, NULL, sizeof(CMD_TX_PWR_T),
+			(PUINT_8)prTxPwrParam, NULL, 0);
 }
 
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief This utility function is used to set auto tx power parameter
-*
-* @param prAdapter          Pointer of ADAPTER_T
-*        prTxPwrParam       Pointer of Auto TX power parameters
-*
-* @retval WLAN_STATUS_PENDING
-*         WLAN_STATUS_FAILURE
-*/
+ * @brief This utility function is used to set auto tx power parameter
+ *
+ * @param prAdapter          Pointer of ADAPTER_T
+ *        prTxPwrParam       Pointer of Auto TX power parameters
+ *
+ * @retval WLAN_STATUS_PENDING
+ *         WLAN_STATUS_FAILURE
+ */
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS nicSetAutoTxPower(IN P_ADAPTER_T prAdapter, IN P_CMD_AUTO_POWER_PARAM_T prAutoPwrParam)
 {
@@ -2155,25 +2047,21 @@ WLAN_STATUS nicSetAutoTxPower(IN P_ADAPTER_T prAdapter, IN P_CMD_AUTO_POWER_PARA
 
 	ASSERT(prAdapter);
 
-	return wlanSendSetQueryCmd(prAdapter,
-				   CMD_ID_SET_AUTOPWR_CTRL,
-				   TRUE,
-				   FALSE,
-				   FALSE,
-				   NULL, NULL, sizeof(CMD_AUTO_POWER_PARAM_T), (PUINT_8) prAutoPwrParam, NULL, 0);
+	return wlanSendSetQueryCmd(prAdapter, CMD_ID_SET_AUTOPWR_CTRL, TRUE, FALSE, FALSE, NULL, NULL,
+			sizeof(CMD_AUTO_POWER_PARAM_T), (PUINT_8)prAutoPwrParam, NULL, 0);
 }
 
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief This utility function is used to update TX power gain corresponding to
-*        each band/modulation combination
-*
-* @param prAdapter          Pointer of ADAPTER_T
-*        prTxPwrParam       Pointer of TX power parameters
-*
-* @retval WLAN_STATUS_PENDING
-*         WLAN_STATUS_FAILURE
-*/
+ * @brief This utility function is used to update TX power gain corresponding to
+ *        each band/modulation combination
+ *
+ * @param prAdapter          Pointer of ADAPTER_T
+ *        prTxPwrParam       Pointer of TX power parameters
+ *
+ * @retval WLAN_STATUS_PENDING
+ *         WLAN_STATUS_FAILURE
+ */
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS nicSetAutoTxPowerControl(IN P_ADAPTER_T prAdapter, IN P_CMD_TX_PWR_T prTxPwrParam)
 {
@@ -2181,35 +2069,33 @@ WLAN_STATUS nicSetAutoTxPowerControl(IN P_ADAPTER_T prAdapter, IN P_CMD_TX_PWR_T
 
 	ASSERT(prAdapter);
 
-	return wlanSendSetQueryCmd(prAdapter,
-				   CMD_ID_SET_TX_PWR,
-				   TRUE,
-				   FALSE, FALSE, NULL, NULL, sizeof(CMD_TX_PWR_T), (PUINT_8) prTxPwrParam, NULL, 0);
+	return wlanSendSetQueryCmd(prAdapter, CMD_ID_SET_TX_PWR, TRUE, FALSE, FALSE, NULL, NULL, sizeof(CMD_TX_PWR_T),
+			(PUINT_8)prTxPwrParam, NULL, 0);
 }
 
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief This utility function is used to update power offset around 5GHz band
-*
-* @param prAdapter          Pointer of ADAPTER_T
-*        pr5GPwrOffset      Pointer of 5GHz power offset parameter
-*
-* @retval WLAN_STATUS_PENDING
-*         WLAN_STATUS_FAILURE
-*/
+ * @brief This utility function is used to update power offset around 5GHz band
+ *
+ * @param prAdapter          Pointer of ADAPTER_T
+ *        pr5GPwrOffset      Pointer of 5GHz power offset parameter
+ *
+ * @retval WLAN_STATUS_PENDING
+ *         WLAN_STATUS_FAILURE
+ */
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS nicUpdate5GOffset(IN P_ADAPTER_T prAdapter, IN P_CMD_5G_PWR_OFFSET_T pr5GPwrOffset)
 {
-#if 0				/* It is not needed anymore */
+#if 0 /* It is not needed anymore */
 	DEBUGFUNC("nicUpdate5GOffset");
 
 	ASSERT(prAdapter);
 
 	return wlanSendSetQueryCmd(prAdapter,
-				   CMD_ID_SET_5G_PWR_OFFSET,
-				   TRUE,
-				   FALSE,
-				   FALSE, NULL, NULL, sizeof(CMD_5G_PWR_OFFSET_T), (PUINT_8) pr5GPwrOffset, NULL, 0);
+					CMD_ID_SET_5G_PWR_OFFSET,
+					TRUE,
+					FALSE,
+					FALSE, NULL, NULL, sizeof(CMD_5G_PWR_OFFSET_T), (PUINT_8) pr5GPwrOffset, NULL, 0);
 #else
 	return 0;
 #endif
@@ -2217,14 +2103,14 @@ WLAN_STATUS nicUpdate5GOffset(IN P_ADAPTER_T prAdapter, IN P_CMD_5G_PWR_OFFSET_T
 
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief This utility function is used to update DPD calibration result
-*
-* @param prAdapter          Pointer of ADAPTER_T
-*        pr5GPwrOffset      Pointer of parameter for DPD calibration result
-*
-* @retval WLAN_STATUS_PENDING
-*         WLAN_STATUS_FAILURE
-*/
+ * @brief This utility function is used to update DPD calibration result
+ *
+ * @param prAdapter          Pointer of ADAPTER_T
+ *        pr5GPwrOffset      Pointer of parameter for DPD calibration result
+ *
+ * @retval WLAN_STATUS_PENDING
+ *         WLAN_STATUS_FAILURE
+ */
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS nicUpdateDPD(IN P_ADAPTER_T prAdapter, IN P_CMD_PWR_PARAM_T prDpdCalResult)
 {
@@ -2232,22 +2118,19 @@ WLAN_STATUS nicUpdateDPD(IN P_ADAPTER_T prAdapter, IN P_CMD_PWR_PARAM_T prDpdCal
 
 	ASSERT(prAdapter);
 
-	return wlanSendSetQueryCmd(prAdapter,
-				   CMD_ID_SET_PWR_PARAM,
-				   TRUE,
-				   FALSE,
-				   FALSE, NULL, NULL, sizeof(CMD_PWR_PARAM_T), (PUINT_8) prDpdCalResult, NULL, 0);
+	return wlanSendSetQueryCmd(prAdapter, CMD_ID_SET_PWR_PARAM, TRUE, FALSE, FALSE, NULL, NULL, sizeof(CMD_PWR_PARAM_T),
+			(PUINT_8)prDpdCalResult, NULL, 0);
 }
 
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief This utility function starts system service such as timer and
-*        memory pools
-*
-* @param prAdapter          Pointer of ADAPTER_T
-*
-* @retval none
-*/
+ * @brief This utility function starts system service such as timer and
+ *        memory pools
+ *
+ * @param prAdapter          Pointer of ADAPTER_T
+ *
+ * @retval none
+ */
 /*----------------------------------------------------------------------------*/
 VOID nicInitSystemService(IN P_ADAPTER_T prAdapter)
 {
@@ -2263,18 +2146,17 @@ VOID nicInitSystemService(IN P_ADAPTER_T prAdapter)
 
 	/* <3> Timer Initialization */
 	cnmTimerInitialize(prAdapter);
-
 }
 
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief This utility function reset some specific system service,
-*        such as STA-REC
-*
-* @param prAdapter          Pointer of ADAPTER_T
-*
-* @retval none
-*/
+ * @brief This utility function reset some specific system service,
+ *        such as STA-REC
+ *
+ * @param prAdapter          Pointer of ADAPTER_T
+ *
+ * @retval none
+ */
 /*----------------------------------------------------------------------------*/
 VOID nicResetSystemService(IN P_ADAPTER_T prAdapter)
 {
@@ -2283,12 +2165,12 @@ VOID nicResetSystemService(IN P_ADAPTER_T prAdapter)
 
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief This utility function is used to update WMM Parms
-*
-* @param prAdapter          Pointer of ADAPTER_T
-*
-* @retval none
-*/
+ * @brief This utility function is used to update WMM Parms
+ *
+ * @param prAdapter          Pointer of ADAPTER_T
+ *
+ * @retval none
+ */
 /*----------------------------------------------------------------------------*/
 VOID nicUninitSystemService(IN P_ADAPTER_T prAdapter)
 {
@@ -2299,17 +2181,16 @@ VOID nicUninitSystemService(IN P_ADAPTER_T prAdapter)
 
 	/* Mailbox Destruction */
 	mboxDestroy(prAdapter);
-
 }
 
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief This utility function is used to update WMM Parms
-*
-* @param prAdapter          Pointer of ADAPTER_T
-*
-* @retval none
-*/
+ * @brief This utility function is used to update WMM Parms
+ *
+ * @param prAdapter          Pointer of ADAPTER_T
+ *
+ * @retval none
+ */
 /*----------------------------------------------------------------------------*/
 VOID nicInitMGMT(IN P_ADAPTER_T prAdapter, IN P_REG_INFO_T prRegInfo)
 {
@@ -2336,17 +2217,16 @@ VOID nicInitMGMT(IN P_ADAPTER_T prAdapter, IN P_REG_INFO_T prRegInfo)
 #if CFG_SUPPORT_SWCR
 	swCrDebugInit(prAdapter);
 #endif /* CFG_SUPPORT_SWCR */
-
 }
 
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief This utility function is used to update WMM Parms
-*
-* @param prAdapter          Pointer of ADAPTER_T
-*
-* @retval none
-*/
+ * @brief This utility function is used to update WMM Parms
+ *
+ * @param prAdapter          Pointer of ADAPTER_T
+ *
+ * @retval none
+ */
 /*----------------------------------------------------------------------------*/
 VOID nicUninitMGMT(IN P_ADAPTER_T prAdapter)
 {
@@ -2372,48 +2252,41 @@ VOID nicUninitMGMT(IN P_ADAPTER_T prAdapter)
 
 	/* CNM Module - uninitialization */
 	cnmUninit(prAdapter);
-
 }
 
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief This function is invoked to buffer scan result
-*
-* @param prAdapter          Pointer to the Adapter structure.
-* @param rMacAddr           BSSID
-* @param prSsid             Pointer to SSID
-* @param u4Privacy          Privacy settings (0: Open / 1: WEP/WPA/WPA2 enabled)
-* @param rRssi              Received Strength (-10 ~ -200 dBm)
-* @param eNetworkType       Network Type (a/b/g)
-* @param prConfiguration    Network Parameter
-* @param eOpMode            Infra/Ad-Hoc
-* @param rSupportedRates    Supported basic rates
-* @param u2IELength         IE Length
-* @param pucIEBuf           Pointer to Information Elements(IEs)
-*
-* @return (none)
-*/
+ * @brief This function is invoked to buffer scan result
+ *
+ * @param prAdapter          Pointer to the Adapter structure.
+ * @param rMacAddr           BSSID
+ * @param prSsid             Pointer to SSID
+ * @param u4Privacy          Privacy settings (0: Open / 1: WEP/WPA/WPA2 enabled)
+ * @param rRssi              Received Strength (-10 ~ -200 dBm)
+ * @param eNetworkType       Network Type (a/b/g)
+ * @param prConfiguration    Network Parameter
+ * @param eOpMode            Infra/Ad-Hoc
+ * @param rSupportedRates    Supported basic rates
+ * @param u2IELength         IE Length
+ * @param pucIEBuf           Pointer to Information Elements(IEs)
+ *
+ * @return (none)
+ */
 /*----------------------------------------------------------------------------*/
-VOID
-nicAddScanResult(IN P_ADAPTER_T prAdapter,
-		 IN PARAM_MAC_ADDRESS rMacAddr,
-		 IN P_PARAM_SSID_T prSsid,
-		 IN UINT_32 u4Privacy,
-		 IN PARAM_RSSI rRssi,
-		 IN ENUM_PARAM_NETWORK_TYPE_T eNetworkType,
-		 IN P_PARAM_802_11_CONFIG_T prConfiguration,
-		 IN ENUM_PARAM_OP_MODE_T eOpMode,
-		 IN PARAM_RATES_EX rSupportedRates, IN UINT_16 u2IELength, IN PUINT_8 pucIEBuf)
+VOID nicAddScanResult(IN P_ADAPTER_T prAdapter, IN PARAM_MAC_ADDRESS rMacAddr, IN P_PARAM_SSID_T prSsid,
+		IN UINT_32 u4Privacy, IN PARAM_RSSI rRssi, IN ENUM_PARAM_NETWORK_TYPE_T eNetworkType,
+		IN P_PARAM_802_11_CONFIG_T prConfiguration, IN ENUM_PARAM_OP_MODE_T eOpMode, IN PARAM_RATES_EX rSupportedRates,
+		IN UINT_16 u2IELength, IN PUINT_8 pucIEBuf)
 {
-	BOOLEAN bReplace;
-	UINT_32 i;
-	UINT_32 u4IdxWeakest = 0;
+	BOOLEAN	   bReplace;
+	UINT_32	   i;
+	UINT_32	   u4IdxWeakest = 0;
 	PARAM_RSSI rWeakestRssi;
-	UINT_32 u4BufferSize;
+	UINT_32	   u4BufferSize;
 
 	ASSERT(prAdapter);
 
-	rWeakestRssi = (PARAM_RSSI) INT_MAX;
+	rWeakestRssi = (PARAM_RSSI)INT_MAX;
 	u4BufferSize = ARRAY_SIZE(prAdapter->rWlanInfo.aucScanIEBuf);
 
 	bReplace = FALSE;
@@ -2421,20 +2294,18 @@ nicAddScanResult(IN P_ADAPTER_T prAdapter,
 	/* decide to replace or add */
 	for (i = 0; i < prAdapter->rWlanInfo.u4ScanResultNum; i++) {
 		/* find weakest entry && not connected one */
-		if (UNEQUAL_MAC_ADDR
-		    (prAdapter->rWlanInfo.arScanResult[i].arMacAddress, prAdapter->rWlanInfo.rCurrBssId.arMacAddress)
-		    && prAdapter->rWlanInfo.arScanResult[i].rRssi < rWeakestRssi) {
+		if (UNEQUAL_MAC_ADDR(
+					prAdapter->rWlanInfo.arScanResult[i].arMacAddress, prAdapter->rWlanInfo.rCurrBssId.arMacAddress) &&
+				prAdapter->rWlanInfo.arScanResult[i].rRssi < rWeakestRssi) {
 			u4IdxWeakest = i;
 			rWeakestRssi = prAdapter->rWlanInfo.arScanResult[i].rRssi;
 		}
 
 		if (prAdapter->rWlanInfo.arScanResult[i].eOpMode == eOpMode &&
-		    EQUAL_MAC_ADDR(&(prAdapter->rWlanInfo.arScanResult[i].arMacAddress), rMacAddr)
-		    &&
-		    (EQUAL_SSID
-		     (prAdapter->rWlanInfo.arScanResult[i].rSsid.aucSsid,
-		      prAdapter->rWlanInfo.arScanResult[i].rSsid.u4SsidLen, prSsid->aucSsid, prSsid->u4SsidLen)
-		     || prAdapter->rWlanInfo.arScanResult[i].rSsid.u4SsidLen == 0)) {
+				EQUAL_MAC_ADDR(&(prAdapter->rWlanInfo.arScanResult[i].arMacAddress), rMacAddr) &&
+				(EQUAL_SSID(prAdapter->rWlanInfo.arScanResult[i].rSsid.aucSsid,
+						 prAdapter->rWlanInfo.arScanResult[i].rSsid.u4SsidLen, prSsid->aucSsid, prSsid->u4SsidLen) ||
+						prAdapter->rWlanInfo.arScanResult[i].rSsid.u4SsidLen == 0)) {
 			/* replace entry */
 			bReplace = TRUE;
 
@@ -2443,40 +2314,34 @@ nicAddScanResult(IN P_ADAPTER_T prAdapter,
 			kalMemZero(&(prAdapter->rWlanInfo.arScanResult[i]), OFFSET_OF(PARAM_BSSID_EX_T, aucIEs));
 
 			/* then fill buffer */
-			prAdapter->rWlanInfo.arScanResult[i].u4Length =
-			    OFFSET_OF(PARAM_BSSID_EX_T, aucIEs) + u2IELength;
+			prAdapter->rWlanInfo.arScanResult[i].u4Length = OFFSET_OF(PARAM_BSSID_EX_T, aucIEs) + u2IELength;
 			COPY_MAC_ADDR(prAdapter->rWlanInfo.arScanResult[i].arMacAddress, rMacAddr);
 			COPY_SSID(prAdapter->rWlanInfo.arScanResult[i].rSsid.aucSsid,
-				  prAdapter->rWlanInfo.arScanResult[i].rSsid.u4SsidLen,
-				  prSsid->aucSsid, prSsid->u4SsidLen);
-			prAdapter->rWlanInfo.arScanResult[i].u4Privacy = u4Privacy;
-			prAdapter->rWlanInfo.arScanResult[i].rRssi = rRssi;
+					prAdapter->rWlanInfo.arScanResult[i].rSsid.u4SsidLen, prSsid->aucSsid, prSsid->u4SsidLen);
+			prAdapter->rWlanInfo.arScanResult[i].u4Privacy		   = u4Privacy;
+			prAdapter->rWlanInfo.arScanResult[i].rRssi			   = rRssi;
 			prAdapter->rWlanInfo.arScanResult[i].eNetworkTypeInUse = eNetworkType;
-			kalMemCopy(&(prAdapter->rWlanInfo.arScanResult[i].rConfiguration),
-				   prConfiguration, sizeof(PARAM_802_11_CONFIG_T));
+			kalMemCopy(&(prAdapter->rWlanInfo.arScanResult[i].rConfiguration), prConfiguration,
+					sizeof(PARAM_802_11_CONFIG_T));
 			prAdapter->rWlanInfo.arScanResult[i].eOpMode = eOpMode;
-			kalMemCopy((prAdapter->rWlanInfo.arScanResult[i].rSupportedRates),
-				   rSupportedRates, sizeof(PARAM_RATES_EX));
-			prAdapter->rWlanInfo.arScanResult[i].u4IELength = (UINT_32) u2IELength;
+			kalMemCopy((prAdapter->rWlanInfo.arScanResult[i].rSupportedRates), rSupportedRates, sizeof(PARAM_RATES_EX));
+			prAdapter->rWlanInfo.arScanResult[i].u4IELength = (UINT_32)u2IELength;
 
 			/* IE - allocate buffer and update pointer */
 			if (u2IELength > 0) {
 				if (ALIGN_4(u2IELength) + prAdapter->rWlanInfo.u4ScanIEBufferUsage <= u4BufferSize) {
-					kalMemCopy(&
-						   (prAdapter->rWlanInfo.
-						    aucScanIEBuf[prAdapter->rWlanInfo.u4ScanIEBufferUsage]), pucIEBuf,
-						   u2IELength);
+					kalMemCopy(&(prAdapter->rWlanInfo.aucScanIEBuf[prAdapter->rWlanInfo.u4ScanIEBufferUsage]), pucIEBuf,
+							u2IELength);
 
 					prAdapter->rWlanInfo.apucScanResultIEs[i] =
-					    &(prAdapter->rWlanInfo.
-					      aucScanIEBuf[prAdapter->rWlanInfo.u4ScanIEBufferUsage]);
+							&(prAdapter->rWlanInfo.aucScanIEBuf[prAdapter->rWlanInfo.u4ScanIEBufferUsage]);
 
 					prAdapter->rWlanInfo.u4ScanIEBufferUsage += ALIGN_4(u2IELength);
 				} else {
 					/* buffer is not enough */
 					prAdapter->rWlanInfo.arScanResult[i].u4Length -= u2IELength;
 					prAdapter->rWlanInfo.arScanResult[i].u4IELength = 0;
-					prAdapter->rWlanInfo.apucScanResultIEs[i] = NULL;
+					prAdapter->rWlanInfo.apucScanResultIEs[i]		= NULL;
 				}
 			} else {
 				prAdapter->rWlanInfo.apucScanResultIEs[i] = NULL;
@@ -2494,47 +2359,41 @@ nicAddScanResult(IN P_ADAPTER_T prAdapter,
 			kalMemZero(&(prAdapter->rWlanInfo.arScanResult[i]), OFFSET_OF(PARAM_BSSID_EX_T, aucIEs));
 
 			/* then fill buffer */
-			prAdapter->rWlanInfo.arScanResult[i].u4Length =
-			    OFFSET_OF(PARAM_BSSID_EX_T, aucIEs) + u2IELength;
+			prAdapter->rWlanInfo.arScanResult[i].u4Length = OFFSET_OF(PARAM_BSSID_EX_T, aucIEs) + u2IELength;
 			COPY_MAC_ADDR(prAdapter->rWlanInfo.arScanResult[i].arMacAddress, rMacAddr);
 			COPY_SSID(prAdapter->rWlanInfo.arScanResult[i].rSsid.aucSsid,
-				  prAdapter->rWlanInfo.arScanResult[i].rSsid.u4SsidLen,
-				  prSsid->aucSsid, prSsid->u4SsidLen);
-			prAdapter->rWlanInfo.arScanResult[i].u4Privacy = u4Privacy;
-			prAdapter->rWlanInfo.arScanResult[i].rRssi = rRssi;
+					prAdapter->rWlanInfo.arScanResult[i].rSsid.u4SsidLen, prSsid->aucSsid, prSsid->u4SsidLen);
+			prAdapter->rWlanInfo.arScanResult[i].u4Privacy		   = u4Privacy;
+			prAdapter->rWlanInfo.arScanResult[i].rRssi			   = rRssi;
 			prAdapter->rWlanInfo.arScanResult[i].eNetworkTypeInUse = eNetworkType;
-			kalMemCopy(&(prAdapter->rWlanInfo.arScanResult[i].rConfiguration),
-				   prConfiguration, sizeof(PARAM_802_11_CONFIG_T));
+			kalMemCopy(&(prAdapter->rWlanInfo.arScanResult[i].rConfiguration), prConfiguration,
+					sizeof(PARAM_802_11_CONFIG_T));
 			prAdapter->rWlanInfo.arScanResult[i].eOpMode = eOpMode;
-			kalMemCopy((prAdapter->rWlanInfo.arScanResult[i].rSupportedRates),
-				   rSupportedRates, sizeof(PARAM_RATES_EX));
-			prAdapter->rWlanInfo.arScanResult[i].u4IELength = (UINT_32) u2IELength;
+			kalMemCopy((prAdapter->rWlanInfo.arScanResult[i].rSupportedRates), rSupportedRates, sizeof(PARAM_RATES_EX));
+			prAdapter->rWlanInfo.arScanResult[i].u4IELength = (UINT_32)u2IELength;
 
 			/* IE - allocate buffer and update pointer */
 			if (u2IELength > 0) {
 				if (ALIGN_4(u2IELength) + prAdapter->rWlanInfo.u4ScanIEBufferUsage <= u4BufferSize) {
-					kalMemCopy(&
-						   (prAdapter->rWlanInfo.
-						    aucScanIEBuf[prAdapter->rWlanInfo.u4ScanIEBufferUsage]), pucIEBuf,
-						   u2IELength);
+					kalMemCopy(&(prAdapter->rWlanInfo.aucScanIEBuf[prAdapter->rWlanInfo.u4ScanIEBufferUsage]), pucIEBuf,
+							u2IELength);
 
 					prAdapter->rWlanInfo.apucScanResultIEs[i] =
-					    &(prAdapter->rWlanInfo.
-					      aucScanIEBuf[prAdapter->rWlanInfo.u4ScanIEBufferUsage]);
+							&(prAdapter->rWlanInfo.aucScanIEBuf[prAdapter->rWlanInfo.u4ScanIEBufferUsage]);
 
 					prAdapter->rWlanInfo.u4ScanIEBufferUsage += ALIGN_4(u2IELength);
 				} else {
 					/* buffer is not enough */
 					prAdapter->rWlanInfo.arScanResult[i].u4Length -= u2IELength;
 					prAdapter->rWlanInfo.arScanResult[i].u4IELength = 0;
-					prAdapter->rWlanInfo.apucScanResultIEs[i] = NULL;
+					prAdapter->rWlanInfo.apucScanResultIEs[i]		= NULL;
 				}
 			} else {
 				prAdapter->rWlanInfo.apucScanResultIEs[i] = NULL;
 			}
 
 			prAdapter->rWlanInfo.u4ScanResultNum++;
-		} else if (rWeakestRssi != (PARAM_RSSI) INT_MAX) {
+		} else if (rWeakestRssi != (PARAM_RSSI)INT_MAX) {
 			/* replace weakest one */
 			i = u4IdxWeakest;
 
@@ -2543,40 +2402,34 @@ nicAddScanResult(IN P_ADAPTER_T prAdapter,
 			kalMemZero(&(prAdapter->rWlanInfo.arScanResult[i]), OFFSET_OF(PARAM_BSSID_EX_T, aucIEs));
 
 			/* then fill buffer */
-			prAdapter->rWlanInfo.arScanResult[i].u4Length =
-			    OFFSET_OF(PARAM_BSSID_EX_T, aucIEs) + u2IELength;
+			prAdapter->rWlanInfo.arScanResult[i].u4Length = OFFSET_OF(PARAM_BSSID_EX_T, aucIEs) + u2IELength;
 			COPY_MAC_ADDR(prAdapter->rWlanInfo.arScanResult[i].arMacAddress, rMacAddr);
 			COPY_SSID(prAdapter->rWlanInfo.arScanResult[i].rSsid.aucSsid,
-				  prAdapter->rWlanInfo.arScanResult[i].rSsid.u4SsidLen,
-				  prSsid->aucSsid, prSsid->u4SsidLen);
-			prAdapter->rWlanInfo.arScanResult[i].u4Privacy = u4Privacy;
-			prAdapter->rWlanInfo.arScanResult[i].rRssi = rRssi;
+					prAdapter->rWlanInfo.arScanResult[i].rSsid.u4SsidLen, prSsid->aucSsid, prSsid->u4SsidLen);
+			prAdapter->rWlanInfo.arScanResult[i].u4Privacy		   = u4Privacy;
+			prAdapter->rWlanInfo.arScanResult[i].rRssi			   = rRssi;
 			prAdapter->rWlanInfo.arScanResult[i].eNetworkTypeInUse = eNetworkType;
-			kalMemCopy(&(prAdapter->rWlanInfo.arScanResult[i].rConfiguration),
-				   prConfiguration, sizeof(PARAM_802_11_CONFIG_T));
+			kalMemCopy(&(prAdapter->rWlanInfo.arScanResult[i].rConfiguration), prConfiguration,
+					sizeof(PARAM_802_11_CONFIG_T));
 			prAdapter->rWlanInfo.arScanResult[i].eOpMode = eOpMode;
-			kalMemCopy((prAdapter->rWlanInfo.arScanResult[i].rSupportedRates),
-				   rSupportedRates, sizeof(PARAM_RATES_EX));
-			prAdapter->rWlanInfo.arScanResult[i].u4IELength = (UINT_32) u2IELength;
+			kalMemCopy((prAdapter->rWlanInfo.arScanResult[i].rSupportedRates), rSupportedRates, sizeof(PARAM_RATES_EX));
+			prAdapter->rWlanInfo.arScanResult[i].u4IELength = (UINT_32)u2IELength;
 
 			if (u2IELength > 0) {
 				/* IE - allocate buffer and update pointer */
 				if (ALIGN_4(u2IELength) + prAdapter->rWlanInfo.u4ScanIEBufferUsage <= u4BufferSize) {
-					kalMemCopy(&
-						   (prAdapter->rWlanInfo.
-						    aucScanIEBuf[prAdapter->rWlanInfo.u4ScanIEBufferUsage]), pucIEBuf,
-						   u2IELength);
+					kalMemCopy(&(prAdapter->rWlanInfo.aucScanIEBuf[prAdapter->rWlanInfo.u4ScanIEBufferUsage]), pucIEBuf,
+							u2IELength);
 
 					prAdapter->rWlanInfo.apucScanResultIEs[i] =
-					    &(prAdapter->rWlanInfo.
-					      aucScanIEBuf[prAdapter->rWlanInfo.u4ScanIEBufferUsage]);
+							&(prAdapter->rWlanInfo.aucScanIEBuf[prAdapter->rWlanInfo.u4ScanIEBufferUsage]);
 
 					prAdapter->rWlanInfo.u4ScanIEBufferUsage += ALIGN_4(u2IELength);
 				} else {
 					/* buffer is not enough */
 					prAdapter->rWlanInfo.arScanResult[i].u4Length -= u2IELength;
 					prAdapter->rWlanInfo.arScanResult[i].u4IELength = 0;
-					prAdapter->rWlanInfo.apucScanResultIEs[i] = NULL;
+					prAdapter->rWlanInfo.apucScanResultIEs[i]		= NULL;
 				}
 			} else {
 				prAdapter->rWlanInfo.apucScanResultIEs[i] = NULL;
@@ -2587,13 +2440,13 @@ nicAddScanResult(IN P_ADAPTER_T prAdapter,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief This function is invoked to free IE buffer for dedicated scan result
-*
-* @param prAdapter          Pointer to the Adapter structure.
-* @param u4Idx              Index of Scan Result
-*
-* @return (none)
-*/
+ * @brief This function is invoked to free IE buffer for dedicated scan result
+ *
+ * @param prAdapter          Pointer to the Adapter structure.
+ * @param u4Idx              Index of Scan Result
+ *
+ * @return (none)
+ */
 /*----------------------------------------------------------------------------*/
 VOID nicFreeScanResultIE(IN P_ADAPTER_T prAdapter, IN UINT_32 u4Idx)
 {
@@ -2604,18 +2457,18 @@ VOID nicFreeScanResultIE(IN P_ADAPTER_T prAdapter, IN UINT_32 u4Idx)
 	ASSERT(prAdapter);
 	ASSERT(u4Idx < CFG_MAX_NUM_BSS_LIST);
 
-	if (prAdapter->rWlanInfo.arScanResult[u4Idx].u4IELength == 0
-	    || prAdapter->rWlanInfo.apucScanResultIEs[u4Idx] == NULL) {
+	if (prAdapter->rWlanInfo.arScanResult[u4Idx].u4IELength == 0 ||
+			prAdapter->rWlanInfo.apucScanResultIEs[u4Idx] == NULL) {
 		return;
 	}
 
 	u4FreeSize = ALIGN_4(prAdapter->rWlanInfo.arScanResult[u4Idx].u4IELength);
 
-	pucPivot = prAdapter->rWlanInfo.apucScanResultIEs[u4Idx];
-	pucMovePivot = (PUINT_8) ((ULONG) (prAdapter->rWlanInfo.apucScanResultIEs[u4Idx]) + u4FreeSize);
+	pucPivot	 = prAdapter->rWlanInfo.apucScanResultIEs[u4Idx];
+	pucMovePivot = (PUINT_8)((ULONG)(prAdapter->rWlanInfo.apucScanResultIEs[u4Idx]) + u4FreeSize);
 
-	u4ReserveSize = ((ULONG) pucPivot) - (ULONG) (&(prAdapter->rWlanInfo.aucScanIEBuf[0]));
-	u4MoveSize = prAdapter->rWlanInfo.u4ScanIEBufferUsage - u4ReserveSize - u4FreeSize;
+	u4ReserveSize = ((ULONG)pucPivot) - (ULONG)(&(prAdapter->rWlanInfo.aucScanIEBuf[0]));
+	u4MoveSize	  = prAdapter->rWlanInfo.u4ScanIEBufferUsage - u4ReserveSize - u4FreeSize;
 
 	/* 1. rest of buffer to move forward */
 	kalMemCopy(pucPivot, pucMovePivot, u4MoveSize);
@@ -2625,83 +2478,78 @@ VOID nicFreeScanResultIE(IN P_ADAPTER_T prAdapter, IN UINT_32 u4Idx)
 		if (i != u4Idx) {
 			if (prAdapter->rWlanInfo.apucScanResultIEs[i] >= pucMovePivot) {
 				prAdapter->rWlanInfo.apucScanResultIEs[i] =
-				    (PUINT_8) ((ULONG) (prAdapter->rWlanInfo.apucScanResultIEs[i])
-					       - u4FreeSize);
+						(PUINT_8)((ULONG)(prAdapter->rWlanInfo.apucScanResultIEs[i]) - u4FreeSize);
 			}
 		}
 	}
 
 	/* 1.2 reset the freed one */
 	prAdapter->rWlanInfo.arScanResult[u4Idx].u4IELength = 0;
-	prAdapter->rWlanInfo.apucScanResultIEs[i] = NULL;
+	prAdapter->rWlanInfo.apucScanResultIEs[i]			= NULL;
 
 	/* 2. reduce IE buffer usage */
 	prAdapter->rWlanInfo.u4ScanIEBufferUsage -= u4FreeSize;
-
 }
 
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief This function is to hack parameters for WLAN TABLE for
-*        fixed rate settings
-*
-* @param prAdapter          Pointer to the Adapter structure.
-* @param eRateSetting
-* @param pu2DesiredNonHTRateSet,
-* @param pu2BSSBasicRateSet,
-* @param pucMcsSet
-* @param pucSupMcs32
-* @param pu2HtCapInfo
-*
-* @return WLAN_STATUS_SUCCESS
-*/
+ * @brief This function is to hack parameters for WLAN TABLE for
+ *        fixed rate settings
+ *
+ * @param prAdapter          Pointer to the Adapter structure.
+ * @param eRateSetting
+ * @param pu2DesiredNonHTRateSet,
+ * @param pu2BSSBasicRateSet,
+ * @param pucMcsSet
+ * @param pucSupMcs32
+ * @param pu2HtCapInfo
+ *
+ * @return WLAN_STATUS_SUCCESS
+ */
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS
-nicUpdateRateParams(IN P_ADAPTER_T prAdapter,
-		    IN ENUM_REGISTRY_FIXED_RATE_T eRateSetting,
-		    IN PUINT_8 pucDesiredPhyTypeSet,
-		    IN PUINT_16 pu2DesiredNonHTRateSet,
-		    IN PUINT_16 pu2BSSBasicRateSet,
-		    IN PUINT_8 pucMcsSet, IN PUINT_8 pucSupMcs32, IN PUINT_16 pu2HtCapInfo)
+nicUpdateRateParams(IN P_ADAPTER_T prAdapter, IN ENUM_REGISTRY_FIXED_RATE_T eRateSetting,
+		IN PUINT_8 pucDesiredPhyTypeSet, IN PUINT_16 pu2DesiredNonHTRateSet, IN PUINT_16 pu2BSSBasicRateSet,
+		IN PUINT_8 pucMcsSet, IN PUINT_8 pucSupMcs32, IN PUINT_16 pu2HtCapInfo)
 {
 	ASSERT(prAdapter);
 	ASSERT(eRateSetting > FIXED_RATE_NONE && eRateSetting < FIXED_RATE_NUM);
 
 	switch (prAdapter->rWifiVar.eRateSetting) {
 	case FIXED_RATE_1M:
-		*pucDesiredPhyTypeSet = PHY_TYPE_BIT_HR_DSSS;
+		*pucDesiredPhyTypeSet	= PHY_TYPE_BIT_HR_DSSS;
 		*pu2DesiredNonHTRateSet = RATE_SET_BIT_1M;
-		*pu2BSSBasicRateSet = RATE_SET_BIT_1M;
-		*pucMcsSet = 0;
-		*pucSupMcs32 = 0;
-		*pu2HtCapInfo = 0;
+		*pu2BSSBasicRateSet		= RATE_SET_BIT_1M;
+		*pucMcsSet				= 0;
+		*pucSupMcs32			= 0;
+		*pu2HtCapInfo			= 0;
 		break;
 
 	case FIXED_RATE_2M:
-		*pucDesiredPhyTypeSet = PHY_TYPE_BIT_HR_DSSS;
+		*pucDesiredPhyTypeSet	= PHY_TYPE_BIT_HR_DSSS;
 		*pu2DesiredNonHTRateSet = RATE_SET_BIT_2M;
-		*pu2BSSBasicRateSet = RATE_SET_BIT_2M;
-		*pucMcsSet = 0;
-		*pucSupMcs32 = 0;
-		*pu2HtCapInfo = 0;
+		*pu2BSSBasicRateSet		= RATE_SET_BIT_2M;
+		*pucMcsSet				= 0;
+		*pucSupMcs32			= 0;
+		*pu2HtCapInfo			= 0;
 		break;
 
 	case FIXED_RATE_5_5M:
-		*pucDesiredPhyTypeSet = PHY_TYPE_BIT_HR_DSSS;
+		*pucDesiredPhyTypeSet	= PHY_TYPE_BIT_HR_DSSS;
 		*pu2DesiredNonHTRateSet = RATE_SET_BIT_5_5M;
-		*pu2BSSBasicRateSet = RATE_SET_BIT_5_5M;
-		*pucMcsSet = 0;
-		*pucSupMcs32 = 0;
-		*pu2HtCapInfo = 0;
+		*pu2BSSBasicRateSet		= RATE_SET_BIT_5_5M;
+		*pucMcsSet				= 0;
+		*pucSupMcs32			= 0;
+		*pu2HtCapInfo			= 0;
 		break;
 
 	case FIXED_RATE_11M:
-		*pucDesiredPhyTypeSet = PHY_TYPE_BIT_HR_DSSS;
+		*pucDesiredPhyTypeSet	= PHY_TYPE_BIT_HR_DSSS;
 		*pu2DesiredNonHTRateSet = RATE_SET_BIT_11M;
-		*pu2BSSBasicRateSet = RATE_SET_BIT_11M;
-		*pucMcsSet = 0;
-		*pucSupMcs32 = 0;
-		*pu2HtCapInfo = 0;
+		*pu2BSSBasicRateSet		= RATE_SET_BIT_11M;
+		*pucMcsSet				= 0;
+		*pucSupMcs32			= 0;
+		*pu2HtCapInfo			= 0;
 		break;
 
 	case FIXED_RATE_6M:
@@ -2711,10 +2559,10 @@ nicUpdateRateParams(IN P_ADAPTER_T prAdapter,
 			*pucDesiredPhyTypeSet = PHY_TYPE_BIT_OFDM;
 
 		*pu2DesiredNonHTRateSet = RATE_SET_BIT_6M;
-		*pu2BSSBasicRateSet = RATE_SET_BIT_6M;
-		*pucMcsSet = 0;
-		*pucSupMcs32 = 0;
-		*pu2HtCapInfo = 0;
+		*pu2BSSBasicRateSet		= RATE_SET_BIT_6M;
+		*pucMcsSet				= 0;
+		*pucSupMcs32			= 0;
+		*pu2HtCapInfo			= 0;
 		break;
 
 	case FIXED_RATE_9M:
@@ -2724,10 +2572,10 @@ nicUpdateRateParams(IN P_ADAPTER_T prAdapter,
 			*pucDesiredPhyTypeSet = PHY_TYPE_BIT_OFDM;
 
 		*pu2DesiredNonHTRateSet = RATE_SET_BIT_9M;
-		*pu2BSSBasicRateSet = RATE_SET_BIT_9M;
-		*pucMcsSet = 0;
-		*pucSupMcs32 = 0;
-		*pu2HtCapInfo = 0;
+		*pu2BSSBasicRateSet		= RATE_SET_BIT_9M;
+		*pucMcsSet				= 0;
+		*pucSupMcs32			= 0;
+		*pu2HtCapInfo			= 0;
 		break;
 
 	case FIXED_RATE_12M:
@@ -2737,10 +2585,10 @@ nicUpdateRateParams(IN P_ADAPTER_T prAdapter,
 			*pucDesiredPhyTypeSet = PHY_TYPE_BIT_OFDM;
 
 		*pu2DesiredNonHTRateSet = RATE_SET_BIT_12M;
-		*pu2BSSBasicRateSet = RATE_SET_BIT_12M;
-		*pucMcsSet = 0;
-		*pucSupMcs32 = 0;
-		*pu2HtCapInfo = 0;
+		*pu2BSSBasicRateSet		= RATE_SET_BIT_12M;
+		*pucMcsSet				= 0;
+		*pucSupMcs32			= 0;
+		*pu2HtCapInfo			= 0;
 		break;
 
 	case FIXED_RATE_18M:
@@ -2750,10 +2598,10 @@ nicUpdateRateParams(IN P_ADAPTER_T prAdapter,
 			*pucDesiredPhyTypeSet = PHY_TYPE_BIT_OFDM;
 
 		*pu2DesiredNonHTRateSet = RATE_SET_BIT_18M;
-		*pu2BSSBasicRateSet = RATE_SET_BIT_18M;
-		*pucMcsSet = 0;
-		*pucSupMcs32 = 0;
-		*pu2HtCapInfo = 0;
+		*pu2BSSBasicRateSet		= RATE_SET_BIT_18M;
+		*pucMcsSet				= 0;
+		*pucSupMcs32			= 0;
+		*pu2HtCapInfo			= 0;
 		break;
 
 	case FIXED_RATE_24M:
@@ -2763,10 +2611,10 @@ nicUpdateRateParams(IN P_ADAPTER_T prAdapter,
 			*pucDesiredPhyTypeSet = PHY_TYPE_BIT_OFDM;
 
 		*pu2DesiredNonHTRateSet = RATE_SET_BIT_24M;
-		*pu2BSSBasicRateSet = RATE_SET_BIT_24M;
-		*pucMcsSet = 0;
-		*pucSupMcs32 = 0;
-		*pu2HtCapInfo = 0;
+		*pu2BSSBasicRateSet		= RATE_SET_BIT_24M;
+		*pucMcsSet				= 0;
+		*pucSupMcs32			= 0;
+		*pu2HtCapInfo			= 0;
 		break;
 
 	case FIXED_RATE_36M:
@@ -2776,10 +2624,10 @@ nicUpdateRateParams(IN P_ADAPTER_T prAdapter,
 			*pucDesiredPhyTypeSet = PHY_TYPE_BIT_OFDM;
 
 		*pu2DesiredNonHTRateSet = RATE_SET_BIT_36M;
-		*pu2BSSBasicRateSet = RATE_SET_BIT_36M;
-		*pucMcsSet = 0;
-		*pucSupMcs32 = 0;
-		*pu2HtCapInfo = 0;
+		*pu2BSSBasicRateSet		= RATE_SET_BIT_36M;
+		*pucMcsSet				= 0;
+		*pucSupMcs32			= 0;
+		*pu2HtCapInfo			= 0;
 		break;
 
 	case FIXED_RATE_48M:
@@ -2789,10 +2637,10 @@ nicUpdateRateParams(IN P_ADAPTER_T prAdapter,
 			*pucDesiredPhyTypeSet = PHY_TYPE_BIT_OFDM;
 
 		*pu2DesiredNonHTRateSet = RATE_SET_BIT_48M;
-		*pu2BSSBasicRateSet = RATE_SET_BIT_48M;
-		*pucMcsSet = 0;
-		*pucSupMcs32 = 0;
-		*pu2HtCapInfo = 0;
+		*pu2BSSBasicRateSet		= RATE_SET_BIT_48M;
+		*pucMcsSet				= 0;
+		*pucSupMcs32			= 0;
+		*pu2HtCapInfo			= 0;
 		break;
 
 	case FIXED_RATE_54M:
@@ -2802,348 +2650,348 @@ nicUpdateRateParams(IN P_ADAPTER_T prAdapter,
 			*pucDesiredPhyTypeSet = PHY_TYPE_BIT_OFDM;
 
 		*pu2DesiredNonHTRateSet = RATE_SET_BIT_54M;
-		*pu2BSSBasicRateSet = RATE_SET_BIT_54M;
-		*pucMcsSet = 0;
-		*pucSupMcs32 = 0;
-		*pu2HtCapInfo = 0;
+		*pu2BSSBasicRateSet		= RATE_SET_BIT_54M;
+		*pucMcsSet				= 0;
+		*pucSupMcs32			= 0;
+		*pu2HtCapInfo			= 0;
 		break;
 
 	case FIXED_RATE_MCS0_20M_800NS:
-		*pucDesiredPhyTypeSet = PHY_TYPE_BIT_HT;
+		*pucDesiredPhyTypeSet	= PHY_TYPE_BIT_HT;
 		*pu2DesiredNonHTRateSet = RATE_SET_BIT_HT_PHY;
-		*pu2BSSBasicRateSet = RATE_SET_BIT_HT_PHY;
-		*pucMcsSet = BIT(HT_RATE_MCS0_INDEX-1);
-		*pucSupMcs32 = 0;
-		(*pu2HtCapInfo) &= ~(HT_CAP_INFO_SUP_CHNL_WIDTH
-				     | HT_CAP_INFO_SHORT_GI_20M | HT_CAP_INFO_SHORT_GI_40M | HT_CAP_INFO_HT_GF);
+		*pu2BSSBasicRateSet		= RATE_SET_BIT_HT_PHY;
+		*pucMcsSet				= BIT(HT_RATE_MCS0_INDEX - 1);
+		*pucSupMcs32			= 0;
+		(*pu2HtCapInfo) &=
+				~(HT_CAP_INFO_SUP_CHNL_WIDTH | HT_CAP_INFO_SHORT_GI_20M | HT_CAP_INFO_SHORT_GI_40M | HT_CAP_INFO_HT_GF);
 		break;
 
 	case FIXED_RATE_MCS1_20M_800NS:
-		*pucDesiredPhyTypeSet = PHY_TYPE_BIT_HT;
+		*pucDesiredPhyTypeSet	= PHY_TYPE_BIT_HT;
 		*pu2DesiredNonHTRateSet = RATE_SET_BIT_HT_PHY;
-		*pu2BSSBasicRateSet = RATE_SET_BIT_HT_PHY;
-		*pucMcsSet = BIT(HT_RATE_MCS1_INDEX-1);
-		*pucSupMcs32 = 0;
-		(*pu2HtCapInfo) &= ~(HT_CAP_INFO_SUP_CHNL_WIDTH
-				     | HT_CAP_INFO_SHORT_GI_20M | HT_CAP_INFO_SHORT_GI_40M | HT_CAP_INFO_HT_GF);
+		*pu2BSSBasicRateSet		= RATE_SET_BIT_HT_PHY;
+		*pucMcsSet				= BIT(HT_RATE_MCS1_INDEX - 1);
+		*pucSupMcs32			= 0;
+		(*pu2HtCapInfo) &=
+				~(HT_CAP_INFO_SUP_CHNL_WIDTH | HT_CAP_INFO_SHORT_GI_20M | HT_CAP_INFO_SHORT_GI_40M | HT_CAP_INFO_HT_GF);
 		break;
 
 	case FIXED_RATE_MCS2_20M_800NS:
-		*pucDesiredPhyTypeSet = PHY_TYPE_BIT_HT;
+		*pucDesiredPhyTypeSet	= PHY_TYPE_BIT_HT;
 		*pu2DesiredNonHTRateSet = RATE_SET_BIT_HT_PHY;
-		*pu2BSSBasicRateSet = RATE_SET_BIT_HT_PHY;
-		*pucMcsSet = BIT(HT_RATE_MCS2_INDEX-1);
-		*pucSupMcs32 = 0;
-		(*pu2HtCapInfo) &= ~(HT_CAP_INFO_SUP_CHNL_WIDTH
-				     | HT_CAP_INFO_SHORT_GI_20M | HT_CAP_INFO_SHORT_GI_40M | HT_CAP_INFO_HT_GF);
+		*pu2BSSBasicRateSet		= RATE_SET_BIT_HT_PHY;
+		*pucMcsSet				= BIT(HT_RATE_MCS2_INDEX - 1);
+		*pucSupMcs32			= 0;
+		(*pu2HtCapInfo) &=
+				~(HT_CAP_INFO_SUP_CHNL_WIDTH | HT_CAP_INFO_SHORT_GI_20M | HT_CAP_INFO_SHORT_GI_40M | HT_CAP_INFO_HT_GF);
 		break;
 
 	case FIXED_RATE_MCS3_20M_800NS:
-		*pucDesiredPhyTypeSet = PHY_TYPE_BIT_HT;
+		*pucDesiredPhyTypeSet	= PHY_TYPE_BIT_HT;
 		*pu2DesiredNonHTRateSet = RATE_SET_BIT_HT_PHY;
-		*pu2BSSBasicRateSet = RATE_SET_BIT_HT_PHY;
-		*pucMcsSet = BIT(HT_RATE_MCS3_INDEX-1);
-		*pucSupMcs32 = 0;
-		(*pu2HtCapInfo) &= ~(HT_CAP_INFO_SUP_CHNL_WIDTH
-				     | HT_CAP_INFO_SHORT_GI_20M | HT_CAP_INFO_SHORT_GI_40M | HT_CAP_INFO_HT_GF);
+		*pu2BSSBasicRateSet		= RATE_SET_BIT_HT_PHY;
+		*pucMcsSet				= BIT(HT_RATE_MCS3_INDEX - 1);
+		*pucSupMcs32			= 0;
+		(*pu2HtCapInfo) &=
+				~(HT_CAP_INFO_SUP_CHNL_WIDTH | HT_CAP_INFO_SHORT_GI_20M | HT_CAP_INFO_SHORT_GI_40M | HT_CAP_INFO_HT_GF);
 		break;
 
 	case FIXED_RATE_MCS4_20M_800NS:
-		*pucDesiredPhyTypeSet = PHY_TYPE_BIT_HT;
+		*pucDesiredPhyTypeSet	= PHY_TYPE_BIT_HT;
 		*pu2DesiredNonHTRateSet = RATE_SET_BIT_HT_PHY;
-		*pu2BSSBasicRateSet = RATE_SET_BIT_HT_PHY;
-		*pucMcsSet = BIT(HT_RATE_MCS4_INDEX-1);
-		*pucSupMcs32 = 0;
-		(*pu2HtCapInfo) &= ~(HT_CAP_INFO_SUP_CHNL_WIDTH
-				     | HT_CAP_INFO_SHORT_GI_20M | HT_CAP_INFO_SHORT_GI_40M | HT_CAP_INFO_HT_GF);
+		*pu2BSSBasicRateSet		= RATE_SET_BIT_HT_PHY;
+		*pucMcsSet				= BIT(HT_RATE_MCS4_INDEX - 1);
+		*pucSupMcs32			= 0;
+		(*pu2HtCapInfo) &=
+				~(HT_CAP_INFO_SUP_CHNL_WIDTH | HT_CAP_INFO_SHORT_GI_20M | HT_CAP_INFO_SHORT_GI_40M | HT_CAP_INFO_HT_GF);
 		break;
 
 	case FIXED_RATE_MCS5_20M_800NS:
-		*pucDesiredPhyTypeSet = PHY_TYPE_BIT_HT;
+		*pucDesiredPhyTypeSet	= PHY_TYPE_BIT_HT;
 		*pu2DesiredNonHTRateSet = RATE_SET_BIT_HT_PHY;
-		*pu2BSSBasicRateSet = RATE_SET_BIT_HT_PHY;
-		*pucMcsSet = BIT(HT_RATE_MCS5_INDEX-1);
-		*pucSupMcs32 = 0;
-		(*pu2HtCapInfo) &= ~(HT_CAP_INFO_SUP_CHNL_WIDTH
-				     | HT_CAP_INFO_SHORT_GI_20M | HT_CAP_INFO_SHORT_GI_40M | HT_CAP_INFO_HT_GF);
+		*pu2BSSBasicRateSet		= RATE_SET_BIT_HT_PHY;
+		*pucMcsSet				= BIT(HT_RATE_MCS5_INDEX - 1);
+		*pucSupMcs32			= 0;
+		(*pu2HtCapInfo) &=
+				~(HT_CAP_INFO_SUP_CHNL_WIDTH | HT_CAP_INFO_SHORT_GI_20M | HT_CAP_INFO_SHORT_GI_40M | HT_CAP_INFO_HT_GF);
 		break;
 
 	case FIXED_RATE_MCS6_20M_800NS:
-		*pucDesiredPhyTypeSet = PHY_TYPE_BIT_HT;
+		*pucDesiredPhyTypeSet	= PHY_TYPE_BIT_HT;
 		*pu2DesiredNonHTRateSet = RATE_SET_BIT_HT_PHY;
-		*pu2BSSBasicRateSet = RATE_SET_BIT_HT_PHY;
-		*pucMcsSet = BIT(HT_RATE_MCS6_INDEX-1);
-		*pucSupMcs32 = 0;
-		(*pu2HtCapInfo) &= ~(HT_CAP_INFO_SUP_CHNL_WIDTH
-				     | HT_CAP_INFO_SHORT_GI_20M | HT_CAP_INFO_SHORT_GI_40M | HT_CAP_INFO_HT_GF);
+		*pu2BSSBasicRateSet		= RATE_SET_BIT_HT_PHY;
+		*pucMcsSet				= BIT(HT_RATE_MCS6_INDEX - 1);
+		*pucSupMcs32			= 0;
+		(*pu2HtCapInfo) &=
+				~(HT_CAP_INFO_SUP_CHNL_WIDTH | HT_CAP_INFO_SHORT_GI_20M | HT_CAP_INFO_SHORT_GI_40M | HT_CAP_INFO_HT_GF);
 		break;
 
 	case FIXED_RATE_MCS7_20M_800NS:
-		*pucDesiredPhyTypeSet = PHY_TYPE_BIT_HT;
+		*pucDesiredPhyTypeSet	= PHY_TYPE_BIT_HT;
 		*pu2DesiredNonHTRateSet = RATE_SET_BIT_HT_PHY;
-		*pu2BSSBasicRateSet = RATE_SET_BIT_HT_PHY;
-		*pucMcsSet = BIT(HT_RATE_MCS7_INDEX-1);
-		*pucSupMcs32 = 0;
-		(*pu2HtCapInfo) &= ~(HT_CAP_INFO_SUP_CHNL_WIDTH
-				     | HT_CAP_INFO_SHORT_GI_20M | HT_CAP_INFO_SHORT_GI_40M | HT_CAP_INFO_HT_GF);
+		*pu2BSSBasicRateSet		= RATE_SET_BIT_HT_PHY;
+		*pucMcsSet				= BIT(HT_RATE_MCS7_INDEX - 1);
+		*pucSupMcs32			= 0;
+		(*pu2HtCapInfo) &=
+				~(HT_CAP_INFO_SUP_CHNL_WIDTH | HT_CAP_INFO_SHORT_GI_20M | HT_CAP_INFO_SHORT_GI_40M | HT_CAP_INFO_HT_GF);
 		break;
 
 	case FIXED_RATE_MCS0_20M_400NS:
-		*pucDesiredPhyTypeSet = PHY_TYPE_BIT_HT;
+		*pucDesiredPhyTypeSet	= PHY_TYPE_BIT_HT;
 		*pu2DesiredNonHTRateSet = RATE_SET_BIT_HT_PHY;
-		*pu2BSSBasicRateSet = RATE_SET_BIT_HT_PHY;
-		*pucMcsSet = BIT(HT_RATE_MCS0_INDEX-1);
-		*pucSupMcs32 = 0;
+		*pu2BSSBasicRateSet		= RATE_SET_BIT_HT_PHY;
+		*pucMcsSet				= BIT(HT_RATE_MCS0_INDEX - 1);
+		*pucSupMcs32			= 0;
 		(*pu2HtCapInfo) &= ~(HT_CAP_INFO_SUP_CHNL_WIDTH | HT_CAP_INFO_SHORT_GI_40M | HT_CAP_INFO_HT_GF);
 		(*pu2HtCapInfo) |= HT_CAP_INFO_SHORT_GI_20M;
 		break;
 
 	case FIXED_RATE_MCS1_20M_400NS:
-		*pucDesiredPhyTypeSet = PHY_TYPE_BIT_HT;
+		*pucDesiredPhyTypeSet	= PHY_TYPE_BIT_HT;
 		*pu2DesiredNonHTRateSet = RATE_SET_BIT_HT_PHY;
-		*pu2BSSBasicRateSet = RATE_SET_BIT_HT_PHY;
-		*pucMcsSet = BIT(HT_RATE_MCS1_INDEX-1);
-		*pucSupMcs32 = 0;
+		*pu2BSSBasicRateSet		= RATE_SET_BIT_HT_PHY;
+		*pucMcsSet				= BIT(HT_RATE_MCS1_INDEX - 1);
+		*pucSupMcs32			= 0;
 		(*pu2HtCapInfo) &= ~(HT_CAP_INFO_SUP_CHNL_WIDTH | HT_CAP_INFO_SHORT_GI_40M | HT_CAP_INFO_HT_GF);
 		(*pu2HtCapInfo) |= HT_CAP_INFO_SHORT_GI_20M;
 		break;
 
 	case FIXED_RATE_MCS2_20M_400NS:
-		*pucDesiredPhyTypeSet = PHY_TYPE_BIT_HT;
+		*pucDesiredPhyTypeSet	= PHY_TYPE_BIT_HT;
 		*pu2DesiredNonHTRateSet = RATE_SET_BIT_HT_PHY;
-		*pu2BSSBasicRateSet = RATE_SET_BIT_HT_PHY;
-		*pucMcsSet = BIT(HT_RATE_MCS2_INDEX-1);
-		*pucSupMcs32 = 0;
+		*pu2BSSBasicRateSet		= RATE_SET_BIT_HT_PHY;
+		*pucMcsSet				= BIT(HT_RATE_MCS2_INDEX - 1);
+		*pucSupMcs32			= 0;
 		(*pu2HtCapInfo) &= ~(HT_CAP_INFO_SUP_CHNL_WIDTH | HT_CAP_INFO_SHORT_GI_40M | HT_CAP_INFO_HT_GF);
 		(*pu2HtCapInfo) |= HT_CAP_INFO_SHORT_GI_20M;
 		break;
 
 	case FIXED_RATE_MCS3_20M_400NS:
-		*pucDesiredPhyTypeSet = PHY_TYPE_BIT_HT;
+		*pucDesiredPhyTypeSet	= PHY_TYPE_BIT_HT;
 		*pu2DesiredNonHTRateSet = RATE_SET_BIT_HT_PHY;
-		*pu2BSSBasicRateSet = RATE_SET_BIT_HT_PHY;
-		*pucMcsSet = BIT(HT_RATE_MCS3_INDEX-1);
-		*pucSupMcs32 = 0;
+		*pu2BSSBasicRateSet		= RATE_SET_BIT_HT_PHY;
+		*pucMcsSet				= BIT(HT_RATE_MCS3_INDEX - 1);
+		*pucSupMcs32			= 0;
 		(*pu2HtCapInfo) &= ~(HT_CAP_INFO_SUP_CHNL_WIDTH | HT_CAP_INFO_SHORT_GI_40M | HT_CAP_INFO_HT_GF);
 		(*pu2HtCapInfo) |= HT_CAP_INFO_SHORT_GI_20M;
 		break;
 
 	case FIXED_RATE_MCS4_20M_400NS:
-		*pucDesiredPhyTypeSet = PHY_TYPE_BIT_HT;
+		*pucDesiredPhyTypeSet	= PHY_TYPE_BIT_HT;
 		*pu2DesiredNonHTRateSet = RATE_SET_BIT_HT_PHY;
-		*pu2BSSBasicRateSet = RATE_SET_BIT_HT_PHY;
-		*pucMcsSet = BIT(HT_RATE_MCS4_INDEX-1);
-		*pucSupMcs32 = 0;
+		*pu2BSSBasicRateSet		= RATE_SET_BIT_HT_PHY;
+		*pucMcsSet				= BIT(HT_RATE_MCS4_INDEX - 1);
+		*pucSupMcs32			= 0;
 		(*pu2HtCapInfo) &= ~(HT_CAP_INFO_SUP_CHNL_WIDTH | HT_CAP_INFO_SHORT_GI_40M | HT_CAP_INFO_HT_GF);
 		(*pu2HtCapInfo) |= HT_CAP_INFO_SHORT_GI_20M;
 		break;
 
 	case FIXED_RATE_MCS5_20M_400NS:
-		*pucDesiredPhyTypeSet = PHY_TYPE_BIT_HT;
+		*pucDesiredPhyTypeSet	= PHY_TYPE_BIT_HT;
 		*pu2DesiredNonHTRateSet = RATE_SET_BIT_HT_PHY;
-		*pu2BSSBasicRateSet = RATE_SET_BIT_HT_PHY;
-		*pucMcsSet = BIT(HT_RATE_MCS5_INDEX-1);
-		*pucSupMcs32 = 0;
+		*pu2BSSBasicRateSet		= RATE_SET_BIT_HT_PHY;
+		*pucMcsSet				= BIT(HT_RATE_MCS5_INDEX - 1);
+		*pucSupMcs32			= 0;
 		(*pu2HtCapInfo) &= ~(HT_CAP_INFO_SUP_CHNL_WIDTH | HT_CAP_INFO_SHORT_GI_40M | HT_CAP_INFO_HT_GF);
 		(*pu2HtCapInfo) |= HT_CAP_INFO_SHORT_GI_20M;
 		break;
 
 	case FIXED_RATE_MCS6_20M_400NS:
-		*pucDesiredPhyTypeSet = PHY_TYPE_BIT_HT;
+		*pucDesiredPhyTypeSet	= PHY_TYPE_BIT_HT;
 		*pu2DesiredNonHTRateSet = RATE_SET_BIT_HT_PHY;
-		*pu2BSSBasicRateSet = RATE_SET_BIT_HT_PHY;
-		*pucMcsSet = BIT(HT_RATE_MCS6_INDEX-1);
-		*pucSupMcs32 = 0;
+		*pu2BSSBasicRateSet		= RATE_SET_BIT_HT_PHY;
+		*pucMcsSet				= BIT(HT_RATE_MCS6_INDEX - 1);
+		*pucSupMcs32			= 0;
 		(*pu2HtCapInfo) &= ~(HT_CAP_INFO_SUP_CHNL_WIDTH | HT_CAP_INFO_SHORT_GI_40M | HT_CAP_INFO_HT_GF);
 		(*pu2HtCapInfo) |= HT_CAP_INFO_SHORT_GI_20M;
 		break;
 
 	case FIXED_RATE_MCS7_20M_400NS:
-		*pucDesiredPhyTypeSet = PHY_TYPE_BIT_HT;
+		*pucDesiredPhyTypeSet	= PHY_TYPE_BIT_HT;
 		*pu2DesiredNonHTRateSet = RATE_SET_BIT_HT_PHY;
-		*pu2BSSBasicRateSet = RATE_SET_BIT_HT_PHY;
-		*pucMcsSet = BIT(HT_RATE_MCS7_INDEX-1);
-		*pucSupMcs32 = 0;
+		*pu2BSSBasicRateSet		= RATE_SET_BIT_HT_PHY;
+		*pucMcsSet				= BIT(HT_RATE_MCS7_INDEX - 1);
+		*pucSupMcs32			= 0;
 		(*pu2HtCapInfo) &= ~(HT_CAP_INFO_SUP_CHNL_WIDTH | HT_CAP_INFO_SHORT_GI_40M | HT_CAP_INFO_HT_GF);
 		(*pu2HtCapInfo) |= HT_CAP_INFO_SHORT_GI_20M;
 		break;
 
 	case FIXED_RATE_MCS0_40M_800NS:
-		*pucDesiredPhyTypeSet = PHY_TYPE_BIT_HT;
+		*pucDesiredPhyTypeSet	= PHY_TYPE_BIT_HT;
 		*pu2DesiredNonHTRateSet = RATE_SET_BIT_HT_PHY;
-		*pu2BSSBasicRateSet = RATE_SET_BIT_HT_PHY;
-		*pucMcsSet = BIT(HT_RATE_MCS0_INDEX-1);
-		*pucSupMcs32 = 0;
+		*pu2BSSBasicRateSet		= RATE_SET_BIT_HT_PHY;
+		*pucMcsSet				= BIT(HT_RATE_MCS0_INDEX - 1);
+		*pucSupMcs32			= 0;
 		(*pu2HtCapInfo) &= ~(HT_CAP_INFO_SHORT_GI_20M | HT_CAP_INFO_SHORT_GI_40M | HT_CAP_INFO_HT_GF);
 		(*pu2HtCapInfo) |= HT_CAP_INFO_SUP_CHNL_WIDTH;
 		break;
 
 	case FIXED_RATE_MCS1_40M_800NS:
-		*pucDesiredPhyTypeSet = PHY_TYPE_BIT_HT;
+		*pucDesiredPhyTypeSet	= PHY_TYPE_BIT_HT;
 		*pu2DesiredNonHTRateSet = RATE_SET_BIT_HT_PHY;
-		*pu2BSSBasicRateSet = RATE_SET_BIT_HT_PHY;
-		*pucMcsSet = BIT(HT_RATE_MCS1_INDEX-1);
-		*pucSupMcs32 = 0;
+		*pu2BSSBasicRateSet		= RATE_SET_BIT_HT_PHY;
+		*pucMcsSet				= BIT(HT_RATE_MCS1_INDEX - 1);
+		*pucSupMcs32			= 0;
 		(*pu2HtCapInfo) &= ~(HT_CAP_INFO_SHORT_GI_20M | HT_CAP_INFO_SHORT_GI_40M | HT_CAP_INFO_HT_GF);
 		(*pu2HtCapInfo) |= HT_CAP_INFO_SUP_CHNL_WIDTH;
 		break;
 
 	case FIXED_RATE_MCS2_40M_800NS:
-		*pucDesiredPhyTypeSet = PHY_TYPE_BIT_HT;
+		*pucDesiredPhyTypeSet	= PHY_TYPE_BIT_HT;
 		*pu2DesiredNonHTRateSet = RATE_SET_BIT_HT_PHY;
-		*pu2BSSBasicRateSet = RATE_SET_BIT_HT_PHY;
-		*pucMcsSet = BIT(HT_RATE_MCS2_INDEX-1);
-		*pucSupMcs32 = 0;
+		*pu2BSSBasicRateSet		= RATE_SET_BIT_HT_PHY;
+		*pucMcsSet				= BIT(HT_RATE_MCS2_INDEX - 1);
+		*pucSupMcs32			= 0;
 		(*pu2HtCapInfo) &= ~(HT_CAP_INFO_SHORT_GI_20M | HT_CAP_INFO_SHORT_GI_40M | HT_CAP_INFO_HT_GF);
 		(*pu2HtCapInfo) |= HT_CAP_INFO_SUP_CHNL_WIDTH;
 		break;
 
 	case FIXED_RATE_MCS3_40M_800NS:
-		*pucDesiredPhyTypeSet = PHY_TYPE_BIT_HT;
+		*pucDesiredPhyTypeSet	= PHY_TYPE_BIT_HT;
 		*pu2DesiredNonHTRateSet = RATE_SET_BIT_HT_PHY;
-		*pu2BSSBasicRateSet = RATE_SET_BIT_HT_PHY;
-		*pucMcsSet = BIT(HT_RATE_MCS3_INDEX-1);
-		*pucSupMcs32 = 0;
+		*pu2BSSBasicRateSet		= RATE_SET_BIT_HT_PHY;
+		*pucMcsSet				= BIT(HT_RATE_MCS3_INDEX - 1);
+		*pucSupMcs32			= 0;
 		(*pu2HtCapInfo) &= ~(HT_CAP_INFO_SHORT_GI_20M | HT_CAP_INFO_SHORT_GI_40M | HT_CAP_INFO_HT_GF);
 		(*pu2HtCapInfo) |= HT_CAP_INFO_SUP_CHNL_WIDTH;
 		break;
 
 	case FIXED_RATE_MCS4_40M_800NS:
-		*pucDesiredPhyTypeSet = PHY_TYPE_BIT_HT;
+		*pucDesiredPhyTypeSet	= PHY_TYPE_BIT_HT;
 		*pu2DesiredNonHTRateSet = RATE_SET_BIT_HT_PHY;
-		*pu2BSSBasicRateSet = RATE_SET_BIT_HT_PHY;
-		*pucMcsSet = BIT(HT_RATE_MCS4_INDEX-1);
-		*pucSupMcs32 = 0;
+		*pu2BSSBasicRateSet		= RATE_SET_BIT_HT_PHY;
+		*pucMcsSet				= BIT(HT_RATE_MCS4_INDEX - 1);
+		*pucSupMcs32			= 0;
 		(*pu2HtCapInfo) &= ~(HT_CAP_INFO_SHORT_GI_20M | HT_CAP_INFO_SHORT_GI_40M | HT_CAP_INFO_HT_GF);
 		(*pu2HtCapInfo) |= HT_CAP_INFO_SUP_CHNL_WIDTH;
 		break;
 
 	case FIXED_RATE_MCS5_40M_800NS:
-		*pucDesiredPhyTypeSet = PHY_TYPE_BIT_HT;
+		*pucDesiredPhyTypeSet	= PHY_TYPE_BIT_HT;
 		*pu2DesiredNonHTRateSet = RATE_SET_BIT_HT_PHY;
-		*pu2BSSBasicRateSet = RATE_SET_BIT_HT_PHY;
-		*pucMcsSet = BIT(HT_RATE_MCS5_INDEX-1);
-		*pucSupMcs32 = 0;
+		*pu2BSSBasicRateSet		= RATE_SET_BIT_HT_PHY;
+		*pucMcsSet				= BIT(HT_RATE_MCS5_INDEX - 1);
+		*pucSupMcs32			= 0;
 		(*pu2HtCapInfo) &= ~(HT_CAP_INFO_SHORT_GI_20M | HT_CAP_INFO_SHORT_GI_40M | HT_CAP_INFO_HT_GF);
 		(*pu2HtCapInfo) |= HT_CAP_INFO_SUP_CHNL_WIDTH;
 		break;
 
 	case FIXED_RATE_MCS6_40M_800NS:
-		*pucDesiredPhyTypeSet = PHY_TYPE_BIT_HT;
+		*pucDesiredPhyTypeSet	= PHY_TYPE_BIT_HT;
 		*pu2DesiredNonHTRateSet = RATE_SET_BIT_HT_PHY;
-		*pu2BSSBasicRateSet = RATE_SET_BIT_HT_PHY;
-		*pucMcsSet = BIT(HT_RATE_MCS6_INDEX-1);
-		*pucSupMcs32 = 0;
+		*pu2BSSBasicRateSet		= RATE_SET_BIT_HT_PHY;
+		*pucMcsSet				= BIT(HT_RATE_MCS6_INDEX - 1);
+		*pucSupMcs32			= 0;
 		(*pu2HtCapInfo) &= ~(HT_CAP_INFO_SHORT_GI_20M | HT_CAP_INFO_SHORT_GI_40M | HT_CAP_INFO_HT_GF);
 		(*pu2HtCapInfo) |= HT_CAP_INFO_SUP_CHNL_WIDTH;
 		break;
 
 	case FIXED_RATE_MCS7_40M_800NS:
-		*pucDesiredPhyTypeSet = PHY_TYPE_BIT_HT;
+		*pucDesiredPhyTypeSet	= PHY_TYPE_BIT_HT;
 		*pu2DesiredNonHTRateSet = RATE_SET_BIT_HT_PHY;
-		*pu2BSSBasicRateSet = RATE_SET_BIT_HT_PHY;
-		*pucMcsSet = BIT(HT_RATE_MCS7_INDEX-1);
-		*pucSupMcs32 = 0;
+		*pu2BSSBasicRateSet		= RATE_SET_BIT_HT_PHY;
+		*pucMcsSet				= BIT(HT_RATE_MCS7_INDEX - 1);
+		*pucSupMcs32			= 0;
 		(*pu2HtCapInfo) &= ~(HT_CAP_INFO_SHORT_GI_20M | HT_CAP_INFO_SHORT_GI_40M | HT_CAP_INFO_HT_GF);
 		(*pu2HtCapInfo) |= HT_CAP_INFO_SUP_CHNL_WIDTH;
 		break;
 
 	case FIXED_RATE_MCS32_800NS:
-		*pucDesiredPhyTypeSet = PHY_TYPE_BIT_HT;
+		*pucDesiredPhyTypeSet	= PHY_TYPE_BIT_HT;
 		*pu2DesiredNonHTRateSet = RATE_SET_BIT_HT_PHY;
-		*pu2BSSBasicRateSet = RATE_SET_BIT_HT_PHY;
-		*pucMcsSet = 0;
-		*pucSupMcs32 = 1;
+		*pu2BSSBasicRateSet		= RATE_SET_BIT_HT_PHY;
+		*pucMcsSet				= 0;
+		*pucSupMcs32			= 1;
 		(*pu2HtCapInfo) &= ~(HT_CAP_INFO_SHORT_GI_20M | HT_CAP_INFO_SHORT_GI_40M | HT_CAP_INFO_HT_GF);
 		(*pu2HtCapInfo) |= HT_CAP_INFO_SUP_CHNL_WIDTH;
 		break;
 
 	case FIXED_RATE_MCS0_40M_400NS:
-		*pucDesiredPhyTypeSet = PHY_TYPE_BIT_HT;
+		*pucDesiredPhyTypeSet	= PHY_TYPE_BIT_HT;
 		*pu2DesiredNonHTRateSet = RATE_SET_BIT_HT_PHY;
-		*pu2BSSBasicRateSet = RATE_SET_BIT_HT_PHY;
-		*pucMcsSet = BIT(HT_RATE_MCS0_INDEX-1);
-		*pucSupMcs32 = 0;
+		*pu2BSSBasicRateSet		= RATE_SET_BIT_HT_PHY;
+		*pucMcsSet				= BIT(HT_RATE_MCS0_INDEX - 1);
+		*pucSupMcs32			= 0;
 		(*pu2HtCapInfo) &= ~(HT_CAP_INFO_SHORT_GI_20M | HT_CAP_INFO_HT_GF);
 		(*pu2HtCapInfo) |= (HT_CAP_INFO_SUP_CHNL_WIDTH | HT_CAP_INFO_SHORT_GI_40M);
 		break;
 
 	case FIXED_RATE_MCS1_40M_400NS:
-		*pucDesiredPhyTypeSet = PHY_TYPE_BIT_HT;
+		*pucDesiredPhyTypeSet	= PHY_TYPE_BIT_HT;
 		*pu2DesiredNonHTRateSet = RATE_SET_BIT_HT_PHY;
-		*pu2BSSBasicRateSet = RATE_SET_BIT_HT_PHY;
-		*pucMcsSet = BIT(HT_RATE_MCS1_INDEX-1);
-		*pucSupMcs32 = 0;
+		*pu2BSSBasicRateSet		= RATE_SET_BIT_HT_PHY;
+		*pucMcsSet				= BIT(HT_RATE_MCS1_INDEX - 1);
+		*pucSupMcs32			= 0;
 		(*pu2HtCapInfo) &= ~(HT_CAP_INFO_SHORT_GI_20M | HT_CAP_INFO_HT_GF);
 		(*pu2HtCapInfo) |= (HT_CAP_INFO_SUP_CHNL_WIDTH | HT_CAP_INFO_SHORT_GI_40M);
 		break;
 
 	case FIXED_RATE_MCS2_40M_400NS:
-		*pucDesiredPhyTypeSet = PHY_TYPE_BIT_HT;
+		*pucDesiredPhyTypeSet	= PHY_TYPE_BIT_HT;
 		*pu2DesiredNonHTRateSet = RATE_SET_BIT_HT_PHY;
-		*pu2BSSBasicRateSet = RATE_SET_BIT_HT_PHY;
-		*pucMcsSet = BIT(HT_RATE_MCS2_INDEX-1);
-		*pucSupMcs32 = 0;
+		*pu2BSSBasicRateSet		= RATE_SET_BIT_HT_PHY;
+		*pucMcsSet				= BIT(HT_RATE_MCS2_INDEX - 1);
+		*pucSupMcs32			= 0;
 		(*pu2HtCapInfo) &= ~(HT_CAP_INFO_SHORT_GI_20M | HT_CAP_INFO_HT_GF);
 		(*pu2HtCapInfo) |= (HT_CAP_INFO_SUP_CHNL_WIDTH | HT_CAP_INFO_SHORT_GI_40M);
 		break;
 
 	case FIXED_RATE_MCS3_40M_400NS:
-		*pucDesiredPhyTypeSet = PHY_TYPE_BIT_HT;
+		*pucDesiredPhyTypeSet	= PHY_TYPE_BIT_HT;
 		*pu2DesiredNonHTRateSet = RATE_SET_BIT_HT_PHY;
-		*pu2BSSBasicRateSet = RATE_SET_BIT_HT_PHY;
-		*pucMcsSet = BIT(HT_RATE_MCS3_INDEX-1);
-		*pucSupMcs32 = 0;
+		*pu2BSSBasicRateSet		= RATE_SET_BIT_HT_PHY;
+		*pucMcsSet				= BIT(HT_RATE_MCS3_INDEX - 1);
+		*pucSupMcs32			= 0;
 		(*pu2HtCapInfo) &= ~(HT_CAP_INFO_SHORT_GI_20M | HT_CAP_INFO_HT_GF);
 		(*pu2HtCapInfo) |= (HT_CAP_INFO_SUP_CHNL_WIDTH | HT_CAP_INFO_SHORT_GI_40M);
 		break;
 
 	case FIXED_RATE_MCS4_40M_400NS:
-		*pucDesiredPhyTypeSet = PHY_TYPE_BIT_HT;
+		*pucDesiredPhyTypeSet	= PHY_TYPE_BIT_HT;
 		*pu2DesiredNonHTRateSet = RATE_SET_BIT_HT_PHY;
-		*pu2BSSBasicRateSet = RATE_SET_BIT_HT_PHY;
-		*pucMcsSet = BIT(HT_RATE_MCS4_INDEX-1);
-		*pucSupMcs32 = 0;
+		*pu2BSSBasicRateSet		= RATE_SET_BIT_HT_PHY;
+		*pucMcsSet				= BIT(HT_RATE_MCS4_INDEX - 1);
+		*pucSupMcs32			= 0;
 		(*pu2HtCapInfo) &= ~(HT_CAP_INFO_SHORT_GI_20M | HT_CAP_INFO_HT_GF);
 		(*pu2HtCapInfo) |= (HT_CAP_INFO_SUP_CHNL_WIDTH | HT_CAP_INFO_SHORT_GI_40M);
 		break;
 
 	case FIXED_RATE_MCS5_40M_400NS:
-		*pucDesiredPhyTypeSet = PHY_TYPE_BIT_HT;
+		*pucDesiredPhyTypeSet	= PHY_TYPE_BIT_HT;
 		*pu2DesiredNonHTRateSet = RATE_SET_BIT_HT_PHY;
-		*pu2BSSBasicRateSet = RATE_SET_BIT_HT_PHY;
-		*pucMcsSet = BIT(HT_RATE_MCS5_INDEX-1);
-		*pucSupMcs32 = 0;
+		*pu2BSSBasicRateSet		= RATE_SET_BIT_HT_PHY;
+		*pucMcsSet				= BIT(HT_RATE_MCS5_INDEX - 1);
+		*pucSupMcs32			= 0;
 		(*pu2HtCapInfo) &= ~(HT_CAP_INFO_SHORT_GI_20M | HT_CAP_INFO_HT_GF);
 		(*pu2HtCapInfo) |= (HT_CAP_INFO_SUP_CHNL_WIDTH | HT_CAP_INFO_SHORT_GI_40M);
 		break;
 
 	case FIXED_RATE_MCS6_40M_400NS:
-		*pucDesiredPhyTypeSet = PHY_TYPE_BIT_HT;
+		*pucDesiredPhyTypeSet	= PHY_TYPE_BIT_HT;
 		*pu2DesiredNonHTRateSet = RATE_SET_BIT_HT_PHY;
-		*pu2BSSBasicRateSet = RATE_SET_BIT_HT_PHY;
-		*pucMcsSet = BIT(HT_RATE_MCS6_INDEX-1);
-		*pucSupMcs32 = 0;
+		*pu2BSSBasicRateSet		= RATE_SET_BIT_HT_PHY;
+		*pucMcsSet				= BIT(HT_RATE_MCS6_INDEX - 1);
+		*pucSupMcs32			= 0;
 		(*pu2HtCapInfo) &= ~(HT_CAP_INFO_SHORT_GI_20M | HT_CAP_INFO_HT_GF);
 		(*pu2HtCapInfo) |= (HT_CAP_INFO_SUP_CHNL_WIDTH | HT_CAP_INFO_SHORT_GI_40M);
 		break;
 
 	case FIXED_RATE_MCS7_40M_400NS:
-		*pucDesiredPhyTypeSet = PHY_TYPE_BIT_HT;
+		*pucDesiredPhyTypeSet	= PHY_TYPE_BIT_HT;
 		*pu2DesiredNonHTRateSet = RATE_SET_BIT_HT_PHY;
-		*pu2BSSBasicRateSet = RATE_SET_BIT_HT_PHY;
-		*pucMcsSet = BIT(HT_RATE_MCS7_INDEX-1);
-		*pucSupMcs32 = 0;
+		*pu2BSSBasicRateSet		= RATE_SET_BIT_HT_PHY;
+		*pucMcsSet				= BIT(HT_RATE_MCS7_INDEX - 1);
+		*pucSupMcs32			= 0;
 		(*pu2HtCapInfo) &= ~(HT_CAP_INFO_SHORT_GI_20M | HT_CAP_INFO_HT_GF);
 		(*pu2HtCapInfo) |= (HT_CAP_INFO_SUP_CHNL_WIDTH | HT_CAP_INFO_SHORT_GI_40M);
 		break;
 
 	case FIXED_RATE_MCS32_400NS:
-		*pucDesiredPhyTypeSet = PHY_TYPE_BIT_HT;
+		*pucDesiredPhyTypeSet	= PHY_TYPE_BIT_HT;
 		*pu2DesiredNonHTRateSet = RATE_SET_BIT_HT_PHY;
-		*pu2BSSBasicRateSet = RATE_SET_BIT_HT_PHY;
-		*pucMcsSet = 0;
-		*pucSupMcs32 = 1;
+		*pu2BSSBasicRateSet		= RATE_SET_BIT_HT_PHY;
+		*pucMcsSet				= 0;
+		*pucSupMcs32			= 1;
 		(*pu2HtCapInfo) &= ~(HT_CAP_INFO_SHORT_GI_20M | HT_CAP_INFO_HT_GF);
 		(*pu2HtCapInfo) |= (HT_CAP_INFO_SUP_CHNL_WIDTH | HT_CAP_INFO_SHORT_GI_40M);
 		break;
@@ -3157,14 +3005,14 @@ nicUpdateRateParams(IN P_ADAPTER_T prAdapter,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief This utility function is used to write the register
-*
-* @param u4Address         Register address
-*        u4Value           the value to be written
-*
-* @retval WLAN_STATUS_SUCCESS
-*         WLAN_STATUS_FAILURE
-*/
+ * @brief This utility function is used to write the register
+ *
+ * @param u4Address         Register address
+ *        u4Value           the value to be written
+ *
+ * @retval WLAN_STATUS_SUCCESS
+ *         WLAN_STATUS_FAILURE
+ */
 /*----------------------------------------------------------------------------*/
 
 WLAN_STATUS nicWriteMcr(IN P_ADAPTER_T prAdapter, IN UINT_32 u4Address, IN UINT_32 u4Value)
@@ -3172,72 +3020,67 @@ WLAN_STATUS nicWriteMcr(IN P_ADAPTER_T prAdapter, IN UINT_32 u4Address, IN UINT_
 	CMD_ACCESS_REG rCmdAccessReg;
 
 	rCmdAccessReg.u4Address = u4Address;
-	rCmdAccessReg.u4Data = u4Value;
+	rCmdAccessReg.u4Data	= u4Value;
 
-	return wlanSendSetQueryCmd(prAdapter,
-				   CMD_ID_ACCESS_REG,
-				   TRUE,
-				   FALSE,
-				   FALSE, NULL, NULL, sizeof(CMD_ACCESS_REG), (PUINT_8) &rCmdAccessReg, NULL, 0);
-
+	return wlanSendSetQueryCmd(prAdapter, CMD_ID_ACCESS_REG, TRUE, FALSE, FALSE, NULL, NULL, sizeof(CMD_ACCESS_REG),
+			(PUINT_8)&rCmdAccessReg, NULL, 0);
 }
 
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief This utility function is used to modify the auto rate parameters
-*
-* @param u4ArSysParam0  see description below
-*        u4ArSysParam1
-*        u4ArSysParam2
-*        u4ArSysParam3
-*
-*
-* @retval WLAN_STATUS_SUCCESS
-*         WLAN_STATUS_FAILURE
-*
-* @note
-*   ArSysParam0[0:3] -> auto rate version (0:disable 1:version1 2:version2)
-*   ArSysParam0[4:5]-> auto bw version (0:disable 1:version1 2:version2)
-*   ArSysParam0[6:7]-> auto gi version (0:disable 1:version1 2:version2)
-*   ArSysParam0[8:15]-> HT rate clear mask
-*   ArSysParam0[16:31]-> Legacy rate clear mask
-*   ArSysParam1[0:7]-> Auto Rate check weighting window
-*   ArSysParam1[8:15]-> Auto Rate v1 Force Rate down
-*   ArSysParam1[16:23]-> Auto Rate v1 PerH
-*   ArSysParam1[24:31]-> Auto Rate v1 PerL
-*
-*   Examples
-*   ArSysParam0 = 1,
-*   Enable auto rate version 1
-*
-*   ArSysParam0 = 983041,
-*   Enable auto rate version 1
-*   Remove CCK 1M, 2M, 5.5M, 11M
-*
-*   ArSysParam0 = 786433
-*   Enable auto rate version 1
-*   Remove CCK 5.5M 11M
-*/
+ * @brief This utility function is used to modify the auto rate parameters
+ *
+ * @param u4ArSysParam0  see description below
+ *        u4ArSysParam1
+ *        u4ArSysParam2
+ *        u4ArSysParam3
+ *
+ *
+ * @retval WLAN_STATUS_SUCCESS
+ *         WLAN_STATUS_FAILURE
+ *
+ * @note
+ *   ArSysParam0[0:3] -> auto rate version (0:disable 1:version1 2:version2)
+ *   ArSysParam0[4:5]-> auto bw version (0:disable 1:version1 2:version2)
+ *   ArSysParam0[6:7]-> auto gi version (0:disable 1:version1 2:version2)
+ *   ArSysParam0[8:15]-> HT rate clear mask
+ *   ArSysParam0[16:31]-> Legacy rate clear mask
+ *   ArSysParam1[0:7]-> Auto Rate check weighting window
+ *   ArSysParam1[8:15]-> Auto Rate v1 Force Rate down
+ *   ArSysParam1[16:23]-> Auto Rate v1 PerH
+ *   ArSysParam1[24:31]-> Auto Rate v1 PerL
+ *
+ *   Examples
+ *   ArSysParam0 = 1,
+ *   Enable auto rate version 1
+ *
+ *   ArSysParam0 = 983041,
+ *   Enable auto rate version 1
+ *   Remove CCK 1M, 2M, 5.5M, 11M
+ *
+ *   ArSysParam0 = 786433
+ *   Enable auto rate version 1
+ *   Remove CCK 5.5M 11M
+ */
 /*----------------------------------------------------------------------------*/
 
 WLAN_STATUS
-nicRlmArUpdateParms(IN P_ADAPTER_T prAdapter,
-		    IN UINT_32 u4ArSysParam0,
-		    IN UINT_32 u4ArSysParam1, IN UINT_32 u4ArSysParam2, IN UINT_32 u4ArSysParam3)
+nicRlmArUpdateParms(IN P_ADAPTER_T prAdapter, IN UINT_32 u4ArSysParam0, IN UINT_32 u4ArSysParam1,
+		IN UINT_32 u4ArSysParam2, IN UINT_32 u4ArSysParam3)
 {
-	UINT_8 ucArVer, ucAbwVer, ucAgiVer;
+	UINT_8	ucArVer, ucAbwVer, ucAgiVer;
 	UINT_16 u2HtClrMask;
 	UINT_16 u2LegacyClrMask;
-	UINT_8 ucArCheckWindow;
-	UINT_8 ucArPerL;
-	UINT_8 ucArPerH;
-	UINT_8 ucArPerForceRateDownPer;
+	UINT_8	ucArCheckWindow;
+	UINT_8	ucArPerL;
+	UINT_8	ucArPerH;
+	UINT_8	ucArPerForceRateDownPer;
 
-	ucArVer = (UINT_8) (u4ArSysParam0 & BITS(0, 3));
-	ucAbwVer = (UINT_8) ((u4ArSysParam0 & BITS(4, 5)) >> 4);
-	ucAgiVer = (UINT_8) ((u4ArSysParam0 & BITS(6, 7)) >> 6);
-	u2HtClrMask = (UINT_16) ((u4ArSysParam0 & BITS(8, 15)) >> 8);
-	u2LegacyClrMask = (UINT_16) ((u4ArSysParam0 & BITS(16, 31)) >> 16);
+	ucArVer			= (UINT_8)(u4ArSysParam0 & BITS(0, 3));
+	ucAbwVer		= (UINT_8)((u4ArSysParam0 & BITS(4, 5)) >> 4);
+	ucAgiVer		= (UINT_8)((u4ArSysParam0 & BITS(6, 7)) >> 6);
+	u2HtClrMask		= (UINT_16)((u4ArSysParam0 & BITS(8, 15)) >> 8);
+	u2LegacyClrMask = (UINT_16)((u4ArSysParam0 & BITS(16, 31)) >> 16);
 
 #if 0
 	ucArCheckWindow = (UINT_8) (u4ArSysParam1 & BITS(0, 7));
@@ -3246,20 +3089,20 @@ nicRlmArUpdateParms(IN P_ADAPTER_T prAdapter,
 	ucArPerL = (UINT_8) ((u4ArSysParam1 & BITS(24, 31)) >> 24);
 #endif
 
-	ucArCheckWindow = (UINT_8) (u4ArSysParam1 & BITS(0, 7));
-	ucArPerForceRateDownPer = (UINT_8) (((u4ArSysParam1 >> 8) & BITS(0, 7)));
-	ucArPerH = (UINT_8) (((u4ArSysParam1 >> 16) & BITS(0, 7)));
-	ucArPerL = (UINT_8) (((u4ArSysParam1 >> 24) & BITS(0, 7)));
+	ucArCheckWindow			= (UINT_8)(u4ArSysParam1 & BITS(0, 7));
+	ucArPerForceRateDownPer = (UINT_8)(((u4ArSysParam1 >> 8) & BITS(0, 7)));
+	ucArPerH				= (UINT_8)(((u4ArSysParam1 >> 16) & BITS(0, 7)));
+	ucArPerL				= (UINT_8)(((u4ArSysParam1 >> 24) & BITS(0, 7)));
 
 	DBGLOG(INIT, INFO, "ArParam %ld %ld %ld %ld\n", u4ArSysParam0, u4ArSysParam1, u4ArSysParam2, u4ArSysParam3);
 	DBGLOG(INIT, INFO, "ArVer %u AbwVer %u AgiVer %u\n", ucArVer, ucAbwVer, ucAgiVer);
 	DBGLOG(INIT, INFO, "HtMask %x LegacyMask %x\n", u2HtClrMask, u2LegacyClrMask);
-	DBGLOG(INIT, INFO,
-	       "CheckWin %u RateDownPer %u PerH %u PerL %u\n", ucArCheckWindow,
-	       ucArPerForceRateDownPer, ucArPerH, ucArPerL);
+	DBGLOG(INIT, INFO, "CheckWin %u RateDownPer %u PerH %u PerL %u\n", ucArCheckWindow, ucArPerForceRateDownPer,
+			ucArPerH, ucArPerL);
 
-#define SWCR_DATA_ADDR(MOD, ADDR) (0x90000000+(MOD<<8)+(ADDR))
-#define SWCR_DATA_CMD(CATE, WRITE, INDEX, OPT0, OPT1) ((CATE<<24) | (WRITE<<23) | (INDEX<<16) | (OPT0 << 8) | OPT1)
+#define SWCR_DATA_ADDR(MOD, ADDR) (0x90000000 + (MOD << 8) + (ADDR))
+#define SWCR_DATA_CMD(CATE, WRITE, INDEX, OPT0, OPT1) \
+	((CATE << 24) | (WRITE << 23) | (INDEX << 16) | (OPT0 << 8) | OPT1)
 #define SWCR_DATA0 0x0
 #define SWCR_DATA1 0x4
 #define SWCR_DATA2 0x8
@@ -3319,24 +3162,24 @@ nicRlmArUpdateParms(IN P_ADAPTER_T prAdapter,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief This utility function is used to enable roaming
-*
-* @param u4EnableRoaming
-*
-*
-* @retval WLAN_STATUS_SUCCESS
-*         WLAN_STATUS_FAILURE
-*
-* @note
-*   u4EnableRoaming -> Enable Romaing
-*
-*/
+ * @brief This utility function is used to enable roaming
+ *
+ * @param u4EnableRoaming
+ *
+ *
+ * @retval WLAN_STATUS_SUCCESS
+ *         WLAN_STATUS_FAILURE
+ *
+ * @note
+ *   u4EnableRoaming -> Enable Romaing
+ *
+ */
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS nicRoamingUpdateParams(IN P_ADAPTER_T prAdapter, IN UINT_32 u4EnableRoaming)
 {
 	P_CONNECTION_SETTINGS_T prConnSettings;
 
-	prConnSettings = &(prAdapter->rWifiVar.rConnSettings);
+	prConnSettings					  = &(prAdapter->rWifiVar.rConnSettings);
 	prConnSettings->fgIsEnableRoaming = ((u4EnableRoaming > 0) ? (TRUE) : (FALSE));
 
 	return WLAN_STATUS_SUCCESS;
@@ -3344,20 +3187,20 @@ WLAN_STATUS nicRoamingUpdateParams(IN P_ADAPTER_T prAdapter, IN UINT_32 u4Enable
 
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief This function is called to update Link Quality information
-*
-* @param prAdapter      Pointer of Adapter Data Structure
-*        ucBssIndex
-*        prEventLinkQuality
-*        cRssi
-*        cLinkQuality
-*
-* @return none
-*/
+ * @brief This function is called to update Link Quality information
+ *
+ * @param prAdapter      Pointer of Adapter Data Structure
+ *        ucBssIndex
+ *        prEventLinkQuality
+ *        cRssi
+ *        cLinkQuality
+ *
+ * @return none
+ */
 /*----------------------------------------------------------------------------*/
 VOID nicUpdateLinkQuality(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex, IN P_EVENT_LINK_QUALITY_V2 prEventLinkQuality)
 {
-	INT_8 cRssi;
+	INT_8	cRssi;
 	UINT_16 u2AdjustRssi = 10;
 
 	ASSERT(prAdapter);
@@ -3369,30 +3212,26 @@ VOID nicUpdateLinkQuality(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex, IN P_E
 		if (GET_BSS_INFO_BY_INDEX(prAdapter, ucBssIndex)->eConnectionState == PARAM_MEDIA_STATE_CONNECTED) {
 			/* check is to prevent RSSI to be updated by incorrect initial RSSI from hardware */
 			/* buffer statistics for further query */
-			if (prAdapter->fgIsLinkQualityValid == FALSE
-			    || (kalGetTimeTick() - prAdapter->rLinkQualityUpdateTime) > CFG_LINK_QUALITY_VALID_PERIOD) {
+			if (prAdapter->fgIsLinkQualityValid == FALSE ||
+					(kalGetTimeTick() - prAdapter->rLinkQualityUpdateTime) > CFG_LINK_QUALITY_VALID_PERIOD) {
 				/* ranged from (-128 ~ 30) in unit of dBm */
 				cRssi = prEventLinkQuality->rLq[ucBssIndex].cRssi;
-				cRssi = (INT_8) (((INT_16) (cRssi) * u2AdjustRssi) / 10);
-				DBGLOG(RLM, INFO,
-				       "Rssi=%d, NewRssi=%d\n", prEventLinkQuality->rLq[ucBssIndex].cRssi, cRssi);
-				nicUpdateRSSI(prAdapter, ucBssIndex, cRssi,
-					      prEventLinkQuality->rLq[ucBssIndex].cLinkQuality);
+				cRssi = (INT_8)(((INT_16)(cRssi)*u2AdjustRssi) / 10);
+				DBGLOG(RLM, INFO, "Rssi=%d, NewRssi=%d\n", prEventLinkQuality->rLq[ucBssIndex].cRssi, cRssi);
+				nicUpdateRSSI(prAdapter, ucBssIndex, cRssi, prEventLinkQuality->rLq[ucBssIndex].cLinkQuality);
 			}
 
-			if (prAdapter->fgIsLinkRateValid == FALSE
-			    || (kalGetTimeTick() - prAdapter->rLinkRateUpdateTime) > CFG_LINK_QUALITY_VALID_PERIOD) {
-				nicUpdateLinkSpeed(prAdapter, ucBssIndex,
-						   prEventLinkQuality->rLq[ucBssIndex].u2LinkSpeed);
+			if (prAdapter->fgIsLinkRateValid == FALSE ||
+					(kalGetTimeTick() - prAdapter->rLinkRateUpdateTime) > CFG_LINK_QUALITY_VALID_PERIOD) {
+				nicUpdateLinkSpeed(prAdapter, ucBssIndex, prEventLinkQuality->rLq[ucBssIndex].u2LinkSpeed);
 			}
-
 		}
 		break;
 
-#if 0				/* #if CFG_ENABLE_WIFI_DIRECT && CFG_SUPPORT_P2P_RSSI_QUERY */
+#if 0 /* #if CFG_ENABLE_WIFI_DIRECT && CFG_SUPPORT_P2P_RSSI_QUERY */
 	case NETWORK_TYPE_P2P:
 		if (prAdapter->fgIsP2pLinkQualityValid == FALSE
-		    || (kalGetTimeTick() - prAdapter->rP2pLinkQualityUpdateTime) > CFG_LINK_QUALITY_VALID_PERIOD) {
+			|| (kalGetTimeTick() - prAdapter->rP2pLinkQualityUpdateTime) > CFG_LINK_QUALITY_VALID_PERIOD) {
 			P_EVENT_LINK_QUALITY_EX prEventLQEx = (P_EVENT_LINK_QUALITY_EX) prEventLinkQuality;
 
 			nicUpdateRSSI(prAdapter, ucBssIndex, prEventLQEx->cRssiP2P, prEventLQEx->cLinkQualityP2P);
@@ -3401,22 +3240,20 @@ VOID nicUpdateLinkQuality(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex, IN P_E
 #endif
 	default:
 		break;
-
 	}
-
 }
 
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief This function is called to update RSSI and Link Quality information
-*
-* @param prAdapter      Pointer of Adapter Data Structure
-*        ucBssIndex
-*        cRssi
-*        cLinkQuality
-*
-* @return none
-*/
+ * @brief This function is called to update RSSI and Link Quality information
+ *
+ * @param prAdapter      Pointer of Adapter Data Structure
+ *        ucBssIndex
+ *        cRssi
+ *        cLinkQuality
+ *
+ * @return none
+ */
 /*----------------------------------------------------------------------------*/
 VOID nicUpdateRSSI(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex, IN INT_8 cRssi, IN INT_8 cLinkQuality)
 {
@@ -3426,24 +3263,23 @@ VOID nicUpdateRSSI(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex, IN INT_8 cRss
 	switch (GET_BSS_INFO_BY_INDEX(prAdapter, ucBssIndex)->eNetworkType) {
 	case NETWORK_TYPE_AIS:
 		if (GET_BSS_INFO_BY_INDEX(prAdapter, ucBssIndex)->eConnectionState == PARAM_MEDIA_STATE_CONNECTED) {
-			prAdapter->fgIsLinkQualityValid = TRUE;
+			prAdapter->fgIsLinkQualityValid	  = TRUE;
 			prAdapter->rLinkQualityUpdateTime = kalGetTimeTick();
 
-			prAdapter->rLinkQuality.cRssi = cRssi;
+			prAdapter->rLinkQuality.cRssi		 = cRssi;
 			prAdapter->rLinkQuality.cLinkQuality = cLinkQuality;
 			/* indicate to glue layer */
-			kalUpdateRSSI(prAdapter->prGlueInfo,
-				      KAL_NETWORK_TYPE_AIS_INDEX,
-				      prAdapter->rLinkQuality.cRssi, prAdapter->rLinkQuality.cLinkQuality);
+			kalUpdateRSSI(prAdapter->prGlueInfo, KAL_NETWORK_TYPE_AIS_INDEX, prAdapter->rLinkQuality.cRssi,
+					prAdapter->rLinkQuality.cLinkQuality);
 		}
 
 		break;
 #if CFG_ENABLE_WIFI_DIRECT && CFG_SUPPORT_P2P_RSSI_QUERY
 	case NETWORK_TYPE_P2P:
-		prAdapter->fgIsP2pLinkQualityValid = TRUE;
+		prAdapter->fgIsP2pLinkQualityValid	 = TRUE;
 		prAdapter->rP2pLinkQualityUpdateTime = kalGetTimeTick();
 
-		prAdapter->rP2pLinkQuality.cRssi = cRssi;
+		prAdapter->rP2pLinkQuality.cRssi		= cRssi;
 		prAdapter->rP2pLinkQuality.cLinkQuality = cLinkQuality;
 
 		kalUpdateRSSI(prAdapter->prGlueInfo, KAL_NETWORK_TYPE_P2P_INDEX, cRssi, cLinkQuality);
@@ -3451,23 +3287,21 @@ VOID nicUpdateRSSI(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex, IN INT_8 cRss
 #endif
 	default:
 		break;
-
 	}
-
 }
 
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief This function is called to update Link Quality information
-*
-* @param prAdapter      Pointer of Adapter Data Structure
-*        ucBssIndex
-*        prEventLinkQuality
-*        cRssi
-*        cLinkQuality
-*
-* @return none
-*/
+ * @brief This function is called to update Link Quality information
+ *
+ * @param prAdapter      Pointer of Adapter Data Structure
+ *        ucBssIndex
+ *        prEventLinkQuality
+ *        cRssi
+ *        cLinkQuality
+ *
+ * @return none
+ */
 /*----------------------------------------------------------------------------*/
 VOID nicUpdateLinkSpeed(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex, IN UINT_16 u2LinkSpeed)
 {
@@ -3478,7 +3312,7 @@ VOID nicUpdateLinkSpeed(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex, IN UINT_
 	case NETWORK_TYPE_AIS:
 		if (GET_BSS_INFO_BY_INDEX(prAdapter, ucBssIndex)->eConnectionState == PARAM_MEDIA_STATE_CONNECTED) {
 			/* buffer statistics for further query */
-			prAdapter->fgIsLinkRateValid = TRUE;
+			prAdapter->fgIsLinkRateValid   = TRUE;
 			prAdapter->rLinkRateUpdateTime = kalGetTimeTick();
 
 			prAdapter->rLinkQuality.u2LinkSpeed = u2LinkSpeed;
@@ -3487,9 +3321,7 @@ VOID nicUpdateLinkSpeed(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex, IN UINT_
 
 	default:
 		break;
-
 	}
-
 }
 
 #if CFG_SUPPORT_RDD_TEST_MODE
@@ -3499,24 +3331,22 @@ WLAN_STATUS nicUpdateRddTestMode(IN P_ADAPTER_T prAdapter, IN P_CMD_RDD_CH_T prR
 
 	ASSERT(prAdapter);
 
-/* aisFsmScanRequest(prAdapter, NULL); */
+	/* aisFsmScanRequest(prAdapter, NULL); */
 
-	return wlanSendSetQueryCmd(prAdapter,
-				   CMD_ID_SET_RDD_CH,
-				   TRUE,
-				   FALSE, FALSE, NULL, NULL, sizeof(CMD_RDD_CH_T), (PUINT_8) prRddChParam, NULL, 0);
+	return wlanSendSetQueryCmd(prAdapter, CMD_ID_SET_RDD_CH, TRUE, FALSE, FALSE, NULL, NULL, sizeof(CMD_RDD_CH_T),
+			(PUINT_8)prRddChParam, NULL, 0);
 }
 #endif
 
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief This function is called to apply network address setting to
-*        both OS side and firmware domain
-*
-* @param prAdapter      Pointer of Adapter Data Structure
-*
-* @return none
-*/
+ * @brief This function is called to apply network address setting to
+ *        both OS side and firmware domain
+ *
+ * @param prAdapter      Pointer of Adapter Data Structure
+ *
+ * @return none
+ */
 /*----------------------------------------------------------------------------*/
 
 WLAN_STATUS nicApplyNetworkAddress(IN P_ADAPTER_T prAdapter)
@@ -3539,8 +3369,7 @@ WLAN_STATUS nicApplyNetworkAddress(IN P_ADAPTER_T prAdapter)
 	if (prAdapter->fgIsP2PRegistered) {
 		for (i = 0; i < BSS_INFO_NUM; i++) {
 			if (prAdapter->rWifiVar.arBssInfoPool[i].eNetworkType == NETWORK_TYPE_P2P) {
-				COPY_MAC_ADDR(prAdapter->rWifiVar.arBssInfoPool[i].aucOwnMacAddr,
-					      prAdapter->rWifiVar.aucDeviceAddress);
+				COPY_MAC_ADDR(prAdapter->rWifiVar.arBssInfoPool[i].aucOwnMacAddr, prAdapter->rWifiVar.aucDeviceAddress);
 			}
 		}
 	}
@@ -3549,8 +3378,7 @@ WLAN_STATUS nicApplyNetworkAddress(IN P_ADAPTER_T prAdapter)
 #if CFG_ENABLE_BT_OVER_WIFI
 	for (i = 0; i < BSS_INFO_NUM; i++) {
 		if (prAdapter->rWifiVar.arBssInfoPool[i].eNetworkType == NETWORK_TYPE_BOW) {
-			COPY_MAC_ADDR(prAdapter->rWifiVar.arBssInfoPool[i].aucOwnMacAddr,
-				      prAdapter->rWifiVar.aucDeviceAddress);
+			COPY_MAC_ADDR(prAdapter->rWifiVar.arBssInfoPool[i].aucOwnMacAddr, prAdapter->rWifiVar.aucDeviceAddress);
 		}
 	}
 #endif
@@ -3622,30 +3450,26 @@ UINT_8 nicGetChipFactoryVer(VOID)
 UINT_8 nicGetChipEcoVer(IN P_ADAPTER_T prAdapter)
 {
 	P_ECO_INFO_T prEcoInfo;
-	UINT_8 ucEcoVer;
-	UINT_8 ucCurSwVer, ucCurHwVer, ucCurFactoryVer;
+	UINT_8		 ucEcoVer;
+	UINT_8		 ucCurSwVer, ucCurHwVer, ucCurFactoryVer;
 
-	ucCurSwVer = nicGetChipSwVer();
-	ucCurHwVer = nicGetChipHwVer();
+	ucCurSwVer		= nicGetChipSwVer();
+	ucCurHwVer		= nicGetChipHwVer();
 	ucCurFactoryVer = nicGetChipFactoryVer();
 
 	ucEcoVer = 0;
 
 	while (TRUE) {
 		/* Get ECO info from table */
-		prEcoInfo = (P_ECO_INFO_T) &(prAdapter->chip_info->eco_info[ucEcoVer]);
+		prEcoInfo = (P_ECO_INFO_T) & (prAdapter->chip_info->eco_info[ucEcoVer]);
 
-		if ((prEcoInfo->ucRomVer == 0) &&
-			(prEcoInfo->ucHwVer == 0) &&
-			(prEcoInfo->ucFactoryVer == 0)) {
-
+		if ((prEcoInfo->ucRomVer == 0) && (prEcoInfo->ucHwVer == 0) && (prEcoInfo->ucFactoryVer == 0)) {
 			/* End of table */
 			break;
 		}
 
-		if ((prEcoInfo->ucRomVer == ucCurSwVer) &&
-			(prEcoInfo->ucHwVer == ucCurHwVer) &&
-			(prEcoInfo->ucFactoryVer == ucCurFactoryVer)) {
+		if ((prEcoInfo->ucRomVer == ucCurSwVer) && (prEcoInfo->ucHwVer == ucCurHwVer) &&
+				(prEcoInfo->ucFactoryVer == ucCurFactoryVer)) {
 			break;
 		}
 
@@ -3654,8 +3478,8 @@ UINT_8 nicGetChipEcoVer(IN P_ADAPTER_T prAdapter)
 
 #if 0
 	DBGLOG(INIT, INFO,
-	       "Cannot get ECO version for SwVer[0x%02x]HwVer[0x%02x]FactoryVer[0x%1x],recognize as latest version[E%u]\n",
-	       ucCurSwVer, ucCurHwVer, ucCurFactoryVer, prAdapter->chip_info->eco_info[ucEcoVer].ucEcoVer);
+			"Cannot get ECO version for SwVer[0x%02x]HwVer[0x%02x]FactoryVer[0x%1x],recognize as latest version[E%u]\n",
+			ucCurSwVer, ucCurHwVer, ucCurFactoryVer, prAdapter->chip_info->eco_info[ucEcoVer].ucEcoVer);
 #endif
 	return prAdapter->chip_info->eco_info[ucEcoVer].ucEcoVer;
 }
@@ -3736,4 +3560,3 @@ BOOLEAN nicSerIsRxStop(IN P_ADAPTER_T prAdapter)
 		return FALSE;
 	}
 }
-

@@ -54,56 +54,56 @@
 */
 
 /*! \file   "aaa_fsm.c"
-*    \brief  This file defines the FSM for AAA MODULE.
-*
-*    This file defines the FSM for AAA MODULE.
-*/
+ *    \brief  This file defines the FSM for AAA MODULE.
+ *
+ *    This file defines the FSM for AAA MODULE.
+ */
 
 /*******************************************************************************
-*                         C O M P I L E R   F L A G S
-********************************************************************************
-*/
+ *                         C O M P I L E R   F L A G S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                    E X T E R N A L   R E F E R E N C E S
-********************************************************************************
-*/
+ *                    E X T E R N A L   R E F E R E N C E S
+ ********************************************************************************
+ */
 #include "precomp.h"
 
 /*******************************************************************************
-*                              C O N S T A N T S
-********************************************************************************
-*/
+ *                              C O N S T A N T S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                             D A T A   T Y P E S
-********************************************************************************
-*/
+ *                             D A T A   T Y P E S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                            P U B L I C   D A T A
-********************************************************************************
-*/
+ *                            P U B L I C   D A T A
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                           P R I V A T E   D A T A
-********************************************************************************
-*/
+ *                           P R I V A T E   D A T A
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                                 M A C R O S
-********************************************************************************
-*/
+ *                                 M A C R O S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                   F U N C T I O N   D E C L A R A T I O N S
-********************************************************************************
-*/
+ *                   F U N C T I O N   D E C L A R A T I O N S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                              F U N C T I O N S
-********************************************************************************
-*/
+ *                              F U N C T I O N S
+ ********************************************************************************
+ */
 #if 0
 /*----------------------------------------------------------------------------*/
 /*!
@@ -213,8 +213,8 @@ VOID aaaFsmRunEventStart(IN P_MSG_HDR_T prMsgHdr)
 
 VOID aaaFsmRunEventTxReqTimeOut(IN P_ADAPTER_T prAdapter, IN ULONG plParamPtr)
 {
-	P_STA_RECORD_T prStaRec = (P_STA_RECORD_T) plParamPtr;
-	P_BSS_INFO_T prBssInfo;
+	P_STA_RECORD_T prStaRec = (P_STA_RECORD_T)plParamPtr;
+	P_BSS_INFO_T   prBssInfo;
 
 	prBssInfo = GET_BSS_INFO_BY_INDEX(prAdapter, prStaRec->ucBssIndex);
 
@@ -229,9 +229,8 @@ VOID aaaFsmRunEventTxReqTimeOut(IN P_ADAPTER_T prAdapter, IN ULONG plParamPtr)
 
 	switch (prStaRec->eAuthAssocState) {
 	case AAA_STATE_SEND_AUTH2:
-		DBGLOG(AAA, ERROR,
-			       "LOST EVENT ,Auth Tx done disappear for (%d)Ms\n",
-			TU_TO_MSEC(TX_AUTHENTICATION_RESPONSE_TIMEOUT_TU));
+		DBGLOG(AAA, ERROR, "LOST EVENT ,Auth Tx done disappear for (%d)Ms\n",
+				TU_TO_MSEC(TX_AUTHENTICATION_RESPONSE_TIMEOUT_TU));
 
 		prStaRec->eAuthAssocState = AA_STATE_IDLE;
 
@@ -239,8 +238,8 @@ VOID aaaFsmRunEventTxReqTimeOut(IN P_ADAPTER_T prAdapter, IN ULONG plParamPtr)
 		cnmStaRecChangeState(prAdapter, prStaRec, STA_STATE_1);
 
 #if CFG_ENABLE_WIFI_DIRECT
-			if (prBssInfo->eNetworkType == NETWORK_TYPE_P2P)
-				p2pRoleFsmRunEventAAATxFail(prAdapter, prStaRec, prBssInfo);
+		if (prBssInfo->eNetworkType == NETWORK_TYPE_P2P)
+			p2pRoleFsmRunEventAAATxFail(prAdapter, prStaRec, prBssInfo);
 #endif /* CFG_ENABLE_WIFI_DIRECT */
 		break;
 #if 0
@@ -249,7 +248,7 @@ VOID aaaFsmRunEventTxReqTimeOut(IN P_ADAPTER_T prAdapter, IN ULONG plParamPtr)
 	 */
 	case AAA_STATE_SEND_ASSOC2:
 		DBGLOG(AAA, ERROR,
-			       "LOST EVENT ,Assoc Tx done disappear for (%d)Ms\n",
+					"LOST EVENT ,Assoc Tx done disappear for (%d)Ms\n",
 			TU_TO_MSEC(TX_AUTHENTICATION_RESPONSE_TIMEOUT_TU));
 
 
@@ -269,36 +268,31 @@ VOID aaaFsmRunEventTxReqTimeOut(IN P_ADAPTER_T prAdapter, IN ULONG plParamPtr)
 		return;
 	}
 
-
-}				/* end of saaFsmRunEventTxReqTimeOut() */
-
-
-
-
+} /* end of saaFsmRunEventTxReqTimeOut() */
 
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief This function will process the Rx Auth Request Frame and then
-*        trigger AAA FSM.
-*
-* @param[in] prAdapter          Pointer to the Adapter structure.
-* @param[in] prSwRfb            Pointer to the SW_RFB_T structure.
-*
-* @return (none)
-*/
+ * @brief This function will process the Rx Auth Request Frame and then
+ *        trigger AAA FSM.
+ *
+ * @param[in] prAdapter          Pointer to the Adapter structure.
+ * @param[in] prSwRfb            Pointer to the SW_RFB_T structure.
+ *
+ * @return (none)
+ */
 /*----------------------------------------------------------------------------*/
 VOID aaaFsmRunEventRxAuth(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb)
 {
-	P_BSS_INFO_T prBssInfo = (P_BSS_INFO_T) NULL;
-	P_STA_RECORD_T prStaRec = (P_STA_RECORD_T) NULL;
-	UINT_16 u2StatusCode;
-	BOOLEAN fgReplyAuth = FALSE;
-	P_WLAN_AUTH_FRAME_T prAuthFrame = (P_WLAN_AUTH_FRAME_T) NULL;
+	P_BSS_INFO_T		prBssInfo = (P_BSS_INFO_T)NULL;
+	P_STA_RECORD_T		prStaRec  = (P_STA_RECORD_T)NULL;
+	UINT_16				u2StatusCode;
+	BOOLEAN				fgReplyAuth = FALSE;
+	P_WLAN_AUTH_FRAME_T prAuthFrame = (P_WLAN_AUTH_FRAME_T)NULL;
 
 	ASSERT(prAdapter);
 
 	do {
-		prAuthFrame = (P_WLAN_AUTH_FRAME_T) prSwRfb->pvHeader;
+		prAuthFrame = (P_WLAN_AUTH_FRAME_T)prSwRfb->pvHeader;
 
 #if CFG_ENABLE_WIFI_DIRECT
 		prBssInfo = p2pFuncBSSIDFindBssInfo(prAdapter, prAuthFrame->aucBSSID);
@@ -312,21 +306,13 @@ VOID aaaFsmRunEventRxAuth(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb)
 			goto bow_proc;
 
 		if (prBssInfo && prBssInfo->fgIsNetActive) {
-
 			/* 4 <1.1> Validate Auth Frame by Auth Algorithm/Transation Seq */
-			if (WLAN_STATUS_SUCCESS ==
-				authProcessRxAuth1Frame(prAdapter,
-					prSwRfb,
-					prBssInfo->aucBSSID,
-					AUTH_ALGORITHM_NUM_OPEN_SYSTEM,
-					AUTH_TRANSACTION_SEQ_1, &u2StatusCode)) {
-
+			if (WLAN_STATUS_SUCCESS == authProcessRxAuth1Frame(prAdapter, prSwRfb, prBssInfo->aucBSSID,
+											   AUTH_ALGORITHM_NUM_OPEN_SYSTEM, AUTH_TRANSACTION_SEQ_1, &u2StatusCode)) {
 				if (u2StatusCode == STATUS_CODE_SUCCESSFUL) {
 					DBGLOG(AAA, TRACE, "process RxAuth status success\n");
 					/* 4 <1.2> Validate Auth Frame for Network Specific Conditions */
-					fgReplyAuth = p2pFuncValidateAuth(prAdapter,
-									  prBssInfo,
-									  prSwRfb, &prStaRec, &u2StatusCode);
+					fgReplyAuth = p2pFuncValidateAuth(prAdapter, prBssInfo, prSwRfb, &prStaRec, &u2StatusCode);
 
 #if CFG_SUPPORT_802_11W
 					/* AP PMF, if PMF connection, ignore Rx auth */
@@ -344,42 +330,32 @@ VOID aaaFsmRunEventRxAuth(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb)
 		}
 #endif /* CFG_ENABLE_WIFI_DIRECT */
 
-bow_proc:
-
+bow_proc :
 		/* 4 <2> Check BOW network conditions */
 #if CFG_ENABLE_BT_OVER_WIFI
-		{
-			P_BOW_FSM_INFO_T prBowFsmInfo = (P_BOW_FSM_INFO_T) NULL;
+{
+	P_BOW_FSM_INFO_T prBowFsmInfo = (P_BOW_FSM_INFO_T)NULL;
 
-			prBowFsmInfo = &(prAdapter->rWifiVar.rBowFsmInfo);
-			prBssInfo = GET_BSS_INFO_BY_INDEX(prAdapter, prBowFsmInfo->ucBssIndex);
+	prBowFsmInfo = &(prAdapter->rWifiVar.rBowFsmInfo);
+	prBssInfo	 = GET_BSS_INFO_BY_INDEX(prAdapter, prBowFsmInfo->ucBssIndex);
 
-			if ((prBssInfo->fgIsNetActive) && (prBssInfo->eCurrentOPMode == OP_MODE_BOW)) {
+	if ((prBssInfo->fgIsNetActive) && (prBssInfo->eCurrentOPMode == OP_MODE_BOW)) {
+		/* 4 <2.1> Validate Auth Frame by Auth Algorithm/Transation Seq */
+		/* Check if for this BSSID */
+		if (WLAN_STATUS_SUCCESS == authProcessRxAuth1Frame(prAdapter, prSwRfb, prBssInfo->aucBSSID,
+										   AUTH_ALGORITHM_NUM_OPEN_SYSTEM, AUTH_TRANSACTION_SEQ_1, &u2StatusCode)) {
+			if (u2StatusCode == STATUS_CODE_SUCCESSFUL) {
+				/* 4 <2.2> Validate Auth Frame for Network Specific Conditions */
+				fgReplyAuth = bowValidateAuth(prAdapter, prSwRfb, &prStaRec, &u2StatusCode);
 
-				/* 4 <2.1> Validate Auth Frame by Auth Algorithm/Transation Seq */
-				/* Check if for this BSSID */
-				if (WLAN_STATUS_SUCCESS ==
-				    authProcessRxAuth1Frame(prAdapter,
-							    prSwRfb,
-							    prBssInfo->aucBSSID,
-							    AUTH_ALGORITHM_NUM_OPEN_SYSTEM,
-							    AUTH_TRANSACTION_SEQ_1, &u2StatusCode)) {
-
-					if (u2StatusCode == STATUS_CODE_SUCCESSFUL) {
-
-						/* 4 <2.2> Validate Auth Frame for Network Specific Conditions */
-						fgReplyAuth =
-						    bowValidateAuth(prAdapter, prSwRfb, &prStaRec, &u2StatusCode);
-
-					} else {
-
-						fgReplyAuth = TRUE;
-					}
-					/* TODO(Kevin): Allocate a STA_RECORD_T for new client */
-					break;
-				}
+			} else {
+				fgReplyAuth = TRUE;
 			}
+			/* TODO(Kevin): Allocate a STA_RECORD_T for new client */
+			break;
 		}
+	}
+}
 #endif /* CFG_ENABLE_BT_OVER_WIFI */
 
 		return;
@@ -392,13 +368,10 @@ bow_proc:
 	}
 	/* 4 <3> Update STA_RECORD_T and reply Auth_2(Response to Auth_1) Frame */
 	if (fgReplyAuth) {
-
 		if (prStaRec) {
-
 			if (u2StatusCode == STATUS_CODE_SUCCESSFUL) {
 				if (prStaRec->eAuthAssocState != AA_STATE_IDLE) {
-					DBGLOG(AAA, WARN,
-					       "Previous AuthAssocState (%d) != IDLE.\n", prStaRec->eAuthAssocState);
+					DBGLOG(AAA, WARN, "Previous AuthAssocState (%d) != IDLE.\n", prStaRec->eAuthAssocState);
 				}
 
 				prStaRec->eAuthAssocState = AAA_STATE_SEND_AUTH2;
@@ -420,60 +393,53 @@ bow_proc:
 			/* NOTE(Kevin): We should have STA_RECORD_T if the status code was successful */
 			ASSERT(!(u2StatusCode == STATUS_CODE_SUCCESSFUL)
 #if CFG_SUPPORT_H2E
-				&& (u2StatusCode != WLAN_STATUS_SAE_HASH_TO_ELEMENT)
+					&& (u2StatusCode != WLAN_STATUS_SAE_HASH_TO_ELEMENT)
 #endif
 			);
 		}
 
 		/* NOTE: Ignore the return status for AAA */
 		/* 4 <4> Reply  Auth */
-		authSendAuthFrame(prAdapter,
-				  prStaRec, prBssInfo->ucBssIndex, prSwRfb, AUTH_TRANSACTION_SEQ_2, u2StatusCode);
-
+		authSendAuthFrame(prAdapter, prStaRec, prBssInfo->ucBssIndex, prSwRfb, AUTH_TRANSACTION_SEQ_2, u2StatusCode);
 
 		/*sta_rec might be removed when client list full, skip timer setting*/
 		if (prStaRec) {
 			cnmTimerStopTimer(prAdapter, &prStaRec->rTxReqDoneOrRxRespTimer);
 			/*ToDo:Init Timer to check get Auth Txdone avoid sta_rec not clear*/
-			cnmTimerInitTimer(prAdapter,
-					  &prStaRec->rTxReqDoneOrRxRespTimer, (PFN_MGMT_TIMEOUT_FUNC)
-					  aaaFsmRunEventTxReqTimeOut, (ULONG) prStaRec);
+			cnmTimerInitTimer(prAdapter, &prStaRec->rTxReqDoneOrRxRespTimer,
+					(PFN_MGMT_TIMEOUT_FUNC)aaaFsmRunEventTxReqTimeOut, (ULONG)prStaRec);
 
-			cnmTimerStartTimer(prAdapter,
-					   &prStaRec->rTxReqDoneOrRxRespTimer,
-					   TU_TO_MSEC(TX_AUTHENTICATION_RESPONSE_TIMEOUT_TU));
+			cnmTimerStartTimer(
+					prAdapter, &prStaRec->rTxReqDoneOrRxRespTimer, TU_TO_MSEC(TX_AUTHENTICATION_RESPONSE_TIMEOUT_TU));
 		}
-
-
 
 	} else if (prStaRec)
 		cnmStaRecFree(prAdapter, prStaRec);
-}				/* end of aaaFsmRunEventRxAuth() */
+} /* end of aaaFsmRunEventRxAuth() */
 
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief This function will process the Rx (Re)Association Request Frame and then
-*        trigger AAA FSM.
-*
-* @param[in] prAdapter          Pointer to the Adapter structure.
-* @param[in] prSwRfb            Pointer to the SW_RFB_T structure.
-*
-* @retval WLAN_STATUS_SUCCESS           Always return success
-*/
+ * @brief This function will process the Rx (Re)Association Request Frame and then
+ *        trigger AAA FSM.
+ *
+ * @param[in] prAdapter          Pointer to the Adapter structure.
+ * @param[in] prSwRfb            Pointer to the SW_RFB_T structure.
+ *
+ * @retval WLAN_STATUS_SUCCESS           Always return success
+ */
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS aaaFsmRunEventRxAssoc(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb)
 {
-	P_BSS_INFO_T prBssInfo;
-	P_STA_RECORD_T prStaRec = (P_STA_RECORD_T) NULL;
-	UINT_16 u2StatusCode = STATUS_CODE_RESERVED;
-	BOOLEAN fgReplyAssocResp = FALSE;
-	BOOLEAN fgSendSAQ = FALSE;
+	P_BSS_INFO_T   prBssInfo;
+	P_STA_RECORD_T prStaRec			= (P_STA_RECORD_T)NULL;
+	UINT_16		   u2StatusCode		= STATUS_CODE_RESERVED;
+	BOOLEAN		   fgReplyAssocResp = FALSE;
+	BOOLEAN		   fgSendSAQ		= FALSE;
 
 	ASSERT(prAdapter);
 	DBGLOG(AAA, INFO, "aaaFsmRunEventRxAssoc\n");
 
 	do {
-
 		/* 4 <1> Check if we have the STA_RECORD_T for incoming Assoc Req */
 		prStaRec = cnmGetStaRecByIndex(prAdapter, prSwRfb->ucStaRecIdx);
 
@@ -486,13 +452,12 @@ WLAN_STATUS aaaFsmRunEventRxAssoc(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRf
 		if (!IS_CLIENT_STA(prStaRec))
 			break;
 
-		DBGLOG(AAA, TRACE, "RxAssoc enter ucStaState:%d, eAuthassocState:%d\n",
-			prStaRec->ucStaState, prStaRec->eAuthAssocState);
+		DBGLOG(AAA, TRACE, "RxAssoc enter ucStaState:%d, eAuthassocState:%d\n", prStaRec->ucStaState,
+				prStaRec->eAuthAssocState);
 
 		if (prStaRec->ucStaState == STA_STATE_3) {
 			/* Do Reassocation */
-		} else if ((prStaRec->ucStaState == STA_STATE_2) &&
-				(prStaRec->eAuthAssocState == AAA_STATE_SEND_AUTH2)) {
+		} else if ((prStaRec->ucStaState == STA_STATE_2) && (prStaRec->eAuthAssocState == AAA_STATE_SEND_AUTH2)) {
 			/* Normal case */
 		} else {
 			DBGLOG(AAA, WARN, "Previous AuthAssocState (%d) != SEND_AUTH2.\n", prStaRec->eAuthAssocState);
@@ -508,21 +473,15 @@ WLAN_STATUS aaaFsmRunEventRxAssoc(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRf
 		/* 4 <2> Check P2P network conditions */
 #if CFG_ENABLE_WIFI_DIRECT
 		if ((prAdapter->fgIsP2PRegistered) && (IS_STA_IN_P2P(prStaRec))) {
-
 			prBssInfo = GET_BSS_INFO_BY_INDEX(prAdapter, prStaRec->ucBssIndex);
 
 			if (prBssInfo->fgIsNetActive) {
-
 				/* 4 <2.1> Validate Assoc Req Frame and get Status Code */
 				/* Check if for this BSSID */
-				if (WLAN_STATUS_SUCCESS ==
-				    assocProcessRxAssocReqFrame(prAdapter, prSwRfb, &u2StatusCode)) {
-
+				if (WLAN_STATUS_SUCCESS == assocProcessRxAssocReqFrame(prAdapter, prSwRfb, &u2StatusCode)) {
 					if (u2StatusCode == STATUS_CODE_SUCCESSFUL) {
 						/* 4 <2.2> Validate Assoc Req  Frame for Network Specific Conditions */
-						fgReplyAssocResp =
-						    p2pFuncValidateAssocReq(prAdapter, prSwRfb,
-									    (PUINT_16)&u2StatusCode);
+						fgReplyAssocResp = p2pFuncValidateAssocReq(prAdapter, prSwRfb, (PUINT_16)&u2StatusCode);
 					} else {
 						fgReplyAssocResp = TRUE;
 					}
@@ -536,24 +495,17 @@ WLAN_STATUS aaaFsmRunEventRxAssoc(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRf
 		/* 4 <3> Check BOW network conditions */
 #if CFG_ENABLE_BT_OVER_WIFI
 		if (IS_STA_BOW_TYPE(prStaRec)) {
-
 			prBssInfo = GET_BSS_INFO_BY_INDEX(prAdapter, prStaRec->ucBssIndex);
 
 			if ((prBssInfo->fgIsNetActive) && (prBssInfo->eCurrentOPMode == OP_MODE_BOW)) {
-
 				/* 4 <3.1> Validate Auth Frame by Auth Algorithm/Transation Seq */
 				/* Check if for this BSSID */
-				if (WLAN_STATUS_SUCCESS ==
-				    assocProcessRxAssocReqFrame(prAdapter, prSwRfb, &u2StatusCode)) {
-
+				if (WLAN_STATUS_SUCCESS == assocProcessRxAssocReqFrame(prAdapter, prSwRfb, &u2StatusCode)) {
 					if (u2StatusCode == STATUS_CODE_SUCCESSFUL) {
-
 						/* 4 <3.2> Validate Auth Frame for Network Specific Conditions */
-						fgReplyAssocResp =
-						    bowValidateAssocReq(prAdapter, prSwRfb, &u2StatusCode);
+						fgReplyAssocResp = bowValidateAssocReq(prAdapter, prSwRfb, &u2StatusCode);
 
 					} else {
-
 						fgReplyAssocResp = TRUE;
 					}
 
@@ -564,7 +516,7 @@ WLAN_STATUS aaaFsmRunEventRxAssoc(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRf
 		}
 #endif /* CFG_ENABLE_BT_OVER_WIFI */
 
-		return WLAN_STATUS_SUCCESS;	/* To release the SW_RFB_T */
+		return WLAN_STATUS_SUCCESS; /* To release the SW_RFB_T */
 	} while (FALSE);
 
 	/* 4 <4> Update STA_RECORD_T and reply Assoc Resp Frame */
@@ -574,29 +526,24 @@ WLAN_STATUS aaaFsmRunEventRxAssoc(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRf
 
 		cnmTimerStopTimer(prAdapter, &prStaRec->rTxReqDoneOrRxRespTimer);
 
-		if ((((P_WLAN_ASSOC_REQ_FRAME_T) (prSwRfb->pvHeader))->u2FrameCtrl & MASK_FRAME_TYPE) ==
-		    MAC_FRAME_REASSOC_REQ) {
+		if ((((P_WLAN_ASSOC_REQ_FRAME_T)(prSwRfb->pvHeader))->u2FrameCtrl & MASK_FRAME_TYPE) == MAC_FRAME_REASSOC_REQ) {
+			u2IELength = prSwRfb->u2PacketLen - (UINT_16)OFFSET_OF(WLAN_REASSOC_REQ_FRAME_T, aucInfoElem[0]);
 
-			u2IELength = prSwRfb->u2PacketLen -
-			    (UINT_16) OFFSET_OF(WLAN_REASSOC_REQ_FRAME_T, aucInfoElem[0]);
-
-			pucIE = ((P_WLAN_REASSOC_REQ_FRAME_T) (prSwRfb->pvHeader))->aucInfoElem;
+			pucIE = ((P_WLAN_REASSOC_REQ_FRAME_T)(prSwRfb->pvHeader))->aucInfoElem;
 		} else {
-			u2IELength = prSwRfb->u2PacketLen - (UINT_16) OFFSET_OF(WLAN_ASSOC_REQ_FRAME_T, aucInfoElem[0]);
+			u2IELength = prSwRfb->u2PacketLen - (UINT_16)OFFSET_OF(WLAN_ASSOC_REQ_FRAME_T, aucInfoElem[0]);
 
-			pucIE = ((P_WLAN_ASSOC_REQ_FRAME_T) (prSwRfb->pvHeader))->aucInfoElem;
+			pucIE = ((P_WLAN_ASSOC_REQ_FRAME_T)(prSwRfb->pvHeader))->aucInfoElem;
 		}
 
 		rlmProcessAssocReq(prAdapter, prSwRfb, pucIE, u2IELength);
 
 		/* 4 <4.1> Assign Association ID */
 		if (u2StatusCode == STATUS_CODE_SUCCESSFUL) {
-
 #if CFG_ENABLE_WIFI_DIRECT
 			if ((prAdapter->fgIsP2PRegistered) && (IS_STA_IN_P2P(prStaRec))) {
 				prBssInfo = GET_BSS_INFO_BY_INDEX(prAdapter, prStaRec->ucBssIndex);
-				if (p2pRoleFsmRunEventAAAComplete(prAdapter, prStaRec, prBssInfo) ==
-				    WLAN_STATUS_SUCCESS) {
+				if (p2pRoleFsmRunEventAAAComplete(prAdapter, prStaRec, prBssInfo) == WLAN_STATUS_SUCCESS) {
 					prStaRec->u2AssocId = bssAssignAssocID(prStaRec);
 					/* prStaRec->eAuthAssocState = AA_STATE_IDLE; */
 					/* NOTE(Kevin): for TX done */
@@ -607,7 +554,7 @@ WLAN_STATUS aaaFsmRunEventRxAssoc(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRf
 					/* Client List FULL. */
 					u2StatusCode = STATUS_CODE_REQ_DECLINED;
 
-					prStaRec->u2AssocId = 0;	/* Invalid Association ID */
+					prStaRec->u2AssocId = 0; /* Invalid Association ID */
 
 					/* If(Re)association fail,remove sta record and use class error to handle sta */
 					prStaRec->eAuthAssocState = AA_STATE_IDLE;
@@ -621,15 +568,14 @@ WLAN_STATUS aaaFsmRunEventRxAssoc(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRf
 #if CFG_ENABLE_BT_OVER_WIFI
 			if ((IS_STA_BOW_TYPE(prStaRec))) {
 				/* if (bowRunEventAAAComplete(prAdapter, prStaRec) == WLAN_STATUS_SUCCESS) { */
-				prStaRec->u2AssocId = bssAssignAssocID(prStaRec);
-				prStaRec->eAuthAssocState = AAA_STATE_SEND_ASSOC2;	/* NOTE(Kevin): for TX done */
+				prStaRec->u2AssocId		  = bssAssignAssocID(prStaRec);
+				prStaRec->eAuthAssocState = AAA_STATE_SEND_ASSOC2; /* NOTE(Kevin): for TX done */
 
 				/* NOTE(Kevin): Method A: Change to STATE_3 before handle TX Done */
 				/* cnmStaRecChangeState(prAdapter, prStaRec, STA_STATE_3); */
 			}
 #endif
 		} else {
-
 #if CFG_SUPPORT_802_11W
 			/* AP PMF */
 			/* don't change state, just send assoc resp (NO need TX done, TIE + code30) and then SAQ */
@@ -639,13 +585,12 @@ WLAN_STATUS aaaFsmRunEventRxAssoc(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRf
 			} else
 #endif
 			{
-				prStaRec->u2AssocId = 0;	/* Invalid Association ID */
+				prStaRec->u2AssocId = 0; /* Invalid Association ID */
 
 				/* If (Re)association fail, remove sta record and use class error to handle sta */
 				prStaRec->eAuthAssocState = AA_STATE_IDLE;
 				/* Remove from client list if it was previously associated */
-				if ((prStaRec->ucStaState > STA_STATE_1) && prAdapter->fgIsP2PRegistered
-					&& (IS_STA_IN_P2P(prStaRec))) {
+				if ((prStaRec->ucStaState > STA_STATE_1) && prAdapter->fgIsP2PRegistered && (IS_STA_IN_P2P(prStaRec))) {
 					P_BSS_INFO_T prBssInfo = NULL;
 
 					prBssInfo = GET_BSS_INFO_BY_INDEX(prAdapter, prStaRec->ucBssIndex);
@@ -676,29 +621,28 @@ WLAN_STATUS aaaFsmRunEventRxAssoc(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRf
 			rsnApStartSaQuery(prAdapter, prStaRec);
 		}
 #endif
-
 	}
 
 	return WLAN_STATUS_SUCCESS;
 
-}				/* end of aaaFsmRunEventRxAssoc() */
+} /* end of aaaFsmRunEventRxAssoc() */
 
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief This function will handle TxDone(Auth2/AssocReq) Event of AAA FSM.
-*
-* @param[in] prAdapter      Pointer to the Adapter structure.
-* @param[in] prMsduInfo     Pointer to the MSDU_INFO_T.
-* @param[in] rTxDoneStatus  Return TX status of the Auth1/Auth3/AssocReq frame.
-*
-* @retval WLAN_STATUS_SUCCESS
-*/
+ * @brief This function will handle TxDone(Auth2/AssocReq) Event of AAA FSM.
+ *
+ * @param[in] prAdapter      Pointer to the Adapter structure.
+ * @param[in] prMsduInfo     Pointer to the MSDU_INFO_T.
+ * @param[in] rTxDoneStatus  Return TX status of the Auth1/Auth3/AssocReq frame.
+ *
+ * @retval WLAN_STATUS_SUCCESS
+ */
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS
 aaaFsmRunEventTxDone(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo, IN ENUM_TX_RESULT_CODE_T rTxDoneStatus)
 {
 	P_STA_RECORD_T prStaRec;
-	P_BSS_INFO_T prBssInfo;
+	P_BSS_INFO_T   prBssInfo;
 
 	ASSERT(prAdapter);
 	ASSERT(prMsduInfo);
@@ -708,108 +652,95 @@ aaaFsmRunEventTxDone(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo, IN E
 	prStaRec = cnmGetStaRecByIndex(prAdapter, prMsduInfo->ucStaRecIndex);
 
 	if ((!prStaRec) || (!prStaRec->fgIsInUse))
-		return WLAN_STATUS_SUCCESS;	/* For the case of replying ERROR STATUS CODE */
+		return WLAN_STATUS_SUCCESS; /* For the case of replying ERROR STATUS CODE */
 
 	ASSERT(prStaRec->ucBssIndex <= MAX_BSS_INDEX);
 
 	prBssInfo = GET_BSS_INFO_BY_INDEX(prAdapter, prStaRec->ucBssIndex);
 
-	DBGLOG(AAA, LOUD, "TxDone ucStaState:%d, eAuthAssocState:%d\n",
-		prStaRec->ucStaState, prStaRec->eAuthAssocState);
+	DBGLOG(AAA, LOUD, "TxDone ucStaState:%d, eAuthAssocState:%d\n", prStaRec->ucStaState, prStaRec->eAuthAssocState);
 
 	/* Trigger statistics log if Auth/Assoc Tx failed */
 	if (rTxDoneStatus != TX_RESULT_SUCCESS)
 		wlanTriggerStatsLog(prAdapter, prAdapter->rWifiVar.u4StatsLogDuration);
 
 	switch (prStaRec->eAuthAssocState) {
-	case AAA_STATE_SEND_AUTH2:
-		{
-			/* Strictly check the outgoing frame is matched with current AA STATE */
-			if (authCheckTxAuthFrame(prAdapter, prMsduInfo, AUTH_TRANSACTION_SEQ_2) != WLAN_STATUS_SUCCESS)
-				break;
+	case AAA_STATE_SEND_AUTH2: {
+		/* Strictly check the outgoing frame is matched with current AA STATE */
+		if (authCheckTxAuthFrame(prAdapter, prMsduInfo, AUTH_TRANSACTION_SEQ_2) != WLAN_STATUS_SUCCESS)
+			break;
 
-			cnmTimerStopTimer(prAdapter, &prStaRec->rTxReqDoneOrRxRespTimer);
+		cnmTimerStopTimer(prAdapter, &prStaRec->rTxReqDoneOrRxRespTimer);
 
-			if (prStaRec->u2StatusCode == STATUS_CODE_SUCCESSFUL) {
-				if (rTxDoneStatus == TX_RESULT_SUCCESS) {
+		if (prStaRec->u2StatusCode == STATUS_CODE_SUCCESSFUL) {
+			if (rTxDoneStatus == TX_RESULT_SUCCESS) {
+				/* NOTE(Kevin): Change to STATE_2 at TX Done */
+				cnmStaRecChangeState(prAdapter, prStaRec, STA_STATE_2);
+				/* Error handle if can not complete the ASSOC flow */
+				cnmTimerStartTimer(prAdapter, &prStaRec->rTxReqDoneOrRxRespTimer, TU_TO_MSEC(TX_ASSOCIATE_TIMEOUT_TU));
+			} else {
+				prStaRec->eAuthAssocState = AA_STATE_IDLE;
 
-					/* NOTE(Kevin): Change to STATE_2 at TX Done */
-					cnmStaRecChangeState(prAdapter, prStaRec, STA_STATE_2);
-					/* Error handle if can not complete the ASSOC flow */
-					cnmTimerStartTimer(prAdapter,
-							   &prStaRec->rTxReqDoneOrRxRespTimer,
-							   TU_TO_MSEC(TX_ASSOCIATE_TIMEOUT_TU));
-				} else {
-
-					prStaRec->eAuthAssocState = AA_STATE_IDLE;
-
-					/* NOTE(Kevin): Change to STATE_1 */
-					cnmStaRecChangeState(prAdapter, prStaRec, STA_STATE_1);
+				/* NOTE(Kevin): Change to STATE_1 */
+				cnmStaRecChangeState(prAdapter, prStaRec, STA_STATE_1);
 
 #if CFG_ENABLE_WIFI_DIRECT
-					if (prBssInfo->eNetworkType == NETWORK_TYPE_P2P)
-						p2pRoleFsmRunEventAAATxFail(prAdapter, prStaRec, prBssInfo);
+				if (prBssInfo->eNetworkType == NETWORK_TYPE_P2P)
+					p2pRoleFsmRunEventAAATxFail(prAdapter, prStaRec, prBssInfo);
 #endif /* CFG_ENABLE_WIFI_DIRECT */
 #if CFG_ENABLE_BT_OVER_WIFI
-					if (IS_STA_BOW_TYPE(prStaRec))
-						bowRunEventAAATxFail(prAdapter, prStaRec);
+				if (IS_STA_BOW_TYPE(prStaRec))
+					bowRunEventAAATxFail(prAdapter, prStaRec);
 
 #endif /* CFG_ENABLE_BT_OVER_WIFI */
-				}
-
 			}
-			/* NOTE(Kevin): Ignore the TX Done Event of Auth Frame with Error Status Code */
-
 		}
-		break;
+		/* NOTE(Kevin): Ignore the TX Done Event of Auth Frame with Error Status Code */
 
-	case AAA_STATE_SEND_ASSOC2:
-		{
-			/* Strictly check the outgoing frame is matched with current SAA STATE */
-			if (assocCheckTxReAssocRespFrame(prAdapter, prMsduInfo) != WLAN_STATUS_SUCCESS)
-				break;
+	} break;
 
-			if (prStaRec->u2StatusCode == STATUS_CODE_SUCCESSFUL) {
-				if (rTxDoneStatus == TX_RESULT_SUCCESS) {
+	case AAA_STATE_SEND_ASSOC2: {
+		/* Strictly check the outgoing frame is matched with current SAA STATE */
+		if (assocCheckTxReAssocRespFrame(prAdapter, prMsduInfo) != WLAN_STATUS_SUCCESS)
+			break;
 
-					prStaRec->eAuthAssocState = AA_STATE_IDLE;
+		if (prStaRec->u2StatusCode == STATUS_CODE_SUCCESSFUL) {
+			if (rTxDoneStatus == TX_RESULT_SUCCESS) {
+				prStaRec->eAuthAssocState = AA_STATE_IDLE;
 
-					/* NOTE(Kevin): Change to STATE_3 at TX Done */
+				/* NOTE(Kevin): Change to STATE_3 at TX Done */
 #if CFG_ENABLE_WIFI_DIRECT
-					if (prBssInfo->eNetworkType == NETWORK_TYPE_P2P)
-						p2pRoleFsmRunEventAAASuccess(prAdapter, prStaRec, prBssInfo);
+				if (prBssInfo->eNetworkType == NETWORK_TYPE_P2P)
+					p2pRoleFsmRunEventAAASuccess(prAdapter, prStaRec, prBssInfo);
 #endif /* CFG_ENABLE_WIFI_DIRECT */
 
 #if CFG_ENABLE_BT_OVER_WIFI
 
-					if (IS_STA_BOW_TYPE(prStaRec))
-						bowRunEventAAAComplete(prAdapter, prStaRec);
+				if (IS_STA_BOW_TYPE(prStaRec))
+					bowRunEventAAAComplete(prAdapter, prStaRec);
 
 #endif /* CFG_ENABLE_BT_OVER_WIFI */
 
-				} else {
+			} else {
+				prStaRec->eAuthAssocState = AAA_STATE_SEND_AUTH2;
 
-					prStaRec->eAuthAssocState = AAA_STATE_SEND_AUTH2;
-
-					/* NOTE(Kevin): Change to STATE_2 */
-					cnmStaRecChangeState(prAdapter, prStaRec, STA_STATE_2);
+				/* NOTE(Kevin): Change to STATE_2 */
+				cnmStaRecChangeState(prAdapter, prStaRec, STA_STATE_2);
 
 #if CFG_ENABLE_WIFI_DIRECT
-					if (prBssInfo->eNetworkType == NETWORK_TYPE_P2P)
-						p2pRoleFsmRunEventAAATxFail(prAdapter, prStaRec, prBssInfo);
+				if (prBssInfo->eNetworkType == NETWORK_TYPE_P2P)
+					p2pRoleFsmRunEventAAATxFail(prAdapter, prStaRec, prBssInfo);
 #endif /* CFG_ENABLE_WIFI_DIRECT */
 
 #if CFG_ENABLE_BT_OVER_WIFI
-					if (IS_STA_BOW_TYPE(prStaRec))
-						bowRunEventAAATxFail(prAdapter, prStaRec);
+				if (IS_STA_BOW_TYPE(prStaRec))
+					bowRunEventAAATxFail(prAdapter, prStaRec);
 
 #endif /* CFG_ENABLE_BT_OVER_WIFI */
-
-				}
 			}
-			/* NOTE(Kevin): Ignore the TX Done Event of Auth Frame with Error Status Code */
 		}
-		break;
+		/* NOTE(Kevin): Ignore the TX Done Event of Auth Frame with Error Status Code */
+	} break;
 
 	case AA_STATE_IDLE:
 		/* 2013-08-27 frog:  Do nothing.
@@ -824,18 +755,18 @@ aaaFsmRunEventTxDone(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo, IN E
 		break;
 
 	default:
-		break;		/* Ignore other cases */
+		break; /* Ignore other cases */
 	}
 
-	DBGLOG(AAA, LOUD, "TxDone end ucStaState:%d, eAuthAssocState:%d\n",
-		prStaRec->ucStaState, prStaRec->eAuthAssocState);
+	DBGLOG(AAA, LOUD, "TxDone end ucStaState:%d, eAuthAssocState:%d\n", prStaRec->ucStaState,
+			prStaRec->eAuthAssocState);
 
 	return WLAN_STATUS_SUCCESS;
 
-}				/* end of aaaFsmRunEventTxDone() */
+} /* end of aaaFsmRunEventTxDone() */
 #endif /* CFG_SUPPORT_AAA */
 
-#if 0				/* TODO(Kevin): for abort event, just reset the STA_RECORD_T. */
+#if 0 /* TODO(Kevin): for abort event, just reset the STA_RECORD_T. */
 /*----------------------------------------------------------------------------*/
 /*!
 * \brief This function will send ABORT Event to JOIN FSM.
@@ -972,7 +903,7 @@ VOID joinAdoptParametersFromPeerBss(IN P_ADAPTER_T prAdapter)
 	prAdapter->eCurrentPhyType = prBssDesc->ePhyType;
 
 	DBGLOG(JOIN, INFO, "Target BSS[%s]'s PhyType = %s\n",
-	       prBssDesc->aucSSID, (prBssDesc->ePhyType == PHY_TYPE_ERP_INDEX) ? "ERP" : "HR_DSSS");
+			prBssDesc->aucSSID, (prBssDesc->ePhyType == PHY_TYPE_ERP_INDEX) ? "ERP" : "HR_DSSS");
 
 	/* 4 <2> Adopt Peer BSS' Frequency(Band/Channel) */
 	DBGLOG(JOIN, INFO, "Target BSS's Channel = %d, Band = %d\n", prBssDesc->ucChannelNum, prBssDesc->eBand);
@@ -1052,7 +983,7 @@ VOID joinComplete(IN P_ADAPTER_T prAdapter)
 		 * broadcast SSID on its Beacon Frame.
 		 */
 		COPY_SSID(prBssDesc->aucSSID,
-			  prBssDesc->ucSSIDLen, prAdapter->rConnSettings.aucSSID, prAdapter->rConnSettings.ucSSIDLen);
+			prBssDesc->ucSSIDLen, prAdapter->rConnSettings.aucSSID, prAdapter->rConnSettings.ucSSIDLen);
 
 		if (prBssDesc->ucSSIDLen)
 			prBssDesc->fgIsHiddenSSID = FALSE;
@@ -1104,7 +1035,7 @@ VOID joinComplete(IN P_ADAPTER_T prAdapter)
 
 	/* 4 <2.I> ERP Information */
 	if ((prBssInfo->ePhyType == PHY_TYPE_ERP_INDEX) &&	/* Our BSS's PHY_TYPE is ERP now. */
-	    (prBssDesc->fgIsERPPresent)) {
+		(prBssDesc->fgIsERPPresent)) {
 
 		prBssInfo->fgIsERPPresent = TRUE;
 		prBssInfo->ucERP = prBssDesc->ucERP;	/* Save the ERP for later check */
@@ -1146,8 +1077,8 @@ VOID joinComplete(IN P_ADAPTER_T prAdapter)
 	prBssInfo->u2CapInfo = prBssDesc->u2CapInfo;
 
 	DBGLOG(JOIN, INFO,
-	       "prBssInfo-> fgIsERPPresent = %d, ucERP = %02x, rRcpi = %d, rRssi = %ld\n",
-	       prBssInfo->fgIsERPPresent, prBssInfo->ucERP, prBssInfo->rRcpi, prBssInfo->rRssi);
+			"prBssInfo-> fgIsERPPresent = %d, ucERP = %02x, rRcpi = %d, rRssi = %ld\n",
+			prBssInfo->fgIsERPPresent, prBssInfo->ucERP, prBssInfo->rRcpi, prBssInfo->rRssi);
 
 /* 4 <3> Update BSS_INFO_T from PEER_BSS_INFO_T & NIC RATE FUNC */
 	/* 4 <3.A> Association ID */
@@ -1165,8 +1096,8 @@ VOID joinComplete(IN P_ADAPTER_T prAdapter)
 			kalMemCopy(&prBssInfo->rWmmInfo, &prPeerBssInfo->rWmmInfo, sizeof(WMM_INFO_T));
 		} else {
 			kalMemCopy(&prBssInfo->rWmmInfo,
-				   &prPeerBssInfo->rWmmInfo,
-				   sizeof(WMM_INFO_T) - sizeof(prPeerBssInfo->rWmmInfo.arWmmAcParams));
+					&prPeerBssInfo->rWmmInfo,
+					sizeof(WMM_INFO_T) - sizeof(prPeerBssInfo->rWmmInfo.arWmmAcParams));
 		}
 	} else {
 		prBssInfo->fgIsWmmAssoc = FALSE;
@@ -1198,10 +1129,10 @@ VOID joinComplete(IN P_ADAPTER_T prAdapter)
 		 * FALSE           TRUE                   TRUE            FALSE(we should set to FALSE)
 		 */
 		if ((prPeerBssInfo->fgIsShortPreambleAllowed) &&
-		    ((prConnSettings->ePreambleType == PREAMBLE_TYPE_SHORT) ||
+			((prConnSettings->ePreambleType == PREAMBLE_TYPE_SHORT) ||
 		     /* Short Preamble Option Enable is TRUE */
-		     ((prConnSettings->ePreambleType == PREAMBLE_TYPE_AUTO)
-		      && (prBssDesc->u2CapInfo & CAP_INFO_SHORT_PREAMBLE)))) {
+			((prConnSettings->ePreambleType == PREAMBLE_TYPE_AUTO)
+				&& (prBssDesc->u2CapInfo & CAP_INFO_SHORT_PREAMBLE)))) {
 
 			prBssInfo->fgIsShortPreambleAllowed = TRUE;
 
@@ -1226,12 +1157,12 @@ VOID joinComplete(IN P_ADAPTER_T prAdapter)
 		 */
 
 		prBssInfo->fgIsShortPreambleAllowed = prBssInfo->fgUseShortPreamble =
-		    prPeerBssInfo->fgIsShortPreambleAllowed;
+			prPeerBssInfo->fgIsShortPreambleAllowed;
 	}
 
 	DBGLOG(JOIN, INFO,
-	       "prBssInfo->fgIsShortPreambleAllowed = %d, prBssInfo->fgUseShortPreamble = %d\n",
-	       prBssInfo->fgIsShortPreambleAllowed, prBssInfo->fgUseShortPreamble);
+			"prBssInfo->fgIsShortPreambleAllowed = %d, prBssInfo->fgUseShortPreamble = %d\n",
+			prBssInfo->fgIsShortPreambleAllowed, prBssInfo->fgUseShortPreamble);
 
 	/* 4 <3.E> Short Slot Time */
 	prBssInfo->fgUseShortSlotTime = prPeerBssInfo->fgUseShortSlotTime;	/* AP support Short Slot Time */
@@ -1239,9 +1170,9 @@ VOID joinComplete(IN P_ADAPTER_T prAdapter)
 	DBGLOG(JOIN, INFO, "prBssInfo->fgUseShortSlotTime = %d\n", prBssInfo->fgUseShortSlotTime);
 
 	nicSetSlotTime(prAdapter,
-		       prBssInfo->ePhyType,
-		       ((prConnSettings->fgIsShortSlotTimeOptionEnable &&
-			 prBssInfo->fgUseShortSlotTime) ? TRUE : FALSE));
+				prBssInfo->ePhyType,
+				((prConnSettings->fgIsShortSlotTimeOptionEnable &&
+			prBssInfo->fgUseShortSlotTime) ? TRUE : FALSE));
 
 	/* 4 <3.F> Update Tx Rate for Control Frame */
 	bssUpdateTxRateForControlFrame(prAdapter);
@@ -1261,7 +1192,7 @@ VOID joinComplete(IN P_ADAPTER_T prAdapter)
 		 * during the stable time.
 		 */
 		SET_EXPIRATION_TIME(prBssInfo->rRoamingStableExpirationTime,
-				    SEC_TO_SYSTIME(ROAMING_STABLE_TIMEOUT_SEC));
+					SEC_TO_SYSTIME(ROAMING_STABLE_TIMEOUT_SEC));
 	}
 
 	/* 4 <3.H> Update Parameter for TX Fragmentation Threshold */
@@ -1290,7 +1221,7 @@ VOID joinComplete(IN P_ADAPTER_T prAdapter)
 
 		/* Try to set the best initial rate for this entry */
 		if (!rateGetBestInitialRateIndex(prStaRec->u2DesiredRateSet,
-						 prStaRec->rRcpi, &prStaRec->ucCurrRate1Index)) {
+						prStaRec->rRcpi, &prStaRec->ucCurrRate1Index)) {
 
 			if (!rateGetLowestRateIndexFromRateSet(prStaRec->u2DesiredRateSet, &prStaRec->ucCurrRate1Index))
 				ASSERT(0);
@@ -1348,9 +1279,9 @@ VOID joinComplete(IN P_ADAPTER_T prAdapter)
 	{
 		prTxCtrl->fgBlockTxDuringJoin = FALSE;
 
-#if !CFG_TX_AGGREGATE_HW_FIFO	/* TX FIFO AGGREGATE already do flush once */
+#if !CFG_TX_AGGREGATE_HW_FIFO /* TX FIFO AGGREGATE already do flush once */
 		nicTxFlushStopQueues(prAdapter, (UINT_8) TXQ_DATA_MASK, (UINT_8) NULL);
-#endif /* CFG_TX_AGGREGATE_HW_FIFO */
+#endif						  /* CFG_TX_AGGREGATE_HW_FIFO */
 
 		nicTxRetransmitOfSendWaitQue(prAdapter);
 

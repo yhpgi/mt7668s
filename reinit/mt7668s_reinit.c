@@ -42,7 +42,7 @@ static int __init mt7668s_reinit(void)
 
 static void __exit mt7668s_cleanup(void)
 {
-    pr_info("Cleaning up module.\n");
+	pr_info("Cleaning up module.\n");
 }
 
 module_init(mt7668s_reinit);

@@ -54,59 +54,58 @@
 */
 
 /*! \file   "nic_pwr_mgt.c"
-*    \brief  In this file we define the STATE and EVENT for Power Management FSM.
-*
-*    The SCAN FSM is responsible for performing SCAN behavior when the Arbiter enter
-*    ARB_STATE_SCAN. The STATE and EVENT for SCAN FSM are defined here with detail
-*    description.
-*/
-
-
-/*******************************************************************************
-*                         C O M P I L E R   F L A G S
-********************************************************************************
-*/
+ *    \brief  In this file we define the STATE and EVENT for Power Management FSM.
+ *
+ *    The SCAN FSM is responsible for performing SCAN behavior when the Arbiter enter
+ *    ARB_STATE_SCAN. The STATE and EVENT for SCAN FSM are defined here with detail
+ *    description.
+ */
 
 /*******************************************************************************
-*                    E X T E R N A L   R E F E R E N C E S
-********************************************************************************
-*/
+ *                         C O M P I L E R   F L A G S
+ ********************************************************************************
+ */
+
+/*******************************************************************************
+ *                    E X T E R N A L   R E F E R E N C E S
+ ********************************************************************************
+ */
 #include "precomp.h"
 
 /*******************************************************************************
-*                              C O N S T A N T S
-********************************************************************************
-*/
+ *                              C O N S T A N T S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                             D A T A   T Y P E S
-********************************************************************************
-*/
+ *                             D A T A   T Y P E S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                            P U B L I C   D A T A
-********************************************************************************
-*/
+ *                            P U B L I C   D A T A
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                           P R I V A T E   D A T A
-********************************************************************************
-*/
+ *                           P R I V A T E   D A T A
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                                 M A C R O S
-********************************************************************************
-*/
+ *                                 M A C R O S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                   F U N C T I O N   D E C L A R A T I O N S
-********************************************************************************
-*/
+ *                   F U N C T I O N   D E C L A R A T I O N S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                              F U N C T I O N S
-********************************************************************************
-*/
+ *                              F U N C T I O N S
+ ********************************************************************************
+ */
 
 VOID nicpmWakeUpWiFi(IN P_ADAPTER_T prAdapter)
 {
@@ -119,12 +118,12 @@ VOID nicpmWakeUpWiFi(IN P_ADAPTER_T prAdapter)
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief This routine is used to process the POWER ON procedure.
-*
-* \param[in] pvAdapter Pointer to the Adapter structure.
-*
-* \return (none)
-*/
+ * \brief This routine is used to process the POWER ON procedure.
+ *
+ * \param[in] pvAdapter Pointer to the Adapter structure.
+ *
+ * \return (none)
+ */
 /*----------------------------------------------------------------------------*/
 VOID nicpmSetFWOwn(IN P_ADAPTER_T prAdapter, IN BOOLEAN fgEnableGlobalInt)
 {
@@ -133,12 +132,12 @@ VOID nicpmSetFWOwn(IN P_ADAPTER_T prAdapter, IN BOOLEAN fgEnableGlobalInt)
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief This routine is used to process the POWER OFF procedure.
-*
-* \param[in] pvAdapter Pointer to the Adapter structure.
-*
-* \return (none)
-*/
+ * \brief This routine is used to process the POWER OFF procedure.
+ *
+ * \param[in] pvAdapter Pointer to the Adapter structure.
+ *
+ * \return (none)
+ */
 /*----------------------------------------------------------------------------*/
 BOOLEAN nicpmSetDriverOwn(IN P_ADAPTER_T prAdapter)
 {
@@ -147,16 +146,15 @@ BOOLEAN nicpmSetDriverOwn(IN P_ADAPTER_T prAdapter)
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief This routine is used to set ACPI power mode to D0.
-*
-* \param[in] pvAdapter Pointer to the Adapter structure.
-*
-* \return (none)
-*/
+ * \brief This routine is used to set ACPI power mode to D0.
+ *
+ * \param[in] pvAdapter Pointer to the Adapter structure.
+ *
+ * \return (none)
+ */
 /*----------------------------------------------------------------------------*/
 BOOLEAN nicpmSetAcpiPowerD0(IN P_ADAPTER_T prAdapter)
 {
-
 #if 0
 	WLAN_STATUS u4Status = WLAN_STATUS_SUCCESS;
 	UINT_32 u4Value = 0, u4WHISR = 0;
@@ -203,8 +201,8 @@ BOOLEAN nicpmSetAcpiPowerD0(IN P_ADAPTER_T prAdapter)
 
 #if CFG_ENABLE_FW_DOWNLOAD
 		prFwMappingHandle =
-		    kalFirmwareImageMapping(prAdapter->prGlueInfo, &pvFwImageMapFile, &u4FwImgLength,
-					    &pvCr4FwImageMapFile, &u4Cr4FwImgLength);
+			kalFirmwareImageMapping(prAdapter->prGlueInfo, &pvFwImageMapFile, &u4FwImgLength,
+						&pvCr4FwImageMapFile, &u4Cr4FwImgLength);
 		if (!prFwMappingHandle) {
 			DBGLOG(INIT, ERROR, "Fail to load FW image from file!\n");
 			pvFwImageMapFile = NULL;
@@ -223,12 +221,12 @@ BOOLEAN nicpmSetAcpiPowerD0(IN P_ADAPTER_T prAdapter)
 #if CFG_ENABLE_FW_DIVIDED_DOWNLOAD
 			/* 3a. parse file header for decision of divided firmware download or not */
 			prFwHead =
-			    (P_FIRMWARE_DIVIDED_DOWNLOAD_T) ((PUINT_8) pvFwImageMapFile + u4FwImgLength -
-							     (2 * sizeof(FWDL_SECTION_INFO_T)));
+				(P_FIRMWARE_DIVIDED_DOWNLOAD_T) ((PUINT_8) pvFwImageMapFile + u4FwImgLength -
+								(2 * sizeof(FWDL_SECTION_INFO_T)));
 #if 0
 			if (prFwHead->u4Signature == MTK_WIFI_SIGNATURE &&
-			    prFwHead->u4CRC == wlanCRC32((PUINT_8) pvFwImageMapFile + u4CRCOffset,
-							 u4FwImgLength - u4CRCOffset)) {
+				prFwHead->u4CRC == wlanCRC32((PUINT_8) pvFwImageMapFile + u4CRCOffset,
+							u4FwImgLength - u4CRCOffset)) {
 				fgValidHead = TRUE;
 			} else {
 				fgValidHead = FALSE;
@@ -241,7 +239,7 @@ BOOLEAN nicpmSetAcpiPowerD0(IN P_ADAPTER_T prAdapter)
 #endif
 			{
 				if (wlanImageSectionConfig(prAdapter,
-							   u4FwLoadAddr, u4FwImgLength, TRUE) != WLAN_STATUS_SUCCESS) {
+								u4FwLoadAddr, u4FwImgLength, TRUE) != WLAN_STATUS_SUCCESS) {
 					DBGLOG(INIT, ERROR, "Firmware download configuration failed!\n");
 
 					u4Status = WLAN_STATUS_FAILURE;
@@ -252,21 +250,21 @@ BOOLEAN nicpmSetAcpiPowerD0(IN P_ADAPTER_T prAdapter)
 			/* escape to top */
 			if (u4Status != WLAN_STATUS_SUCCESS) {
 				kalFirmwareImageUnmapping(prAdapter->prGlueInfo, prFwMappingHandle, pvFwImageMapFile,
-							  pvCr4FwImageMapFile);
+							pvCr4FwImageMapFile);
 				break;
 			}
 #if !CFG_ENABLE_FW_DOWNLOAD_ACK
 			/* Send INIT_CMD_ID_QUERY_PENDING_ERROR command and wait for response */
 			if (wlanImageQueryStatus(prAdapter) != WLAN_STATUS_SUCCESS) {
 				kalFirmwareImageUnmapping(prAdapter->prGlueInfo, prFwMappingHandle, pvFwImageMapFile,
-							  pvCr4FwImageMapFile);
+							pvCr4FwImageMapFile);
 				u4Status = WLAN_STATUS_FAILURE;
 				break;
 			}
 #endif
 
 			kalFirmwareImageUnmapping(prAdapter->prGlueInfo, prFwMappingHandle, pvFwImageMapFile,
-						  pvCr4FwImageMapFile);
+						pvCr4FwImageMapFile);
 		} else {
 			u4Status = WLAN_STATUS_FAILURE;
 			break;
@@ -342,16 +340,16 @@ BOOLEAN nicpmSetAcpiPowerD0(IN P_ADAPTER_T prAdapter)
 
 /*----------------------------------------------------------------------------*/
 /*!
-* @brief This routine is used to set ACPI power mode to D3.
-*
-* @param prAdapter pointer to the Adapter handler
-*
-* @return (none)
-*/
+ * @brief This routine is used to set ACPI power mode to D3.
+ *
+ * @param prAdapter pointer to the Adapter handler
+ *
+ * @return (none)
+ */
 /*----------------------------------------------------------------------------*/
 BOOLEAN nicpmSetAcpiPowerD3(IN P_ADAPTER_T prAdapter)
 {
-/*	UINT_32 i; */
+	/*	UINT_32 i; */
 
 	ASSERT(prAdapter);
 

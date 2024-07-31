@@ -75,21 +75,21 @@
 #endif
 
 /*******************************************************************************
-*						C O N S T A N T S
-********************************************************************************
-*/
+ *						C O N S T A N T S
+ ********************************************************************************
+ */
 
 PARAM_RX_STAT_T g_HqaRxStat;
-UINT_32 u4RxStatSeqNum;
-BOOLEAN g_DBDCEnable = FALSE;
+UINT_32			u4RxStatSeqNum;
+BOOLEAN			g_DBDCEnable = FALSE;
 /* For SA Buffer Mode Temp Solution */
-BOOLEAN	g_BufferDownload = FALSE;
-UINT_32	u4EepromMode = 4;
+BOOLEAN g_BufferDownload = FALSE;
+UINT_32 u4EepromMode	 = 4;
 UINT_32 g_u4Chip_ID;
-UINT_8 g_ucEepromCurrentMode = EFUSE_MODE;
+UINT_8	g_ucEepromCurrentMode = EFUSE_MODE;
 
 #if CFG_SUPPORT_BUFFER_MODE
-UINT_8	uacEEPROMImage[MAX_EEPROM_BUFFER_SIZE] = {
+UINT_8 uacEEPROMImage[MAX_EEPROM_BUFFER_SIZE] = {
 	/* 0x000 ~ 0x00F */
 	0xAE, 0x86, 0x06, 0x00, 0x18, 0x0D, 0x00, 0x00, 0xC0, 0x1F, 0xBD, 0x81, 0x3F, 0x01, 0x19, 0x00,
 	/* 0x010 ~ 0x01F */
@@ -245,36 +245,36 @@ UINT_8	uacEEPROMImage[MAX_EEPROM_BUFFER_SIZE] = {
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For Response ACK to QA Tool DLL.
-*
-* \param[in] HqaCmdFrame		Ethernet Frame Format respond to QA Tool DLL
-* \param[in] prIwReqData
-* \param[in] i4Length			Length of Ethernet Frame data field
-* \param[in] i4Status			Status to respond
-* \param[out] None
-*
-* \retval 0					On success.
-* \retval -EFAULT				If copy_to_user fail
-*/
+ * \brief  QA Agent For Response ACK to QA Tool DLL.
+ *
+ * \param[in] HqaCmdFrame		Ethernet Frame Format respond to QA Tool DLL
+ * \param[in] prIwReqData
+ * \param[in] i4Length			Length of Ethernet Frame data field
+ * \param[in] i4Status			Status to respond
+ * \param[out] None
+ *
+ * \retval 0					On success.
+ * \retval -EFAULT				If copy_to_user fail
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 ResponseToQA(HQA_CMD_FRAME *HqaCmdFrame,
-			   IN union iwreq_data *prIwReqData, INT_32 i4Length, INT_32 i4Status)
+static INT_32 ResponseToQA(
+		HQA_CMD_FRAME *HqaCmdFrame, IN union iwreq_data *prIwReqData, INT_32 i4Length, INT_32 i4Status)
 {
 	HqaCmdFrame->Length = ntohs((i4Length));
 
 	i4Status = ntohs((i4Status));
 	memcpy(HqaCmdFrame->Data, &i4Status, 2);
 
-	prIwReqData->data.length = sizeof((HqaCmdFrame)->MagicNo) + sizeof((HqaCmdFrame)->Type)
-	    + sizeof((HqaCmdFrame)->Id) + sizeof((HqaCmdFrame)->Length)
-	    + sizeof((HqaCmdFrame)->Sequence) + ntohs((HqaCmdFrame)->Length);
+	prIwReqData->data.length = sizeof((HqaCmdFrame)->MagicNo) + sizeof((HqaCmdFrame)->Type) +
+							   sizeof((HqaCmdFrame)->Id) + sizeof((HqaCmdFrame)->Length) +
+							   sizeof((HqaCmdFrame)->Sequence) + ntohs((HqaCmdFrame)->Length);
 
-	if (copy_to_user(prIwReqData->data.pointer, (UCHAR *) (HqaCmdFrame), prIwReqData->data.length)) {
+	if (copy_to_user(prIwReqData->data.pointer, (UCHAR *)(HqaCmdFrame), prIwReqData->data.length)) {
 		DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT copy_to_user() fail in %s\n", __func__);
 		return -EFAULT;
 	}
 	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA command(0x%04x)[Magic number(0x%08x)] is done\n",
-	       ntohs(HqaCmdFrame->Id), ntohl(HqaCmdFrame->MagicNo));
+			ntohs(HqaCmdFrame->Id), ntohl(HqaCmdFrame->MagicNo));
 
 	return 0;
 }
@@ -292,18 +292,17 @@ static INT_32 ToDoFunction(struct net_device *prNetDev, IN union iwreq_data *prI
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For Open Adapter (called when QA Tool UI Open).
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For Open Adapter (called when QA Tool UI Open).
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 HQA_OpenAdapter(struct net_device *prNetDev,
-			      IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_OpenAdapter(struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
 	INT_32 i4Ret = 0;
 
@@ -321,18 +320,18 @@ static INT_32 HQA_OpenAdapter(struct net_device *prNetDev,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For Close Adapter (called when QA Tool UI Close).
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For Close Adapter (called when QA Tool UI Close).
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 HQA_CloseAdapter(struct net_device *prNetDev,
-			       IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_CloseAdapter(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
 	INT_32 i4Ret = 0;
 
@@ -347,19 +346,19 @@ static INT_32 HQA_CloseAdapter(struct net_device *prNetDev,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For Start TX.
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For Start TX.
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
 static INT_32 HQA_StartTx(struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Ret = 0;
+	INT_32	i4Ret = 0;
 	UINT_32 TxCount;
 	UINT_16 TxLength;
 
@@ -374,7 +373,7 @@ static INT_32 HQA_StartTx(struct net_device *prNetDev, IN union iwreq_data *prIw
 	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_StartTx TxLength = %d\n", TxLength);
 
 	i4Ret = MT_ATESetTxCount(prNetDev, TxCount);
-	i4Ret = MT_ATESetTxLength(prNetDev, (UINT_32) TxLength);
+	i4Ret = MT_ATESetTxLength(prNetDev, (UINT_32)TxLength);
 	i4Ret = MT_ATEStartTX(prNetDev, "TXFRAME");
 
 	ResponseToQA(HqaCmdFrame, prIwReqData, 2, i4Ret);
@@ -384,15 +383,15 @@ static INT_32 HQA_StartTx(struct net_device *prNetDev, IN union iwreq_data *prIw
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
 /* 1 todo not support yet */
 static INT_32 HQA_StartTxExt(struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
@@ -408,19 +407,19 @@ static INT_32 HQA_StartTxExt(struct net_device *prNetDev, IN union iwreq_data *p
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For Start Continuous TX.
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For Start Continuous TX.
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
 /* 1 todo not support yet */
-static INT_32 HQA_StartTxContiTx(struct net_device *prNetDev,
-				 IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_StartTxContiTx(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
 	INT_32 i4Ret = 0;
 
@@ -433,19 +432,19 @@ static INT_32 HQA_StartTxContiTx(struct net_device *prNetDev,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
 /* 1 todo not support yets */
-static INT_32 HQA_StartTxCarrier(struct net_device *prNetDev,
-				 IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_StartTxCarrier(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
 	INT_32 i4Ret = 0;
 
@@ -458,15 +457,15 @@ static INT_32 HQA_StartTxCarrier(struct net_device *prNetDev,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For Start RX (Legacy function).
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For Start RX (Legacy function).
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
 static INT_32 HQA_StartRx(struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
@@ -484,15 +483,15 @@ static INT_32 HQA_StartRx(struct net_device *prNetDev, IN union iwreq_data *prIw
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For Stop TX (Legacy function).
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For Stop TX (Legacy function).
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
 static INT_32 HQA_StopTx(struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
@@ -510,18 +509,17 @@ static INT_32 HQA_StopTx(struct net_device *prNetDev, IN union iwreq_data *prIwR
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For Stop Continuous TX.
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For Stop Continuous TX.
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 HQA_StopContiTx(struct net_device *prNetDev,
-			      IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_StopContiTx(struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
 	INT_32 i4Ret = 0;
 
@@ -534,18 +532,18 @@ static INT_32 HQA_StopContiTx(struct net_device *prNetDev,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 HQA_StopTxCarrier(struct net_device *prNetDev,
-				IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_StopTxCarrier(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
 	INT_32 i4Ret = 0;
 
@@ -558,15 +556,15 @@ static INT_32 HQA_StopTxCarrier(struct net_device *prNetDev,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For Stop RX (Legacy function).
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For Stop RX (Legacy function).
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
 static INT_32 HQA_StopRx(struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
@@ -584,15 +582,15 @@ static INT_32 HQA_StopRx(struct net_device *prNetDev, IN union iwreq_data *prIwR
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For Set TX Path.
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For Set TX Path.
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
 static INT_32 HQA_SetTxPath(struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
@@ -607,24 +605,24 @@ static INT_32 HQA_SetTxPath(struct net_device *prNetDev, IN union iwreq_data *pr
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For Set RX Path.
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For Set RX Path.
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
 static INT_32 HQA_SetRxPath(struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
 	INT_32 i4Ret = 0;
-/*	INT_16 Value = 0;
-*	P_GLUE_INFO_T prGlueInfo = NULL;
-*	PARAM_MTK_WIFI_TEST_STRUCT_T rRfATInfo;
-*	UINT_32 u4BufLen = 0;
-*/
+	/*	INT_16 Value = 0;
+	 *	P_GLUE_INFO_T prGlueInfo = NULL;
+	 *	PARAM_MTK_WIFI_TEST_STRUCT_T rRfATInfo;
+	 *	UINT_32 u4BufLen = 0;
+	 */
 
 	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_SetRxPath\n");
 
@@ -640,13 +638,13 @@ static INT_32 HQA_SetRxPath(struct net_device *prNetDev, IN union iwreq_data *pr
 	rRfATInfo.u4FuncData = (UINT_32) ((Value << 16) || (0 & BITS(0, 15)));
 
 	i4Ret = kalIoctl(prGlueInfo,	/* prGlueInfo */
-			 wlanoidRftestSetAutoTest,	/* pfnOidHandler */
-			 &rRfATInfo,	/* pvInfoBuf */
-			 sizeof(rRfATInfo),	/* u4InfoBufLen */
-			 FALSE,	/* fgRead */
-			 FALSE,	/* fgWaitResp */
-			 TRUE,	/* fgCmd */
-			 &u4BufLen);	/* pu4QryInfoLen */
+			wlanoidRftestSetAutoTest,	/* pfnOidHandler */
+			&rRfATInfo,	/* pvInfoBuf */
+			sizeof(rRfATInfo),	/* u4InfoBufLen */
+			FALSE,	/* fgRead */
+			FALSE,	/* fgWaitResp */
+			TRUE,	/* fgCmd */
+			&u4BufLen);	/* pu4QryInfoLen */
 
 	if (i4Ret != WLAN_STATUS_SUCCESS)
 		return -EFAULT;
@@ -659,19 +657,19 @@ static INT_32 HQA_SetRxPath(struct net_device *prNetDev, IN union iwreq_data *pr
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For Set TX Inter-Packet Guard.
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For Set TX Inter-Packet Guard.
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
 static INT_32 HQA_SetTxIPG(struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Ret = 0;
+	INT_32	i4Ret  = 0;
 	UINT_32 u4Aifs = 0;
 
 	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_SetTxIPG\n");
@@ -690,18 +688,17 @@ static INT_32 HQA_SetTxIPG(struct net_device *prNetDev, IN union iwreq_data *prI
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For Set TX Power0 (Legacy Function).
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For Set TX Power0 (Legacy Function).
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 HQA_SetTxPower0(struct net_device *prNetDev,
-			      IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_SetTxPower0(struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
 	INT_32 i4Ret = 0;
 
@@ -714,18 +711,17 @@ static INT_32 HQA_SetTxPower0(struct net_device *prNetDev,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For Set TX Power1.
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For Set TX Power1.
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 HAQ_SetTxPower1(struct net_device *prNetDev,
-			      IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HAQ_SetTxPower1(struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
 	INT_32 i4Ret = 0;
 
@@ -738,25 +734,25 @@ static INT_32 HAQ_SetTxPower1(struct net_device *prNetDev,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 HQA_SetTxPowerExt(struct net_device *prNetDev,
-				IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_SetTxPowerExt(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Ret = 0;
-	UINT_32 u4Power = 0;
-	UINT_32 u4Channel = 0;
+	INT_32	i4Ret	   = 0;
+	UINT_32 u4Power	   = 0;
+	UINT_32 u4Channel  = 0;
 	UINT_32 u4Dbdc_idx = 0;
 	UINT_32 u4Band_idx = 0;
-	UINT_32 u4Ant_idx = 0;
+	UINT_32 u4Ant_idx  = 0;
 
 	memcpy(&u4Power, HqaCmdFrame->Data + 4 * 0, 4);
 	u4Power = ntohl(u4Power);
@@ -789,15 +785,15 @@ static INT_32 HQA_SetTxPowerExt(struct net_device *prNetDev,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
 static INT_32 HQA_SetOnOff(struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
@@ -812,15 +808,15 @@ static INT_32 HQA_SetOnOff(struct net_device *prNetDev, IN union iwreq_data *prI
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For Antenna Selection.
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For Antenna Selection.
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
 static INT_32 HQA_AntennaSel(struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
@@ -835,18 +831,18 @@ static INT_32 HQA_AntennaSel(struct net_device *prNetDev, IN union iwreq_data *p
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 HQA_FWPacketCMD_ClockSwitchDisable(struct net_device *prNetDev,
-						 IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_FWPacketCMD_ClockSwitchDisable(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
 	INT_32 i4Ret = 0;
 
@@ -859,45 +855,45 @@ static INT_32 HQA_FWPacketCMD_ClockSwitchDisable(struct net_device *prNetDev,
 
 static HQA_CMD_HANDLER HQA_CMD_SET0[] = {
 	/* cmd id start from 0x1000 */
-	HQA_OpenAdapter,	/* 0x1000 */
-	HQA_CloseAdapter,	/* 0x1001 */
-	HQA_StartTx,		/* 0x1002 */
-	HQA_StartTxExt,		/* 0x1003 */
-	HQA_StartTxContiTx,	/* 0x1004 */
-	HQA_StartTxCarrier,	/* 0x1005 */
-	HQA_StartRx,		/* 0x1006 */
-	HQA_StopTx,		/* 0x1007 */
-	HQA_StopContiTx,	/* 0x1008 */
-	HQA_StopTxCarrier,	/* 0x1009 */
-	HQA_StopRx,		/* 0x100A */
-	HQA_SetTxPath,		/* 0x100B */
-	HQA_SetRxPath,		/* 0x100C */
-	HQA_SetTxIPG,		/* 0x100D */
-	HQA_SetTxPower0,	/* 0x100E */
-	HAQ_SetTxPower1,	/* 0x100F */
-	ToDoFunction,		/* 0x1010 */
-	HQA_SetTxPowerExt,	/* 0x1011 */
-	HQA_SetOnOff,		/* 0x1012 */
-	HQA_AntennaSel,		/* 0x1013 */
-	HQA_FWPacketCMD_ClockSwitchDisable,	/* 0x1014 */
+	HQA_OpenAdapter,					/* 0x1000 */
+	HQA_CloseAdapter,					/* 0x1001 */
+	HQA_StartTx,						/* 0x1002 */
+	HQA_StartTxExt,						/* 0x1003 */
+	HQA_StartTxContiTx,					/* 0x1004 */
+	HQA_StartTxCarrier,					/* 0x1005 */
+	HQA_StartRx,						/* 0x1006 */
+	HQA_StopTx,							/* 0x1007 */
+	HQA_StopContiTx,					/* 0x1008 */
+	HQA_StopTxCarrier,					/* 0x1009 */
+	HQA_StopRx,							/* 0x100A */
+	HQA_SetTxPath,						/* 0x100B */
+	HQA_SetRxPath,						/* 0x100C */
+	HQA_SetTxIPG,						/* 0x100D */
+	HQA_SetTxPower0,					/* 0x100E */
+	HAQ_SetTxPower1,					/* 0x100F */
+	ToDoFunction,						/* 0x1010 */
+	HQA_SetTxPowerExt,					/* 0x1011 */
+	HQA_SetOnOff,						/* 0x1012 */
+	HQA_AntennaSel,						/* 0x1013 */
+	HQA_FWPacketCMD_ClockSwitchDisable, /* 0x1014 */
 };
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For Set Channel Frequency (Legacy Function).
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For Set Channel Frequency (Legacy Function).
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
 static INT_32 HQA_SetChannel(struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
 	UINT_32 i4SetFreq = 0, i4SetChan = 0;
-	INT_32 i4Ret = 0;
+	INT_32	i4Ret = 0;
 
 	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_SetChannel\n");
 
@@ -907,7 +903,7 @@ static INT_32 HQA_SetChannel(struct net_device *prNetDev, IN union iwreq_data *p
 	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_SetChannel Channel = %d\n", i4SetChan);
 
 	i4SetFreq = nicChannelNum2Freq(i4SetChan);
-	i4Ret = MT_ATESetChannel(prNetDev, 0, i4SetFreq);
+	i4Ret	  = MT_ATESetChannel(prNetDev, 0, i4SetFreq);
 
 	ResponseToQA(HqaCmdFrame, prIwReqData, 2, i4Ret);
 
@@ -916,21 +912,20 @@ static INT_32 HQA_SetChannel(struct net_device *prNetDev, IN union iwreq_data *p
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For Set Preamble (Legacy Function).
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For Set Preamble (Legacy Function).
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 HQA_SetPreamble(struct net_device *prNetDev,
-			      IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_SetPreamble(struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
 	INT_32 i4Mode = 0;
-	INT_32 i4Ret = 0;
+	INT_32 i4Ret  = 0;
 
 	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_SetPreamble\n");
 
@@ -948,19 +943,19 @@ static INT_32 HQA_SetPreamble(struct net_device *prNetDev,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For Set Rate (Legacy Function).
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For Set Rate (Legacy Function).
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
 static INT_32 HQA_SetRate(struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-/*	INT_32 i4Value = 0; */
+	/*	INT_32 i4Value = 0; */
 	INT_32 i4Ret = 0;
 
 	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_SetRate\n");
@@ -972,15 +967,15 @@ static INT_32 HQA_SetRate(struct net_device *prNetDev, IN union iwreq_data *prIw
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For Set Nss.
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For Set Nss.
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
 static INT_32 HQA_SetNss(struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
@@ -995,21 +990,20 @@ static INT_32 HQA_SetNss(struct net_device *prNetDev, IN union iwreq_data *prIwR
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For Set System BW (Legacy Function).
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For Set System BW (Legacy Function).
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 HQA_SetSystemBW(struct net_device *prNetDev,
-			      IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_SetSystemBW(struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
 	UINT_32 i4BW;
-	INT_32 i4Ret = 0;
+	INT_32	i4Ret = 0;
 
 	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_SetSystemBW\n");
 
@@ -1027,20 +1021,19 @@ static INT_32 HQA_SetSystemBW(struct net_device *prNetDev,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For Set Data BW (Legacy Function).
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For Set Data BW (Legacy Function).
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 HQA_SetPerPktBW(struct net_device *prNetDev,
-			      IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_SetPerPktBW(struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Ret = 0;
+	INT_32	i4Ret = 0;
 	UINT_32 u4Perpkt_bw;
 
 	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_SetPerPktBW\n");
@@ -1059,21 +1052,21 @@ static INT_32 HQA_SetPerPktBW(struct net_device *prNetDev,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For Set Primary BW.
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For Set Primary BW.
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 HQA_SetPrimaryBW(struct net_device *prNetDev,
-			       IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_SetPrimaryBW(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Ret = 0;
-	UINT_32               u4Pri_sel = 0;
+	INT_32	i4Ret	  = 0;
+	UINT_32 u4Pri_sel = 0;
 
 	memcpy(&u4Pri_sel, HqaCmdFrame->Data, 4);
 	u4Pri_sel = ntohl(u4Pri_sel);
@@ -1089,26 +1082,26 @@ static INT_32 HQA_SetPrimaryBW(struct net_device *prNetDev,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For Set Frequency Offset.
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For Set Frequency Offset.
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 HQA_SetFreqOffset(struct net_device *prNetDev,
-				IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_SetFreqOffset(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Ret = 0;
-	UINT_32 u4FreqOffset = 0;
-	P_GLUE_INFO_T prGlueInfo = NULL;
+	INT_32						 i4Ret		  = 0;
+	UINT_32						 u4FreqOffset = 0;
+	P_GLUE_INFO_T				 prGlueInfo	  = NULL;
 	PARAM_MTK_WIFI_TEST_STRUCT_T rRfATInfo;
-	UINT_32 u4BufLen = 0;
+	UINT_32						 u4BufLen = 0;
 
-	prGlueInfo = *((P_GLUE_INFO_T *) netdev_priv(prNetDev));
+	prGlueInfo = *((P_GLUE_INFO_T *)netdev_priv(prNetDev));
 
 	memcpy(&u4FreqOffset, HqaCmdFrame->Data, 4);
 	u4FreqOffset = ntohl(u4FreqOffset);
@@ -1116,16 +1109,16 @@ static INT_32 HQA_SetFreqOffset(struct net_device *prNetDev,
 	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_SetFreqOffset u4FreqOffset : %d\n", u4FreqOffset);
 
 	rRfATInfo.u4FuncIndex = RF_AT_FUNCID_SET_FRWQ_OFFSET;
-	rRfATInfo.u4FuncData = (UINT_32) u4FreqOffset;
+	rRfATInfo.u4FuncData  = (UINT_32)u4FreqOffset;
 
-	i4Ret = kalIoctl(prGlueInfo,	/* prGlueInfo */
-			 wlanoidRftestSetAutoTest,	/* pfnOidHandler */
-			 &rRfATInfo,	/* pvInfoBuf */
-			 sizeof(rRfATInfo),	/* u4InfoBufLen */
-			 FALSE,	/* fgRead */
-			 FALSE,	/* fgWaitResp */
-			 TRUE,	/* fgCmd */
-			 &u4BufLen);	/* pu4QryInfoLen */
+	i4Ret = kalIoctl(prGlueInfo,	  /* prGlueInfo */
+			wlanoidRftestSetAutoTest, /* pfnOidHandler */
+			&rRfATInfo,				  /* pvInfoBuf */
+			sizeof(rRfATInfo),		  /* u4InfoBufLen */
+			FALSE,					  /* fgRead */
+			FALSE,					  /* fgWaitResp */
+			TRUE,					  /* fgCmd */
+			&u4BufLen);				  /* pu4QryInfoLen */
 
 	if (i4Ret != WLAN_STATUS_SUCCESS)
 		return -EFAULT;
@@ -1137,18 +1130,18 @@ static INT_32 HQA_SetFreqOffset(struct net_device *prNetDev,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 HQA_SetAutoResponder(struct net_device *prNetDev,
-				   IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_SetAutoResponder(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
 	INT_32 i4Ret = 0;
 
@@ -1161,18 +1154,18 @@ static INT_32 HQA_SetAutoResponder(struct net_device *prNetDev,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 HQA_SetTssiOnOff(struct net_device *prNetDev,
-			       IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_SetTssiOnOff(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
 	INT_32 i4Ret = 0;
 
@@ -1185,20 +1178,20 @@ static INT_32 HQA_SetTssiOnOff(struct net_device *prNetDev,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
 /* 1 todo not support yet */
 
-static INT_32 HQA_SetRxHighLowTemperatureCompensation(struct net_device *prNetDev,
-						      IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_SetRxHighLowTemperatureCompensation(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
 	INT_32 i4Ret = 0;
 
@@ -1211,15 +1204,15 @@ static INT_32 HQA_SetRxHighLowTemperatureCompensation(struct net_device *prNetDe
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
 static INT_32 HQA_LowPower(struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
@@ -1234,34 +1227,34 @@ static INT_32 HQA_LowPower(struct net_device *prNetDev, IN union iwreq_data *prI
 
 static HQA_CMD_HANDLER HQA_CMD_SET1[] = {
 	/* cmd id start from 0x1100 */
-	HQA_SetChannel,		/* 0x1100 */
-	HQA_SetPreamble,	/* 0x1101 */
-	HQA_SetRate,		/* 0x1102 */
-	HQA_SetNss,		/* 0x1103 */
-	HQA_SetSystemBW,	/* 0x1104 */
-	HQA_SetPerPktBW,	/* 0x1105 */
-	HQA_SetPrimaryBW,	/* 0x1106 */
-	HQA_SetFreqOffset,	/* 0x1107 */
-	HQA_SetAutoResponder,	/* 0x1108 */
-	HQA_SetTssiOnOff,	/* 0x1109 */
-	HQA_SetRxHighLowTemperatureCompensation,	/* 0x110A */
-	HQA_LowPower,		/* 0x110B */
+	HQA_SetChannel,							 /* 0x1100 */
+	HQA_SetPreamble,						 /* 0x1101 */
+	HQA_SetRate,							 /* 0x1102 */
+	HQA_SetNss,								 /* 0x1103 */
+	HQA_SetSystemBW,						 /* 0x1104 */
+	HQA_SetPerPktBW,						 /* 0x1105 */
+	HQA_SetPrimaryBW,						 /* 0x1106 */
+	HQA_SetFreqOffset,						 /* 0x1107 */
+	HQA_SetAutoResponder,					 /* 0x1108 */
+	HQA_SetTssiOnOff,						 /* 0x1109 */
+	HQA_SetRxHighLowTemperatureCompensation, /* 0x110A */
+	HQA_LowPower,							 /* 0x110B */
 };
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For Reset TRX Counter
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For Reset TRX Counter
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 HQA_ResetTxRxCounter(struct net_device *prNetDev,
-				   IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_ResetTxRxCounter(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
 	UINT_32 i4Status;
 
@@ -1276,18 +1269,18 @@ static INT_32 HQA_ResetTxRxCounter(struct net_device *prNetDev,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 HQA_GetStatistics(struct net_device *prNetDev,
-				IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_GetStatistics(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
 	INT_32 i4Ret = 0;
 
@@ -1300,18 +1293,17 @@ static INT_32 HQA_GetStatistics(struct net_device *prNetDev,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 HQA_GetRxOKData(struct net_device *prNetDev,
-			      IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_GetRxOKData(struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
 	INT_32 i4Ret = 0;
 
@@ -1324,18 +1316,18 @@ static INT_32 HQA_GetRxOKData(struct net_device *prNetDev,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 HQA_GetRxOKOther(struct net_device *prNetDev,
-			       IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_GetRxOKOther(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
 	INT_32 i4Ret = 0;
 
@@ -1348,18 +1340,18 @@ static INT_32 HQA_GetRxOKOther(struct net_device *prNetDev,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 HQA_GetRxAllPktCount(struct net_device *prNetDev,
-				   IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_GetRxAllPktCount(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
 	INT_32 i4Ret = 0;
 
@@ -1372,18 +1364,18 @@ static INT_32 HQA_GetRxAllPktCount(struct net_device *prNetDev,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 HQA_GetTxTransmitted(struct net_device *prNetDev,
-				   IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_GetTxTransmitted(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
 	INT_32 i4Ret = 0;
 
@@ -1396,18 +1388,18 @@ static INT_32 HQA_GetTxTransmitted(struct net_device *prNetDev,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 HQA_GetHwCounter(struct net_device *prNetDev,
-			       IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_GetHwCounter(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
 	INT_32 i4Ret = 0;
 
@@ -1420,18 +1412,18 @@ static INT_32 HQA_GetHwCounter(struct net_device *prNetDev,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 HQA_CalibrationOperation(struct net_device *prNetDev,
-				       IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_CalibrationOperation(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
 	INT_32 i4Ret = 0;
 
@@ -1444,27 +1436,27 @@ static INT_32 HQA_CalibrationOperation(struct net_device *prNetDev,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 HQA_CalibrationBypassExt(struct net_device *prNetDev,
-				       IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_CalibrationBypassExt(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Status = 0;
-	UINT_32 u4Item = 0;
-	UINT_32 u4Band_idx = 0;
-	P_GLUE_INFO_T prGlueInfo = NULL;
+	INT_32						 i4Status	= 0;
+	UINT_32						 u4Item		= 0;
+	UINT_32						 u4Band_idx = 0;
+	P_GLUE_INFO_T				 prGlueInfo = NULL;
 	PARAM_MTK_WIFI_TEST_STRUCT_T rRfATInfo;
-	UINT_32 u4BufLen = 0;
+	UINT_32						 u4BufLen = 0;
 
-	prGlueInfo = *((P_GLUE_INFO_T *) netdev_priv(prNetDev));
+	prGlueInfo = *((P_GLUE_INFO_T *)netdev_priv(prNetDev));
 
 	memcpy(&u4Item, HqaCmdFrame->Data, 4);
 	u4Item = ntohl(u4Item);
@@ -1477,16 +1469,16 @@ static INT_32 HQA_CalibrationBypassExt(struct net_device *prNetDev,
 	MT_ATESetDBDCBandIndex(prNetDev, u4Band_idx);
 
 	rRfATInfo.u4FuncIndex = RF_AT_FUNCID_SET_BYPASS_CAL_STEP;
-	rRfATInfo.u4FuncData = u4Item;
+	rRfATInfo.u4FuncData  = u4Item;
 
-	i4Status = kalIoctl(prGlueInfo,	/* prGlueInfo */
-			    wlanoidRftestSetAutoTest,	/* pfnOidHandler */
-			    &rRfATInfo,	/* pvInfoBuf */
-			    sizeof(rRfATInfo),	/* u4InfoBufLen */
-			    FALSE,	/* fgRead */
-			    FALSE,	/* fgWaitResp */
-			    TRUE,	/* fgCmd */
-			    &u4BufLen);	/* pu4QryInfoLen */
+	i4Status = kalIoctl(prGlueInfo,	  /* prGlueInfo */
+			wlanoidRftestSetAutoTest, /* pfnOidHandler */
+			&rRfATInfo,				  /* pvInfoBuf */
+			sizeof(rRfATInfo),		  /* u4InfoBufLen */
+			FALSE,					  /* fgRead */
+			FALSE,					  /* fgWaitResp */
+			TRUE,					  /* fgCmd */
+			&u4BufLen);				  /* pu4QryInfoLen */
 
 	if (i4Status != WLAN_STATUS_SUCCESS)
 		return -EFAULT;
@@ -1498,27 +1490,27 @@ static INT_32 HQA_CalibrationBypassExt(struct net_device *prNetDev,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 HQA_SetRXVectorIdx(struct net_device *prNetDev,
-				 IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_SetRXVectorIdx(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Ret = 0;
-	UINT_32 band_idx = 0;
-	UINT_32 Group_1 = 0, Group_2 = 0;
-	P_GLUE_INFO_T prGlueInfo = NULL;
+	INT_32						 i4Ret	  = 0;
+	UINT_32						 band_idx = 0;
+	UINT_32						 Group_1 = 0, Group_2 = 0;
+	P_GLUE_INFO_T				 prGlueInfo = NULL;
 	PARAM_MTK_WIFI_TEST_STRUCT_T rRfATInfo;
-	UINT_32 u4BufLen = 0;
+	UINT_32						 u4BufLen = 0;
 
-	prGlueInfo = *((P_GLUE_INFO_T *) netdev_priv(prNetDev));
+	prGlueInfo = *((P_GLUE_INFO_T *)netdev_priv(prNetDev));
 
 	memcpy(&band_idx, HqaCmdFrame->Data + 4 * 0, 4);
 	band_idx = ntohl(band_idx);
@@ -1532,21 +1524,20 @@ static INT_32 HQA_SetRXVectorIdx(struct net_device *prNetDev,
 	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_SetRXVectorIdx Group_2 : %d\n", Group_2);
 
 	rRfATInfo.u4FuncIndex = RF_AT_FUNCID_SET_RXV_INDEX;
-	rRfATInfo.u4FuncData = (UINT_32) (Group_1);
-	rRfATInfo.u4FuncData |= (UINT_32) (Group_2 << 8);
-	rRfATInfo.u4FuncData |= (UINT_32) (band_idx << 16);
+	rRfATInfo.u4FuncData  = (UINT_32)(Group_1);
+	rRfATInfo.u4FuncData |= (UINT_32)(Group_2 << 8);
+	rRfATInfo.u4FuncData |= (UINT_32)(band_idx << 16);
 
-	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_SetRXVectorIdx rRfATInfo.u4FuncData : 0x%08x\n",
-	       rRfATInfo.u4FuncData);
+	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_SetRXVectorIdx rRfATInfo.u4FuncData : 0x%08x\n", rRfATInfo.u4FuncData);
 
-	i4Ret = kalIoctl(prGlueInfo,	/* prGlueInfo */
-			 wlanoidRftestSetAutoTest,	/* pfnOidHandler */
-			 &rRfATInfo,	/* pvInfoBuf */
-			 sizeof(rRfATInfo),	/* u4InfoBufLen */
-			 FALSE,	/* fgRead */
-			 FALSE,	/* fgWaitResp */
-			 TRUE,	/* fgCmd */
-			 &u4BufLen);	/* pu4QryInfoLen */
+	i4Ret = kalIoctl(prGlueInfo,	  /* prGlueInfo */
+			wlanoidRftestSetAutoTest, /* pfnOidHandler */
+			&rRfATInfo,				  /* pvInfoBuf */
+			sizeof(rRfATInfo),		  /* u4InfoBufLen */
+			FALSE,					  /* fgRead */
+			FALSE,					  /* fgWaitResp */
+			TRUE,					  /* fgCmd */
+			&u4BufLen);				  /* pu4QryInfoLen */
 
 	if (i4Ret != WLAN_STATUS_SUCCESS)
 		return -EFAULT;
@@ -1558,27 +1549,27 @@ static INT_32 HQA_SetRXVectorIdx(struct net_device *prNetDev,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For Set FAGC Rssi Path
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For Set FAGC Rssi Path
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 HQA_SetFAGCRssiPath(struct net_device *prNetDev,
-				  IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_SetFAGCRssiPath(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Ret = 0;
-	UINT_32 u4band_idx = 0;
-	UINT_32 u4FAGC_Path = 0;
-	P_GLUE_INFO_T prGlueInfo = NULL;
+	INT_32						 i4Ret		 = 0;
+	UINT_32						 u4band_idx	 = 0;
+	UINT_32						 u4FAGC_Path = 0;
+	P_GLUE_INFO_T				 prGlueInfo	 = NULL;
 	PARAM_MTK_WIFI_TEST_STRUCT_T rRfATInfo;
-	UINT_32 u4BufLen = 0;
+	UINT_32						 u4BufLen = 0;
 
-	prGlueInfo = *((P_GLUE_INFO_T *) netdev_priv(prNetDev));
+	prGlueInfo = *((P_GLUE_INFO_T *)netdev_priv(prNetDev));
 
 	memcpy(&u4band_idx, HqaCmdFrame->Data + 4 * 0, 4);
 	u4band_idx = ntohl(u4band_idx);
@@ -1589,16 +1580,16 @@ static INT_32 HQA_SetFAGCRssiPath(struct net_device *prNetDev,
 	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_SetFAGCRssiPath u4FAGC_Path : %d\n", u4FAGC_Path);
 
 	rRfATInfo.u4FuncIndex = RF_AT_FUNCID_FAGC_RSSI_PATH;
-	rRfATInfo.u4FuncData = (UINT_32) ((u4band_idx << 16) || (u4FAGC_Path & BITS(0, 15)));
+	rRfATInfo.u4FuncData  = (UINT_32)((u4band_idx << 16) || (u4FAGC_Path & BITS(0, 15)));
 
-	i4Ret = kalIoctl(prGlueInfo,	/* prGlueInfo */
-			 wlanoidRftestSetAutoTest,	/* pfnOidHandler */
-			 &rRfATInfo,	/* pvInfoBuf */
-			 sizeof(rRfATInfo),	/* u4InfoBufLen */
-			 FALSE,	/* fgRead */
-			 FALSE,	/* fgWaitResp */
-			 TRUE,	/* fgCmd */
-			 &u4BufLen);	/* pu4QryInfoLen */
+	i4Ret = kalIoctl(prGlueInfo,	  /* prGlueInfo */
+			wlanoidRftestSetAutoTest, /* pfnOidHandler */
+			&rRfATInfo,				  /* pvInfoBuf */
+			sizeof(rRfATInfo),		  /* u4InfoBufLen */
+			FALSE,					  /* fgRead */
+			FALSE,					  /* fgWaitResp */
+			TRUE,					  /* fgCmd */
+			&u4BufLen);				  /* pu4QryInfoLen */
 
 	if (i4Ret != WLAN_STATUS_SUCCESS)
 		return -EFAULT;
@@ -1610,38 +1601,38 @@ static INT_32 HQA_SetFAGCRssiPath(struct net_device *prNetDev,
 
 static HQA_CMD_HANDLER HQA_CMD_SET2[] = {
 	/* cmd id start from 0x1200 */
-	HQA_ResetTxRxCounter,	/* 0x1200 */
-	HQA_GetStatistics,	/* 0x1201 */
-	HQA_GetRxOKData,	/* 0x1202 */
-	HQA_GetRxOKOther,	/* 0x1203 */
-	HQA_GetRxAllPktCount,	/* 0x1204 */
-	HQA_GetTxTransmitted,	/* 0x1205 */
-	HQA_GetHwCounter,	/* 0x1206 */
-	HQA_CalibrationOperation,	/* 0x1207 */
-	HQA_CalibrationBypassExt,	/* 0x1208 */
-	HQA_SetRXVectorIdx,	/* 0x1209 */
-	HQA_SetFAGCRssiPath,	/* 0x120A */
+	HQA_ResetTxRxCounter,	  /* 0x1200 */
+	HQA_GetStatistics,		  /* 0x1201 */
+	HQA_GetRxOKData,		  /* 0x1202 */
+	HQA_GetRxOKOther,		  /* 0x1203 */
+	HQA_GetRxAllPktCount,	  /* 0x1204 */
+	HQA_GetTxTransmitted,	  /* 0x1205 */
+	HQA_GetHwCounter,		  /* 0x1206 */
+	HQA_CalibrationOperation, /* 0x1207 */
+	HQA_CalibrationBypassExt, /* 0x1208 */
+	HQA_SetRXVectorIdx,		  /* 0x1209 */
+	HQA_SetFAGCRssiPath,	  /* 0x120A */
 };
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For MAC CR Read.
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For MAC CR Read.
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 HQA_MacBbpRegRead(struct net_device *prNetDev,
-				IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_MacBbpRegRead(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	UINT_32 u4Offset, u4Value;
-	INT_32 i4Status;
-	UINT_32 u4BufLen = 0;
-	P_GLUE_INFO_T prGlueInfo = NULL;
+	UINT_32						 u4Offset, u4Value;
+	INT_32						 i4Status;
+	UINT_32						 u4BufLen	= 0;
+	P_GLUE_INFO_T				 prGlueInfo = NULL;
 	PARAM_CUSTOM_MCR_RW_STRUCT_T rMcrInfo;
 
 	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_MacBbpRegRead\n");
@@ -1652,8 +1643,8 @@ static INT_32 HQA_MacBbpRegRead(struct net_device *prNetDev,
 	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_MacBbpRegRead Offset = 0x%08lx\n", u4Offset);
 
 	rMcrInfo.u4McrOffset = u4Offset;
-	rMcrInfo.u4McrData = 0;
-	prGlueInfo = *((P_GLUE_INFO_T *) netdev_priv(prNetDev));
+	rMcrInfo.u4McrData	 = 0;
+	prGlueInfo			 = *((P_GLUE_INFO_T *)netdev_priv(prNetDev));
 
 	i4Status = kalIoctl(prGlueInfo, wlanoidQueryMcrRead, &rMcrInfo, sizeof(rMcrInfo), TRUE, TRUE, TRUE, &u4BufLen);
 
@@ -1673,25 +1664,24 @@ static INT_32 HQA_MacBbpRegRead(struct net_device *prNetDev,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For MAC CR Write.
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For MAC CR Write.
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 HQA_MacBbpRegWrite(struct net_device *prNetDev,
-				 IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_MacBbpRegWrite(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-
-/*	INT_32 i4Ret = 0; */
-	UINT_32 u4Offset, u4Value;
-	INT_32 i4Status = 0;
-	UINT_32 u4BufLen = 0;
-	P_GLUE_INFO_T prGlueInfo = NULL;
+	/*	INT_32 i4Ret = 0; */
+	UINT_32						 u4Offset, u4Value;
+	INT_32						 i4Status	= 0;
+	UINT_32						 u4BufLen	= 0;
+	P_GLUE_INFO_T				 prGlueInfo = NULL;
 	PARAM_CUSTOM_MCR_RW_STRUCT_T rMcrInfo;
 
 	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_MacBbpRegWrite\n");
@@ -1700,14 +1690,14 @@ static INT_32 HQA_MacBbpRegWrite(struct net_device *prNetDev,
 	memcpy(&u4Value, HqaCmdFrame->Data + 4, 4);
 
 	u4Offset = ntohl(u4Offset);
-	u4Value = ntohl(u4Value);
+	u4Value	 = ntohl(u4Value);
 
 	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_MacBbpRegWrite Offset = 0x%08lx\n", u4Offset);
 	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_MacBbpRegWrite Value = 0x%08lx\n", u4Value);
 
 	rMcrInfo.u4McrOffset = u4Offset;
-	rMcrInfo.u4McrData = u4Value;
-	prGlueInfo = *((P_GLUE_INFO_T *) netdev_priv(prNetDev));
+	rMcrInfo.u4McrData	 = u4Value;
+	prGlueInfo			 = *((P_GLUE_INFO_T *)netdev_priv(prNetDev));
 
 	i4Status = kalIoctl(prGlueInfo, wlanoidSetMcrWrite, &rMcrInfo, sizeof(rMcrInfo), FALSE, FALSE, TRUE, &u4BufLen);
 
@@ -1718,24 +1708,24 @@ static INT_32 HQA_MacBbpRegWrite(struct net_device *prNetDev,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For Read Bulk MAC CR.
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For Read Bulk MAC CR.
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 HQA_MACBbpRegBulkRead(struct net_device *prNetDev,
-				    IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_MACBbpRegBulkRead(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	UINT_32 u4Index, u4Offset, u4Value;
-	UINT_16 u2Len;
-	INT_32 i4Status = 0;
-	UINT_32 u4BufLen = 0;
-	P_GLUE_INFO_T prGlueInfo = NULL;
+	UINT_32						 u4Index, u4Offset, u4Value;
+	UINT_16						 u2Len;
+	INT_32						 i4Status	= 0;
+	UINT_32						 u4BufLen	= 0;
+	P_GLUE_INFO_T				 prGlueInfo = NULL;
 	PARAM_CUSTOM_MCR_RW_STRUCT_T rMcrInfo;
 
 	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_MACBbpRegBulkRead\n");
@@ -1750,23 +1740,21 @@ static INT_32 HQA_MACBbpRegBulkRead(struct net_device *prNetDev,
 
 	for (u4Index = 0; u4Index < u2Len; u4Index++) {
 		rMcrInfo.u4McrOffset = u4Offset + u4Index * 4;
-		rMcrInfo.u4McrData = 0;
-		prGlueInfo = *((P_GLUE_INFO_T *) netdev_priv(prNetDev));
+		rMcrInfo.u4McrData	 = 0;
+		prGlueInfo			 = *((P_GLUE_INFO_T *)netdev_priv(prNetDev));
 
-		i4Status = kalIoctl(prGlueInfo,
-				    wlanoidQueryMcrRead, &rMcrInfo, sizeof(rMcrInfo), TRUE, TRUE, TRUE, &u4BufLen);
+		i4Status = kalIoctl(prGlueInfo, wlanoidQueryMcrRead, &rMcrInfo, sizeof(rMcrInfo), TRUE, TRUE, TRUE, &u4BufLen);
 
 		if (i4Status == 0) {
 			u4Value = rMcrInfo.u4McrData;
 
-			DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT Address = 0x%08lx, Result = 0x%08lx\n",
-			       u4Offset + u4Index * 4, u4Value);
+			DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT Address = 0x%08lx, Result = 0x%08lx\n", u4Offset + u4Index * 4,
+					u4Value);
 
 			u4Value = ntohl(u4Value);
-			if (2 + (u4Index * 4) + 4 > sizeof(HqaCmdFrame->Data))
-			{
-				DBGLOG(RFTEST, ERROR, "%s : memcpy data overflow, offset=%lu, ignored.\n",
-					__func__, 2 + (u4Index * 4) + 4);
+			if (2 + (u4Index * 4) + 4 > sizeof(HqaCmdFrame->Data)) {
+				DBGLOG(RFTEST, ERROR, "%s : memcpy data overflow, offset=%lu, ignored.\n", __func__,
+						2 + (u4Index * 4) + 4);
 				break;
 			}
 			memcpy(HqaCmdFrame->Data + 2 + (u4Index * 4), &u4Value, 4);
@@ -1780,23 +1768,23 @@ static INT_32 HQA_MACBbpRegBulkRead(struct net_device *prNetDev,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For Read Bulk RF CR.
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For Read Bulk RF CR.
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 HQA_RfRegBulkRead(struct net_device *prNetDev,
-				IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_RfRegBulkRead(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	UINT_32 u4Index, u4WfSel, u4Offset, u4Length, u4Value;
-	INT_32 i4Status = 0;
-	UINT_32 u4BufLen = 0;
-	P_GLUE_INFO_T prGlueInfo = NULL;
+	UINT_32						 u4Index, u4WfSel, u4Offset, u4Length, u4Value;
+	INT_32						 i4Status	= 0;
+	UINT_32						 u4BufLen	= 0;
+	P_GLUE_INFO_T				 prGlueInfo = NULL;
 	PARAM_CUSTOM_MCR_RW_STRUCT_T rMcrInfo;
 
 	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_RfRegBulkRead\n");
@@ -1817,32 +1805,29 @@ static INT_32 HQA_RfRegBulkRead(struct net_device *prNetDev,
 	else if (u4WfSel == 1)
 		u4Offset = u4Offset | 0x99910000;
 
-	if ((2 + (u4Length * 4)) > sizeof(HqaCmdFrame->Data)
-		|| (u4Length >> 30) != 0) {
-                /* avoid integer overflow by checking u4Length * 4: checking whether 2 MSB is 0*/
+	if ((2 + (u4Length * 4)) > sizeof(HqaCmdFrame->Data) || (u4Length >> 30) != 0) {
+		/* avoid integer overflow by checking u4Length * 4: checking whether 2 MSB is 0*/
 		i4Status = WLAN_STATUS_INVALID_LENGTH;
 		return i4Status;
 	}
 
 	for (u4Index = 0; u4Index < u4Length; u4Index++) {
 		rMcrInfo.u4McrOffset = u4Offset + u4Index * 4;
-		rMcrInfo.u4McrData = 0;
-		prGlueInfo = *((P_GLUE_INFO_T *) netdev_priv(prNetDev));
+		rMcrInfo.u4McrData	 = 0;
+		prGlueInfo			 = *((P_GLUE_INFO_T *)netdev_priv(prNetDev));
 
-		i4Status = kalIoctl(prGlueInfo,
-				    wlanoidQueryMcrRead, &rMcrInfo, sizeof(rMcrInfo), TRUE, TRUE, TRUE, &u4BufLen);
+		i4Status = kalIoctl(prGlueInfo, wlanoidQueryMcrRead, &rMcrInfo, sizeof(rMcrInfo), TRUE, TRUE, TRUE, &u4BufLen);
 
 		if (i4Status == 0) {
 			u4Value = rMcrInfo.u4McrData;
 
-			DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT Address = 0x%08lx, Result = 0x%08lx\n",
-			       u4Offset + u4Index * 4, u4Value);
+			DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT Address = 0x%08lx, Result = 0x%08lx\n", u4Offset + u4Index * 4,
+					u4Value);
 
 			u4Value = ntohl(u4Value);
-			if (2 + (u4Index * 4) + 4 > sizeof(HqaCmdFrame->Data))
-			{
-				DBGLOG(RFTEST, ERROR, "%s : memcpy data overflow, offset=%lu, ignored.\n",
-					__func__, 2 + (u4Index * 4) + 4);
+			if (2 + (u4Index * 4) + 4 > sizeof(HqaCmdFrame->Data)) {
+				DBGLOG(RFTEST, ERROR, "%s : memcpy data overflow, offset=%lu, ignored.\n", __func__,
+						2 + (u4Index * 4) + 4);
 				break;
 			}
 			memcpy(HqaCmdFrame->Data + 2 + (u4Index * 4), &u4Value, 4);
@@ -1856,23 +1841,23 @@ static INT_32 HQA_RfRegBulkRead(struct net_device *prNetDev,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For Write RF CR.
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For Write RF CR.
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 HQA_RfRegBulkWrite(struct net_device *prNetDev,
-				 IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_RfRegBulkWrite(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	UINT_32 u4WfSel, u4Offset, u4Length, u4Value;
-	INT_32 i4Status;
-	UINT_32 u4BufLen = 0;
-	P_GLUE_INFO_T prGlueInfo = NULL;
+	UINT_32						 u4WfSel, u4Offset, u4Length, u4Value;
+	INT_32						 i4Status;
+	UINT_32						 u4BufLen	= 0;
+	P_GLUE_INFO_T				 prGlueInfo = NULL;
 	PARAM_CUSTOM_MCR_RW_STRUCT_T rMcrInfo;
 
 	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_RfRegBulkWrite\n");
@@ -1896,10 +1881,9 @@ static INT_32 HQA_RfRegBulkWrite(struct net_device *prNetDev,
 	else if (u4WfSel == 1)
 		u4Offset = u4Offset | 0x99910000;
 
-
 	rMcrInfo.u4McrOffset = u4Offset;
-	rMcrInfo.u4McrData = u4Value;
-	prGlueInfo = *((P_GLUE_INFO_T *) netdev_priv(prNetDev));
+	rMcrInfo.u4McrData	 = u4Value;
+	prGlueInfo			 = *((P_GLUE_INFO_T *)netdev_priv(prNetDev));
 
 	i4Status = kalIoctl(prGlueInfo, wlanoidSetMcrWrite, &rMcrInfo, sizeof(rMcrInfo), FALSE, FALSE, TRUE, &u4BufLen);
 
@@ -1910,28 +1894,27 @@ static INT_32 HQA_RfRegBulkWrite(struct net_device *prNetDev,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
 static INT_32 HQA_ReadEEPROM(struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-
-	UINT_16 Offset;
-	UINT_16 Len;
+	UINT_16		Offset;
+	UINT_16		Len;
 	WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
 
-#if  (CFG_EEPROM_PAGE_ACCESS == 1)
-	UINT_32 u4BufLen = 0;
-	UINT_8  u4Index = 0;
-	UINT_16  u4Value = 0;
-	P_GLUE_INFO_T prGlueInfo = NULL;
+#if (CFG_EEPROM_PAGE_ACCESS == 1)
+	UINT_32						u4BufLen   = 0;
+	UINT_8						u4Index	   = 0;
+	UINT_16						u4Value	   = 0;
+	P_GLUE_INFO_T				prGlueInfo = NULL;
 	PARAM_CUSTOM_ACCESS_EFUSE_T rAccessEfuseInfo;
 #endif
 
@@ -1948,29 +1931,23 @@ static INT_32 HQA_ReadEEPROM(struct net_device *prNetDev, IN union iwreq_data *p
 		return WLAN_STATUS_FAILURE;
 	}
 
-#if  (CFG_EEPROM_PAGE_ACCESS == 1)
-	prGlueInfo = *((P_GLUE_INFO_T *) netdev_priv(prNetDev));
+#if (CFG_EEPROM_PAGE_ACCESS == 1)
+	prGlueInfo = *((P_GLUE_INFO_T *)netdev_priv(prNetDev));
 	kalMemSet(&rAccessEfuseInfo, 0, sizeof(PARAM_CUSTOM_ACCESS_EFUSE_T));
-
 
 	rAccessEfuseInfo.u4Address = (Offset / EFUSE_BLOCK_SIZE) * EFUSE_BLOCK_SIZE;
 
-
-	rStatus = kalIoctl(prGlueInfo,
-				wlanoidQueryProcessAccessEfuseRead,
-				&rAccessEfuseInfo,
-				sizeof(PARAM_CUSTOM_ACCESS_EFUSE_T), TRUE, TRUE, TRUE, &u4BufLen);
+	rStatus = kalIoctl(prGlueInfo, wlanoidQueryProcessAccessEfuseRead, &rAccessEfuseInfo,
+			sizeof(PARAM_CUSTOM_ACCESS_EFUSE_T), TRUE, TRUE, TRUE, &u4BufLen);
 
 	u4Index = Offset % EFUSE_BLOCK_SIZE;
 	if (u4Index <= 14)
-		u4Value = (prGlueInfo->prAdapter->aucEepromVaule[u4Index])
-					| (prGlueInfo->prAdapter->aucEepromVaule[u4Index+1] << 8);
+		u4Value = (prGlueInfo->prAdapter->aucEepromVaule[u4Index]) |
+				  (prGlueInfo->prAdapter->aucEepromVaule[u4Index + 1] << 8);
 
-
-    /* isVaild = pResult->u4Valid; */
+	/* isVaild = pResult->u4Valid; */
 
 	if (rStatus == WLAN_STATUS_SUCCESS) {
-
 		DBGLOG(INIT, INFO, "MT6632 : QA_AGENT HQA_ReadEEPROM u4Value = %x\n", u4Value);
 
 		u4Value = ntohl(u4Value);
@@ -1985,29 +1962,27 @@ static INT_32 HQA_ReadEEPROM(struct net_device *prNetDev, IN union iwreq_data *p
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 HQA_WriteEEPROM(struct net_device *prNetDev,
-			      IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_WriteEEPROM(struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
 	INT_32 i4Ret = 0;
 
-
-#if  (CFG_EEPROM_PAGE_ACCESS == 1)
-	UINT_16  u4WriteData = 0;
-	UINT_32 u4BufLen = 0;
-	UINT_8  u4Index = 0;
-	UINT_16 Offset;
-	WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
-	P_GLUE_INFO_T prGlueInfo = NULL;
+#if (CFG_EEPROM_PAGE_ACCESS == 1)
+	UINT_16						u4WriteData = 0;
+	UINT_32						u4BufLen	= 0;
+	UINT_8						u4Index		= 0;
+	UINT_16						Offset;
+	WLAN_STATUS					rStatus	   = WLAN_STATUS_SUCCESS;
+	P_GLUE_INFO_T				prGlueInfo = NULL;
 	PARAM_CUSTOM_ACCESS_EFUSE_T rAccessEfuseInfoWrite;
 
 	memcpy(&Offset, HqaCmdFrame->Data + 2 * 0, 2);
@@ -2015,7 +1990,7 @@ static INT_32 HQA_WriteEEPROM(struct net_device *prNetDev,
 	memcpy(&u4WriteData, HqaCmdFrame->Data + 2 * 1, 2);
 	u4WriteData = ntohs(u4WriteData);
 
-	prGlueInfo = *((P_GLUE_INFO_T *) netdev_priv(prNetDev));
+	prGlueInfo = *((P_GLUE_INFO_T *)netdev_priv(prNetDev));
 #if 0
     /* Read */
 	DBGLOG(INIT, INFO, "MT6632 : QA_AGENT HQA_ReadEEPROM\n");
@@ -2027,36 +2002,32 @@ static INT_32 HQA_WriteEEPROM(struct net_device *prNetDev,
 				sizeof(PARAM_CUSTOM_ACCESS_EFUSE_T), FALSE, FALSE, TRUE, &u4BufLen);
 #endif
 
-    /* Write */
+	/* Write */
 	DBGLOG(INIT, INFO, "HQA_WriteEEPROM : QA_AGENT HQA_WriteEEPROM\n");
 	kalMemSet(&rAccessEfuseInfoWrite, 0, sizeof(PARAM_CUSTOM_ACCESS_EFUSE_T));
 	u4Index = Offset % EFUSE_BLOCK_SIZE;
 
-	if (prGlueInfo->prAdapter->rWifiVar.ucEfuseBufferModeCal
-		== LOAD_EEPROM_BIN) {
+	if (prGlueInfo->prAdapter->rWifiVar.ucEfuseBufferModeCal == LOAD_EEPROM_BIN) {
 		if (Offset >= MAX_EEPROM_BUFFER_SIZE - 1) {
 			DBGLOG(INIT, ERROR, "HQA_WriteEEPROM : eeprom Offset error\n");
 			return -EINVAL;
 		}
-		uacEEPROMImage[Offset] = u4WriteData & 0xff;
+		uacEEPROMImage[Offset]	   = u4WriteData & 0xff;
 		uacEEPROMImage[Offset + 1] = u4WriteData >> 8 & 0xff;
 	} else {
-
 		if (u4Index >= EFUSE_BLOCK_SIZE - 1) {
 			DBGLOG(INIT, ERROR, "HQA_WriteEEPROM : eeprom Offset error\n");
 			return -EINVAL;
 		}
 
-		prGlueInfo->prAdapter->aucEepromVaule[u4Index] = u4WriteData & 0xff; /* Note: u4WriteData is UINT_16 */
-		prGlueInfo->prAdapter->aucEepromVaule[u4Index+1] = u4WriteData >> 8 & 0xff;
+		prGlueInfo->prAdapter->aucEepromVaule[u4Index]	   = u4WriteData & 0xff; /* Note: u4WriteData is UINT_16 */
+		prGlueInfo->prAdapter->aucEepromVaule[u4Index + 1] = u4WriteData >> 8 & 0xff;
 
 		kalMemCopy(rAccessEfuseInfoWrite.aucData, prGlueInfo->prAdapter->aucEepromVaule, 16);
-		rAccessEfuseInfoWrite.u4Address = (Offset / EFUSE_BLOCK_SIZE)*EFUSE_BLOCK_SIZE;
+		rAccessEfuseInfoWrite.u4Address = (Offset / EFUSE_BLOCK_SIZE) * EFUSE_BLOCK_SIZE;
 
-		rStatus = kalIoctl(prGlueInfo,
-					wlanoidQueryProcessAccessEfuseWrite,
-					&rAccessEfuseInfoWrite,
-					sizeof(PARAM_CUSTOM_ACCESS_EFUSE_T), FALSE, FALSE, TRUE, &u4BufLen);
+		rStatus = kalIoctl(prGlueInfo, wlanoidQueryProcessAccessEfuseWrite, &rAccessEfuseInfoWrite,
+				sizeof(PARAM_CUSTOM_ACCESS_EFUSE_T), FALSE, FALSE, TRUE, &u4BufLen);
 	}
 #endif
 
@@ -2067,34 +2038,34 @@ static INT_32 HQA_WriteEEPROM(struct net_device *prNetDev,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 HQA_ReadBulkEEPROM(struct net_device *prNetDev,
-				 IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_ReadBulkEEPROM(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Ret = 0;
+	INT_32	i4Ret = 0;
 	UINT_16 Offset;
 	UINT_16 Len;
-#if  (CFG_EEPROM_PAGE_ACCESS == 1)
+#if (CFG_EEPROM_PAGE_ACCESS == 1)
 	PARAM_CUSTOM_ACCESS_EFUSE_T rAccessEfuseInfo;
-	UINT_32 u4BufLen = 0;
-	UINT_8  u4Loop = 0;
-	uint32_t u4TotalOffset = 0;
+	UINT_32						u4BufLen	  = 0;
+	UINT_8						u4Loop		  = 0;
+	uint32_t					u4TotalOffset = 0;
 
-	UINT_16 Buffer;
+	UINT_16		  Buffer;
 	P_GLUE_INFO_T prGlueInfo = NULL;
-	WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
-	UINT_8 tmp = 0;
+	WLAN_STATUS	  rStatus	 = WLAN_STATUS_SUCCESS;
+	UINT_8		  tmp		 = 0;
 
-	prGlueInfo = *((P_GLUE_INFO_T *) netdev_priv(prNetDev));
+	prGlueInfo = *((P_GLUE_INFO_T *)netdev_priv(prNetDev));
 
 	kalMemSet(&rAccessEfuseInfo, 0, sizeof(PARAM_CUSTOM_ACCESS_EFUSE_T));
 #endif
@@ -2119,20 +2090,16 @@ static INT_32 HQA_ReadBulkEEPROM(struct net_device *prNetDev,
 	DBGLOG(INIT, INFO, "MT6632 : QA_AGENT HQA_ReadBulkEEPROM Offset : %d\n", Offset);
 	DBGLOG(INIT, INFO, "MT6632 : QA_AGENT HQA_ReadBulkEEPROM Len : %d\n", Len);
 
-#if  (CFG_EEPROM_PAGE_ACCESS == 1)
+#if (CFG_EEPROM_PAGE_ACCESS == 1)
 	rAccessEfuseInfo.u4Address = (Offset / EFUSE_BLOCK_SIZE) * EFUSE_BLOCK_SIZE;
 
 	DBGLOG(INIT, INFO, "MT6632 : QA_AGENT HQA_ReadBulkEEPROM Address : %d\n", rAccessEfuseInfo.u4Address);
 
-	if	((g_ucEepromCurrentMode == EFUSE_MODE)
-		&& (prGlueInfo->prAdapter->fgIsSupportQAAccessEfuse == TRUE)) {
-
+	if ((g_ucEepromCurrentMode == EFUSE_MODE) && (prGlueInfo->prAdapter->fgIsSupportQAAccessEfuse == TRUE)) {
 		/* Read from Efuse */
 		DBGLOG(INIT, INFO, "MT6632 : QA_AGENT HQA_ReadBulkEEPROM Efuse Mode\n");
-		rStatus = kalIoctl(prGlueInfo,
-					wlanoidQueryProcessAccessEfuseRead,
-					&rAccessEfuseInfo,
-					sizeof(PARAM_CUSTOM_ACCESS_EFUSE_T), TRUE, TRUE, TRUE, &u4BufLen);
+		rStatus = kalIoctl(prGlueInfo, wlanoidQueryProcessAccessEfuseRead, &rAccessEfuseInfo,
+				sizeof(PARAM_CUSTOM_ACCESS_EFUSE_T), TRUE, TRUE, TRUE, &u4BufLen);
 
 		if (rStatus == WLAN_STATUS_FAILURE)
 			DBGLOG(INIT, INFO, "MT6632 : QA_AGENT HQA_ReadBulkEEPROM kal fail\n");
@@ -2148,41 +2115,36 @@ static INT_32 HQA_ReadBulkEEPROM(struct net_device *prNetDev,
 		for (u4Loop = 0; u4Loop < Len; u4Loop += 2) {
 			u4TotalOffset = Offset + u4Loop;
 			if (u4TotalOffset >= EFUSE_BLOCK_SIZE - 1) {
-				DBGLOG(RFTEST, ERROR, "%s : memcpy data overflow, offset=%lu, ignored.\n",
-					__func__, Offset + u4TotalOffset + 2);
+				DBGLOG(RFTEST, ERROR, "%s : memcpy data overflow, offset=%lu, ignored.\n", __func__,
+						Offset + u4TotalOffset + 2);
 				break;
 			}
 			memcpy(&Buffer, prGlueInfo->prAdapter->aucEepromVaule + u4TotalOffset, 2);
 			Buffer = ntohs(Buffer);
 			DBGLOG(INIT, INFO, "MT6632 :From Efuse  u4Loop=%d  Buffer=%x\n", u4Loop, Buffer);
-			if (2 + u4Loop + 2 > sizeof(HqaCmdFrame->Data))
-			{
-				DBGLOG(RFTEST, ERROR, "%s : memcpy data overflow, offset=%lu, ignored.\n",
-					__func__, 2 + u4Loop + 2);
+			if (2 + u4Loop + 2 > sizeof(HqaCmdFrame->Data)) {
+				DBGLOG(RFTEST, ERROR, "%s : memcpy data overflow, offset=%lu, ignored.\n", __func__, 2 + u4Loop + 2);
 				break;
 			}
 			memcpy(HqaCmdFrame->Data + 2 + u4Loop, &Buffer, 2);
 		}
 
-	} else {  /* Read from EEPROM */
+	} else { /* Read from EEPROM */
 		for (u4Loop = 0; u4Loop < Len; u4Loop += 2) {
 			u4TotalOffset = Offset + u4Loop;
 			if (u4TotalOffset >= MAX_EEPROM_BUFFER_SIZE - 1) {
-				DBGLOG(RFTEST, ERROR, "%s : memcpy data overflow, offset=%lu, ignored.\n",
-					__func__, u4TotalOffset + 2);
+				DBGLOG(RFTEST, ERROR, "%s : memcpy data overflow, offset=%lu, ignored.\n", __func__, u4TotalOffset + 2);
 				break;
 			}
 			memcpy(&Buffer, uacEEPROMImage + u4TotalOffset, 2);
 			Buffer = ntohs(Buffer);
-			if (2 + u4Loop + 2 > sizeof(HqaCmdFrame->Data))
-			{
-				DBGLOG(RFTEST, ERROR, "%s : memcpy data overflow, offset=%lu, ignored.\n",
-					__func__, 2 + u4Loop + 2);
+			if (2 + u4Loop + 2 > sizeof(HqaCmdFrame->Data)) {
+				DBGLOG(RFTEST, ERROR, "%s : memcpy data overflow, offset=%lu, ignored.\n", __func__, 2 + u4Loop + 2);
 				break;
 			}
 			memcpy(HqaCmdFrame->Data + 2 + u4Loop, &Buffer, 2);
-			DBGLOG(INIT, INFO, "MT6632 : QA_AGENT HQA_ReadBulkEEPROM u4Loop=%d  u4Value=%x\n",
-				u4Loop, uacEEPROMImage[u4TotalOffset]);
+			DBGLOG(INIT, INFO, "MT6632 : QA_AGENT HQA_ReadBulkEEPROM u4Loop=%d  u4Value=%x\n", u4Loop,
+					uacEEPROMImage[u4TotalOffset]);
 		}
 	}
 #endif
@@ -2221,9 +2183,9 @@ static INT_32 HQA_ReadBulkEEPROM(struct net_device *prNetDev,
 			rSetEfuseBufModeInfo.ucSourceMode = 1;
 			rSetEfuseBufModeInfo.ucCount = EFUSE_CONTENT_SIZE;
 			rStatus = kalIoctl(prGlueInfo,
-					   wlanoidSetEfusBufferMode,
-					   &rSetEfuseBufModeInfo,
-					   sizeof(PARAM_CUSTOM_EFUSE_BUFFER_MODE_T), FALSE, FALSE, TRUE, &u4BufLen);
+						wlanoidSetEfusBufferMode,
+						&rSetEfuseBufModeInfo,
+						sizeof(PARAM_CUSTOM_EFUSE_BUFFER_MODE_T), FALSE, FALSE, TRUE, &u4BufLen);
 		}
 
 		g_BufferDownload = TRUE;
@@ -2236,42 +2198,41 @@ static INT_32 HQA_ReadBulkEEPROM(struct net_device *prNetDev,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 HQA_WriteBulkEEPROM(struct net_device *prNetDev,
-				  IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_WriteBulkEEPROM(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Ret = 0;
-	UINT_16 Offset;
-	UINT_16 Len;
+	INT_32		i4Ret = 0;
+	UINT_16		Offset;
+	UINT_16		Len;
 	P_ADAPTER_T prAdapter = NULL;
 
-	UINT_32 u4BufLen = 0;
+	UINT_32						u4BufLen = 0;
 	PARAM_CUSTOM_ACCESS_EFUSE_T rAccessEfuseInfoRead, rAccessEfuseInfoWrite;
-	UINT_16	*Buffer = NULL;
-	P_GLUE_INFO_T prGlueInfo = NULL;
-	WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
-	UINT_8  u4Loop = 0, u4Index = 0;
-	UINT_16 ucTemp2;
-	UINT_16 i = 0;
-	UINT_32 u4TotalOffset = 0;
+	UINT_16					*Buffer	   = NULL;
+	P_GLUE_INFO_T				prGlueInfo = NULL;
+	WLAN_STATUS					rStatus	   = WLAN_STATUS_SUCCESS;
+	UINT_8						u4Loop = 0, u4Index = 0;
+	UINT_16						ucTemp2;
+	UINT_16						i			  = 0;
+	UINT_32						u4TotalOffset = 0;
 
-	prGlueInfo = *((P_GLUE_INFO_T *) netdev_priv(prNetDev));
-	prAdapter = prGlueInfo->prAdapter;
+	prGlueInfo = *((P_GLUE_INFO_T *)netdev_priv(prNetDev));
+	prAdapter  = prGlueInfo->prAdapter;
 
 	kalMemSet(&rAccessEfuseInfoRead, 0, sizeof(PARAM_CUSTOM_ACCESS_EFUSE_T));
 	kalMemSet(&rAccessEfuseInfoWrite, 0, sizeof(PARAM_CUSTOM_ACCESS_EFUSE_T));
 
 	DBGLOG(INIT, INFO, "MT6632 : QA_AGENT HQA_WriteBulkEEPROM\n");
-
 
 	memcpy(&Offset, HqaCmdFrame->Data + 2 * 0, 2);
 	Offset = ntohs(Offset);
@@ -2291,14 +2252,12 @@ static INT_32 HQA_WriteBulkEEPROM(struct net_device *prNetDev,
 	DBGLOG(INIT, INFO, "MT6632 : QA_AGENT HQA_WriteBulkEEPROM Offset : %x\n", Offset);
 	DBGLOG(INIT, INFO, "MT6632 : QA_AGENT HQA_WriteBulkEEPROM Len : %d\n", Len);
 
-
 	/* Support Delay Calibraiton */
 	if (prGlueInfo->prAdapter->fgIsSupportQAAccessEfuse == TRUE) {
-
-		Buffer = kmalloc(sizeof(UINT_8)*(EFUSE_BLOCK_SIZE), GFP_KERNEL);
+		Buffer = kmalloc(sizeof(UINT_8) * (EFUSE_BLOCK_SIZE), GFP_KERNEL);
 		if (!Buffer)
 			return -ENOMEM;
-		kalMemSet(Buffer, 0, sizeof(UINT_8)*(EFUSE_BLOCK_SIZE));
+		kalMemSet(Buffer, 0, sizeof(UINT_8) * (EFUSE_BLOCK_SIZE));
 
 		kalMemCopy((UINT_8 *)Buffer, (UINT_8 *)HqaCmdFrame->Data + 4, Len);
 
@@ -2319,15 +2278,15 @@ static INT_32 HQA_WriteBulkEEPROM(struct net_device *prNetDev,
 
 #endif
 			if (Len > 2) {
-				for (u4Loop = 0; u4Loop < EFUSE_BLOCK_SIZE/2 ; u4Loop++) {
-					Buffer[u4Loop] = ntohs(Buffer[u4Loop]);
-					uacEEPROMImage[Offset] = Buffer[u4Loop] & 0xff;
+				for (u4Loop = 0; u4Loop < EFUSE_BLOCK_SIZE / 2; u4Loop++) {
+					Buffer[u4Loop]			   = ntohs(Buffer[u4Loop]);
+					uacEEPROMImage[Offset]	   = Buffer[u4Loop] & 0xff;
 					uacEEPROMImage[Offset + 1] = Buffer[u4Loop] >> 8 & 0xff;
 					Offset += 2;
 				}
 			} else {
-				*Buffer = ntohs(*Buffer);
-				uacEEPROMImage[Offset] = *Buffer & 0xff;
+				*Buffer					   = ntohs(*Buffer);
+				uacEEPROMImage[Offset]	   = *Buffer & 0xff;
 				uacEEPROMImage[Offset + 1] = *Buffer >> 8 & 0xff;
 			}
 		} else if (g_ucEepromCurrentMode == EFUSE_MODE) {
@@ -2336,22 +2295,19 @@ static INT_32 HQA_WriteBulkEEPROM(struct net_device *prNetDev,
 			DBGLOG(INIT, INFO, "MT6632 : QA_AGENT HQA_WriteBulkEEPROM  Read\n");
 			kalMemSet(&rAccessEfuseInfoRead, 0, sizeof(PARAM_CUSTOM_ACCESS_EFUSE_T));
 			rAccessEfuseInfoRead.u4Address = (Offset / EFUSE_BLOCK_SIZE) * EFUSE_BLOCK_SIZE;
-			rStatus = kalIoctl(prGlueInfo,
-						wlanoidQueryProcessAccessEfuseRead,
-						&rAccessEfuseInfoRead,
-						sizeof(PARAM_CUSTOM_ACCESS_EFUSE_T), TRUE, TRUE, TRUE, &u4BufLen);
+			rStatus = kalIoctl(prGlueInfo, wlanoidQueryProcessAccessEfuseRead, &rAccessEfuseInfoRead,
+					sizeof(PARAM_CUSTOM_ACCESS_EFUSE_T), TRUE, TRUE, TRUE, &u4BufLen);
 
 			/* Write */
 			kalMemSet(&rAccessEfuseInfoWrite, 0, sizeof(PARAM_CUSTOM_ACCESS_EFUSE_T));
 
 			if (Len > 2) {
-				for (u4Loop = 0; u4Loop < 8 ; u4Loop++)
+				for (u4Loop = 0; u4Loop < 8; u4Loop++)
 					Buffer[u4Loop] = ntohs(Buffer[u4Loop]);
 				memcpy(rAccessEfuseInfoWrite.aucData, Buffer, 16);
 			} else {
 				u4Index = Offset % EFUSE_BLOCK_SIZE;
-				DBGLOG(INIT, INFO, "MT6632:QA_AGENT HQA_WriteBulkEEPROM Wr,u4Index=%x\n",
-						u4Index);
+				DBGLOG(INIT, INFO, "MT6632:QA_AGENT HQA_WriteBulkEEPROM Wr,u4Index=%x\n", u4Index);
 
 				if (u4Index >= EFUSE_BLOCK_SIZE - 1) {
 					DBGLOG(INIT, ERROR, "MT6632 : efuse Offset error\n");
@@ -2359,89 +2315,76 @@ static INT_32 HQA_WriteBulkEEPROM(struct net_device *prNetDev,
 					goto exit;
 				}
 
-
 				*Buffer = ntohs(*Buffer);
-				DBGLOG(INIT, INFO, "MT6632 : Buffer[0]=%x, Buffer[0]&0xff=%x\n"
-					, Buffer[0], Buffer[0]&0xff);
-				DBGLOG(INIT, INFO, "MT6632 : Buffer[0] >> 8 & 0xff=%x\n"
-					, Buffer[0] >> 8 & 0xff);
+				DBGLOG(INIT, INFO, "MT6632 : Buffer[0]=%x, Buffer[0]&0xff=%x\n", Buffer[0], Buffer[0] & 0xff);
+				DBGLOG(INIT, INFO, "MT6632 : Buffer[0] >> 8 & 0xff=%x\n", Buffer[0] >> 8 & 0xff);
 
-				prGlueInfo->prAdapter->aucEepromVaule[u4Index] = *Buffer & 0xff;
-				prGlueInfo->prAdapter->aucEepromVaule[u4Index+1] = *Buffer >> 8 & 0xff;
+				prGlueInfo->prAdapter->aucEepromVaule[u4Index]	   = *Buffer & 0xff;
+				prGlueInfo->prAdapter->aucEepromVaule[u4Index + 1] = *Buffer >> 8 & 0xff;
 				kalMemCopy(rAccessEfuseInfoWrite.aucData, prGlueInfo->prAdapter->aucEepromVaule, 16);
 			}
 
-			rAccessEfuseInfoWrite.u4Address = (Offset / EFUSE_BLOCK_SIZE)*EFUSE_BLOCK_SIZE;
+			rAccessEfuseInfoWrite.u4Address = (Offset / EFUSE_BLOCK_SIZE) * EFUSE_BLOCK_SIZE;
 			for (u4Loop = 0; u4Loop < (EFUSE_BLOCK_SIZE); u4Loop++) {
-
-				DBGLOG(INIT, INFO, "MT6632 :  Loop=%d  aucData=%x\n",
-				u4Loop, rAccessEfuseInfoWrite.aucData[u4Loop]);
+				DBGLOG(INIT, INFO, "MT6632 :  Loop=%d  aucData=%x\n", u4Loop, rAccessEfuseInfoWrite.aucData[u4Loop]);
 			}
 
 			DBGLOG(INIT, INFO, "Going for e-Fuse\n");
 
-			rStatus = kalIoctl(prGlueInfo,
-							wlanoidQueryProcessAccessEfuseWrite,
-							&rAccessEfuseInfoWrite,
-							sizeof(PARAM_CUSTOM_ACCESS_EFUSE_T),
-							FALSE, TRUE, TRUE, &u4BufLen);
+			rStatus = kalIoctl(prGlueInfo, wlanoidQueryProcessAccessEfuseWrite, &rAccessEfuseInfoWrite,
+					sizeof(PARAM_CUSTOM_ACCESS_EFUSE_T), FALSE, TRUE, TRUE, &u4BufLen);
 		} else {
 			DBGLOG(INIT, INFO, "Invalid ID!!\n");
 		}
 	} else {
-
 		if (Len == 2) {
 			memcpy(&ucTemp2, HqaCmdFrame->Data + 2 * 2, 2);
 			ucTemp2 = ntohs(ucTemp2);
 			memcpy(uacEEPROMImage + Offset, &ucTemp2, Len);
 		} else {
-			for (i = 0 ; i < 8 ; i++) {
+			for (i = 0; i < 8; i++) {
 				/* Fix coverity issue: CID10708595 */
 				u4TotalOffset = Offset + 2 * i;
 				if (u4TotalOffset > MAX_EEPROM_BUFFER_SIZE - 1) {
 					DBGLOG(INIT, ERROR, "%s u4TotalOffset : %d not supported\n", __func__, u4TotalOffset);
 					return WLAN_STATUS_FAILURE;
 				}
-				memcpy(&ucTemp2, HqaCmdFrame->Data + 2 * 2 + 2*i, 2);
+				memcpy(&ucTemp2, HqaCmdFrame->Data + 2 * 2 + 2 * i, 2);
 				ucTemp2 = ntohs(ucTemp2);
 				memcpy(uacEEPROMImage + u4TotalOffset, &ucTemp2, 2);
 			}
 
 			if (!g_BufferDownload) {
-				UINT_16 u2InitAddr = Offset;
-				UINT_32 j = 0;
-				UINT_32 u4BufLen = 0;
-				WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
-				P_GLUE_INFO_T prGlueInfo = NULL;
+				UINT_16							  u2InitAddr			= Offset;
+				UINT_32							  j						= 0;
+				UINT_32							  u4BufLen				= 0;
+				WLAN_STATUS						  rStatus				= WLAN_STATUS_SUCCESS;
+				P_GLUE_INFO_T					  prGlueInfo			= NULL;
 				PARAM_CUSTOM_EFUSE_BUFFER_MODE_T *prSetEfuseBufModeInfo = NULL;
-				BIN_CONTENT_T *pBinContent;
+				BIN_CONTENT_T					  *pBinContent;
 
-				prSetEfuseBufModeInfo = (PARAM_CUSTOM_EFUSE_BUFFER_MODE_T *)
-					kalMemAlloc(sizeof(PARAM_CUSTOM_EFUSE_BUFFER_MODE_T), VIR_MEM_TYPE);
+				prSetEfuseBufModeInfo = (PARAM_CUSTOM_EFUSE_BUFFER_MODE_T *)kalMemAlloc(
+						sizeof(PARAM_CUSTOM_EFUSE_BUFFER_MODE_T), VIR_MEM_TYPE);
 				if (prSetEfuseBufModeInfo == NULL)
 					return 0;
 				kalMemZero(prSetEfuseBufModeInfo, sizeof(PARAM_CUSTOM_EFUSE_BUFFER_MODE_T));
 
-				prGlueInfo = *((P_GLUE_INFO_T *) netdev_priv(prNetDev));
+				prGlueInfo	= *((P_GLUE_INFO_T *)netdev_priv(prNetDev));
 				pBinContent = (BIN_CONTENT_T *)prSetEfuseBufModeInfo->aBinContent;
 
-				for (j = 0 ; j < 16 ; j++) {
-					pBinContent->u2Addr = u2InitAddr;
+				for (j = 0; j < 16; j++) {
+					pBinContent->u2Addr	 = u2InitAddr;
 					pBinContent->ucValue = uacEEPROMImage[u2InitAddr];
 
 					pBinContent++;
 				}
 
 				prSetEfuseBufModeInfo->ucSourceMode = 1;
-				prSetEfuseBufModeInfo->ucCount = EFUSE_CONTENT_SIZE;
-				rStatus = kalIoctl(prGlueInfo,
-							wlanoidSetEfusBufferMode,
-							(PVOID)prSetEfuseBufModeInfo,
-							sizeof(PARAM_CUSTOM_EFUSE_BUFFER_MODE_T),
-							FALSE, FALSE, TRUE, &u4BufLen);
+				prSetEfuseBufModeInfo->ucCount		= EFUSE_CONTENT_SIZE;
+				rStatus = kalIoctl(prGlueInfo, wlanoidSetEfusBufferMode, (PVOID)prSetEfuseBufModeInfo,
+						sizeof(PARAM_CUSTOM_EFUSE_BUFFER_MODE_T), FALSE, FALSE, TRUE, &u4BufLen);
 
-				kalMemFree(prSetEfuseBufModeInfo, VIR_MEM_TYPE,
-							sizeof(PARAM_CUSTOM_EFUSE_BUFFER_MODE_T));
+				kalMemFree(prSetEfuseBufModeInfo, VIR_MEM_TYPE, sizeof(PARAM_CUSTOM_EFUSE_BUFFER_MODE_T));
 
 				if (Offset == 0x4A0)
 					g_BufferDownload = TRUE;
@@ -2459,21 +2402,21 @@ exit:
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 HQA_CheckEfuseMode(struct net_device *prNetDev,
-				 IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_CheckEfuseMode(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32		i4Ret = 0;
-	UINT_32		Value = 0;
+	INT_32	i4Ret = 0;
+	UINT_32 Value = 0;
 
 	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_CheckEfuseMode\n");
 
@@ -2488,42 +2431,38 @@ static INT_32 HQA_CheckEfuseMode(struct net_device *prNetDev,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 HQA_GetFreeEfuseBlock(struct net_device *prNetDev,
-				    IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_GetFreeEfuseBlock(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-
 	INT_32 i4Ret = 0, u4FreeBlockCount = 0;
 
 #if (CFG_EEPROM_PAGE_ACCESS == 1)
 	PARAM_CUSTOM_EFUSE_FREE_BLOCK_T rEfuseFreeBlock;
-	WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
-	UINT_32 u4BufLen = 0;
-	P_GLUE_INFO_T prGlueInfo = NULL;
+	WLAN_STATUS						rStatus	   = WLAN_STATUS_SUCCESS;
+	UINT_32							u4BufLen   = 0;
+	P_GLUE_INFO_T					prGlueInfo = NULL;
 #endif
 
-	prGlueInfo = *((P_GLUE_INFO_T *) netdev_priv(prNetDev));
+	prGlueInfo = *((P_GLUE_INFO_T *)netdev_priv(prNetDev));
 
 	DBGLOG(INIT, INFO, "MT6632 : QA_AGENT HQA_GetFreeEfuseBlock\n");
 
-#if  (CFG_EEPROM_PAGE_ACCESS == 1)
+#if (CFG_EEPROM_PAGE_ACCESS == 1)
 	if (prGlueInfo->prAdapter->fgIsSupportGetFreeEfuseBlockCount == TRUE) {
 		kalMemSet(&rEfuseFreeBlock, 0, sizeof(PARAM_CUSTOM_EFUSE_FREE_BLOCK_T));
 
-
-		rStatus = kalIoctl(prGlueInfo,
-					wlanoidQueryEfuseFreeBlock,
-					&rEfuseFreeBlock,
-					sizeof(PARAM_CUSTOM_EFUSE_FREE_BLOCK_T), TRUE, TRUE, TRUE, &u4BufLen);
+		rStatus = kalIoctl(prGlueInfo, wlanoidQueryEfuseFreeBlock, &rEfuseFreeBlock,
+				sizeof(PARAM_CUSTOM_EFUSE_FREE_BLOCK_T), TRUE, TRUE, TRUE, &u4BufLen);
 
 		u4FreeBlockCount = prGlueInfo->prAdapter->u4FreeBlockNum;
 		u4FreeBlockCount = ntohl(u4FreeBlockCount);
@@ -2538,18 +2477,18 @@ static INT_32 HQA_GetFreeEfuseBlock(struct net_device *prNetDev,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 HQA_GetEfuseBlockNr(struct net_device *prNetDev,
-				  IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_GetEfuseBlockNr(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
 	INT_32 i4Ret = 0;
 
@@ -2562,18 +2501,18 @@ static INT_32 HQA_GetEfuseBlockNr(struct net_device *prNetDev,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 HQA_WriteEFuseFromBuffer(struct net_device *prNetDev,
-				       IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_WriteEFuseFromBuffer(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
 	INT_32 i4Ret = 0;
 
@@ -2586,27 +2525,27 @@ static INT_32 HQA_WriteEFuseFromBuffer(struct net_device *prNetDev,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
 static INT_32 HQA_GetTxPower(struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Ret = 0;
+	INT_32	i4Ret	  = 0;
 	UINT_32 u4Channel = 0, u4Band = 0, u4Ch_Band = 0, u4TxTargetPower = 0;
-/*	UINT_32 u4EfuseAddr = 0, u4Power = 0; */
+	/*	UINT_32 u4EfuseAddr = 0, u4Power = 0; */
 
 #if (CFG_EEPROM_PAGE_ACCESS == 1)
 	PARAM_CUSTOM_GET_TX_POWER_T rGetTxPower;
-	WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
-	UINT_32 u4BufLen = 0;
-	P_GLUE_INFO_T prGlueInfo = NULL;
+	WLAN_STATUS					rStatus	   = WLAN_STATUS_SUCCESS;
+	UINT_32						u4BufLen   = 0;
+	P_GLUE_INFO_T				prGlueInfo = NULL;
 #endif
 
 	memcpy(&u4Channel, HqaCmdFrame->Data + 4 * 0, 4);
@@ -2620,19 +2559,17 @@ static INT_32 HQA_GetTxPower(struct net_device *prNetDev, IN union iwreq_data *p
 	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_GetTxPower u4Band : %d\n", u4Band);
 	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_GetTxPower u4Ch_Band : %d\n", u4Ch_Band);
 
-	prGlueInfo = *((P_GLUE_INFO_T *) netdev_priv(prNetDev));
+	prGlueInfo = *((P_GLUE_INFO_T *)netdev_priv(prNetDev));
 
 	if (prGlueInfo->prAdapter->fgIsSupportGetTxPower == TRUE) {
 		kalMemSet(&rGetTxPower, 0, sizeof(PARAM_CUSTOM_GET_TX_POWER_T));
 
 		rGetTxPower.ucCenterChannel = u4Channel;
-		rGetTxPower.ucBand = u4Band;
-		rGetTxPower.ucDbdcIdx = u4Ch_Band;
+		rGetTxPower.ucBand			= u4Band;
+		rGetTxPower.ucDbdcIdx		= u4Ch_Band;
 
-		rStatus = kalIoctl(prGlueInfo,
-					wlanoidQueryGetTxPower,
-					&rGetTxPower,
-					sizeof(PARAM_CUSTOM_GET_TX_POWER_T), TRUE, TRUE, TRUE, &u4BufLen);
+		rStatus = kalIoctl(prGlueInfo, wlanoidQueryGetTxPower, &rGetTxPower, sizeof(PARAM_CUSTOM_GET_TX_POWER_T), TRUE,
+				TRUE, TRUE, &u4BufLen);
 
 		u4TxTargetPower = prGlueInfo->prAdapter->u4GetTxPower;
 		u4TxTargetPower = ntohl(u4TxTargetPower);
@@ -2645,27 +2582,26 @@ static INT_32 HQA_GetTxPower(struct net_device *prNetDev, IN union iwreq_data *p
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 HQA_SetCfgOnOff(struct net_device *prNetDev,
-			      IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_SetCfgOnOff(struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Ret = 0;
-	UINT_32 Type, Enable, Band;
-	P_GLUE_INFO_T prGlueInfo = NULL;
-	WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
+	INT_32						 i4Ret = 0;
+	UINT_32						 Type, Enable, Band;
+	P_GLUE_INFO_T				 prGlueInfo = NULL;
+	WLAN_STATUS					 rStatus	= WLAN_STATUS_SUCCESS;
 	PARAM_MTK_WIFI_TEST_STRUCT_T rRfATInfo;
-	UINT_32 u4BufLen = 0;
+	UINT_32						 u4BufLen = 0;
 
-	prGlueInfo = *((P_GLUE_INFO_T *) netdev_priv(prNetDev));
+	prGlueInfo = *((P_GLUE_INFO_T *)netdev_priv(prNetDev));
 
 	memcpy(&Type, HqaCmdFrame->Data + 4 * 0, 4);
 	Type = ntohl(Type);
@@ -2679,21 +2615,21 @@ static INT_32 HQA_SetCfgOnOff(struct net_device *prNetDev,
 	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_SetCfgOnOff Band : %d\n", Band);
 
 	rRfATInfo.u4FuncIndex = RF_AT_FUNCID_SET_TSSI;
-	rRfATInfo.u4FuncData = 0;
+	rRfATInfo.u4FuncData  = 0;
 
 	if (Band == 0 && Enable == 1)
 		rRfATInfo.u4FuncData |= BIT(0);
 	else if (Band == 1 && Enable == 1)
 		rRfATInfo.u4FuncData |= BIT(1);
 
-	rStatus = kalIoctl(prGlueInfo,	/* prGlueInfo */
-			   wlanoidRftestSetAutoTest,	/* pfnOidHandler */
-			   &rRfATInfo,	/* pvInfoBuf */
-			   sizeof(rRfATInfo),	/* u4InfoBufLen */
-			   FALSE,	/* fgRead */
-			   FALSE,	/* fgWaitResp */
-			   TRUE,	/* fgCmd */
-			   &u4BufLen);	/* pu4QryInfoLen */
+	rStatus = kalIoctl(prGlueInfo,	  /* prGlueInfo */
+			wlanoidRftestSetAutoTest, /* pfnOidHandler */
+			&rRfATInfo,				  /* pvInfoBuf */
+			sizeof(rRfATInfo),		  /* u4InfoBufLen */
+			FALSE,					  /* fgRead */
+			FALSE,					  /* fgWaitResp */
+			TRUE,					  /* fgCmd */
+			&u4BufLen);				  /* pu4QryInfoLen */
 
 	if (rStatus != WLAN_STATUS_SUCCESS)
 		return -EFAULT;
@@ -2705,32 +2641,32 @@ static INT_32 HQA_SetCfgOnOff(struct net_device *prNetDev,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 HQA_GetFreqOffset(struct net_device *prNetDev,
-				IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_GetFreqOffset(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Ret = 0;
-	UINT_32 u4FreqOffset = 0;
-	UINT_32 u4BufLen = 0;
-	P_GLUE_INFO_T prGlueInfo = NULL;
+	INT_32						 i4Ret		  = 0;
+	UINT_32						 u4FreqOffset = 0;
+	UINT_32						 u4BufLen	  = 0;
+	P_GLUE_INFO_T				 prGlueInfo	  = NULL;
 	PARAM_MTK_WIFI_TEST_STRUCT_T rRfATInfo;
 
-	prGlueInfo = *((P_GLUE_INFO_T *) netdev_priv(prNetDev));
+	prGlueInfo = *((P_GLUE_INFO_T *)netdev_priv(prNetDev));
 
 	rRfATInfo.u4FuncIndex = RF_AT_FUNCID_GET_FREQ_OFFSET;
-	rRfATInfo.u4FuncData = 0;
+	rRfATInfo.u4FuncData  = 0;
 
-	i4Ret = kalIoctl(prGlueInfo,
-			 wlanoidRftestQueryAutoTest, &rRfATInfo, sizeof(rRfATInfo), TRUE, TRUE, TRUE, &u4BufLen);
+	i4Ret = kalIoctl(
+			prGlueInfo, wlanoidRftestQueryAutoTest, &rRfATInfo, sizeof(rRfATInfo), TRUE, TRUE, TRUE, &u4BufLen);
 
 	if (i4Ret == 0) {
 		u4FreqOffset = rRfATInfo.u4FuncData;
@@ -2748,15 +2684,15 @@ static INT_32 HQA_GetFreqOffset(struct net_device *prNetDev,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
 static INT_32 HQA_DBDCTXTone(struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
@@ -2765,25 +2701,25 @@ static INT_32 HQA_DBDCTXTone(struct net_device *prNetDev, IN union iwreq_data *p
 	INT_32 i4BandIdx = 0, i4Control = 0, i4AntIndex = 0, i4ToneType = 0, i4ToneFreq = 0;
 	INT_32 i4DcOffsetI = 0, i4DcOffsetQ = 0, i4Band = 0, i4RF_Power = 0, i4Digi_Power = 0;
 
-	memcpy(&i4BandIdx, HqaCmdFrame->Data + 4 * 0, 4);	/* DBDC Band Index : Band0, Band1 */
+	memcpy(&i4BandIdx, HqaCmdFrame->Data + 4 * 0, 4); /* DBDC Band Index : Band0, Band1 */
 	i4BandIdx = ntohl(i4BandIdx);
-	memcpy(&i4Control, HqaCmdFrame->Data + 4 * 1, 4);	/* Control TX Tone Start and Stop */
+	memcpy(&i4Control, HqaCmdFrame->Data + 4 * 1, 4); /* Control TX Tone Start and Stop */
 	i4Control = ntohl(i4Control);
-	memcpy(&i4AntIndex, HqaCmdFrame->Data + 4 * 2, 4);	/* Select TX Antenna */
+	memcpy(&i4AntIndex, HqaCmdFrame->Data + 4 * 2, 4); /* Select TX Antenna */
 	i4AntIndex = ntohl(i4AntIndex);
-	memcpy(&i4ToneType, HqaCmdFrame->Data + 4 * 3, 4);	/* ToneType : Single or Two */
+	memcpy(&i4ToneType, HqaCmdFrame->Data + 4 * 3, 4); /* ToneType : Single or Two */
 	i4ToneType = ntohl(i4ToneType);
-	memcpy(&i4ToneFreq, HqaCmdFrame->Data + 4 * 4, 4);	/* ToneFreq: DC/5M/10M/20M/40M */
+	memcpy(&i4ToneFreq, HqaCmdFrame->Data + 4 * 4, 4); /* ToneFreq: DC/5M/10M/20M/40M */
 	i4ToneFreq = ntohl(i4ToneFreq);
-	memcpy(&i4DcOffsetI, HqaCmdFrame->Data + 4 * 5, 4);	/* DC Offset I : -512~1535 */
+	memcpy(&i4DcOffsetI, HqaCmdFrame->Data + 4 * 5, 4); /* DC Offset I : -512~1535 */
 	i4DcOffsetI = ntohl(i4DcOffsetI);
-	memcpy(&i4DcOffsetQ, HqaCmdFrame->Data + 4 * 6, 4);	/* DC Offset Q : -512~1535 */
+	memcpy(&i4DcOffsetQ, HqaCmdFrame->Data + 4 * 6, 4); /* DC Offset Q : -512~1535 */
 	i4DcOffsetQ = ntohl(i4DcOffsetQ);
-	memcpy(&i4Band, HqaCmdFrame->Data + 4 * 7, 4);	/* Band : 2.4G/5G */
+	memcpy(&i4Band, HqaCmdFrame->Data + 4 * 7, 4); /* Band : 2.4G/5G */
 	i4Band = ntohl(i4Band);
-	memcpy(&i4RF_Power, HqaCmdFrame->Data + 4 * 8, 4);	/* RF_Power: (1db) 0~15 */
+	memcpy(&i4RF_Power, HqaCmdFrame->Data + 4 * 8, 4); /* RF_Power: (1db) 0~15 */
 	i4RF_Power = ntohl(i4RF_Power);
-	memcpy(&i4Digi_Power, HqaCmdFrame->Data + 4 * 9, 4);	/* Digi_Power: (0.25db) -32~31 */
+	memcpy(&i4Digi_Power, HqaCmdFrame->Data + 4 * 9, 4); /* Digi_Power: (0.25db) -32~31 */
 	i4Digi_Power = ntohl(i4Digi_Power);
 
 	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_DBDCTXTone BandIdx = 0x%08lx\n", i4BandIdx);
@@ -2834,28 +2770,28 @@ static INT_32 HQA_DBDCTXTone(struct net_device *prNetDev, IN union iwreq_data *p
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 HQA_DBDCContinuousTX(struct net_device *prNetDev,
-				   IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_DBDCContinuousTX(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Ret = 0;
-	UINT_32 u4Band = 0, u4Control = 0, u4AntMask = 0, u4Phymode = 0, u4BW = 0;
-	UINT_32 u4Pri_Ch = 0, u4Rate = 0, u4Central_Ch = 0, u4TxfdMode = 0, u4Freq = 0;
-	UINT_32 u4BufLen = 0;
-	P_GLUE_INFO_T prGlueInfo = NULL;
-	WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
+	INT_32						 i4Ret	= 0;
+	UINT_32						 u4Band = 0, u4Control = 0, u4AntMask = 0, u4Phymode = 0, u4BW = 0;
+	UINT_32						 u4Pri_Ch = 0, u4Rate = 0, u4Central_Ch = 0, u4TxfdMode = 0, u4Freq = 0;
+	UINT_32						 u4BufLen	= 0;
+	P_GLUE_INFO_T				 prGlueInfo = NULL;
+	WLAN_STATUS					 rStatus	= WLAN_STATUS_SUCCESS;
 	PARAM_MTK_WIFI_TEST_STRUCT_T rRfATInfo;
 
-	prGlueInfo = *((P_GLUE_INFO_T *) netdev_priv(prNetDev));
+	prGlueInfo = *((P_GLUE_INFO_T *)netdev_priv(prNetDev));
 
 	memcpy(&u4Band, HqaCmdFrame->Data + 4 * 0, 4);
 	u4Band = ntohl(u4Band);
@@ -2876,15 +2812,15 @@ static INT_32 HQA_DBDCContinuousTX(struct net_device *prNetDev,
 	memcpy(&u4TxfdMode, HqaCmdFrame->Data + 4 * 8, 4);
 	u4TxfdMode = ntohl(u4TxfdMode);
 
-	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_DBDCContinuousTX u4Band : %d\n", u4Band);	/* ok */
-	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_DBDCContinuousTX u4Control : %d\n", u4Control);	/* ok */
-	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_DBDCContinuousTX u4AntMask : %d\n", u4AntMask);	/* ok */
-	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_DBDCContinuousTX u4Phymode : %d\n", u4Phymode);	/* ok */
-	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_DBDCContinuousTX u4BW : %d\n", u4BW);	/* ok */
-	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_DBDCContinuousTX u4Pri_Ch : %d\n", u4Pri_Ch);	/* ok */
-	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_DBDCContinuousTX u4Rate : %d\n", u4Rate);	/* ok */
-	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_DBDCContinuousTX u4Central_Ch : %d\n", u4Central_Ch);	/* ok */
-	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_DBDCContinuousTX u4TxfdMode : %d\n", u4TxfdMode);	/* ok */
+	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_DBDCContinuousTX u4Band : %d\n", u4Band);			  /* ok */
+	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_DBDCContinuousTX u4Control : %d\n", u4Control);		  /* ok */
+	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_DBDCContinuousTX u4AntMask : %d\n", u4AntMask);		  /* ok */
+	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_DBDCContinuousTX u4Phymode : %d\n", u4Phymode);		  /* ok */
+	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_DBDCContinuousTX u4BW : %d\n", u4BW);				  /* ok */
+	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_DBDCContinuousTX u4Pri_Ch : %d\n", u4Pri_Ch);		  /* ok */
+	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_DBDCContinuousTX u4Rate : %d\n", u4Rate);			  /* ok */
+	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_DBDCContinuousTX u4Central_Ch : %d\n", u4Central_Ch); /* ok */
+	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_DBDCContinuousTX u4TxfdMode : %d\n", u4TxfdMode);	  /* ok */
 
 	if (u4Control) {
 		MT_ATESetDBDCBandIndex(prNetDev, u4Band);
@@ -2928,61 +2864,61 @@ static INT_32 HQA_DBDCContinuousTX(struct net_device *prNetDev,
 		MT_ATESetSystemBW(prNetDev, u4BW);
 
 		rRfATInfo.u4FuncIndex = RF_AT_FUNCID_SET_CW_MODE;
-		rRfATInfo.u4FuncData = u4TxfdMode;
+		rRfATInfo.u4FuncData  = u4TxfdMode;
 
-		rStatus = kalIoctl(prGlueInfo,	/* prGlueInfo */
-				   wlanoidRftestSetAutoTest,	/* pfnOidHandler */
-				   &rRfATInfo,	/* pvInfoBuf */
-				   sizeof(rRfATInfo),	/* u4InfoBufLen */
-				   FALSE,	/* fgRead */
-				   FALSE,	/* fgWaitResp */
-				   TRUE,	/* fgCmd */
-				   &u4BufLen);	/* pu4QryInfoLen */
+		rStatus = kalIoctl(prGlueInfo,	  /* prGlueInfo */
+				wlanoidRftestSetAutoTest, /* pfnOidHandler */
+				&rRfATInfo,				  /* pvInfoBuf */
+				sizeof(rRfATInfo),		  /* u4InfoBufLen */
+				FALSE,					  /* fgRead */
+				FALSE,					  /* fgWaitResp */
+				TRUE,					  /* fgCmd */
+				&u4BufLen);				  /* pu4QryInfoLen */
 
 		if (rStatus != WLAN_STATUS_SUCCESS)
 			return -EFAULT;
 
 		rRfATInfo.u4FuncIndex = RF_AT_FUNCID_SET_ANTMASK;
-		rRfATInfo.u4FuncData = u4AntMask;
+		rRfATInfo.u4FuncData  = u4AntMask;
 
-		rStatus = kalIoctl(prGlueInfo,	/* prGlueInfo */
-				   wlanoidRftestSetAutoTest,	/* pfnOidHandler */
-				   &rRfATInfo,	/* pvInfoBuf */
-				   sizeof(rRfATInfo),	/* u4InfoBufLen */
-				   FALSE,	/* fgRead */
-				   FALSE,	/* fgWaitResp */
-				   TRUE,	/* fgCmd */
-				   &u4BufLen);	/* pu4QryInfoLen */
+		rStatus = kalIoctl(prGlueInfo,	  /* prGlueInfo */
+				wlanoidRftestSetAutoTest, /* pfnOidHandler */
+				&rRfATInfo,				  /* pvInfoBuf */
+				sizeof(rRfATInfo),		  /* u4InfoBufLen */
+				FALSE,					  /* fgRead */
+				FALSE,					  /* fgWaitResp */
+				TRUE,					  /* fgCmd */
+				&u4BufLen);				  /* pu4QryInfoLen */
 
 		if (rStatus != WLAN_STATUS_SUCCESS)
 			return -EFAULT;
 
 		rRfATInfo.u4FuncIndex = RF_AT_FUNCID_COMMAND;
-		rRfATInfo.u4FuncData = RF_AT_COMMAND_CW;
+		rRfATInfo.u4FuncData  = RF_AT_COMMAND_CW;
 
-		rStatus = kalIoctl(prGlueInfo,	/* prGlueInfo */
-				   wlanoidRftestSetAutoTest,	/* pfnOidHandler */
-				   &rRfATInfo,	/* pvInfoBuf */
-				   sizeof(rRfATInfo),	/* u4InfoBufLen */
-				   FALSE,	/* fgRead */
-				   FALSE,	/* fgWaitResp */
-				   TRUE,	/* fgCmd */
-				   &u4BufLen);	/* pu4QryInfoLen */
+		rStatus = kalIoctl(prGlueInfo,	  /* prGlueInfo */
+				wlanoidRftestSetAutoTest, /* pfnOidHandler */
+				&rRfATInfo,				  /* pvInfoBuf */
+				sizeof(rRfATInfo),		  /* u4InfoBufLen */
+				FALSE,					  /* fgRead */
+				FALSE,					  /* fgWaitResp */
+				TRUE,					  /* fgCmd */
+				&u4BufLen);				  /* pu4QryInfoLen */
 
 		if (rStatus != WLAN_STATUS_SUCCESS)
 			return -EFAULT;
 	} else {
 		rRfATInfo.u4FuncIndex = RF_AT_FUNCID_COMMAND;
-		rRfATInfo.u4FuncData = RF_AT_COMMAND_STOPTEST;
+		rRfATInfo.u4FuncData  = RF_AT_COMMAND_STOPTEST;
 
-		rStatus = kalIoctl(prGlueInfo,	/* prGlueInfo */
-				   wlanoidRftestSetAutoTest,	/* pfnOidHandler */
-				   &rRfATInfo,	/* pvInfoBuf */
-				   sizeof(rRfATInfo),	/* u4InfoBufLen */
-				   FALSE,	/* fgRead */
-				   FALSE,	/* fgWaitResp */
-				   TRUE,	/* fgCmd */
-				   &u4BufLen);	/* pu4QryInfoLen */
+		rStatus = kalIoctl(prGlueInfo,	  /* prGlueInfo */
+				wlanoidRftestSetAutoTest, /* pfnOidHandler */
+				&rRfATInfo,				  /* pvInfoBuf */
+				sizeof(rRfATInfo),		  /* u4InfoBufLen */
+				FALSE,					  /* fgRead */
+				FALSE,					  /* fgWaitResp */
+				TRUE,					  /* fgCmd */
+				&u4BufLen);				  /* pu4QryInfoLen */
 
 		if (rStatus != WLAN_STATUS_SUCCESS)
 			return -EFAULT;
@@ -2995,26 +2931,26 @@ static INT_32 HQA_DBDCContinuousTX(struct net_device *prNetDev,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 HQA_SetRXFilterPktLen(struct net_device *prNetDev,
-				    IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_SetRXFilterPktLen(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Ret = 0;
-	UINT_32 u4Band = 0, u4Control = 0, u4RxPktlen = 0;
-	P_GLUE_INFO_T prGlueInfo = NULL;
+	INT_32						 i4Ret	= 0;
+	UINT_32						 u4Band = 0, u4Control = 0, u4RxPktlen = 0;
+	P_GLUE_INFO_T				 prGlueInfo = NULL;
 	PARAM_MTK_WIFI_TEST_STRUCT_T rRfATInfo;
-	UINT_32 u4BufLen = 0;
+	UINT_32						 u4BufLen = 0;
 
-	prGlueInfo = *((P_GLUE_INFO_T *) netdev_priv(prNetDev));
+	prGlueInfo = *((P_GLUE_INFO_T *)netdev_priv(prNetDev));
 
 	memcpy(&u4Band, HqaCmdFrame->Data + 4 * 0, 4);
 	u4Band = ntohl(u4Band);
@@ -3028,8 +2964,8 @@ static INT_32 HQA_SetRXFilterPktLen(struct net_device *prNetDev,
 	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_SetRXFilterPktLen RxPktlen : %d\n", u4RxPktlen);
 
 	rRfATInfo.u4FuncIndex = RF_AT_FUNCID_RX_FILTER_PKT_LEN;
-	rRfATInfo.u4FuncData = (UINT_32) (u4RxPktlen & BITS(0, 23));
-	rRfATInfo.u4FuncData |= (UINT_32) (u4Band << 24);
+	rRfATInfo.u4FuncData  = (UINT_32)(u4RxPktlen & BITS(0, 23));
+	rRfATInfo.u4FuncData |= (UINT_32)(u4Band << 24);
 
 	if (u4Control == 1)
 		rRfATInfo.u4FuncData |= BIT(30);
@@ -3037,16 +2973,16 @@ static INT_32 HQA_SetRXFilterPktLen(struct net_device *prNetDev,
 		rRfATInfo.u4FuncData &= ~BIT(30);
 
 	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_SetRXFilterPktLen rRfATInfo.u4FuncData : 0x%08x\n",
-	       rRfATInfo.u4FuncData);
+			rRfATInfo.u4FuncData);
 
-	i4Ret = kalIoctl(prGlueInfo,	/* prGlueInfo */
-			 wlanoidRftestSetAutoTest,	/* pfnOidHandler */
-			 &rRfATInfo,	/* pvInfoBuf */
-			 sizeof(rRfATInfo),	/* u4InfoBufLen */
-			 FALSE,	/* fgRead */
-			 FALSE,	/* fgWaitResp */
-			 TRUE,	/* fgCmd */
-			 &u4BufLen);	/* pu4QryInfoLen */
+	i4Ret = kalIoctl(prGlueInfo,	  /* prGlueInfo */
+			wlanoidRftestSetAutoTest, /* pfnOidHandler */
+			&rRfATInfo,				  /* pvInfoBuf */
+			sizeof(rRfATInfo),		  /* u4InfoBufLen */
+			FALSE,					  /* fgRead */
+			FALSE,					  /* fgWaitResp */
+			TRUE,					  /* fgCmd */
+			&u4BufLen);				  /* pu4QryInfoLen */
 
 	if (i4Ret != WLAN_STATUS_SUCCESS)
 		return -EFAULT;
@@ -3058,34 +2994,34 @@ static INT_32 HQA_SetRXFilterPktLen(struct net_device *prNetDev,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
 static INT_32 HQA_GetTXInfo(struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	UINT_32 u4Txed_band0 = 0;
-	UINT_32 u4Txed_band1 = 0;
-	INT_32 i4Status;
-	UINT_32 u4BufLen = 0;
-	P_GLUE_INFO_T prGlueInfo = NULL;
+	UINT_32						 u4Txed_band0 = 0;
+	UINT_32						 u4Txed_band1 = 0;
+	INT_32						 i4Status;
+	UINT_32						 u4BufLen	= 0;
+	P_GLUE_INFO_T				 prGlueInfo = NULL;
 	PARAM_MTK_WIFI_TEST_STRUCT_T rRfATInfo;
 
-	prGlueInfo = *((P_GLUE_INFO_T *) netdev_priv(prNetDev));
+	prGlueInfo = *((P_GLUE_INFO_T *)netdev_priv(prNetDev));
 
 	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_GetTXInfo\n");
 
 	rRfATInfo.u4FuncIndex = RF_AT_FUNCID_TXED_COUNT;
-	rRfATInfo.u4FuncData = 0;
+	rRfATInfo.u4FuncData  = 0;
 
-	i4Status = kalIoctl(prGlueInfo,
-			    wlanoidRftestQueryAutoTest, &rRfATInfo, sizeof(rRfATInfo), TRUE, TRUE, TRUE, &u4BufLen);
+	i4Status = kalIoctl(
+			prGlueInfo, wlanoidRftestQueryAutoTest, &rRfATInfo, sizeof(rRfATInfo), TRUE, TRUE, TRUE, &u4BufLen);
 
 	if (i4Status == 0) {
 		u4Txed_band0 = rRfATInfo.u4FuncData;
@@ -3100,8 +3036,8 @@ static INT_32 HQA_GetTXInfo(struct net_device *prNetDev, IN union iwreq_data *pr
 	rRfATInfo.u4FuncIndex |= BIT(8);
 	rRfATInfo.u4FuncData = 0;
 
-	i4Status = kalIoctl(prGlueInfo,
-			    wlanoidRftestQueryAutoTest, &rRfATInfo, sizeof(rRfATInfo), TRUE, TRUE, TRUE, &u4BufLen);
+	i4Status = kalIoctl(
+			prGlueInfo, wlanoidRftestQueryAutoTest, &rRfATInfo, sizeof(rRfATInfo), TRUE, TRUE, TRUE, &u4BufLen);
 
 	if (i4Status == 0) {
 		u4Txed_band1 = rRfATInfo.u4FuncData;
@@ -3119,18 +3055,17 @@ static INT_32 HQA_GetTXInfo(struct net_device *prNetDev, IN union iwreq_data *pr
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 HQA_GetCfgOnOff(struct net_device *prNetDev,
-			      IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_GetCfgOnOff(struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
 	INT_32 i4Ret = 0;
 
@@ -3141,23 +3076,22 @@ static INT_32 HQA_GetCfgOnOff(struct net_device *prNetDev,
 	return i4Ret;
 }
 
-
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 HQA_SetBufferBin(struct net_device *prNetDev,
-			      IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_SetBufferBin(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 Ret = 0;
+	INT_32	Ret	 = 0;
 	UINT_32 data = 0;
 
 	kalMemCopy(&data, HqaCmdFrame->Data, sizeof(data));
@@ -3180,48 +3114,47 @@ static INT_32 HQA_SetBufferBin(struct net_device *prNetDev,
 	return Ret;
 }
 
-
 static HQA_CMD_HANDLER HQA_CMD_SET3[] = {
 	/* cmd id start from 0x1300 */
-	HQA_MacBbpRegRead,	/* 0x1300 */
-	HQA_MacBbpRegWrite,	/* 0x1301 */
-	HQA_MACBbpRegBulkRead,	/* 0x1302 */
-	HQA_RfRegBulkRead,	/* 0x1303 */
-	HQA_RfRegBulkWrite,	/* 0x1304 */
-	HQA_ReadEEPROM,		/* 0x1305 */
-	HQA_WriteEEPROM,	/* 0x1306 */
-	HQA_ReadBulkEEPROM,	/* 0x1307 */
-	HQA_WriteBulkEEPROM,	/* 0x1308 */
-	HQA_CheckEfuseMode,	/* 0x1309 */
-	HQA_GetFreeEfuseBlock,	/* 0x130A */
-	HQA_GetEfuseBlockNr,	/* 0x130B */
-	HQA_WriteEFuseFromBuffer,	/* 0x130C */
-	HQA_GetTxPower,		/* 0x130D */
-	HQA_SetCfgOnOff,	/* 0x130E */
-	HQA_GetFreqOffset,	/* 0x130F */
-	HQA_DBDCTXTone,		/* 0x1310 */
-	HQA_DBDCContinuousTX,	/* 0x1311 */
-	HQA_SetRXFilterPktLen,	/* 0x1312 */
-	HQA_GetTXInfo,		/* 0x1313 */
-	HQA_GetCfgOnOff,	/* 0x1314 */
-	NULL,					/* 0x1315 */
-	HQA_SetBufferBin,		/* 0x1316 */
+	HQA_MacBbpRegRead,		  /* 0x1300 */
+	HQA_MacBbpRegWrite,		  /* 0x1301 */
+	HQA_MACBbpRegBulkRead,	  /* 0x1302 */
+	HQA_RfRegBulkRead,		  /* 0x1303 */
+	HQA_RfRegBulkWrite,		  /* 0x1304 */
+	HQA_ReadEEPROM,			  /* 0x1305 */
+	HQA_WriteEEPROM,		  /* 0x1306 */
+	HQA_ReadBulkEEPROM,		  /* 0x1307 */
+	HQA_WriteBulkEEPROM,	  /* 0x1308 */
+	HQA_CheckEfuseMode,		  /* 0x1309 */
+	HQA_GetFreeEfuseBlock,	  /* 0x130A */
+	HQA_GetEfuseBlockNr,	  /* 0x130B */
+	HQA_WriteEFuseFromBuffer, /* 0x130C */
+	HQA_GetTxPower,			  /* 0x130D */
+	HQA_SetCfgOnOff,		  /* 0x130E */
+	HQA_GetFreqOffset,		  /* 0x130F */
+	HQA_DBDCTXTone,			  /* 0x1310 */
+	HQA_DBDCContinuousTX,	  /* 0x1311 */
+	HQA_SetRXFilterPktLen,	  /* 0x1312 */
+	HQA_GetTXInfo,			  /* 0x1313 */
+	HQA_GetCfgOnOff,		  /* 0x1314 */
+	NULL,					  /* 0x1315 */
+	HQA_SetBufferBin,		  /* 0x1316 */
 };
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 HQA_ReadTempReferenceValue(struct net_device *prNetDev,
-					 IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_ReadTempReferenceValue(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
 	INT_32 i4Ret = 0;
 
@@ -3234,31 +3167,31 @@ static INT_32 HQA_ReadTempReferenceValue(struct net_device *prNetDev,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For Get Thermal Value.
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For Get Thermal Value.
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 HQA_GetThermalValue(struct net_device *prNetDev,
-				  IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_GetThermalValue(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	UINT_32 u4Value;
-	UINT_32 u4BufLen = 0;
-	INT_32 i4Status;
-	P_GLUE_INFO_T prGlueInfo = NULL;
+	UINT_32						 u4Value;
+	UINT_32						 u4BufLen = 0;
+	INT_32						 i4Status;
+	P_GLUE_INFO_T				 prGlueInfo = NULL;
 	PARAM_MTK_WIFI_TEST_STRUCT_T rRfATInfo;
 
 	rRfATInfo.u4FuncIndex = RF_AT_FUNCID_TEMP_SENSOR;
-	rRfATInfo.u4FuncData = 0;
-	prGlueInfo = *((P_GLUE_INFO_T *) netdev_priv(prNetDev));
+	rRfATInfo.u4FuncData  = 0;
+	prGlueInfo			  = *((P_GLUE_INFO_T *)netdev_priv(prNetDev));
 
-	i4Status = kalIoctl(prGlueInfo,
-			    wlanoidRftestQueryAutoTest, &rRfATInfo, sizeof(rRfATInfo), TRUE, TRUE, TRUE, &u4BufLen);
+	i4Status = kalIoctl(
+			prGlueInfo, wlanoidRftestQueryAutoTest, &rRfATInfo, sizeof(rRfATInfo), TRUE, TRUE, TRUE, &u4BufLen);
 
 	if (i4Status == 0) {
 		u4Value = rRfATInfo.u4FuncData;
@@ -3277,18 +3210,18 @@ static INT_32 HQA_GetThermalValue(struct net_device *prNetDev,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 HQA_SetSideBandOption(struct net_device *prNetDev,
-				    IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_SetSideBandOption(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
 	INT_32 i4Ret = 0;
 
@@ -3301,22 +3234,22 @@ static INT_32 HQA_SetSideBandOption(struct net_device *prNetDev,
 
 static HQA_CMD_HANDLER HQA_CMD_SET4[] = {
 	/* cmd id start from 0x1400 */
-	HQA_ReadTempReferenceValue,	/* 0x1400 */
-	HQA_GetThermalValue,	/* 0x1401 */
-	HQA_SetSideBandOption,	/* 0x1402 */
+	HQA_ReadTempReferenceValue, /* 0x1400 */
+	HQA_GetThermalValue,		/* 0x1401 */
+	HQA_SetSideBandOption,		/* 0x1402 */
 };
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
 static INT_32 HQA_GetFWInfo(struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
@@ -3331,18 +3264,18 @@ static INT_32 HQA_GetFWInfo(struct net_device *prNetDev, IN union iwreq_data *pr
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 HQA_StartContinousTx(struct net_device *prNetDev,
-				   IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_StartContinousTx(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
 	INT_32 i4Ret = 0;
 
@@ -3355,15 +3288,15 @@ static INT_32 HQA_StartContinousTx(struct net_device *prNetDev,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
 static INT_32 HQA_SetSTBC(struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
@@ -3378,19 +3311,19 @@ static INT_32 HQA_SetSTBC(struct net_device *prNetDev, IN union iwreq_data *prIw
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For Set short GI.
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For Set short GI.
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
 static INT_32 HQA_SetShortGI(struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Ret = 0;
+	INT_32	i4Ret = 0;
 	UINT_32 u4ShortGi;
 
 	memcpy(&u4ShortGi, HqaCmdFrame->Data, 4);
@@ -3407,15 +3340,15 @@ static INT_32 HQA_SetShortGI(struct net_device *prNetDev, IN union iwreq_data *p
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
 static INT_32 HQA_SetDPD(struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
@@ -3430,35 +3363,34 @@ static INT_32 HQA_SetDPD(struct net_device *prNetDev, IN union iwreq_data *prIwR
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For Get Rx Statistics.
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For Get Rx Statistics.
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 HQA_GetRxStatisticsAll(struct net_device *prNetDev,
-				     IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_GetRxStatisticsAll(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Ret = 0;
-	P_GLUE_INFO_T prGlueInfo = NULL;
-	UINT_32 u4BufLen = 0;
+	INT_32						i4Ret	   = 0;
+	P_GLUE_INFO_T				prGlueInfo = NULL;
+	UINT_32						u4BufLen   = 0;
 	PARAM_CUSTOM_ACCESS_RX_STAT rRxStatisticsTest;
 
 	/* memset(&g_HqaRxStat, 0, sizeof(PARAM_RX_STAT_T)); */
-	prGlueInfo = *((P_GLUE_INFO_T *) netdev_priv(prNetDev));
+	prGlueInfo = *((P_GLUE_INFO_T *)netdev_priv(prNetDev));
 
 	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_GetRxStatisticsAll\n");
 
-	rRxStatisticsTest.u4SeqNum = u4RxStatSeqNum;
+	rRxStatisticsTest.u4SeqNum	 = u4RxStatSeqNum;
 	rRxStatisticsTest.u4TotalNum = HQA_RX_STATISTIC_NUM + 6;
 
-	i4Ret = kalIoctl(prGlueInfo,
-			 wlanoidQueryRxStatistics,
-			 &rRxStatisticsTest, sizeof(rRxStatisticsTest), TRUE, TRUE, TRUE, &u4BufLen);
+	i4Ret = kalIoctl(prGlueInfo, wlanoidQueryRxStatistics, &rRxStatisticsTest, sizeof(rRxStatisticsTest), TRUE, TRUE,
+			TRUE, &u4BufLen);
 
 	/* ASSERT(rRxStatisticsTest.u4SeqNum == u4RxStatSeqNum); */
 
@@ -3472,18 +3404,18 @@ static INT_32 HQA_GetRxStatisticsAll(struct net_device *prNetDev,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 HQA_StartContiTxTone(struct net_device *prNetDev,
-				   IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_StartContiTxTone(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
 	INT_32 i4Ret = 0;
 
@@ -3496,18 +3428,18 @@ static INT_32 HQA_StartContiTxTone(struct net_device *prNetDev,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 HQA_StopContiTxTone(struct net_device *prNetDev,
-				  IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_StopContiTxTone(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
 	INT_32 i4Ret = 0;
 
@@ -3520,21 +3452,21 @@ static INT_32 HQA_StopContiTxTone(struct net_device *prNetDev,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 HQA_CalibrationTestMode(struct net_device *prNetDev,
-				      IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_CalibrationTestMode(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Ret = 0;
-	UINT_32 u4Mode = 0;
+	INT_32	i4Ret	  = 0;
+	UINT_32 u4Mode	  = 0;
 	UINT_32 u4IcapLen = 0;
 
 	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_CalibrationTestMode\n");
@@ -3554,27 +3486,27 @@ static INT_32 HQA_CalibrationTestMode(struct net_device *prNetDev,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 HQA_DoCalibrationTestItem(struct net_device *prNetDev,
-					IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_DoCalibrationTestItem(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Status = 0;
-	UINT_32 u4Item = 0;
-	UINT_32 u4Band_idx = 0;
-	P_GLUE_INFO_T prGlueInfo = NULL;
+	INT_32						 i4Status	= 0;
+	UINT_32						 u4Item		= 0;
+	UINT_32						 u4Band_idx = 0;
+	P_GLUE_INFO_T				 prGlueInfo = NULL;
 	PARAM_MTK_WIFI_TEST_STRUCT_T rRfATInfo;
-	UINT_32 u4BufLen = 0;
+	UINT_32						 u4BufLen = 0;
 
-	prGlueInfo = *((P_GLUE_INFO_T *) netdev_priv(prNetDev));
+	prGlueInfo = *((P_GLUE_INFO_T *)netdev_priv(prNetDev));
 
 	memcpy(&u4Item, HqaCmdFrame->Data, 4);
 	u4Item = ntohl(u4Item);
@@ -3588,16 +3520,16 @@ static INT_32 HQA_DoCalibrationTestItem(struct net_device *prNetDev,
 	MT_ATESetDBDCBandIndex(prNetDev, u4Band_idx);
 
 	rRfATInfo.u4FuncIndex = RF_AT_FUNCID_SET_RECAL_CAL_STEP;
-	rRfATInfo.u4FuncData = u4Item;
+	rRfATInfo.u4FuncData  = u4Item;
 
-	i4Status = kalIoctl(prGlueInfo,	/* prGlueInfo */
-			    wlanoidRftestSetAutoTest,	/* pfnOidHandler */
-			    &rRfATInfo,	/* pvInfoBuf */
-			    sizeof(rRfATInfo),	/* u4InfoBufLen */
-			    FALSE,	/* fgRead */
-			    FALSE,	/* fgWaitResp */
-			    TRUE,	/* fgCmd */
-			    &u4BufLen);	/* pu4QryInfoLen */
+	i4Status = kalIoctl(prGlueInfo,	  /* prGlueInfo */
+			wlanoidRftestSetAutoTest, /* pfnOidHandler */
+			&rRfATInfo,				  /* pvInfoBuf */
+			sizeof(rRfATInfo),		  /* u4InfoBufLen */
+			FALSE,					  /* fgRead */
+			FALSE,					  /* fgWaitResp */
+			TRUE,					  /* fgCmd */
+			&u4BufLen);				  /* pu4QryInfoLen */
 
 	if (i4Status != WLAN_STATUS_SUCCESS)
 		return -EFAULT;
@@ -3609,18 +3541,18 @@ static INT_32 HQA_DoCalibrationTestItem(struct net_device *prNetDev,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 HQA_eFusePhysicalWrite(struct net_device *prNetDev,
-				     IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_eFusePhysicalWrite(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
 	INT_32 i4Ret = 0;
 
@@ -3633,18 +3565,18 @@ static INT_32 HQA_eFusePhysicalWrite(struct net_device *prNetDev,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 HQA_eFusePhysicalRead(struct net_device *prNetDev,
-				    IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_eFusePhysicalRead(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
 	INT_32 i4Ret = 0;
 
@@ -3657,18 +3589,18 @@ static INT_32 HQA_eFusePhysicalRead(struct net_device *prNetDev,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 HQA_eFuseLogicalRead(struct net_device *prNetDev,
-				   IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_eFuseLogicalRead(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
 	INT_32 i4Ret = 0;
 
@@ -3681,18 +3613,18 @@ static INT_32 HQA_eFuseLogicalRead(struct net_device *prNetDev,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 HQA_eFuseLogicalWrite(struct net_device *prNetDev,
-				    IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_eFuseLogicalWrite(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
 	INT_32 i4Ret = 0;
 
@@ -3705,19 +3637,19 @@ static INT_32 HQA_eFuseLogicalWrite(struct net_device *prNetDev,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
 static INT_32 HQA_TMRSetting(struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Ret = 0;
+	INT_32	i4Ret = 0;
 	UINT_32 u4Setting;
 	UINT_32 u4Version;
 	UINT_32 u4MPThres;
@@ -3746,15 +3678,15 @@ static INT_32 HQA_TMRSetting(struct net_device *prNetDev, IN union iwreq_data *p
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
 static INT_32 HQA_GetRxSNR(struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
@@ -3769,44 +3701,42 @@ static INT_32 HQA_GetRxSNR(struct net_device *prNetDev, IN union iwreq_data *prI
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 HQA_WriteBufferDone(struct net_device *prNetDev,
-				  IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_WriteBufferDone(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Ret = 0;
-	UINT_16	u2InitAddr;
+	INT_32	i4Ret = 0;
+	UINT_16 u2InitAddr;
 	UINT_32 Value;
-/*	UINT_32 i = 0, j = 0;
-*	UINT_32 u4BufLen = 0;
-*/
-	WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
+	/*	UINT_32 i = 0, j = 0;
+	 *	UINT_32 u4BufLen = 0;
+	 */
+	WLAN_STATUS	  rStatus	 = WLAN_STATUS_SUCCESS;
 	P_GLUE_INFO_T prGlueInfo = NULL;
-/*	PARAM_CUSTOM_EFUSE_BUFFER_MODE_T rSetEfuseBufModeInfo; */
+	/*	PARAM_CUSTOM_EFUSE_BUFFER_MODE_T rSetEfuseBufModeInfo; */
 	PARAM_CUSTOM_EFUSE_BUFFER_MODE_T *prSetEfuseBufModeInfo = NULL;
-	PUINT_8 pucConfigBuf = NULL;
-	UINT_32 u4ContentLen;
-	UINT_32 u4BufLen = 0;
-	P_ADAPTER_T prAdapter = NULL;
+	PUINT_8							  pucConfigBuf			= NULL;
+	UINT_32							  u4ContentLen;
+	UINT_32							  u4BufLen	= 0;
+	P_ADAPTER_T						  prAdapter = NULL;
 
-
-	prGlueInfo = *((P_GLUE_INFO_T *) netdev_priv(prNetDev));
-	prAdapter = prGlueInfo->prAdapter;
+	prGlueInfo = *((P_GLUE_INFO_T *)netdev_priv(prNetDev));
+	prAdapter  = prGlueInfo->prAdapter;
 
 #if (CFG_FW_Report_Efuse_Address)
 	u2InitAddr = prAdapter->u4EfuseStartAddress;
 #else
-	u2InitAddr = EFUSE_CONTENT_BUFFER_START;
+	u2InitAddr	 = EFUSE_CONTENT_BUFFER_START;
 #endif
-
 
 	memcpy(&Value, HqaCmdFrame->Data + 4 * 0, 4);
 	Value = ntohl(Value);
@@ -3816,15 +3746,15 @@ static INT_32 HQA_WriteBufferDone(struct net_device *prNetDev,
 	u4EepromMode = Value;
 
 	/* allocate memory for buffer mode info */
-	prSetEfuseBufModeInfo = (PARAM_CUSTOM_EFUSE_BUFFER_MODE_T *)
-		kalMemAlloc(sizeof(PARAM_CUSTOM_EFUSE_BUFFER_MODE_T), VIR_MEM_TYPE);
+	prSetEfuseBufModeInfo =
+			(PARAM_CUSTOM_EFUSE_BUFFER_MODE_T *)kalMemAlloc(sizeof(PARAM_CUSTOM_EFUSE_BUFFER_MODE_T), VIR_MEM_TYPE);
 	if (prSetEfuseBufModeInfo == NULL)
 		goto label_exit;
 	kalMemZero(prSetEfuseBufModeInfo, sizeof(PARAM_CUSTOM_EFUSE_BUFFER_MODE_T));
 
 	/* copy to the command buffer */
 #if (CFG_FW_Report_Efuse_Address)
-	u4ContentLen = (prAdapter->u4EfuseEndAddress)-(prAdapter->u4EfuseStartAddress)+1;
+	u4ContentLen = (prAdapter->u4EfuseEndAddress) - (prAdapter->u4EfuseStartAddress) + 1;
 #else
 	u4ContentLen = EFUSE_CONTENT_BUFFER_SIZE;
 #endif
@@ -3835,13 +3765,10 @@ static INT_32 HQA_WriteBufferDone(struct net_device *prNetDev,
 	prSetEfuseBufModeInfo->ucSourceMode = Value;
 
 	prSetEfuseBufModeInfo->ucCmdType = 0x1 | (prAdapter->rWifiVar.ucCalTimingCtrl << 4);
-	prSetEfuseBufModeInfo->ucCount   = 0xFF; /* ucCmdType 1 don't care the ucCount */
+	prSetEfuseBufModeInfo->ucCount	 = 0xFF; /* ucCmdType 1 don't care the ucCount */
 
-	rStatus = kalIoctl(prGlueInfo,
-			wlanoidSetEfusBufferMode,
-			(PVOID)prSetEfuseBufModeInfo,
-			sizeof(PARAM_CUSTOM_EFUSE_BUFFER_MODE_T),
-			FALSE, TRUE, TRUE, &u4BufLen);
+	rStatus = kalIoctl(prGlueInfo, wlanoidSetEfusBufferMode, (PVOID)prSetEfuseBufModeInfo,
+			sizeof(PARAM_CUSTOM_EFUSE_BUFFER_MODE_T), FALSE, TRUE, TRUE, &u4BufLen);
 
 #if 0
 	for (i = 0 ; i < MAX_EEPROM_BUFFER_SIZE/16 ; i++) {
@@ -3856,9 +3783,9 @@ static INT_32 HQA_WriteBufferDone(struct net_device *prNetDev,
 		rSetEfuseBufModeInfo.ucSourceMode = 1;
 		rSetEfuseBufModeInfo.ucCount = EFUSE_CONTENT_SIZE;
 		rStatus = kalIoctl(prGlueInfo,
-				   wlanoidSetEfusBufferMode,
-				   &rSetEfuseBufModeInfo,
-				   sizeof(PARAM_CUSTOM_EFUSE_BUFFER_MODE_T), FALSE, FALSE, TRUE, &u4BufLen);
+					wlanoidSetEfusBufferMode,
+					&rSetEfuseBufModeInfo,
+					sizeof(PARAM_CUSTOM_EFUSE_BUFFER_MODE_T), FALSE, FALSE, TRUE, &u4BufLen);
 	}
 #endif
 
@@ -3878,15 +3805,15 @@ label_exit:
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
 static INT_32 HQA_FFT(struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
@@ -3901,18 +3828,18 @@ static INT_32 HQA_FFT(struct net_device *prNetDev, IN union iwreq_data *prIwReqD
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 HQA_SetTxTonePower(struct net_device *prNetDev,
-				 IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_SetTxTonePower(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
 	INT_32 i4Ret = 0;
 
@@ -3925,34 +3852,34 @@ static INT_32 HQA_SetTxTonePower(struct net_device *prNetDev,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
 static INT_32 HQA_GetChipID(struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Ret = 0;
-	UINT_32 u4ChipId;
+	INT_32					 i4Ret = 0;
+	UINT_32					 u4ChipId;
 	struct mt66xx_chip_info *prChipInfo;
-	P_ADAPTER_T prAdapter = NULL;
-	P_GLUE_INFO_T prGlueInfo = NULL;
-/*	UINT_32 u4BufLen = 0;
-*	PARAM_CUSTOM_MCR_RW_STRUCT_T rMcrInfo;
-*/
+	P_ADAPTER_T				 prAdapter	= NULL;
+	P_GLUE_INFO_T			 prGlueInfo = NULL;
+	/*	UINT_32 u4BufLen = 0;
+	 *	PARAM_CUSTOM_MCR_RW_STRUCT_T rMcrInfo;
+	 */
 
 	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_GetChipID\n");
 
-	prGlueInfo = *((P_GLUE_INFO_T *) netdev_priv(prNetDev));
-	prAdapter = prGlueInfo->prAdapter;
-	prChipInfo = prAdapter->chip_info;
+	prGlueInfo	= *((P_GLUE_INFO_T *)netdev_priv(prNetDev));
+	prAdapter	= prGlueInfo->prAdapter;
+	prChipInfo	= prAdapter->chip_info;
 	g_u4Chip_ID = prChipInfo->chip_id;
-	u4ChipId = g_u4Chip_ID;
+	u4ChipId	= g_u4Chip_ID;
 
 	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_GetChipID ChipId = 0x%08lx\n", u4ChipId);
 
@@ -3965,55 +3892,55 @@ static INT_32 HQA_GetChipID(struct net_device *prNetDev, IN union iwreq_data *pr
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 HQA_MPSSetSeqData(struct net_device *prNetDev,
-				IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_MPSSetSeqData(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32		i4Ret = 0;
-	UINT_32		*mps_setting = NULL;
-	UINT_32		u4Band_idx = 0;
-	UINT_32		u4Offset = 0;
-	UINT_32		u4Len = 0;
-	UINT_32		i = 0;
-	UINT_32		u4Value = 0;
-	UINT_32		u4Mode = 0;
-	UINT_32		u4TxPath = 0;
-	UINT_32		u4Mcs = 0;
+	INT_32	 i4Ret		 = 0;
+	UINT_32 *mps_setting = NULL;
+	UINT_32	 u4Band_idx	 = 0;
+	UINT_32	 u4Offset	 = 0;
+	UINT_32	 u4Len		 = 0;
+	UINT_32	 i			 = 0;
+	UINT_32	 u4Value	 = 0;
+	UINT_32	 u4Mode		 = 0;
+	UINT_32	 u4TxPath	 = 0;
+	UINT_32	 u4Mcs		 = 0;
 
-	u4Len = ntohs(HqaCmdFrame->Length)/sizeof(UINT_32) - 1;
+	u4Len = ntohs(HqaCmdFrame->Length) / sizeof(UINT_32) - 1;
 
 	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_MPSSetSeqData u4Len : %d\n", u4Len);
 
-	mps_setting = kmalloc(sizeof(UINT_32)*(u4Len), GFP_KERNEL);
+	mps_setting = kmalloc(sizeof(UINT_32) * (u4Len), GFP_KERNEL);
 
 	memcpy(&u4Band_idx, HqaCmdFrame->Data + 4 * 0, 4);
 	u4Band_idx = ntohl(u4Band_idx);
 
 	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_MPSSetSeqData u4Band_idx : %d\n", u4Band_idx);
 
-	for (i = 0 ; i < u4Len ; i++) {
+	for (i = 0; i < u4Len; i++) {
 		u4Offset = 4 + 4 * i;
 		if (u4Offset + 4 > sizeof(HqaCmdFrame->Data)) /* Reserved at least 4 byte availbale data */
 			break;
-		memcpy(&u4Value, HqaCmdFrame->Data + 4 + 4*i, 4);
+		memcpy(&u4Value, HqaCmdFrame->Data + 4 + 4 * i, 4);
 		u4Value = ntohl(u4Value);
 
-		u4Mode = (u4Value & BITS(24, 27)) >> 24;
+		u4Mode	 = (u4Value & BITS(24, 27)) >> 24;
 		u4TxPath = (u4Value & BITS(8, 23)) >> 8;
-		u4Mcs = (u4Value & BITS(0, 7));
+		u4Mcs	 = (u4Value & BITS(0, 7));
 
 		DBGLOG(RFTEST, INFO,
-			"MT6632 : QA_AGENT HQA_MPSSetSeqData mps_setting Case %d (Mode : %d / TX Path : %d / MCS : %d)\n"
-			, i, u4Mode, u4TxPath, u4Mcs);
+				"MT6632 : QA_AGENT HQA_MPSSetSeqData mps_setting Case %d (Mode : %d / TX Path : %d / MCS : %d)\n", i,
+				u4Mode, u4TxPath, u4Mcs);
 
 		if (u4Mode == 1) {
 			u4Mode = 0;
@@ -4044,12 +3971,9 @@ static INT_32 HQA_MPSSetSeqData(struct net_device *prNetDev,
 		mps_setting[i] = (u4Mcs) | (u4TxPath << 8) | (u4Mode << 24);
 
 		DBGLOG(RFTEST, INFO,
-			"MT6632 : QA_AGENT HQA_MPSSetSeqData mps_setting Case %d (Mode : %d / TX Path : %d / MCS : %d)\n",
-			i,
-			(mps_setting[i] & BITS(24, 27)) >> 24,
-			(mps_setting[i] & BITS(8, 23)) >> 8,
-			(mps_setting[i] & BITS(0, 7)));
-
+				"MT6632 : QA_AGENT HQA_MPSSetSeqData mps_setting Case %d (Mode : %d / TX Path : %d / MCS : %d)\n", i,
+				(mps_setting[i] & BITS(24, 27)) >> 24, (mps_setting[i] & BITS(8, 23)) >> 8,
+				(mps_setting[i] & BITS(0, 7)));
 	}
 
 	i4Ret = MT_ATEMPSSetSeqData(prNetDev, u4Len, mps_setting, u4Band_idx);
@@ -4063,48 +3987,47 @@ static INT_32 HQA_MPSSetSeqData(struct net_device *prNetDev,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 HQA_MPSSetPayloadLength(struct net_device *prNetDev,
-				      IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_MPSSetPayloadLength(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32		i4Ret = 0;
-	UINT_32		*mps_setting = NULL;
-	UINT_32		u4Band_idx = 0;
-	UINT_32		u4Offset = 0;
-	UINT_32		u4Len = 0;
-	UINT_32		i = 0;
-	UINT_32		u4Value = 0;
+	INT_32	 i4Ret		 = 0;
+	UINT_32 *mps_setting = NULL;
+	UINT_32	 u4Band_idx	 = 0;
+	UINT_32	 u4Offset	 = 0;
+	UINT_32	 u4Len		 = 0;
+	UINT_32	 i			 = 0;
+	UINT_32	 u4Value	 = 0;
 
-	u4Len = ntohs(HqaCmdFrame->Length)/sizeof(UINT_32) - 1;
+	u4Len = ntohs(HqaCmdFrame->Length) / sizeof(UINT_32) - 1;
 
 	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_MPSSetPayloadLength u4Len : %d\n", u4Len);
 
-	mps_setting = kmalloc(sizeof(UINT_32)*(u4Len), GFP_KERNEL);
+	mps_setting = kmalloc(sizeof(UINT_32) * (u4Len), GFP_KERNEL);
 
 	memcpy(&u4Band_idx, HqaCmdFrame->Data + 4 * 0, 4);
 	u4Band_idx = ntohl(u4Band_idx);
 
 	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_MPSSetPayloadLength u4Band_idx : %d\n", u4Band_idx);
 
-	for (i = 0 ; i < u4Len ; i++) {
+	for (i = 0; i < u4Len; i++) {
 		u4Offset = 4 + 4 * i;
 		if (u4Offset + 4 > sizeof(HqaCmdFrame->Data)) /* Reserved at least 4 byte availbale data */
 			break;
-		memcpy(&u4Value, HqaCmdFrame->Data + 4 + 4*i, 4);
+		memcpy(&u4Value, HqaCmdFrame->Data + 4 + 4 * i, 4);
 		mps_setting[i] = ntohl(u4Value);
 
-		DBGLOG(RFTEST, INFO,
-			"MT6632 : QA_AGENT HQA_MPSSetPayloadLength mps_setting Case %d (Payload Length : %d)\n",
-			i, mps_setting[i]);
+		DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_MPSSetPayloadLength mps_setting Case %d (Payload Length : %d)\n", i,
+				mps_setting[i]);
 	}
 
 	i4Ret = MT_ATEMPSSetPayloadLength(prNetDev, u4Len, mps_setting, u4Band_idx);
@@ -4118,48 +4041,47 @@ static INT_32 HQA_MPSSetPayloadLength(struct net_device *prNetDev,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 HQA_MPSSetPacketCount(struct net_device *prNetDev,
-				    IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_MPSSetPacketCount(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32		i4Ret = 0;
-	UINT_32		*mps_setting = NULL;
-	UINT_32		u4Band_idx = 0;
-	UINT_32		u4Offset = 0;
-	UINT_32		u4Len = 0;
-	UINT_32		i = 0;
-	UINT_32		u4Value = 0;
+	INT_32	 i4Ret		 = 0;
+	UINT_32 *mps_setting = NULL;
+	UINT_32	 u4Band_idx	 = 0;
+	UINT_32	 u4Offset	 = 0;
+	UINT_32	 u4Len		 = 0;
+	UINT_32	 i			 = 0;
+	UINT_32	 u4Value	 = 0;
 
-	u4Len = ntohs(HqaCmdFrame->Length)/sizeof(UINT_32) - 1;
+	u4Len = ntohs(HqaCmdFrame->Length) / sizeof(UINT_32) - 1;
 
 	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_MPSSetPacketCount u4Len : %d\n", u4Len);
 
-	mps_setting = kmalloc(sizeof(UINT_32)*(u4Len), GFP_KERNEL);
+	mps_setting = kmalloc(sizeof(UINT_32) * (u4Len), GFP_KERNEL);
 
 	memcpy(&u4Band_idx, HqaCmdFrame->Data + 4 * 0, 4);
 	u4Band_idx = ntohl(u4Band_idx);
 
 	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_MPSSetPacketCount u4Band_idx : %d\n", u4Band_idx);
 
-	for (i = 0 ; i < u4Len ; i++) {
+	for (i = 0; i < u4Len; i++) {
 		u4Offset = 4 + 4 * i;
 		if (u4Offset + 4 > sizeof(HqaCmdFrame->Data)) /* Reserved at least 4 byte availbale data */
 			break;
-		memcpy(&u4Value, HqaCmdFrame->Data + 4 + 4*i, 4);
+		memcpy(&u4Value, HqaCmdFrame->Data + 4 + 4 * i, 4);
 		mps_setting[i] = ntohl(u4Value);
 
-		DBGLOG(RFTEST, INFO,
-			"MT6632 : QA_AGENT HQA_MPSSetPacketCount mps_setting Case %d (Packet Count : %d)\n",
-			i, mps_setting[i]);
+		DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_MPSSetPacketCount mps_setting Case %d (Packet Count : %d)\n", i,
+				mps_setting[i]);
 	}
 
 	i4Ret = MT_ATEMPSSetPacketCount(prNetDev, u4Len, mps_setting, u4Band_idx);
@@ -4173,47 +4095,47 @@ static INT_32 HQA_MPSSetPacketCount(struct net_device *prNetDev,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 HQA_MPSSetPowerGain(struct net_device *prNetDev,
-				  IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_MPSSetPowerGain(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32		i4Ret = 0;
-	UINT_32		*mps_setting = NULL;
-	UINT_32		u4Band_idx = 0;
-	UINT_32		u4Offset = 0;
-	UINT_32		u4Len = 0;
-	UINT_32		i = 0;
-	UINT_32		u4Value = 0;
+	INT_32	 i4Ret		 = 0;
+	UINT_32 *mps_setting = NULL;
+	UINT_32	 u4Band_idx	 = 0;
+	UINT_32	 u4Offset	 = 0;
+	UINT_32	 u4Len		 = 0;
+	UINT_32	 i			 = 0;
+	UINT_32	 u4Value	 = 0;
 
-	u4Len = ntohs(HqaCmdFrame->Length)/sizeof(UINT_32) - 1;
+	u4Len = ntohs(HqaCmdFrame->Length) / sizeof(UINT_32) - 1;
 
 	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_MPSSetPowerGain u4Len : %d\n", u4Len);
 
-	mps_setting = kmalloc(sizeof(UINT_32)*(u4Len), GFP_KERNEL);
+	mps_setting = kmalloc(sizeof(UINT_32) * (u4Len), GFP_KERNEL);
 
 	memcpy(&u4Band_idx, HqaCmdFrame->Data + 4 * 0, 4);
 	u4Band_idx = ntohl(u4Band_idx);
 
 	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_MPSSetPowerGain u4Band_idx : %d\n", u4Band_idx);
 
-	for (i = 0 ; i < u4Len ; i++) {
+	for (i = 0; i < u4Len; i++) {
 		u4Offset = 4 + 4 * i;
 		if (u4Offset + 4 > sizeof(HqaCmdFrame->Data)) /* Reserved at least 4 byte availbale data */
 			break;
-		memcpy(&u4Value, HqaCmdFrame->Data + 4 + 4*i, 4);
+		memcpy(&u4Value, HqaCmdFrame->Data + 4 + 4 * i, 4);
 		mps_setting[i] = ntohl(u4Value);
 
-		DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_MPSSetPowerGain mps_setting Case %d (Power : %d)\n",
-			i, mps_setting[i]);
+		DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_MPSSetPowerGain mps_setting Case %d (Power : %d)\n", i,
+				mps_setting[i]);
 	}
 
 	i4Ret = MT_ATEMPSSetPowerGain(prNetDev, u4Len, mps_setting, u4Band_idx);
@@ -4227,20 +4149,20 @@ static INT_32 HQA_MPSSetPowerGain(struct net_device *prNetDev,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
 static INT_32 HQA_MPSStart(struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32		i4Ret = 0;
-	UINT_32		u4Band_idx = 0;
+	INT_32	i4Ret	   = 0;
+	UINT_32 u4Band_idx = 0;
 
 	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_MPSStart\n");
 
@@ -4257,20 +4179,20 @@ static INT_32 HQA_MPSStart(struct net_device *prNetDev, IN union iwreq_data *prI
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
 static INT_32 HQA_MPSStop(struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32		i4Ret = 0;
-	UINT_32		u4Band_idx = 0;
+	INT_32	i4Ret	   = 0;
+	UINT_32 u4Band_idx = 0;
 
 	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_MPSStop\n");
 
@@ -4286,31 +4208,31 @@ static INT_32 HQA_MPSStop(struct net_device *prNetDev, IN union iwreq_data *prIw
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
 static INT_32 HQA_MPSSetNss(struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32		i4Ret = 0;
-	UINT_32		*mps_setting = NULL;
-	UINT_32		u4Band_idx = 0;
-	UINT_32		u4Offset = 0;
-	UINT_32		u4Len = 0;
-	UINT_32		i = 0;
-	UINT_32		u4Value = 0;
+	INT_32	 i4Ret		 = 0;
+	UINT_32 *mps_setting = NULL;
+	UINT_32	 u4Band_idx	 = 0;
+	UINT_32	 u4Offset	 = 0;
+	UINT_32	 u4Len		 = 0;
+	UINT_32	 i			 = 0;
+	UINT_32	 u4Value	 = 0;
 
-	u4Len = ntohs(HqaCmdFrame->Length)/sizeof(UINT_32) - 1;
+	u4Len = ntohs(HqaCmdFrame->Length) / sizeof(UINT_32) - 1;
 
 	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_MPSSetNss u4Len : %d\n", u4Len);
 
-	mps_setting = kmalloc(sizeof(UINT_32)*(u4Len), GFP_KERNEL);
+	mps_setting = kmalloc(sizeof(UINT_32) * (u4Len), GFP_KERNEL);
 
 	memcpy(&u4Band_idx, HqaCmdFrame->Data + 4 * 0, 4);
 	u4Band_idx = ntohl(u4Band_idx);
@@ -4321,11 +4243,10 @@ static INT_32 HQA_MPSSetNss(struct net_device *prNetDev, IN union iwreq_data *pr
 		u4Offset = 4 + 4 * i;
 		if (u4Offset + 4 > sizeof(HqaCmdFrame->Data)) /* Reserved at least 4 byte availbale data */
 			break;
-		memcpy(&u4Value, HqaCmdFrame->Data + 4 + 4*i, 4);
+		memcpy(&u4Value, HqaCmdFrame->Data + 4 + 4 * i, 4);
 		mps_setting[i] = ntohl(u4Value);
 
-		DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_MPSSetNss mps_setting Case %d (Nss : %d)\n",
-			i, mps_setting[i]);
+		DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_MPSSetNss mps_setting Case %d (Nss : %d)\n", i, mps_setting[i]);
 	}
 
 	i4Ret = MT_ATEMPSSetNss(prNetDev, u4Len, mps_setting, u4Band_idx);
@@ -4339,49 +4260,47 @@ static INT_32 HQA_MPSSetNss(struct net_device *prNetDev, IN union iwreq_data *pr
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
 static INT_32 HQA_MPSSetPerpacketBW(
-	struct net_device *prNetDev,
-	IN union iwreq_data *prIwReqData,
-	HQA_CMD_FRAME *HqaCmdFrame)
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32		i4Ret = 0;
-	UINT_32		*mps_setting = NULL;
-	UINT_32		u4Band_idx = 0;
-	UINT_32		u4Offset = 0;
-	UINT_32		u4Len = 0;
-	UINT_32		i = 0;
-	UINT_32		u4Value = 0;
+	INT_32	 i4Ret		 = 0;
+	UINT_32 *mps_setting = NULL;
+	UINT_32	 u4Band_idx	 = 0;
+	UINT_32	 u4Offset	 = 0;
+	UINT_32	 u4Len		 = 0;
+	UINT_32	 i			 = 0;
+	UINT_32	 u4Value	 = 0;
 
-	u4Len = ntohs(HqaCmdFrame->Length)/sizeof(UINT_32) - 1;
+	u4Len = ntohs(HqaCmdFrame->Length) / sizeof(UINT_32) - 1;
 
 	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_MPSSetPerpacketBW u4Len : %d\n", u4Len);
 
-	mps_setting = kmalloc(sizeof(UINT_32)*(u4Len), GFP_KERNEL);
+	mps_setting = kmalloc(sizeof(UINT_32) * (u4Len), GFP_KERNEL);
 
 	memcpy(&u4Band_idx, HqaCmdFrame->Data + 4 * 0, 4);
 	u4Band_idx = ntohl(u4Band_idx);
 
 	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_MPSSetPerpacketBW u4Band_idx : %d\n", u4Band_idx);
 
-	for (i = 0 ; i < u4Len ; i++) {
+	for (i = 0; i < u4Len; i++) {
 		u4Offset = 4 + 4 * i;
 		if (u4Offset + 4 > sizeof(HqaCmdFrame->Data)) /* Reserved at least 4 byte availbale data */
 			break;
-		memcpy(&u4Value, HqaCmdFrame->Data + 4 + 4*i, 4);
+		memcpy(&u4Value, HqaCmdFrame->Data + 4 + 4 * i, 4);
 		mps_setting[i] = ntohl(u4Value);
 
-		DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_MPSSetPerpacketBW mps_setting Case %d (BW : %d)\n",
-			i, mps_setting[i]);
+		DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_MPSSetPerpacketBW mps_setting Case %d (BW : %d)\n", i,
+				mps_setting[i]);
 	}
 
 	i4Ret = MT_ATEMPSSetPerpacketBW(prNetDev, u4Len, mps_setting, u4Band_idx);
@@ -4393,22 +4312,21 @@ static INT_32 HQA_MPSSetPerpacketBW(
 	return i4Ret;
 }
 
-
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
 static INT_32 HQA_SetAIFS(struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Ret = 0;
+	INT_32	i4Ret	 = 0;
 	UINT_32 SlotTime = 0;
 	UINT_32 SifsTime = 0;
 
@@ -4429,31 +4347,31 @@ static INT_32 HQA_SetAIFS(struct net_device *prNetDev, IN union iwreq_data *prIw
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 HQA_CheckEfuseModeType(struct net_device *prNetDev,
-				     IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_CheckEfuseModeType(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32		i4Ret = 0;
-	UINT_32		Value = u4EepromMode;
+	INT_32	i4Ret = 0;
+	UINT_32 Value = u4EepromMode;
 
 	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_CheckEfuseModeType\n");
 
 	/*
-	* Value:
-	* 1 -> efuse Mode
-	* 2 -> flash Mode
-	* 3 -> eeprom Mode
-	* 4 -> bin Mode
-	*/
+	 * Value:
+	 * 1 -> efuse Mode
+	 * 2 -> flash Mode
+	 * 3 -> eeprom Mode
+	 * 4 -> bin Mode
+	 */
 	Value = ntohl(Value);
 	memcpy(HqaCmdFrame->Data + 2, &(Value), sizeof(Value));
 
@@ -4464,18 +4382,18 @@ static INT_32 HQA_CheckEfuseModeType(struct net_device *prNetDev,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 HQA_CheckEfuseNativeModeType(struct net_device *prNetDev,
-					   IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_CheckEfuseNativeModeType(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
 	INT_32 i4Ret = 0;
 
@@ -4488,20 +4406,19 @@ static INT_32 HQA_CheckEfuseNativeModeType(struct net_device *prNetDev,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 HQA_SetBandMode(struct net_device *prNetDev,
-			      IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_SetBandMode(struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Ret = 0;
+	INT_32	i4Ret		= 0;
 	UINT_32 u4Band_mode = 0;
 	UINT_32 u4Band_type = 0;
 
@@ -4525,27 +4442,26 @@ static INT_32 HQA_SetBandMode(struct net_device *prNetDev,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 HQA_GetBandMode(struct net_device *prNetDev,
-			      IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_GetBandMode(struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Ret = 0;
-	UINT_32 u4Band_mode = 0;
-	UINT_32 u4Band_idx = 0;
-	P_GLUE_INFO_T prGlueInfo = NULL;
+	INT_32						 i4Ret		 = 0;
+	UINT_32						 u4Band_mode = 0;
+	UINT_32						 u4Band_idx	 = 0;
+	P_GLUE_INFO_T				 prGlueInfo	 = NULL;
 	PARAM_MTK_WIFI_TEST_STRUCT_T rRfATInfo;
-	UINT_32 u4BufLen = 0;
+	UINT_32						 u4BufLen = 0;
 
-	prGlueInfo = *((P_GLUE_INFO_T *) netdev_priv(prNetDev));
+	prGlueInfo = *((P_GLUE_INFO_T *)netdev_priv(prNetDev));
 
 	memcpy((PUCHAR)&u4Band_idx, HqaCmdFrame->Data, 4);
 
@@ -4559,14 +4475,14 @@ static INT_32 HQA_GetBandMode(struct net_device *prNetDev,
 
 	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_GetBandMode g_DBDCEnable = %d\n", g_DBDCEnable);
 
-	i4Ret = kalIoctl(prGlueInfo,	/* prGlueInfo */
-			 wlanoidRftestSetAutoTest,	/* pfnOidHandler */
-			 &rRfATInfo,	/* pvInfoBuf */
-			 sizeof(rRfATInfo),	/* u4InfoBufLen */
-			 FALSE,	/* fgRead */
-			 FALSE,	/* fgWaitResp */
-			 TRUE,	/* fgCmd */
-			 &u4BufLen);	/* pu4QryInfoLen */
+	i4Ret = kalIoctl(prGlueInfo,	  /* prGlueInfo */
+			wlanoidRftestSetAutoTest, /* pfnOidHandler */
+			&rRfATInfo,				  /* pvInfoBuf */
+			sizeof(rRfATInfo),		  /* u4InfoBufLen */
+			FALSE,					  /* fgRead */
+			FALSE,					  /* fgWaitResp */
+			TRUE,					  /* fgCmd */
+			&u4BufLen);				  /* pu4QryInfoLen */
 
 	if (i4Ret != WLAN_STATUS_SUCCESS)
 		return -EFAULT;
@@ -4591,18 +4507,17 @@ static INT_32 HQA_GetBandMode(struct net_device *prNetDev,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 HQA_RDDStartExt(struct net_device *prNetDev,
-			      IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_RDDStartExt(struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
 	INT_32 i4Ret = 0;
 
@@ -4619,18 +4534,17 @@ static INT_32 HQA_RDDStartExt(struct net_device *prNetDev,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 HQA_RDDStopExt(struct net_device *prNetDev,
-				IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_RDDStopExt(struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
 	INT_32 i4Ret = 0;
 
@@ -4647,22 +4561,22 @@ static INT_32 HQA_RDDStopExt(struct net_device *prNetDev,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 HQA_BssInfoUpdate(struct net_device *prNetDev,
-				IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_BssInfoUpdate(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Ret = 0;
+	INT_32	i4Ret	  = 0;
 	UINT_32 OwnMacIdx = 0, BssIdx = 0;
-	UINT_8 ucAddr1[MAC_ADDR_LEN];
+	UINT_8	ucAddr1[MAC_ADDR_LEN];
 	UINT_8 *prInBuf;
 
 	prInBuf = kmalloc(sizeof(UINT_8) * (HQA_BF_STR_SIZE), GFP_KERNEL);
@@ -4675,12 +4589,12 @@ static INT_32 HQA_BssInfoUpdate(struct net_device *prNetDev,
 
 	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_BssInfoUpdate OwnMacIdx : %d\n", OwnMacIdx);
 	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_BssInfoUpdate BssIdx : %d\n", BssIdx);
-	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_BssInfoUpdate addr1:%02x:%02x:%02x:%02x:%02x:%02x\n",
-	       ucAddr1[0], ucAddr1[1], ucAddr1[2], ucAddr1[3], ucAddr1[4], ucAddr1[5]);
+	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_BssInfoUpdate addr1:%02x:%02x:%02x:%02x:%02x:%02x\n", ucAddr1[0],
+			ucAddr1[1], ucAddr1[2], ucAddr1[3], ucAddr1[4], ucAddr1[5]);
 
 	kalMemSet(prInBuf, 0, sizeof(UINT_8) * (HQA_BF_STR_SIZE));
-	kalSprintf(prInBuf, "%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x",
-		   OwnMacIdx, BssIdx, ucAddr1[0], ucAddr1[1], ucAddr1[2], ucAddr1[3], ucAddr1[4], ucAddr1[5]);
+	kalSprintf(prInBuf, "%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x", OwnMacIdx, BssIdx, ucAddr1[0], ucAddr1[1],
+			ucAddr1[2], ucAddr1[3], ucAddr1[4], ucAddr1[5]);
 
 	DBGLOG(RFTEST, ERROR, "MT6632 prInBuf = %s\n", prInBuf);
 
@@ -4695,22 +4609,22 @@ static INT_32 HQA_BssInfoUpdate(struct net_device *prNetDev,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 HQA_DevInfoUpdate(struct net_device *prNetDev,
-				IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_DevInfoUpdate(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Ret = 0;
+	INT_32	i4Ret = 0;
 	UINT_32 Band = 0, OwnMacIdx = 0;
-	UINT_8 ucAddr1[MAC_ADDR_LEN];
+	UINT_8	ucAddr1[MAC_ADDR_LEN];
 	UINT_8 *prInBuf;
 
 	prInBuf = kmalloc(sizeof(UINT_8) * (HQA_BF_STR_SIZE), GFP_KERNEL);
@@ -4723,12 +4637,12 @@ static INT_32 HQA_DevInfoUpdate(struct net_device *prNetDev,
 
 	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_DevInfoUpdate Band : %d\n", Band);
 	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_DevInfoUpdate OwnMacIdx : %d\n", OwnMacIdx);
-	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_DevInfoUpdate addr1:%02x:%02x:%02x:%02x:%02x:%02x\n",
-	       ucAddr1[0], ucAddr1[1], ucAddr1[2], ucAddr1[3], ucAddr1[4], ucAddr1[5]);
+	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_DevInfoUpdate addr1:%02x:%02x:%02x:%02x:%02x:%02x\n", ucAddr1[0],
+			ucAddr1[1], ucAddr1[2], ucAddr1[3], ucAddr1[4], ucAddr1[5]);
 
 	kalMemSet(prInBuf, 0, sizeof(UINT_8) * (HQA_BF_STR_SIZE));
-	kalSprintf(prInBuf, "%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x",
-		   OwnMacIdx, ucAddr1[0], ucAddr1[1], ucAddr1[2], ucAddr1[3], ucAddr1[4], ucAddr1[5], Band);
+	kalSprintf(prInBuf, "%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x", OwnMacIdx, ucAddr1[0], ucAddr1[1], ucAddr1[2],
+			ucAddr1[3], ucAddr1[4], ucAddr1[5], Band);
 
 	DBGLOG(RFTEST, ERROR, "MT6632 prInBuf = %s\n", prInBuf);
 
@@ -4743,19 +4657,19 @@ static INT_32 HQA_DevInfoUpdate(struct net_device *prNetDev,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
 static INT_32 HQA_LogOnOff(struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Ret = 0;
+	INT_32	i4Ret	   = 0;
 	UINT_32 u4Band_idx = 0;
 	UINT_32 u4Log_type = 0;
 	UINT_32 u4Log_ctrl = 0;
@@ -4784,69 +4698,69 @@ static INT_32 HQA_LogOnOff(struct net_device *prNetDev, IN union iwreq_data *prI
 
 static HQA_CMD_HANDLER HQA_CMD_SET5[] = {
 	/* cmd id start from 0x1500 */
-	HQA_GetFWInfo,		/* 0x1500 */
-	HQA_StartContinousTx,	/* 0x1501 */
-	HQA_SetSTBC,		/* 0x1502 */
-	HQA_SetShortGI,		/* 0x1503 */
-	HQA_SetDPD,		/* 0x1504 */
-	HQA_SetTssiOnOff,	/* 0x1505 */
-	HQA_GetRxStatisticsAll,	/* 0x1506 */
-	HQA_StartContiTxTone,	/* 0x1507 */
-	HQA_StopContiTxTone,	/* 0x1508 */
-	HQA_CalibrationTestMode,	/* 0x1509 */
-	HQA_DoCalibrationTestItem,	/* 0x150A */
-	HQA_eFusePhysicalWrite,	/* 0x150B */
-	HQA_eFusePhysicalRead,	/* 0x150C */
-	HQA_eFuseLogicalRead,	/* 0x150D */
-	HQA_eFuseLogicalWrite,	/* 0x150E */
-	HQA_TMRSetting,		/* 0x150F */
-	HQA_GetRxSNR,		/* 0x1510 */
-	HQA_WriteBufferDone,	/* 0x1511 */
-	HQA_FFT,		/* 0x1512 */
-	HQA_SetTxTonePower,	/* 0x1513 */
-	HQA_GetChipID,		/* 0x1514 */
-	HQA_MPSSetSeqData,	/* 0x1515 */
-	HQA_MPSSetPayloadLength,	/* 0x1516 */
-	HQA_MPSSetPacketCount,	/* 0x1517 */
-	HQA_MPSSetPowerGain,	/* 0x1518 */
-	HQA_MPSStart,		/* 0x1519 */
-	HQA_MPSStop,		/* 0x151A */
-	ToDoFunction,		/* 0x151B */
-	ToDoFunction,		/* 0x151C */
-	ToDoFunction,		/* 0x151D */
-	ToDoFunction,		/* 0x151E */
-	ToDoFunction,		/* 0x151F */
-	ToDoFunction,		/* 0x1520 */
-	HQA_SetAIFS,		/* 0x1521 */
-	HQA_CheckEfuseModeType,	/* 0x1522 */
-	HQA_CheckEfuseNativeModeType,	/* 0x1523 */
-	ToDoFunction,		/* 0x1524 */
-	ToDoFunction,		/* 0x1525 */
-	ToDoFunction,		/* 0x1526 */
-	ToDoFunction,		/* 0x1527 */
-	ToDoFunction,		/* 0x1528 */
-	ToDoFunction,		/* 0x1529 */
-	ToDoFunction,		/* 0x152A */
-	ToDoFunction,		/* 0x152B */
-	HQA_SetBandMode,	/* 0x152C */
-	HQA_GetBandMode,	/* 0x152D */
-	HQA_RDDStartExt,	/* 0x152E */
-	HQA_RDDStopExt,		/* 0x152F */
-	ToDoFunction,		/* 0x1530 */
-	HQA_BssInfoUpdate,	/* 0x1531 */
-	HQA_DevInfoUpdate,	/* 0x1532 */
-	HQA_LogOnOff,		/* 0x1533 */
-	ToDoFunction,		/* 0x1534 */
-	ToDoFunction,		/* 0x1535 */
-	HQA_MPSSetNss,		/* 0x1536 */
-	HQA_MPSSetPerpacketBW,	/* 0x1537 */
+	HQA_GetFWInfo,				  /* 0x1500 */
+	HQA_StartContinousTx,		  /* 0x1501 */
+	HQA_SetSTBC,				  /* 0x1502 */
+	HQA_SetShortGI,				  /* 0x1503 */
+	HQA_SetDPD,					  /* 0x1504 */
+	HQA_SetTssiOnOff,			  /* 0x1505 */
+	HQA_GetRxStatisticsAll,		  /* 0x1506 */
+	HQA_StartContiTxTone,		  /* 0x1507 */
+	HQA_StopContiTxTone,		  /* 0x1508 */
+	HQA_CalibrationTestMode,	  /* 0x1509 */
+	HQA_DoCalibrationTestItem,	  /* 0x150A */
+	HQA_eFusePhysicalWrite,		  /* 0x150B */
+	HQA_eFusePhysicalRead,		  /* 0x150C */
+	HQA_eFuseLogicalRead,		  /* 0x150D */
+	HQA_eFuseLogicalWrite,		  /* 0x150E */
+	HQA_TMRSetting,				  /* 0x150F */
+	HQA_GetRxSNR,				  /* 0x1510 */
+	HQA_WriteBufferDone,		  /* 0x1511 */
+	HQA_FFT,					  /* 0x1512 */
+	HQA_SetTxTonePower,			  /* 0x1513 */
+	HQA_GetChipID,				  /* 0x1514 */
+	HQA_MPSSetSeqData,			  /* 0x1515 */
+	HQA_MPSSetPayloadLength,	  /* 0x1516 */
+	HQA_MPSSetPacketCount,		  /* 0x1517 */
+	HQA_MPSSetPowerGain,		  /* 0x1518 */
+	HQA_MPSStart,				  /* 0x1519 */
+	HQA_MPSStop,				  /* 0x151A */
+	ToDoFunction,				  /* 0x151B */
+	ToDoFunction,				  /* 0x151C */
+	ToDoFunction,				  /* 0x151D */
+	ToDoFunction,				  /* 0x151E */
+	ToDoFunction,				  /* 0x151F */
+	ToDoFunction,				  /* 0x1520 */
+	HQA_SetAIFS,				  /* 0x1521 */
+	HQA_CheckEfuseModeType,		  /* 0x1522 */
+	HQA_CheckEfuseNativeModeType, /* 0x1523 */
+	ToDoFunction,				  /* 0x1524 */
+	ToDoFunction,				  /* 0x1525 */
+	ToDoFunction,				  /* 0x1526 */
+	ToDoFunction,				  /* 0x1527 */
+	ToDoFunction,				  /* 0x1528 */
+	ToDoFunction,				  /* 0x1529 */
+	ToDoFunction,				  /* 0x152A */
+	ToDoFunction,				  /* 0x152B */
+	HQA_SetBandMode,			  /* 0x152C */
+	HQA_GetBandMode,			  /* 0x152D */
+	HQA_RDDStartExt,			  /* 0x152E */
+	HQA_RDDStopExt,				  /* 0x152F */
+	ToDoFunction,				  /* 0x1530 */
+	HQA_BssInfoUpdate,			  /* 0x1531 */
+	HQA_DevInfoUpdate,			  /* 0x1532 */
+	HQA_LogOnOff,				  /* 0x1533 */
+	ToDoFunction,				  /* 0x1534 */
+	ToDoFunction,				  /* 0x1535 */
+	HQA_MPSSetNss,				  /* 0x1536 */
+	HQA_MPSSetPerpacketBW,		  /* 0x1537 */
 };
 
 #if CFG_SUPPORT_TX_BF
-static INT_32 HQA_TxBfProfileTagInValid(struct net_device *prNetDev,
-					IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_TxBfProfileTagInValid(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Ret = 0;
+	INT_32	i4Ret	= 0;
 	UINT_32 invalid = 0;
 	UINT_8 *prInBuf;
 
@@ -4871,10 +4785,10 @@ static INT_32 HQA_TxBfProfileTagInValid(struct net_device *prNetDev,
 	return i4Ret;
 }
 
-static INT_32 HQA_TxBfProfileTagPfmuIdx(struct net_device *prNetDev,
-					IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_TxBfProfileTagPfmuIdx(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Ret = 0;
+	INT_32	i4Ret	= 0;
 	UINT_32 pfmuidx = 0;
 	UINT_8 *prInBuf;
 
@@ -4899,10 +4813,10 @@ static INT_32 HQA_TxBfProfileTagPfmuIdx(struct net_device *prNetDev,
 	return i4Ret;
 }
 
-static INT_32 HQA_TxBfProfileTagBfType(struct net_device *prNetDev,
-				       IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_TxBfProfileTagBfType(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Ret = 0;
+	INT_32	i4Ret  = 0;
 	UINT_32 bftype = 0;
 	UINT_8 *prInBuf;
 
@@ -4927,10 +4841,10 @@ static INT_32 HQA_TxBfProfileTagBfType(struct net_device *prNetDev,
 	return i4Ret;
 }
 
-static INT_32 HQA_TxBfProfileTagBw(struct net_device *prNetDev,
-				   IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_TxBfProfileTagBw(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Ret = 0;
+	INT_32	i4Ret  = 0;
 	UINT_32 tag_bw = 0;
 	UINT_8 *prInBuf;
 
@@ -4955,10 +4869,10 @@ static INT_32 HQA_TxBfProfileTagBw(struct net_device *prNetDev,
 	return i4Ret;
 }
 
-static INT_32 HQA_TxBfProfileTagSuMu(struct net_device *prNetDev,
-				     IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_TxBfProfileTagSuMu(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Ret = 0;
+	INT_32	i4Ret = 0;
 	UINT_32 su_mu = 0;
 	UINT_8 *prInBuf;
 
@@ -4983,10 +4897,10 @@ static INT_32 HQA_TxBfProfileTagSuMu(struct net_device *prNetDev,
 	return i4Ret;
 }
 
-static INT_32 HQA_TxBfProfileTagMemAlloc(struct net_device *prNetDev,
-					 IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_TxBfProfileTagMemAlloc(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Ret = 0;
+	INT_32	i4Ret = 0;
 	UINT_32 col_idx0, row_idx0, col_idx1, row_idx1;
 	UINT_32 col_idx2, row_idx2, col_idx3, row_idx3;
 	UINT_8 *prInBuf;
@@ -5013,8 +4927,8 @@ static INT_32 HQA_TxBfProfileTagMemAlloc(struct net_device *prNetDev,
 	row_idx3 = ntohl(row_idx3);
 
 	kalMemSet(prInBuf, 0, sizeof(UINT_8) * (HQA_BF_STR_SIZE));
-	kalSprintf(prInBuf, "%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x",
-		   col_idx0, row_idx0, col_idx1, row_idx1, col_idx2, row_idx2, col_idx3, row_idx3);
+	kalSprintf(prInBuf, "%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x", col_idx0, row_idx0, col_idx1, row_idx1, col_idx2,
+			row_idx2, col_idx3, row_idx3);
 
 	DBGLOG(RFTEST, ERROR, "MT6632 prInBuf = %s\n", prInBuf);
 
@@ -5027,10 +4941,10 @@ static INT_32 HQA_TxBfProfileTagMemAlloc(struct net_device *prNetDev,
 	return i4Ret;
 }
 
-static INT_32 HQA_TxBfProfileTagMatrix(struct net_device *prNetDev,
-				       IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_TxBfProfileTagMatrix(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Ret = 0;
+	INT_32	i4Ret = 0;
 	UINT_32 nrow, ncol, ngroup, LM, code_book, htc_exist;
 	UINT_8 *prInBuf;
 
@@ -5065,10 +4979,10 @@ static INT_32 HQA_TxBfProfileTagMatrix(struct net_device *prNetDev,
 	return i4Ret;
 }
 
-static INT_32 HQA_TxBfProfileTagSnr(struct net_device *prNetDev,
-				    IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_TxBfProfileTagSnr(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Ret = 0;
+	INT_32	i4Ret = 0;
 	UINT_32 snr_sts0, snr_sts1, snr_sts2, snr_sts3;
 	UINT_8 *prInBuf;
 
@@ -5099,10 +5013,10 @@ static INT_32 HQA_TxBfProfileTagSnr(struct net_device *prNetDev,
 	return i4Ret;
 }
 
-static INT_32 HQA_TxBfProfileTagSmtAnt(struct net_device *prNetDev,
-				       IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_TxBfProfileTagSmtAnt(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Ret = 0;
+	INT_32	i4Ret	= 0;
 	UINT_32 smt_ant = 0;
 	UINT_8 *prInBuf;
 
@@ -5127,10 +5041,10 @@ static INT_32 HQA_TxBfProfileTagSmtAnt(struct net_device *prNetDev,
 	return i4Ret;
 }
 
-static INT_32 HQA_TxBfProfileTagSeIdx(struct net_device *prNetDev,
-				      IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_TxBfProfileTagSeIdx(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Ret = 0;
+	INT_32	i4Ret  = 0;
 	UINT_32 se_idx = 0;
 	UINT_8 *prInBuf;
 
@@ -5155,10 +5069,10 @@ static INT_32 HQA_TxBfProfileTagSeIdx(struct net_device *prNetDev,
 	return i4Ret;
 }
 
-static INT_32 HQA_TxBfProfileTagRmsdThrd(struct net_device *prNetDev,
-					 IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_TxBfProfileTagRmsdThrd(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Ret = 0;
+	INT_32	i4Ret	  = 0;
 	UINT_32 rmsd_thrd = 0;
 	UINT_8 *prInBuf;
 
@@ -5183,10 +5097,10 @@ static INT_32 HQA_TxBfProfileTagRmsdThrd(struct net_device *prNetDev,
 	return i4Ret;
 }
 
-static INT_32 HQA_TxBfProfileTagMcsThrd(struct net_device *prNetDev,
-					IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_TxBfProfileTagMcsThrd(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Ret = 0;
+	INT_32	i4Ret = 0;
 	UINT_32 mcs_lss0, mcs_sss0, mcs_lss1, mcs_sss1, mcs_lss2, mcs_sss2;
 	UINT_8 *prInBuf;
 
@@ -5208,8 +5122,7 @@ static INT_32 HQA_TxBfProfileTagMcsThrd(struct net_device *prNetDev,
 	mcs_sss2 = ntohl(mcs_sss2);
 
 	kalMemSet(prInBuf, 0, sizeof(UINT_8) * (HQA_BF_STR_SIZE));
-	kalSprintf(prInBuf, "%02x:%02x:%02x:%02x:%02x:%02x", mcs_lss0, mcs_sss0, mcs_lss1, mcs_sss1, mcs_lss2,
-		   mcs_sss2);
+	kalSprintf(prInBuf, "%02x:%02x:%02x:%02x:%02x:%02x", mcs_lss0, mcs_sss0, mcs_lss1, mcs_sss1, mcs_lss2, mcs_sss2);
 
 	DBGLOG(RFTEST, ERROR, "MT6632 prInBuf = %s\n", prInBuf);
 
@@ -5222,10 +5135,10 @@ static INT_32 HQA_TxBfProfileTagMcsThrd(struct net_device *prNetDev,
 	return i4Ret;
 }
 
-static INT_32 HQA_TxBfProfileTagTimeOut(struct net_device *prNetDev,
-					IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_TxBfProfileTagTimeOut(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Ret = 0;
+	INT_32	i4Ret	= 0;
 	UINT_32 bf_tout = 0;
 	UINT_8 *prInBuf;
 
@@ -5250,10 +5163,10 @@ static INT_32 HQA_TxBfProfileTagTimeOut(struct net_device *prNetDev,
 	return i4Ret;
 }
 
-static INT_32 HQA_TxBfProfileTagDesiredBw(struct net_device *prNetDev,
-					  IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_TxBfProfileTagDesiredBw(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Ret = 0;
+	INT_32	i4Ret	  = 0;
 	UINT_32 desire_bw = 0;
 	UINT_8 *prInBuf;
 
@@ -5278,10 +5191,10 @@ static INT_32 HQA_TxBfProfileTagDesiredBw(struct net_device *prNetDev,
 	return i4Ret;
 }
 
-static INT_32 HQA_TxBfProfileTagDesiredNc(struct net_device *prNetDev,
-					  IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_TxBfProfileTagDesiredNc(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Ret = 0;
+	INT_32	i4Ret	  = 0;
 	UINT_32 desire_nc = 0;
 	UINT_8 *prInBuf;
 
@@ -5306,10 +5219,10 @@ static INT_32 HQA_TxBfProfileTagDesiredNc(struct net_device *prNetDev,
 	return i4Ret;
 }
 
-static INT_32 HQA_TxBfProfileTagDesiredNr(struct net_device *prNetDev,
-					  IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_TxBfProfileTagDesiredNr(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Ret = 0;
+	INT_32	i4Ret	  = 0;
 	UINT_32 desire_nr = 0;
 	UINT_8 *prInBuf;
 
@@ -5334,11 +5247,11 @@ static INT_32 HQA_TxBfProfileTagDesiredNr(struct net_device *prNetDev,
 	return i4Ret;
 }
 
-static INT_32 HQA_TxBfProfileTagWrite(struct net_device *prNetDev,
-				      IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_TxBfProfileTagWrite(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Ret = 0;
-	UINT_32 idx = 0;	/* WLAN_IDX */
+	INT_32	i4Ret = 0;
+	UINT_32 idx	  = 0; /* WLAN_IDX */
 	UINT_8 *prInBuf;
 
 	prInBuf = kmalloc(sizeof(idx), GFP_KERNEL);
@@ -5362,12 +5275,12 @@ static INT_32 HQA_TxBfProfileTagWrite(struct net_device *prNetDev,
 	return i4Ret;
 }
 
-static INT_32 HQA_TxBfProfileTagRead(struct net_device *prNetDev,
-				     IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_TxBfProfileTagRead(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Ret = 0;
-	UINT_32 idx = 0, isBFer = 0;
-	UINT_8 *prInBuf;
+	INT_32			  i4Ret = 0;
+	UINT_32			  idx = 0, isBFer = 0;
+	UINT_8		   *prInBuf;
 	PFMU_PROFILE_TAG1 rPfmuTag1;
 	PFMU_PROFILE_TAG2 rPfmuTag2;
 
@@ -5406,12 +5319,12 @@ static INT_32 HQA_TxBfProfileTagRead(struct net_device *prNetDev,
 	return i4Ret;
 }
 
-static INT_32 HQA_StaRecCmmUpdate(struct net_device *prNetDev,
-				  IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_StaRecCmmUpdate(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Ret = 0;
+	INT_32	i4Ret = 0;
 	UINT_32 wlan_idx, bss_idx, aid;
-	UINT_8 mac[MAC_ADDR_LEN];
+	UINT_8	mac[MAC_ADDR_LEN];
 	UINT_8 *prInBuf;
 
 	prInBuf = kmalloc(sizeof(UINT_8) * (HQA_BF_STR_SIZE), GFP_KERNEL);
@@ -5428,8 +5341,8 @@ static INT_32 HQA_StaRecCmmUpdate(struct net_device *prNetDev,
 	memcpy(mac, HqaCmdFrame->Data + 4 * 3, 6);
 
 	kalMemSet(prInBuf, 0, sizeof(UINT_8) * (HQA_BF_STR_SIZE));
-	kalSprintf(prInBuf, "%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x",
-		   wlan_idx, bss_idx, aid, mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+	kalSprintf(prInBuf, "%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x", wlan_idx, bss_idx, aid, mac[0], mac[1], mac[2],
+			mac[3], mac[4], mac[5]);
 
 	DBGLOG(RFTEST, ERROR, "MT6632 prInBuf = %s\n", prInBuf);
 
@@ -5442,10 +5355,10 @@ static INT_32 HQA_StaRecCmmUpdate(struct net_device *prNetDev,
 	return i4Ret;
 }
 
-static INT_32 HQA_StaRecBfUpdate(struct net_device *prNetDev,
-				 IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_StaRecBfUpdate(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Ret = 0;
+	INT_32	i4Ret = 0;
 	UINT_32 wlan_idx, bss_idx, PfmuId, su_mu, etxbf_cap, ndpa_rate, ndp_rate;
 	UINT_32 report_poll_rate, tx_mode, nc, nr, cbw, spe_idx, tot_mem_req;
 	UINT_32 mem_req_20m, mem_row0, mem_col0, mem_row1, mem_col1;
@@ -5526,10 +5439,10 @@ static INT_32 HQA_StaRecBfUpdate(struct net_device *prNetDev,
 
 	kalMemSet(prInBuf, 0, sizeof(UINT_8) * (HQA_BF_STR_SIZE));
 	kalSprintf(prInBuf,
-		   "%02x:%02x:%02x:%02x:%02x:%02d:%02d:%02d:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x",
-		   wlan_idx, bss_idx, PfmuId, su_mu, etxbf_cap, ndpa_rate, ndp_rate, report_poll_rate, tx_mode, nc, nr,
-		   cbw, spe_idx, tot_mem_req, mem_req_20m, mem_row0, mem_col0, mem_row1, mem_col1, mem_row2, mem_col2,
-		   mem_row3, mem_col3);
+			"%02x:%02x:%02x:%02x:%02x:%02d:%02d:%02d:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x",
+			wlan_idx, bss_idx, PfmuId, su_mu, etxbf_cap, ndpa_rate, ndp_rate, report_poll_rate, tx_mode, nc, nr, cbw,
+			spe_idx, tot_mem_req, mem_req_20m, mem_row0, mem_col0, mem_row1, mem_col1, mem_row2, mem_col2, mem_row3,
+			mem_col3);
 
 	DBGLOG(RFTEST, ERROR, "MT6632 prInBuf = %s\n", prInBuf);
 
@@ -5542,15 +5455,15 @@ static INT_32 HQA_StaRecBfUpdate(struct net_device *prNetDev,
 	return i4Ret;
 }
 
-static INT_32 HQA_BFProfileDataRead(struct net_device *prNetDev,
-				    IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_BFProfileDataRead(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Ret = 0;
-	UINT_32 idx = 0, fgBFer = 0, subcarrIdx = 0, subcarr_start = 0, subcarr_end = 0;
-	UINT_32 NumOfsub = 0;
-	UINT_32 offset = 0;
-	UINT_8 *SubIdx = NULL;
-	UINT_8 *prInBuf;
+	INT_32	  i4Ret = 0;
+	UINT_32	  idx = 0, fgBFer = 0, subcarrIdx = 0, subcarr_start = 0, subcarr_end = 0;
+	UINT_32	  NumOfsub = 0;
+	UINT_32	  offset   = 0;
+	UINT_8   *SubIdx   = NULL;
+	UINT_8   *prInBuf;
 	PFMU_DATA rPfmuData;
 
 	prInBuf = kmalloc(sizeof(UINT_8) * (HQA_BF_STR_SIZE), GFP_KERNEL);
@@ -5566,7 +5479,7 @@ static INT_32 HQA_BFProfileDataRead(struct net_device *prNetDev,
 	memcpy(&subcarr_end, HqaCmdFrame->Data + 4 * 3, 4);
 	subcarr_end = ntohl(subcarr_end);
 
-	if (subcarr_end == (UINT_32) 0xffffffff) /* avoid endless loop */
+	if (subcarr_end == (UINT_32)0xffffffff) /* avoid endless loop */
 	{
 		DBGLOG(RFTEST, ERROR, "%s : subcarr_end(%lu) invalid.\n", __func__, subcarr_end);
 		goto reply;
@@ -5579,7 +5492,7 @@ static INT_32 HQA_BFProfileDataRead(struct net_device *prNetDev,
 	offset += sizeof(NumOfsub);
 
 	for (subcarrIdx = subcarr_start; subcarrIdx <= subcarr_end; subcarrIdx++) {
-		SubIdx = (UINT_8 *) &subcarrIdx;
+		SubIdx = (UINT_8 *)&subcarrIdx;
 
 		kalMemSet(prInBuf, 0, sizeof(UINT_8) * (HQA_BF_STR_SIZE));
 		kalSprintf(prInBuf, "%02x:%02x:%02x:%02x", idx, fgBFer, SubIdx[1], SubIdx[0]);
@@ -5594,14 +5507,13 @@ static INT_32 HQA_BFProfileDataRead(struct net_device *prNetDev,
 		rPfmuData.au4RawData[3] = ntohl(g_rPfmuData.au4RawData[3]);
 		rPfmuData.au4RawData[4] = ntohl(g_rPfmuData.au4RawData[4]);
 
-		if (offset+2+sizeof(rPfmuData) > sizeof(HqaCmdFrame->Data))
-		{
-			DBGLOG(RFTEST, WARN, "%s : offset(%lu) overflow, raw data read may not complete.\n", __func__, offset+2+sizeof(rPfmuData));
+		if (offset + 2 + sizeof(rPfmuData) > sizeof(HqaCmdFrame->Data)) {
+			DBGLOG(RFTEST, WARN, "%s : offset(%lu) overflow, raw data read may not complete.\n", __func__,
+					offset + 2 + sizeof(rPfmuData));
 			break;
 		}
 		memcpy(HqaCmdFrame->Data + 2 + offset, &rPfmuData, sizeof(rPfmuData));
 		offset += sizeof(rPfmuData);
-
 	}
 
 reply:
@@ -5611,10 +5523,10 @@ reply:
 	return i4Ret;
 }
 
-static INT_32 HQA_BFProfileDataWrite(struct net_device *prNetDev,
-				     IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_BFProfileDataWrite(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Ret = 0;
+	INT_32	i4Ret = 0;
 	UINT_32 pfmuid, subcarrier, phi11, psi21, phi21, psi31, phi31, psi41;
 	UINT_32 phi22, psi32, phi32, psi42, phi33, psi43, snr00, snr01, snr02, snr03;
 	UINT_8 *prInBuf;
@@ -5662,8 +5574,8 @@ static INT_32 HQA_BFProfileDataWrite(struct net_device *prNetDev,
 
 	kalMemSet(prInBuf, 0, sizeof(UINT_8) * (HQA_BF_STR_SIZE));
 	kalSprintf(prInBuf, "%02x:%03x:%03x:%02x:%03x:%02x:%03x:%02x:%03x:%02x:%03x:%02x:%03x:%02x:%02x:%02x:%02x:%02x",
-		   pfmuid, subcarrier, phi11, psi21, phi21, psi31, phi31, psi41,
-		   phi22, psi32, phi32, psi42, phi33, psi43, snr00, snr01, snr02, snr03);
+			pfmuid, subcarrier, phi11, psi21, phi21, psi31, phi31, psi41, phi22, psi32, phi32, psi42, phi33, psi43,
+			snr00, snr01, snr02, snr03);
 
 	DBGLOG(RFTEST, ERROR, "MT6632 prInBuf = %s\n", prInBuf);
 
@@ -5678,7 +5590,7 @@ static INT_32 HQA_BFProfileDataWrite(struct net_device *prNetDev,
 
 static INT_32 HQA_BFSounding(struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Ret = 0;
+	INT_32	i4Ret = 0;
 	UINT_32 su_mu, mu_num, snd_interval, wlan_id0;
 	UINT_32 wlan_id1, wlan_id2, wlan_id3, band_idx;
 	UINT_8 *prInBuf;
@@ -5705,8 +5617,8 @@ static INT_32 HQA_BFSounding(struct net_device *prNetDev, IN union iwreq_data *p
 	band_idx = ntohl(band_idx);
 
 	kalMemSet(prInBuf, 0, sizeof(UINT_8) * (HQA_BF_STR_SIZE));
-	kalSprintf(prInBuf, "%02x:%02x:%02x:%02x:%02x:%02x:%02x",
-		   su_mu, mu_num, snd_interval, wlan_id0, wlan_id1, wlan_id2, wlan_id3);
+	kalSprintf(prInBuf, "%02x:%02x:%02x:%02x:%02x:%02x:%02x", su_mu, mu_num, snd_interval, wlan_id0, wlan_id1, wlan_id2,
+			wlan_id3);
 
 	DBGLOG(RFTEST, ERROR, "MT6632 prInBuf = %s\n", prInBuf);
 
@@ -5719,8 +5631,8 @@ static INT_32 HQA_BFSounding(struct net_device *prNetDev, IN union iwreq_data *p
 	return i4Ret;
 }
 
-static INT_32 HQA_TXBFSoundingStop(struct net_device *prNetDev,
-				   IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_TXBFSoundingStop(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
 	INT_32 i4Ret = 0;
 
@@ -5733,8 +5645,8 @@ static INT_32 HQA_TXBFSoundingStop(struct net_device *prNetDev,
 	return i4Ret;
 }
 
-static INT_32 HQA_TXBFProfileDataWriteAllExt(struct net_device *prNetDev,
-					     IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_TXBFProfileDataWriteAllExt(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
 	INT_32 i4Ret = 0;
 
@@ -5743,13 +5655,12 @@ static INT_32 HQA_TXBFProfileDataWriteAllExt(struct net_device *prNetDev,
 	return i4Ret;
 }
 
-static INT_32 HQA_TxBfTxApply(struct net_device *prNetDev,
-			      IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_TxBfTxApply(struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Ret = 0;
-	UINT_32 eBF_enable = 0;
-	UINT_32 iBF_enable = 0;
-	UINT_32 wlan_id = 0;
+	INT_32	i4Ret		= 0;
+	UINT_32 eBF_enable	= 0;
+	UINT_32 iBF_enable	= 0;
+	UINT_32 wlan_id		= 0;
 	UINT_32 MuTx_enable = 0;
 	UINT_8 *prInBuf;
 
@@ -5780,10 +5691,9 @@ static INT_32 HQA_TxBfTxApply(struct net_device *prNetDev,
 	return i4Ret;
 }
 
-static INT_32 HQA_ManualAssoc(struct net_device *prNetDev,
-			      IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_ManualAssoc(struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Ret = 0;
+	INT_32	i4Ret = 0;
 	UINT_32 type;
 	UINT_32 wtbl_idx;
 	UINT_32 ownmac_idx;
@@ -5794,7 +5704,7 @@ static INT_32 HQA_ManualAssoc(struct net_device *prNetDev,
 	UINT_32 marate_mcs;
 	UINT_32 spe_idx;
 	UINT_32 aid;
-	UINT_8 ucAddr1[MAC_ADDR_LEN];
+	UINT_8	ucAddr1[MAC_ADDR_LEN];
 	UINT_32 nss = 1;
 	UINT_8 *prInBuf;
 
@@ -5826,8 +5736,8 @@ static INT_32 HQA_ManualAssoc(struct net_device *prNetDev,
 
 	kalMemSet(prInBuf, 0, sizeof(UINT_8) * (HQA_BF_STR_SIZE));
 	kalSprintf(prInBuf, "%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x",
-		   ucAddr1[0], ucAddr1[1], ucAddr1[2], ucAddr1[3], ucAddr1[4], ucAddr1[5], type, wtbl_idx, ownmac_idx,
-		   phymode, bw, nss, pfmuid, marate_mode, marate_mcs, spe_idx, aid, 0);
+			ucAddr1[0], ucAddr1[1], ucAddr1[2], ucAddr1[3], ucAddr1[4], ucAddr1[5], type, wtbl_idx, ownmac_idx, phymode,
+			bw, nss, pfmuid, marate_mode, marate_mcs, spe_idx, aid, 0);
 
 	DBGLOG(RFTEST, ERROR, "MT6632 prInBuf = %s\n", prInBuf);
 
@@ -5841,41 +5751,41 @@ static INT_32 HQA_ManualAssoc(struct net_device *prNetDev,
 }
 
 static HQA_CMD_HANDLER HQA_TXBF_CMDS[] = {
-	HQA_TxBfProfileTagInValid,	/* 0x1540 */
-	HQA_TxBfProfileTagPfmuIdx,	/* 0x1541 */
-	HQA_TxBfProfileTagBfType,	/* 0x1542 */
-	HQA_TxBfProfileTagBw,	/* 0x1543 */
-	HQA_TxBfProfileTagSuMu,	/* 0x1544 */
-	HQA_TxBfProfileTagMemAlloc,	/* 0x1545 */
-	HQA_TxBfProfileTagMatrix,	/* 0x1546 */
-	HQA_TxBfProfileTagSnr,	/* 0x1547 */
-	HQA_TxBfProfileTagSmtAnt,	/* 0x1548 */
-	HQA_TxBfProfileTagSeIdx,	/* 0x1549 */
-	HQA_TxBfProfileTagRmsdThrd,	/* 0x154A */
-	HQA_TxBfProfileTagMcsThrd,	/* 0x154B */
-	HQA_TxBfProfileTagTimeOut,	/* 0x154C */
+	HQA_TxBfProfileTagInValid,		/* 0x1540 */
+	HQA_TxBfProfileTagPfmuIdx,		/* 0x1541 */
+	HQA_TxBfProfileTagBfType,		/* 0x1542 */
+	HQA_TxBfProfileTagBw,			/* 0x1543 */
+	HQA_TxBfProfileTagSuMu,			/* 0x1544 */
+	HQA_TxBfProfileTagMemAlloc,		/* 0x1545 */
+	HQA_TxBfProfileTagMatrix,		/* 0x1546 */
+	HQA_TxBfProfileTagSnr,			/* 0x1547 */
+	HQA_TxBfProfileTagSmtAnt,		/* 0x1548 */
+	HQA_TxBfProfileTagSeIdx,		/* 0x1549 */
+	HQA_TxBfProfileTagRmsdThrd,		/* 0x154A */
+	HQA_TxBfProfileTagMcsThrd,		/* 0x154B */
+	HQA_TxBfProfileTagTimeOut,		/* 0x154C */
 	HQA_TxBfProfileTagDesiredBw,	/* 0x154D */
 	HQA_TxBfProfileTagDesiredNc,	/* 0x154E */
 	HQA_TxBfProfileTagDesiredNr,	/* 0x154F */
-	HQA_TxBfProfileTagWrite,	/* 0x1550 */
-	HQA_TxBfProfileTagRead,	/* 0x1551 */
-	HQA_StaRecCmmUpdate,	/* 0x1552 */
-	HQA_StaRecBfUpdate,	/* 0x1553 */
-	HQA_BFProfileDataRead,	/* 0x1554 */
-	HQA_BFProfileDataWrite,	/* 0x1555 */
-	HQA_BFSounding,		/* 0x1556 */
-	HQA_TXBFSoundingStop,	/* 0x1557 */
-	HQA_TXBFProfileDataWriteAllExt,	/* 0x1558 */
-	HQA_TxBfTxApply,	/* 0x1559 */
-	HQA_ManualAssoc,	/* 0x155A */
+	HQA_TxBfProfileTagWrite,		/* 0x1550 */
+	HQA_TxBfProfileTagRead,			/* 0x1551 */
+	HQA_StaRecCmmUpdate,			/* 0x1552 */
+	HQA_StaRecBfUpdate,				/* 0x1553 */
+	HQA_BFProfileDataRead,			/* 0x1554 */
+	HQA_BFProfileDataWrite,			/* 0x1555 */
+	HQA_BFSounding,					/* 0x1556 */
+	HQA_TXBFSoundingStop,			/* 0x1557 */
+	HQA_TXBFProfileDataWriteAllExt, /* 0x1558 */
+	HQA_TxBfTxApply,				/* 0x1559 */
+	HQA_ManualAssoc,				/* 0x155A */
 };
 
 #if CFG_SUPPORT_MU_MIMO
-static INT_32 HQA_MUGetInitMCS(struct net_device *prNetDev,
-			       IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_MUGetInitMCS(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Ret = 0;
-	UINT_32 u4Gid = 0;
+	INT_32	i4Ret		   = 0;
+	UINT_32 u4Gid		   = 0;
 	UINT_32 u4User0InitMCS = 0;
 	UINT_32 u4User1InitMCS = 0;
 	UINT_32 u4User2InitMCS = 0;
@@ -5913,10 +5823,10 @@ static INT_32 HQA_MUGetInitMCS(struct net_device *prNetDev,
 	return i4Ret;
 }
 
-static INT_32 HQA_MUCalInitMCS(struct net_device *prNetDev,
-			       IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_MUCalInitMCS(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Ret = 0;
+	INT_32	i4Ret = 0;
 	UINT_32 u4Num_of_user;
 	UINT_32 u4Bandwidth;
 	UINT_32 u4Nss_of_user0;
@@ -5927,7 +5837,7 @@ static INT_32 HQA_MUCalInitMCS(struct net_device *prNetDev,
 	UINT_32 u4Pf_mu_id_of_user1;
 	UINT_32 u4Pf_mu_id_of_user2;
 	UINT_32 u4Pf_mu_id_of_user3;
-	UINT_32 u4Num_of_txer;	/* number of antenna */
+	UINT_32 u4Num_of_txer; /* number of antenna */
 	UINT_32 u4Spe_index;
 	UINT_32 u4Group_index;
 	UINT_8 *prInBuf;
@@ -5964,9 +5874,8 @@ static INT_32 HQA_MUCalInitMCS(struct net_device *prNetDev,
 	u4Group_index = ntohl(u4Group_index);
 
 	kalMemSet(prInBuf, 0, sizeof(UINT_8) * (HQA_BF_STR_SIZE));
-	kalSprintf(prInBuf, "%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x",
-		   u4Num_of_user, u4Bandwidth, u4Nss_of_user0, u4Nss_of_user1, u4Pf_mu_id_of_user0, u4Pf_mu_id_of_user1,
-		   u4Num_of_txer, u4Spe_index, u4Group_index);
+	kalSprintf(prInBuf, "%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x", u4Num_of_user, u4Bandwidth, u4Nss_of_user0,
+			u4Nss_of_user1, u4Pf_mu_id_of_user0, u4Pf_mu_id_of_user1, u4Num_of_txer, u4Spe_index, u4Group_index);
 
 	DBGLOG(RFTEST, ERROR, "MT6632 prInBuf = %s\n", prInBuf);
 
@@ -5981,7 +5890,7 @@ static INT_32 HQA_MUCalInitMCS(struct net_device *prNetDev,
 
 static INT_32 HQA_MUCalLQ(struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Ret = 0;
+	INT_32	i4Ret  = 0;
 	UINT_32 u4Type = 0;
 	UINT_32 u4Num_of_user;
 	UINT_32 u4Bandwidth;
@@ -5993,7 +5902,7 @@ static INT_32 HQA_MUCalLQ(struct net_device *prNetDev, IN union iwreq_data *prIw
 	UINT_32 u4Pf_mu_id_of_user1;
 	UINT_32 u4Pf_mu_id_of_user2;
 	UINT_32 u4Pf_mu_id_of_user3;
-	UINT_32 u4Num_of_txer;	/* number of antenna */
+	UINT_32 u4Num_of_txer; /* number of antenna */
 	UINT_32 u4Spe_index;
 	UINT_32 u4Group_index;
 	UINT_8 *prInBuf;
@@ -6032,9 +5941,8 @@ static INT_32 HQA_MUCalLQ(struct net_device *prNetDev, IN union iwreq_data *prIw
 	u4Group_index = ntohl(u4Group_index);
 
 	kalMemSet(prInBuf, 0, sizeof(UINT_8) * (HQA_BF_STR_SIZE));
-	kalSprintf(prInBuf, "%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x",
-		   u4Num_of_user, u4Bandwidth, u4Nss_of_user0, u4Nss_of_user1, u4Pf_mu_id_of_user0, u4Pf_mu_id_of_user1,
-		   u4Num_of_txer, u4Spe_index, u4Group_index);
+	kalSprintf(prInBuf, "%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x", u4Num_of_user, u4Bandwidth, u4Nss_of_user0,
+			u4Nss_of_user1, u4Pf_mu_id_of_user0, u4Pf_mu_id_of_user1, u4Num_of_txer, u4Spe_index, u4Group_index);
 
 	DBGLOG(RFTEST, ERROR, "MT6632 prInBuf = %s\n", prInBuf);
 
@@ -6049,9 +5957,9 @@ static INT_32 HQA_MUCalLQ(struct net_device *prNetDev, IN union iwreq_data *prIw
 
 static INT_32 HQA_MUGetLQ(struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Ret = 0;
+	INT_32	i4Ret = 0;
 	UINT_32 i;
-	UINT_8 u4LqReport[NUM_OF_USER * NUM_OF_MODUL];
+	UINT_8	u4LqReport[NUM_OF_USER * NUM_OF_MODUL];
 	UINT_8 *prInBuf;
 
 	prInBuf = kmalloc(sizeof(UINT_8) * (HQA_BF_STR_SIZE), GFP_KERNEL);
@@ -6076,10 +5984,10 @@ static INT_32 HQA_MUGetLQ(struct net_device *prNetDev, IN union iwreq_data *prIw
 	return i4Ret;
 }
 
-static INT_32 HQA_MUSetSNROffset(struct net_device *prNetDev,
-				 IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_MUSetSNROffset(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Ret = 0;
+	INT_32	i4Ret	 = 0;
 	UINT_32 u4Offset = 0;
 	UINT_8 *prInBuf;
 
@@ -6104,10 +6012,10 @@ static INT_32 HQA_MUSetSNROffset(struct net_device *prNetDev,
 	return i4Ret;
 }
 
-static INT_32 HQA_MUSetZeroNss(struct net_device *prNetDev,
-			       IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_MUSetZeroNss(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Ret = 0;
+	INT_32	i4Ret	   = 0;
 	UINT_32 u4Zero_nss = 0;
 	UINT_8 *prInBuf;
 
@@ -6132,10 +6040,10 @@ static INT_32 HQA_MUSetZeroNss(struct net_device *prNetDev,
 	return i4Ret;
 }
 
-static INT_32 HQA_MUSetSpeedUpLQ(struct net_device *prNetDev,
-				 IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_MUSetSpeedUpLQ(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Ret = 0;
+	INT_32	i4Ret		= 0;
 	UINT_32 u4SpeedUpLq = 0;
 	UINT_8 *prInBuf;
 
@@ -6158,15 +6066,14 @@ static INT_32 HQA_MUSetSpeedUpLQ(struct net_device *prNetDev,
 	kfree(prInBuf);
 
 	return i4Ret;
-
 }
 
-static INT_32 HQA_MUSetMUTable(struct net_device *prNetDev,
-			       IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_MUSetMUTable(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Ret = 0;
+	INT_32	i4Ret = 0;
 	UINT_8 *prTable;
-	UINT_16 u2Len = 0;
+	UINT_16 u2Len  = 0;
 	UINT_32 u4SuMu = 0;
 
 	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_MUSetMUTable\n");
@@ -6175,15 +6082,13 @@ static INT_32 HQA_MUSetMUTable(struct net_device *prNetDev,
 	u4SuMu = ntohl(u4SuMu);
 
 	u2Len = ntohl(HqaCmdFrame->Length) - sizeof(u4SuMu);
-	if (u2Len > sizeof(HqaCmdFrame->Data) - 4)
-	{
+	if (u2Len > sizeof(HqaCmdFrame->Data) - 4) {
 		DBGLOG(RFTEST, ERROR, "%s : Invalid u2Len(%d).\n", __func__, u2Len);
 		i4Ret = WLAN_STATUS_FAILURE;
 		goto error0;
 	}
 	prTable = kmalloc_array(u2Len, sizeof(UINT_8), GFP_KERNEL);
-	if (!prTable)
-	{
+	if (!prTable) {
 		DBGLOG(RFTEST, ERROR, "%s : prTable allocate failed.\n", __func__);
 		i4Ret = WLAN_STATUS_FAILURE;
 		goto error0;
@@ -6200,13 +6105,13 @@ error0:
 
 static INT_32 HQA_MUSetGroup(struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Ret = 0;
+	INT_32	i4Ret = 0;
 	UINT_32 u4GroupIndex, u4NumOfUser, u4User0Ldpc, u4User1Ldpc, u4User2Ldpc, u4User3Ldpc;
 	UINT_32 u4ShortGI, u4Bw, u4User0Nss, u4User1Nss, u4User2Nss, u4User3Nss;
 	UINT_32 u4GroupId, u4User0UP, u4User1UP, u4User2UP, u4User3UP;
 	UINT_32 u4User0MuPfId, u4User1MuPfId, u4User2MuPfId, u4User3MuPfId;
 	UINT_32 u4User0InitMCS, u4User1InitMCS, u4User2InitMCS, u4User3InitMCS;
-	UINT_8 ucAddr1[MAC_ADDR_LEN], ucAddr2[MAC_ADDR_LEN], ucAddr3[MAC_ADDR_LEN], ucAddr4[MAC_ADDR_LEN];
+	UINT_8	ucAddr1[MAC_ADDR_LEN], ucAddr2[MAC_ADDR_LEN], ucAddr3[MAC_ADDR_LEN], ucAddr4[MAC_ADDR_LEN];
 	UINT_8 *prInBuf;
 
 	prInBuf = kmalloc(sizeof(UINT_8) * (HQA_BF_STR_SIZE), GFP_KERNEL);
@@ -6271,11 +6176,11 @@ static INT_32 HQA_MUSetGroup(struct net_device *prNetDev, IN union iwreq_data *p
 
 	kalMemSet(prInBuf, 0, sizeof(UINT_8) * (HQA_BF_STR_SIZE));
 	kalSprintf(prInBuf,
-		   "%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x",
-		   u4GroupIndex, u4NumOfUser, u4User0Ldpc, u4User1Ldpc, u4ShortGI, u4Bw, u4User0Nss, u4User1Nss,
-		   u4GroupId, u4User0UP, u4User1UP, u4User0MuPfId, u4User1MuPfId, u4User0InitMCS, u4User1InitMCS,
-		   ucAddr1[0], ucAddr1[1], ucAddr1[2], ucAddr1[3], ucAddr1[4], ucAddr1[5], ucAddr2[0], ucAddr2[1],
-		   ucAddr2[2], ucAddr2[3], ucAddr2[4], ucAddr2[5]);
+			"%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x",
+			u4GroupIndex, u4NumOfUser, u4User0Ldpc, u4User1Ldpc, u4ShortGI, u4Bw, u4User0Nss, u4User1Nss, u4GroupId,
+			u4User0UP, u4User1UP, u4User0MuPfId, u4User1MuPfId, u4User0InitMCS, u4User1InitMCS, ucAddr1[0], ucAddr1[1],
+			ucAddr1[2], ucAddr1[3], ucAddr1[4], ucAddr1[5], ucAddr2[0], ucAddr2[1], ucAddr2[2], ucAddr2[3], ucAddr2[4],
+			ucAddr2[5]);
 
 	DBGLOG(RFTEST, ERROR, "MT6632 prInBuf = %s\n", prInBuf);
 
@@ -6290,7 +6195,7 @@ static INT_32 HQA_MUSetGroup(struct net_device *prNetDev, IN union iwreq_data *p
 
 static INT_32 HQA_MUGetQD(struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Ret = 0;
+	INT_32	i4Ret	 = 0;
 	UINT_32 u4SubIdx = 0;
 
 	/* TODO */
@@ -6333,10 +6238,9 @@ static INT_32 HQA_MUGetQD(struct net_device *prNetDev, IN union iwreq_data *prIw
 	return i4Ret;
 }
 
-static INT_32 HQA_MUSetEnable(struct net_device *prNetDev,
-			      IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_MUSetEnable(struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Ret = 0;
+	INT_32	i4Ret	 = 0;
 	UINT_32 u4Enable = 0;
 	UINT_8 *prInBuf;
 
@@ -6361,10 +6265,9 @@ static INT_32 HQA_MUSetEnable(struct net_device *prNetDev,
 	return i4Ret;
 }
 
-static INT_32 HQA_MUSetGID_UP(struct net_device *prNetDev,
-			      IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_MUSetGID_UP(struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Ret = 0;
+	INT_32	i4Ret = 0;
 	UINT_32 au4Gid[2];
 	UINT_32 au4Up[4];
 	UINT_8 *prInBuf;
@@ -6387,8 +6290,7 @@ static INT_32 HQA_MUSetGID_UP(struct net_device *prNetDev,
 	au4Up[3] = ntohl(au4Up[3]);
 
 	kalMemSet(prInBuf, 0, sizeof(UINT_8) * (HQA_BF_STR_SIZE));
-	kalSprintf(prInBuf, "%02x:%02x:%02x:%02x:%02x:%02x", au4Gid[0], au4Gid[1], au4Up[0], au4Up[1], au4Up[2],
-		   au4Up[3]);
+	kalSprintf(prInBuf, "%02x:%02x:%02x:%02x:%02x:%02x", au4Gid[0], au4Gid[1], au4Up[0], au4Up[1], au4Up[2], au4Up[3]);
 
 	DBGLOG(RFTEST, ERROR, "MT6632 prInBuf = %s\n", prInBuf);
 
@@ -6401,14 +6303,13 @@ static INT_32 HQA_MUSetGID_UP(struct net_device *prNetDev,
 	return i4Ret;
 }
 
-static INT_32 HQA_MUTriggerTx(struct net_device *prNetDev,
-			      IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_MUTriggerTx(struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Ret = 0;
+	INT_32	i4Ret = 0;
 	UINT_32 u4BandIdx, u4IsRandomPattern;
 	UINT_32 u4MsduPayloadLength0, u4MsduPayloadLength1, u4MsduPayloadLength2, u4MsduPayloadLength3;
 	UINT_32 u4MuPacketCount, u4NumOfSTAs;
-	UINT_8 ucAddr1[MAC_ADDR_LEN], ucAddr2[MAC_ADDR_LEN], ucAddr3[MAC_ADDR_LEN], ucAddr4[MAC_ADDR_LEN];
+	UINT_8	ucAddr1[MAC_ADDR_LEN], ucAddr2[MAC_ADDR_LEN], ucAddr3[MAC_ADDR_LEN], ucAddr4[MAC_ADDR_LEN];
 	UINT_8 *prInBuf;
 
 	prInBuf = kmalloc(sizeof(UINT_8) * (HQA_BF_STR_SIZE), GFP_KERNEL);
@@ -6438,9 +6339,9 @@ static INT_32 HQA_MUTriggerTx(struct net_device *prNetDev,
 
 	kalMemSet(prInBuf, 0, sizeof(UINT_8) * (HQA_BF_STR_SIZE));
 	kalSprintf(prInBuf, "%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x",
-		   u4IsRandomPattern, u4MsduPayloadLength0, u4MsduPayloadLength1, u4MuPacketCount, u4NumOfSTAs,
-		   ucAddr1[0], ucAddr1[1], ucAddr1[2], ucAddr1[3], ucAddr1[4], ucAddr1[5],
-		   ucAddr2[0], ucAddr2[1], ucAddr2[2], ucAddr2[3], ucAddr2[4], ucAddr2[5]);
+			u4IsRandomPattern, u4MsduPayloadLength0, u4MsduPayloadLength1, u4MuPacketCount, u4NumOfSTAs, ucAddr1[0],
+			ucAddr1[1], ucAddr1[2], ucAddr1[3], ucAddr1[4], ucAddr1[5], ucAddr2[0], ucAddr2[1], ucAddr2[2], ucAddr2[3],
+			ucAddr2[4], ucAddr2[5]);
 
 	DBGLOG(RFTEST, ERROR, "MT6632 prInBuf = %s\n", prInBuf);
 
@@ -6458,9 +6359,9 @@ static HQA_CMD_HANDLER HQA_TXMU_CMDS[] = {
 	HQA_MUCalInitMCS,	/* 0x1561 */
 	HQA_MUCalLQ,		/* 0x1562 */
 	HQA_MUGetLQ,		/* 0x1563 */
-	HQA_MUSetSNROffset,	/* 0x1564 */
+	HQA_MUSetSNROffset, /* 0x1564 */
 	HQA_MUSetZeroNss,	/* 0x1565 */
-	HQA_MUSetSpeedUpLQ,	/* 0x1566 */
+	HQA_MUSetSpeedUpLQ, /* 0x1566 */
 	HQA_MUSetMUTable,	/* 0x1567 */
 	HQA_MUSetGroup,		/* 0x1568 */
 	HQA_MUGetQD,		/* 0x1569 */
@@ -6473,41 +6374,41 @@ static HQA_CMD_HANDLER HQA_TXMU_CMDS[] = {
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For ICAP
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For ICAP
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 HQA_CapWiFiSpectrum(struct net_device *prNetDev,
-				  IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_CapWiFiSpectrum(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	P_GLUE_INFO_T prGlueInfo = NULL;
-	WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
+	P_GLUE_INFO_T				 prGlueInfo = NULL;
+	WLAN_STATUS					 rStatus	= WLAN_STATUS_SUCCESS;
 	PARAM_MTK_WIFI_TEST_STRUCT_T rRfATInfo;
-	UINT_32 u4BufLen = 0;
-	UINT_32 u4Control = 0;
-	UINT_32 u4Trigger = 0;
-	UINT_32 u4RingCapEn = 0;
-	UINT_32 u4TriggerEvent = 0;
-	UINT_32 u4CaptureNode = 0;
-	UINT_32 u4CaptureLen = 0;
-	UINT_32 u4CapStopCycle = 0;
-	UINT_32 u4BW = 0;
-/*	UINT_32 u4MacTriggerEvent = 0; */	/* Temp unused */
-/*	UINT_32 u4TriggerMac = 0; */	/* Temp unused */
+	UINT_32						 u4BufLen		= 0;
+	UINT_32						 u4Control		= 0;
+	UINT_32						 u4Trigger		= 0;
+	UINT_32						 u4RingCapEn	= 0;
+	UINT_32						 u4TriggerEvent = 0;
+	UINT_32						 u4CaptureNode	= 0;
+	UINT_32						 u4CaptureLen	= 0;
+	UINT_32						 u4CapStopCycle = 0;
+	UINT_32						 u4BW			= 0;
+	/*	UINT_32 u4MacTriggerEvent = 0; */ /* Temp unused */
+	/*	UINT_32 u4TriggerMac = 0; */	  /* Temp unused */
 	UINT_32 u4WFNum;
 	UINT_32 u4IQ;
 	UINT_32 u4TempLen = 0;
 	UINT_32 u4DataLen;
-	INT_32 i = 0, i4Ret = 0;
+	INT_32	i = 0, i4Ret = 0;
 	INT_32 *prIQAry;
 
-	prGlueInfo = *((P_GLUE_INFO_T *) netdev_priv(prNetDev));
+	prGlueInfo = *((P_GLUE_INFO_T *)netdev_priv(prNetDev));
 
 	memcpy((PUCHAR)&u4Control, HqaCmdFrame->Data + 4 * 0, 4);
 	u4Control = ntohl(u4Control);
@@ -6546,16 +6447,16 @@ static INT_32 HQA_CapWiFiSpectrum(struct net_device *prNetDev,
 
 		/* iwpriv wlan205 set_test_cmd 75 0   (J mode Setting) */
 		rRfATInfo.u4FuncIndex = RF_AT_FUNCID_SET_J_MODE;
-		rRfATInfo.u4FuncData = 0;
+		rRfATInfo.u4FuncData  = 0;
 
-		rStatus = kalIoctl(prGlueInfo,	/* prGlueInfo */
-				   wlanoidRftestSetAutoTest,	/* pfnOidHandler */
-				   &rRfATInfo,	/* pvInfoBuf */
-				   sizeof(rRfATInfo),	/* u4InfoBufLen */
-				   FALSE,	/* fgRead */
-				   FALSE,	/* fgWaitResp */
-				   TRUE,	/* fgCmd */
-				   &u4BufLen);	/* pu4QryInfoLen */
+		rStatus = kalIoctl(prGlueInfo,	  /* prGlueInfo */
+				wlanoidRftestSetAutoTest, /* pfnOidHandler */
+				&rRfATInfo,				  /* pvInfoBuf */
+				sizeof(rRfATInfo),		  /* u4InfoBufLen */
+				FALSE,					  /* fgRead */
+				FALSE,					  /* fgWaitResp */
+				TRUE,					  /* fgCmd */
+				&u4BufLen);				  /* pu4QryInfoLen */
 
 		if (rStatus != WLAN_STATUS_SUCCESS)
 			return -EFAULT;
@@ -6567,66 +6468,66 @@ static INT_32 HQA_CapWiFiSpectrum(struct net_device *prNetDev,
 			u4BW = 4;
 
 		rRfATInfo.u4FuncIndex = RF_AT_FUNCID_SET_CBW;
-		rRfATInfo.u4FuncData = u4BW;
+		rRfATInfo.u4FuncData  = u4BW;
 
-		rStatus = kalIoctl(prGlueInfo,	/* prGlueInfo */
-				   wlanoidRftestSetAutoTest,	/* pfnOidHandler */
-				   &rRfATInfo,	/* pvInfoBuf */
-				   sizeof(rRfATInfo),	/* u4InfoBufLen */
-				   FALSE,	/* fgRead */
-				   FALSE,	/* fgWaitResp */
-				   TRUE,	/* fgCmd */
-				   &u4BufLen);	/* pu4QryInfoLen */
+		rStatus = kalIoctl(prGlueInfo,	  /* prGlueInfo */
+				wlanoidRftestSetAutoTest, /* pfnOidHandler */
+				&rRfATInfo,				  /* pvInfoBuf */
+				sizeof(rRfATInfo),		  /* u4InfoBufLen */
+				FALSE,					  /* fgRead */
+				FALSE,					  /* fgWaitResp */
+				TRUE,					  /* fgCmd */
+				&u4BufLen);				  /* pu4QryInfoLen */
 
 		if (rStatus != WLAN_STATUS_SUCCESS)
 			return -EFAULT;
 
 		/* iwpriv wlan205 set_test_cmd 24 0     (ADC clock mode) */
 		rRfATInfo.u4FuncIndex = RF_AT_FUNCID_ADC_CLK_MODE;
-		rRfATInfo.u4FuncData = 0;
+		rRfATInfo.u4FuncData  = 0;
 
-		rStatus = kalIoctl(prGlueInfo,	/* prGlueInfo */
-				   wlanoidRftestSetAutoTest,	/* pfnOidHandler */
-				   &rRfATInfo,	/* pvInfoBuf */
-				   sizeof(rRfATInfo),	/* u4InfoBufLen */
-				   FALSE,	/* fgRead */
-				   FALSE,	/* fgWaitResp */
-				   TRUE,	/* fgCmd */
-				   &u4BufLen);	/* pu4QryInfoLen */
+		rStatus = kalIoctl(prGlueInfo,	  /* prGlueInfo */
+				wlanoidRftestSetAutoTest, /* pfnOidHandler */
+				&rRfATInfo,				  /* pvInfoBuf */
+				sizeof(rRfATInfo),		  /* u4InfoBufLen */
+				FALSE,					  /* fgRead */
+				FALSE,					  /* fgWaitResp */
+				TRUE,					  /* fgCmd */
+				&u4BufLen);				  /* pu4QryInfoLen */
 
 		if (rStatus != WLAN_STATUS_SUCCESS)
 			return -EFAULT;
 
 		/* iwpriv wlan205 set_test_cmd 84 18000   (Internal Capture Trigger Offset) */
 		rRfATInfo.u4FuncIndex = RF_AT_FUNCID_SET_ICAP_TRIGGER_OFFSET;
-		rRfATInfo.u4FuncData = u4CapStopCycle;
+		rRfATInfo.u4FuncData  = u4CapStopCycle;
 
-		rStatus = kalIoctl(prGlueInfo,	/* prGlueInfo */
-				   wlanoidRftestSetAutoTest,	/* pfnOidHandler */
-				   &rRfATInfo,	/* pvInfoBuf */
-				   sizeof(rRfATInfo),	/* u4InfoBufLen */
-				   FALSE,	/* fgRead */
-				   FALSE,	/* fgWaitResp */
-				   TRUE,	/* fgCmd */
-				   &u4BufLen);	/* pu4QryInfoLen */
+		rStatus = kalIoctl(prGlueInfo,	  /* prGlueInfo */
+				wlanoidRftestSetAutoTest, /* pfnOidHandler */
+				&rRfATInfo,				  /* pvInfoBuf */
+				sizeof(rRfATInfo),		  /* u4InfoBufLen */
+				FALSE,					  /* fgRead */
+				FALSE,					  /* fgWaitResp */
+				TRUE,					  /* fgCmd */
+				&u4BufLen);				  /* pu4QryInfoLen */
 
 		if (rStatus != WLAN_STATUS_SUCCESS)
 			return -EFAULT;
 
 		if (u4CaptureLen == 0)
-			u4CaptureLen = 196615;/* 24000; */
+			u4CaptureLen = 196615; /* 24000; */
 		/* iwpriv wlan205 set_test_cmd 83 24576   (Internal Capture Size) */
 		rRfATInfo.u4FuncIndex = RF_AT_FUNCID_SET_ICAP_SIZE;
-		rRfATInfo.u4FuncData = u4CaptureLen;
+		rRfATInfo.u4FuncData  = u4CaptureLen;
 
-		rStatus = kalIoctl(prGlueInfo,	/* prGlueInfo */
-				   wlanoidRftestSetAutoTest,	/* pfnOidHandler */
-				   &rRfATInfo,	/* pvInfoBuf */
-				   sizeof(rRfATInfo),	/* u4InfoBufLen */
-				   FALSE,	/* fgRead */
-				   FALSE,	/* fgWaitResp */
-				   TRUE,	/* fgCmd */
-				   &u4BufLen);	/* pu4QryInfoLen */
+		rStatus = kalIoctl(prGlueInfo,	  /* prGlueInfo */
+				wlanoidRftestSetAutoTest, /* pfnOidHandler */
+				&rRfATInfo,				  /* pvInfoBuf */
+				sizeof(rRfATInfo),		  /* u4InfoBufLen */
+				FALSE,					  /* fgRead */
+				FALSE,					  /* fgWaitResp */
+				TRUE,					  /* fgCmd */
+				&u4BufLen);				  /* pu4QryInfoLen */
 
 		if (rStatus != WLAN_STATUS_SUCCESS)
 			return -EFAULT;
@@ -6639,76 +6540,76 @@ static INT_32 HQA_CapWiFiSpectrum(struct net_device *prNetDev,
 			u4CaptureNode = 0x48;
 
 		rRfATInfo.u4FuncIndex = RF_AT_FUNCID_SET_ICAP_CONTENT;
-		rRfATInfo.u4FuncData = u4CaptureNode;
+		rRfATInfo.u4FuncData  = u4CaptureNode;
 
-		rStatus = kalIoctl(prGlueInfo,	/* prGlueInfo */
-				   wlanoidRftestSetAutoTest,	/* pfnOidHandler */
-				   &rRfATInfo,	/* pvInfoBuf */
-				   sizeof(rRfATInfo),	/* u4InfoBufLen */
-				   FALSE,	/* fgRead */
-				   FALSE,	/* fgWaitResp */
-				   TRUE,	/* fgCmd */
-				   &u4BufLen);	/* pu4QryInfoLen */
+		rStatus = kalIoctl(prGlueInfo,	  /* prGlueInfo */
+				wlanoidRftestSetAutoTest, /* pfnOidHandler */
+				&rRfATInfo,				  /* pvInfoBuf */
+				sizeof(rRfATInfo),		  /* u4InfoBufLen */
+				FALSE,					  /* fgRead */
+				FALSE,					  /* fgWaitResp */
+				TRUE,					  /* fgCmd */
+				&u4BufLen);				  /* pu4QryInfoLen */
 
 		if (rStatus != WLAN_STATUS_SUCCESS)
 			return -EFAULT;
 		/* iwpriv wlan205 set_test_cmd 81 0   (Internal Capture  Trigger mode) */
 		rRfATInfo.u4FuncIndex = RF_AT_FUNCID_SET_ICAP_MODE;
-		rRfATInfo.u4FuncData = u4TriggerEvent;
+		rRfATInfo.u4FuncData  = u4TriggerEvent;
 
-		rStatus = kalIoctl(prGlueInfo,	/* prGlueInfo */
-				   wlanoidRftestSetAutoTest,	/* pfnOidHandler */
-				   &rRfATInfo,	/* pvInfoBuf */
-				   sizeof(rRfATInfo),	/* u4InfoBufLen */
-				   FALSE,	/* fgRead */
-				   FALSE,	/* fgWaitResp */
-				   TRUE,	/* fgCmd */
-				   &u4BufLen);	/* pu4QryInfoLen */
+		rStatus = kalIoctl(prGlueInfo,	  /* prGlueInfo */
+				wlanoidRftestSetAutoTest, /* pfnOidHandler */
+				&rRfATInfo,				  /* pvInfoBuf */
+				sizeof(rRfATInfo),		  /* u4InfoBufLen */
+				FALSE,					  /* fgRead */
+				FALSE,					  /* fgWaitResp */
+				TRUE,					  /* fgCmd */
+				&u4BufLen);				  /* pu4QryInfoLen */
 
 		if (rStatus != WLAN_STATUS_SUCCESS)
 			return -EFAULT;
 
 		rRfATInfo.u4FuncIndex = RF_AT_FUNCID_SET_ICAP_RING;
-		rRfATInfo.u4FuncData = u4RingCapEn;
+		rRfATInfo.u4FuncData  = u4RingCapEn;
 
-		rStatus = kalIoctl(prGlueInfo,	/* prGlueInfo */
-				   wlanoidRftestSetAutoTest,	/* pfnOidHandler */
-				   &rRfATInfo,	/* pvInfoBuf */
-				   sizeof(rRfATInfo),	/* u4InfoBufLen */
-				   FALSE,	/* fgRead */
-				   FALSE,	/* fgWaitResp */
-				   TRUE,	/* fgCmd */
-				   &u4BufLen);	/* pu4QryInfoLen */
+		rStatus = kalIoctl(prGlueInfo,	  /* prGlueInfo */
+				wlanoidRftestSetAutoTest, /* pfnOidHandler */
+				&rRfATInfo,				  /* pvInfoBuf */
+				sizeof(rRfATInfo),		  /* u4InfoBufLen */
+				FALSE,					  /* fgRead */
+				FALSE,					  /* fgWaitResp */
+				TRUE,					  /* fgCmd */
+				&u4BufLen);				  /* pu4QryInfoLen */
 
 		if (rStatus != WLAN_STATUS_SUCCESS)
 			return -EFAULT;
 		/* iwpriv wlan205 set_test_cmd 1 13 */
 		rRfATInfo.u4FuncIndex = RF_AT_FUNCID_COMMAND;
-		rRfATInfo.u4FuncData = RF_AT_COMMAND_CH_SWITCH_FOR_ICAP;
+		rRfATInfo.u4FuncData  = RF_AT_COMMAND_CH_SWITCH_FOR_ICAP;
 
-		rStatus = kalIoctl(prGlueInfo,	/* prGlueInfo */
-				   wlanoidRftestSetAutoTest,	/* pfnOidHandler */
-				   &rRfATInfo,	/* pvInfoBuf */
-				   sizeof(rRfATInfo),	/* u4InfoBufLen */
-				   FALSE,	/* fgRead */
-				   FALSE,	/* fgWaitResp */
-				   TRUE,	/* fgCmd */
-				   &u4BufLen);	/* pu4QryInfoLen */
+		rStatus = kalIoctl(prGlueInfo,	  /* prGlueInfo */
+				wlanoidRftestSetAutoTest, /* pfnOidHandler */
+				&rRfATInfo,				  /* pvInfoBuf */
+				sizeof(rRfATInfo),		  /* u4InfoBufLen */
+				FALSE,					  /* fgRead */
+				FALSE,					  /* fgWaitResp */
+				TRUE,					  /* fgCmd */
+				&u4BufLen);				  /* pu4QryInfoLen */
 
 		if (rStatus != WLAN_STATUS_SUCCESS)
 			return -EFAULT;
 		/* iwpriv wlan205 set_test_cmd 1 11 */
 		rRfATInfo.u4FuncIndex = RF_AT_FUNCID_COMMAND;
-		rRfATInfo.u4FuncData = RF_AT_COMMAND_ICAP;
+		rRfATInfo.u4FuncData  = RF_AT_COMMAND_ICAP;
 
-		rStatus = kalIoctl(prGlueInfo,	/* prGlueInfo */
-				   wlanoidRftestSetAutoTest,	/* pfnOidHandler */
-				   &rRfATInfo,	/* pvInfoBuf */
-				   sizeof(rRfATInfo),	/* u4InfoBufLen */
-				   FALSE,	/* fgRead */
-				   FALSE,	/* fgWaitResp */
-				   TRUE,	/* fgCmd */
-				   &u4BufLen);	/* pu4QryInfoLen */
+		rStatus = kalIoctl(prGlueInfo,	  /* prGlueInfo */
+				wlanoidRftestSetAutoTest, /* pfnOidHandler */
+				&rRfATInfo,				  /* pvInfoBuf */
+				sizeof(rRfATInfo),		  /* u4InfoBufLen */
+				FALSE,					  /* fgRead */
+				FALSE,					  /* fgWaitResp */
+				TRUE,					  /* fgCmd */
+				&u4BufLen);				  /* pu4QryInfoLen */
 
 		if (rStatus != WLAN_STATUS_SUCCESS)
 			return -EFAULT;
@@ -6742,18 +6643,18 @@ static INT_32 HQA_CapWiFiSpectrum(struct net_device *prNetDev,
 			u4DataLen /= 4;
 
 			u4Control = ntohl(u4Control);
-			memcpy(HqaCmdFrame->Data + 2 + 4 * 0, (UCHAR *) &u4Control, sizeof(u4Control));
+			memcpy(HqaCmdFrame->Data + 2 + 4 * 0, (UCHAR *)&u4Control, sizeof(u4Control));
 			u4WFNum = ntohl(u4WFNum);
-			memcpy(HqaCmdFrame->Data + 2 + 4 * 1, (UCHAR *) &u4WFNum, sizeof(u4WFNum));
+			memcpy(HqaCmdFrame->Data + 2 + 4 * 1, (UCHAR *)&u4WFNum, sizeof(u4WFNum));
 			u4IQ = ntohl(u4IQ);
-			memcpy(HqaCmdFrame->Data + 2 + 4 * 2, (UCHAR *) &u4IQ, sizeof(u4IQ));
+			memcpy(HqaCmdFrame->Data + 2 + 4 * 2, (UCHAR *)&u4IQ, sizeof(u4IQ));
 			u4DataLen = ntohl(u4DataLen);
-			memcpy(HqaCmdFrame->Data + 2 + 4 * 3, (UCHAR *) &u4DataLen, sizeof(u4DataLen));
+			memcpy(HqaCmdFrame->Data + 2 + 4 * 3, (UCHAR *)&u4DataLen, sizeof(u4DataLen));
 
 			for (i = 0; i < u4TempLen / sizeof(UINT_32); i++)
 				prIQAry[i] = ntohl(prIQAry[i]);
 
-			memcpy(HqaCmdFrame->Data + 2 + 4 * 4, (UCHAR *) &prIQAry[0], u4TempLen);
+			memcpy(HqaCmdFrame->Data + 2 + 4 * 4, (UCHAR *)&prIQAry[0], u4TempLen);
 		} else {
 			u4TempLen = 0;
 		}
@@ -6767,36 +6668,36 @@ static INT_32 HQA_CapWiFiSpectrum(struct net_device *prNetDev,
 }
 
 static HQA_CMD_HANDLER HQA_ICAP_CMDS[] = {
-	HQA_CapWiFiSpectrum,	/* 0x1580 */
+	HQA_CapWiFiSpectrum, /* 0x1580 */
 };
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 hqa_set_channel_ext(struct net_device *prNetDev,
-				  IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 hqa_set_channel_ext(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Ret = 0;
-	UINT_32 u4Ext_id = 0;
-	UINT_32 u4Param_num = 0;
-	UINT_32 u4Band_idx = 0;
+	INT_32	i4Ret		  = 0;
+	UINT_32 u4Ext_id	  = 0;
+	UINT_32 u4Param_num	  = 0;
+	UINT_32 u4Band_idx	  = 0;
 	UINT_32 u4Central_ch0 = 0;
 	UINT_32 u4Central_ch1 = 0;
-	UINT_32 u4Sys_bw = 0;
-	UINT_32 u4Perpkt_bw = 0;
-	UINT_32 u4Pri_sel = 0;
-	UINT_32 u4Reason = 0;
-	UINT_32 u4Ch_band = 0;
-	UINT_32 u4SetFreq = 0;
+	UINT_32 u4Sys_bw	  = 0;
+	UINT_32 u4Perpkt_bw	  = 0;
+	UINT_32 u4Pri_sel	  = 0;
+	UINT_32 u4Reason	  = 0;
+	UINT_32 u4Ch_band	  = 0;
+	UINT_32 u4SetFreq	  = 0;
 
 	memcpy(&u4Ext_id, HqaCmdFrame->Data + 4 * 0, 4);
 	u4Ext_id = ntohl(u4Ext_id);
@@ -6840,7 +6741,7 @@ static INT_32 hqa_set_channel_ext(struct net_device *prNetDev,
 	 * 4: BW5
 	 * 5: BW160C
 	 * 6: BW160NC
-	*/
+	 */
 	/* BW Mapping in MT6632 FW
 	 * 0: BW20
 	 * 1: BW40
@@ -6849,7 +6750,7 @@ static INT_32 hqa_set_channel_ext(struct net_device *prNetDev,
 	 * 4: BW160NC
 	 * 5: BW5
 	 * 6: BW10
-	*/
+	 */
 	/* For POR Cal Setting - 20160601 */
 	if ((u4Central_ch0 == u4Central_ch1) && (u4Sys_bw == 6) && (u4Perpkt_bw == 6)) {
 		DBGLOG(RFTEST, INFO, "MT6632 : Wrong Setting for POR Cal\n");
@@ -6886,7 +6787,7 @@ static INT_32 hqa_set_channel_ext(struct net_device *prNetDev,
 
 exit:
 	u4Ext_id = ntohl(u4Ext_id);
-	memcpy(HqaCmdFrame->Data + 2, (UCHAR *) &u4Ext_id, sizeof(u4Ext_id));
+	memcpy(HqaCmdFrame->Data + 2, (UCHAR *)&u4Ext_id, sizeof(u4Ext_id));
 
 	ResponseToQA(HqaCmdFrame, prIwReqData, 6, i4Ret);
 	return i4Ret;
@@ -6894,33 +6795,33 @@ exit:
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 hqa_set_txcontent_ext(struct net_device *prNetDev,
-				    IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 hqa_set_txcontent_ext(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Ret = 0;
-	UINT_32 u4Len = 0;
-	UINT_32 u4Ext_id = 0;
-	UINT_32 u4Param_num = 0;
-	UINT_32 u4Band_idx = 0;
-	UINT_32 u4FC = 0;
-	UINT_32 u4Dur = 0;
-	UINT_32 u4Seq = 0;
+	INT_32	i4Ret			   = 0;
+	UINT_32 u4Len			   = 0;
+	UINT_32 u4Ext_id		   = 0;
+	UINT_32 u4Param_num		   = 0;
+	UINT_32 u4Band_idx		   = 0;
+	UINT_32 u4FC			   = 0;
+	UINT_32 u4Dur			   = 0;
+	UINT_32 u4Seq			   = 0;
 	UINT_32 u4Gen_payload_rule = 0;
-	UINT_32 u4Txlen = 0;
-	UINT_32 u4Payload_len = 0;
-	UINT_8 ucAddr1[MAC_ADDR_LEN];
-	UINT_8 ucAddr2[MAC_ADDR_LEN];
-	UINT_8 ucAddr3[MAC_ADDR_LEN];
+	UINT_32 u4Txlen			   = 0;
+	UINT_32 u4Payload_len	   = 0;
+	UINT_8	ucAddr1[MAC_ADDR_LEN];
+	UINT_8	ucAddr2[MAC_ADDR_LEN];
+	UINT_8	ucAddr3[MAC_ADDR_LEN];
 	UINT_32 ucPayload = 0;
 
 	u4Len = ntohs(HqaCmdFrame->Length);
@@ -6961,12 +6862,12 @@ static INT_32 hqa_set_txcontent_ext(struct net_device *prNetDev,
 	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT hqa_set_txcontent_ext gen_payload_rule : %d\n", u4Gen_payload_rule);
 	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT hqa_set_txcontent_ext txlen : %d\n", u4Txlen);
 	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT hqa_set_txcontent_ext payload_len : %d\n", u4Payload_len);
-	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT hqa_set_txcontent_ext addr1:%02x:%02x:%02x:%02x:%02x:%02x\n",
-	       ucAddr1[0], ucAddr1[1], ucAddr1[2], ucAddr1[3], ucAddr1[4], ucAddr1[5]);
-	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT hqa_set_txcontent_ext addr2:%02x:%02x:%02x:%02x:%02x:%02x\n",
-	       ucAddr2[0], ucAddr2[1], ucAddr2[2], ucAddr2[3], ucAddr2[4], ucAddr2[5]);
-	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT hqa_set_txcontent_ext addr3:%02x:%02x:%02x:%02x:%02x:%02x\n",
-	       ucAddr3[0], ucAddr3[1], ucAddr3[2], ucAddr3[3], ucAddr3[4], ucAddr3[5]);
+	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT hqa_set_txcontent_ext addr1:%02x:%02x:%02x:%02x:%02x:%02x\n", ucAddr1[0],
+			ucAddr1[1], ucAddr1[2], ucAddr1[3], ucAddr1[4], ucAddr1[5]);
+	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT hqa_set_txcontent_ext addr2:%02x:%02x:%02x:%02x:%02x:%02x\n", ucAddr2[0],
+			ucAddr2[1], ucAddr2[2], ucAddr2[3], ucAddr2[4], ucAddr2[5]);
+	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT hqa_set_txcontent_ext addr3:%02x:%02x:%02x:%02x:%02x:%02x\n", ucAddr3[0],
+			ucAddr3[1], ucAddr3[2], ucAddr3[3], ucAddr3[4], ucAddr3[5]);
 	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT hqa_start_tx_ext payload : 0x%x\n", ucPayload);
 
 	MT_ATESetDBDCBandIndex(prNetDev, u4Band_idx);
@@ -6978,7 +6879,7 @@ static INT_32 hqa_set_txcontent_ext(struct net_device *prNetDev,
 	/* PeiHsuan Memo : No Set Addr3 */
 
 	u4Ext_id = ntohl(u4Ext_id);
-	memcpy(HqaCmdFrame->Data + 2, (UCHAR *) &u4Ext_id, sizeof(u4Ext_id));
+	memcpy(HqaCmdFrame->Data + 2, (UCHAR *)&u4Ext_id, sizeof(u4Ext_id));
 	ResponseToQA(HqaCmdFrame, prIwReqData, 2 + sizeof(u4Ext_id), i4Ret);
 
 	return i4Ret;
@@ -6986,36 +6887,36 @@ static INT_32 hqa_set_txcontent_ext(struct net_device *prNetDev,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 hqa_start_tx_ext(struct net_device *prNetDev,
-			       IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 hqa_start_tx_ext(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Ret = 0;
-	UINT_32 u4Ext_id = 0;
+	INT_32	i4Ret		= 0;
+	UINT_32 u4Ext_id	= 0;
 	UINT_32 u4Param_num = 0;
-	UINT_32 u4Band_idx = 0;
-	UINT_32 u4Pkt_cnt = 0;
-	UINT_32 u4Phymode = 0;
-	UINT_32 u4Rate = 0;
-	UINT_32 u4Pwr = 0;
-	UINT_32 u4Stbc = 0;
-	UINT_32 u4Ldpc = 0;
-	UINT_32 u4iBF = 0;
-	UINT_32 u4eBF = 0;
-	UINT_32 u4Wlan_id = 0;
-	UINT_32 u4Aifs = 0;
-	UINT_32 u4Gi = 0;
-	UINT_32 u4Tx_path = 0;
-	UINT_32 u4Nss = 0;
+	UINT_32 u4Band_idx	= 0;
+	UINT_32 u4Pkt_cnt	= 0;
+	UINT_32 u4Phymode	= 0;
+	UINT_32 u4Rate		= 0;
+	UINT_32 u4Pwr		= 0;
+	UINT_32 u4Stbc		= 0;
+	UINT_32 u4Ldpc		= 0;
+	UINT_32 u4iBF		= 0;
+	UINT_32 u4eBF		= 0;
+	UINT_32 u4Wlan_id	= 0;
+	UINT_32 u4Aifs		= 0;
+	UINT_32 u4Gi		= 0;
+	UINT_32 u4Tx_path	= 0;
+	UINT_32 u4Nss		= 0;
 
 	memcpy(&u4Ext_id, HqaCmdFrame->Data + 4 * 0, 4);
 	u4Ext_id = ntohl(u4Ext_id);
@@ -7118,7 +7019,7 @@ static INT_32 hqa_start_tx_ext(struct net_device *prNetDev,
 	MT_ATEStartTX(prNetDev, "TXFRAME");
 
 	u4Ext_id = ntohl(u4Ext_id);
-	memcpy(HqaCmdFrame->Data + 2, (UCHAR *) &u4Ext_id, sizeof(u4Ext_id));
+	memcpy(HqaCmdFrame->Data + 2, (UCHAR *)&u4Ext_id, sizeof(u4Ext_id));
 	ResponseToQA(HqaCmdFrame, prIwReqData, 2 + sizeof(u4Ext_id), i4Ret);
 
 	return i4Ret;
@@ -7126,30 +7027,30 @@ static INT_32 hqa_start_tx_ext(struct net_device *prNetDev,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 hqa_start_rx_ext(struct net_device *prNetDev,
-			       IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 hqa_start_rx_ext(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Ret = 0;
-	UINT_32 u4Ext_id = 0;
-	UINT_32 u4Param_num = 0;
-	UINT_32 u4Band_idx = 0;
-	UINT_32 u4Rx_path = 0;
-	UCHAR ucOwn_mac[MAC_ADDR_LEN];
-	P_GLUE_INFO_T prGlueInfo = NULL;
+	INT_32						 i4Ret		 = 0;
+	UINT_32						 u4Ext_id	 = 0;
+	UINT_32						 u4Param_num = 0;
+	UINT_32						 u4Band_idx	 = 0;
+	UINT_32						 u4Rx_path	 = 0;
+	UCHAR						 ucOwn_mac[MAC_ADDR_LEN];
+	P_GLUE_INFO_T				 prGlueInfo = NULL;
 	PARAM_MTK_WIFI_TEST_STRUCT_T rRfATInfo;
-	UINT_32 u4BufLen = 0;
+	UINT_32						 u4BufLen = 0;
 
-	prGlueInfo = *((P_GLUE_INFO_T *) netdev_priv(prNetDev));
+	prGlueInfo = *((P_GLUE_INFO_T *)netdev_priv(prNetDev));
 
 	memcpy(&u4Ext_id, HqaCmdFrame->Data, 4);
 	u4Ext_id = ntohl(u4Ext_id);
@@ -7166,8 +7067,8 @@ static INT_32 hqa_start_rx_ext(struct net_device *prNetDev,
 	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT hqa_start_rx_ext ext_id : %d\n", u4Ext_id);
 	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT hqa_start_rx_ext param_num : %d\n", u4Param_num);
 	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT hqa_start_rx_ext band_idx : %d\n", u4Band_idx);
-	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT hqa_start_rx_ext own_mac:%02x:%02x:%02x:%02x:%02x:%02x\n",
-	       ucOwn_mac[0], ucOwn_mac[1], ucOwn_mac[2], ucOwn_mac[3], ucOwn_mac[4], ucOwn_mac[5]);
+	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT hqa_start_rx_ext own_mac:%02x:%02x:%02x:%02x:%02x:%02x\n", ucOwn_mac[0],
+			ucOwn_mac[1], ucOwn_mac[2], ucOwn_mac[3], ucOwn_mac[4], ucOwn_mac[5]);
 	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT hqa_start_rx_ext rx_path : 0x%x\n", u4Rx_path);
 
 	u4RxStatSeqNum = 0;
@@ -7175,16 +7076,16 @@ static INT_32 hqa_start_rx_ext(struct net_device *prNetDev,
 	MT_ATESetDBDCBandIndex(prNetDev, u4Band_idx);
 
 	rRfATInfo.u4FuncIndex = RF_AT_FUNCID_SET_RX_PATH;
-	rRfATInfo.u4FuncData = u4Rx_path << 16 | u4Band_idx;
+	rRfATInfo.u4FuncData  = u4Rx_path << 16 | u4Band_idx;
 
-	i4Ret = kalIoctl(prGlueInfo,	/* prGlueInfo */
-			 wlanoidRftestSetAutoTest,	/* pfnOidHandler */
-			 &rRfATInfo,	/* pvInfoBuf */
-			 sizeof(rRfATInfo),	/* u4InfoBufLen */
-			 FALSE,	/* fgRead */
-			 FALSE,	/* fgWaitResp */
-			 TRUE,	/* fgCmd */
-			 &u4BufLen);	/* pu4QryInfoLen */
+	i4Ret = kalIoctl(prGlueInfo,	  /* prGlueInfo */
+			wlanoidRftestSetAutoTest, /* pfnOidHandler */
+			&rRfATInfo,				  /* pvInfoBuf */
+			sizeof(rRfATInfo),		  /* u4InfoBufLen */
+			FALSE,					  /* fgRead */
+			FALSE,					  /* fgWaitResp */
+			TRUE,					  /* fgCmd */
+			&u4BufLen);				  /* pu4QryInfoLen */
 
 	if (i4Ret != WLAN_STATUS_SUCCESS)
 		return -EFAULT;
@@ -7192,7 +7093,7 @@ static INT_32 hqa_start_rx_ext(struct net_device *prNetDev,
 	MT_ATEStartRX(prNetDev, "RXFRAME");
 
 	u4Ext_id = ntohl(u4Ext_id);
-	memcpy(HqaCmdFrame->Data + 2, (UCHAR *) &u4Ext_id, sizeof(u4Ext_id));
+	memcpy(HqaCmdFrame->Data + 2, (UCHAR *)&u4Ext_id, sizeof(u4Ext_id));
 	ResponseToQA(HqaCmdFrame, prIwReqData, 2 + sizeof(u4Ext_id), i4Ret);
 
 	return i4Ret;
@@ -7200,23 +7101,22 @@ static INT_32 hqa_start_rx_ext(struct net_device *prNetDev,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 hqa_stop_tx_ext(struct net_device *prNetDev,
-			      IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 hqa_stop_tx_ext(struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Ret = 0;
-	UINT_32 u4Ext_id = 0;
+	INT_32	i4Ret		= 0;
+	UINT_32 u4Ext_id	= 0;
 	UINT_32 u4Param_num = 0;
-	UINT_32 u4Band_idx = 0;
+	UINT_32 u4Band_idx	= 0;
 
 	memcpy(&u4Ext_id, HqaCmdFrame->Data, 4);
 	u4Ext_id = ntohl(u4Ext_id);
@@ -7233,7 +7133,7 @@ static INT_32 hqa_stop_tx_ext(struct net_device *prNetDev,
 	MT_ATEStopTX(prNetDev, "TXSTOP");
 
 	u4Ext_id = ntohl(u4Ext_id);
-	memcpy(HqaCmdFrame->Data + 2, (UCHAR *) &u4Ext_id, sizeof(u4Ext_id));
+	memcpy(HqaCmdFrame->Data + 2, (UCHAR *)&u4Ext_id, sizeof(u4Ext_id));
 	ResponseToQA(HqaCmdFrame, prIwReqData, 6, i4Ret);
 
 	return i4Ret;
@@ -7241,23 +7141,22 @@ static INT_32 hqa_stop_tx_ext(struct net_device *prNetDev,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-static INT_32 hqa_stop_rx_ext(struct net_device *prNetDev,
-			      IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 hqa_stop_rx_ext(struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Ret = 0;
-	UINT_32 u4Ext_id = 0;
+	INT_32	i4Ret		= 0;
+	UINT_32 u4Ext_id	= 0;
 	UINT_32 u4Param_num = 0;
-	UINT_32 u4Band_idx = 0;
+	UINT_32 u4Band_idx	= 0;
 
 	memcpy(&u4Ext_id, HqaCmdFrame->Data, 4);
 	u4Ext_id = ntohl(u4Ext_id);
@@ -7274,7 +7173,7 @@ static INT_32 hqa_stop_rx_ext(struct net_device *prNetDev,
 	MT_ATEStopRX(prNetDev, "RXSTOP");
 
 	u4Ext_id = ntohl(u4Ext_id);
-	memcpy(HqaCmdFrame->Data + 2, (UCHAR *) &u4Ext_id, sizeof(u4Ext_id));
+	memcpy(HqaCmdFrame->Data + 2, (UCHAR *)&u4Ext_id, sizeof(u4Ext_id));
 	ResponseToQA(HqaCmdFrame, prIwReqData, 6, i4Ret);
 
 	return i4Ret;
@@ -7291,8 +7190,7 @@ static INT_32 HQA_iBFInit(struct net_device *prNetDev, IN union iwreq_data *prIw
 	return i4Ret;
 }
 
-static INT_32 HQA_iBFSetValue(struct net_device *prNetDev,
-			      IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_iBFSetValue(struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
 	INT_32 i4Ret = 0;
 
@@ -7303,8 +7201,8 @@ static INT_32 HQA_iBFSetValue(struct net_device *prNetDev,
 	return i4Ret;
 }
 
-static INT_32 HQA_iBFGetStatus(struct net_device *prNetDev,
-			       IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_iBFGetStatus(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
 	INT_32 i4Ret = 0;
 
@@ -7315,8 +7213,8 @@ static INT_32 HQA_iBFGetStatus(struct net_device *prNetDev,
 	return i4Ret;
 }
 
-static INT_32 HQA_iBFChanProfUpdate(struct net_device *prNetDev,
-				    IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_iBFChanProfUpdate(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
 	INT_32 i4Ret = 0;
 
@@ -7327,8 +7225,8 @@ static INT_32 HQA_iBFChanProfUpdate(struct net_device *prNetDev,
 	return i4Ret;
 }
 
-static INT_32 HQA_iBFProfileRead(struct net_device *prNetDev,
-				 IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_iBFProfileRead(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
 	INT_32 i4Ret = 0;
 
@@ -7341,7 +7239,7 @@ static INT_32 HQA_iBFProfileRead(struct net_device *prNetDev,
 
 static INT_32 HQA_IRRSetADC(struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Ret = 0;
+	INT_32	i4Ret = 0;
 	UINT_32 u4WFIdx;
 	UINT_32 u4ChFreq;
 	UINT_32 u4BW;
@@ -7372,7 +7270,7 @@ static INT_32 HQA_IRRSetADC(struct net_device *prNetDev, IN union iwreq_data *pr
 	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_IRRSetADC u4WFIdx : %d\n", u4WFIdx);
 	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_IRRSetADC u4ChFreq : %d\n", u4ChFreq);
 	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_IRRSetADC u4BW : %d\n", u4BW);
-	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_IRRSetADC u4Sx : %d\n", u4Sx);	/* SX : 0, 2 */
+	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_IRRSetADC u4Sx : %d\n", u4Sx); /* SX : 0, 2 */
 	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_IRRSetADC u4Band : %d\n", u4Band);
 	/* RunType : 0 -> QA, 1 -> ATE */
 	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_IRRSetADC u4RunType : %d\n", u4RunType);
@@ -7382,16 +7280,16 @@ static INT_32 HQA_IRRSetADC(struct net_device *prNetDev, IN union iwreq_data *pr
 	i4Ret = MT_ATE_IRRSetADC(prNetDev, u4WFIdx, u4ChFreq, u4BW, u4Sx, u4Band, u4RunType, u4FType);
 
 	u4Ext_id = ntohl(u4Ext_id);
-	memcpy(HqaCmdFrame->Data + 2, (UCHAR *) &u4Ext_id, sizeof(u4Ext_id));
+	memcpy(HqaCmdFrame->Data + 2, (UCHAR *)&u4Ext_id, sizeof(u4Ext_id));
 	ResponseToQA(HqaCmdFrame, prIwReqData, 6, i4Ret);
 
 	return i4Ret;
 }
 
-static INT_32 HQA_IRRSetRxGain(struct net_device *prNetDev,
-			       IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_IRRSetRxGain(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Ret = 0;
+	INT_32	i4Ret = 0;
 	UINT_32 u4PgaLpfg;
 	UINT_32 u4Lna;
 	UINT_32 u4Band;
@@ -7427,7 +7325,7 @@ static INT_32 HQA_IRRSetRxGain(struct net_device *prNetDev,
 	i4Ret = MT_ATE_IRRSetRxGain(prNetDev, u4PgaLpfg, u4Lna, u4Band, u4WF_inx, u4Rfdgc);
 
 	u4Ext_id = ntohl(u4Ext_id);
-	memcpy(HqaCmdFrame->Data + 2, (UCHAR *) &u4Ext_id, sizeof(u4Ext_id));
+	memcpy(HqaCmdFrame->Data + 2, (UCHAR *)&u4Ext_id, sizeof(u4Ext_id));
 	ResponseToQA(HqaCmdFrame, prIwReqData, 6, i4Ret);
 
 	return i4Ret;
@@ -7435,7 +7333,7 @@ static INT_32 HQA_IRRSetRxGain(struct net_device *prNetDev,
 
 static INT_32 HQA_IRRSetTTG(struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Ret = 0;
+	INT_32	i4Ret = 0;
 	UINT_32 u4Ext_id;
 	UINT_32 u4TTGPwrIdx;
 	UINT_32 u4ChFreq;
@@ -7466,16 +7364,16 @@ static INT_32 HQA_IRRSetTTG(struct net_device *prNetDev, IN union iwreq_data *pr
 	i4Ret = MT_ATE_IRRSetTTG(prNetDev, u4TTGPwrIdx, u4ChFreq, u4FIToneFreq, u4Band);
 
 	u4Ext_id = ntohl(u4Ext_id);
-	memcpy(HqaCmdFrame->Data + 2, (UCHAR *) &u4Ext_id, sizeof(u4Ext_id));
+	memcpy(HqaCmdFrame->Data + 2, (UCHAR *)&u4Ext_id, sizeof(u4Ext_id));
 	ResponseToQA(HqaCmdFrame, prIwReqData, 6, i4Ret);
 
 	return i4Ret;
 }
 
-static INT_32 HQA_IRRSetTrunOnTTG(struct net_device *prNetDev,
-				  IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
+static INT_32 HQA_IRRSetTrunOnTTG(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Ret = 0;
+	INT_32	i4Ret = 0;
 	UINT_32 u4Ext_id;
 	UINT_32 u4TTGOnOff;
 	UINT_32 u4Band;
@@ -7499,62 +7397,61 @@ static INT_32 HQA_IRRSetTrunOnTTG(struct net_device *prNetDev,
 	i4Ret = MT_ATE_IRRSetTrunOnTTG(prNetDev, u4TTGOnOff, u4Band, u4WF_inx);
 
 	u4Ext_id = ntohl(u4Ext_id);
-	memcpy(HqaCmdFrame->Data + 2, (UCHAR *) &u4Ext_id, sizeof(u4Ext_id));
+	memcpy(HqaCmdFrame->Data + 2, (UCHAR *)&u4Ext_id, sizeof(u4Ext_id));
 	ResponseToQA(HqaCmdFrame, prIwReqData, 6, i4Ret);
 
 	return i4Ret;
 }
 
 static HQA_CMD_HANDLER hqa_ext_cmd_set[] = {
-	NULL,
-	hqa_set_channel_ext,	/* 0x00000001 */
-	hqa_set_txcontent_ext,	/* 0x00000002 */
-	hqa_start_tx_ext,	/* 0x00000003 */
-	hqa_start_rx_ext,	/* 0x00000004 */
-	hqa_stop_tx_ext,	/* 0x00000005 */
-	hqa_stop_rx_ext,	/* 0x00000006 */
-	HQA_iBFInit,		/* 0x00000007 */
-	HQA_iBFSetValue,	/* 0x00000008 */
-	HQA_iBFGetStatus,	/* 0x00000009 */
-	HQA_iBFChanProfUpdate,	/* 0x0000000A */
-	HQA_iBFProfileRead,	/* 0x0000000B */
-	ToDoFunction,		/* 0x0000000C */
-	ToDoFunction,		/* 0x0000000D */
-	ToDoFunction,		/* 0x0000000E */
-	ToDoFunction,		/* 0x0000000F */
-	ToDoFunction,		/* 0x00000010 */
-	ToDoFunction,		/* 0x00000011 */
-	ToDoFunction,		/* 0x00000012 */
-	ToDoFunction,		/* 0x00000013 */
-	ToDoFunction,		/* 0x00000014 */
-	ToDoFunction,		/* 0x00000015 */
-	ToDoFunction,		/* 0x00000016 */
-	ToDoFunction,		/* 0x00000017 */
-	ToDoFunction,		/* 0x00000018 */
-	ToDoFunction,		/* 0x00000019 */
-	ToDoFunction,		/* 0x0000001A */
-	ToDoFunction,		/* 0x0000001B */
-	ToDoFunction,		/* 0x0000001C */
-	ToDoFunction,		/* 0x0000001D */
-	ToDoFunction,		/* 0x0000001E */
-	ToDoFunction,		/* 0x0000001F */
-	HQA_IRRSetADC,		/* 0x00000020 */
-	HQA_IRRSetRxGain,	/* 0x00000021 */
-	HQA_IRRSetTTG,		/* 0x00000022 */
-	HQA_IRRSetTrunOnTTG,	/* 0x00000023 */
+	NULL, hqa_set_channel_ext, /* 0x00000001 */
+	hqa_set_txcontent_ext,	   /* 0x00000002 */
+	hqa_start_tx_ext,		   /* 0x00000003 */
+	hqa_start_rx_ext,		   /* 0x00000004 */
+	hqa_stop_tx_ext,		   /* 0x00000005 */
+	hqa_stop_rx_ext,		   /* 0x00000006 */
+	HQA_iBFInit,			   /* 0x00000007 */
+	HQA_iBFSetValue,		   /* 0x00000008 */
+	HQA_iBFGetStatus,		   /* 0x00000009 */
+	HQA_iBFChanProfUpdate,	   /* 0x0000000A */
+	HQA_iBFProfileRead,		   /* 0x0000000B */
+	ToDoFunction,			   /* 0x0000000C */
+	ToDoFunction,			   /* 0x0000000D */
+	ToDoFunction,			   /* 0x0000000E */
+	ToDoFunction,			   /* 0x0000000F */
+	ToDoFunction,			   /* 0x00000010 */
+	ToDoFunction,			   /* 0x00000011 */
+	ToDoFunction,			   /* 0x00000012 */
+	ToDoFunction,			   /* 0x00000013 */
+	ToDoFunction,			   /* 0x00000014 */
+	ToDoFunction,			   /* 0x00000015 */
+	ToDoFunction,			   /* 0x00000016 */
+	ToDoFunction,			   /* 0x00000017 */
+	ToDoFunction,			   /* 0x00000018 */
+	ToDoFunction,			   /* 0x00000019 */
+	ToDoFunction,			   /* 0x0000001A */
+	ToDoFunction,			   /* 0x0000001B */
+	ToDoFunction,			   /* 0x0000001C */
+	ToDoFunction,			   /* 0x0000001D */
+	ToDoFunction,			   /* 0x0000001E */
+	ToDoFunction,			   /* 0x0000001F */
+	HQA_IRRSetADC,			   /* 0x00000020 */
+	HQA_IRRSetRxGain,		   /* 0x00000021 */
+	HQA_IRRSetTTG,			   /* 0x00000022 */
+	HQA_IRRSetTrunOnTTG,	   /* 0x00000023 */
 };
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For Extension Commands (For MT7615).
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For Extension Commands (For MT7615).
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
 static INT_32 hqa_ext_cmds(struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
@@ -7568,7 +7465,7 @@ static INT_32 hqa_ext_cmds(struct net_device *prNetDev, IN union iwreq_data *prI
 
 	if (i4Idx < (sizeof(hqa_ext_cmd_set) / sizeof(HQA_CMD_HANDLER))) {
 		if (hqa_ext_cmd_set[i4Idx] != NULL)
-			i4Ret = (*hqa_ext_cmd_set[i4Idx]) (prNetDev, prIwReqData, HqaCmdFrame);
+			i4Ret = (*hqa_ext_cmd_set[i4Idx])(prNetDev, prIwReqData, HqaCmdFrame);
 		else
 			DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT hqa_ext_cmds cmd idx %d is NULL : %d\n", i4Idx);
 	} else
@@ -7579,91 +7476,81 @@ static INT_32 hqa_ext_cmds(struct net_device *prNetDev, IN union iwreq_data *prI
 
 static HQA_CMD_HANDLER HQA_CMD_SET6[] = {
 	/* cmd id start from 0x1600 */
-	hqa_ext_cmds,		/* 0x1600 */
+	hqa_ext_cmds, /* 0x1600 */
 };
 
 static HQA_CMD_TABLE HQA_CMD_TABLES[] = {
 	{
-	 HQA_CMD_SET0,
-	 sizeof(HQA_CMD_SET0) / sizeof(HQA_CMD_HANDLER),
-	 0x1000,
-	 }
-	,
+			HQA_CMD_SET0,
+			sizeof(HQA_CMD_SET0) / sizeof(HQA_CMD_HANDLER),
+			0x1000,
+	},
 	{
-	 HQA_CMD_SET1,
-	 sizeof(HQA_CMD_SET1) / sizeof(HQA_CMD_HANDLER),
-	 0x1100,
-	 }
-	,
+			HQA_CMD_SET1,
+			sizeof(HQA_CMD_SET1) / sizeof(HQA_CMD_HANDLER),
+			0x1100,
+	},
 	{
-	 HQA_CMD_SET2,
-	 sizeof(HQA_CMD_SET2) / sizeof(HQA_CMD_HANDLER),
-	 0x1200,
-	 }
-	,
+			HQA_CMD_SET2,
+			sizeof(HQA_CMD_SET2) / sizeof(HQA_CMD_HANDLER),
+			0x1200,
+	},
 	{
-	 HQA_CMD_SET3,
-	 sizeof(HQA_CMD_SET3) / sizeof(HQA_CMD_HANDLER),
-	 0x1300,
-	 }
-	,
+			HQA_CMD_SET3,
+			sizeof(HQA_CMD_SET3) / sizeof(HQA_CMD_HANDLER),
+			0x1300,
+	},
 	{
-	 HQA_CMD_SET4,
-	 sizeof(HQA_CMD_SET4) / sizeof(HQA_CMD_HANDLER),
-	 0x1400,
-	 }
-	,
+			HQA_CMD_SET4,
+			sizeof(HQA_CMD_SET4) / sizeof(HQA_CMD_HANDLER),
+			0x1400,
+	},
 	{
-	 HQA_CMD_SET5,
-	 sizeof(HQA_CMD_SET5) / sizeof(HQA_CMD_HANDLER),
-	 0x1500,
-	 }
-	,
+			HQA_CMD_SET5,
+			sizeof(HQA_CMD_SET5) / sizeof(HQA_CMD_HANDLER),
+			0x1500,
+	},
 #if CFG_SUPPORT_TX_BF
 	{
-	 HQA_TXBF_CMDS,
-	 sizeof(HQA_TXBF_CMDS) / sizeof(HQA_CMD_HANDLER),
-	 0x1540,
-	 }
-	,
+			HQA_TXBF_CMDS,
+			sizeof(HQA_TXBF_CMDS) / sizeof(HQA_CMD_HANDLER),
+			0x1540,
+	},
 #if CFG_SUPPORT_MU_MIMO
 	{
-	 HQA_TXMU_CMDS,
-	 sizeof(HQA_TXMU_CMDS) / sizeof(HQA_CMD_HANDLER),
-	 0x1560,
-	 }
-	,
+			HQA_TXMU_CMDS,
+			sizeof(HQA_TXMU_CMDS) / sizeof(HQA_CMD_HANDLER),
+			0x1560,
+	},
 #endif
 #endif
 	{
-	 HQA_ICAP_CMDS,
-	 sizeof(HQA_ICAP_CMDS) / sizeof(HQA_CMD_HANDLER),
-	 0x1580,
-	 }
-	,
+			HQA_ICAP_CMDS,
+			sizeof(HQA_ICAP_CMDS) / sizeof(HQA_CMD_HANDLER),
+			0x1580,
+	},
 	{
-	 HQA_CMD_SET6,
-	 sizeof(HQA_CMD_SET6) / sizeof(HQA_CMD_HANDLER),
-	 0x1600,
-	 }
-	,
+			HQA_CMD_SET6,
+			sizeof(HQA_CMD_SET6) / sizeof(HQA_CMD_HANDLER),
+			0x1600,
+	},
 };
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  QA Agent For Handle Ethernet command by Command Idx.
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqData
-* \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  QA Agent For Handle Ethernet command by Command Idx.
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqData
+ * \param[in] HqaCmdFrame			Ethernet Frame Format receive from QA Tool DLL
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
 int HQA_CMDHandler(struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32 i4Status = 0;
+	INT_32	i4Status = 0;
 	UINT_32 u4CmdId;
 	UINT_32 u4TableIndex = 0;
 
@@ -7679,7 +7566,7 @@ int HQA_CMDHandler(struct net_device *prNetDev, IN union iwreq_data *prIwReqData
 			pCmdSet = HQA_CMD_TABLES[u4TableIndex].CmdSet;
 
 			if (pCmdSet[CmdIndex] != NULL)
-				i4Status = (*pCmdSet[CmdIndex]) (prNetDev, prIwReqData, HqaCmdFrame);
+				i4Status = (*pCmdSet[CmdIndex])(prNetDev, prIwReqData, HqaCmdFrame);
 			break;
 		}
 		u4TableIndex++;
@@ -7690,23 +7577,23 @@ int HQA_CMDHandler(struct net_device *prNetDev, IN union iwreq_data *prIwReqData
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief  Ioctl entry from ATE Daemon.
-*
-* \param[in] prNetDev				Pointer to the Net Device
-* \param[in] prIwReqInfo
-* \param[in] prIwReqData
-* \param[in] pcExtra
-* \param[out] None
-*
-* \retval 0						On success.
-*/
+ * \brief  Ioctl entry from ATE Daemon.
+ *
+ * \param[in] prNetDev				Pointer to the Net Device
+ * \param[in] prIwReqInfo
+ * \param[in] prIwReqData
+ * \param[in] pcExtra
+ * \param[out] None
+ *
+ * \retval 0						On success.
+ */
 /*----------------------------------------------------------------------------*/
-int priv_qa_agent(IN struct net_device *prNetDev,
-		  IN struct iw_request_info *prIwReqInfo, IN union iwreq_data *prIwReqData, IN char *pcExtra)
+int priv_qa_agent(IN struct net_device *prNetDev, IN struct iw_request_info *prIwReqInfo,
+		IN union iwreq_data *prIwReqData, IN char *pcExtra)
 {
-	INT_32 i4Status = 0;
+	INT_32		   i4Status = 0;
 	HQA_CMD_FRAME *HqaCmdFrame;
-	UINT_32 u4ATEMagicNum, u4ATEId, u4ATEData;
+	UINT_32		   u4ATEMagicNum, u4ATEId, u4ATEData;
 
 	HqaCmdFrame = kmalloc(sizeof(*HqaCmdFrame), GFP_KERNEL);
 
@@ -7717,9 +7604,7 @@ int priv_qa_agent(IN struct net_device *prNetDev,
 
 	memset(HqaCmdFrame, 0, sizeof(*HqaCmdFrame));
 
-	if (!prIwReqData || prIwReqData->data.length == 0 ||
-	     prIwReqData->data.length > sizeof(*HqaCmdFrame))
-	{
+	if (!prIwReqData || prIwReqData->data.length == 0 || prIwReqData->data.length > sizeof(*HqaCmdFrame)) {
 		DBGLOG(RFTEST, WARN, "%s: Invalid length:%d > %d\n", __func__, prIwReqData->data.length, sizeof(*HqaCmdFrame));
 		i4Status = -EFAULT;
 		goto ERROR1;
@@ -7731,7 +7616,7 @@ int priv_qa_agent(IN struct net_device *prNetDev,
 	}
 
 	u4ATEMagicNum = ntohl(HqaCmdFrame->MagicNo);
-	u4ATEId = ntohs(HqaCmdFrame->Id);
+	u4ATEId		  = ntohs(HqaCmdFrame->Id);
 	memcpy((PUCHAR)&u4ATEData, HqaCmdFrame->Data, 4);
 	u4ATEData = ntohl(u4ATEData);
 

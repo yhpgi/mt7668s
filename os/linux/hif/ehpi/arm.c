@@ -54,68 +54,57 @@
 */
 
 /*! \file   "colibri.c"
-*    \brief  Brief description.
-*
-*    Detail description.
-*/
-
+ *    \brief  Brief description.
+ *
+ *    Detail description.
+ */
 
 /******************************************************************************
-*                         C O M P I L E R   F L A G S
-*******************************************************************************
-*/
+ *                         C O M P I L E R   F L A G S
+ *******************************************************************************
+ */
 #if !defined(MCR_EHTCR)
-#define MCR_EHTCR                           0x0054
+#define MCR_EHTCR 0x0054
 #endif
 
 /*******************************************************************************
-*                E X T E R N A L   R E F E R E N C E S
-********************************************************************************
-*/
+ *                E X T E R N A L   R E F E R E N C E S
+ ********************************************************************************
+ */
 #include "gl_os.h"
 #include "colibri.h"
 #include "wlan_lib.h"
 
 /*******************************************************************************
-*                         D A T A   T Y P E S
-********************************************************************************
-*/
+ *                         D A T A   T Y P E S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                        P U B L I C   D A T A
-********************************************************************************
-*/
+ *                        P U B L I C   D A T A
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                       P R I V A T E   D A T A
-********************************************************************************
-*/
+ *                       P R I V A T E   D A T A
+ ********************************************************************************
+ */
 static void __iomem *mt5931_mcr_base;
 
 /*******************************************************************************
-*                             M A C R O S
-********************************************************************************
-*/
+ *                             M A C R O S
+ ********************************************************************************
+ */
 #if CFG_EHPI_FASTER_BUS_TIMING
-#define EHPI_CONFIG     MSC_CS(4, MSC_RBUFF_SLOW | \
-	    MSC_RRR(4) | \
-	    MSC_RDN(8) | \
-	    MSC_RDF(7) | \
-	    MSC_RBW_16 | \
-	    MSC_RT_VLIO)
+#define EHPI_CONFIG MSC_CS(4, MSC_RBUFF_SLOW | MSC_RRR(4) | MSC_RDN(8) | MSC_RDF(7) | MSC_RBW_16 | MSC_RT_VLIO)
 #else
-#define EHPI_CONFIG     MSC_CS(4, MSC_RBUFF_SLOW | \
-	    MSC_RRR(7) | \
-	    MSC_RDN(13) | \
-	    MSC_RDF(12) | \
-	    MSC_RBW_16 | \
-	    MSC_RT_VLIO)
+#define EHPI_CONFIG MSC_CS(4, MSC_RBUFF_SLOW | MSC_RRR(7) | MSC_RDN(13) | MSC_RDF(12) | MSC_RBW_16 | MSC_RT_VLIO)
 #endif /* CFG_EHPI_FASTER_BUS_TIMING */
 
 /*******************************************************************************
-*              F U N C T I O N   D E C L A R A T I O N S
-********************************************************************************
-*/
+ *              F U N C T I O N   D E C L A R A T I O N S
+ ********************************************************************************
+ */
 static VOID collibri_ehpi_reg_init(VOID);
 
 static VOID collibri_ehpi_reg_uninit(VOID);
@@ -135,23 +124,22 @@ static void initTrig(void);
 #endif
 
 /*******************************************************************************
-*                          F U N C T I O N S
-********************************************************************************
-*/
+ *                          F U N C T I O N S
+ ********************************************************************************
+ */
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief This function will register sdio bus to the os
-*
-* \param[in] pfProbe    Function pointer to detect card
-* \param[in] pfRemove   Function pointer to remove card
-*
-* \return The result of registering sdio bus
-*/
+ * \brief This function will register sdio bus to the os
+ *
+ * \param[in] pfProbe    Function pointer to detect card
+ * \param[in] pfRemove   Function pointer to remove card
+ *
+ * \return The result of registering sdio bus
+ */
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS glRegisterBus(probe_card pfProbe, remove_card pfRemove)
 {
-
 	ASSERT(pfProbe);
 	ASSERT(pfRemove);
 
@@ -164,16 +152,16 @@ WLAN_STATUS glRegisterBus(probe_card pfProbe, remove_card pfRemove)
 	}
 
 	return WLAN_STATUS_SUCCESS;
-}				/* end of glRegisterBus() */
+} /* end of glRegisterBus() */
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief This function will unregister sdio bus to the os
-*
-* \param[in] pfRemove   Function pointer to remove card
-*
-* \return (none)
-*/
+ * \brief This function will unregister sdio bus to the os
+ *
+ * \param[in] pfRemove   Function pointer to remove card
+ *
+ * \return (none)
+ */
 /*----------------------------------------------------------------------------*/
 VOID glUnregisterBus(remove_card pfRemove)
 {
@@ -181,17 +169,17 @@ VOID glUnregisterBus(remove_card pfRemove)
 	pfRemove();
 
 	/* TODO: eHPI uninitialization */
-}				/* end of glUnregisterBus() */
+} /* end of glUnregisterBus() */
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief This function stores hif related info, which is initialized before.
-*
-* \param[in] prGlueInfo Pointer to glue info structure
-* \param[in] u4Cookie   Pointer to UINT_32 memory base variable for _HIF_HPI
-*
-* \return (none)
-*/
+ * \brief This function stores hif related info, which is initialized before.
+ *
+ * \param[in] prGlueInfo Pointer to glue info structure
+ * \param[in] u4Cookie   Pointer to UINT_32 memory base variable for _HIF_HPI
+ *
+ * \return (none)
+ */
 /*----------------------------------------------------------------------------*/
 VOID glSetHifInfo(P_GLUE_INFO_T prGlueInfo, ULONG ulCookie)
 {
@@ -204,16 +192,16 @@ VOID glSetHifInfo(P_GLUE_INFO_T prGlueInfo, ULONG ulCookie)
 	/* fill some buffered information into prHif */
 	prHif->mcr_addr_base = mt5931_mcr_base + EHPI_OFFSET_ADDR;
 	prHif->mcr_data_base = mt5931_mcr_base + EHPI_OFFSET_DATA;
-}				/* end of glSetHifInfo() */
+} /* end of glSetHifInfo() */
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief This function clears hif related info.
-*
-* \param[in] prGlueInfo Pointer to glue info structure
-*
-* \return (none)
-*/
+ * \brief This function clears hif related info.
+ *
+ * \param[in] prGlueInfo Pointer to glue info structure
+ *
+ * \return (none)
+ */
 /*----------------------------------------------------------------------------*/
 VOID glClearHifInfo(P_GLUE_INFO_T prGlueInfo)
 {
@@ -226,18 +214,18 @@ VOID glClearHifInfo(P_GLUE_INFO_T prGlueInfo)
 	/* do something */
 	prHif->mcr_addr_base = 0;
 	prHif->mcr_data_base = 0;
-}				/* end of glClearHifInfo() */
+} /* end of glClearHifInfo() */
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief Initialize bus operation and hif related information, request resources.
-*
-* \param[out] pvData    A pointer to HIF-specific data type buffer.
-*                       For eHPI, pvData is a pointer to UINT_32 type and stores a
-*                       mapped base address.
-*
-* \return (none)
-*/
+ * \brief Initialize bus operation and hif related information, request resources.
+ *
+ * \param[out] pvData    A pointer to HIF-specific data type buffer.
+ *                       For eHPI, pvData is a pointer to UINT_32 type and stores a
+ *                       mapped base address.
+ *
+ * \return (none)
+ */
 /*----------------------------------------------------------------------------*/
 BOOL glBusInit(PVOID pvData)
 {
@@ -256,12 +244,12 @@ BOOL glBusInit(PVOID pvData)
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief Stop bus operation and release resources.
-*
-* \param[in] pvData A pointer to struct net_device.
-*
-* \return (none)
-*/
+ * \brief Stop bus operation and release resources.
+ *
+ * \param[in] pvData A pointer to struct net_device.
+ *
+ * \return (none)
+ */
 /*----------------------------------------------------------------------------*/
 VOID glBusRelease(PVOID pvData)
 {
@@ -270,24 +258,24 @@ VOID glBusRelease(PVOID pvData)
 
 	/* 2. uninitialize eHPI control registers */
 	collibri_ehpi_reg_uninit();
-}				/* end of glBusRelease() */
+} /* end of glBusRelease() */
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief Setup bus interrupt operation and interrupt handler for os.
-*
-* \param[in] pvData     A pointer to struct net_device.
-* \param[in] pfnIsr     A pointer to interrupt handler function.
-* \param[in] pvCookie   Private data for pfnIsr function.
-*
-* \retval WLAN_STATUS_SUCCESS   if success
-*         NEGATIVE_VALUE   if fail
-*/
+ * \brief Setup bus interrupt operation and interrupt handler for os.
+ *
+ * \param[in] pvData     A pointer to struct net_device.
+ * \param[in] pfnIsr     A pointer to interrupt handler function.
+ * \param[in] pvCookie   Private data for pfnIsr function.
+ *
+ * \retval WLAN_STATUS_SUCCESS   if success
+ *         NEGATIVE_VALUE   if fail
+ */
 /*----------------------------------------------------------------------------*/
 INT_32 glBusSetIrq(PVOID pvData, PVOID pfnIsr, PVOID pvCookie)
 {
-	struct net_device *pDev = (struct net_device *)pvData;
-	int i4Status = 0;
+	struct net_device *pDev		= (struct net_device *)pvData;
+	int				   i4Status = 0;
 
 	/* 1. enable GPIO pin as IRQ */
 	busSetIrq();
@@ -297,9 +285,8 @@ INT_32 glBusSetIrq(PVOID pvData, PVOID pfnIsr, PVOID pvCookie)
 
 	/* 3. register ISR callback */
 
-	i4Status = request_irq(pDev->irq,
-			       glEhpiInterruptHandler,
-			       IRQF_DISABLED | IRQF_SHARED | IRQF_TRIGGER_FALLING, pDev->name, pvCookie);
+	i4Status = request_irq(pDev->irq, glEhpiInterruptHandler, IRQF_DISABLED | IRQF_SHARED | IRQF_TRIGGER_FALLING,
+			pDev->name, pvCookie);
 
 	if (i4Status < 0)
 		pr_debug("request_irq(%d) failed\n", pDev->irq);
@@ -311,13 +298,13 @@ INT_32 glBusSetIrq(PVOID pvData, PVOID pfnIsr, PVOID pvCookie)
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief Stop bus interrupt operation and disable interrupt handling for os.
-*
-* \param[in] pvData     A pointer to struct net_device.
-* \param[in] pvCookie   Private data for pfnIsr function.
-*
-* \return (none)
-*/
+ * \brief Stop bus interrupt operation and disable interrupt handling for os.
+ *
+ * \param[in] pvData     A pointer to struct net_device.
+ * \param[in] pvCookie   Private data for pfnIsr function.
+ *
+ * \return (none)
+ */
 /*----------------------------------------------------------------------------*/
 VOID glBusFreeIrq(PVOID pvData, PVOID pvCookie)
 {
@@ -339,13 +326,13 @@ VOID glBusFreeIrq(PVOID pvData, PVOID pvCookie)
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief Set power state
-*
-* \param[in] pvGlueInfo     A pointer to GLUE_INFO_T
-* \param[in] ePowerMode     Power Mode Setting
-*
-* \return (none)
-*/
+ * \brief Set power state
+ *
+ * \param[in] pvGlueInfo     A pointer to GLUE_INFO_T
+ * \param[in] ePowerMode     Power Mode Setting
+ *
+ * \return (none)
+ */
 /*----------------------------------------------------------------------------*/
 VOID glSetPowerState(IN P_GLUE_INFO_T prGlueInfo, IN UINT_32 ePowerMode)
 {
@@ -354,48 +341,48 @@ VOID glSetPowerState(IN P_GLUE_INFO_T prGlueInfo, IN UINT_32 ePowerMode)
 #if DBG
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief Setup the GPIO pin.
-*
-* \return N/A
-*/
+ * \brief Setup the GPIO pin.
+ *
+ * \return N/A
+ */
 /*----------------------------------------------------------------------------*/
 void setTrig(void)
 {
 	GPSR1 = (0x1UL << 8);
-}				/* end of setTrig() */
+} /* end of setTrig() */
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief Clear the GPIO pin.
-*
-* \return N/A
-*/
+ * \brief Clear the GPIO pin.
+ *
+ * \return N/A
+ */
 /*----------------------------------------------------------------------------*/
 void clearTrig(void)
 {
 	GPCR1 = (0x1UL << 8);
-}				/* end of clearTrig() */
+} /* end of clearTrig() */
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief Set a specified GPIO pin to H or L.
-*
-* \return N/A
-*/
+ * \brief Set a specified GPIO pin to H or L.
+ *
+ * \return N/A
+ */
 /*----------------------------------------------------------------------------*/
 static void initTrig(void)
 {
 	set_GPIO_mode(GPIO40_FFDTR | GPIO_OUT);
 	clearTrig();
-}				/* end of initTrig() */
+} /* end of initTrig() */
 #endif
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief This function congifure platform-dependent interrupt triger type.
-*
-* \return N/A
-*/
+ * \brief This function congifure platform-dependent interrupt triger type.
+ *
+ * \return N/A
+ */
 /*----------------------------------------------------------------------------*/
 void busSetIrq(void)
 {
@@ -407,10 +394,10 @@ void busSetIrq(void)
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief This function should restore settings changed by busSetIrq().
-*
-* \return N/A
-*/
+ * \brief This function should restore settings changed by busSetIrq().
+ *
+ * \return N/A
+ */
 /*----------------------------------------------------------------------------*/
 void busFreeIrq(void)
 {
@@ -421,10 +408,10 @@ void busFreeIrq(void)
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief This function configures colibri memory controller registers
-*
-* \return N/A
-*/
+ * \brief This function configures colibri memory controller registers
+ *
+ * \return N/A
+ */
 /*----------------------------------------------------------------------------*/
 static VOID collibri_ehpi_reg_init(VOID)
 {
@@ -444,10 +431,10 @@ static VOID collibri_ehpi_reg_init(VOID)
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief This function restores colibri memory controller registers
-*
-* \return N/A
-*/
+ * \brief This function restores colibri memory controller registers
+ *
+ * \return N/A
+ */
 /*----------------------------------------------------------------------------*/
 static VOID collibri_ehpi_reg_uninit(VOID)
 {
@@ -461,10 +448,10 @@ static VOID collibri_ehpi_reg_uninit(VOID)
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief This function configures MT5931 mapped registers on colibri
-*
-* \return N/A
-*/
+ * \brief This function configures MT5931 mapped registers on colibri
+ *
+ * \return N/A
+ */
 /*----------------------------------------------------------------------------*/
 static VOID mt5931_ehpi_reg_init(VOID)
 {
@@ -488,10 +475,10 @@ static VOID mt5931_ehpi_reg_init(VOID)
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief This function releases MT5931 mapped registers on colibri
-*
-* \return N/A
-*/
+ * \brief This function releases MT5931 mapped registers on colibri
+ *
+ * \return N/A
+ */
 /*----------------------------------------------------------------------------*/
 static VOID mt5931_ehpi_reg_uninit(VOID)
 {
@@ -503,14 +490,14 @@ static VOID mt5931_ehpi_reg_uninit(VOID)
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief Callback for interrupt coming from device
-*
-* \return N/A
-*/
+ * \brief Callback for interrupt coming from device
+ *
+ * \return N/A
+ */
 /*----------------------------------------------------------------------------*/
 static irqreturn_t glEhpiInterruptHandler(int irq, void *dev_id)
 {
-	P_GLUE_INFO_T prGlueInfo = (P_GLUE_INFO_T) dev_id;
+	P_GLUE_INFO_T prGlueInfo = (P_GLUE_INFO_T)dev_id;
 
 	ASSERT(prGlueInfo);
 

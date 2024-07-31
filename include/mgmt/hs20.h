@@ -72,8 +72,8 @@
  *                              C O N S T A N T S
  ********************************************************************************
  */
-#define BSSID_POOL_MAX_SIZE             8
-#define HS20_SIGMA_SCAN_RESULT_TIMEOUT  30	/* sec */
+#define BSSID_POOL_MAX_SIZE 8
+#define HS20_SIGMA_SCAN_RESULT_TIMEOUT 30 /* sec */
 
 /*******************************************************************************
  *                             D A T A   T Y P E S
@@ -83,7 +83,7 @@
 #if CFG_ENABLE_GTK_FRAME_FILTER
 /*For GTK Frame Filter*/
 typedef struct _IPV4_NETWORK_ADDRESS_LIST {
-	UINT_8 ucAddrCount;
+	UINT_8				 ucAddrCount;
 	IPV4_NETWORK_ADDRESS arNetAddr[1];
 } IPV4_NETWORK_ADDRESS_LIST, *P_IPV4_NETWORK_ADDRESS_LIST;
 #endif
@@ -97,7 +97,7 @@ struct _HS20_INFO_T {
 	/*Hotspot 2.0 Information */
 	UINT_8 aucHESSID[MAC_ADDR_LEN];
 	UINT_8 ucAccessNetworkOptions;
-	UINT_8 ucVenueGroup;	/* VenueInfo - Group */
+	UINT_8 ucVenueGroup; /* VenueInfo - Group */
 	UINT_8 ucVenueType;
 	UINT_8 ucHotspotConfig;
 
@@ -114,8 +114,8 @@ struct _HS20_INFO_T {
 	/* For SIGMA Test */
 	/* BSSID Pool */
 	BSSID_ENTRY_T arBssidPool[BSSID_POOL_MAX_SIZE];
-	UINT_8 ucNumBssidPoolEntry;
-	BOOLEAN fgIsHS2SigmaMode;
+	UINT_8		  ucNumBssidPoolEntry;
+	BOOLEAN		  fgIsHS2SigmaMode;
 };
 
 /*******************************************************************************
@@ -135,18 +135,18 @@ struct _HS20_INFO_T {
 
 /*For GTK Frame Filter*/
 #if DBG
-#define FREE_IPV4_NETWORK_ADDR_LIST(_prAddrList)    \
-	{   \
-		UINT_32 u4Size = OFFSET_OF(IPV4_NETWORK_ADDRESS_LIST, arNetAddr) +  \
-				 (((_prAddrList)->ucAddrCount) * sizeof(IPV4_NETWORK_ADDRESS));  \
-		kalMemFree((_prAddrList), VIR_MEM_TYPE, u4Size);    \
-		(_prAddrList) = NULL;   \
+#define FREE_IPV4_NETWORK_ADDR_LIST(_prAddrList) \
+	{ \
+		UINT_32 u4Size = OFFSET_OF(IPV4_NETWORK_ADDRESS_LIST, arNetAddr) + \
+						 (((_prAddrList)->ucAddrCount) * sizeof(IPV4_NETWORK_ADDRESS)); \
+		kalMemFree((_prAddrList), VIR_MEM_TYPE, u4Size); \
+		(_prAddrList) = NULL; \
 	}
 #else
-#define FREE_IPV4_NETWORK_ADDR_LIST(_prAddrList)    \
-	{   \
-		kalMemFree((_prAddrList), VIR_MEM_TYPE, 0);    \
-		(_prAddrList) = NULL;   \
+#define FREE_IPV4_NETWORK_ADDR_LIST(_prAddrList) \
+	{ \
+		kalMemFree((_prAddrList), VIR_MEM_TYPE, 0); \
+		(_prAddrList) = NULL; \
 	}
 #endif
 

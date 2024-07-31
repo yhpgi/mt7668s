@@ -54,40 +54,39 @@
 */
 
 /*! \file   "roaming_fsm.h"
-*    \brief  This file defines the FSM for Roaming MODULE.
-*
-*    This file defines the FSM for Roaming MODULE.
-*/
-
+ *    \brief  This file defines the FSM for Roaming MODULE.
+ *
+ *    This file defines the FSM for Roaming MODULE.
+ */
 
 #ifndef _ROAMING_FSM_H
 #define _ROAMING_FSM_H
 
 /*******************************************************************************
-*                         C O M P I L E R   F L A G S
-********************************************************************************
-*/
+ *                         C O M P I L E R   F L A G S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                    E X T E R N A L   R E F E R E N C E S
-********************************************************************************
-*/
+ *                    E X T E R N A L   R E F E R E N C E S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                              C O N S T A N T S
-********************************************************************************
-*/
+ *                              C O N S T A N T S
+ ********************************************************************************
+ */
 /* Roaming Discovery interval, SCAN result need to be updated */
-#define ROAMING_DISCOVERY_TIMEOUT_SEC               5	/* Seconds. */
+#define ROAMING_DISCOVERY_TIMEOUT_SEC 5 /* Seconds. */
 #if CFG_SUPPORT_ROAMING_SKIP_ONE_AP
-#define ROAMING_ONE_AP_SKIP_TIMES		3
+#define ROAMING_ONE_AP_SKIP_TIMES 3
 #endif
 
 /* #define ROAMING_NO_SWING_RCPI_STEP                  5 //rcpi */
 /*******************************************************************************
-*                             D A T A   T Y P E S
-********************************************************************************
-*/
+ *                             D A T A   T Y P E S
+ ********************************************************************************
+ */
 typedef enum _ENUM_ROAMING_FAIL_REASON_T {
 	ROAMING_FAIL_REASON_CONNLIMIT = 0,
 	ROAMING_FAIL_REASON_NOCANDIDATE,
@@ -112,35 +111,34 @@ typedef enum _ENUM_ROAMING_REASON_T {
 } ENUM_ROAMING_REASON_T;
 
 typedef struct _CMD_ROAMING_TRANSIT_T {
-	UINT_16	u2Event;
-	UINT_16	u2Data;
-	UINT_16	u2RcpiLowThreshold;
-	UINT_8	ucIsSupport11B;
-	UINT_8	aucReserved[1];
-	ENUM_ROAMING_REASON_T	eReason;
-	UINT_32	u4RoamingTriggerTime; /*sec in mcu*/
-	UINT_8 aucReserved2[8];
+	UINT_16				  u2Event;
+	UINT_16				  u2Data;
+	UINT_16				  u2RcpiLowThreshold;
+	UINT_8				  ucIsSupport11B;
+	UINT_8				  aucReserved[1];
+	ENUM_ROAMING_REASON_T eReason;
+	UINT_32				  u4RoamingTriggerTime; /*sec in mcu*/
+	UINT_8				  aucReserved2[8];
 } CMD_ROAMING_TRANSIT_T, *P_CMD_ROAMING_TRANSIT_T;
 
-
 typedef struct _CMD_ROAMING_CTRL_T {
-	UINT_8 fgEnable;
-	UINT_8 ucRcpiAdjustStep;
+	UINT_8	fgEnable;
+	UINT_8	ucRcpiAdjustStep;
 	UINT_16 u2RcpiLowThr;
-	UINT_8 ucRoamingRetryLimit;
-	UINT_8 ucRoamingStableTimeout;
-	UINT_8 aucReserved[2];
+	UINT_8	ucRoamingRetryLimit;
+	UINT_8	ucRoamingStableTimeout;
+	UINT_8	aucReserved[2];
 } CMD_ROAMING_CTRL_T, *P_CMD_ROAMING_CTRL_T;
 
 #if CFG_SUPPORT_ROAMING_SKIP_ONE_AP
 typedef struct _CMD_ROAMING_SKIP_ONE_AP_T {
-	  UINT_8	  fgIsRoamingSkipOneAP;
-	  UINT_8	  aucReserved[3];
-	  UINT_8	  aucReserved2[8];
+	UINT_8 fgIsRoamingSkipOneAP;
+	UINT_8 aucReserved[3];
+	UINT_8 aucReserved2[8];
 } CMD_ROAMING_SKIP_ONE_AP_T, *P_CMD_ROAMING_SKIP_ONE_AP_T;
 #endif
 
- /**/ typedef enum _ENUM_ROAMING_STATE_T {
+/**/ typedef enum _ENUM_ROAMING_STATE_T {
 	ROAMING_STATE_IDLE = 0,
 	ROAMING_STATE_DECISION,
 	ROAMING_STATE_DISCOVERY,
@@ -160,31 +158,30 @@ typedef struct _ROAMING_INFO_T {
 } ROAMING_INFO_T, *P_ROAMING_INFO_T;
 
 /*******************************************************************************
-*                            P U B L I C   D A T A
-********************************************************************************
-*/
+ *                            P U B L I C   D A T A
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                           P R I V A T E   D A T A
-********************************************************************************
-*/
+ *                           P R I V A T E   D A T A
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                                 M A C R O S
-********************************************************************************
-*/
+ *                                 M A C R O S
+ ********************************************************************************
+ */
 
 #if CFG_SUPPORT_ROAMING
-#define IS_ROAMING_ACTIVE(prAdapter) \
-	(prAdapter->rWifiVar.rRoamingInfo.eCurrentState == ROAMING_STATE_ROAM)
+#define IS_ROAMING_ACTIVE(prAdapter) (prAdapter->rWifiVar.rRoamingInfo.eCurrentState == ROAMING_STATE_ROAM)
 #else
 #define IS_ROAMING_ACTIVE(prAdapter) FALSE
 #endif /* CFG_SUPPORT_ROAMING */
 
 /*******************************************************************************
-*                  F U N C T I O N   D E C L A R A T I O N S
-********************************************************************************
-*/
+ *                  F U N C T I O N   D E C L A R A T I O N S
+ ********************************************************************************
+ */
 VOID roamingFsmInit(IN P_ADAPTER_T prAdapter);
 
 VOID roamingFsmUninit(IN P_ADAPTER_T prAdapter);
@@ -208,8 +205,8 @@ VOID roamingFsmRunEventAbort(IN P_ADAPTER_T prAdapter);
 WLAN_STATUS roamingFsmProcessEvent(IN P_ADAPTER_T prAdapter, IN P_CMD_ROAMING_TRANSIT_T prTransit);
 
 /*******************************************************************************
-*                              F U N C T I O N S
-********************************************************************************
-*/
+ *                              F U N C T I O N S
+ ********************************************************************************
+ */
 
 #endif /* _ROAMING_FSM_H */

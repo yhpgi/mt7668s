@@ -50,40 +50,40 @@
  *
  *****************************************************************************/
 /*! \file   gl_qa_agent.h
-*    \brief  This file includes private ioctl support.
-*/
+ *    \brief  This file includes private ioctl support.
+ */
 
 #ifndef _GL_QA_AGENT_H
 #define _GL_QA_AGENT_H
 #if CFG_SUPPORT_QA_TOOL
 /*******************************************************************************
-*                         C O M P I L E R   F L A G S
-********************************************************************************
-*/
+ *                         C O M P I L E R   F L A G S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                    E X T E R N A L   R E F E R E N C E S
-********************************************************************************
-*/
+ *                    E X T E R N A L   R E F E R E N C E S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                              C O N S T A N T S
-********************************************************************************
-*/
+ *                              C O N S T A N T S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                                 M A C R O S
-********************************************************************************
-*/
+ *                                 M A C R O S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                  F U N C T I O N   D E C L A R A T I O N S
-********************************************************************************
-*/
+ *                  F U N C T I O N   D E C L A R A T I O N S
+ ********************************************************************************
+ */
 
 #define HQA_CMD_MAGIC_NO 0x18142880
-#define HQA_CHIP_ID_6632	0x6632
-#define HQA_CHIP_ID_7668	0x7668
+#define HQA_CHIP_ID_6632 0x6632
+#define HQA_CHIP_ID_7668 0x7668
 
 #if CFG_SUPPORT_TX_BF
 #define HQA_BF_STR_SIZE 512
@@ -97,32 +97,32 @@ extern UINT_8 uacEEPROMImage[MAX_EEPROM_BUFFER_SIZE];
 
 #if 0
 typedef struct _PARAM_RX_STAT_T {
-	UINT_32 MacFCSErr;	/* Y            0x820F_D014 */
-	UINT_32 MacMdrdy;	/* Y            0x820F_D030 */
-	UINT_32 FCSErr_CCK;	/* Y            0x8207_021C     [15:00] */
-	UINT_32 FCSErr_OFDM;	/* Y            0x8207_021C     [31:16] */
-	UINT_32 CCK_PD;		/* Y            0x8207_020C     [15:00] */
-	UINT_32 OFDM_PD;	/* Y            0x8207_020C     [15:00] */
-	UINT_32 CCK_SIG_Err;	/* Y            0x8207_0210     [31:16] */
-	UINT_32 CCK_SFD_Err;	/* Y            0x8207_0210     [15:00] */
-	UINT_32 OFDM_SIG_Err;	/* Y            0x8207_0214     [31:16] */
-	UINT_32 OFDM_TAG_Err;	/* Y            0x8207_0214     [15:00] */
-	UINT_32 WB_RSSSI0;	/* Y            0x8207_21A8     [23:16] */
-	UINT_32 IB_RSSSI0;	/* Y            0x8207_21A8     [31:24] */
-	UINT_32 WB_RSSSI1;	/* Y            0x8207_21A8     [07:00] */
-	UINT_32 IB_RSSSI1;	/* Y            0x8207_21A8     [15:08] */
-	UINT_32 PhyMdrdyCCK;	/* Y            0x8207_0220     [15:00] */
-	UINT_32 PhyMdrdyOFDM;	/* Y            0x8207_0220     [31:16] */
-	UINT_32 DriverRxCount;	/* Y            FW Counter Band0 */
-	UINT_32 RCPI0;		/* Y            RXV4            [07:00] */
-	UINT_32 RCPI1;		/* Y            RXV4            [15:08] */
-	UINT_32 FreqOffsetFromRX;	/* Y            RXV5            MISC1[24:00]    OFDM:[11:00]    CCK:[10:00] */
+	UINT_32 MacFCSErr;	/* Y				0x820F_D014 */
+	UINT_32 MacMdrdy;	/* Y				0x820F_D030 */
+	UINT_32 FCSErr_CCK;	/* Y				0x8207_021C	[15:00] */
+	UINT_32 FCSErr_OFDM;	/* Y				0x8207_021C	[31:16] */
+	UINT_32 CCK_PD;		/* Y				0x8207_020C	[15:00] */
+	UINT_32 OFDM_PD;	/* Y				0x8207_020C	[15:00] */
+	UINT_32 CCK_SIG_Err;	/* Y				0x8207_0210	[31:16] */
+	UINT_32 CCK_SFD_Err;	/* Y				0x8207_0210	[15:00] */
+	UINT_32 OFDM_SIG_Err;	/* Y				0x8207_0214	[31:16] */
+	UINT_32 OFDM_TAG_Err;	/* Y				0x8207_0214	[15:00] */
+	UINT_32 WB_RSSSI0;	/* Y				0x8207_21A8	[23:16] */
+	UINT_32 IB_RSSSI0;	/* Y				0x8207_21A8	[31:24] */
+	UINT_32 WB_RSSSI1;	/* Y				0x8207_21A8	[07:00] */
+	UINT_32 IB_RSSSI1;	/* Y				0x8207_21A8	[15:08] */
+	UINT_32 PhyMdrdyCCK;	/* Y				0x8207_0220	[15:00] */
+	UINT_32 PhyMdrdyOFDM;	/* Y				0x8207_0220	[31:16] */
+	UINT_32 DriverRxCount;	/* Y				FW Counter Band0 */
+	UINT_32 RCPI0;		/* Y				RXV4				[07:00] */
+	UINT_32 RCPI1;		/* Y				RXV4				[15:08] */
+	UINT_32 FreqOffsetFromRX;	/* Y				RXV5				MISC1[24:00]	OFDM:[11:00]	CCK:[10:00] */
 	UINT_32 RSSI0;		/* N */
 	UINT_32 RSSI1;		/* N */
 	UINT_32 rx_fifo_full;	/* N */
 	UINT_32 RxLenMismatch;	/* N */
-	UINT_32 MacFCSErr_band1;	/* Y            0x820F_D214 */
-	UINT_32 MacMdrdy_band1;	/* Y            0x820F_D230 */
+	UINT_32 MacFCSErr_band1;	/* Y				0x820F_D214 */
+	UINT_32 MacMdrdy_band1;	/* Y				0x820F_D230 */
 	/* Y            RXV3            [23:16] (must set 0x8207066C[1:0] = 0x0 ~ 0x3) */
 	UINT_32 FAGC_IB_RSSSI[4];
 	/* Y            RXV3            [31:24] (must set 0x8207066C[1:0] = 0x0 ~ 0x3) */
@@ -131,35 +131,35 @@ typedef struct _PARAM_RX_STAT_T {
 	UINT_32 Inst_IB_RSSSI[4];
 	/* Y            0x8207_21A8     [23:16] [07:00] 0x8207_29A8     [23:16] [07:00] */
 	UINT_32 Inst_WB_RSSSI[4];
-	UINT_32 ACIHitLow;	/* Y            0x8207_21B0     [18] */
-	UINT_32 ACIHitHigh;	/* Y            0x8207_29B0     [18] */
-	UINT_32 DriverRxCount1;	/* Y            FW Counter Band1 */
-	UINT_32 RCPI2;		/* Y            RXV4            [23:16] */
-	UINT_32 RCPI3;		/* Y            RXV4            [31:24] */
+	UINT_32 ACIHitLow;	/* Y				0x8207_21B0	[18] */
+	UINT_32 ACIHitHigh;	/* Y				0x8207_29B0	[18] */
+	UINT_32 DriverRxCount1;	/* Y				FW Counter Band1 */
+	UINT_32 RCPI2;		/* Y				RXV4				[23:16] */
+	UINT_32 RCPI3;		/* Y				RXV4				[31:24] */
 	UINT_32 RSSI2;		/* N */
 	UINT_32 RSSI3;		/* N */
-	UINT_32 SNR0;		/* Y            RXV5            (MISC1 >> 19) - 16 */
+	UINT_32 SNR0;		/* Y				RXV5				(MISC1 >> 19) - 16 */
 	UINT_32 SNR1;		/* N */
 	UINT_32 SNR2;		/* N */
 	UINT_32 SNR3;		/* N */
 	UINT_32 rx_fifo_full_band1;	/* N */
 	UINT_32 RxLenMismatch_band1;	/* N */
-	UINT_32 CCK_PD_band1;	/* Y            0x8207_040C     [15:00] */
-	UINT_32 OFDM_PD_band1;	/* Y            0x8207_040C     [31:16] */
-	UINT_32 CCK_SIG_Err_band1;	/* Y            0x8207_0410     [31:16] */
-	UINT_32 CCK_SFD_Err_band1;	/* Y            0x8207_0410     [15:00] */
-	UINT_32 OFDM_SIG_Err_band1;	/* Y            0x8207_0414     [31:16] */
-	UINT_32 OFDM_TAG_Err_band1;	/* Y            0x8207_0414     [15:00] */
-	UINT_32 PhyMdrdyCCK_band1;	/* Y            0x8207_0420     [15:00] */
-	UINT_32 PhyMdrdyOFDM_band1;	/* Y            0x8207_0420     [31:16] */
-	UINT_32 CCK_FCS_Err_band1;	/* Y            0x8207_041C     [15:00] */
-	UINT_32 OFDM_FCS_Err_band1;	/* Y            0x8207_041C     [31:16] */
-	UINT_32 MuPktCount;	/* Y            MT_ATEUpdateRxStatistic RXV1_2ND_CYCLE->GroupId */
+	UINT_32 CCK_PD_band1;	/* Y				0x8207_040C	[15:00] */
+	UINT_32 OFDM_PD_band1;	/* Y				0x8207_040C	[31:16] */
+	UINT_32 CCK_SIG_Err_band1;	/* Y				0x8207_0410	[31:16] */
+	UINT_32 CCK_SFD_Err_band1;	/* Y				0x8207_0410	[15:00] */
+	UINT_32 OFDM_SIG_Err_band1;	/* Y				0x8207_0414	[31:16] */
+	UINT_32 OFDM_TAG_Err_band1;	/* Y				0x8207_0414	[15:00] */
+	UINT_32 PhyMdrdyCCK_band1;	/* Y				0x8207_0420	[15:00] */
+	UINT_32 PhyMdrdyOFDM_band1;	/* Y				0x8207_0420	[31:16] */
+	UINT_32 CCK_FCS_Err_band1;	/* Y				0x8207_041C	[15:00] */
+	UINT_32 OFDM_FCS_Err_band1;	/* Y				0x8207_041C	[31:16] */
+	UINT_32 MuPktCount;	/* Y				MT_ATEUpdateRxStatistic RXV1_2ND_CYCLE->GroupId */
 } PARAM_RX_STAT_T, *P_PARAM_RX_STAT_T;
 #else
 typedef struct _PARAM_RX_STAT_T {
-	UINT_32 MAC_FCS_Err;	/* b0 */
-	UINT_32 MAC_Mdrdy;	/* b0 */
+	UINT_32 MAC_FCS_Err; /* b0 */
+	UINT_32 MAC_Mdrdy;	 /* b0 */
 	UINT_32 FCSErr_CCK;
 	UINT_32 FCSErr_OFDM;
 	UINT_32 CCK_PD;
@@ -179,11 +179,11 @@ typedef struct _PARAM_RX_STAT_T {
 	UINT_32 RCPI1;
 	UINT_32 FreqOffsetFromRX;
 	UINT_32 RSSI0;
-	UINT_32 RSSI1;		/* insert new member here */
-	UINT_32 OutOfResource;	/* MT7615 begin here */
+	UINT_32 RSSI1;		   /* insert new member here */
+	UINT_32 OutOfResource; /* MT7615 begin here */
 	UINT_32 LengthMismatchCount_B0;
-	UINT_32 MAC_FCS_Err1;	/* b1 */
-	UINT_32 MAC_Mdrdy1;	/* b1 */
+	UINT_32 MAC_FCS_Err1; /* b1 */
+	UINT_32 MAC_Mdrdy1;	  /* b1 */
 	UINT_32 FAGCRssiIBR0;
 	UINT_32 FAGCRssiIBR1;
 	UINT_32 FAGCRssiIBR2;
@@ -251,22 +251,22 @@ typedef struct _HQA_CMD_FRAME {
 	UINT_16 Id;
 	UINT_16 Length;
 	UINT_16 Sequence;
-	UCHAR Data[2000];
+	UCHAR	Data[2000];
 } __packed HQA_CMD_FRAME;
 
-typedef INT_32(*HQA_CMD_HANDLER) (struct net_device *prNetDev,
-				  IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame);
+typedef INT_32 (*HQA_CMD_HANDLER)(
+		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame);
 
 typedef struct _HQA_CMD_TABLE {
 	HQA_CMD_HANDLER *CmdSet;
-	UINT_32 CmdSetSize;
-	UINT_32 CmdOffset;
+	UINT_32			 CmdSetSize;
+	UINT_32			 CmdOffset;
 } HQA_CMD_TABLE;
 
 int HQA_CMDHandler(struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame);
 
-int priv_qa_agent(IN struct net_device *prNetDev,
-		  IN struct iw_request_info *prIwReqInfo, IN union iwreq_data *prIwReqData, IN char *pcExtra);
+int priv_qa_agent(IN struct net_device *prNetDev, IN struct iw_request_info *prIwReqInfo,
+		IN union iwreq_data *prIwReqData, IN char *pcExtra);
 
 int priv_set_eeprom_mode(IN UINT_32 u4Mode);
 #endif /*CFG_SUPPORT_QA_TOOL */

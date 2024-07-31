@@ -54,21 +54,21 @@
 */
 
 /*! \file   precomp.h
-*    \brief  Collection of most compiler flags are described here.
-*
-*    In this file we collect all compiler flags and detail the driver behavior if
-*    enable/disable such switch or adjust numeric parameters.
-*/
+ *    \brief  Collection of most compiler flags are described here.
+ *
+ *    In this file we collect all compiler flags and detail the driver behavior if
+ *    enable/disable such switch or adjust numeric parameters.
+ */
 
 #ifndef _PRECOMP_H
 #define _PRECOMP_H
 
 /*******************************************************************************
-*                         C O M P I L E R   F L A G S
-********************************************************************************
-*/
+ *                         C O M P I L E R   F L A G S
+ ********************************************************************************
+ */
 
-#define DBG                                      0
+#define DBG 0
 
 #ifdef __GNUC__
 #if (DBG == 0)
@@ -77,10 +77,10 @@
 #endif
 
 /*******************************************************************************
-*                    E X T E R N A L   R E F E R E N C E S
-********************************************************************************
-*/
-#include "gl_os.h"		/* Include "config.h" */
+ *                    E X T E R N A L   R E F E R E N C E S
+ ********************************************************************************
+ */
+#include "gl_os.h" /* Include "config.h" */
 
 #if CFG_ENABLE_WIFI_DIRECT
 #include "gl_p2p_os.h"
@@ -258,48 +258,45 @@
 #endif
 
 /*******************************************************************************
-*                              C O N S T A N T S
-********************************************************************************
-*/
+ *                              C O N S T A N T S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                             D A T A   T Y P E S
-********************************************************************************
-*/
+ *                             D A T A   T Y P E S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                            P U B L I C   D A T A
-********************************************************************************
-*/
+ *                            P U B L I C   D A T A
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                           P R I V A T E   D A T A
-********************************************************************************
-*/
+ *                           P R I V A T E   D A T A
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                                 M A C R O S
-********************************************************************************
-*/
+ *                                 M A C R O S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                  F U N C T I O N   D E C L A R A T I O N S
-********************************************************************************
-*/
+ *                  F U N C T I O N   D E C L A R A T I O N S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                              F U N C T I O N S
-********************************************************************************
-*/
+ *                              F U N C T I O N S
+ ********************************************************************************
+ */
 #if MTK_WCN_HIF_SDIO
-extern INT_32 mtk_sdio_probe(MTK_WCN_HIF_SDIO_CLTCTX cltCtx,
-		const MTK_WCN_HIF_SDIO_FUNCINFO *prFuncInfo);
+extern INT_32 mtk_sdio_probe(MTK_WCN_HIF_SDIO_CLTCTX cltCtx, const MTK_WCN_HIF_SDIO_FUNCINFO *prFuncInfo);
 extern INT_32 mtk_sdio_remove(MTK_WCN_HIF_SDIO_CLTCTX cltCtx);
 #else
-extern int mtk_sdio_probe(struct sdio_func *func,
-				const struct sdio_device_id *id);
+extern int	mtk_sdio_probe(struct sdio_func *func, const struct sdio_device_id *id);
 extern void mtk_sdio_remove(struct sdio_func *func);
 #endif
-
 
 #endif /* _PRECOMP_H */

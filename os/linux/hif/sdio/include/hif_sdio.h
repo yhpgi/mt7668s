@@ -54,46 +54,44 @@
 */
 
 /*! \file   "hif_sdio.h"
-*    \brief
-*
-*
-*/
-
+ *    \brief
+ *
+ *
+ */
 
 #ifndef _HIF_SDIO_H
 #define _HIF_SDIO_H
 /*******************************************************************************
-*                         C O M P I L E R   F L A G S
-********************************************************************************
-*/
-#define HIF_SDIO_DEBUG  (0)	/* 0:turn off debug msg and assert, 1:turn off debug msg and assert */
+ *                         C O M P I L E R   F L A G S
+ ********************************************************************************
+ */
+#define HIF_SDIO_DEBUG (0) /* 0:turn off debug msg and assert, 1:turn off debug msg and assert */
 
 /*******************************************************************************
-*                    E X T E R N A L   R E F E R E N C E S
-********************************************************************************
-*/
+ *                    E X T E R N A L   R E F E R E N C E S
+ ********************************************************************************
+ */
 #include "mtk_porting.h"
 
 /*******************************************************************************
-*                              C O N S T A N T S
-********************************************************************************
-*/
-#define CFG_CLIENT_COUNT  (8)
+ *                              C O N S T A N T S
+ ********************************************************************************
+ */
+#define CFG_CLIENT_COUNT (8)
 
-#define HIF_DEFAULT_BLK_SIZE  (256)
-#define HIF_DEFAULT_VENDOR    (0x037A)
+#define HIF_DEFAULT_BLK_SIZE (256)
+#define HIF_DEFAULT_VENDOR (0x037A)
 
 /*******************************************************************************
-*                             D A T A   T Y P E S
-********************************************************************************
-*/
+ *                             D A T A   T Y P E S
+ ********************************************************************************
+ */
 
 /* sdio driver data mapping */
 typedef struct _MTK_WCN_SDIO_DRIVER_DATA_MAPPING {
-	UINT_16 card_id;	/* TPLMID_CARD: card ID */
+	UINT_16						   card_id; /* TPLMID_CARD: card ID */
 	struct mt66xx_hif_driver_data *mt66xx_driver_data;
 } MTK_WCN_SDIO_DRIVER_DATA_MAPPING;
-
 
 /* Function info provided by client driver */
 typedef struct _MTK_WCN_HIF_SDIO_FUNCINFO MTK_WCN_HIF_SDIO_FUNCINFO;
@@ -102,52 +100,52 @@ typedef struct _MTK_WCN_HIF_SDIO_FUNCINFO MTK_WCN_HIF_SDIO_FUNCINFO;
 typedef ULONG MTK_WCN_HIF_SDIO_CLTCTX;
 
 /* Callback functions provided by client driver */
-typedef INT_32(*MTK_WCN_HIF_SDIO_PROBE)(MTK_WCN_HIF_SDIO_CLTCTX, const MTK_WCN_HIF_SDIO_FUNCINFO *prFuncInfo);
-typedef INT_32(*MTK_WCN_HIF_SDIO_REMOVE)(MTK_WCN_HIF_SDIO_CLTCTX);
-typedef INT_32(*MTK_WCN_HIF_SDIO_IRQ)(MTK_WCN_HIF_SDIO_CLTCTX);
+typedef INT_32 (*MTK_WCN_HIF_SDIO_PROBE)(MTK_WCN_HIF_SDIO_CLTCTX, const MTK_WCN_HIF_SDIO_FUNCINFO *prFuncInfo);
+typedef INT_32 (*MTK_WCN_HIF_SDIO_REMOVE)(MTK_WCN_HIF_SDIO_CLTCTX);
+typedef INT_32 (*MTK_WCN_HIF_SDIO_IRQ)(MTK_WCN_HIF_SDIO_CLTCTX);
 
 /* Function info provided by client driver */
 struct _MTK_WCN_HIF_SDIO_FUNCINFO {
-	UINT_16 manf_id;	/* TPLMID_MANF: manufacturer ID */
-	UINT_16 card_id;	/* TPLMID_CARD: card ID */
-	UINT_16 func_num;	/* Function Number */
-	UINT_16 blk_sz;		/* Function block size */
+	UINT_16 manf_id;  /* TPLMID_MANF: manufacturer ID */
+	UINT_16 card_id;  /* TPLMID_CARD: card ID */
+	UINT_16 func_num; /* Function Number */
+	UINT_16 blk_sz;	  /* Function block size */
 };
 
 /* Client info provided by client driver */
 typedef struct _MTK_WCN_HIF_SDIO_CLTINFO {
-	const MTK_WCN_HIF_SDIO_FUNCINFO *func_tbl;	/* supported function info table */
-	UINT_32 func_tbl_size;	/* supported function table info element number */
-	MTK_WCN_HIF_SDIO_PROBE hif_clt_probe;	/* callback function for probing */
-	MTK_WCN_HIF_SDIO_REMOVE hif_clt_remove;	/* callback function for removing */
-	MTK_WCN_HIF_SDIO_IRQ hif_clt_irq;	/* callback function for interrupt handling */
+	const MTK_WCN_HIF_SDIO_FUNCINFO *func_tbl;		 /* supported function info table */
+	UINT_32							 func_tbl_size;	 /* supported function table info element number */
+	MTK_WCN_HIF_SDIO_PROBE			 hif_clt_probe;	 /* callback function for probing */
+	MTK_WCN_HIF_SDIO_REMOVE			 hif_clt_remove; /* callback function for removing */
+	MTK_WCN_HIF_SDIO_IRQ			 hif_clt_irq;	 /* callback function for interrupt handling */
 } MTK_WCN_HIF_SDIO_CLTINFO;
 
 /* function info provided by registed function */
 typedef struct _MTK_WCN_HIF_SDIO_REGISTINFO {
-	const MTK_WCN_HIF_SDIO_CLTINFO *sdio_cltinfo;	/* client's MTK_WCN_HIF_SDIO_CLTINFO pointer */
-	const MTK_WCN_HIF_SDIO_FUNCINFO *func_info;	/* supported function info pointer */
+	const MTK_WCN_HIF_SDIO_CLTINFO  *sdio_cltinfo; /* client's MTK_WCN_HIF_SDIO_CLTINFO pointer */
+	const MTK_WCN_HIF_SDIO_FUNCINFO *func_info;	   /* supported function info pointer */
 } MTK_WCN_HIF_SDIO_REGISTINFO;
 
 /* Card info provided by probed function */
 typedef struct _MTK_WCN_HIF_SDIO_PROBEINFO {
-	struct sdio_func *func;	/* probed sdio function pointer */
-	INT_8 clt_idx;		/* registered function table info element number (initial value is -1) */
-	MTK_WCN_BOOL interrupted;	/* TRUE: interrupted, FALSE: not interrupted */
-	void *private_data_p;	/* clt's private data pointer */
+	struct sdio_func *func;			  /* probed sdio function pointer */
+	INT_8			  clt_idx;		  /* registered function table info element number (initial value is -1) */
+	MTK_WCN_BOOL	  interrupted;	  /* TRUE: interrupted, FALSE: not interrupted */
+	void			 *private_data_p; /* clt's private data pointer */
 } MTK_WCN_HIF_SDIO_PROBEINFO;
 
 /* work queue info needed by worker */
 typedef struct _MTK_WCN_HIF_SDIO_CLT_PROBE_WORKERINFO {
-	struct work_struct probe_work;	/* work queue structure */
-	MTK_WCN_HIF_SDIO_REGISTINFO *registinfo_p;	/* MTK_WCN_HIF_SDIO_REGISTINFO pointer of the client */
-	INT_8 probe_idx;	/* probed function table info element number (initial value is -1) */
+	struct work_struct			 probe_work;   /* work queue structure */
+	MTK_WCN_HIF_SDIO_REGISTINFO *registinfo_p; /* MTK_WCN_HIF_SDIO_REGISTINFO pointer of the client */
+	INT_8						 probe_idx;	   /* probed function table info element number (initial value is -1) */
 } MTK_WCN_HIF_SDIO_CLT_PROBE_WORKERINFO;
 
 /* error code returned by hif_sdio driver (use NEGATIVE number) */
 typedef enum {
 	HIF_SDIO_ERR_SUCCESS = 0,
-	HIF_SDIO_ERR_FAIL,	/* generic error */
+	HIF_SDIO_ERR_FAIL, /* generic error */
 	HIF_SDIO_ERR_INVALID_PARAM,
 	HIF_SDIO_ERR_DUPLICATED,
 	HIF_SDIO_ERR_UNSUP_MANF_ID,
@@ -157,19 +155,19 @@ typedef enum {
 } MTK_WCN_HIF_SDIO_ERR;
 
 /*******************************************************************************
-*                            P U B L I C   D A T A
-********************************************************************************
-*/
+ *                            P U B L I C   D A T A
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                           P R I V A T E   D A T A
-********************************************************************************
-*/
+ *                           P R I V A T E   D A T A
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                                 M A C R O S
-********************************************************************************
-*/
+ *                                 M A C R O S
+ ********************************************************************************
+ */
 
 /*!
  * \brief A macro used to describe an SDIO function
@@ -189,7 +187,7 @@ typedef enum {
  *
  */
 #if HIF_SDIO_DEBUG
-#define DPRINTK(fmt, args...) pr_debug("%s: " fmt, __func__, ## args)
+#define DPRINTK(fmt, args...) pr_debug("%s: " fmt, __func__, ##args)
 #else
 #define DPRINTK(fmt, args...)
 #endif
@@ -202,19 +200,20 @@ typedef enum {
 #define ASSERT(expr) \
 	{ \
 		if (!(expr)) { \
-			LOG_FUNC("assertion failed! %s[%d]: %s\n",\
-				__func__, __LINE__, #expr); \
-			WARN_ON(!(expr));\
+			LOG_FUNC("assertion failed! %s[%d]: %s\n", __func__, __LINE__, #expr); \
+			WARN_ON(!(expr)); \
 		} \
 	}
 #else
-#define ASSERT(expr)    do {} while (0)
+#define ASSERT(expr) \
+	do { \
+	} while (0)
 #endif
 
 /*******************************************************************************
-*                   F U N C T I O N   D E C L A R A T I O N S
-********************************************************************************
-*/
+ *                   F U N C T I O N   D E C L A R A T I O N S
+ ********************************************************************************
+ */
 
 /*!
  * \brief MTK hif sdio client registration function
@@ -253,7 +252,7 @@ extern void mtk_wcn_hif_sdio_enable_irq(MTK_WCN_HIF_SDIO_CLTCTX ctx, MTK_WCN_BOO
 extern INT_32 mtk_wcn_hif_sdio_wake_up_ctrl(MTK_WCN_HIF_SDIO_CLTCTX ctx);
 
 /*******************************************************************************
-*                              F U N C T I O N S
-********************************************************************************
-*/
+ *                              F U N C T I O N S
+ ********************************************************************************
+ */
 #endif /* _HIF_SDIO_H */

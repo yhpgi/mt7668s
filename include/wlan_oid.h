@@ -54,154 +54,149 @@
 */
 
 /*! \file   "wlan_oid.h"
-*    \brief This file contains the declairation file of the WLAN OID processing routines
-*	   of Windows driver for MediaTek Inc. 802.11 Wireless LAN Adapters.
-*/
-
+ *    \brief This file contains the declairation file of the WLAN OID processing routines
+ *	   of Windows driver for MediaTek Inc. 802.11 Wireless LAN Adapters.
+ */
 
 #ifndef _WLAN_OID_H
 #define _WLAN_OID_H
 
 /*******************************************************************************
-*                         C O M P I L E R   F L A G S
-********************************************************************************
-*/
+ *                         C O M P I L E R   F L A G S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                    E X T E R N A L   R E F E R E N C E S
-********************************************************************************
-*/
+ *                    E X T E R N A L   R E F E R E N C E S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                              C O N S T A N T S
-********************************************************************************
-*/
+ *                              C O N S T A N T S
+ ********************************************************************************
+ */
 
-#define PARAM_MAX_LEN_SSID                      32
+#define PARAM_MAX_LEN_SSID 32
 
-#define PARAM_MAC_ADDR_LEN                      6
+#define PARAM_MAC_ADDR_LEN 6
 
-#define ETHERNET_HEADER_SZ                      14
-#define ETHERNET_MIN_PKT_SZ                     60
-#define ETHERNET_MAX_PKT_SZ                     1514
+#define ETHERNET_HEADER_SZ 14
+#define ETHERNET_MIN_PKT_SZ 60
+#define ETHERNET_MAX_PKT_SZ 1514
 
-#define PARAM_MAX_LEN_RATES                     8
-#define PARAM_MAX_LEN_RATES_EX                  16
+#define PARAM_MAX_LEN_RATES 8
+#define PARAM_MAX_LEN_RATES_EX 16
 
-#define PARAM_AUTH_REQUEST_REAUTH               0x01
-#define PARAM_AUTH_REQUEST_KEYUPDATE            0x02
-#define PARAM_AUTH_REQUEST_PAIRWISE_ERROR       0x06
-#define PARAM_AUTH_REQUEST_GROUP_ERROR          0x0E
+#define PARAM_AUTH_REQUEST_REAUTH 0x01
+#define PARAM_AUTH_REQUEST_KEYUPDATE 0x02
+#define PARAM_AUTH_REQUEST_PAIRWISE_ERROR 0x06
+#define PARAM_AUTH_REQUEST_GROUP_ERROR 0x0E
 
-#define PARAM_EEPROM_READ_METHOD_READ           1
-#define PARAM_EEPROM_READ_METHOD_GETSIZE        0
+#define PARAM_EEPROM_READ_METHOD_READ 1
+#define PARAM_EEPROM_READ_METHOD_GETSIZE 0
 
-#define PARAM_WHQL_RSSI_MAX_DBM                 (-10)
-#define PARAM_WHQL_RSSI_MIN_DBM                 (-200)
+#define PARAM_WHQL_RSSI_MAX_DBM (-10)
+#define PARAM_WHQL_RSSI_MIN_DBM (-200)
 
-#define PARAM_DEVICE_WAKE_UP_ENABLE                     0x00000001
-#define PARAM_DEVICE_WAKE_ON_PATTERN_MATCH_ENABLE       0x00000002
-#define PARAM_DEVICE_WAKE_ON_MAGIC_PACKET_ENABLE        0x00000004
+#define PARAM_DEVICE_WAKE_UP_ENABLE 0x00000001
+#define PARAM_DEVICE_WAKE_ON_PATTERN_MATCH_ENABLE 0x00000002
+#define PARAM_DEVICE_WAKE_ON_MAGIC_PACKET_ENABLE 0x00000004
 
-#define PARAM_WAKE_UP_MAGIC_PACKET              0x00000001
-#define PARAM_WAKE_UP_PATTERN_MATCH             0x00000002
-#define PARAM_WAKE_UP_LINK_CHANGE               0x00000004
+#define PARAM_WAKE_UP_MAGIC_PACKET 0x00000001
+#define PARAM_WAKE_UP_PATTERN_MATCH 0x00000002
+#define PARAM_WAKE_UP_LINK_CHANGE 0x00000004
 
 /* Packet filter bit definitioin (UINT_32 bit-wise definition) */
-#define PARAM_PACKET_FILTER_DIRECTED            0x00000001
-#define PARAM_PACKET_FILTER_MULTICAST           0x00000002
-#define PARAM_PACKET_FILTER_ALL_MULTICAST       0x00000004
-#define PARAM_PACKET_FILTER_BROADCAST           0x00000008
-#define PARAM_PACKET_FILTER_PROMISCUOUS         0x00000020
-#define PARAM_PACKET_FILTER_ALL_LOCAL           0x00000080
+#define PARAM_PACKET_FILTER_DIRECTED 0x00000001
+#define PARAM_PACKET_FILTER_MULTICAST 0x00000002
+#define PARAM_PACKET_FILTER_ALL_MULTICAST 0x00000004
+#define PARAM_PACKET_FILTER_BROADCAST 0x00000008
+#define PARAM_PACKET_FILTER_PROMISCUOUS 0x00000020
+#define PARAM_PACKET_FILTER_ALL_LOCAL 0x00000080
 #if CFG_ENABLE_WIFI_DIRECT_CFG_80211
-#define PARAM_PACKET_FILTER_P2P_MASK             0xC0000000
-#define PARAM_PACKET_FILTER_PROBE_REQ           0x80000000
-#define PARAM_PACKET_FILTER_ACTION_FRAME      0x40000000
+#define PARAM_PACKET_FILTER_P2P_MASK 0xC0000000
+#define PARAM_PACKET_FILTER_PROBE_REQ 0x80000000
+#define PARAM_PACKET_FILTER_ACTION_FRAME 0x40000000
 #endif
 
 #if CFG_SLT_SUPPORT
-#define PARAM_PACKET_FILTER_SUPPORTED   (PARAM_PACKET_FILTER_DIRECTED | \
-					 PARAM_PACKET_FILTER_MULTICAST | \
-					 PARAM_PACKET_FILTER_BROADCAST | \
-					 PARAM_PACKET_FILTER_ALL_MULTICAST)
+#define PARAM_PACKET_FILTER_SUPPORTED \
+	(PARAM_PACKET_FILTER_DIRECTED | PARAM_PACKET_FILTER_MULTICAST | PARAM_PACKET_FILTER_BROADCAST | \
+			PARAM_PACKET_FILTER_ALL_MULTICAST)
 #else
-#define PARAM_PACKET_FILTER_SUPPORTED   (PARAM_PACKET_FILTER_DIRECTED | \
-					 PARAM_PACKET_FILTER_MULTICAST | \
-					 PARAM_PACKET_FILTER_BROADCAST | \
-					 PARAM_PACKET_FILTER_ALL_MULTICAST)
+#define PARAM_PACKET_FILTER_SUPPORTED \
+	(PARAM_PACKET_FILTER_DIRECTED | PARAM_PACKET_FILTER_MULTICAST | PARAM_PACKET_FILTER_BROADCAST | \
+			PARAM_PACKET_FILTER_ALL_MULTICAST)
 #endif
 
-#define PARAM_MEM_DUMP_MAX_SIZE         1536
+#define PARAM_MEM_DUMP_MAX_SIZE 1536
 
 #if CFG_SUPPORT_CAL_RESULT_BACKUP_TO_HOST
-#define PARAM_CAL_DATA_DUMP_MAX_SIZE	1200
-#define PARAM_CAL_DATA_DUMP_MAX_NUM		300
+#define PARAM_CAL_DATA_DUMP_MAX_SIZE 1200
+#define PARAM_CAL_DATA_DUMP_MAX_NUM 300
 #endif
 
-#define BT_PROFILE_PARAM_LEN        8
+#define BT_PROFILE_PARAM_LEN 8
 
-#define EFUSE_ADDR_MAX  0x3BF	/* Based on EEPROM layout 20160120 */
+#define EFUSE_ADDR_MAX 0x3BF /* Based on EEPROM layout 20160120 */
 #if CFG_SUPPORT_BUFFER_MODE
 
 /* For MT7668 */
-#define EFUSE_CONTENT_BUFFER_START        0x03A
-#define EFUSE_CONTENT_BUFFER_END          0x1D9
-#define EFUSE_CONTENT_BUFFER_SIZE		  (EFUSE_CONTENT_BUFFER_END - EFUSE_CONTENT_BUFFER_START + 1)
+#define EFUSE_CONTENT_BUFFER_START 0x03A
+#define EFUSE_CONTENT_BUFFER_END 0x1D9
+#define EFUSE_CONTENT_BUFFER_SIZE (EFUSE_CONTENT_BUFFER_END - EFUSE_CONTENT_BUFFER_START + 1)
 
-#define DEFAULT_EFUSE_MACADDR_OFFSET	  4
-
+#define DEFAULT_EFUSE_MACADDR_OFFSET 4
 
 /* For MT6632 */
-#define EFUSE_CONTENT_SIZE			16
+#define EFUSE_CONTENT_SIZE 16
 
 #define EFUSE_BLOCK_SIZE 16
 #define EEPROM_SIZE 1184
-#define MAX_EEPROM_BUFFER_SIZE	1200
+#define MAX_EEPROM_BUFFER_SIZE 1200
 #endif /* CFG_SUPPORT_BUFFER_MODE */
 
 #if CFG_SUPPORT_TX_BF
-#define TXBF_CMD_NEED_TO_RESPONSE(u4TxBfCmdId) (u4TxBfCmdId == BF_PFMU_TAG_READ || \
-						u4TxBfCmdId == BF_PROFILE_READ)
+#define TXBF_CMD_NEED_TO_RESPONSE(u4TxBfCmdId) (u4TxBfCmdId == BF_PFMU_TAG_READ || u4TxBfCmdId == BF_PROFILE_READ)
 #endif /* CFG_SUPPORT_TX_BF */
-#define MU_CMD_NEED_TO_RESPONSE(u4MuCmdId) (u4MuCmdId == MU_GET_CALC_INIT_MCS || \
-					    u4MuCmdId == MU_HQA_GET_QD || \
-					    u4MuCmdId == MU_HQA_GET_CALC_LQ)
+#define MU_CMD_NEED_TO_RESPONSE(u4MuCmdId) \
+	(u4MuCmdId == MU_GET_CALC_INIT_MCS || u4MuCmdId == MU_HQA_GET_QD || u4MuCmdId == MU_HQA_GET_CALC_LQ)
 #if CFG_SUPPORT_MU_MIMO
 /* @NITESH: MACROS For Init MCS calculation (MU Metric Table) */
-#define NUM_MUT_FEC             2
-#define NUM_MUT_MCS             10
-#define NUM_MUT_NR_NUM          3
-#define NUM_MUT_INDEX           8
+#define NUM_MUT_FEC 2
+#define NUM_MUT_MCS 10
+#define NUM_MUT_NR_NUM 3
+#define NUM_MUT_INDEX 8
 
-#define NUM_OF_USER             2
-#define NUM_OF_MODUL            5
+#define NUM_OF_USER 2
+#define NUM_OF_MODUL 5
 #endif /* CFG_SUPPORT_MU_MIMO */
 
 /*******************************************************************************
-*                             D A T A   T Y P E S
-********************************************************************************
-*/
+ *                             D A T A   T Y P E S
+ ********************************************************************************
+ */
 /*----------------------------------------------------------------------------*/
 /* Parameters of User Configuration which match to NDIS5.1                    */
 /*----------------------------------------------------------------------------*/
 /* NDIS_802_11_AUTHENTICATION_MODE */
 typedef enum _ENUM_PARAM_AUTH_MODE_T {
-	AUTH_MODE_OPEN,		/*!< Open system */
-	AUTH_MODE_SHARED,	/*!< Shared key */
-	AUTH_MODE_AUTO_SWITCH,	/*!< Either open system or shared key */
+	AUTH_MODE_OPEN,		   /*!< Open system */
+	AUTH_MODE_SHARED,	   /*!< Shared key */
+	AUTH_MODE_AUTO_SWITCH, /*!< Either open system or shared key */
 	AUTH_MODE_WPA,
 	AUTH_MODE_WPA_PSK,
-	AUTH_MODE_WPA_NONE,	/*!< For Ad hoc */
+	AUTH_MODE_WPA_NONE, /*!< For Ad hoc */
 	AUTH_MODE_WPA2,
 	AUTH_MODE_WPA2_PSK,
 #if CFG_SUPPORT_CFG80211_AUTH
 	AUTH_MODE_WPA2_SAE,
 #endif
-	AUTH_MODE_NUM		/*!< Upper bound, not real case */
-} ENUM_PARAM_AUTH_MODE_T, *P_ENUM_PARAM_AUTH_MODE_T;
+	AUTH_MODE_NUM /*!< Upper bound, not real case */
+} ENUM_PARAM_AUTH_MODE_T,
+		*P_ENUM_PARAM_AUTH_MODE_T;
 
-/* NDIS_802_11_ENCRYPTION_STATUS *//* Encryption types */
+/* NDIS_802_11_ENCRYPTION_STATUS */ /* Encryption types */
 typedef enum _ENUM_WEP_STATUS_T {
 	ENUM_WEP_ENABLED,
 	ENUM_ENCRYPTION1_ENABLED = ENUM_WEP_ENABLED,
@@ -220,13 +215,14 @@ typedef enum _ENUM_WEP_STATUS_T {
 	ENUM_ENCRYPTION4_KEY_ABSENT,
 #endif
 	ENUM_ENCRYPTION_NUM
-} ENUM_PARAM_ENCRYPTION_STATUS_T, *P_ENUM_PARAM_ENCRYPTION_STATUS_T;
+} ENUM_PARAM_ENCRYPTION_STATUS_T,
+		*P_ENUM_PARAM_ENCRYPTION_STATUS_T;
 
 typedef UINT_8 PARAM_MAC_ADDRESS[PARAM_MAC_ADDR_LEN];
 
 typedef UINT_32 PARAM_KEY_INDEX;
 typedef UINT_64 PARAM_KEY_RSC;
-typedef INT_32 PARAM_RSSI;
+typedef INT_32	PARAM_RSSI;
 
 typedef UINT_32 PARAM_FRAGMENTATION_THRESHOLD;
 typedef UINT_32 PARAM_RTS_THRESHOLD;
@@ -235,33 +231,35 @@ typedef UINT_8 PARAM_RATES[PARAM_MAX_LEN_RATES];
 typedef UINT_8 PARAM_RATES_EX[PARAM_MAX_LEN_RATES_EX];
 
 typedef enum _ENUM_PARAM_PHY_TYPE_T {
-	PHY_TYPE_802_11ABG = 0,	/*!< Can associated with 802.11abg AP,
-				* Scan dual band.
-				*/
-	PHY_TYPE_802_11BG,	/*!< Can associated with 802_11bg AP,
-				*  Scan single band and not report 802_11a BSSs.
-				*/
-	PHY_TYPE_802_11G,	/*!< Can associated with 802_11g only AP,
-				* Scan single band and not report 802_11ab BSSs.
-				*/
-	PHY_TYPE_802_11A,	/*!< Can associated with 802_11a only AP,
-				* Scan single band and not report 802_11bg BSSs.
-				*/
-	PHY_TYPE_802_11B,	/*!< Can associated with 802_11b only AP
-				* Scan single band and not report 802_11ag BSSs.
-				*/
-	PHY_TYPE_NUM		/* 5 */
-} ENUM_PARAM_PHY_TYPE_T, *P_ENUM_PARAM_PHY_TYPE_T;
+	PHY_TYPE_802_11ABG = 0, /*!< Can associated with 802.11abg AP,
+							 * Scan dual band.
+							 */
+	PHY_TYPE_802_11BG,		/*!< Can associated with 802_11bg AP,
+							 *  Scan single band and not report 802_11a BSSs.
+							 */
+	PHY_TYPE_802_11G,		/*!< Can associated with 802_11g only AP,
+							 * Scan single band and not report 802_11ab BSSs.
+							 */
+	PHY_TYPE_802_11A,		/*!< Can associated with 802_11a only AP,
+							 * Scan single band and not report 802_11bg BSSs.
+							 */
+	PHY_TYPE_802_11B,		/*!< Can associated with 802_11b only AP
+							 * Scan single band and not report 802_11ag BSSs.
+							 */
+	PHY_TYPE_NUM			/* 5 */
+} ENUM_PARAM_PHY_TYPE_T,
+		*P_ENUM_PARAM_PHY_TYPE_T;
 
 typedef enum _ENUM_PARAM_OP_MODE_T {
-	NET_TYPE_IBSS = 0,	/*!< Try to merge/establish an AdHoc, do periodic SCAN for merging. */
-	NET_TYPE_INFRA,		/*!< Try to join an Infrastructure, do periodic SCAN for joining. */
-	NET_TYPE_AUTO_SWITCH,	/*!< Try to join an Infrastructure, if fail then try to merge or */
-				/*  establish an AdHoc, do periodic SCAN for joining or merging. */
-	NET_TYPE_DEDICATED_IBSS,	/*!< Try to merge an AdHoc first, */
-					/* if fail then establish AdHoc permanently, no more SCAN. */
-	NET_TYPE_NUM		/* 4 */
-} ENUM_PARAM_OP_MODE_T, *P_ENUM_PARAM_OP_MODE_T;
+	NET_TYPE_IBSS = 0,		 /*!< Try to merge/establish an AdHoc, do periodic SCAN for merging. */
+	NET_TYPE_INFRA,			 /*!< Try to join an Infrastructure, do periodic SCAN for joining. */
+	NET_TYPE_AUTO_SWITCH,	 /*!< Try to join an Infrastructure, if fail then try to merge or */
+							 /*  establish an AdHoc, do periodic SCAN for joining or merging. */
+	NET_TYPE_DEDICATED_IBSS, /*!< Try to merge an AdHoc first, */
+	/* if fail then establish AdHoc permanently, no more SCAN. */
+	NET_TYPE_NUM /* 4 */
+} ENUM_PARAM_OP_MODE_T,
+		*P_ENUM_PARAM_OP_MODE_T;
 
 #if CFG_SUPPORT_CFG80211_AUTH
 #if CFG_WDEV_LOCK_THREAD_SUPPORT
@@ -276,12 +274,12 @@ enum ENUM_CFG80211_WDEV_LOCK_FUNC {
 #endif
 
 typedef struct _PARAM_SSID_T {
-	UINT_32 u4SsidLen;	/*!< SSID length in bytes. Zero length is broadcast(any) SSID */
-	UINT_8 aucSsid[PARAM_MAX_LEN_SSID];
+	UINT_32 u4SsidLen; /*!< SSID length in bytes. Zero length is broadcast(any) SSID */
+	UINT_8	aucSsid[PARAM_MAX_LEN_SSID];
 } PARAM_SSID_T, *P_PARAM_SSID_T;
 
 typedef struct _PARAM_CONNECT_T {
-	UINT_32 u4SsidLen;	/*!< SSID length in bytes. Zero length is broadcast(any) SSID */
+	UINT_32 u4SsidLen; /*!< SSID length in bytes. Zero length is broadcast(any) SSID */
 	UINT_8 *pucSsid;
 	UINT_8 *pucBssid;
 	UINT_32 u4CenterFreq;
@@ -290,17 +288,19 @@ typedef struct _PARAM_CONNECT_T {
 /* This is enum defined for user to select an AdHoc Mode */
 typedef enum _ENUM_PARAM_AD_HOC_MODE_T {
 	AD_HOC_MODE_11B = 0,	/*!< Create 11b IBSS if we support 802.11abg/802.11bg. */
-	AD_HOC_MODE_MIXED_11BG,	/*!< Create 11bg mixed IBSS if we support 802.11abg/802.11bg/802.11g. */
-	AD_HOC_MODE_11G,	/*!< Create 11g only IBSS if we support 802.11abg/802.11bg/802.11g. */
-	AD_HOC_MODE_11A,	/*!< Create 11a only IBSS if we support 802.11abg. */
-	AD_HOC_MODE_NUM		/* 4 */
-} ENUM_PARAM_AD_HOC_MODE_T, *P_ENUM_PARAM_AD_HOC_MODE_T;
+	AD_HOC_MODE_MIXED_11BG, /*!< Create 11bg mixed IBSS if we support 802.11abg/802.11bg/802.11g. */
+	AD_HOC_MODE_11G,		/*!< Create 11g only IBSS if we support 802.11abg/802.11bg/802.11g. */
+	AD_HOC_MODE_11A,		/*!< Create 11a only IBSS if we support 802.11abg. */
+	AD_HOC_MODE_NUM			/* 4 */
+} ENUM_PARAM_AD_HOC_MODE_T,
+		*P_ENUM_PARAM_AD_HOC_MODE_T;
 
 typedef enum _ENUM_PARAM_MEDIA_STATE_T {
 	PARAM_MEDIA_STATE_CONNECTED,
 	PARAM_MEDIA_STATE_DISCONNECTED,
-	PARAM_MEDIA_STATE_TO_BE_INDICATED	/* for following MSDN re-association behavior */
-} ENUM_PARAM_MEDIA_STATE_T, *P_ENUM_PARAM_MEDIA_STATE_T;
+	PARAM_MEDIA_STATE_TO_BE_INDICATED /* for following MSDN re-association behavior */
+} ENUM_PARAM_MEDIA_STATE_T,
+		*P_ENUM_PARAM_MEDIA_STATE_T;
 
 typedef enum _ENUM_PARAM_NETWORK_TYPE_T {
 	PARAM_NETWORK_TYPE_FH,
@@ -308,11 +308,12 @@ typedef enum _ENUM_PARAM_NETWORK_TYPE_T {
 	PARAM_NETWORK_TYPE_OFDM5,
 	PARAM_NETWORK_TYPE_OFDM24,
 	PARAM_NETWORK_TYPE_AUTOMODE,
-	PARAM_NETWORK_TYPE_NUM	/*!< Upper bound, not real case */
-} ENUM_PARAM_NETWORK_TYPE_T, *P_ENUM_PARAM_NETWORK_TYPE_T;
+	PARAM_NETWORK_TYPE_NUM /*!< Upper bound, not real case */
+} ENUM_PARAM_NETWORK_TYPE_T,
+		*P_ENUM_PARAM_NETWORK_TYPE_T;
 
 typedef struct _PARAM_NETWORK_TYPE_LIST {
-	UINT_32 NumberOfItems;	/*!< At least 1 */
+	UINT_32					  NumberOfItems; /*!< At least 1 */
 	ENUM_PARAM_NETWORK_TYPE_T eNetworkType[1];
 } PARAM_NETWORK_TYPE_LIST, *PPARAM_NETWORK_TYPE_LIST;
 
@@ -320,22 +321,20 @@ typedef enum _ENUM_PARAM_PRIVACY_FILTER_T {
 	PRIVACY_FILTER_ACCEPT_ALL,
 	PRIVACY_FILTER_8021xWEP,
 	PRIVACY_FILTER_NUM
-} ENUM_PARAM_PRIVACY_FILTER_T, *P_ENUM_PARAM_PRIVACY_FILTER_T;
+} ENUM_PARAM_PRIVACY_FILTER_T,
+		*P_ENUM_PARAM_PRIVACY_FILTER_T;
 
-typedef enum _ENUM_RELOAD_DEFAULTS {
-	ENUM_RELOAD_WEP_KEYS
-} PARAM_RELOAD_DEFAULTS, *P_PARAM_RELOAD_DEFAULTS;
+typedef enum _ENUM_RELOAD_DEFAULTS { ENUM_RELOAD_WEP_KEYS } PARAM_RELOAD_DEFAULTS, *P_PARAM_RELOAD_DEFAULTS;
 
 typedef struct _PARAM_PM_PACKET_PATTERN {
-	UINT_32 Priority;	/* Importance of the given pattern. */
-	UINT_32 Reserved;	/* Context information for transports. */
-	UINT_32 MaskSize;	/* Size in bytes of the pattern mask. */
-	UINT_32 PatternOffset;	/* Offset from beginning of this */
+	UINT_32 Priority;	   /* Importance of the given pattern. */
+	UINT_32 Reserved;	   /* Context information for transports. */
+	UINT_32 MaskSize;	   /* Size in bytes of the pattern mask. */
+	UINT_32 PatternOffset; /* Offset from beginning of this */
 	/* structure to the pattern bytes. */
-	UINT_32 PatternSize;	/* Size in bytes of the pattern. */
-	UINT_32 PatternFlags;	/* Flags (TBD). */
+	UINT_32 PatternSize;  /* Size in bytes of the pattern. */
+	UINT_32 PatternFlags; /* Flags (TBD). */
 } PARAM_PM_PACKET_PATTERN, *P_PARAM_PM_PACKET_PATTERN;
-
 
 /* Combine ucTpTestMode and ucSigmaTestMode in one flag */
 /* ucTpTestMode == 0, for normal driver */
@@ -350,7 +349,8 @@ typedef enum _ENUM_TP_TEST_MODE_T {
 	ENUM_TP_TEST_MODE_SIGMA_WMM_PS,
 	ENUM_TP_TEST_MODE_AUDIO_MRM,
 	ENUM_TP_TEST_MODE_NUM
-} ENUM_TP_TEST_MODE_T, *P_ENUM_TP_TEST_MODE_T;
+} ENUM_TP_TEST_MODE_T,
+		*P_ENUM_TP_TEST_MODE_T;
 
 /*--------------------------------------------------------------*/
 /*! \brief Struct definition to indicate specific event.                */
@@ -359,21 +359,22 @@ typedef enum _ENUM_STATUS_TYPE_T {
 	ENUM_STATUS_TYPE_AUTHENTICATION,
 	ENUM_STATUS_TYPE_MEDIA_STREAM_MODE,
 	ENUM_STATUS_TYPE_CANDIDATE_LIST,
-	ENUM_STATUS_TYPE_NUM	/*!< Upper bound, not real case */
-} ENUM_STATUS_TYPE_T, *P_ENUM_STATUS_TYPE_T;
+	ENUM_STATUS_TYPE_NUM /*!< Upper bound, not real case */
+} ENUM_STATUS_TYPE_T,
+		*P_ENUM_STATUS_TYPE_T;
 
 typedef struct _PARAM_802_11_CONFIG_FH_T {
-	UINT_32 u4Length;	/*!< Length of structure */
-	UINT_32 u4HopPattern;	/*!< Defined as 802.11 */
-	UINT_32 u4HopSet;	/*!< to one if non-802.11 */
-	UINT_32 u4DwellTime;	/*!< In unit of Kusec */
+	UINT_32 u4Length;	  /*!< Length of structure */
+	UINT_32 u4HopPattern; /*!< Defined as 802.11 */
+	UINT_32 u4HopSet;	  /*!< to one if non-802.11 */
+	UINT_32 u4DwellTime;  /*!< In unit of Kusec */
 } PARAM_802_11_CONFIG_FH_T, *P_PARAM_802_11_CONFIG_FH_T;
 
 typedef struct _PARAM_802_11_CONFIG_T {
-	UINT_32 u4Length;	/*!< Length of structure */
-	UINT_32 u4BeaconPeriod;	/*!< In unit of Kusec */
-	UINT_32 u4ATIMWindow;	/*!< In unit of Kusec */
-	UINT_32 u4DSConfig;	/*!< Channel frequency in unit of kHz */
+	UINT_32					 u4Length;		 /*!< Length of structure */
+	UINT_32					 u4BeaconPeriod; /*!< In unit of Kusec */
+	UINT_32					 u4ATIMWindow;	 /*!< In unit of Kusec */
+	UINT_32					 u4DSConfig;	 /*!< Channel frequency in unit of kHz */
 	PARAM_802_11_CONFIG_FH_T rFHConfig;
 } PARAM_802_11_CONFIG_T, *P_PARAM_802_11_CONFIG_T;
 
@@ -382,66 +383,66 @@ typedef struct _PARAM_STATUS_INDICATION_T {
 } PARAM_STATUS_INDICATION_T, *P_PARAM_STATUS_INDICATION_T;
 
 typedef struct _PARAM_AUTH_REQUEST_T {
-	UINT_32 u4Length;	/*!< Length of this struct */
+	UINT_32			  u4Length; /*!< Length of this struct */
 	PARAM_MAC_ADDRESS arBssid;
-	UINT_32 u4Flags;	/*!< Definitions are as follows */
+	UINT_32			  u4Flags; /*!< Definitions are as follows */
 } PARAM_AUTH_REQUEST_T, *P_PARAM_AUTH_REQUEST_T;
 
 typedef struct _PARAM_AUTH_EVENT_T {
 	PARAM_STATUS_INDICATION_T rStatus;
-	PARAM_AUTH_REQUEST_T arRequest[1];
+	PARAM_AUTH_REQUEST_T	  arRequest[1];
 } PARAM_AUTH_EVENT_T, *P_PARAM_AUTH_EVENT_T;
 
 /*! \brief Capabilities, privacy, rssi and IEs of each BSSID */
 typedef struct _PARAM_BSSID_EX_T {
-	UINT_32 u4Length;	/*!< Length of structure */
-	PARAM_MAC_ADDRESS arMacAddress;	/*!< BSSID */
-	UINT_8 Reserved[2];
-	PARAM_SSID_T rSsid;	/*!< SSID */
-	UINT_32 u4Privacy;	/*!< Need WEP encryption */
-	PARAM_RSSI rRssi;	/*!< in dBm */
+	UINT_32					  u4Length;		/*!< Length of structure */
+	PARAM_MAC_ADDRESS		  arMacAddress; /*!< BSSID */
+	UINT_8					  Reserved[2];
+	PARAM_SSID_T			  rSsid;	 /*!< SSID */
+	UINT_32					  u4Privacy; /*!< Need WEP encryption */
+	PARAM_RSSI				  rRssi;	 /*!< in dBm */
 	ENUM_PARAM_NETWORK_TYPE_T eNetworkTypeInUse;
-	PARAM_802_11_CONFIG_T rConfiguration;
-	ENUM_PARAM_OP_MODE_T eOpMode;
-	PARAM_RATES_EX rSupportedRates;
-	UINT_32 u4IELength;
-	UINT_8 aucIEs[1];
+	PARAM_802_11_CONFIG_T	  rConfiguration;
+	ENUM_PARAM_OP_MODE_T	  eOpMode;
+	PARAM_RATES_EX			  rSupportedRates;
+	UINT_32					  u4IELength;
+	UINT_8					  aucIEs[1];
 } PARAM_BSSID_EX_T, *P_PARAM_BSSID_EX_T;
 
 typedef struct _PARAM_BSSID_LIST_EX {
-	UINT_32 u4NumberOfItems;	/*!< at least 1 */
+	UINT_32			 u4NumberOfItems; /*!< at least 1 */
 	PARAM_BSSID_EX_T arBssid[1];
 } PARAM_BSSID_LIST_EX_T, *P_PARAM_BSSID_LIST_EX_T;
 
 typedef struct _PARAM_WEP_T {
-	UINT_32 u4Length;	/*!< Length of structure */
-	UINT_32 u4KeyIndex;	/*!< 0: pairwise key, others group keys */
-	UINT_32 u4KeyLength;	/*!< Key length in bytes */
-	UINT_8 aucKeyMaterial[32];	/*!< Key content by above setting */
+	UINT_32 u4Length;			/*!< Length of structure */
+	UINT_32 u4KeyIndex;			/*!< 0: pairwise key, others group keys */
+	UINT_32 u4KeyLength;		/*!< Key length in bytes */
+	UINT_8	aucKeyMaterial[32]; /*!< Key content by above setting */
 } PARAM_WEP_T, *P_PARAM_WEP_T;
 
 /*! \brief Key mapping of BSSID */
 typedef struct _PARAM_KEY_T {
-	UINT_32 u4Length;	/*!< Length of structure */
-	UINT_32 u4KeyIndex;	/*!< KeyID */
-	UINT_32 u4KeyLength;	/*!< Key length in bytes */
-	PARAM_MAC_ADDRESS arBSSID;	/*!< MAC address */
-	PARAM_KEY_RSC rKeyRSC;
-	UINT_8 ucBssIdx;
-	UINT_8 ucCipher;
-	UINT_8 aucKeyMaterial[32];	/*!< Key content by above setting */
-	/* Following add to change the original windows structure */
+	UINT_32			  u4Length;	   /*!< Length of structure */
+	UINT_32			  u4KeyIndex;  /*!< KeyID */
+	UINT_32			  u4KeyLength; /*!< Key length in bytes */
+	PARAM_MAC_ADDRESS arBSSID;	   /*!< MAC address */
+	PARAM_KEY_RSC	  rKeyRSC;
+	UINT_8			  ucBssIdx;
+	UINT_8			  ucCipher;
+	UINT_8			  aucKeyMaterial[32]; /*!< Key content by above setting */
+										  /* Following add to change the original windows structure */
 } PARAM_KEY_T, *P_PARAM_KEY_T;
 
 /* for more remove key control (ucCtrlFlag) */
-#define FLAG_RM_KEY_CTRL_WO_OID     BIT(0)	/* not OID operation */
+#define FLAG_RM_KEY_CTRL_WO_OID BIT(0) /* not OID operation */
 
 typedef struct _PARAM_REMOVE_KEY_T {
-	UINT_32 u4Length;	/*!< Length of structure */
-	UINT_32 u4KeyIndex;	/*!< KeyID */
-	PARAM_MAC_ADDRESS arBSSID;	/*!< MAC address */
-	UINT_8 ucBssIdx;
-	UINT_8 ucCtrlFlag;	/* Ctrl Flag for RM key CMD */
+	UINT_32			  u4Length;	  /*!< Length of structure */
+	UINT_32			  u4KeyIndex; /*!< KeyID */
+	PARAM_MAC_ADDRESS arBSSID;	  /*!< MAC address */
+	UINT_8			  ucBssIdx;
+	UINT_8			  ucCtrlFlag; /* Ctrl Flag for RM key CMD */
 } PARAM_REMOVE_KEY_T, *P_PARAM_REMOVE_KEY_T;
 
 /*! \brief Default key */
@@ -453,29 +454,21 @@ typedef struct _PARAM_DEFAULT_KEY_T {
 } PARAM_DEFAULT_KEY_T, *P_PARAM_DEFAULT_KEY_T;
 
 #if CFG_SUPPORT_WAPI
-typedef enum _ENUM_KEY_TYPE {
-	ENUM_WPI_PAIRWISE_KEY = 0,
-	ENUM_WPI_GROUP_KEY
-} ENUM_KEY_TYPE;
+typedef enum _ENUM_KEY_TYPE { ENUM_WPI_PAIRWISE_KEY = 0, ENUM_WPI_GROUP_KEY } ENUM_KEY_TYPE;
 
-typedef enum _ENUM_WPI_PROTECT_TYPE {
-	ENUM_WPI_NONE,
-	ENUM_WPI_RX,
-	ENUM_WPI_TX,
-	ENUM_WPI_RX_TX
-} ENUM_WPI_PROTECT_TYPE;
+typedef enum _ENUM_WPI_PROTECT_TYPE { ENUM_WPI_NONE, ENUM_WPI_RX, ENUM_WPI_TX, ENUM_WPI_RX_TX } ENUM_WPI_PROTECT_TYPE;
 
 typedef struct _PARAM_WPI_KEY_T {
-	ENUM_KEY_TYPE eKeyType;
+	ENUM_KEY_TYPE		  eKeyType;
 	ENUM_WPI_PROTECT_TYPE eDirection;
-	UINT_8 ucKeyID;
-	UINT_8 aucRsv[3];
-	UINT_8 aucAddrIndex[12];
-	UINT_32 u4LenWPIEK;
-	UINT_8 aucWPIEK[256];
-	UINT_32 u4LenWPICK;
-	UINT_8 aucWPICK[256];
-	UINT_8 aucPN[16];
+	UINT_8				  ucKeyID;
+	UINT_8				  aucRsv[3];
+	UINT_8				  aucAddrIndex[12];
+	UINT_32				  u4LenWPIEK;
+	UINT_8				  aucWPIEK[256];
+	UINT_32				  u4LenWPICK;
+	UINT_8				  aucWPICK[256];
+	UINT_8				  aucPN[16];
 } PARAM_WPI_KEY_T, *P_PARAM_WPI_KEY_T;
 #endif
 
@@ -486,8 +479,9 @@ typedef enum _PARAM_POWER_MODE {
 #ifdef SUPPORT_PERIODIC_PS
 	Param_PowerModePeriodic_PSP,
 #endif
-	Param_PowerModeMax	/* Upper bound, not real case */
-} PARAM_POWER_MODE, *PPARAM_POWER_MODE;
+	Param_PowerModeMax /* Upper bound, not real case */
+} PARAM_POWER_MODE,
+		*PPARAM_POWER_MODE;
 
 typedef enum _PARAM_DEVICE_POWER_STATE {
 	ParamDeviceStateUnspecified = 0,
@@ -496,20 +490,21 @@ typedef enum _PARAM_DEVICE_POWER_STATE {
 	ParamDeviceStateD2,
 	ParamDeviceStateD3,
 	ParamDeviceStateMaximum
-} PARAM_DEVICE_POWER_STATE, *PPARAM_DEVICE_POWER_STATE;
+} PARAM_DEVICE_POWER_STATE,
+		*PPARAM_DEVICE_POWER_STATE;
 
 #if CFG_SUPPORT_FW_DBG_LEVEL_CTRL
 /* FW debug control level related definition and enumerations */
-#define FW_DBG_LEVEL_DONT_SET   0
-#define FW_DBG_LEVEL_ERROR      (1 << 0)
-#define FW_DBG_LEVEL_WARN       (1 << 1)
-#define FW_DBG_LEVEL_STATE      (1 << 2)
-#define FW_DBG_LEVEL_INFO       (1 << 3)
-#define FW_DBG_LEVEL_LOUD       (1 << 4)
+#define FW_DBG_LEVEL_DONT_SET 0
+#define FW_DBG_LEVEL_ERROR (1 << 0)
+#define FW_DBG_LEVEL_WARN (1 << 1)
+#define FW_DBG_LEVEL_STATE (1 << 2)
+#define FW_DBG_LEVEL_INFO (1 << 3)
+#define FW_DBG_LEVEL_LOUD (1 << 4)
 #endif
 
 typedef struct _PARAM_POWER_MODE_T {
-	UINT_8 ucBssIdx;
+	UINT_8			 ucBssIdx;
 	PARAM_POWER_MODE ePowerMode;
 } PARAM_POWER_MODE_T, *P_PARAM_POWER_MODE_T;
 
@@ -519,7 +514,8 @@ typedef struct _PARAM_POWER_MODE_T {
 typedef enum _PARAM_MULTI_DOMAIN_CAPABILITY {
 	ParamMultiDomainCapDisabled,
 	ParamMultiDomainCapEnabled
-} PARAM_MULTI_DOMAIN_CAPABILITY, *P_PARAM_MULTI_DOMAIN_CAPABILITY;
+} PARAM_MULTI_DOMAIN_CAPABILITY,
+		*P_PARAM_MULTI_DOMAIN_CAPABILITY;
 #endif
 
 typedef struct _COUNTRY_STRING_ENTRY {
@@ -528,19 +524,20 @@ typedef struct _COUNTRY_STRING_ENTRY {
 } COUNTRY_STRING_ENTRY, *P_COUNTRY_STRING_ENTRY;
 
 /* Power management related definition and enumerations */
-#define UAPSD_NONE                              0
-#define UAPSD_AC0                               (BIT(0) | BIT(4))
-#define UAPSD_AC1                               (BIT(1) | BIT(5))
-#define UAPSD_AC2                               (BIT(2) | BIT(6))
-#define UAPSD_AC3                               (BIT(3) | BIT(7))
-#define UAPSD_ALL                               (UAPSD_AC0 | UAPSD_AC1 | UAPSD_AC2 | UAPSD_AC3)
+#define UAPSD_NONE 0
+#define UAPSD_AC0 (BIT(0) | BIT(4))
+#define UAPSD_AC1 (BIT(1) | BIT(5))
+#define UAPSD_AC2 (BIT(2) | BIT(6))
+#define UAPSD_AC3 (BIT(3) | BIT(7))
+#define UAPSD_ALL (UAPSD_AC0 | UAPSD_AC1 | UAPSD_AC2 | UAPSD_AC3)
 
 typedef enum _ENUM_POWER_SAVE_PROFILE_T {
 	ENUM_PSP_CONTINUOUS_ACTIVE = 0,
 	ENUM_PSP_CONTINUOUS_POWER_SAVE,
 	ENUM_PSP_FAST_SWITCH,
 	ENUM_PSP_NUM
-} ENUM_POWER_SAVE_PROFILE_T, *PENUM_POWER_SAVE_PROFILE_T;
+} ENUM_POWER_SAVE_PROFILE_T,
+		*PENUM_POWER_SAVE_PROFILE_T;
 
 /*--------------------------------------------------------------*/
 /*! \brief Set/Query testing type.                              */
@@ -550,7 +547,7 @@ typedef struct _PARAM_802_11_TEST_T {
 	UINT_32 u4Type;
 	union {
 		PARAM_AUTH_EVENT_T AuthenticationEvent;
-		PARAM_RSSI RssiTrigger;
+		PARAM_RSSI		   RssiTrigger;
 	} u;
 } PARAM_802_11_TEST_T, *P_PARAM_802_11_TEST_T;
 
@@ -558,15 +555,15 @@ typedef struct _PARAM_802_11_TEST_T {
 /*! \brief Set/Query authentication and encryption capability.  */
 /*--------------------------------------------------------------*/
 typedef struct _PARAM_AUTH_ENCRYPTION_T {
-	ENUM_PARAM_AUTH_MODE_T eAuthModeSupported;
+	ENUM_PARAM_AUTH_MODE_T		   eAuthModeSupported;
 	ENUM_PARAM_ENCRYPTION_STATUS_T eEncryptStatusSupported;
 } PARAM_AUTH_ENCRYPTION_T, *P_PARAM_AUTH_ENCRYPTION_T;
 
 typedef struct _PARAM_CAPABILITY_T {
-	UINT_32 u4Length;
-	UINT_32 u4Version;
-	UINT_32 u4NoOfPMKIDs;
-	UINT_32 u4NoOfAuthEncryptPairsSupported;
+	UINT_32					u4Length;
+	UINT_32					u4Version;
+	UINT_32					u4NoOfPMKIDs;
+	UINT_32					u4NoOfAuthEncryptPairsSupported;
 	PARAM_AUTH_ENCRYPTION_T arAuthenticationEncryptionSupported[1];
 } PARAM_CAPABILITY_T, *P_PARAM_CAPABILITY_T;
 
@@ -578,38 +575,38 @@ typedef struct _PARAM_BSSID_INFO_T {
 } PARAM_BSSID_INFO_T, *P_PARAM_BSSID_INFO_T;
 
 typedef struct _PARAM_PMKID_T {
-	UINT_32 u4Length;
-	UINT_32 u4BSSIDInfoCount;
+	UINT_32			   u4Length;
+	UINT_32			   u4BSSIDInfoCount;
 	PARAM_BSSID_INFO_T arBSSIDInfo[1];
 } PARAM_PMKID_T, *P_PARAM_PMKID_T;
 
 /*! \brief PMKID candidate lists. */
 typedef struct _PARAM_PMKID_CANDIDATE_T {
 	PARAM_MAC_ADDRESS arBSSID;
-	UINT_32 u4Flags;
+	UINT_32			  u4Flags;
 } PARAM_PMKID_CANDIDATE_T, *P_PARAM_PMKID_CANDIDATE_T;
 
 /* #ifdef LINUX */
 typedef struct _PARAM_PMKID_CANDIDATE_LIST_T {
-	UINT_32 u4Version;	/*!< Version */
-	UINT_32 u4NumCandidates;	/*!< How many candidates follow */
+	UINT_32					u4Version;		 /*!< Version */
+	UINT_32					u4NumCandidates; /*!< How many candidates follow */
 	PARAM_PMKID_CANDIDATE_T arCandidateList[1];
 } PARAM_PMKID_CANDIDATE_LIST_T, *P_PARAM_PMKID_CANDIDATE_LIST_T;
 /* #endif */
 
-#define NL80211_KCK_LEN                 16
-#define NL80211_KEK_LEN                 16
-#define NL80211_REPLAY_CTR_LEN          8
-#define NL80211_KEYRSC_LEN		8
+#define NL80211_KCK_LEN 16
+#define NL80211_KEK_LEN 16
+#define NL80211_REPLAY_CTR_LEN 8
+#define NL80211_KEYRSC_LEN 8
 
 typedef struct _PARAM_GTK_REKEY_DATA {
-	UINT_8 aucKek[NL80211_KEK_LEN];
-	UINT_8 aucKck[NL80211_KCK_LEN];
-	UINT_8 aucReplayCtr[NL80211_REPLAY_CTR_LEN];
-	UINT_8 ucBssIndex;
-	UINT_8 ucRekeyMode;
-	UINT_8 ucCurKeyId;
-	UINT_8 ucRsv;
+	UINT_8	aucKek[NL80211_KEK_LEN];
+	UINT_8	aucKck[NL80211_KCK_LEN];
+	UINT_8	aucReplayCtr[NL80211_REPLAY_CTR_LEN];
+	UINT_8	ucBssIndex;
+	UINT_8	ucRekeyMode;
+	UINT_8	ucCurKeyId;
+	UINT_8	ucRsv;
 	UINT_32 u4Proto;
 	UINT_32 u4PairwiseCipher;
 	UINT_32 u4GroupCipher;
@@ -630,7 +627,7 @@ typedef struct _PARAM_CUSTOM_MCR_RW_STRUCT_T {
 /************************************************/
 struct PARAM_COEX_CTRL {
 	UINT_32 u4SubCmd;
-	UINT_8  aucBuffer[64];
+	UINT_8	aucBuffer[64];
 };
 
 /* Isolation Structure */
@@ -690,10 +687,10 @@ typedef struct _PARAM_CAL_BACKUP_STRUCT_V2_T {
 	UINT_8	ucNeedResp;
 	UINT_8	ucFragNum;
 	UINT_8	ucRomRam;
-	UINT_32	u4ThermalValue;
+	UINT_32 u4ThermalValue;
 	UINT_32 u4Address;
-	UINT_32	u4Length;
-	UINT_32	u4RemainLength;
+	UINT_32 u4Length;
+	UINT_32 u4RemainLength;
 } PARAM_CAL_BACKUP_STRUCT_V2_T, *P_PARAM_CAL_BACKUP_STRUCT_V2_T;
 #endif
 
@@ -701,8 +698,8 @@ typedef struct _PARAM_CAL_BACKUP_STRUCT_V2_T {
 #if CFG_SUPPORT_BUFFER_MODE
 typedef struct _BIN_CONTENT_T {
 	UINT_16 u2Addr;
-	UINT_8 ucValue;
-	UINT_8 ucReserved;
+	UINT_8	ucValue;
+	UINT_8	ucReserved;
 } BIN_CONTENT_T, *P_BIN_CONTENT_T;
 
 typedef struct _PARAM_CUSTOM_EFUSE_BUFFER_MODE_T {
@@ -717,33 +714,30 @@ typedef struct _PARAM_CUSTOM_EFUSE_BUFFER_MODE_T {
 typedef struct _PARAM_CUSTOM_ACCESS_EFUSE_T {
 	UINT_32 u4Address;
 	UINT_32 u4Valid;
-	UINT_8 aucData[16];
+	UINT_8	aucData[16];
 } PARAM_CUSTOM_ACCESS_EFUSE_T, *P_PARAM_CUSTOM_ACCESS_EFUSE_T;
 
-
 typedef struct _PARAM_CUSTOM_EFUSE_FREE_BLOCK_T {
-	UINT_8  ucGetFreeBlock;
-	UINT_8  aucReserved[3];
+	UINT_8 ucGetFreeBlock;
+	UINT_8 aucReserved[3];
 } PARAM_CUSTOM_EFUSE_FREE_BLOCK_T, *P_PARAM_CUSTOM_EFUSE_FREE_BLOCK_T;
-
 
 typedef struct _PARAM_CUSTOM_GET_TX_POWER_T {
 	UINT_8 ucTxPwrType;
 	UINT_8 ucCenterChannel;
 	UINT_8 ucDbdcIdx; /* 0:Band 0, 1: Band1 */
-	UINT_8 ucBand; /* 0:G-band 1: A-band*/
+	UINT_8 ucBand;	  /* 0:G-band 1: A-band*/
 	UINT_8 ucReserved[4];
 } PARAM_CUSTOM_GET_TX_POWER_T, *P_PARAM_CUSTOM_GET_TX_POWER_T;
-
 
 /*#endif*/
 
 #endif /* CFG_SUPPORT_BUFFER_MODE */
 
 typedef struct _PARAM_CUSTOM_SET_TX_TARGET_POWER_T {
-	INT_8 cTxPwr2G4Cck;       /* signed, in unit of 0.5dBm */
-	INT_8 cTxPwr2G4Dsss;      /* signed, in unit of 0.5dBm */
-	UINT_8 ucTxTargetPwr;		/* Tx target power base for all*/
+	INT_8  cTxPwr2G4Cck;  /* signed, in unit of 0.5dBm */
+	INT_8  cTxPwr2G4Dsss; /* signed, in unit of 0.5dBm */
+	UINT_8 ucTxTargetPwr; /* Tx target power base for all*/
 	UINT_8 ucReserved;
 
 	INT_8 cTxPwr2G4OFDM_BPSK;
@@ -841,116 +835,113 @@ typedef enum _BF_ACTION_CATEGORY {
 } BF_ACTION_CATEGORY;
 
 enum {
-	DEVINFO_ACTIVE = 0,
+	DEVINFO_ACTIVE	= 0,
 	DEVINFO_MAX_NUM = 1,
 };
 
-enum {
-	DEVINFO_ACTIVE_FEATURE = (1 << DEVINFO_ACTIVE),
-	DEVINFO_MAX_NUM_FEATURE = (1 << DEVINFO_MAX_NUM)
-};
+enum { DEVINFO_ACTIVE_FEATURE = (1 << DEVINFO_ACTIVE), DEVINFO_MAX_NUM_FEATURE = (1 << DEVINFO_MAX_NUM) };
 
 enum {
-	BSS_INFO_OWN_MAC = 0,
-	BSS_INFO_BASIC = 1,
-	BSS_INFO_RF_CH = 2,
-	BSS_INFO_PM = 3,
-	BSS_INFO_UAPSD = 4,
+	BSS_INFO_OWN_MAC		= 0,
+	BSS_INFO_BASIC			= 1,
+	BSS_INFO_RF_CH			= 2,
+	BSS_INFO_PM				= 3,
+	BSS_INFO_UAPSD			= 4,
 	BSS_INFO_ROAM_DETECTION = 5,
-	BSS_INFO_LQ_RM = 6,
-	BSS_INFO_EXT_BSS = 7,
+	BSS_INFO_LQ_RM			= 6,
+	BSS_INFO_EXT_BSS		= 7,
 	BSS_INFO_BROADCAST_INFO = 8,
-	BSS_INFO_SYNC_MODE = 9,
+	BSS_INFO_SYNC_MODE		= 9,
 	BSS_INFO_MAX_NUM
 };
 
 typedef union _PFMU_PROFILE_TAG1 {
 	struct {
-		UINT_32 ucProfileID:7;	/* [6:0] : 0 ~ 63 */
-		UINT_32 ucTxBf:1;	/* [7] : 0: iBF, 1: eBF */
-		UINT_32 ucDBW:2;	/* [9:8] : 0/1/2/3: DW20/40/80/160NC */
-		UINT_32 ucSU_MU:1;	/* [10] : 0:SU, 1: MU */
-		UINT_32 ucInvalidProf:1;	/* [11] : 0:default, 1: This profile number is invalid by SW */
-		UINT_32 ucRMSD:3;	/* [14:12] : RMSD value from CE */
-		UINT_32 ucMemAddr1ColIdx:3;	/* [17 : 15] : column index : 0 ~ 5 */
-		UINT_32 ucMemAddr1RowIdx:6;	/* [23 : 18] : row index : 0 ~ 63 */
-		UINT_32 ucMemAddr2ColIdx:3;	/* [26 : 24] : column index : 0 ~ 5 */
-		UINT_32 ucMemAddr2RowIdx:5;	/* [31 : 27] : row index : 0 ~ 63 */
-		UINT_32 ucMemAddr2RowIdxMsb:1;	/* [32] : MSB of row index */
-		UINT_32 ucMemAddr3ColIdx:3;	/* [35 : 33] : column index : 0 ~ 5 */
-		UINT_32 ucMemAddr3RowIdx:6;	/* [41 : 36] : row index : 0 ~ 63 */
-		UINT_32 ucMemAddr4ColIdx:3;	/* [44 : 42] : column index : 0 ~ 5 */
-		UINT_32 ucMemAddr4RowIdx:6;	/* [50 : 45] : row index : 0 ~ 63 */
-		UINT_32 ucReserved:1;	/* [51] : Reserved */
-		UINT_32 ucNrow:2;	/* [53 : 52] : Nrow */
-		UINT_32 ucNcol:2;	/* [55 : 54] : Ncol */
-		UINT_32 ucNgroup:2;	/* [57 : 56] : Ngroup */
-		UINT_32 ucLM:2;	/* [59 : 58] : 0/1/2 */
-		UINT_32 ucCodeBook:2;	/* [61:60] : Code book */
-		UINT_32 ucHtcExist:1;	/* [62] : HtcExist */
-		UINT_32 ucReserved1:1;	/* [63] : Reserved */
-		UINT_32 ucSNR_STS0:8;	/* [71:64] : SNR_STS0 */
-		UINT_32 ucSNR_STS1:8;	/* [79:72] : SNR_STS1 */
-		UINT_32 ucSNR_STS2:8;	/* [87:80] : SNR_STS2 */
-		UINT_32 ucSNR_STS3:8;	/* [95:88] : SNR_STS3 */
-		UINT_32 ucIBfLnaIdx:8;	/* [103:96] : iBF LNA index */
+		UINT_32 ucProfileID : 7;		 /* [6:0] : 0 ~ 63 */
+		UINT_32 ucTxBf : 1;				 /* [7] : 0: iBF, 1: eBF */
+		UINT_32 ucDBW : 2;				 /* [9:8] : 0/1/2/3: DW20/40/80/160NC */
+		UINT_32 ucSU_MU : 1;			 /* [10] : 0:SU, 1: MU */
+		UINT_32 ucInvalidProf : 1;		 /* [11] : 0:default, 1: This profile number is invalid by SW */
+		UINT_32 ucRMSD : 3;				 /* [14:12] : RMSD value from CE */
+		UINT_32 ucMemAddr1ColIdx : 3;	 /* [17 : 15] : column index : 0 ~ 5 */
+		UINT_32 ucMemAddr1RowIdx : 6;	 /* [23 : 18] : row index : 0 ~ 63 */
+		UINT_32 ucMemAddr2ColIdx : 3;	 /* [26 : 24] : column index : 0 ~ 5 */
+		UINT_32 ucMemAddr2RowIdx : 5;	 /* [31 : 27] : row index : 0 ~ 63 */
+		UINT_32 ucMemAddr2RowIdxMsb : 1; /* [32] : MSB of row index */
+		UINT_32 ucMemAddr3ColIdx : 3;	 /* [35 : 33] : column index : 0 ~ 5 */
+		UINT_32 ucMemAddr3RowIdx : 6;	 /* [41 : 36] : row index : 0 ~ 63 */
+		UINT_32 ucMemAddr4ColIdx : 3;	 /* [44 : 42] : column index : 0 ~ 5 */
+		UINT_32 ucMemAddr4RowIdx : 6;	 /* [50 : 45] : row index : 0 ~ 63 */
+		UINT_32 ucReserved : 1;			 /* [51] : Reserved */
+		UINT_32 ucNrow : 2;				 /* [53 : 52] : Nrow */
+		UINT_32 ucNcol : 2;				 /* [55 : 54] : Ncol */
+		UINT_32 ucNgroup : 2;			 /* [57 : 56] : Ngroup */
+		UINT_32 ucLM : 2;				 /* [59 : 58] : 0/1/2 */
+		UINT_32 ucCodeBook : 2;			 /* [61:60] : Code book */
+		UINT_32 ucHtcExist : 1;			 /* [62] : HtcExist */
+		UINT_32 ucReserved1 : 1;		 /* [63] : Reserved */
+		UINT_32 ucSNR_STS0 : 8;			 /* [71:64] : SNR_STS0 */
+		UINT_32 ucSNR_STS1 : 8;			 /* [79:72] : SNR_STS1 */
+		UINT_32 ucSNR_STS2 : 8;			 /* [87:80] : SNR_STS2 */
+		UINT_32 ucSNR_STS3 : 8;			 /* [95:88] : SNR_STS3 */
+		UINT_32 ucIBfLnaIdx : 8;		 /* [103:96] : iBF LNA index */
 	} rField;
 	UINT_32 au4RawData[4];
 } PFMU_PROFILE_TAG1, *P_PFMU_PROFILE_TAG1;
 
 typedef union _PFMU_PROFILE_TAG2 {
 	struct {
-		UINT_32 u2SmartAnt:12;	/* [11:0] : Smart Ant config */
-		UINT_32 ucReserved0:3;	/* [14:12] : Reserved */
-		UINT_32 ucSEIdx:5;	/* [19:15] : SE index */
-		UINT_32 ucRMSDThd:3;	/* [22:20] : RMSD Threshold */
-		UINT_32 ucReserved1:1;	/* [23] : Reserved */
-		UINT_32 ucMCSThL1SS:4;	/* [27:24] : MCS TH long 1SS */
-		UINT_32 ucMCSThS1SS:4;	/* [31:28] : MCS TH short 1SS */
-		UINT_32 ucMCSThL2SS:4;	/* [35:32] : MCS TH long 2SS */
-		UINT_32 ucMCSThS2SS:4;	/* [39:36] : MCS TH short 2SS */
-		UINT_32 ucMCSThL3SS:4;	/* [43:40] : MCS TH long 3SS */
-		UINT_32 ucMCSThS3SS:4;	/* [47:44] : MCS TH short 3SS */
-		UINT_32 uciBfTimeOut:8;	/* [55:48] : iBF timeout limit */
-		UINT_32 ucReserved2:8;	/* [63:56] : Reserved */
-		UINT_32 ucReserved3:8;	/* [71:64] : Reserved */
-		UINT_32 ucReserved4:8;	/* [79:72] : Reserved */
-		UINT_32 uciBfDBW:2;	/* [81:80] : iBF desired DBW 0/1/2/3 : BW20/40/80/160NC */
-		UINT_32 uciBfNcol:2;	/* [83:82] : iBF desired Ncol = 1 ~ 3 */
-		UINT_32 uciBfNrow:2;	/* [85:84] : iBF desired Nrow = 1 ~ 4 */
-		UINT_32 u2Reserved5:10;	/* [95:86] : Reserved */
+		UINT_32 u2SmartAnt : 12;  /* [11:0] : Smart Ant config */
+		UINT_32 ucReserved0 : 3;  /* [14:12] : Reserved */
+		UINT_32 ucSEIdx : 5;	  /* [19:15] : SE index */
+		UINT_32 ucRMSDThd : 3;	  /* [22:20] : RMSD Threshold */
+		UINT_32 ucReserved1 : 1;  /* [23] : Reserved */
+		UINT_32 ucMCSThL1SS : 4;  /* [27:24] : MCS TH long 1SS */
+		UINT_32 ucMCSThS1SS : 4;  /* [31:28] : MCS TH short 1SS */
+		UINT_32 ucMCSThL2SS : 4;  /* [35:32] : MCS TH long 2SS */
+		UINT_32 ucMCSThS2SS : 4;  /* [39:36] : MCS TH short 2SS */
+		UINT_32 ucMCSThL3SS : 4;  /* [43:40] : MCS TH long 3SS */
+		UINT_32 ucMCSThS3SS : 4;  /* [47:44] : MCS TH short 3SS */
+		UINT_32 uciBfTimeOut : 8; /* [55:48] : iBF timeout limit */
+		UINT_32 ucReserved2 : 8;  /* [63:56] : Reserved */
+		UINT_32 ucReserved3 : 8;  /* [71:64] : Reserved */
+		UINT_32 ucReserved4 : 8;  /* [79:72] : Reserved */
+		UINT_32 uciBfDBW : 2;	  /* [81:80] : iBF desired DBW 0/1/2/3 : BW20/40/80/160NC */
+		UINT_32 uciBfNcol : 2;	  /* [83:82] : iBF desired Ncol = 1 ~ 3 */
+		UINT_32 uciBfNrow : 2;	  /* [85:84] : iBF desired Nrow = 1 ~ 4 */
+		UINT_32 u2Reserved5 : 10; /* [95:86] : Reserved */
 	} rField;
 	UINT_32 au4RawData[3];
 } PFMU_PROFILE_TAG2, *P_PFMU_PROFILE_TAG2;
 
 typedef union _PFMU_DATA {
 	struct {
-		UINT_32 u2Phi11:9;
-		UINT_32 ucPsi21:7;
-		UINT_32 u2Phi21:9;
-		UINT_32 ucPsi31:7;
-		UINT_32 u2Phi31:9;
-		UINT_32 ucPsi41:7;
-		UINT_32 u2Phi22:9;
-		UINT_32 ucPsi32:7;
-		UINT_32 u2Phi32:9;
-		UINT_32 ucPsi42:7;
-		UINT_32 u2Phi33:9;
-		UINT_32 ucPsi43:7;
-		UINT_32 u2dSNR00:4;
-		UINT_32 u2dSNR01:4;
-		UINT_32 u2dSNR02:4;
-		UINT_32 u2dSNR03:4;
-		UINT_32 u2Reserved:16;
+		UINT_32 u2Phi11 : 9;
+		UINT_32 ucPsi21 : 7;
+		UINT_32 u2Phi21 : 9;
+		UINT_32 ucPsi31 : 7;
+		UINT_32 u2Phi31 : 9;
+		UINT_32 ucPsi41 : 7;
+		UINT_32 u2Phi22 : 9;
+		UINT_32 ucPsi32 : 7;
+		UINT_32 u2Phi32 : 9;
+		UINT_32 ucPsi42 : 7;
+		UINT_32 u2Phi33 : 9;
+		UINT_32 ucPsi43 : 7;
+		UINT_32 u2dSNR00 : 4;
+		UINT_32 u2dSNR01 : 4;
+		UINT_32 u2dSNR02 : 4;
+		UINT_32 u2dSNR03 : 4;
+		UINT_32 u2Reserved : 16;
 	} rField;
 	UINT_32 au4RawData[5];
 } PFMU_DATA, *P_PFMU_DATA;
 
 typedef struct _PROFILE_TAG_READ_T {
-	UINT_8 ucTxBfCategory;
-	UINT_8 ucProfileIdx;
+	UINT_8	ucTxBfCategory;
+	UINT_8	ucProfileIdx;
 	BOOLEAN fgBfer;
-	UINT_8 ucRsv;
+	UINT_8	ucRsv;
 } PROFILE_TAG_READ_T, *P_PROFILE_TAG_READ_T;
 
 typedef struct _PROFILE_TAG_WRITE_T {
@@ -960,19 +951,19 @@ typedef struct _PROFILE_TAG_WRITE_T {
 } PROFILE_TAG_WRITE_T, *P_PROFILE_TAG_WRITE_T;
 
 typedef struct _PROFILE_DATA_READ_T {
-	UINT_8 ucTxBfCategory;
-	UINT_8 ucPfmuIdx;
+	UINT_8	ucTxBfCategory;
+	UINT_8	ucPfmuIdx;
 	BOOLEAN fgBFer;
-	UINT_8 ucReserved[3];
-	UINT_8 ucSubCarrIdxLsb;
-	UINT_8 ucSubCarrIdxMsb;
+	UINT_8	ucReserved[3];
+	UINT_8	ucSubCarrIdxLsb;
+	UINT_8	ucSubCarrIdxMsb;
 } PROFILE_DATA_READ_T, *P_PROFILE_DATA_READ_T;
 
 typedef struct _PROFILE_DATA_WRITE_T {
-	UINT_8 ucTxBfCategory;
-	UINT_8 ucPfmuIdx;
-	UINT_8 u2SubCarrIdxLsb;
-	UINT_8 u2SubCarrIdxMsb;
+	UINT_8	  ucTxBfCategory;
+	UINT_8	  ucPfmuIdx;
+	UINT_8	  u2SubCarrIdxLsb;
+	UINT_8	  u2SubCarrIdxMsb;
 	PFMU_DATA rTxBfPfmuData;
 } PROFILE_DATA_WRITE_T, *P_PROFILE_DATA_WRITE_T;
 
@@ -983,10 +974,10 @@ typedef struct _PROFILE_PN_READ_T {
 } PROFILE_PN_READ_T, *P_PROFILE_PN_READ_T;
 
 typedef struct _PROFILE_PN_WRITE_T {
-	UINT_8 ucTxBfCategory;
-	UINT_8 ucPfmuIdx;
+	UINT_8	ucTxBfCategory;
+	UINT_8	ucPfmuIdx;
 	UINT_16 u2bw;
-	UINT_8 ucBuf[32];
+	UINT_8	ucBuf[32];
 } PROFILE_PN_WRITE_T, *P_PROFILE_PN_WRITE_T;
 
 typedef enum _BF_SOUNDING_MODE {
@@ -998,130 +989,130 @@ typedef enum _BF_SOUNDING_MODE {
 } BF_SOUNDING_MODE;
 
 typedef struct _EXT_CMD_ETXBf_SND_PERIODIC_TRIGGER_CTRL_T {
-	UINT_8 ucCmdCategoryID;
-	UINT_8 ucSuMuSndMode;
-	UINT_8 ucWlanIdx;
-	UINT_32 u4SoundingInterval;	/* By ms */
+	UINT_8	ucCmdCategoryID;
+	UINT_8	ucSuMuSndMode;
+	UINT_8	ucWlanIdx;
+	UINT_32 u4SoundingInterval; /* By ms */
 } EXT_CMD_ETXBf_SND_PERIODIC_TRIGGER_CTRL_T, *P_EXT_CMD_ETXBf_SND_PERIODIC_TRIGGER_CTRL_T;
 
 typedef struct _EXT_CMD_ETXBf_MU_SND_PERIODIC_TRIGGER_CTRL_T {
-	UINT_8 ucCmdCategoryID;
-	UINT_8 ucSuMuSndMode;
-	UINT_8 ucWlanId[4];
-	UINT_8 ucStaNum;
-	UINT_32 u4SoundingInterval;	/* By ms */
+	UINT_8	ucCmdCategoryID;
+	UINT_8	ucSuMuSndMode;
+	UINT_8	ucWlanId[4];
+	UINT_8	ucStaNum;
+	UINT_32 u4SoundingInterval; /* By ms */
 } EXT_CMD_ETXBf_MU_SND_PERIODIC_TRIGGER_CTRL_T, *P_EXT_CMD_ETXBf_MU_SND_PERIODIC_TRIGGER_CTRL_T;
 
 /* Device information (Tag0) */
 typedef struct _CMD_DEVINFO_ACTIVE_T {
-	UINT_16 u2Tag;		/* Tag = 0x00 */
+	UINT_16 u2Tag; /* Tag = 0x00 */
 	UINT_16 u2Length;
-	UINT_8 ucActive;
-	UINT_8 ucBandNum;
-	UINT_8 aucOwnMacAddr[6];
-	UINT_8 aucReserve[4];
+	UINT_8	ucActive;
+	UINT_8	ucBandNum;
+	UINT_8	aucOwnMacAddr[6];
+	UINT_8	aucReserve[4];
 } CMD_DEVINFO_ACTIVE_T, *P_CMD_DEVINFO_ACTIVE_T;
 
 typedef struct _BSSINFO_BASIC_T {
 	/* Basic BSS information (Tag1) */
-	UINT_16 u2Tag;		/* Tag = 0x01 */
+	UINT_16 u2Tag; /* Tag = 0x01 */
 	UINT_16 u2Length;
 	UINT_32 u4NetworkType;
-	UINT_8 ucActive;
-	UINT_8 ucReserve0;
+	UINT_8	ucActive;
+	UINT_8	ucReserve0;
 	UINT_16 u2BcnInterval;
-	UINT_8 aucBSSID[6];
-	UINT_8 ucWmmIdx;
-	UINT_8 ucDtimPeriod;
-	UINT_8 ucBcMcWlanidx;	/* indicate which wlan-idx used for MC/BC transmission. */
-	UINT_8 ucCipherSuit;
-	UINT_8 acuReserve[6];
+	UINT_8	aucBSSID[6];
+	UINT_8	ucWmmIdx;
+	UINT_8	ucDtimPeriod;
+	UINT_8	ucBcMcWlanidx; /* indicate which wlan-idx used for MC/BC transmission. */
+	UINT_8	ucCipherSuit;
+	UINT_8	acuReserve[6];
 } CMD_BSSINFO_BASIC_T, *P_CMD_BSSINFO_BASIC_T;
 
 typedef struct _TXBF_PFMU_STA_INFO {
-	UINT_16 u2PfmuId;	/* 0xFFFF means no access right for PFMU */
-	UINT_8 fgSU_MU;		/* 0 : SU, 1 : MU */
-	UINT_8 fgETxBfCap;	/* 0 : ITxBf, 1 : ETxBf */
-	UINT_8 ucSoundingPhy;	/* 0: legacy, 1: OFDM, 2: HT, 4: VHT */
-	UINT_8 ucNdpaRate;
-	UINT_8 ucNdpRate;
-	UINT_8 ucReptPollRate;
-	UINT_8 ucTxMode;	/* 0: legacy, 1: OFDM, 2: HT, 4: VHT */
-	UINT_8 ucNc;
-	UINT_8 ucNr;
-	UINT_8 ucCBW;		/* 0 : 20M, 1 : 40M, 2 : 80M, 3 : 80 + 80M */
-	UINT_8 ucTotMemRequire;
-	UINT_8 ucMemRequire20M;
-	UINT_8 ucMemRow0;
-	UINT_8 ucMemCol0;
-	UINT_8 ucMemRow1;
-	UINT_8 ucMemCol1;
-	UINT_8 ucMemRow2;
-	UINT_8 ucMemCol2;
-	UINT_8 ucMemRow3;
-	UINT_8 ucMemCol3;
+	UINT_16 u2PfmuId;	   /* 0xFFFF means no access right for PFMU */
+	UINT_8	fgSU_MU;	   /* 0 : SU, 1 : MU */
+	UINT_8	fgETxBfCap;	   /* 0 : ITxBf, 1 : ETxBf */
+	UINT_8	ucSoundingPhy; /* 0: legacy, 1: OFDM, 2: HT, 4: VHT */
+	UINT_8	ucNdpaRate;
+	UINT_8	ucNdpRate;
+	UINT_8	ucReptPollRate;
+	UINT_8	ucTxMode; /* 0: legacy, 1: OFDM, 2: HT, 4: VHT */
+	UINT_8	ucNc;
+	UINT_8	ucNr;
+	UINT_8	ucCBW; /* 0 : 20M, 1 : 40M, 2 : 80M, 3 : 80 + 80M */
+	UINT_8	ucTotMemRequire;
+	UINT_8	ucMemRequire20M;
+	UINT_8	ucMemRow0;
+	UINT_8	ucMemCol0;
+	UINT_8	ucMemRow1;
+	UINT_8	ucMemCol1;
+	UINT_8	ucMemRow2;
+	UINT_8	ucMemCol2;
+	UINT_8	ucMemRow3;
+	UINT_8	ucMemCol3;
 	UINT_16 u2SmartAnt;
-	UINT_8 ucSEIdx;
-	UINT_8 uciBfTimeOut;
-	UINT_8 uciBfDBW;
-	UINT_8 uciBfNcol;
-	UINT_8 uciBfNrow;
-	UINT_8 aucReserved[3];
+	UINT_8	ucSEIdx;
+	UINT_8	uciBfTimeOut;
+	UINT_8	uciBfDBW;
+	UINT_8	uciBfNcol;
+	UINT_8	uciBfNrow;
+	UINT_8	aucReserved[3];
 } TXBF_PFMU_STA_INFO, *P_TXBF_PFMU_STA_INFO;
 
 typedef struct _STA_REC_UPD_ENTRY_T {
 	TXBF_PFMU_STA_INFO rTxBfPfmuStaInfo;
-	UINT_8 aucAddr[PARAM_MAC_ADDR_LEN];
-	UINT_8 ucAid;
-	UINT_8 ucRsv;
+	UINT_8			   aucAddr[PARAM_MAC_ADDR_LEN];
+	UINT_8			   ucAid;
+	UINT_8			   ucRsv;
 } STA_REC_UPD_ENTRY_T, *P_STA_REC_UPD_ENTRY_T;
 
 typedef struct _STAREC_COMMON_T {
 	/* Basic STA record (Group0) */
-	UINT_16 u2Tag;		/* Tag = 0x00 */
+	UINT_16 u2Tag; /* Tag = 0x00 */
 	UINT_16 u2Length;
 	UINT_32 u4ConnectionType;
-	UINT_8 ucConnectionState;
-	UINT_8 ucIsQBSS;
+	UINT_8	ucConnectionState;
+	UINT_8	ucIsQBSS;
 	UINT_16 u2AID;
-	UINT_8 aucPeerMacAddr[6];
+	UINT_8	aucPeerMacAddr[6];
 	UINT_16 u2Reserve1;
 } CMD_STAREC_COMMON_T, *P_CMD_STAREC_COMMON_T;
 
 typedef struct _CMD_STAREC_BF {
-	UINT_16 u2Tag;		/* Tag = 0x02 */
-	UINT_16 u2Length;
+	UINT_16			   u2Tag; /* Tag = 0x02 */
+	UINT_16			   u2Length;
 	TXBF_PFMU_STA_INFO rTxBfPfmuInfo;
-	UINT_8 ucReserved[3];
+	UINT_8			   ucReserved[3];
 } CMD_STAREC_BF, *P_CMD_STAREC_BF;
 
 /* QA tool: maunal assoc */
 typedef struct _CMD_MANUAL_ASSOC_STRUCT_T {
-/*
-*	UINT_8              ucBssIndex;
-*	UINT_8              ucWlanIdx;
-*	UINT_16             u2TotalElementNum;
-*	UINT_32             u4Reserve;
-*/
+	/*
+	 *	UINT_8              ucBssIndex;
+	 *	UINT_8              ucWlanIdx;
+	 *	UINT_16             u2TotalElementNum;
+	 *	UINT_32             u4Reserve;
+	 */
 	/* extension */
-	UINT_16 u2Tag;		/* Tag = 0x05 */
+	UINT_16 u2Tag; /* Tag = 0x05 */
 	UINT_16 u2Length;
-	UINT_8 aucMac[MAC_ADDR_LEN];
-	UINT_8 ucType;
-	UINT_8 ucWtbl;
-	UINT_8 ucOwnmac;
-	UINT_8 ucMode;
-	UINT_8 ucBw;
-	UINT_8 ucNss;
-	UINT_8 ucPfmuId;
-	UINT_8 ucMarate;
-	UINT_8 ucSpeIdx;
-	UINT_8 ucaid;
+	UINT_8	aucMac[MAC_ADDR_LEN];
+	UINT_8	ucType;
+	UINT_8	ucWtbl;
+	UINT_8	ucOwnmac;
+	UINT_8	ucMode;
+	UINT_8	ucBw;
+	UINT_8	ucNss;
+	UINT_8	ucPfmuId;
+	UINT_8	ucMarate;
+	UINT_8	ucSpeIdx;
+	UINT_8	ucaid;
 } CMD_MANUAL_ASSOC_STRUCT_T, *P_CMD_MANUAL_ASSOC_STRUCT_T;
 
 typedef struct _TX_BF_SOUNDING_START_T {
 	union {
-		EXT_CMD_ETXBf_SND_PERIODIC_TRIGGER_CTRL_T rExtCmdExtBfSndPeriodicTriggerCtrl;
+		EXT_CMD_ETXBf_SND_PERIODIC_TRIGGER_CTRL_T	 rExtCmdExtBfSndPeriodicTriggerCtrl;
 		EXT_CMD_ETXBf_MU_SND_PERIODIC_TRIGGER_CTRL_T rExtCmdExtBfMuSndPeriodicTriggerCtrl;
 	} rTxBfSounding;
 } TX_BF_SOUNDING_START_T, *P_TX_BF_SOUNDING_START_T;
@@ -1155,43 +1146,43 @@ typedef struct _TX_BF_PFMU_MEM_RLS_T {
 } TX_BF_PFMU_MEM_RLS_T, *P_TX_BF_PFMU_MEM_RLS_T;
 
 typedef union _PARAM_CUSTOM_TXBF_ACTION_STRUCT_T {
-	PROFILE_TAG_READ_T rProfileTagRead;
-	PROFILE_TAG_WRITE_T rProfileTagWrite;
-	PROFILE_DATA_READ_T rProfileDataRead;
-	PROFILE_DATA_WRITE_T rProfileDataWrite;
-	PROFILE_PN_READ_T rProfilePnRead;
-	PROFILE_PN_WRITE_T rProfilePnWrite;
+	PROFILE_TAG_READ_T	   rProfileTagRead;
+	PROFILE_TAG_WRITE_T	   rProfileTagWrite;
+	PROFILE_DATA_READ_T	   rProfileDataRead;
+	PROFILE_DATA_WRITE_T   rProfileDataWrite;
+	PROFILE_PN_READ_T	   rProfilePnRead;
+	PROFILE_PN_WRITE_T	   rProfilePnWrite;
 	TX_BF_SOUNDING_START_T rTxBfSoundingStart;
-	TX_BF_SOUNDING_STOP_T rTxBfSoundingStop;
-	TX_BF_TX_APPLY_T rTxBfTxApply;
+	TX_BF_SOUNDING_STOP_T  rTxBfSoundingStop;
+	TX_BF_TX_APPLY_T	   rTxBfTxApply;
 	TX_BF_PFMU_MEM_ALLOC_T rTxBfPfmuMemAlloc;
-	TX_BF_PFMU_MEM_RLS_T rTxBfPfmuMemRls;
+	TX_BF_PFMU_MEM_RLS_T   rTxBfPfmuMemRls;
 } PARAM_CUSTOM_TXBF_ACTION_STRUCT_T, *P_PARAM_CUSTOM_TXBF_ACTION_STRUCT_T;
 
 typedef struct _PARAM_CUSTOM_STA_REC_UPD_STRUCT_T {
-	UINT_8 ucBssIndex;
-	UINT_8 ucWlanIdx;
-	UINT_16 u2TotalElementNum;
-	UINT_8 ucAppendCmdTLV;
-	UINT_8 ucMuarIdx;
-	UINT_8 aucReserve[2];
-	UINT_32 *prStaRec;
+	UINT_8		  ucBssIndex;
+	UINT_8		  ucWlanIdx;
+	UINT_16		  u2TotalElementNum;
+	UINT_8		  ucAppendCmdTLV;
+	UINT_8		  ucMuarIdx;
+	UINT_8		  aucReserve[2];
+	UINT_32		*prStaRec;
 	CMD_STAREC_BF rCmdStaRecBf;
 } PARAM_CUSTOM_STA_REC_UPD_STRUCT_T, *P_PARAM_CUSTOM_STA_REC_UPD_STRUCT_T;
 
 typedef struct _BSSINFO_ARGUMENT_T {
-	UCHAR OwnMacIdx;
-	UINT_8 ucBssIndex;
-	UINT_8 Bssid[PARAM_MAC_ADDR_LEN];
-	UINT_8 ucBcMcWlanIdx;
-	UINT_8 ucPeerWlanIdx;
+	UCHAR	OwnMacIdx;
+	UINT_8	ucBssIndex;
+	UINT_8	Bssid[PARAM_MAC_ADDR_LEN];
+	UINT_8	ucBcMcWlanIdx;
+	UINT_8	ucPeerWlanIdx;
 	UINT_32 NetworkType;
 	UINT_32 u4ConnectionType;
-	UINT_8 CipherSuit;
-	UINT_8 Active;
-	UINT_8 WmmIdx;
+	UINT_8	CipherSuit;
+	UINT_8	Active;
+	UINT_8	WmmIdx;
 	UINT_32 u4BssInfoFeature;
-	UINT_8 aucBuffer[0];
+	UINT_8	aucBuffer[0];
 } BSSINFO_ARGUMENT_T, *P_BSSINFO_ARGUMENT_T;
 
 typedef struct _PARAM_CUSTOM_PFMU_TAG_READ_STRUCT_T {
@@ -1202,11 +1193,11 @@ typedef struct _PARAM_CUSTOM_PFMU_TAG_READ_STRUCT_T {
 #if CFG_SUPPORT_MU_MIMO
 typedef struct _PARAM_CUSTOM_SHOW_GROUP_TBL_ENTRY_STRUCT_T {
 	UINT_32 u4EventId;
-	UINT_8 index;
-	UINT_8 numUser:2;
-	UINT_8 BW:2;
-	UINT_8 NS0:2;
-	UINT_8 NS1:2;
+	UINT_8	index;
+	UINT_8	numUser : 2;
+	UINT_8	BW : 2;
+	UINT_8	NS0 : 2;
+	UINT_8	NS1 : 2;
 	/* UINT_8       NS2:1; */
 	/* UINT_8       NS3:1; */
 	UINT_8 PFIDUser0;
@@ -1216,12 +1207,12 @@ typedef struct _PARAM_CUSTOM_SHOW_GROUP_TBL_ENTRY_STRUCT_T {
 	BOOLEAN fgIsShortGI;
 	BOOLEAN fgIsUsed;
 	BOOLEAN fgIsDisable;
-	UINT_8 initMcsUser0:4;
-	UINT_8 initMcsUser1:4;
+	UINT_8	initMcsUser0 : 4;
+	UINT_8	initMcsUser1 : 4;
 	/* UINT_8       initMcsUser2:4; */
 	/* UINT_8       initMcsUser3:4; */
-	UINT_8 dMcsUser0:4;
-	UINT_8 dMcsUser1:4;
+	UINT_8 dMcsUser0 : 4;
+	UINT_8 dMcsUser1 : 4;
 	/* UINT_8       dMcsUser2:4; */
 	/* UINT_8       dMcsUser3:4; */
 } PARAM_CUSTOM_SHOW_GROUP_TBL_ENTRY_STRUCT_T, *P_PARAM_CUSTOM_SHOW_GROUP_TBL_ENTRY_STRUCT_T;
@@ -1236,7 +1227,7 @@ typedef struct _MU_STRUCT_LQ_REPORT {
 } MU_STRUCT_LQ_REPORT, *P_MU_STRUCT_LQ_REPORT;
 
 typedef struct _PARAM_CUSTOM_GET_MU_CALC_LQ_STRUCT_T {
-	UINT_32 u4EventId;
+	UINT_32				u4EventId;
 	MU_STRUCT_LQ_REPORT rEntry;
 } PARAM_CUSTOM_GET_MU_CALC_LQ_STRUCT_T, *P_PARAM_CUSTOM_GET_MU_CALC_LQ_STRUCT_T;
 
@@ -1246,27 +1237,27 @@ typedef struct _MU_GET_CALC_INIT_MCS_T {
 } MU_GET_CALC_INIT_MCS_T, *P_MU_GET_CALC_INIT_MCS_T;
 
 typedef struct _MU_SET_INIT_MCS_T {
-	UINT_8 ucNumOfUser;	/* zero-base : 0~3: means 1~2 users */
-	UINT_8 ucBandwidth;	/* zero-base : 0:20 hz 1:40 hz 2: 80 hz 3: 160 */
-	UINT_8 ucNssOfUser0;	/* zero-base : 0~1 means uesr0 use 1~2 ss , if no use keep 0 */
-	UINT_8 ucNssOfUser1;	/* zero-base : 0~1 means uesr0 use 1~2 ss , if no use keep 0 */
-	UINT_8 ucPfMuIdOfUser0;	/* zero-base : for now, uesr0 use pf mu id 0 */
-	UINT_8 ucPfMuIdOfUser1;	/* zero-base : for now, uesr1 use pf mu id 1 */
-	UINT_8 ucNumOfTxer;	/* 0~3: mean use 1~4 anntain, for now, should fix 3 */
-	UINT_8 ucSpeIndex;	/*add new field to fill special extension index which replace reserve */
-	UINT_32 u4GroupIndex;	/* 0~ :the index of group table entry for calculation */
+	UINT_8	ucNumOfUser;	 /* zero-base : 0~3: means 1~2 users */
+	UINT_8	ucBandwidth;	 /* zero-base : 0:20 hz 1:40 hz 2: 80 hz 3: 160 */
+	UINT_8	ucNssOfUser0;	 /* zero-base : 0~1 means uesr0 use 1~2 ss , if no use keep 0 */
+	UINT_8	ucNssOfUser1;	 /* zero-base : 0~1 means uesr0 use 1~2 ss , if no use keep 0 */
+	UINT_8	ucPfMuIdOfUser0; /* zero-base : for now, uesr0 use pf mu id 0 */
+	UINT_8	ucPfMuIdOfUser1; /* zero-base : for now, uesr1 use pf mu id 1 */
+	UINT_8	ucNumOfTxer;	 /* 0~3: mean use 1~4 anntain, for now, should fix 3 */
+	UINT_8	ucSpeIndex;		 /*add new field to fill special extension index which replace reserve */
+	UINT_32 u4GroupIndex;	 /* 0~ :the index of group table entry for calculation */
 } MU_SET_INIT_MCS_T, *P_MU_SET_INIT_MCS_T;
 
 typedef struct _MU_SET_CALC_LQ_T {
-	UINT_8 ucNumOfUser;	/* zero-base : 0~3: means 1~2 users */
-	UINT_8 ucBandwidth;	/* zero-base : 0:20 hz 1:40 hz 2: 80 hz 3: 160 */
-	UINT_8 ucNssOfUser0;	/* zero-base : 0~1 means uesr0 use 1~2 ss , if no use keep 0 */
-	UINT_8 ucNssOfUser1;	/* zero-base : 0~1 means uesr0 use 1~2 ss , if no use keep 0 */
-	UINT_8 ucPfMuIdOfUser0;	/* zero-base : for now, uesr0 use pf mu id 0 */
-	UINT_8 ucPfMuIdOfUser1;	/* zero-base : for now, uesr1 use pf mu id 1 */
-	UINT_8 ucNumOfTxer;	/* 0~3: mean use 1~4 anntain, for now, should fix 3 */
-	UINT_8 ucSpeIndex;	/*add new field to fill special extension index which replace reserve */
-	UINT_32 u4GroupIndex;	/* 0~ :the index of group table entry for calculation */
+	UINT_8	ucNumOfUser;	 /* zero-base : 0~3: means 1~2 users */
+	UINT_8	ucBandwidth;	 /* zero-base : 0:20 hz 1:40 hz 2: 80 hz 3: 160 */
+	UINT_8	ucNssOfUser0;	 /* zero-base : 0~1 means uesr0 use 1~2 ss , if no use keep 0 */
+	UINT_8	ucNssOfUser1;	 /* zero-base : 0~1 means uesr0 use 1~2 ss , if no use keep 0 */
+	UINT_8	ucPfMuIdOfUser0; /* zero-base : for now, uesr0 use pf mu id 0 */
+	UINT_8	ucPfMuIdOfUser1; /* zero-base : for now, uesr1 use pf mu id 1 */
+	UINT_8	ucNumOfTxer;	 /* 0~3: mean use 1~4 anntain, for now, should fix 3 */
+	UINT_8	ucSpeIndex;		 /*add new field to fill special extension index which replace reserve */
+	UINT_32 u4GroupIndex;	 /* 0~ :the index of group table entry for calculation */
 } MU_SET_CALC_LQ_T, *P_MU_SET_CALC_LQ_T;
 
 typedef struct _MU_GET_LQ_T {
@@ -1295,7 +1286,7 @@ typedef struct _MU_SET_MU_TABLE_T {
 } MU_SET_MU_TABLE_T, *P_MU_SET_MU_TABLE_T;
 
 typedef struct _MU_SET_GROUP_T {
-	UINT_32 u4GroupIndex;	/* Group Table Idx */
+	UINT_32 u4GroupIndex; /* Group Table Idx */
 	UINT_32 u4NumOfUser;
 	UINT_32 u4User0Ldpc;
 	UINT_32 u4User1Ldpc;
@@ -1310,8 +1301,8 @@ typedef struct _MU_SET_GROUP_T {
 	UINT_32 u4User1MuPfId;
 	UINT_32 u4User0InitMCS;
 	UINT_32 u4User1InitMCS;
-	UINT_8 aucUser0MacAddr[PARAM_MAC_ADDR_LEN];
-	UINT_8 aucUser1MacAddr[PARAM_MAC_ADDR_LEN];
+	UINT_8	aucUser0MacAddr[PARAM_MAC_ADDR_LEN];
+	UINT_8	aucUser1MacAddr[PARAM_MAC_ADDR_LEN];
 } MU_SET_GROUP_T, *P_MU_SET_GROUP_T;
 
 typedef struct _MU_GET_QD_T {
@@ -1331,12 +1322,12 @@ typedef struct _MU_SET_GID_UP_T {
 } MU_SET_GID_UP_T, *P_MU_SET_GID_UP_T;
 
 typedef struct _MU_TRIGGER_MU_TX_T {
-	UINT_8  fgIsRandomPattern; /* is random pattern or not */
+	UINT_8	fgIsRandomPattern;	  /* is random pattern or not */
 	UINT_32 u4MsduPayloadLength0; /* payload length of the MSDU for user 0 */
 	UINT_32 u4MsduPayloadLength1; /* payload length of the MSDU for user 1 */
-	UINT_32 u4MuPacketCount; /* MU TX count */
-	UINT_32 u4NumOfSTAs; /* number of user in the MU TX */
-	UINT_8   aucMacAddrs[2][6]; /* MAC address of users*/
+	UINT_32 u4MuPacketCount;	  /* MU TX count */
+	UINT_32 u4NumOfSTAs;		  /* number of user in the MU TX */
+	UINT_8	aucMacAddrs[2][6];	  /* MAC address of users*/
 } MU_TRIGGER_MU_TX_T, *P_MU_TRIGGER_MU_TX_T;
 
 typedef struct _PARAM_CUSTOM_MUMIMO_ACTION_STRUCT_T {
@@ -1344,18 +1335,18 @@ typedef struct _PARAM_CUSTOM_MUMIMO_ACTION_STRUCT_T {
 	UINT_8 aucRsv[3];
 	union {
 		MU_GET_CALC_INIT_MCS_T rMuGetCalcInitMcs;
-		MU_SET_INIT_MCS_T rMuSetInitMcs;
-		MU_SET_CALC_LQ_T rMuSetCalcLq;
-		MU_GET_LQ_T rMuGetLq;
-		MU_SET_SNR_OFFSET_T rMuSetSnrOffset;
-		MU_SET_ZERO_NSS_T rMuSetZeroNss;
-		MU_SPEED_UP_LQ_T rMuSpeedUpLq;
-		MU_SET_MU_TABLE_T rMuSetMuTable;
-		MU_SET_GROUP_T rMuSetGroup;
-		MU_GET_QD_T rMuGetQd;
-		MU_SET_ENABLE_T rMuSetEnable;
-		MU_SET_GID_UP_T rMuSetGidUp;
-		MU_TRIGGER_MU_TX_T rMuTriggerMuTx;
+		MU_SET_INIT_MCS_T	   rMuSetInitMcs;
+		MU_SET_CALC_LQ_T	   rMuSetCalcLq;
+		MU_GET_LQ_T			   rMuGetLq;
+		MU_SET_SNR_OFFSET_T	   rMuSetSnrOffset;
+		MU_SET_ZERO_NSS_T	   rMuSetZeroNss;
+		MU_SPEED_UP_LQ_T	   rMuSpeedUpLq;
+		MU_SET_MU_TABLE_T	   rMuSetMuTable;
+		MU_SET_GROUP_T		   rMuSetGroup;
+		MU_GET_QD_T			   rMuGetQd;
+		MU_SET_ENABLE_T		   rMuSetEnable;
+		MU_SET_GID_UP_T		   rMuSetGidUp;
+		MU_TRIGGER_MU_TX_T	   rMuTriggerMuTx;
 	} unMuMimoParam;
 } PARAM_CUSTOM_MUMIMO_ACTION_STRUCT_T, *P_PARAM_CUSTOM_MUMIMO_ACTION_STRUCT_T;
 #endif /* CFG_SUPPORT_MU_MIMO */
@@ -1368,7 +1359,7 @@ typedef struct _PARAM_CUSTOM_MEM_DUMP_STRUCT_T {
 	UINT_32 u4RemainLength;
 #if CFG_SUPPORT_QA_TOOL
 	UINT_32 u4IcapContent;
-#endif				/* CFG_SUPPORT_QA_TOOL */
+#endif /* CFG_SUPPORT_QA_TOOL */
 	UINT_8 ucFragNum;
 } PARAM_CUSTOM_MEM_DUMP_STRUCT_T, *P_PARAM_CUSTOM_MEM_DUMP_STRUCT_T;
 
@@ -1379,11 +1370,11 @@ typedef struct _PARAM_CUSTOM_SW_CTRL_STRUCT_T {
 
 typedef struct _PARAM_CUSTOM_CHIP_CONFIG_STRUCT_T {
 	UINT_16 u2Id;
-	UINT_8 ucType;
-	UINT_8 ucRespType;
+	UINT_8	ucType;
+	UINT_8	ucRespType;
 	UINT_16 u2MsgSize;
-	UINT_8 aucReserved0[2];
-	UINT_8 aucCmd[CHIP_CONFIG_RESP_SIZE];
+	UINT_8	aucReserved0[2];
+	UINT_8	aucCmd[CHIP_CONFIG_RESP_SIZE];
 } PARAM_CUSTOM_CHIP_CONFIG_STRUCT_T, *P_PARAM_CUSTOM_CHIP_CONFIG_STRUCT_T;
 
 typedef struct _PARAM_CUSTOM_KEY_CFG_STRUCT_T {
@@ -1392,17 +1383,17 @@ typedef struct _PARAM_CUSTOM_KEY_CFG_STRUCT_T {
 } PARAM_CUSTOM_KEY_CFG_STRUCT_T, *P_PARAM_CUSTOM_KEY_CFG_STRUCT_T;
 
 typedef struct _PARAM_CUSTOM_EEPROM_RW_STRUCT_T {
-	UINT_8 ucEepromMethod;	/* For read only read: 1, query size: 0 */
-	UINT_8 ucEepromIndex;
-	UINT_8 reserved;
+	UINT_8	ucEepromMethod; /* For read only read: 1, query size: 0 */
+	UINT_8	ucEepromIndex;
+	UINT_8	reserved;
 	UINT_16 u2EepromData;
-} PARAM_CUSTOM_EEPROM_RW_STRUCT_T, *P_PARAM_CUSTOM_EEPROM_RW_STRUCT_T,
-PARAM_CUSTOM_NVRAM_RW_STRUCT_T, *P_PARAM_CUSTOM_NVRAM_RW_STRUCT_T;
+} PARAM_CUSTOM_EEPROM_RW_STRUCT_T, *P_PARAM_CUSTOM_EEPROM_RW_STRUCT_T, PARAM_CUSTOM_NVRAM_RW_STRUCT_T,
+		*P_PARAM_CUSTOM_NVRAM_RW_STRUCT_T;
 
 typedef struct _PARAM_CUSTOM_WMM_PS_TEST_STRUCT_T {
-	UINT_8 bmfgApsdEnAc;	/* b0~3: trigger-en AC0~3. b4~7: delivery-en AC0~3 */
-	UINT_8 ucIsEnterPsAtOnce;	/* enter PS immediately without 5 second guard after connected */
-	UINT_8 ucIsDisableUcTrigger;	/* not to trigger UC on beacon TIM is matched (under U-APSD) */
+	UINT_8 bmfgApsdEnAc;		 /* b0~3: trigger-en AC0~3. b4~7: delivery-en AC0~3 */
+	UINT_8 ucIsEnterPsAtOnce;	 /* enter PS immediately without 5 second guard after connected */
+	UINT_8 ucIsDisableUcTrigger; /* not to trigger UC on beacon TIM is matched (under U-APSD) */
 	UINT_8 reserved;
 } PARAM_CUSTOM_WMM_PS_TEST_STRUCT_T, *P_PARAM_CUSTOM_WMM_PS_TEST_STRUCT_T;
 
@@ -1410,14 +1401,14 @@ typedef struct _PARAM_CUSTOM_NOA_PARAM_STRUCT_T {
 	UINT_32 u4NoaDurationMs;
 	UINT_32 u4NoaIntervalMs;
 	UINT_32 u4NoaCount;
-	UINT_8 ucBssIdx;
+	UINT_8	ucBssIdx;
 } PARAM_CUSTOM_NOA_PARAM_STRUCT_T, *P_PARAM_CUSTOM_NOA_PARAM_STRUCT_T;
 
 typedef struct _PARAM_CUSTOM_OPPPS_PARAM_STRUCT_T {
-	UINT_8 ucBssIdx;
-	UINT_8 ucLegcyPS;
-	UINT_8 ucOppPs;
-	UINT_8 aucResv[1];
+	UINT_8	ucBssIdx;
+	UINT_8	ucLegcyPS;
+	UINT_8	ucOppPs;
+	UINT_8	aucResv[1];
 	UINT_32 u4CTwindowMs;
 } PARAM_CUSTOM_OPPPS_PARAM_STRUCT_T, *P_PARAM_CUSTOM_OPPPS_PARAM_STRUCT_T;
 
@@ -1444,17 +1435,18 @@ typedef enum _ENUM_PARAM_CUSTOM_ACL_POLICY_T {
 	PARAM_CUSTOM_ACL_POLICY_ACCEPT,
 	PARAM_CUSTOM_ACL_POLICY_DENY,
 	PARAM_CUSTOM_ACL_POLICY_NUM
-} ENUM_PARAM_CUSTOM_ACL_POLICY_T, *P_ENUM_PARAM_CUSTOM_ACL_POLICY_T;
+} ENUM_PARAM_CUSTOM_ACL_POLICY_T,
+		*P_ENUM_PARAM_CUSTOM_ACL_POLICY_T;
 
 typedef struct _PARAM_CUSTOM_ACL_ENTRY {
-	UINT_8 aucAddr[MAC_ADDR_LEN];
+	UINT_8	aucAddr[MAC_ADDR_LEN];
 	UINT_16 u2Rsv;
 } PARAM_CUSTOM_ACL_ENTRY, *PPARAM_CUSTOM_ACL_ENTRY;
 
 typedef struct _PARAM_CUSTOM_ACL {
 	ENUM_PARAM_CUSTOM_ACL_POLICY_T ePolicy;
-	UINT_32 u4Num;
-	PARAM_CUSTOM_ACL_ENTRY rEntry[MAX_NUMBER_OF_ACL];
+	UINT_32						   u4Num;
+	PARAM_CUSTOM_ACL_ENTRY		   rEntry[MAX_NUMBER_OF_ACL];
 } PARAM_CUSTOM_ACL, *PPARAM_CUSTOM_ACL;
 
 typedef enum _ENUM_CFG_SRC_TYPE_T {
@@ -1462,43 +1454,45 @@ typedef enum _ENUM_CFG_SRC_TYPE_T {
 	CFG_SRC_TYPE_NVRAM,
 	CFG_SRC_TYPE_UNKNOWN,
 	CFG_SRC_TYPE_NUM
-} ENUM_CFG_SRC_TYPE_T, *P_ENUM_CFG_SRC_TYPE_T;
+} ENUM_CFG_SRC_TYPE_T,
+		*P_ENUM_CFG_SRC_TYPE_T;
 
 typedef enum _ENUM_EEPROM_TYPE_T {
 	EEPROM_TYPE_NO,
 	EEPROM_TYPE_PRESENT,
 	EEPROM_TYPE_NUM
-} ENUM_EEPROM_TYPE_T, *P_ENUM_EEPROM_TYPE_T;
+} ENUM_EEPROM_TYPE_T,
+		*P_ENUM_EEPROM_TYPE_T;
 
 typedef struct _PARAM_QOS_TSINFO {
-	UINT_8 ucTrafficType;	/* Traffic Type: 1 for isochronous 0 for asynchronous */
-	UINT_8 ucTid;		/* TSID: must be between 8 ~ 15 */
-	UINT_8 ucDirection;	/* direction */
-	UINT_8 ucAccessPolicy;	/* access policy */
-	UINT_8 ucAggregation;	/* aggregation */
-	UINT_8 ucApsd;		/* APSD */
-	UINT_8 ucuserPriority;	/* user priority */
-	UINT_8 ucTsInfoAckPolicy;	/* TSINFO ACK policy */
-	UINT_8 ucSchedule;	/* Schedule */
+	UINT_8 ucTrafficType;	  /* Traffic Type: 1 for isochronous 0 for asynchronous */
+	UINT_8 ucTid;			  /* TSID: must be between 8 ~ 15 */
+	UINT_8 ucDirection;		  /* direction */
+	UINT_8 ucAccessPolicy;	  /* access policy */
+	UINT_8 ucAggregation;	  /* aggregation */
+	UINT_8 ucApsd;			  /* APSD */
+	UINT_8 ucuserPriority;	  /* user priority */
+	UINT_8 ucTsInfoAckPolicy; /* TSINFO ACK policy */
+	UINT_8 ucSchedule;		  /* Schedule */
 } PARAM_QOS_TSINFO, *P_PARAM_QOS_TSINFO;
 
 typedef struct _PARAM_QOS_TSPEC {
-	PARAM_QOS_TSINFO rTsInfo;	/* TS info field */
-	UINT_16 u2NominalMSDUSize;	/* nominal MSDU size */
-	UINT_16 u2MaxMSDUsize;	/* maximum MSDU size */
-	UINT_32 u4MinSvcIntv;	/* minimum service interval */
-	UINT_32 u4MaxSvcIntv;	/* maximum service interval */
-	UINT_32 u4InactIntv;	/* inactivity interval */
-	UINT_32 u4SpsIntv;	/* suspension interval */
-	UINT_32 u4SvcStartTime;	/* service start time */
-	UINT_32 u4MinDataRate;	/* minimum Data rate */
-	UINT_32 u4MeanDataRate;	/* mean data rate */
-	UINT_32 u4PeakDataRate;	/* peak data rate */
-	UINT_32 u4MaxBurstSize;	/* maximum burst size */
-	UINT_32 u4DelayBound;	/* delay bound */
-	UINT_32 u4MinPHYRate;	/* minimum PHY rate */
-	UINT_16 u2Sba;		/* surplus bandwidth allowance */
-	UINT_16 u2MediumTime;	/* medium time */
+	PARAM_QOS_TSINFO rTsInfo;			/* TS info field */
+	UINT_16			 u2NominalMSDUSize; /* nominal MSDU size */
+	UINT_16			 u2MaxMSDUsize;		/* maximum MSDU size */
+	UINT_32			 u4MinSvcIntv;		/* minimum service interval */
+	UINT_32			 u4MaxSvcIntv;		/* maximum service interval */
+	UINT_32			 u4InactIntv;		/* inactivity interval */
+	UINT_32			 u4SpsIntv;			/* suspension interval */
+	UINT_32			 u4SvcStartTime;	/* service start time */
+	UINT_32			 u4MinDataRate;		/* minimum Data rate */
+	UINT_32			 u4MeanDataRate;	/* mean data rate */
+	UINT_32			 u4PeakDataRate;	/* peak data rate */
+	UINT_32			 u4MaxBurstSize;	/* maximum burst size */
+	UINT_32			 u4DelayBound;		/* delay bound */
+	UINT_32			 u4MinPHYRate;		/* minimum PHY rate */
+	UINT_16			 u2Sba;				/* surplus bandwidth allowance */
+	UINT_16			 u2MediumTime;		/* medium time */
 } PARAM_QOS_TSPEC, *P_PARAM_QOS_TSPEC;
 
 typedef struct _PARAM_QOS_ADDTS_REQ_INFO {
@@ -1506,12 +1500,12 @@ typedef struct _PARAM_QOS_ADDTS_REQ_INFO {
 } PARAM_QOS_ADDTS_REQ_INFO, *P_PARAM_QOS_ADDTS_REQ_INFO;
 
 typedef struct _PARAM_VOIP_CONFIG {
-	UINT_32 u4VoipTrafficInterval;	/* 0: disable VOIP configuration */
+	UINT_32 u4VoipTrafficInterval; /* 0: disable VOIP configuration */
 } PARAM_VOIP_CONFIG, *P_PARAM_VOIP_CONFIG;
 
 /*802.11 Statistics Struct*/
 typedef struct _PARAM_802_11_STATISTICS_STRUCT_T {
-	UINT_32 u4Length;	/* Length of structure */
+	UINT_32		  u4Length; /* Length of structure */
 	LARGE_INTEGER rTransmittedFragmentCount;
 	LARGE_INTEGER rMulticastTransmittedFrameCount;
 	LARGE_INTEGER rFailedCount;
@@ -1558,58 +1552,60 @@ typedef struct _PARAM_MTK_WIFI_TEST_STRUCT_T {
 typedef enum _ENUM_MEDIA_STREAM_MODE {
 	ENUM_MEDIA_STREAM_OFF,
 	ENUM_MEDIA_STREAM_ON
-} ENUM_MEDIA_STREAM_MODE, *P_ENUM_MEDIA_STREAM_MODE;
+} ENUM_MEDIA_STREAM_MODE,
+		*P_ENUM_MEDIA_STREAM_MODE;
 
 /* for NDIS 5.1 Media Streaming Change */
 typedef struct _PARAM_MEDIA_STREAMING_INDICATION {
 	PARAM_STATUS_INDICATION_T rStatus;
-	ENUM_MEDIA_STREAM_MODE eMediaStreamMode;
+	ENUM_MEDIA_STREAM_MODE	  eMediaStreamMode;
 } PARAM_MEDIA_STREAMING_INDICATION, *P_PARAM_MEDIA_STREAMING_INDICATION;
 
-#define PARAM_PROTOCOL_ID_DEFAULT       0x00
-#define PARAM_PROTOCOL_ID_TCP_IP        0x02
-#define PARAM_PROTOCOL_ID_IPX           0x06
-#define PARAM_PROTOCOL_ID_NBF           0x07
-#define PARAM_PROTOCOL_ID_MAX           0x0F
-#define PARAM_PROTOCOL_ID_MASK          0x0F
+#define PARAM_PROTOCOL_ID_DEFAULT 0x00
+#define PARAM_PROTOCOL_ID_TCP_IP 0x02
+#define PARAM_PROTOCOL_ID_IPX 0x06
+#define PARAM_PROTOCOL_ID_NBF 0x07
+#define PARAM_PROTOCOL_ID_MAX 0x0F
+#define PARAM_PROTOCOL_ID_MASK 0x0F
 
 /* for NDIS OID_GEN_NETWORK_LAYER_ADDRESSES */
 typedef struct _PARAM_NETWORK_ADDRESS_IP {
 	UINT_16 sin_port;
 	UINT_32 in_addr;
-	UINT_8 sin_zero[8];
+	UINT_8	sin_zero[8];
 } PARAM_NETWORK_ADDRESS_IP, *P_PARAM_NETWORK_ADDRESS_IP;
 
 typedef struct _PARAM_NETWORK_ADDRESS {
-	UINT_16 u2AddressLength;	/* length in bytes of Address[] in this */
-	UINT_16 u2AddressType;	/* type of this address (PARAM_PROTOCOL_ID_XXX above) */
-	UINT_8 aucAddress[1];	/* actually AddressLength bytes long */
+	UINT_16 u2AddressLength; /* length in bytes of Address[] in this */
+	UINT_16 u2AddressType;	 /* type of this address (PARAM_PROTOCOL_ID_XXX above) */
+	UINT_8	aucAddress[1];	 /* actually AddressLength bytes long */
 } PARAM_NETWORK_ADDRESS, *P_PARAM_NETWORK_ADDRESS;
 
 /* The following is used with OID_GEN_NETWORK_LAYER_ADDRESSES to set network layer addresses on an interface */
 
 typedef struct _PARAM_NETWORK_ADDRESS_LIST {
-	UINT_8 ucBssIdx;
-	UINT_32 u4AddressCount;	/* number of addresses following */
-	UINT_16 u2AddressType;	/* type of this address (NDIS_PROTOCOL_ID_XXX above) */
-	PARAM_NETWORK_ADDRESS arAddress[1];	/* actually AddressCount elements long */
+	UINT_8				  ucBssIdx;
+	UINT_32				  u4AddressCount; /* number of addresses following */
+	UINT_16				  u2AddressType;  /* type of this address (NDIS_PROTOCOL_ID_XXX above) */
+	PARAM_NETWORK_ADDRESS arAddress[1];	  /* actually AddressCount elements long */
 } PARAM_NETWORK_ADDRESS_LIST, *P_PARAM_NETWORK_ADDRESS_LIST;
 
 #if CFG_SLT_SUPPORT
 
-#define FIXED_BW_LG20       0x0000
-#define FIXED_BW_UL20       0x2000
-#define FIXED_BW_DL40       0x3000
+#define FIXED_BW_LG20 0x0000
+#define FIXED_BW_UL20 0x2000
+#define FIXED_BW_DL40 0x3000
 
-#define FIXED_EXT_CHNL_U20  0x4000	/* For AGG register. */
-#define FIXED_EXT_CHNL_L20  0xC000	/* For AGG regsiter. */
+#define FIXED_EXT_CHNL_U20 0x4000 /* For AGG register. */
+#define FIXED_EXT_CHNL_L20 0xC000 /* For AGG regsiter. */
 
 typedef enum _ENUM_MTK_LP_TEST_MODE_T {
 	ENUM_MTK_LP_TEST_NORMAL,
 	ENUM_MTK_LP_TEST_GOLDEN_SAMPLE,
 	ENUM_MTK_LP_TEST_DUT,
 	ENUM_MTK_LP_TEST_MODE_NUM
-} ENUM_MTK_LP_TEST_MODE_T, *P_ENUM_MTK_LP_TEST_MODE_T;
+} ENUM_MTK_LP_TEST_MODE_T,
+		*P_ENUM_MTK_LP_TEST_MODE_T;
 
 typedef enum _ENUM_MTK_SLT_FUNC_IDX_T {
 	ENUM_MTK_SLT_FUNC_DO_NOTHING,
@@ -1617,29 +1613,30 @@ typedef enum _ENUM_MTK_SLT_FUNC_IDX_T {
 	ENUM_MTK_SLT_FUNC_RATE_SET,
 	ENUM_MTK_SLT_FUNC_LP_SET,
 	ENUM_MTK_SLT_FUNC_NUM
-} ENUM_MTK_SLT_FUNC_IDX_T, *P_ENUM_MTK_SLT_FUNC_IDX_T;
+} ENUM_MTK_SLT_FUNC_IDX_T,
+		*P_ENUM_MTK_SLT_FUNC_IDX_T;
 
 typedef struct _PARAM_MTK_SLT_LP_TEST_STRUCT_T {
 	ENUM_MTK_LP_TEST_MODE_T rLpTestMode;
-	UINT_32 u4BcnRcvNum;
+	UINT_32					u4BcnRcvNum;
 } PARAM_MTK_SLT_LP_TEST_STRUCT_T, *P_PARAM_MTK_SLT_LP_TEST_STRUCT_T;
 
 typedef struct _PARAM_MTK_SLT_TR_TEST_STRUCT_T {
-	ENUM_PARAM_NETWORK_TYPE_T rNetworkType;	/* Network Type OFDM5G or OFDM2.4G */
-	UINT_32 u4FixedRate;	/* Fixed Rate including BW */
+	ENUM_PARAM_NETWORK_TYPE_T rNetworkType; /* Network Type OFDM5G or OFDM2.4G */
+	UINT_32					  u4FixedRate;	/* Fixed Rate including BW */
 } PARAM_MTK_SLT_TR_TEST_STRUCT_T, *P_PARAM_MTK_SLT_TR_TEST_STRUCT_T;
 
 typedef struct _PARAM_MTK_SLT_INITIAL_STRUCT_T {
-	UINT_8 aucTargetMacAddr[PARAM_MAC_ADDR_LEN];
+	UINT_8	aucTargetMacAddr[PARAM_MAC_ADDR_LEN];
 	UINT_16 u2SiteID;
 } PARAM_MTK_SLT_INITIAL_STRUCT_T, *P_PARAM_MTK_SLT_INITIAL_STRUCT_T;
 
 typedef struct _PARAM_MTK_SLT_TEST_STRUCT_T {
 	ENUM_MTK_SLT_FUNC_IDX_T rSltFuncIdx;
-	UINT_32 u4Length;	/* Length of structure, */
-				/* including myself */
-	UINT_32 u4FuncInfoLen;	/* Include following content */
-				/* field and myself */
+	UINT_32					u4Length; /* Length of structure, */
+									  /* including myself */
+	UINT_32 u4FuncInfoLen;			  /* Include following content */
+									  /* field and myself */
 	union {
 		PARAM_MTK_SLT_INITIAL_STRUCT_T rMtkInitTest;
 		PARAM_MTK_SLT_LP_TEST_STRUCT_T rMtkLpTest;
@@ -1671,11 +1668,11 @@ typedef struct _PARAM_SEC_CONFIG_T {
 
 typedef struct _PARAM_TX_CONFIG_T {
 	UINT_8 aucPA[6];
-	BOOL fgSW;
-	BOOL fgDisRxHdrTran;
+	BOOL   fgSW;
+	BOOL   fgDisRxHdrTran;
 
-	BOOL fgAADOM;
-	UINT_8 ucPFMUIdx;
+	BOOL	fgAADOM;
+	UINT_8	ucPFMUIdx;
 	UINT_16 u2PartialAID;
 
 	BOOL fgTIBF;
@@ -1703,78 +1700,78 @@ typedef struct _PARAM_TX_CONFIG_T {
 	BOOL fgIsToDS;
 	BOOL fgDynBw;
 
-	BOOL fgIsAMSDUCrossLG;
-	BOOL fgCheckPER;
-	BOOL fgIsGID63;
+	BOOL   fgIsAMSDUCrossLG;
+	BOOL   fgCheckPER;
+	BOOL   fgIsGID63;
 	UINT_8 aucReserved[1];
 
 #if (1 /* CFG_SUPPORT_VHT == 1 */)
-	BOOL fgVhtTIBF;
-	BOOL fgVhtTEBF;
-	BOOL fgVhtLDPC;
+	BOOL   fgVhtTIBF;
+	BOOL   fgVhtTEBF;
+	BOOL   fgVhtLDPC;
 	UINT_8 aucReserved2[1];
 #endif
 } PARAM_TX_CONFIG_T, *P_PARAM_TX_CONFIG_T;
 
 typedef struct _PARAM_KEY_CONFIG_T {
-	UINT_8                 aucKey[32];
+	UINT_8 aucKey[32];
 } PARAM_KEY_CONFIG_T, *P_PARAM_KEY_CONFIG_T;
 
 typedef struct _PARAM_PEER_RATE_INFO_T {
-	UINT_8                 ucCounterMPDUFail;
-	UINT_8                 ucCounterMPDUTx;
-	UINT_8                 ucRateIdx;
-	UINT_8                 ucReserved[1];
+	UINT_8 ucCounterMPDUFail;
+	UINT_8 ucCounterMPDUTx;
+	UINT_8 ucRateIdx;
+	UINT_8 ucReserved[1];
 
-	UINT_16                au2RateCode[AUTO_RATE_NUM];
+	UINT_16 au2RateCode[AUTO_RATE_NUM];
 } PARAM_PEER_RATE_INFO_T, *P_PARAM_PEER_RATE_INFO_T;
 
 typedef struct _PARAM_PEER_BA_CONFIG_T {
-	UINT_8			ucBaEn;
-	UINT_8			ucRsv[3];
-	UINT_32			u4BaWinSize;
+	UINT_8	ucBaEn;
+	UINT_8	ucRsv[3];
+	UINT_32 u4BaWinSize;
 } PARAM_PEER_BA_CONFIG_T, *P_PARAM_PEER_BA_CONFIG_T;
 
 typedef struct _PARAM_ANT_ID_CONFIG_T {
-	UINT_8			ucANTIDSts0;
-	UINT_8			ucANTIDSts1;
-	UINT_8			ucANTIDSts2;
-	UINT_8			ucANTIDSts3;
+	UINT_8 ucANTIDSts0;
+	UINT_8 ucANTIDSts1;
+	UINT_8 ucANTIDSts2;
+	UINT_8 ucANTIDSts3;
 } PARAM_ANT_ID_CONFIG_T, *P_PARAM_ANT_ID_CONFIG_T;
 
 typedef struct _PARAM_PEER_CAP_T {
-	PARAM_ANT_ID_CONFIG_T	rAntIDConfig;
+	PARAM_ANT_ID_CONFIG_T rAntIDConfig;
 
-	UINT_8			ucTxPowerOffset;
-	UINT_8			ucCounterBWSelector;
-	UINT_8			ucChangeBWAfterRateN;
-	UINT_8			ucFrequencyCapability;
-	UINT_8			ucSpatialExtensionIndex;
+	UINT_8 ucTxPowerOffset;
+	UINT_8 ucCounterBWSelector;
+	UINT_8 ucChangeBWAfterRateN;
+	UINT_8 ucFrequencyCapability;
+	UINT_8 ucSpatialExtensionIndex;
 
-	BOOL			fgG2;
-	BOOL			fgG4;
-	BOOL			fgG8;
-	BOOL			fgG16;
+	BOOL fgG2;
+	BOOL fgG4;
+	BOOL fgG8;
+	BOOL fgG16;
 
-	UINT_8			ucMMSS;
-	UINT_8			ucAmpduFactor;
-	UINT_8			ucReserved[1];
+	UINT_8 ucMMSS;
+	UINT_8 ucAmpduFactor;
+	UINT_8 ucReserved[1];
 } PARAM_PEER_CAP_T, *P_PARAM_PEER_CAP_T;
 
 typedef struct _PARAM_PEER_RX_COUNTER_ALL_T {
-	UINT_8			ucRxRcpi0;
-	UINT_8			ucRxRcpi1;
-	UINT_8			ucRxRcpi2;
-	UINT_8			ucRxRcpi3;
+	UINT_8 ucRxRcpi0;
+	UINT_8 ucRxRcpi1;
+	UINT_8 ucRxRcpi2;
+	UINT_8 ucRxRcpi3;
 
-	UINT_8			ucRxCC0;
-	UINT_8			ucRxCC1;
-	UINT_8			ucRxCC2;
-	UINT_8			ucRxCC3;
+	UINT_8 ucRxCC0;
+	UINT_8 ucRxCC1;
+	UINT_8 ucRxCC2;
+	UINT_8 ucRxCC3;
 
-	BOOL			fgRxCCSel;
-	UINT_8			ucCeRmsd;
-	UINT_8			aucReserved[2];
+	BOOL   fgRxCCSel;
+	UINT_8 ucCeRmsd;
+	UINT_8 aucReserved[2];
 } PARAM_PEER_RX_COUNTER_ALL_T, *P_PARAM_PEER_RX_COUNTER_ALL_T;
 
 typedef struct _PARAM_PEER_TX_COUNTER_ALL_T {
@@ -1789,13 +1786,13 @@ typedef struct _PARAM_PEER_TX_COUNTER_ALL_T {
 } PARAM_PEER_TX_COUNTER_ALL_T, *P_PARAM_PEER_TX_COUNTER_ALL_T;
 
 typedef struct _PARAM_HW_WLAN_INFO_T {
-	UINT_32			u4Index;
-	PARAM_TX_CONFIG_T	rWtblTxConfig;
-	PARAM_SEC_CONFIG_T	rWtblSecConfig;
-	PARAM_KEY_CONFIG_T	rWtblKeyConfig;
-	PARAM_PEER_RATE_INFO_T	rWtblRateInfo;
-	PARAM_PEER_BA_CONFIG_T  rWtblBaConfig;
-	PARAM_PEER_CAP_T	rWtblPeerCap;
+	UINT_32						u4Index;
+	PARAM_TX_CONFIG_T			rWtblTxConfig;
+	PARAM_SEC_CONFIG_T			rWtblSecConfig;
+	PARAM_KEY_CONFIG_T			rWtblKeyConfig;
+	PARAM_PEER_RATE_INFO_T		rWtblRateInfo;
+	PARAM_PEER_BA_CONFIG_T		rWtblBaConfig;
+	PARAM_PEER_CAP_T			rWtblPeerCap;
 	PARAM_PEER_RX_COUNTER_ALL_T rWtblRxCounter;
 	PARAM_PEER_TX_COUNTER_ALL_T rWtblTxCounter;
 } PARAM_HW_WLAN_INFO_T, *P_PARAM_HW_WLAN_INFO_T;
@@ -1855,26 +1852,26 @@ typedef struct _HW_MIB2_COUNTER_T {
 } HW_MIB2_COUNTER_T, *P_HW_MIB2_COUNTER_T;
 
 typedef struct _PARAM_HW_MIB_INFO_T {
-	UINT_32			u4Index;
-	HW_MIB_COUNTER_T	rHwMibCnt;
-	HW_MIB2_COUNTER_T	rHwMib2Cnt;
-	HW_TX_AMPDU_METRICS_T	rHwTxAmpduMts;
+	UINT_32				  u4Index;
+	HW_MIB_COUNTER_T	  rHwMibCnt;
+	HW_MIB2_COUNTER_T	  rHwMib2Cnt;
+	HW_TX_AMPDU_METRICS_T rHwTxAmpduMts;
 } PARAM_HW_MIB_INFO_T, *P_PARAM_HW_MIB_INFO_T;
 #endif
 
 #if CFG_SUPPORT_LAST_SEC_MCS_INFO
 struct PARAM_TX_MCS_INFO {
-	UINT_8		ucStaIndex;
-	UINT_16		au2TxRateCode[MCS_INFO_SAMPLE_CNT];
-	UINT_8		aucTxRatePer[MCS_INFO_SAMPLE_CNT];
+	UINT_8	ucStaIndex;
+	UINT_16 au2TxRateCode[MCS_INFO_SAMPLE_CNT];
+	UINT_8	aucTxRatePer[MCS_INFO_SAMPLE_CNT];
 };
 #endif
 
 #ifdef CFG_DUMP_TXPOWR_TABLE
 struct PARAM_CMD_GET_TXPWR_TBL {
-	UINT_8 ucDbdcIdx;
-	UINT_8 ucCenterCh;
-	UINT_8 ucFeLoss;
+	UINT_8			   ucDbdcIdx;
+	UINT_8			   ucCenterCh;
+	UINT_8			   ucFeLoss;
 	struct POWER_LIMIT tx_pwr_tbl[TXPWR_TBL_NUM];
 };
 
@@ -1890,22 +1887,17 @@ enum ENUM_TXPWR_TYPE {
 	TXPWR_TYPE_NUM,
 };
 
-enum ENUM_STREAM_MODE {
-	STREAM_SISO,
-	STREAM_CDD,
-	STREAM_MIMO,
-	STREAM_NUM
-};
+enum ENUM_STREAM_MODE { STREAM_SISO, STREAM_CDD, STREAM_MIMO, STREAM_NUM };
 
 struct txpwr_table_entry {
-	char mcs[STREAM_NUM][8];
+	char		 mcs[STREAM_NUM][8];
 	unsigned int idx;
 };
 
 struct txpwr_table {
-	char phy_mode[8];
+	char					  phy_mode[8];
 	struct txpwr_table_entry *tables;
-	int n_tables;
+	int						  n_tables;
 };
 #endif
 
@@ -1961,13 +1953,10 @@ typedef enum _ENUM_REGISTRY_FIXED_RATE_T {
 	FIXED_RATE_MCS7_40M_400NS,
 	FIXED_RATE_MCS32_400NS,
 	FIXED_RATE_NUM
-} ENUM_REGISTRY_FIXED_RATE_T, *P_ENUM_REGISTRY_FIXED_RATE_T;
+} ENUM_REGISTRY_FIXED_RATE_T,
+		*P_ENUM_REGISTRY_FIXED_RATE_T;
 
-typedef enum _ENUM_BT_CMD_T {
-	BT_CMD_PROFILE = 0,
-	BT_CMD_UPDATE,
-	BT_CMD_NUM
-} ENUM_BT_CMD_T;
+typedef enum _ENUM_BT_CMD_T { BT_CMD_PROFILE = 0, BT_CMD_UPDATE, BT_CMD_NUM } ENUM_BT_CMD_T;
 
 typedef enum _ENUM_BT_PROFILE_T {
 	BT_PROFILE_CUSTOM = 0,
@@ -1983,13 +1972,13 @@ typedef struct _PTA_PROFILE_T {
 	union {
 		UINT_8 aucBTPParams[BT_PROFILE_PARAM_LEN];
 		/*  0: sco reserved slot time,
-		*  1: sco idle slot time,
-		*  2: acl throughput,
-		*   3: bt tx power,
-		*   4: bt rssi
-		*   5: VoIP interval
-		*   6: BIT(0) Use this field, BIT(1) 0 apply single/ 1 dual PTA setting.
-		*/
+		 *  1: sco idle slot time,
+		 *  2: acl throughput,
+		 *   3: bt tx power,
+		 *   4: bt rssi
+		 *   5: VoIP interval
+		 *   6: BIT(0) Use this field, BIT(1) 0 apply single/ 1 dual PTA setting.
+		 */
 		UINT_32 au4Btcr[4];
 	} u;
 } PTA_PROFILE_T, *P_PTA_PROFILE_T;
@@ -1999,7 +1988,7 @@ typedef struct _PTA_IPC_T {
 	UINT_8 ucLen;
 	union {
 		PTA_PROFILE_T rProfile;
-		UINT_8 aucBTPParams[BT_PROFILE_PARAM_LEN];
+		UINT_8		  aucBTPParams[BT_PROFILE_PARAM_LEN];
 	} u;
 } PARAM_PTA_IPC_T, *P_PARAM_PTA_IPC_T, PTA_IPC_T, *P_PTA_IPC_T;
 
@@ -2008,17 +1997,17 @@ typedef struct _PTA_IPC_T {
 /*--------------------------------------------------------------*/
 typedef struct _PARAM_SCAN_REQUEST_EXT_T {
 	PARAM_SSID_T rSsid;
-	UINT_32 u4IELength;
-	PUINT_8 pucIE;
+	UINT_32		 u4IELength;
+	PUINT_8		 pucIE;
 } PARAM_SCAN_REQUEST_EXT_T, *P_PARAM_SCAN_REQUEST_EXT_T;
 
 typedef struct _PARAM_SCAN_REQUEST_ADV_T {
-	UINT_32 u4SsidNum;
+	UINT_32		 u4SsidNum;
 	PARAM_SSID_T rSsid[CFG_SCAN_SSID_MAX_NUM];
-	UINT_32 u4IELength;
-	PUINT_8 pucIE;
+	UINT_32		 u4IELength;
+	PUINT_8		 pucIE;
 #if CFG_SCAN_CHANNEL_SPECIFIED
-	UINT_8 ucChannelListNum;
+	UINT_8			  ucChannelListNum;
 	RF_CHANNEL_INFO_T arChnlInfoList[MAXIMUM_OPERATION_CHANNEL_LIST];
 #endif
 } PARAM_SCAN_REQUEST_ADV_T, *P_PARAM_SCAN_REQUEST_ADV_T;
@@ -2027,17 +2016,17 @@ typedef struct _PARAM_SCAN_REQUEST_ADV_T {
 /*! \brief CFG80211 Scheduled Scan Request Container            */
 /*--------------------------------------------------------------*/
 typedef struct _PARAM_SCHED_SCAN_REQUEST_T {
-	UINT_32 u4SsidNum;
+	UINT_32		 u4SsidNum;
 	PARAM_SSID_T arSsid[CFG_SCAN_SSID_MATCH_MAX_NUM];
-	UINT_32 u4IELength;
-	PUINT_8 pucIE;
-	UINT_16 u2ScanInterval;	/* in milliseconds */
+	UINT_32		 u4IELength;
+	PUINT_8		 pucIE;
+	UINT_16		 u2ScanInterval; /* in milliseconds */
 } PARAM_SCHED_SCAN_REQUEST, *P_PARAM_SCHED_SCAN_REQUEST;
 
 #if CFG_SUPPORT_PASSPOINT
 typedef struct _PARAM_HS20_SET_BSSID_POOL {
-	BOOLEAN fgIsEnable;
-	UINT_8 ucNumBssidPool;
+	BOOLEAN			  fgIsEnable;
+	UINT_8			  ucNumBssidPool;
 	PARAM_MAC_ADDRESS arBSSID[8];
 } PARAM_HS20_SET_BSSID_POOL, *P_PARAM_HS20_SET_BSSID_POOL;
 
@@ -2066,185 +2055,184 @@ typedef struct _LTE_SAFE_CHN_INFO_T {
 
 typedef struct _PARAM_CHN_LOAD_INFO {
 	/* Per-CHN Load */
-	UINT_8 ucChannel;
+	UINT_8	ucChannel;
 	UINT_16 u2APNum;
 	UINT_32 u4Dirtiness;
-	UINT_8 ucReserved;
+	UINT_8	ucReserved;
 } PARAM_CHN_LOAD_INFO, *P_PARAM_CHN_LOAD_INFO;
 
 typedef struct _PARAM_CHN_RANK_INFO {
-	UINT_8 ucChannel;
+	UINT_8	ucChannel;
 	UINT_32 u4Dirtiness;
-	UINT_8 ucReserved;
+	UINT_8	ucReserved;
 } PARAM_CHN_RANK_INFO, *P_PARAM_CHN_RANK_INFO;
 
 typedef struct _PARAM_GET_CHN_INFO {
 	LTE_SAFE_CHN_INFO_T rLteSafeChnList;
 	PARAM_CHN_LOAD_INFO rEachChnLoad[MAX_CHN_NUM];
-	BOOLEAN fgDataReadyBit;
+	BOOLEAN				fgDataReadyBit;
 	PARAM_CHN_RANK_INFO rChnRankList[MAX_CHN_NUM];
-	UINT_8 aucReserved[3];
+	UINT_8				aucReserved[3];
 } PARAM_GET_CHN_INFO, *P_PARAM_GET_CHN_INFO;
 
 typedef struct _PARAM_PREFER_CHN_INFO {
-	UINT_8 ucChannel;
+	UINT_8	ucChannel;
 	UINT_16 u2APNumScore;
-	UINT_8 ucReserved;
+	UINT_8	ucReserved;
 } PARAM_PREFER_CHN_INFO, *P_PARAM_PREFER_CHN_INFO;
 #endif
 
-
 typedef struct _UMAC_STAT2_GET_T {
-	UINT_16	u2PleRevPgHif0Group0;
-	UINT_16	u2PleRevPgCpuGroup2;
+	UINT_16 u2PleRevPgHif0Group0;
+	UINT_16 u2PleRevPgCpuGroup2;
 
-	UINT_16	u2PseRevPgHif0Group0;
-	UINT_16	u2PseRevPgHif1Group1;
-	UINT_16	u2PseRevPgCpuGroup2;
-	UINT_16	u2PseRevPgLmac0Group3;
-	UINT_16	u2PseRevPgLmac1Group4;
-	UINT_16	u2PseRevPgLmac2Group5;
-	UINT_16	u2PseRevPgPleGroup6;
+	UINT_16 u2PseRevPgHif0Group0;
+	UINT_16 u2PseRevPgHif1Group1;
+	UINT_16 u2PseRevPgCpuGroup2;
+	UINT_16 u2PseRevPgLmac0Group3;
+	UINT_16 u2PseRevPgLmac1Group4;
+	UINT_16 u2PseRevPgLmac2Group5;
+	UINT_16 u2PseRevPgPleGroup6;
 
-	UINT_16	u2PleSrvPgHif0Group0;
-	UINT_16	u2PleSrvPgCpuGroup2;
+	UINT_16 u2PleSrvPgHif0Group0;
+	UINT_16 u2PleSrvPgCpuGroup2;
 
-	UINT_16	u2PseSrvPgHif0Group0;
-	UINT_16	u2PseSrvPgHif1Group1;
-	UINT_16	u2PseSrvPgCpuGroup2;
-	UINT_16	u2PseSrvPgLmac0Group3;
-	UINT_16	u2PseSrvPgLmac1Group4;
-	UINT_16	u2PseSrvPgLmac2Group5;
-	UINT_16	u2PseSrvPgPleGroup6;
+	UINT_16 u2PseSrvPgHif0Group0;
+	UINT_16 u2PseSrvPgHif1Group1;
+	UINT_16 u2PseSrvPgCpuGroup2;
+	UINT_16 u2PseSrvPgLmac0Group3;
+	UINT_16 u2PseSrvPgLmac1Group4;
+	UINT_16 u2PseSrvPgLmac2Group5;
+	UINT_16 u2PseSrvPgPleGroup6;
 
-	UINT_16	u2PleTotalPageNum;
-	UINT_16	u2PleFreePageNum;
-	UINT_16	u2PleFfaNum;
+	UINT_16 u2PleTotalPageNum;
+	UINT_16 u2PleFreePageNum;
+	UINT_16 u2PleFfaNum;
 
-	UINT_16	u2PseTotalPageNum;
-	UINT_16	u2PseFreePageNum;
-	UINT_16	u2PseFfaNum;
+	UINT_16 u2PseTotalPageNum;
+	UINT_16 u2PseFreePageNum;
+	UINT_16 u2PseFfaNum;
 } UMAC_STAT2_GET_T, *P_UMAC_STAT2_GET_T;
 
 typedef struct _CNM_STATUS_T {
-	UINT_8              fgDbDcModeEn;
-	UINT_8              ucChNumB0;
-	UINT_8              ucChNumB1;
-	UINT_8              usReserved;
+	UINT_8 fgDbDcModeEn;
+	UINT_8 ucChNumB0;
+	UINT_8 ucChNumB1;
+	UINT_8 usReserved;
 } CNM_STATUS_T, *P_CNM_STATUS_T;
 
 typedef struct _CNM_CH_LIST_T {
-	UINT_8              ucChNum[4];
+	UINT_8 ucChNum[4];
 } CNM_CH_LIST_T, *P_CNM_CH_LIST_T;
 
 #if CFG_SUPPORT_CFG80211_AUTH
 #if CFG_WDEV_LOCK_THREAD_SUPPORT
 typedef struct _PARAM_WDEV_LOCK_THREAD_T {
-	QUE_ENTRY_T rQueEntry;
-	struct net_device* pDev;
+	QUE_ENTRY_T						  rQueEntry;
+	struct net_device				  *pDev;
 	enum ENUM_CFG80211_WDEV_LOCK_FUNC fn;
-	UINT_8* pFrameBuf;
-	size_t frameLen;
-	struct cfg80211_bss* pBss;
-	UINT_32 uapsd_queues;
-	BOOLEAN fgIsInterruptContext;
-#if (KERNEL_VERSION (5, 1, 0) <= CFG80211_VERSION_CODE)
+	UINT_8						   *pFrameBuf;
+	size_t							  frameLen;
+	struct cfg80211_bss				*pBss;
+	UINT_32							  uapsd_queues;
+	BOOLEAN							  fgIsInterruptContext;
+#if (KERNEL_VERSION(5, 1, 0) <= CFG80211_VERSION_CODE)
 	const u8 *req_ies;
-	size_t req_ies_len;
+	size_t	  req_ies_len;
 #endif
 } PARAM_WDEV_LOCK_THREAD_T, *P_PARAM_WDEV_LOCK_THREAD_T;
 #endif
 #endif
 
 /*******************************************************************************
-*                            P U B L I C   D A T A
-********************************************************************************
-*/
+ *                            P U B L I C   D A T A
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                           P R I V A T E   D A T A
-********************************************************************************
-*/
+ *                           P R I V A T E   D A T A
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                                 M A C R O S
-********************************************************************************
-*/
+ *                                 M A C R O S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                   F U N C T I O N   D E C L A R A T I O N S
-********************************************************************************
-*/
+ *                   F U N C T I O N   D E C L A R A T I O N S
+ ********************************************************************************
+ */
 /*--------------------------------------------------------------*/
 /* Routines to set parameters or query information.             */
 /*--------------------------------------------------------------*/
 /***** Routines in wlan_oid.c *****/
 WLAN_STATUS
-wlanoidQueryNetworkTypesSupported(IN P_ADAPTER_T prAdapter,
-				  OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
+wlanoidQueryNetworkTypesSupported(
+		IN P_ADAPTER_T prAdapter, OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
 
 WLAN_STATUS
-wlanoidQueryNetworkTypeInUse(IN P_ADAPTER_T prAdapter,
-			     OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
+wlanoidQueryNetworkTypeInUse(
+		IN P_ADAPTER_T prAdapter, OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
 
 WLAN_STATUS
-wlanoidSetNetworkTypeInUse(IN P_ADAPTER_T prAdapter,
-			   IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+wlanoidSetNetworkTypeInUse(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 WLAN_STATUS
-wlanoidQueryBssid(IN P_ADAPTER_T prAdapter,
-		  OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
+wlanoidQueryBssid(
+		IN P_ADAPTER_T prAdapter, OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
 
 WLAN_STATUS
-wlanoidSetBssidListScan(IN P_ADAPTER_T prAdapter,
-			IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+wlanoidSetBssidListScan(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 WLAN_STATUS
-wlanoidSetBssidListScanExt(IN P_ADAPTER_T prAdapter,
-			   IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+wlanoidSetBssidListScanExt(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 WLAN_STATUS
-wlanoidSetBssidListScanAdv(IN P_ADAPTER_T prAdapter,
-			   IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+wlanoidSetBssidListScanAdv(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 WLAN_STATUS
-wlanoidQueryBssidList(IN P_ADAPTER_T prAdapter,
-		      OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
+wlanoidQueryBssidList(
+		IN P_ADAPTER_T prAdapter, OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
 
 WLAN_STATUS
 wlanoidSetBssid(IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 WLAN_STATUS
-wlanoidSetConnect(IN P_ADAPTER_T prAdapter,
-		  IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+wlanoidSetConnect(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 WLAN_STATUS
 wlanoidSetSsid(IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 WLAN_STATUS
-wlanoidQuerySsid(IN P_ADAPTER_T prAdapter,
-		 OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
+wlanoidQuerySsid(
+		IN P_ADAPTER_T prAdapter, OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
 
 WLAN_STATUS
-wlanoidQueryInfrastructureMode(IN P_ADAPTER_T prAdapter,
-			       OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
+wlanoidQueryInfrastructureMode(
+		IN P_ADAPTER_T prAdapter, OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
 
 WLAN_STATUS
-wlanoidSetInfrastructureMode(IN P_ADAPTER_T prAdapter,
-			     IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+wlanoidSetInfrastructureMode(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 WLAN_STATUS
-wlanoidQueryAuthMode(IN P_ADAPTER_T prAdapter,
-		     OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
+wlanoidQueryAuthMode(
+		IN P_ADAPTER_T prAdapter, OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
 
 WLAN_STATUS
-wlanoidSetAuthMode(IN P_ADAPTER_T prAdapter,
-		   IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+wlanoidSetAuthMode(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 #if 0
 WLAN_STATUS
 wlanoidQueryPrivacyFilter(IN P_ADAPTER_T prAdapter,
-			  OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
+			OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
 
 WLAN_STATUS
 wlanoidSetPrivacyFilter(IN P_ADAPTER_T prAdapter,
@@ -2252,171 +2240,171 @@ wlanoidSetPrivacyFilter(IN P_ADAPTER_T prAdapter,
 #endif
 
 WLAN_STATUS
-wlanoidSetEncryptionStatus(IN P_ADAPTER_T prAdapter,
-			   IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+wlanoidSetEncryptionStatus(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 WLAN_STATUS
-wlanoidQueryEncryptionStatus(IN P_ADAPTER_T prAdapter,
-			     IN PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
+wlanoidQueryEncryptionStatus(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
 
 WLAN_STATUS
 wlanoidSetAddWep(IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 WLAN_STATUS
-wlanoidSetRemoveWep(IN P_ADAPTER_T prAdapter,
-		    IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+wlanoidSetRemoveWep(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 WLAN_STATUS
 wlanoidSetAddKey(IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 WLAN_STATUS
-wlanoidSetRemoveKey(IN P_ADAPTER_T prAdapter,
-		    IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+wlanoidSetRemoveKey(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 WLAN_STATUS
-wlanoidSetReloadDefaults(IN P_ADAPTER_T prAdapter,
-			 IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+wlanoidSetReloadDefaults(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 WLAN_STATUS
 wlanoidSetTest(IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 WLAN_STATUS
-wlanoidQueryCapability(IN P_ADAPTER_T prAdapter,
-		       OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
+wlanoidQueryCapability(
+		IN P_ADAPTER_T prAdapter, OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
 
 WLAN_STATUS
-wlanoidQueryFrequency(IN P_ADAPTER_T prAdapter,
-		      OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
+wlanoidQueryFrequency(
+		IN P_ADAPTER_T prAdapter, OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
 
 WLAN_STATUS
-wlanoidSetFrequency(IN P_ADAPTER_T prAdapter,
-		    IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+wlanoidSetFrequency(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 WLAN_STATUS
-wlanoidQueryAtimWindow(IN P_ADAPTER_T prAdapter,
-		       OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
+wlanoidQueryAtimWindow(
+		IN P_ADAPTER_T prAdapter, OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
 
 WLAN_STATUS
-wlanoidSetAtimWindow(IN P_ADAPTER_T prAdapter,
-		     IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+wlanoidSetAtimWindow(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 WLAN_STATUS
-wlanoidSetChannel(IN P_ADAPTER_T prAdapter,
-		  IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+wlanoidSetChannel(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 WLAN_STATUS
-wlanoidQueryRssi(IN P_ADAPTER_T prAdapter,
-		 OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
+wlanoidQueryRssi(
+		IN P_ADAPTER_T prAdapter, OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
 
 WLAN_STATUS
-wlanoidQueryRssiTrigger(IN P_ADAPTER_T prAdapter,
-			OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
+wlanoidQueryRssiTrigger(
+		IN P_ADAPTER_T prAdapter, OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
 
 WLAN_STATUS
-wlanoidSetRssiTrigger(IN P_ADAPTER_T prAdapter,
-		      IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+wlanoidSetRssiTrigger(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 WLAN_STATUS
-wlanoidQueryRtsThreshold(IN P_ADAPTER_T prAdapter,
-			 OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
+wlanoidQueryRtsThreshold(
+		IN P_ADAPTER_T prAdapter, OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
 
 WLAN_STATUS
-wlanoidSetRtsThreshold(IN P_ADAPTER_T prAdapter,
-		       IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+wlanoidSetRtsThreshold(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 WLAN_STATUS
-wlanoidQuery802dot11PowerSaveProfile(IN P_ADAPTER_T prAdapter,
-				     IN PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
+wlanoidQuery802dot11PowerSaveProfile(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
 
 WLAN_STATUS
-wlanoidSet802dot11PowerSaveProfile(IN P_ADAPTER_T prAdapter,
-				   IN PVOID prSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+wlanoidSet802dot11PowerSaveProfile(
+		IN P_ADAPTER_T prAdapter, IN PVOID prSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 WLAN_STATUS
-wlanoidQueryPmkid(IN P_ADAPTER_T prAdapter,
-		  OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
+wlanoidQueryPmkid(
+		IN P_ADAPTER_T prAdapter, OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
 
 WLAN_STATUS
 wlanoidSetPmkid(IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 WLAN_STATUS
-wlanoidQuerySupportedRates(IN P_ADAPTER_T prAdapter,
-			   OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
+wlanoidQuerySupportedRates(
+		IN P_ADAPTER_T prAdapter, OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
 
 WLAN_STATUS
-wlanoidQueryDesiredRates(IN P_ADAPTER_T prAdapter,
-			 OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
+wlanoidQueryDesiredRates(
+		IN P_ADAPTER_T prAdapter, OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
 
 WLAN_STATUS
-wlanoidSetDesiredRates(IN P_ADAPTER_T prAdapter,
-		       IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+wlanoidSetDesiredRates(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 WLAN_STATUS
-wlanoidQueryPermanentAddr(IN P_ADAPTER_T prAdapter,
-			  IN PVOID pvQueryBuf, IN UINT_32 u4QueryBufLen, OUT PUINT_32 pu4QueryInfoLen);
+wlanoidQueryPermanentAddr(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvQueryBuf, IN UINT_32 u4QueryBufLen, OUT PUINT_32 pu4QueryInfoLen);
 
 WLAN_STATUS
-wlanoidQueryCurrentAddr(IN P_ADAPTER_T prAdapter,
-			IN PVOID pvQueryBuf, IN UINT_32 u4QueryBufLen, OUT PUINT_32 pu4QueryInfoLen);
+wlanoidQueryCurrentAddr(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvQueryBuf, IN UINT_32 u4QueryBufLen, OUT PUINT_32 pu4QueryInfoLen);
 
 WLAN_STATUS
-wlanoidQueryPermanentAddr(IN P_ADAPTER_T prAdapter,
-			  IN PVOID pvQueryBuf, IN UINT_32 u4QueryBufLen, OUT PUINT_32 pu4QueryInfoLen);
+wlanoidQueryPermanentAddr(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvQueryBuf, IN UINT_32 u4QueryBufLen, OUT PUINT_32 pu4QueryInfoLen);
 
 WLAN_STATUS
-wlanoidQueryLinkSpeed(IN P_ADAPTER_T prAdapter,
-		      IN PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
+wlanoidQueryLinkSpeed(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
 
 #if CFG_SUPPORT_QA_TOOL
 #if CFG_SUPPORT_BUFFER_MODE
-WLAN_STATUS wlanoidSetEfusBufferMode(IN P_ADAPTER_T prAdapter,
-				     IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+WLAN_STATUS wlanoidSetEfusBufferMode(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 /*#if (CFG_EEPROM_PAGE_ACCESS == 1)*/
 WLAN_STATUS
-wlanoidQueryProcessAccessEfuseRead(IN P_ADAPTER_T prAdapter,
-					IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+wlanoidQueryProcessAccessEfuseRead(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 WLAN_STATUS
-wlanoidQueryProcessAccessEfuseWrite(IN P_ADAPTER_T prAdapter,
-					IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+wlanoidQueryProcessAccessEfuseWrite(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 WLAN_STATUS
-wlanoidQueryEfuseFreeBlock(IN P_ADAPTER_T prAdapter,
-					IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+wlanoidQueryEfuseFreeBlock(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 WLAN_STATUS
-wlanoidQueryGetTxPower(IN P_ADAPTER_T prAdapter,
-					IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+wlanoidQueryGetTxPower(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 /*#endif*/
 
 #endif /* CFG_SUPPORT_BUFFER_MODE */
 WLAN_STATUS
-wlanoidQueryRxStatistics(IN P_ADAPTER_T prAdapter,
-			 IN PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
+wlanoidQueryRxStatistics(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
 
 WLAN_STATUS
-wlanoidBssInfoBasic(IN P_ADAPTER_T prAdapter,
-		    IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+wlanoidBssInfoBasic(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 WLAN_STATUS
-wlanoidDevInfoActive(IN P_ADAPTER_T prAdapter,
-		     IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+wlanoidDevInfoActive(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 WLAN_STATUS
-wlanoidManualAssoc(IN P_ADAPTER_T prAdapter,
-		   IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+wlanoidManualAssoc(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 #if CFG_SUPPORT_TX_BF
 WLAN_STATUS
-wlanoidTxBfAction(IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen,
-		  OUT PUINT_32 pu4SetInfoLen);
-WLAN_STATUS wlanoidMuMimoAction(IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen,
-				OUT PUINT_32 pu4SetInfoLen);
-WLAN_STATUS wlanoidStaRecUpdate(IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen,
-				OUT PUINT_32 pu4SetInfoLen);
-WLAN_STATUS wlanoidStaRecBFUpdate(IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen,
-				  OUT PUINT_32 pu4SetInfoLen);
+wlanoidTxBfAction(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+WLAN_STATUS wlanoidMuMimoAction(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+WLAN_STATUS wlanoidStaRecUpdate(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+WLAN_STATUS wlanoidStaRecBFUpdate(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 #endif /* CFG_SUPPORT_TX_BF */
 #endif /* CFG_SUPPORT_QA_TOOL */
 
@@ -2425,358 +2413,355 @@ WLAN_STATUS
 wlanoidSendCalBackupV2Cmd(IN P_ADAPTER_T prAdapter, IN PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen);
 
 WLAN_STATUS
-wlanoidSetCalBackup(IN P_ADAPTER_T prAdapter,
-		   IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+wlanoidSetCalBackup(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 WLAN_STATUS
-wlanoidQueryCalBackupV2(IN P_ADAPTER_T prAdapter,
-		    IN PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
+wlanoidQueryCalBackupV2(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
 #endif
 
 WLAN_STATUS
-wlanoidQueryMcrRead(IN P_ADAPTER_T prAdapter,
-		    IN PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
+wlanoidQueryMcrRead(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
 
 WLAN_STATUS
-wlanoidQueryMemDump(IN P_ADAPTER_T prAdapter,
-		    IN PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
+wlanoidQueryMemDump(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
 
 WLAN_STATUS
-wlanoidSetMcrWrite(IN P_ADAPTER_T prAdapter,
-		   IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+wlanoidSetMcrWrite(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 WLAN_STATUS
-wlanoidQueryDrvMcrRead(IN P_ADAPTER_T prAdapter,
-		       IN PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
+wlanoidQueryDrvMcrRead(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
 
 WLAN_STATUS
-wlanoidSetDrvMcrWrite(IN P_ADAPTER_T prAdapter,
-		      IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+wlanoidSetDrvMcrWrite(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 WLAN_STATUS
-wlanoidQuerySwCtrlRead(IN P_ADAPTER_T prAdapter,
-		       IN PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
+wlanoidQuerySwCtrlRead(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
 
 WLAN_STATUS
-wlanoidSetSwCtrlWrite(IN P_ADAPTER_T prAdapter,
-		      IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+wlanoidSetSwCtrlWrite(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 WLAN_STATUS
-wlanoidSetChipConfig(IN P_ADAPTER_T prAdapter,
-		     IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+wlanoidSetChipConfig(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 WLAN_STATUS
-wlanoidQueryChipConfig(IN P_ADAPTER_T prAdapter,
-		       IN PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
+wlanoidQueryChipConfig(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
 
 WLAN_STATUS
 wlanoidSetKeyCfg(IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 WLAN_STATUS
-wlanoidQueryEepromRead(IN P_ADAPTER_T prAdapter,
-		       IN PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
+wlanoidQueryEepromRead(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
 
 WLAN_STATUS
-wlanoidSetEepromWrite(IN P_ADAPTER_T prAdapter,
-		      IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+wlanoidSetEepromWrite(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 WLAN_STATUS
-wlanoidQueryRfTestRxStatus(IN P_ADAPTER_T prAdapter,
-			   IN PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
+wlanoidQueryRfTestRxStatus(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
 
 WLAN_STATUS
-wlanoidQueryRfTestTxStatus(IN P_ADAPTER_T prAdapter,
-			   IN PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
+wlanoidQueryRfTestTxStatus(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
 
 WLAN_STATUS
-wlanoidQueryOidInterfaceVersion(IN P_ADAPTER_T prAdapter,
-				IN PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
+wlanoidQueryOidInterfaceVersion(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
 
 WLAN_STATUS
-wlanoidQueryVendorId(IN P_ADAPTER_T prAdapter,
-		     OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
+wlanoidQueryVendorId(
+		IN P_ADAPTER_T prAdapter, OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
 
 WLAN_STATUS
-wlanoidQueryMulticastList(IN P_ADAPTER_T prAdapter,
-			  OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
+wlanoidQueryMulticastList(
+		IN P_ADAPTER_T prAdapter, OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
 
 WLAN_STATUS
-wlanoidSetMulticastList(IN P_ADAPTER_T prAdapter,
-			IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+wlanoidSetMulticastList(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 WLAN_STATUS
-wlanoidQueryRcvError(IN P_ADAPTER_T prAdapter,
-		     IN PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
+wlanoidQueryRcvError(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
 
 WLAN_STATUS
-wlanoidQueryRcvNoBuffer(IN P_ADAPTER_T prAdapter,
-			IN PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
+wlanoidQueryRcvNoBuffer(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
 
 WLAN_STATUS
-wlanoidQueryRcvCrcError(IN P_ADAPTER_T prAdapter,
-			IN PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
+wlanoidQueryRcvCrcError(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
 
 WLAN_STATUS
-wlanoidQueryStatistics(IN P_ADAPTER_T prAdapter,
-		       IN PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
+wlanoidQueryStatistics(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
 
 WLAN_STATUS
-wlanoidQueryCoexIso(IN P_ADAPTER_T prAdapter,
-		       IN PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
+wlanoidQueryCoexIso(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
 
 #ifdef LINUX
 
 WLAN_STATUS
-wlanoidQueryStatisticsForLinux(IN P_ADAPTER_T prAdapter,
-			       IN PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
+wlanoidQueryStatisticsForLinux(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
 
 #endif
 
 WLAN_STATUS
-wlanoidQueryMediaStreamMode(IN P_ADAPTER_T prAdapter,
-			    IN PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
+wlanoidQueryMediaStreamMode(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
 
 WLAN_STATUS
-wlanoidSetMediaStreamMode(IN P_ADAPTER_T prAdapter,
-			  IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+wlanoidSetMediaStreamMode(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 WLAN_STATUS
-wlanoidQueryRcvOk(IN P_ADAPTER_T prAdapter,
-		  IN PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
+wlanoidQueryRcvOk(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
 
 WLAN_STATUS
-wlanoidQueryXmitOk(IN P_ADAPTER_T prAdapter,
-		   IN PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
+wlanoidQueryXmitOk(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
 
 WLAN_STATUS
-wlanoidQueryXmitError(IN P_ADAPTER_T prAdapter,
-		      IN PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
+wlanoidQueryXmitError(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
 
 WLAN_STATUS
-wlanoidQueryXmitOneCollision(IN P_ADAPTER_T prAdapter,
-			     IN PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
+wlanoidQueryXmitOneCollision(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
 
 WLAN_STATUS
-wlanoidQueryXmitMoreCollisions(IN P_ADAPTER_T prAdapter,
-			       IN PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
+wlanoidQueryXmitMoreCollisions(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
 
 WLAN_STATUS
-wlanoidQueryXmitMaxCollisions(IN P_ADAPTER_T prAdapter,
-			      IN PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
+wlanoidQueryXmitMaxCollisions(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
 
 WLAN_STATUS
-wlanoidSetCurrentPacketFilter(IN P_ADAPTER_T prAdapter,
-			      IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+wlanoidSetCurrentPacketFilter(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 WLAN_STATUS
-wlanoidQueryCurrentPacketFilter(IN P_ADAPTER_T prAdapter,
-				IN PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
+wlanoidQueryCurrentPacketFilter(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
 
 WLAN_STATUS
-wlanoidSetAcpiDevicePowerState(IN P_ADAPTER_T prAdapter,
-			       IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+wlanoidSetAcpiDevicePowerState(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 WLAN_STATUS
-wlanoidQueryAcpiDevicePowerState(IN P_ADAPTER_T prAdapter,
-				 IN PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
+wlanoidQueryAcpiDevicePowerState(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
 
 WLAN_STATUS
-wlanoidSetDisassociate(IN P_ADAPTER_T prAdapter,
-		       IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+wlanoidSetDisassociate(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 WLAN_STATUS
-wlanoidQueryFragThreshold(IN P_ADAPTER_T prAdapter,
-			  OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
+wlanoidQueryFragThreshold(
+		IN P_ADAPTER_T prAdapter, OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
 
 WLAN_STATUS
-wlanoidSetFragThreshold(IN P_ADAPTER_T prAdapter,
-			IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+wlanoidSetFragThreshold(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 WLAN_STATUS
-wlanoidQueryAdHocMode(IN P_ADAPTER_T prAdapter,
-		      OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
+wlanoidQueryAdHocMode(
+		IN P_ADAPTER_T prAdapter, OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
 
 WLAN_STATUS
-wlanoidSetAdHocMode(IN P_ADAPTER_T prAdapter,
-		    IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+wlanoidSetAdHocMode(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 WLAN_STATUS
-wlanoidQueryBeaconInterval(IN P_ADAPTER_T prAdapter,
-			   OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
+wlanoidQueryBeaconInterval(
+		IN P_ADAPTER_T prAdapter, OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
 
 WLAN_STATUS
-wlanoidSetBeaconInterval(IN P_ADAPTER_T prAdapter,
-			 IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+wlanoidSetBeaconInterval(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 WLAN_STATUS
-wlanoidSetCurrentAddr(IN P_ADAPTER_T prAdapter,
-		      IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+wlanoidSetCurrentAddr(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 #if CFG_TCP_IP_CHKSUM_OFFLOAD
 WLAN_STATUS
-wlanoidSetCSUMOffload(IN P_ADAPTER_T prAdapter,
-		      IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+wlanoidSetCSUMOffload(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 #endif /* CFG_TCP_IP_CHKSUM_OFFLOAD */
 
 WLAN_STATUS
-wlanoidSetNetworkAddress(IN P_ADAPTER_T prAdapter,
-			 IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+wlanoidSetNetworkAddress(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 WLAN_STATUS
-wlanoidQueryMaxFrameSize(IN P_ADAPTER_T prAdapter,
-			 OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
+wlanoidQueryMaxFrameSize(
+		IN P_ADAPTER_T prAdapter, OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
 
 WLAN_STATUS
-wlanoidQueryMaxTotalSize(IN P_ADAPTER_T prAdapter,
-			 OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
+wlanoidQueryMaxTotalSize(
+		IN P_ADAPTER_T prAdapter, OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
 
 WLAN_STATUS
-wlanoidSetCurrentLookahead(IN P_ADAPTER_T prAdapter,
-			   IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+wlanoidSetCurrentLookahead(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 /* RF Test related APIs */
 WLAN_STATUS
-wlanoidRftestSetTestMode(IN P_ADAPTER_T prAdapter,
-			 IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+wlanoidRftestSetTestMode(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 WLAN_STATUS
-wlanoidRftestSetTestIcapMode(IN P_ADAPTER_T prAdapter,
-			     IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+wlanoidRftestSetTestIcapMode(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 WLAN_STATUS
-wlanoidRftestSetAbortTestMode(IN P_ADAPTER_T prAdapter,
-			      IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+wlanoidRftestSetAbortTestMode(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 WLAN_STATUS
-wlanoidRftestQueryAutoTest(IN P_ADAPTER_T prAdapter,
-			   OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
+wlanoidRftestQueryAutoTest(
+		IN P_ADAPTER_T prAdapter, OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
 
 WLAN_STATUS
-wlanoidRftestSetAutoTest(IN P_ADAPTER_T prAdapter,
-			 OUT PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+wlanoidRftestSetAutoTest(
+		IN P_ADAPTER_T prAdapter, OUT PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 #if CFG_SUPPORT_WAPI
 WLAN_STATUS
-wlanoidSetWapiMode(IN P_ADAPTER_T prAdapter,
-		   IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+wlanoidSetWapiMode(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 WLAN_STATUS
-wlanoidSetWapiAssocInfo(IN P_ADAPTER_T prAdapter,
-			IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+wlanoidSetWapiAssocInfo(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 WLAN_STATUS
-wlanoidSetWapiKey(IN P_ADAPTER_T prAdapter,
-		  IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+wlanoidSetWapiKey(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 #endif
 
 #if CFG_SUPPORT_WPS2
 WLAN_STATUS
-wlanoidSetWSCAssocInfo(IN P_ADAPTER_T prAdapter,
-		       IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+wlanoidSetWSCAssocInfo(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 #endif
 
 #if CFG_ENABLE_WAKEUP_ON_LAN
 WLAN_STATUS
-wlanoidSetAddWakeupPattern(IN P_ADAPTER_T prAdapter,
-			   IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+wlanoidSetAddWakeupPattern(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 WLAN_STATUS
-wlanoidSetRemoveWakeupPattern(IN P_ADAPTER_T prAdapter,
-			      IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+wlanoidSetRemoveWakeupPattern(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 WLAN_STATUS
-wlanoidQueryEnableWakeup(IN P_ADAPTER_T prAdapter,
-			 OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 u4QueryInfoLen);
+wlanoidQueryEnableWakeup(
+		IN P_ADAPTER_T prAdapter, OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 u4QueryInfoLen);
 
 WLAN_STATUS
-wlanoidSetEnableWakeup(IN P_ADAPTER_T prAdapter,
-		       IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+wlanoidSetEnableWakeup(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 #endif
 
 WLAN_STATUS
-wlanoidSetWiFiWmmPsTest(IN P_ADAPTER_T prAdapter,
-			IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+wlanoidSetWiFiWmmPsTest(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 WLAN_STATUS
-wlanoidSetTxAmpdu(IN P_ADAPTER_T prAdapter,
-		  IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+wlanoidSetTxAmpdu(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 WLAN_STATUS
-wlanoidSetAddbaReject(IN P_ADAPTER_T prAdapter,
-		      IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+wlanoidSetAddbaReject(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 WLAN_STATUS
-wlanoidQueryNvramRead(IN P_ADAPTER_T prAdapter,
-		      OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
+wlanoidQueryNvramRead(
+		IN P_ADAPTER_T prAdapter, OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
 
 WLAN_STATUS
-wlanoidSetNvramWrite(IN P_ADAPTER_T prAdapter,
-		     IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+wlanoidSetNvramWrite(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 WLAN_STATUS
-wlanoidQueryCfgSrcType(IN P_ADAPTER_T prAdapter,
-		       OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
+wlanoidQueryCfgSrcType(
+		IN P_ADAPTER_T prAdapter, OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
 
 WLAN_STATUS
-wlanoidQueryEepromType(IN P_ADAPTER_T prAdapter,
-		       OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
+wlanoidQueryEepromType(
+		IN P_ADAPTER_T prAdapter, OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
 
 WLAN_STATUS
-wlanoidSetCountryCode(IN P_ADAPTER_T prAdapter,
-		      IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+wlanoidSetCountryCode(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 WLAN_STATUS wlanSendMemDumpCmd(IN P_ADAPTER_T prAdapter, IN PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen);
 
 #if CFG_SLT_SUPPORT
 
 WLAN_STATUS
-wlanoidQuerySLTStatus(IN P_ADAPTER_T prAdapter,
-		      OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
+wlanoidQuerySLTStatus(
+		IN P_ADAPTER_T prAdapter, OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
 
 WLAN_STATUS
-wlanoidUpdateSLTMode(IN P_ADAPTER_T prAdapter,
-		     IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+wlanoidUpdateSLTMode(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 #endif
 
 #if CFG_SUPPORT_ADVANCE_CONTROL
 WLAN_STATUS
-wlanoidAdvCtrl(IN P_ADAPTER_T prAdapter,
-	OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
+wlanoidAdvCtrl(
+		IN P_ADAPTER_T prAdapter, OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
 #endif
 
 WLAN_STATUS
-wlanoidQueryWlanInfo(IN P_ADAPTER_T prAdapter,
-	OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
+wlanoidQueryWlanInfo(
+		IN P_ADAPTER_T prAdapter, OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
 
 WLAN_STATUS
-wlanoidQueryMibInfo(IN P_ADAPTER_T prAdapter,
-	OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
+wlanoidQueryMibInfo(
+		IN P_ADAPTER_T prAdapter, OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
 #if CFG_SUPPORT_LAST_SEC_MCS_INFO
 WLAN_STATUS
-wlanoidTxMcsInfo(IN P_ADAPTER_T prAdapter,
-	IN PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
+wlanoidTxMcsInfo(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
 #endif
 
 WLAN_STATUS
 wlanoidSetFwLog2Host(
-	IN P_ADAPTER_T prAdapter,
-	IN PVOID pvSetBuffer,
-	IN UINT_32 u4SetBufferLen,
-	OUT PUINT_32 pu4SetInfoLen);
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 #if 0
 WLAN_STATUS
 wlanoidSetNoaParam(IN P_ADAPTER_T prAdapter,
-		   IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+			IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 WLAN_STATUS
 wlanoidSetOppPsParam(IN P_ADAPTER_T prAdapter,
-		     IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+			IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 WLAN_STATUS
 wlanoidSetUApsdParam(IN P_ADAPTER_T prAdapter,
-		     IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+			IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 #endif
 
 /*----------------------------------------------------------------------------*/
@@ -2784,64 +2769,64 @@ WLAN_STATUS
 wlanoidSetBT(IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 WLAN_STATUS
-wlanoidQueryBT(IN P_ADAPTER_T prAdapter,
-	       OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
+wlanoidQueryBT(
+		IN P_ADAPTER_T prAdapter, OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
 
 WLAN_STATUS
-wlanoidSetTxPower(IN P_ADAPTER_T prAdapter,
-		  IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+wlanoidSetTxPower(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 #if 0
 WLAN_STATUS
 wlanoidQueryBtSingleAntenna(
 	IN  P_ADAPTER_T prAdapter,
-	OUT PVOID       pvQueryBuffer,
-	IN  UINT_32     u4QueryBufferLen,
-	OUT PUINT_32    pu4QueryInfoLen);
+	OUT PVOID		pvQueryBuffer,
+	IN  UINT_32	u4QueryBufferLen,
+	OUT PUINT_32	pu4QueryInfoLen);
 
 WLAN_STATUS
 wlanoidSetBtSingleAntenna(
 	IN  P_ADAPTER_T prAdapter,
-	IN  PVOID       pvSetBuffer,
-	IN  UINT_32     u4SetBufferLen,
-	OUT PUINT_32    pu4SetInfoLen);
+	IN  PVOID		pvSetBuffer,
+	IN  UINT_32	u4SetBufferLen,
+	OUT PUINT_32	pu4SetInfoLen);
 
 WLAN_STATUS
 wlanoidSetPta(
 	IN  P_ADAPTER_T prAdapter,
-	IN  PVOID       pvSetBuffer,
-	IN  UINT_32     u4SetBufferLen,
-	OUT PUINT_32    pu4SetInfoLen);
+	IN  PVOID		pvSetBuffer,
+	IN  UINT_32	u4SetBufferLen,
+	OUT PUINT_32	pu4SetInfoLen);
 
 WLAN_STATUS
 wlanoidQueryPta(
 	IN  P_ADAPTER_T prAdapter,
-	OUT PVOID       pvQueryBuffer,
-	IN  UINT_32     u4QueryBufferLen,
-	OUT PUINT_32    pu4QueryInfoLen);
+	OUT PVOID		pvQueryBuffer,
+	IN  UINT_32	u4QueryBufferLen,
+	OUT PUINT_32	pu4QueryInfoLen);
 #endif
 
 #if CFG_ENABLE_WIFI_DIRECT
 WLAN_STATUS
-wlanoidSetP2pMode(IN P_ADAPTER_T prAdapter,
-		  IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+wlanoidSetP2pMode(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 #endif
 
 WLAN_STATUS
-wlanoidSetDefaultKey(IN P_ADAPTER_T prAdapter,
-		     IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+wlanoidSetDefaultKey(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 WLAN_STATUS
-wlanoidSetGtkRekeyData(IN P_ADAPTER_T prAdapter,
-		       IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+wlanoidSetGtkRekeyData(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 WLAN_STATUS
-wlanoidSetStartSchedScan(IN P_ADAPTER_T prAdapter,
-			 IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+wlanoidSetStartSchedScan(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 WLAN_STATUS
-wlanoidSetStopSchedScan(IN P_ADAPTER_T prAdapter,
-			IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+wlanoidSetStopSchedScan(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 #if CFG_M0VE_BA_TO_DRIVER
 WLAN_STATUS wlanoidResetBAScoreboard(IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen);
@@ -2849,126 +2834,104 @@ WLAN_STATUS wlanoidResetBAScoreboard(IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuf
 
 #if CFG_SUPPORT_BATCH_SCAN
 WLAN_STATUS
-wlanoidSetBatchScanReq(IN P_ADAPTER_T prAdapter,
-		       IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+wlanoidSetBatchScanReq(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 WLAN_STATUS
-wlanoidQueryBatchScanResult(IN P_ADAPTER_T prAdapter,
-			    OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
+wlanoidQueryBatchScanResult(
+		IN P_ADAPTER_T prAdapter, OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
 #endif
 
 #if CFG_SUPPORT_PASSPOINT
 WLAN_STATUS
-wlanoidSetHS20Info(IN P_ADAPTER_T prAdapter,
-		   IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+wlanoidSetHS20Info(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 WLAN_STATUS
-wlanoidSetInterworkingInfo(IN P_ADAPTER_T prAdapter,
-			   IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+wlanoidSetInterworkingInfo(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 WLAN_STATUS
-wlanoidSetRoamingConsortiumIEInfo(IN P_ADAPTER_T prAdapter,
-				  IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+wlanoidSetRoamingConsortiumIEInfo(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 WLAN_STATUS
-wlanoidSetHS20BssidPool(IN P_ADAPTER_T prAdapter,
-			IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+wlanoidSetHS20BssidPool(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 #endif /* CFG_SUPPORT_PASSPOINT */
 
 #if CFG_SUPPORT_SNIFFER
-WLAN_STATUS wlanoidSetMonitor(IN P_ADAPTER_T prAdapter,
-			      IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+WLAN_STATUS wlanoidSetMonitor(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 #endif
 
 #if CFG_STR_DHCP_RENEW_OFFLOAD
 WLAN_STATUS
 wlanoidSetDhcpOffladInfo(
-		IN P_ADAPTER_T prAdapter,
-		IN PVOID pvSetBuffer,
-		IN UINT_32 u4SetBufferLen,
-		OUT PUINT_32 pu4SetInfoLen);
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 #endif
 
 WLAN_STATUS
-wlanoidNotifyFwSuspend(IN P_ADAPTER_T prAdapter,
-				IN PVOID pvSetBuffer,
-				IN UINT_32 u4SetBufferLen,
-				OUT PUINT_32 pu4SetInfoLen);
+wlanoidNotifyFwSuspend(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 #if CFG_SUPPORT_DBDC
 WLAN_STATUS
 wlanoidSetDbdcEnable(
-		IN P_ADAPTER_T prAdapter,
-		IN PVOID pvSetBuffer,
-		IN UINT_32 u4SetBufferLen,
-		OUT PUINT_32 pu4SetInfoLen);
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 #endif /*#if CFG_SUPPORT_DBDC*/
 
 WLAN_STATUS
-wlanoidQuerySetTxTargetPower(IN P_ADAPTER_T prAdapter,
-			IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+wlanoidQuerySetTxTargetPower(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 #if (CFG_SUPPORT_DFS_MASTER == 1)
 WLAN_STATUS
-wlanoidQuerySetRddReport(IN P_ADAPTER_T prAdapter,
-			IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+wlanoidQuerySetRddReport(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 WLAN_STATUS
-wlanoidQuerySetRadarDetectMode(IN P_ADAPTER_T prAdapter,
-			IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+wlanoidQuerySetRadarDetectMode(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 #endif
 
 #if CFG_AUTO_CHANNEL_SEL_SUPPORT
 WLAN_STATUS
-wlanoidQueryLteSafeChannel(IN P_ADAPTER_T prAdapter,
-			   IN PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
+wlanoidQueryLteSafeChannel(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
 WLAN_STATUS
 wlanCalculateAllChannelDirtiness(IN P_ADAPTER_T prAdapter);
-VOID
-wlanInitChnLoadInfoChannelList(IN P_ADAPTER_T prAdapter);
+VOID wlanInitChnLoadInfoChannelList(IN P_ADAPTER_T prAdapter);
 UINT_8
 wlanGetChannelIndex(IN UINT_8 channel);
 UINT_8
 wlanGetChannelNumFromIndex(IN UINT_8 ucIdx);
-VOID
-wlanSortChannel(IN P_ADAPTER_T prAdapter);
+VOID wlanSortChannel(IN P_ADAPTER_T prAdapter);
 #endif
 
 #ifdef CFG_SUPPORT_ANT_DIV
 WLAN_STATUS
-wlanoidAntDivCfg(IN P_ADAPTER_T prAdapter,
-		IN PVOID pvSetBuffer,
-		IN UINT_32 u4SetBufferLen,
-		OUT PUINT_32 pu4SetInfoLen);
+wlanoidAntDivCfg(IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 #endif
 
 WLAN_STATUS
-wlanoidLinkDown(IN P_ADAPTER_T prAdapter,
-		       IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
+wlanoidLinkDown(IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 WLAN_STATUS
-wlanoidAbortScan(IN P_ADAPTER_T prAdapter,
-    OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
+wlanoidAbortScan(
+		IN P_ADAPTER_T prAdapter, OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
 
 WLAN_STATUS
 wlanoidSetCSIControl(
-	IN P_ADAPTER_T prAdapter,
-	IN PVOID pvSetBuffer,
-	IN UINT_32 u4SetBufferLen,
-	OUT PUINT_32 pu4SetInfoLen);
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
 #ifdef CFG_DUMP_TXPOWR_TABLE
 WLAN_STATUS
-wlanoidGetTxPwrTbl(IN P_ADAPTER_T prAdapter,
-		   IN PVOID pvQueryBuffer,
-		   IN UINT_32 u4QueryBufferLen,
-		   OUT PUINT_32 pu4QueryInfoLen);
+wlanoidGetTxPwrTbl(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
 #endif
 #ifdef CFG_GET_TEMPURATURE
 WLAN_STATUS
-wlanoidGetTemperature(P_ADAPTER_T prAdapter,
-		      PVOID pvQueryBuffer,
-		      UINT_32 u4QueryBufferLen,
-		      PUINT_32 pu4QueryInfoLen);
+wlanoidGetTemperature(P_ADAPTER_T prAdapter, PVOID pvQueryBuffer, UINT_32 u4QueryBufferLen, PUINT_32 pu4QueryInfoLen);
 #endif
 
 uint32_t wlanGetSupportedFeatureSet(IN P_GLUE_INFO_T prGlueInfo);
@@ -2977,24 +2940,21 @@ WLAN_STATUS wlanSuspendLinkDown(IN P_GLUE_INFO_T prGlueInfo);
 
 #if CFG_SUPPORT_802_11K
 WLAN_STATUS
-wlanoidSendNeighborRequest(IN P_ADAPTER_T prAdapter,
-				    IN PVOID pvSetBuffer, UINT_32 u4SetBufferLen,
-				    PUINT_32 pu4SetInfoLen);
+wlanoidSendNeighborRequest(
+		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, UINT_32 u4SetBufferLen, PUINT_32 pu4SetInfoLen);
 #endif
 
 #if CFG_SUPPORT_802_11V_BSS_TRANSITION_MGT
 WLAN_STATUS
-wlanoidSendBTMQuery(IN P_ADAPTER_T  prAdapter, IN PVOID pvSetBuffer,
-			     UINT_32 u4SetBufferLen, PUINT_32 pu4SetInfoLen);
+wlanoidSendBTMQuery(IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, UINT_32 u4SetBufferLen, PUINT_32 pu4SetInfoLen);
 
 WLAN_STATUS
-wlanoidPktProcessIT(IN P_ADAPTER_T prAdapter, IN PVOID pvBuffer,
-			     UINT_32 u4BufferLen, PUINT_32 pu4InfoLen);
+wlanoidPktProcessIT(IN P_ADAPTER_T prAdapter, IN PVOID pvBuffer, UINT_32 u4BufferLen, PUINT_32 pu4InfoLen);
 #endif
 
 /*******************************************************************************
-*                              F U N C T I O N S
-********************************************************************************
-*/
+ *                              F U N C T I O N S
+ ********************************************************************************
+ */
 
 #endif /* _WLAN_OID_H */

@@ -53,7 +53,6 @@
 ** Id: //Department/DaVinci/TRUNK/WiFi_P2P_Driver/include/nic/p2p.h#3
 */
 
-
 #ifndef _P2P_H
 #define _P2P_H
 
@@ -73,47 +72,47 @@
  */
 
 /* refer to 'Config Methods' in WPS */
-#define WPS_CONFIG_USBA                 0x0001
-#define WPS_CONFIG_ETHERNET             0x0002
-#define WPS_CONFIG_LABEL                0x0004
-#define WPS_CONFIG_DISPLAY              0x0008
-#define WPS_CONFIG_EXT_NFC              0x0010
-#define WPS_CONFIG_INT_NFC              0x0020
-#define WPS_CONFIG_NFC                  0x0040
-#define WPS_CONFIG_PBC                  0x0080
-#define WPS_CONFIG_KEYPAD               0x0100
+#define WPS_CONFIG_USBA 0x0001
+#define WPS_CONFIG_ETHERNET 0x0002
+#define WPS_CONFIG_LABEL 0x0004
+#define WPS_CONFIG_DISPLAY 0x0008
+#define WPS_CONFIG_EXT_NFC 0x0010
+#define WPS_CONFIG_INT_NFC 0x0020
+#define WPS_CONFIG_NFC 0x0040
+#define WPS_CONFIG_PBC 0x0080
+#define WPS_CONFIG_KEYPAD 0x0100
 
 /* refer to 'Device Password ID' in WPS */
-#define WPS_DEV_PASSWORD_ID_PIN         0x0000
-#define WPS_DEV_PASSWORD_ID_USER        0x0001
-#define WPS_DEV_PASSWORD_ID_MACHINE     0x0002
-#define WPS_DEV_PASSWORD_ID_REKEY       0x0003
-#define WPS_DEV_PASSWORD_ID_PUSHBUTTON  0x0004
-#define WPS_DEV_PASSWORD_ID_REGISTRAR   0x0005
+#define WPS_DEV_PASSWORD_ID_PIN 0x0000
+#define WPS_DEV_PASSWORD_ID_USER 0x0001
+#define WPS_DEV_PASSWORD_ID_MACHINE 0x0002
+#define WPS_DEV_PASSWORD_ID_REKEY 0x0003
+#define WPS_DEV_PASSWORD_ID_PUSHBUTTON 0x0004
+#define WPS_DEV_PASSWORD_ID_REGISTRAR 0x0005
 
-#define P2P_DEVICE_TYPE_NUM         2
-#define P2P_DEVICE_NAME_LENGTH      32
-#define P2P_NETWORK_NUM             8
-#define P2P_MEMBER_NUM              8
+#define P2P_DEVICE_TYPE_NUM 2
+#define P2P_DEVICE_NAME_LENGTH 32
+#define P2P_NETWORK_NUM 8
+#define P2P_MEMBER_NUM 8
 
 /* Device Capability Definition. */
-#define P2P_MAXIMUM_CLIENT_COUNT                    10
-#define P2P_MAXIMUM_NOA_COUNT                       8
+#define P2P_MAXIMUM_CLIENT_COUNT 10
+#define P2P_MAXIMUM_NOA_COUNT 8
 
-#define P2P_MAX_SUPPORTED_CHANNEL_LIST_SIZE            51	/* Contains 6 sub-band. */
+#define P2P_MAX_SUPPORTED_CHANNEL_LIST_SIZE 51 /* Contains 6 sub-band. */
 
 /* Memory Size Definition. */
-#define P2P_MAXIMUM_ATTRIBUTES_CACHE_SIZE           768
-#define WPS_MAXIMUM_ATTRIBUTES_CACHE_SIZE           300
+#define P2P_MAXIMUM_ATTRIBUTES_CACHE_SIZE 768
+#define WPS_MAXIMUM_ATTRIBUTES_CACHE_SIZE 300
 
-#define P2P_WILDCARD_SSID           "DIRECT-"
+#define P2P_WILDCARD_SSID "DIRECT-"
 
 /* Device Charactoristic. */
-#define P2P_AP_CHNL_HOLD_TIME_MS 5000	/* 1000 is too short , the deauth would block in the queue */
-#define P2P_DEFAULT_LISTEN_CHANNEL                   1
+#define P2P_AP_CHNL_HOLD_TIME_MS 5000 /* 1000 is too short , the deauth would block in the queue */
+#define P2P_DEFAULT_LISTEN_CHANNEL 1
 
 #if (CFG_SUPPORT_DFS_MASTER == 1)
-#define P2P_AP_CAC_WEATHER_CHNL_HOLD_TIME_MS (600*1000)
+#define P2P_AP_CAC_WEATHER_CHNL_HOLD_TIME_MS (600 * 1000)
 #endif
 
 #define P2P_DEAUTH_TIMEOUT_TIME_MS 1000
@@ -149,18 +148,14 @@
  */
 
 struct _P2P_INFO_T {
-	UINT_32 u4DeviceNum;
+	UINT_32							u4DeviceNum;
 	EVENT_P2P_DEV_DISCOVER_RESULT_T arP2pDiscoverResult[CFG_MAX_NUM_BSS_LIST];
-	PUINT_8 pucCurrIePtr;
+	PUINT_8							pucCurrIePtr;
 	/* A common pool for IE of all scan results. */
 	UINT_8 aucCommIePool[CFG_MAX_COMMON_IE_BUF_LEN];
 };
 
-typedef enum {
-	ENUM_P2P_PEER_GROUP,
-	ENUM_P2P_PEER_DEVICE,
-	ENUM_P2P_PEER_NUM
-} ENUM_P2P_PEER_TYPE, *P_ENUM_P2P_PEER_TYPE;
+typedef enum { ENUM_P2P_PEER_GROUP, ENUM_P2P_PEER_DEVICE, ENUM_P2P_PEER_NUM } ENUM_P2P_PEER_TYPE, *P_ENUM_P2P_PEER_TYPE;
 
 typedef struct _P2P_DEVICE_INFO {
 	UINT_8 aucDevAddr[PARAM_MAC_ADDR_LEN];
@@ -173,9 +168,9 @@ typedef struct _P2P_DEVICE_INFO {
 } P2P_DEVICE_INFO, *P_P2P_DEVICE_INFO;
 
 typedef struct _P2P_GROUP_INFO {
-	PARAM_SSID_T rGroupID;
+	PARAM_SSID_T	rGroupID;
 	P2P_DEVICE_INFO rGroupOwnerInfo;
-	UINT_8 ucMemberNum;
+	UINT_8			ucMemberNum;
 	P2P_DEVICE_INFO arMemberInfo[P2P_MEMBER_NUM];
 } P2P_GROUP_INFO, *P_P2P_GROUP_INFO;
 
@@ -183,13 +178,13 @@ typedef struct _P2P_NETWORK_INFO {
 	ENUM_P2P_PEER_TYPE eNodeType;
 
 	union {
-		P2P_GROUP_INFO rGroupInfo;
+		P2P_GROUP_INFO	rGroupInfo;
 		P2P_DEVICE_INFO rDeviceInfo;
 	} node;
 } P2P_NETWORK_INFO, *P_P2P_NETWORK_INFO;
 
 typedef struct _P2P_NETWORK_LIST {
-	UINT_8 ucNetworkNum;
+	UINT_8			 ucNetworkNum;
 	P2P_NETWORK_INFO rP2PNetworkInfo[P2P_NETWORK_NUM];
 } P2P_NETWORK_LIST, *P_P2P_NETWORK_LIST;
 
@@ -204,38 +199,38 @@ typedef struct _P2P_SSID_STRUCT_T {
 } P2P_SSID_STRUCT_T, *P_P2P_SSID_STRUCT_T;
 
 typedef struct _P2P_SCAN_REQ_INFO_T {
-	ENUM_SCAN_TYPE_T eScanType;
+	ENUM_SCAN_TYPE_T  eScanType;
 	ENUM_SCAN_CHANNEL eChannelSet;
-	UINT_16 u2PassiveDewellTime;
-	UINT_8 ucSeqNumOfScnMsg;
-	BOOLEAN fgIsAbort;
-	BOOLEAN fgIsScanRequest;
-	UINT_8 ucNumChannelList;
+	UINT_16			  u2PassiveDewellTime;
+	UINT_8			  ucSeqNumOfScnMsg;
+	BOOLEAN			  fgIsAbort;
+	BOOLEAN			  fgIsScanRequest;
+	UINT_8			  ucNumChannelList;
 	RF_CHANNEL_INFO_T arScanChannelList[MAXIMUM_OPERATION_CHANNEL_LIST];
-	UINT_32 u4BufLength;
-	UINT_8 aucIEBuf[MAX_IE_LENGTH];
-	UINT_8 ucSsidNum;
-	P2P_SSID_STRUCT_T arSsidStruct[SCN_SSID_MAX_NUM];	/* Currently we can only take one SSID scan request */
+	UINT_32			  u4BufLength;
+	UINT_8			  aucIEBuf[MAX_IE_LENGTH];
+	UINT_8			  ucSsidNum;
+	P2P_SSID_STRUCT_T arSsidStruct[SCN_SSID_MAX_NUM]; /* Currently we can only take one SSID scan request */
 } P2P_SCAN_REQ_INFO_T, *P_P2P_SCAN_REQ_INFO_T;
 
 typedef struct _P2P_CHNL_REQ_INFO_T {
-	LINK_T rP2pChnlReqLink;
-	BOOLEAN fgIsChannelRequested;
-	UINT_8 ucSeqNumOfChReq;
-	UINT_64 u8Cookie;
-	UINT_8 ucReqChnlNum;
-	ENUM_BAND_T eBand;
-	ENUM_CHNL_EXT_T eChnlSco;
-	UINT_8 ucOriChnlNum;
-	ENUM_CHANNEL_WIDTH_T eChannelWidth;	/*VHT operation ie */
-	UINT_8 ucCenterFreqS1;
-	UINT_8 ucCenterFreqS2;
-	ENUM_BAND_T eOriBand;
-	ENUM_CHNL_EXT_T eOriChnlSco;
-	UINT_32 u4MaxInterval;
-	ENUM_CH_REQ_TYPE_T eChnlReqType;
+	LINK_T				 rP2pChnlReqLink;
+	BOOLEAN				 fgIsChannelRequested;
+	UINT_8				 ucSeqNumOfChReq;
+	UINT_64				 u8Cookie;
+	UINT_8				 ucReqChnlNum;
+	ENUM_BAND_T			 eBand;
+	ENUM_CHNL_EXT_T		 eChnlSco;
+	UINT_8				 ucOriChnlNum;
+	ENUM_CHANNEL_WIDTH_T eChannelWidth; /*VHT operation ie */
+	UINT_8				 ucCenterFreqS1;
+	UINT_8				 ucCenterFreqS2;
+	ENUM_BAND_T			 eOriBand;
+	ENUM_CHNL_EXT_T		 eOriChnlSco;
+	UINT_32				 u4MaxInterval;
+	ENUM_CH_REQ_TYPE_T	 eChnlReqType;
 #if CFG_SUPPORT_NFC_BEAM_PLUS
-	UINT_32 NFC_BEAM;	/*NFC Beam + Indication */
+	UINT_32 NFC_BEAM; /*NFC Beam + Indication */
 #endif
 } P2P_CHNL_REQ_INFO_T, *P_P2P_CHNL_REQ_INFO_T;
 
@@ -253,21 +248,21 @@ struct _P2P_CONNECTION_SETTINGS_T {
 };
 
 typedef struct _NOA_TIMING_T {
-	BOOLEAN fgIsInUse;	/* Indicate if this entry is in use or not */
-	UINT_8 ucCount;		/* Count */
+	BOOLEAN fgIsInUse; /* Indicate if this entry is in use or not */
+	UINT_8	ucCount;   /* Count */
 
 	UINT_8 aucReserved[2];
 
-	UINT_32 u4Duration;	/* Duration */
-	UINT_32 u4Interval;	/* Interval */
-	UINT_32 u4StartTime;	/* Start Time */
+	UINT_32 u4Duration;	 /* Duration */
+	UINT_32 u4Interval;	 /* Interval */
+	UINT_32 u4StartTime; /* Start Time */
 } NOA_TIMING_T, *P_NOA_TIMING_T;
 
 struct _P2P_SPECIFIC_BSS_INFO_T {
 	/* For GO(AP) Mode - Compose TIM IE */
-	/*UINT_16 u2SmallestAID;*//* TH3 multiple P2P */
-	/*UINT_16 u2LargestAID;*//* TH3 multiple P2P */
-	/*UINT_8 ucBitmapCtrl;*//* TH3 multiple P2P */
+	/*UINT_16 u2SmallestAID;*/ /* TH3 multiple P2P */
+	/*UINT_16 u2LargestAID;*/  /* TH3 multiple P2P */
+	/*UINT_8 ucBitmapCtrl;*/   /* TH3 multiple P2P */
 	/* UINT_8                  aucPartialVirtualBitmap[MAX_LEN_TIM_PARTIAL_BMP]; */
 
 	/* For GC/GO OppPS */
@@ -275,42 +270,42 @@ struct _P2P_SPECIFIC_BSS_INFO_T {
 	UINT_16 u2CTWindow;
 
 	/* For GC/GO NOA */
-	UINT_8 ucNoAIndex;
-	UINT_8 ucNoATimingCount;	/* Number of NoA Timing */
+	UINT_8		 ucNoAIndex;
+	UINT_8		 ucNoATimingCount; /* Number of NoA Timing */
 	NOA_TIMING_T arNoATiming[P2P_MAXIMUM_NOA_COUNT];
 
 	BOOLEAN fgIsNoaAttrExisted;
 
 	/* For P2P Device */
-	/*UINT_8 ucRegClass;*//* TH3 multiple P2P */	/* Regulatory Class for channel. */
+	/*UINT_8 ucRegClass;*/ /* TH3 multiple P2P */ /* Regulatory Class for channel. */
 	/* Linten Channel only on channels 1, 6 and 11 in the 2.4 GHz. */
-	/*UINT_8 ucListenChannel;*//* TH3 multiple P2P */
+	/*UINT_8 ucListenChannel;*/ /* TH3 multiple P2P */
 
 	/* Operating Channel, should be one of channel */
 	/* list in p2p connection settings. */
-	UINT_8 ucPreferredChannel;
+	UINT_8			ucPreferredChannel;
 	ENUM_CHNL_EXT_T eRfSco;
-	ENUM_BAND_T eRfBand;
+	ENUM_BAND_T		eRfBand;
 
 	/* Extended Listen Timing. */
 	UINT_16 u2AvailabilityPeriod;
 	UINT_16 u2AvailabilityInterval;
 
 	UINT_16 u2AttributeLen;
-	UINT_8 aucAttributesCache[P2P_MAXIMUM_ATTRIBUTES_CACHE_SIZE];
+	UINT_8	aucAttributesCache[P2P_MAXIMUM_ATTRIBUTES_CACHE_SIZE];
 
-	/*UINT_16 u2WscAttributeLen;*//* TH3 multiple P2P */
-	/*UINT_8 aucWscAttributesCache[WPS_MAXIMUM_ATTRIBUTES_CACHE_SIZE];*//* TH3 multiple P2P */
+	/*UINT_16 u2WscAttributeLen;*/										 /* TH3 multiple P2P */
+	/*UINT_8 aucWscAttributesCache[WPS_MAXIMUM_ATTRIBUTES_CACHE_SIZE];*/ /* TH3 multiple P2P */
 
-	/*UINT_8 aucGroupID[MAC_ADDR_LEN];*//* TH3 multiple P2P */
+	/*UINT_8 aucGroupID[MAC_ADDR_LEN];*/ /* TH3 multiple P2P */
 	UINT_16 u2GroupSsidLen;
-	UINT_8 aucGroupSsid[ELEM_MAX_LEN_SSID];
+	UINT_8	aucGroupSsid[ELEM_MAX_LEN_SSID];
 
-	PARAM_CUSTOM_NOA_PARAM_STRUCT_T rNoaParam;
+	PARAM_CUSTOM_NOA_PARAM_STRUCT_T	  rNoaParam;
 	PARAM_CUSTOM_OPPPS_PARAM_STRUCT_T rOppPsParam;
 
 	UINT_16 u2WpaIeLen;
-	UINT_8 aucWpaIeBuffer[ELEM_HDR_LEN + ELEM_MAX_LEN_WPA];
+	UINT_8	aucWpaIeBuffer[ELEM_HDR_LEN + ELEM_MAX_LEN_WPA];
 };
 
 /*******************************************************************************
@@ -328,4 +323,4 @@ struct _P2P_SPECIFIC_BSS_INFO_T {
  ********************************************************************************
  */
 
-#endif	/*_P2P_H */
+#endif /*_P2P_H */

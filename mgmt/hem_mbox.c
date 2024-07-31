@@ -54,103 +54,78 @@
 */
 
 /*! \file   "hem_mbox.c"
-*    \brief
-*
-*/
-
-
-/*******************************************************************************
-*                         C O M P I L E R   F L A G S
-********************************************************************************
-*/
+ *    \brief
+ *
+ */
 
 /*******************************************************************************
-*                    E X T E R N A L   R E F E R E N C E S
-********************************************************************************
-*/
+ *                         C O M P I L E R   F L A G S
+ ********************************************************************************
+ */
+
+/*******************************************************************************
+ *                    E X T E R N A L   R E F E R E N C E S
+ ********************************************************************************
+ */
 #include "precomp.h"
 
 /*******************************************************************************
-*                              C O N S T A N T S
-********************************************************************************
-*/
+ *                              C O N S T A N T S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                             D A T A   T Y P E S
-********************************************************************************
-*/
+ *                             D A T A   T Y P E S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                            P U B L I C   D A T A
-********************************************************************************
-*/
+ *                            P U B L I C   D A T A
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                           P R I V A T E   D A T A
-********************************************************************************
-*/
+ *                           P R I V A T E   D A T A
+ ********************************************************************************
+ */
 #if DBG
 /*lint -save -e64 Type mismatch */
-static PUINT_8 apucDebugMsg[] = {
-	(PUINT_8) DISP_STRING("MID_MNY_CNM_CH_REQ"),
-	(PUINT_8) DISP_STRING("MID_MNY_CNM_CH_ABORT"),
-	(PUINT_8) DISP_STRING("MID_CNM_AIS_CH_GRANT"),
-	(PUINT_8) DISP_STRING("MID_CNM_P2P_CH_GRANT"),
-	(PUINT_8) DISP_STRING("MID_CNM_BOW_CH_GRANT"),
+static PUINT_8 apucDebugMsg[] = { (PUINT_8)DISP_STRING("MID_MNY_CNM_CH_REQ"),
+	(PUINT_8)DISP_STRING("MID_MNY_CNM_CH_ABORT"), (PUINT_8)DISP_STRING("MID_CNM_AIS_CH_GRANT"),
+	(PUINT_8)DISP_STRING("MID_CNM_P2P_CH_GRANT"), (PUINT_8)DISP_STRING("MID_CNM_BOW_CH_GRANT"),
 
-	(PUINT_8) DISP_STRING("MID_AIS_SCN_SCAN_REQ"),
-	(PUINT_8) DISP_STRING("MID_AIS_SCN_SCAN_REQ_V2"),
-	(PUINT_8) DISP_STRING("MID_AIS_SCN_SCAN_CANCEL"),
-	(PUINT_8) DISP_STRING("MID_P2P_SCN_SCAN_REQ"),
-	(PUINT_8) DISP_STRING("MID_P2P_SCN_SCAN_REQ_V2"),
-	(PUINT_8) DISP_STRING("MID_P2P_SCN_SCAN_CANCEL"),
-	(PUINT_8) DISP_STRING("MID_BOW_SCN_SCAN_REQ"),
-	(PUINT_8) DISP_STRING("MID_BOW_SCN_SCAN_REQ_V2"),
-	(PUINT_8) DISP_STRING("MID_BOW_SCN_SCAN_CANCEL"),
-	(PUINT_8) DISP_STRING("MID_RLM_SCN_SCAN_REQ"),
-	(PUINT_8) DISP_STRING("MID_RLM_SCN_SCAN_REQ_V2"),
-	(PUINT_8) DISP_STRING("MID_RLM_SCN_SCAN_CANCEL"),
-	(PUINT_8) DISP_STRING("MID_SCN_AIS_SCAN_DONE"),
-	(PUINT_8) DISP_STRING("MID_SCN_P2P_SCAN_DONE"),
-	(PUINT_8) DISP_STRING("MID_SCN_BOW_SCAN_DONE"),
-	(PUINT_8) DISP_STRING("MID_SCN_RLM_SCAN_DONE"),
+	(PUINT_8)DISP_STRING("MID_AIS_SCN_SCAN_REQ"), (PUINT_8)DISP_STRING("MID_AIS_SCN_SCAN_REQ_V2"),
+	(PUINT_8)DISP_STRING("MID_AIS_SCN_SCAN_CANCEL"), (PUINT_8)DISP_STRING("MID_P2P_SCN_SCAN_REQ"),
+	(PUINT_8)DISP_STRING("MID_P2P_SCN_SCAN_REQ_V2"), (PUINT_8)DISP_STRING("MID_P2P_SCN_SCAN_CANCEL"),
+	(PUINT_8)DISP_STRING("MID_BOW_SCN_SCAN_REQ"), (PUINT_8)DISP_STRING("MID_BOW_SCN_SCAN_REQ_V2"),
+	(PUINT_8)DISP_STRING("MID_BOW_SCN_SCAN_CANCEL"), (PUINT_8)DISP_STRING("MID_RLM_SCN_SCAN_REQ"),
+	(PUINT_8)DISP_STRING("MID_RLM_SCN_SCAN_REQ_V2"), (PUINT_8)DISP_STRING("MID_RLM_SCN_SCAN_CANCEL"),
+	(PUINT_8)DISP_STRING("MID_SCN_AIS_SCAN_DONE"), (PUINT_8)DISP_STRING("MID_SCN_P2P_SCAN_DONE"),
+	(PUINT_8)DISP_STRING("MID_SCN_BOW_SCAN_DONE"), (PUINT_8)DISP_STRING("MID_SCN_RLM_SCAN_DONE"),
 
-	(PUINT_8) DISP_STRING("MID_OID_AIS_FSM_JOIN_REQ"),
-	(PUINT_8) DISP_STRING("MID_OID_AIS_FSM_ABORT"),
-	(PUINT_8) DISP_STRING("MID_AIS_SAA_FSM_START"),
-	(PUINT_8) DISP_STRING("MID_AIS_SAA_FSM_ABORT"),
-	(PUINT_8) DISP_STRING("MID_SAA_AIS_JOIN_COMPLETE"),
+	(PUINT_8)DISP_STRING("MID_OID_AIS_FSM_JOIN_REQ"), (PUINT_8)DISP_STRING("MID_OID_AIS_FSM_ABORT"),
+	(PUINT_8)DISP_STRING("MID_AIS_SAA_FSM_START"), (PUINT_8)DISP_STRING("MID_AIS_SAA_FSM_ABORT"),
+	(PUINT_8)DISP_STRING("MID_SAA_AIS_JOIN_COMPLETE"),
 
 #if CFG_ENABLE_BT_OVER_WIFI
-	(PUINT_8) DISP_STRING("MID_BOW_SAA_FSM_START"),
-	(PUINT_8) DISP_STRING("MID_BOW_SAA_FSM_ABORT"),
-	(PUINT_8) DISP_STRING("MID_SAA_BOW_JOIN_COMPLETE"),
+	(PUINT_8)DISP_STRING("MID_BOW_SAA_FSM_START"), (PUINT_8)DISP_STRING("MID_BOW_SAA_FSM_ABORT"),
+	(PUINT_8)DISP_STRING("MID_SAA_BOW_JOIN_COMPLETE"),
 #endif
 
 #if CFG_ENABLE_WIFI_DIRECT
-	(PUINT_8) DISP_STRING("MID_P2P_SAA_FSM_START"),
-	(PUINT_8) DISP_STRING("MID_P2P_SAA_FSM_ABORT"),
-	(PUINT_8) DISP_STRING("MID_SAA_P2P_JOIN_COMPLETE"),
+	(PUINT_8)DISP_STRING("MID_P2P_SAA_FSM_START"), (PUINT_8)DISP_STRING("MID_P2P_SAA_FSM_ABORT"),
+	(PUINT_8)DISP_STRING("MID_SAA_P2P_JOIN_COMPLETE"),
 
-	(PUINT_8) DISP_STRING("MID_MNY_P2P_FUN_SWITCH"),
-	(PUINT_8) DISP_STRING("MID_MNY_P2P_DEVICE_DISCOVERY"),
-	(PUINT_8) DISP_STRING("MID_MNY_P2P_CONNECTION_REQ"),
-	(PUINT_8) DISP_STRING("MID_MNY_P2P_CONNECTION_ABORT"),
-	(PUINT_8) DISP_STRING("MID_MNY_P2P_BEACON_UPDATE"),
-	(PUINT_8) DISP_STRING("MID_MNY_P2P_STOP_AP"),
-	(PUINT_8) DISP_STRING("MID_MNY_P2P_CHNL_REQ"),
-	(PUINT_8) DISP_STRING("MID_MNY_P2P_CHNL_ABORT"),
-	(PUINT_8) DISP_STRING("MID_MNY_P2P_MGMT_TX"),
-	(PUINT_8) DISP_STRING("MID_MNY_P2P_GROUP_DISSOLVE"),
-	(PUINT_8) DISP_STRING("MID_MNY_P2P_MGMT_FRAME_REGISTER"),
-	(PUINT_8) DISP_STRING("MID_MNY_P2P_NET_DEV_REGISTER"),
-	(PUINT_8) DISP_STRING("MID_MNY_P2P_START_AP"),
-	(PUINT_8) DISP_STRING("MID_MNY_P2P_UPDATE_IE_BUF"),
+	(PUINT_8)DISP_STRING("MID_MNY_P2P_FUN_SWITCH"), (PUINT_8)DISP_STRING("MID_MNY_P2P_DEVICE_DISCOVERY"),
+	(PUINT_8)DISP_STRING("MID_MNY_P2P_CONNECTION_REQ"), (PUINT_8)DISP_STRING("MID_MNY_P2P_CONNECTION_ABORT"),
+	(PUINT_8)DISP_STRING("MID_MNY_P2P_BEACON_UPDATE"), (PUINT_8)DISP_STRING("MID_MNY_P2P_STOP_AP"),
+	(PUINT_8)DISP_STRING("MID_MNY_P2P_CHNL_REQ"), (PUINT_8)DISP_STRING("MID_MNY_P2P_CHNL_ABORT"),
+	(PUINT_8)DISP_STRING("MID_MNY_P2P_MGMT_TX"), (PUINT_8)DISP_STRING("MID_MNY_P2P_GROUP_DISSOLVE"),
+	(PUINT_8)DISP_STRING("MID_MNY_P2P_MGMT_FRAME_REGISTER"), (PUINT_8)DISP_STRING("MID_MNY_P2P_NET_DEV_REGISTER"),
+	(PUINT_8)DISP_STRING("MID_MNY_P2P_START_AP"), (PUINT_8)DISP_STRING("MID_MNY_P2P_UPDATE_IE_BUF"),
 #if (CFG_SUPPORT_DFS_MASTER == 1)
-	(PUINT_8) DISP_STRING("MID_CNM_P2P_RADAR_DETECT"),
-	(PUINT_8) DISP_STRING("MID_CNM_P2P_CSA_DONE"),
-	(PUINT_8) DISP_STRING("MID_MNY_P2P_DFS_CAC"),
-	(PUINT_8) DISP_STRING("MID_MNY_P2P_SET_NEW_CHANNEL"),
+	(PUINT_8)DISP_STRING("MID_CNM_P2P_RADAR_DETECT"), (PUINT_8)DISP_STRING("MID_CNM_P2P_CSA_DONE"),
+	(PUINT_8)DISP_STRING("MID_MNY_P2P_DFS_CAC"), (PUINT_8)DISP_STRING("MID_MNY_P2P_SET_NEW_CHANNEL"),
 #endif
 
 #endif
@@ -160,17 +135,15 @@ static PUINT_8 apucDebugMsg[] = {
 	/* (PUINT_8)DISP_STRING("MID_CNM_AIS_CREATE_IBSS_GRANT"), */
 	/* (PUINT_8)DISP_STRING("MID_AIS_CNM_MERGE_IBSS_REQ"), */
 	/* (PUINT_8)DISP_STRING("MID_CNM_AIS_MERGE_IBSS_GRANT"), */
-	(PUINT_8) DISP_STRING("MID_SCN_AIS_FOUND_IBSS"),
+	(PUINT_8)DISP_STRING("MID_SCN_AIS_FOUND_IBSS"),
 #endif /* CFG_SUPPORT_ADHOC */
 
-	(PUINT_8) DISP_STRING("MID_SAA_AIS_FSM_ABORT"),
-	(PUINT_8) DISP_STRING("MID_MNY_AIS_REMAIN_ON_CHANNEL"),
-	(PUINT_8) DISP_STRING("MID_MNY_AIS_CANCEL_REMAIN_ON_CHANNEL"),
+	(PUINT_8)DISP_STRING("MID_SAA_AIS_FSM_ABORT"), (PUINT_8)DISP_STRING("MID_MNY_AIS_REMAIN_ON_CHANNEL"),
+	(PUINT_8)DISP_STRING("MID_MNY_AIS_CANCEL_REMAIN_ON_CHANNEL"),
 #if CFG_SUPPORT_802_11V_BSS_TRANSITION_MGT
-	(PUINT_8) DISP_STRING("MID_WNM_AIS_BSS_TRANSITION"),
+	(PUINT_8)DISP_STRING("MID_WNM_AIS_BSS_TRANSITION"),
 #endif
-	(PUINT_8) DISP_STRING("MID_MNY_AIS_MGMT_TX")
-};
+	(PUINT_8)DISP_STRING("MID_MNY_AIS_MGMT_TX") };
 
 /*lint -restore */
 #endif /* DBG */
@@ -178,179 +151,161 @@ static PUINT_8 apucDebugMsg[] = {
 /* This message entry will be re-ordered based on the message ID order
  * by invoking mboxInitMsgMap()
  */
-static MSG_HNDL_ENTRY_T arMsgMapTable[] = {
-	{MID_MNY_CNM_CH_REQ, cnmChMngrRequestPrivilege},
-	{MID_MNY_CNM_CH_ABORT, cnmChMngrAbortPrivilege},
-	{MID_CNM_AIS_CH_GRANT, aisFsmRunEventChGrant},
+static MSG_HNDL_ENTRY_T arMsgMapTable[] = { { MID_MNY_CNM_CH_REQ, cnmChMngrRequestPrivilege },
+	{ MID_MNY_CNM_CH_ABORT, cnmChMngrAbortPrivilege }, { MID_CNM_AIS_CH_GRANT, aisFsmRunEventChGrant },
 #if CFG_ENABLE_WIFI_DIRECT
-	{MID_CNM_P2P_CH_GRANT, p2pFsmRunEventChGrant},	/*set in gl_p2p_init.c */
+	{ MID_CNM_P2P_CH_GRANT, p2pFsmRunEventChGrant }, /*set in gl_p2p_init.c */
 #else
-	{MID_CNM_P2P_CH_GRANT, mboxDummy},
+	{ MID_CNM_P2P_CH_GRANT, mboxDummy },
 #endif
 
 #if (CFG_SUPPORT_DFS_MASTER == 1)
-	{MID_CNM_P2P_RADAR_DETECT, p2pRoleFsmRunEventRadarDet},
-	{MID_CNM_P2P_CSA_DONE, p2pRoleFsmRunEventCsaDone},
+	{ MID_CNM_P2P_RADAR_DETECT, p2pRoleFsmRunEventRadarDet }, { MID_CNM_P2P_CSA_DONE, p2pRoleFsmRunEventCsaDone },
 #endif
 
 #if CFG_ENABLE_BT_OVER_WIFI
-	{MID_CNM_BOW_CH_GRANT, bowRunEventChGrant},
+	{ MID_CNM_BOW_CH_GRANT, bowRunEventChGrant },
 #else
-	{MID_CNM_BOW_CH_GRANT, mboxDummy},
+	{ MID_CNM_BOW_CH_GRANT, mboxDummy },
 #endif
 
-    /*--------------------------------------------------*/
+	/*--------------------------------------------------*/
 	/* SCN Module Mailbox Messages                      */
-    /*--------------------------------------------------*/
-	{MID_AIS_SCN_SCAN_REQ, scnFsmMsgStart},
-	{MID_AIS_SCN_SCAN_REQ_V2, scnFsmMsgStart},
-	{MID_AIS_SCN_SCAN_CANCEL, scnFsmMsgAbort},
-	{MID_P2P_SCN_SCAN_REQ, scnFsmMsgStart},
-	{MID_P2P_SCN_SCAN_REQ_V2, scnFsmMsgStart},
-	{MID_P2P_SCN_SCAN_CANCEL, scnFsmMsgAbort},
-	{MID_BOW_SCN_SCAN_REQ, scnFsmMsgStart},
-	{MID_BOW_SCN_SCAN_REQ_V2, scnFsmMsgStart},
-	{MID_BOW_SCN_SCAN_CANCEL, scnFsmMsgAbort},
-	{MID_RLM_SCN_SCAN_REQ, scnFsmMsgStart},
-	{MID_RLM_SCN_SCAN_REQ_V2, scnFsmMsgStart},
-	{MID_RLM_SCN_SCAN_CANCEL, scnFsmMsgAbort},
-	{MID_SCN_AIS_SCAN_DONE, aisFsmRunEventScanDone},
+	/*--------------------------------------------------*/
+	{ MID_AIS_SCN_SCAN_REQ, scnFsmMsgStart }, { MID_AIS_SCN_SCAN_REQ_V2, scnFsmMsgStart },
+	{ MID_AIS_SCN_SCAN_CANCEL, scnFsmMsgAbort }, { MID_P2P_SCN_SCAN_REQ, scnFsmMsgStart },
+	{ MID_P2P_SCN_SCAN_REQ_V2, scnFsmMsgStart }, { MID_P2P_SCN_SCAN_CANCEL, scnFsmMsgAbort },
+	{ MID_BOW_SCN_SCAN_REQ, scnFsmMsgStart }, { MID_BOW_SCN_SCAN_REQ_V2, scnFsmMsgStart },
+	{ MID_BOW_SCN_SCAN_CANCEL, scnFsmMsgAbort }, { MID_RLM_SCN_SCAN_REQ, scnFsmMsgStart },
+	{ MID_RLM_SCN_SCAN_REQ_V2, scnFsmMsgStart }, { MID_RLM_SCN_SCAN_CANCEL, scnFsmMsgAbort },
+	{ MID_SCN_AIS_SCAN_DONE, aisFsmRunEventScanDone },
 #if CFG_ENABLE_WIFI_DIRECT
-	{MID_SCN_P2P_SCAN_DONE, p2pFsmRunEventScanDone},	/*set in gl_p2p_init.c */
+	{ MID_SCN_P2P_SCAN_DONE, p2pFsmRunEventScanDone }, /*set in gl_p2p_init.c */
 #else
-	{MID_SCN_P2P_SCAN_DONE, mboxDummy},
+	{ MID_SCN_P2P_SCAN_DONE, mboxDummy },
 #endif
 
 #if CFG_ENABLE_BT_OVER_WIFI
-	{MID_SCN_BOW_SCAN_DONE, bowResponderScanDone},
+	{ MID_SCN_BOW_SCAN_DONE, bowResponderScanDone },
 #else
-	{MID_SCN_BOW_SCAN_DONE, mboxDummy},
+	{ MID_SCN_BOW_SCAN_DONE, mboxDummy },
 #endif
-	{MID_SCN_RLM_SCAN_DONE, rlmObssScanDone},
+	{ MID_SCN_RLM_SCAN_DONE, rlmObssScanDone },
 
-    /*--------------------------------------------------*/
+	/*--------------------------------------------------*/
 	/* AIS Module Mailbox Messages                      */
-    /*--------------------------------------------------*/
-	{MID_OID_AIS_FSM_JOIN_REQ, aisFsmRunEventAbort},
-	{MID_OID_AIS_FSM_ABORT, aisFsmRunEventAbort},
-	{MID_AIS_SAA_FSM_START, saaFsmRunEventStart},
-	{MID_AIS_SAA_FSM_ABORT, saaFsmRunEventAbort},
-	{MID_SAA_AIS_JOIN_COMPLETE, aisFsmRunEventJoinComplete},
+	/*--------------------------------------------------*/
+	{ MID_OID_AIS_FSM_JOIN_REQ, aisFsmRunEventAbort }, { MID_OID_AIS_FSM_ABORT, aisFsmRunEventAbort },
+	{ MID_AIS_SAA_FSM_START, saaFsmRunEventStart }, { MID_AIS_SAA_FSM_ABORT, saaFsmRunEventAbort },
+	{ MID_SAA_AIS_JOIN_COMPLETE, aisFsmRunEventJoinComplete },
 
 #if CFG_ENABLE_BT_OVER_WIFI
-    /*--------------------------------------------------*/
+	/*--------------------------------------------------*/
 	/* BOW Module Mailbox Messages                      */
-    /*--------------------------------------------------*/
-	{MID_BOW_SAA_FSM_START, saaFsmRunEventStart},
-	{MID_BOW_SAA_FSM_ABORT, saaFsmRunEventAbort},
-	{MID_SAA_BOW_JOIN_COMPLETE, bowFsmRunEventJoinComplete},
+	/*--------------------------------------------------*/
+	{ MID_BOW_SAA_FSM_START, saaFsmRunEventStart }, { MID_BOW_SAA_FSM_ABORT, saaFsmRunEventAbort },
+	{ MID_SAA_BOW_JOIN_COMPLETE, bowFsmRunEventJoinComplete },
 #endif
 
-#if CFG_ENABLE_WIFI_DIRECT	/*set in gl_p2p_init.c */
-	{MID_P2P_SAA_FSM_START, saaFsmRunEventStart},
-	{MID_P2P_SAA_FSM_ABORT, saaFsmRunEventAbort},
-	{MID_SAA_P2P_JOIN_COMPLETE, p2pRoleFsmRunEventJoinComplete},	/* V */
+#if CFG_ENABLE_WIFI_DIRECT /*set in gl_p2p_init.c */
+	{ MID_P2P_SAA_FSM_START, saaFsmRunEventStart }, { MID_P2P_SAA_FSM_ABORT, saaFsmRunEventAbort },
+	{ MID_SAA_P2P_JOIN_COMPLETE, p2pRoleFsmRunEventJoinComplete }, /* V */
 
-	{MID_MNY_P2P_FUN_SWITCH, p2pRoleFsmRunEventSwitchOPMode},
-	{MID_MNY_P2P_DEVICE_DISCOVERY, p2pFsmRunEventScanRequest},	/* V */
-	{MID_MNY_P2P_CONNECTION_REQ, p2pRoleFsmRunEventConnectionRequest},
-	{MID_MNY_P2P_CONNECTION_ABORT, p2pRoleFsmRunEventConnectionAbort},
-	{MID_MNY_P2P_BEACON_UPDATE, p2pRoleFsmRunEventBeaconUpdate},
-	{MID_MNY_P2P_STOP_AP, p2pRoleFsmRunEventStopAP},
-	{MID_MNY_P2P_CHNL_REQ, p2pDevFsmRunEventChannelRequest},	/* V */
-	{MID_MNY_P2P_CHNL_ABORT, p2pDevFsmRunEventChannelAbort},	/* V */
-	{MID_MNY_P2P_MGMT_TX, p2pDevFsmRunEventMgmtTx},	/* V */
-	{MID_MNY_P2P_GROUP_DISSOLVE, p2pRoleFsmRunEventDissolve},
-	{MID_MNY_P2P_MGMT_FRAME_REGISTER, p2pDevFsmRunEventMgmtFrameRegister},
-	{MID_MNY_P2P_NET_DEV_REGISTER, p2pFsmRunEventNetDeviceRegister},
-	{MID_MNY_P2P_START_AP, p2pRoleFsmRunEventStartAP},
-	{MID_MNY_P2P_DEL_IFACE, p2pRoleFsmRunEventDelIface},
-	{MID_MNY_P2P_MGMT_FRAME_UPDATE, p2pFsmRunEventUpdateMgmtFrame},
+	{ MID_MNY_P2P_FUN_SWITCH, p2pRoleFsmRunEventSwitchOPMode },
+	{ MID_MNY_P2P_DEVICE_DISCOVERY, p2pFsmRunEventScanRequest }, /* V */
+	{ MID_MNY_P2P_CONNECTION_REQ, p2pRoleFsmRunEventConnectionRequest },
+	{ MID_MNY_P2P_CONNECTION_ABORT, p2pRoleFsmRunEventConnectionAbort },
+	{ MID_MNY_P2P_BEACON_UPDATE, p2pRoleFsmRunEventBeaconUpdate }, { MID_MNY_P2P_STOP_AP, p2pRoleFsmRunEventStopAP },
+	{ MID_MNY_P2P_CHNL_REQ, p2pDevFsmRunEventChannelRequest }, /* V */
+	{ MID_MNY_P2P_CHNL_ABORT, p2pDevFsmRunEventChannelAbort }, /* V */
+	{ MID_MNY_P2P_MGMT_TX, p2pDevFsmRunEventMgmtTx },		   /* V */
+	{ MID_MNY_P2P_GROUP_DISSOLVE, p2pRoleFsmRunEventDissolve },
+	{ MID_MNY_P2P_MGMT_FRAME_REGISTER, p2pDevFsmRunEventMgmtFrameRegister },
+	{ MID_MNY_P2P_NET_DEV_REGISTER, p2pFsmRunEventNetDeviceRegister },
+	{ MID_MNY_P2P_START_AP, p2pRoleFsmRunEventStartAP }, { MID_MNY_P2P_DEL_IFACE, p2pRoleFsmRunEventDelIface },
+	{ MID_MNY_P2P_MGMT_FRAME_UPDATE, p2pFsmRunEventUpdateMgmtFrame },
 #if (CFG_SUPPORT_DFS_MASTER == 1)
-	{MID_MNY_P2P_DFS_CAC, p2pRoleFsmRunEventDfsCac},
-	{MID_MNY_P2P_SET_NEW_CHANNEL, p2pRoleFsmRunEventSetNewChannel},
+	{ MID_MNY_P2P_DFS_CAC, p2pRoleFsmRunEventDfsCac }, { MID_MNY_P2P_SET_NEW_CHANNEL, p2pRoleFsmRunEventSetNewChannel },
 #endif
 #if CFG_SUPPORT_WFD
-	{MID_MNY_P2P_WFD_CFG_UPDATE, p2pFsmRunEventWfdSettingUpdate},
+	{ MID_MNY_P2P_WFD_CFG_UPDATE, p2pFsmRunEventWfdSettingUpdate },
 #endif
-	{MID_MNY_P2P_ACTIVE_BSS, p2pDevFsmRunEventActiveDevBss},
+	{ MID_MNY_P2P_ACTIVE_BSS, p2pDevFsmRunEventActiveDevBss },
 #endif
 
 #if CFG_SUPPORT_ADHOC
-	{MID_SCN_AIS_FOUND_IBSS, aisFsmRunEventFoundIBSSPeer},
+	{ MID_SCN_AIS_FOUND_IBSS, aisFsmRunEventFoundIBSSPeer },
 #endif /* CFG_SUPPORT_ADHOC */
 
-	{MID_SAA_AIS_FSM_ABORT, aisFsmRunEventAbort},
-	{MID_MNY_AIS_REMAIN_ON_CHANNEL, aisFsmRunEventRemainOnChannel},
-	{MID_MNY_AIS_CANCEL_REMAIN_ON_CHANNEL, aisFsmRunEventCancelRemainOnChannel},
+	{ MID_SAA_AIS_FSM_ABORT, aisFsmRunEventAbort }, { MID_MNY_AIS_REMAIN_ON_CHANNEL, aisFsmRunEventRemainOnChannel },
+	{ MID_MNY_AIS_CANCEL_REMAIN_ON_CHANNEL, aisFsmRunEventCancelRemainOnChannel },
 
 #if CFG_SUPPORT_802_11V_BSS_TRANSITION_MGT
-	{MID_WNM_AIS_BSS_TRANSITION, aisFsmRunEventBssTransition},
+	{ MID_WNM_AIS_BSS_TRANSITION, aisFsmRunEventBssTransition },
 #endif
-	{MID_MNY_AIS_MGMT_TX, aisFsmRunEventMgmtFrameTx}
-};
+	{ MID_MNY_AIS_MGMT_TX, aisFsmRunEventMgmtFrameTx } };
 
 /*******************************************************************************
-*                                 M A C R O S
-********************************************************************************
-*/
+ *                                 M A C R O S
+ ********************************************************************************
+ */
 
 #if DBG
-#define MBOX_HNDL_MSG(prAdapter, prMsg) do { \
-	ASSERT(arMsgMapTable[prMsg->eMsgId].pfMsgHndl); \
-	if (arMsgMapTable[prMsg->eMsgId].pfMsgHndl) { \
-		DBGLOG(CNM, LOUD, "DO MSG [%d: %s]\n", prMsg->eMsgId, apucDebugMsg[prMsg->eMsgId]); \
-		arMsgMapTable[prMsg->eMsgId].pfMsgHndl(prAdapter, prMsg); \
-	} \
-	else { \
-	    DBGLOG(CNM, ERROR, "NULL fptr for MSG [%d]\n", prMsg->eMsgId); \
-	    cnmMemFree(prAdapter, prMsg); \
-	} \
-} while (0)
+#define MBOX_HNDL_MSG(prAdapter, prMsg) \
+	do { \
+		ASSERT(arMsgMapTable[prMsg->eMsgId].pfMsgHndl); \
+		if (arMsgMapTable[prMsg->eMsgId].pfMsgHndl) { \
+			DBGLOG(CNM, LOUD, "DO MSG [%d: %s]\n", prMsg->eMsgId, apucDebugMsg[prMsg->eMsgId]); \
+			arMsgMapTable[prMsg->eMsgId].pfMsgHndl(prAdapter, prMsg); \
+		} else { \
+			DBGLOG(CNM, ERROR, "NULL fptr for MSG [%d]\n", prMsg->eMsgId); \
+			cnmMemFree(prAdapter, prMsg); \
+		} \
+	} while (0)
 #else
-#define MBOX_HNDL_MSG(prAdapter, prMsg) do { \
-	ASSERT(arMsgMapTable[prMsg->eMsgId].pfMsgHndl); \
-	if (arMsgMapTable[prMsg->eMsgId].pfMsgHndl) { \
-		DBGLOG(CNM, LOUD, "DO MSG [%d]\n", prMsg->eMsgId); \
-		arMsgMapTable[prMsg->eMsgId].pfMsgHndl(prAdapter, prMsg); \
-	} \
-	else { \
-	    DBGLOG(CNM, ERROR, "NULL fptr for MSG [%d]\n", prMsg->eMsgId); \
-	    cnmMemFree(prAdapter, prMsg); \
-	} \
-} while (0)
+#define MBOX_HNDL_MSG(prAdapter, prMsg) \
+	do { \
+		ASSERT(arMsgMapTable[prMsg->eMsgId].pfMsgHndl); \
+		if (arMsgMapTable[prMsg->eMsgId].pfMsgHndl) { \
+			DBGLOG(CNM, LOUD, "DO MSG [%d]\n", prMsg->eMsgId); \
+			arMsgMapTable[prMsg->eMsgId].pfMsgHndl(prAdapter, prMsg); \
+		} else { \
+			DBGLOG(CNM, ERROR, "NULL fptr for MSG [%d]\n", prMsg->eMsgId); \
+			cnmMemFree(prAdapter, prMsg); \
+		} \
+	} while (0)
 #endif
 /*******************************************************************************
-*                   F U N C T I O N   D E C L A R A T I O N S
-********************************************************************************
-*/
+ *                   F U N C T I O N   D E C L A R A T I O N S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                              F U N C T I O N S
-********************************************************************************
-*/
+ *                              F U N C T I O N S
+ ********************************************************************************
+ */
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief
-*
-* \param[in]
-*
-* \return none
-*/
+ * \brief
+ *
+ * \param[in]
+ *
+ * \return none
+ */
 /*----------------------------------------------------------------------------*/
 VOID mboxInitMsgMap(VOID)
 {
-	UINT_32 i, idx;
+	UINT_32			 i, idx;
 	MSG_HNDL_ENTRY_T rTempEntry;
 
 	ASSERT((sizeof(arMsgMapTable) / sizeof(MSG_HNDL_ENTRY_T)) == MID_TOTAL_NUM);
 
 	for (i = 0; i < MID_TOTAL_NUM; i++) {
-		if (arMsgMapTable[i].eMsgId == (ENUM_MSG_ID_T) i)
+		if (arMsgMapTable[i].eMsgId == (ENUM_MSG_ID_T)i)
 			continue;
 		for (idx = i + 1; idx < MID_TOTAL_NUM; idx++) {
-			if (arMsgMapTable[idx].eMsgId == (ENUM_MSG_ID_T) i)
+			if (arMsgMapTable[idx].eMsgId == (ENUM_MSG_ID_T)i)
 				break;
 		}
 		ASSERT(idx < MID_TOTAL_NUM);
@@ -358,33 +313,32 @@ VOID mboxInitMsgMap(VOID)
 			continue;
 
 		/* Swap target entry and current entry */
-		rTempEntry.eMsgId = arMsgMapTable[idx].eMsgId;
+		rTempEntry.eMsgId	 = arMsgMapTable[idx].eMsgId;
 		rTempEntry.pfMsgHndl = arMsgMapTable[idx].pfMsgHndl;
 
-		arMsgMapTable[idx].eMsgId = arMsgMapTable[i].eMsgId;
+		arMsgMapTable[idx].eMsgId	 = arMsgMapTable[i].eMsgId;
 		arMsgMapTable[idx].pfMsgHndl = arMsgMapTable[i].pfMsgHndl;
 
-		arMsgMapTable[i].eMsgId = rTempEntry.eMsgId;
+		arMsgMapTable[i].eMsgId	   = rTempEntry.eMsgId;
 		arMsgMapTable[i].pfMsgHndl = rTempEntry.pfMsgHndl;
 	}
 
 	/* Verify the correctness of final message map */
 	for (i = 0; i < MID_TOTAL_NUM; i++) {
-		ASSERT(arMsgMapTable[i].eMsgId == (ENUM_MSG_ID_T) i);
-		while (arMsgMapTable[i].eMsgId != (ENUM_MSG_ID_T) i)
+		ASSERT(arMsgMapTable[i].eMsgId == (ENUM_MSG_ID_T)i);
+		while (arMsgMapTable[i].eMsgId != (ENUM_MSG_ID_T)i)
 			;
 	}
-
 }
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief
-*
-* \param[in]
-*
-* \return none
-*/
+ * \brief
+ *
+ * \param[in]
+ *
+ * \return none
+ */
 /*----------------------------------------------------------------------------*/
 VOID mboxSetup(IN P_ADAPTER_T prAdapter, IN ENUM_MBOX_ID_T eMboxId)
 {
@@ -404,16 +358,15 @@ VOID mboxSetup(IN P_ADAPTER_T prAdapter, IN ENUM_MBOX_ID_T eMboxId)
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief
-*
-* \param[in]
-*
-* \return none
-*/
+ * \brief
+ *
+ * \param[in]
+ *
+ * \return none
+ */
 /*----------------------------------------------------------------------------*/
-VOID
-mboxSendMsg(IN P_ADAPTER_T prAdapter,
-	    IN ENUM_MBOX_ID_T eMboxId, IN P_MSG_HDR_T prMsg, IN EUNM_MSG_SEND_METHOD_T eMethod)
+VOID mboxSendMsg(
+		IN P_ADAPTER_T prAdapter, IN ENUM_MBOX_ID_T eMboxId, IN P_MSG_HDR_T prMsg, IN EUNM_MSG_SEND_METHOD_T eMethod)
 {
 	P_MBOX_T prMbox;
 
@@ -457,16 +410,16 @@ mboxSendMsg(IN P_ADAPTER_T prAdapter,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief
-*
-* \param[in]
-*
-* \return none
-*/
+ * \brief
+ *
+ * \param[in]
+ *
+ * \return none
+ */
 /*----------------------------------------------------------------------------*/
 VOID mboxRcvAllMsg(IN P_ADAPTER_T prAdapter, ENUM_MBOX_ID_T eMboxId)
 {
-	P_MBOX_T prMbox;
+	P_MBOX_T	prMbox;
 	P_MSG_HDR_T prMsg;
 
 	KAL_SPIN_LOCK_DECLARATION();
@@ -488,17 +441,16 @@ VOID mboxRcvAllMsg(IN P_ADAPTER_T prAdapter, ENUM_MBOX_ID_T eMboxId)
 		}
 		MBOX_HNDL_MSG(prAdapter, prMsg);
 	}
-
 }
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief
-*
-* \param[in]
-*
-* \return none
-*/
+ * \brief
+ *
+ * \param[in]
+ *
+ * \return none
+ */
 /*----------------------------------------------------------------------------*/
 VOID mboxInitialize(IN P_ADAPTER_T prAdapter)
 {
@@ -512,23 +464,22 @@ VOID mboxInitialize(IN P_ADAPTER_T prAdapter)
 	/* Setup/initialize each mailbox */
 	for (i = 0; i < MBOX_ID_TOTAL_NUM; i++)
 		mboxSetup(prAdapter, i);
-
 }
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief
-*
-* \param[in]
-*
-* \return none
-*/
+ * \brief
+ *
+ * \param[in]
+ *
+ * \return none
+ */
 /*----------------------------------------------------------------------------*/
 VOID mboxDestroy(IN P_ADAPTER_T prAdapter)
 {
-	P_MBOX_T prMbox;
+	P_MBOX_T	prMbox;
 	P_MSG_HDR_T prMsg;
-	UINT_8 i;
+	UINT_8		i;
 
 	KAL_SPIN_LOCK_DECLARATION();
 
@@ -550,12 +501,12 @@ VOID mboxDestroy(IN P_ADAPTER_T prAdapter)
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief This is dummy function to prevent empty arMsgMapTable[] for compiling.
-*
-* \param[in]
-*
-* \return none
-*/
+ * \brief This is dummy function to prevent empty arMsgMapTable[] for compiling.
+ *
+ * \param[in]
+ *
+ * \return none
+ */
 /*----------------------------------------------------------------------------*/
 VOID mboxDummy(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMsgHdr)
 {

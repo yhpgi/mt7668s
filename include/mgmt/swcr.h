@@ -54,8 +54,8 @@
 */
 
 /*! \file   "swcr.h"
-*    \brief
-*/
+ *    \brief
+ */
 
 /*
  *
@@ -67,55 +67,55 @@
 #include "nic_cmd_event.h"
 
 /*******************************************************************************
-*                         C O M P I L E R   F L A G S
-********************************************************************************
-*/
+ *                         C O M P I L E R   F L A G S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                    E X T E R N A L   R E F E R E N C E S
-********************************************************************************
-*/
+ *                    E X T E R N A L   R E F E R E N C E S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                              C O N S T A N T S
-********************************************************************************
-*/
+ *                              C O N S T A N T S
+ ********************************************************************************
+ */
 #define TEST_PS 1
 
 #define SWCR_VAR(x) ((VOID *)&x)
-#define SWCR_FUNC(x)  ((VOID *)x)
+#define SWCR_FUNC(x) ((VOID *)x)
 
 #define SWCR_T_FUNC BIT(7)
 
 #define SWCR_L_32 3
 #define SWCR_L_16 2
-#define SWCR_L_8  1
+#define SWCR_L_8 1
 
 #define SWCR_READ 0
 #define SWCR_WRITE 1
 
-#define SWCR_MAP_NUM(x)  (ARRAY_SIZE(x))
+#define SWCR_MAP_NUM(x) (ARRAY_SIZE(x))
 
 #define SWCR_CR_NUM 7
 
 #define SWCR_GET_RW_INDEX(action, rw, index) \
-do { \
-	index = action & 0x7F; \
-	rw = action >> 7; \
-} while (0)
+	do { \
+		index = action & 0x7F; \
+		rw	  = action >> 7; \
+	} while (0)
 
-extern UINT_32 g_au4SwCr[];	/*: 0: command other: data */
+extern UINT_32 g_au4SwCr[]; /*: 0: command other: data */
 
-typedef VOID(*PFN_SWCR_RW_T) (P_ADAPTER_T prAdapter, UINT_8 ucRead, UINT_16 u2Addr, UINT_32 *pu4Data);
-typedef VOID(*PFN_CMD_RW_T) (P_ADAPTER_T prAdapter, UINT_8 ucCate, UINT_8 ucAction, UINT_8 ucOpt0, UINT_8 ucOpt1);
+typedef VOID (*PFN_SWCR_RW_T)(P_ADAPTER_T prAdapter, UINT_8 ucRead, UINT_16 u2Addr, UINT_32 *pu4Data);
+typedef VOID (*PFN_CMD_RW_T)(P_ADAPTER_T prAdapter, UINT_8 ucCate, UINT_8 ucAction, UINT_8 ucOpt0, UINT_8 ucOpt1);
 
 typedef struct _SWCR_MAP_ENTRY_T {
 	UINT_16 u2Type;
-	PVOID u4Addr;
+	PVOID	u4Addr;
 } SWCR_MAP_ENTRY_T, *P_SWCR_MAP_ENTRY_T;
 
 typedef struct _SWCR_MOD_MAP_ENTRY_T {
-	UINT_8 ucMapNum;
+	UINT_8			   ucMapNum;
 	P_SWCR_MAP_ENTRY_T prSwCrMap;
 } SWCR_MOD_MAP_ENTRY_T, *P_SWCR_MOD_MAP_ENTRY_T;
 
@@ -186,34 +186,34 @@ typedef enum _ENUM_SWCR_DBG_ALL_T {
 } ENUM_SWCR_DBG_ALL_T;
 
 /*******************************************************************************
-*                             D A T A   T Y P E S
-********************************************************************************
-*/
+ *                             D A T A   T Y P E S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                            P U B L I C   D A T A
-********************************************************************************
-*/
+ *                            P U B L I C   D A T A
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                           P R I V A T E   D A T A
-********************************************************************************
-*/
+ *                           P R I V A T E   D A T A
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                                 M A C R O S
-********************************************************************************
-*/
+ *                                 M A C R O S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                   F U N C T I O N   D E C L A R A T I O N S
-********************************************************************************
-*/
+ *                   F U N C T I O N   D E C L A R A T I O N S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                              F U N C T I O N S
-********************************************************************************
-*/
+ *                              F U N C T I O N S
+ ********************************************************************************
+ */
 
 VOID swCrReadWriteCmd(P_ADAPTER_T prAdapter, UINT_8 ucRead, UINT_16 u2Addr, UINT_32 *pu4Data);
 
@@ -240,7 +240,8 @@ VOID swCtrlSwCr(P_ADAPTER_T prAdapter, UINT_8 ucRead, UINT_16 u2Addr, UINT_32 *p
 /* Support Debug */
 VOID swCrDebugCheck(P_ADAPTER_T prAdapter, P_CMD_SW_DBG_CTRL_T prCmdSwCtrl);
 VOID swCrDebugCheckTimeout(IN P_ADAPTER_T prAdapter, ULONG ulParamPtr);
-VOID swCrDebugQuery(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo, IN PUINT_8 pucEventBuf, IN UINT_32 u4EventBufLen);
+VOID swCrDebugQuery(
+		IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo, IN PUINT_8 pucEventBuf, IN UINT_32 u4EventBufLen);
 VOID swCrDebugQueryTimeout(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo);
 #endif
 

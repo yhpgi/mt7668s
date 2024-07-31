@@ -54,23 +54,23 @@
 */
 
 /*! \file   "platform.c"
-*    \brief  This file including the protocol layer privacy function.
-*
-*    This file provided the macros and functions library support for the
-*    protocol layer security setting from wlan_oid.c and for parse.c and
-*    rsn.c and nic_privacy.c
-*
-*/
+ *    \brief  This file including the protocol layer privacy function.
+ *
+ *    This file provided the macros and functions library support for the
+ *    protocol layer security setting from wlan_oid.c and for parse.c and
+ *    rsn.c and nic_privacy.c
+ *
+ */
 
 /*******************************************************************************
-*                         C O M P I L E R   F L A G S
-********************************************************************************
-*/
+ *                         C O M P I L E R   F L A G S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                    E X T E R N A L   R E F E R E N C E S
-********************************************************************************
-*/
+ *                    E X T E R N A L   R E F E R E N C E S
+ ********************************************************************************
+ */
 #include <linux/version.h>
 #include <linux/init.h>
 #include <linux/types.h>
@@ -86,47 +86,47 @@
 #endif
 
 /*******************************************************************************
-*                              C O N S T A N T S
-********************************************************************************
-*/
-#define WIFI_NVRAM_FILE_NAME   "/data/nvram/APCFG/APRDEB/WIFI"
+ *                              C O N S T A N T S
+ ********************************************************************************
+ */
+#define WIFI_NVRAM_FILE_NAME "/data/nvram/APCFG/APRDEB/WIFI"
 #define WIFI_NVRAM_CUSTOM_NAME "/data/nvram/APCFG/APRDEB/WIFI_CUSTOM"
 
 /*******************************************************************************
-*                             D A T A   T Y P E S
-********************************************************************************
-*/
+ *                             D A T A   T Y P E S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                            P U B L I C   D A T A
-********************************************************************************
-*/
+ *                            P U B L I C   D A T A
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                           P R I V A T E   D A T A
-********************************************************************************
-*/
+ *                           P R I V A T E   D A T A
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                                 M A C R O S
-********************************************************************************
-*/
+ *                                 M A C R O S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                   F U N C T I O N   D E C L A R A T I O N S
-********************************************************************************
-*/
+ *                   F U N C T I O N   D E C L A R A T I O N S
+ ********************************************************************************
+ */
 
 /*******************************************************************************
-*                              F U N C T I O N S
-********************************************************************************
-*/
+ *                              F U N C T I O N S
+ ********************************************************************************
+ */
 #if 1
 static int netdev_event(struct notifier_block *nb, unsigned long notification, void *ptr)
 {
-	struct in_ifaddr *ifa = (struct in_ifaddr *)ptr;
-	struct net_device *prDev = ifa->ifa_dev->dev;
-	P_GLUE_INFO_T prGlueInfo = NULL;
+	struct in_ifaddr	 *ifa		  = (struct in_ifaddr *)ptr;
+	struct net_device *prDev	  = ifa->ifa_dev->dev;
+	P_GLUE_INFO_T	   prGlueInfo = NULL;
 
 	if (prDev == NULL) {
 		/* DBGLOG(REQ, INFO, ("netdev_event: device is empty.\n")); */
@@ -137,7 +137,7 @@ static int netdev_event(struct notifier_block *nb, unsigned long notification, v
 		/* DBGLOG(REQ, INFO, ("netdev_event: xxx\n")); */
 		return NOTIFY_DONE;
 	}
-#if 0				/* CFG_SUPPORT_PASSPOINT */
+#if 0  /* CFG_SUPPORT_PASSPOINT */
 	{
 		/* printk(KERN_INFO "[netdev_event] IPV4_DAD is unlock now!!\n"); */
 		prGlueInfo->fgIsDad = FALSE;
@@ -148,15 +148,14 @@ static int netdev_event(struct notifier_block *nb, unsigned long notification, v
 		return NOTIFY_DONE;
 	}
 
-
-	prGlueInfo = *((P_GLUE_INFO_T *) netdev_priv(prDev));
+	prGlueInfo = *((P_GLUE_INFO_T *)netdev_priv(prDev));
 	if (prGlueInfo == NULL) {
 		DBGLOG(REQ, INFO, "netdev_event: prGlueInfo is empty.\n");
 		return NOTIFY_DONE;
 	}
 
 #if CFG_GARP_KEEPALIVE
-        // garp keepalive needs IP address update when host is awake
+	// garp keepalive needs IP address update when host is awake
 #else
 	if (prGlueInfo->fgIsInSuspendMode == FALSE) {
 		/* DBGLOG(REQ, INFO,
@@ -165,15 +164,14 @@ static int netdev_event(struct notifier_block *nb, unsigned long notification, v
 		 */
 		return NOTIFY_DONE;
 	}
-#endif //CFG_GARP_KEEPALIVE
+#endif // CFG_GARP_KEEPALIVE
 
 	kalSetNetAddressFromInterface(prGlueInfo, prDev, TRUE);
 
 	return NOTIFY_DONE;
-
 }
 #endif
-#if 0				/* CFG_SUPPORT_PASSPOINT */
+#if 0  /* CFG_SUPPORT_PASSPOINT */
 static int net6dev_event(struct notifier_block *nb, unsigned long notification, void *ptr)
 {
 	struct inet6_ifaddr *ifa = (struct inet6_ifaddr *)ptr;
@@ -209,13 +207,13 @@ static int net6dev_event(struct notifier_block *nb, unsigned long notification, 
 }
 #endif /* CFG_SUPPORT_PASSPOINT */
 
-#if 1       /* unused  */
+#if 1 /* unused  */
 static struct notifier_block inetaddr_notifier = {
 	.notifier_call = netdev_event,
 };
 #endif
 
-#if 0				/* CFG_SUPPORT_PASSPOINT */
+#if 0  /* CFG_SUPPORT_PASSPOINT */
 static struct notifier_block inet6addr_notifier = {
 	.notifier_call = net6dev_event,
 };
@@ -226,7 +224,7 @@ void wlanRegisterNotifier(void)
 #if CFG_ENABLE_NET_DEV_NOTIFY
 
 	register_inetaddr_notifier(&inetaddr_notifier);
-#if 0				/* CFG_SUPPORT_PASSPOINT */
+#if 0  /* CFG_SUPPORT_PASSPOINT */
 	register_inet6addr_notifier(&inet6addr_notifier);
 #endif /* CFG_SUPPORT_PASSPOINT */
 
@@ -238,7 +236,7 @@ void wlanUnregisterNotifier(void)
 #if CFG_ENABLE_NET_DEV_NOTIFY
 
 	unregister_inetaddr_notifier(&inetaddr_notifier);
-#if 0				/* CFG_SUPPORT_PASSPOINT */
+#if 0  /* CFG_SUPPORT_PASSPOINT */
 	unregister_inetaddr_notifier(&inet6addr_notifier);
 #endif /* CFG_SUPPORT_PASSPOINT */
 
@@ -248,17 +246,17 @@ void wlanUnregisterNotifier(void)
 #if CFG_ENABLE_EARLY_SUSPEND
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief This function will register platform driver to os
-*
-* \param[in] wlanSuspend    Function pointer to platform suspend function
-* \param[in] wlanResume   Function pointer to platform resume   function
-*
-* \return The result of registering earlysuspend
-*/
+ * \brief This function will register platform driver to os
+ *
+ * \param[in] wlanSuspend    Function pointer to platform suspend function
+ * \param[in] wlanResume   Function pointer to platform resume   function
+ *
+ * \return The result of registering earlysuspend
+ */
 /*----------------------------------------------------------------------------*/
 
-int glRegisterEarlySuspend(struct early_suspend *prDesc,
-			   early_suspend_callback wlanSuspend, late_resume_callback wlanResume)
+int glRegisterEarlySuspend(
+		struct early_suspend *prDesc, early_suspend_callback wlanSuspend, late_resume_callback wlanResume)
 {
 	int ret = 0;
 
@@ -282,10 +280,10 @@ int glRegisterEarlySuspend(struct early_suspend *prDesc,
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief This function will un-register platform driver to os
-*
-* \return The result of un-registering earlysuspend
-*/
+ * \brief This function will un-register platform driver to os
+ *
+ * \return The result of un-registering earlysuspend
+ */
 /*----------------------------------------------------------------------------*/
 
 int glUnregisterEarlySuspend(struct early_suspend *prDesc)
@@ -295,7 +293,7 @@ int glUnregisterEarlySuspend(struct early_suspend *prDesc)
 	unregister_early_suspend(prDesc);
 
 	prDesc->suspend = NULL;
-	prDesc->resume = NULL;
+	prDesc->resume	= NULL;
 
 	return ret;
 }
@@ -303,23 +301,23 @@ int glUnregisterEarlySuspend(struct early_suspend *prDesc)
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief Utility function for reading data from files on NVRAM-FS
-*
-* \param[in]
-*           filename
-*           len
-*           offset
-* \param[out]
-*           buf
-* \return
-*           actual length of data being read
-*/
+ * \brief Utility function for reading data from files on NVRAM-FS
+ *
+ * \param[in]
+ *           filename
+ *           len
+ *           offset
+ * \param[out]
+ *           buf
+ * \return
+ *           actual length of data being read
+ */
 /*----------------------------------------------------------------------------*/
 static int nvram_read(char *filename, char *buf, ssize_t len, int offset)
 {
 #if CFG_SUPPORT_NVRAM
 	struct file *fd;
-	int retLen = -1;
+	int			 retLen = -1;
 
 	mm_segment_t old_fs = get_fs();
 
@@ -369,22 +367,22 @@ static int nvram_read(char *filename, char *buf, ssize_t len, int offset)
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief Utility function for writing data to files on NVRAM-FS
-*
-* \param[in]
-*           filename
-*           buf
-*           len
-*           offset
-* \return
-*           actual length of data being written
-*/
+ * \brief Utility function for writing data to files on NVRAM-FS
+ *
+ * \param[in]
+ *           filename
+ *           buf
+ *           len
+ *           offset
+ * \return
+ *           actual length of data being written
+ */
 /*----------------------------------------------------------------------------*/
 static int nvram_write(char *filename, char *buf, ssize_t len, int offset)
 {
 #if CFG_SUPPORT_NVRAM
 	struct file *fd;
-	int retLen = -1;
+	int			 retLen = -1;
 
 	mm_segment_t old_fs = get_fs();
 
@@ -434,25 +432,24 @@ static int nvram_write(char *filename, char *buf, ssize_t len, int offset)
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief API for reading data on NVRAM
-*
-* \param[in]
-*           prGlueInfo
-*           u4Offset
-* \param[out]
-*           pu2Data
-* \return
-*           TRUE
-*           FALSE
-*/
+ * \brief API for reading data on NVRAM
+ *
+ * \param[in]
+ *           prGlueInfo
+ *           u4Offset
+ * \param[out]
+ *           pu2Data
+ * \return
+ *           TRUE
+ *           FALSE
+ */
 /*----------------------------------------------------------------------------*/
 BOOLEAN kalCfgDataRead16(IN P_GLUE_INFO_T prGlueInfo, IN UINT_32 u4Offset, OUT PUINT_16 pu2Data)
 {
 	if (pu2Data == NULL)
 		return FALSE;
 
-	if (nvram_read(WIFI_NVRAM_FILE_NAME,
-		       (char *)pu2Data, sizeof(unsigned short), u4Offset) != sizeof(unsigned short)) {
+	if (nvram_read(WIFI_NVRAM_FILE_NAME, (char *)pu2Data, sizeof(unsigned short), u4Offset) != sizeof(unsigned short)) {
 		return FALSE;
 	} else {
 		return TRUE;
@@ -461,21 +458,21 @@ BOOLEAN kalCfgDataRead16(IN P_GLUE_INFO_T prGlueInfo, IN UINT_32 u4Offset, OUT P
 
 /*----------------------------------------------------------------------------*/
 /*!
-* \brief API for writing data on NVRAM
-*
-* \param[in]
-*           prGlueInfo
-*           u4Offset
-*           u2Data
-* \return
-*           TRUE
-*           FALSE
-*/
+ * \brief API for writing data on NVRAM
+ *
+ * \param[in]
+ *           prGlueInfo
+ *           u4Offset
+ *           u2Data
+ * \return
+ *           TRUE
+ *           FALSE
+ */
 /*----------------------------------------------------------------------------*/
 BOOLEAN kalCfgDataWrite16(IN P_GLUE_INFO_T prGlueInfo, UINT_32 u4Offset, UINT_16 u2Data)
 {
-	if (nvram_write(WIFI_NVRAM_FILE_NAME,
-			(char *)&u2Data, sizeof(unsigned short), u4Offset) != sizeof(unsigned short)) {
+	if (nvram_write(WIFI_NVRAM_FILE_NAME, (char *)&u2Data, sizeof(unsigned short), u4Offset) !=
+			sizeof(unsigned short)) {
 		return FALSE;
 	} else {
 		return TRUE;
