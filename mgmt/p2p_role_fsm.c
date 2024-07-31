@@ -1435,6 +1435,25 @@ VOID p2pRoleFsmRunEventDfsShutDownTimeout(IN P_ADAPTER_T prAdapter, IN ULONG ulP
 
 #endif
 
+VOID p2pRoleFsmScanTargetBss(IN P_ADAPTER_T prAdapter, IN P_P2P_ROLE_FSM_INFO_T prP2pRoleFsmInfo,
+		IN UINT_8 ucChannelNum, IN ENUM_BAND_T eBand, IN P_P2P_SSID_STRUCT_T prSsid)
+{
+	/* Update scan parameter... to scan target device. */
+	P_P2P_SCAN_REQ_INFO_T prScanReqInfo = &(prP2pRoleFsmInfo->rScanReqInfo);
+
+	prScanReqInfo->ucNumChannelList					 = 1;
+	prScanReqInfo->eScanType						 = SCAN_TYPE_ACTIVE_SCAN;
+	prScanReqInfo->eChannelSet						 = SCAN_CHANNEL_SPECIFIED;
+	prScanReqInfo->arScanChannelList[0].ucChannelNum = ucChannelNum;
+	prScanReqInfo->arScanChannelList[0].eBand		 = eBand;
+	prScanReqInfo->ucSsidNum						 = 1;
+	kalMemCopy(&(prScanReqInfo->arSsidStruct[0]), prSsid, sizeof(P2P_SSID_STRUCT_T));
+	prScanReqInfo->u4BufLength = 0; /* Prevent other P2P ID in IE. */
+	prScanReqInfo->fgIsAbort   = TRUE;
+
+	p2pRoleFsmStateTransition(prAdapter, prP2pRoleFsmInfo, P2P_ROLE_STATE_SCAN);
+}
+
 VOID p2pRoleFsmRunEventConnectionRequest(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMsgHdr)
 {
 	P_BSS_INFO_T				   prP2pBssInfo		= (P_BSS_INFO_T)NULL;
@@ -1509,19 +1528,8 @@ VOID p2pRoleFsmRunEventConnectionRequest(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_
 	prJoinInfo->prTargetBssDesc = scanP2pSearchDesc(prAdapter, prConnReqInfo);
 
 	if (prJoinInfo->prTargetBssDesc == NULL) {
-		/* Update scan parameter... to scan target device. */
-		P_P2P_SCAN_REQ_INFO_T prScanReqInfo = &(prP2pRoleFsmInfo->rScanReqInfo);
-
-		prScanReqInfo->ucNumChannelList					 = 1;
-		prScanReqInfo->eScanType						 = SCAN_TYPE_ACTIVE_SCAN;
-		prScanReqInfo->eChannelSet						 = SCAN_CHANNEL_SPECIFIED;
-		prScanReqInfo->arScanChannelList[0].ucChannelNum = prP2pConnReqMsg->rChannelInfo.ucChannelNum;
-		prScanReqInfo->ucSsidNum						 = 1;
-		kalMemCopy(&(prScanReqInfo->arSsidStruct[0]), &(prP2pConnReqMsg->rSsid), sizeof(P2P_SSID_STRUCT_T));
-		prScanReqInfo->u4BufLength = 0; /* Prevent other P2P ID in IE. */
-		prScanReqInfo->fgIsAbort   = TRUE;
-
-		p2pRoleFsmStateTransition(prAdapter, prP2pRoleFsmInfo, P2P_ROLE_STATE_SCAN);
+		p2pRoleFsmScanTargetBss(prAdapter, prP2pRoleFsmInfo, prP2pConnReqMsg->rChannelInfo.ucChannelNum,
+				prP2pConnReqMsg->rChannelInfo.eBand, &(prP2pConnReqMsg->rSsid));
 	} else {
 		prChnlReqInfo->u8Cookie		 = 0;
 		prChnlReqInfo->ucReqChnlNum	 = prP2pConnReqMsg->rChannelInfo.ucChannelNum;
@@ -1833,7 +1841,7 @@ VOID p2pRoleFsmRunEventJoinComplete(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prM
 
 				prBssDesc->fgIsConnecting = FALSE;
 
-				if (prStaRec->ucJoinFailureCount >= 3) {
+				if (prStaRec->ucJoinFailureCount >= P2P_SAA_RETRY_COUNT) {
 					kalP2PGCIndicateConnectionStatus(prAdapter->prGlueInfo, prP2pRoleFsmInfo->ucRoleIndex,
 							&prP2pRoleFsmInfo->rConnReqInfo, prJoinInfo->aucIEBuf, prJoinInfo->u4BufLength,
 							prStaRec->u2StatusCode, WLAN_STATUS_MEDIA_DISCONNECT_LOCALLY);
@@ -1841,14 +1849,31 @@ VOID p2pRoleFsmRunEventJoinComplete(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prM
 					/* Reset p2p state */
 					prJoinInfo->prTargetBssDesc = NULL;
 					prJoinInfo->prTargetStaRec	= NULL;
+
+					SET_NET_PWR_STATE_IDLE(prAdapter, prP2pBssInfo->ucBssIndex);
+
+					p2pRoleFsmStateTransition(prAdapter, prP2pRoleFsmInfo, P2P_ROLE_STATE_IDLE);
+
+					p2pFuncStopComplete(prAdapter, prP2pBssInfo);
 				}
 			}
 		}
 	}
 
 	if (prP2pRoleFsmInfo->eCurrentState == P2P_ROLE_STATE_GC_JOIN) {
-		/* Return to IDLE state. */
-		p2pRoleFsmStateTransition(prAdapter, prP2pRoleFsmInfo, P2P_ROLE_STATE_IDLE);
+		if (prP2pBssInfo->eConnectionState == PARAM_MEDIA_STATE_CONNECTED) {
+			/* do nothing & wait for timeout or EAPOL 4/4 TX done */
+		} else {
+			P_BSS_DESC_T	  prBssDesc;
+			P2P_SSID_STRUCT_T rSsid;
+
+			prBssDesc = prJoinInfo->prTargetBssDesc;
+
+			if (prBssDesc) {
+				COPY_SSID(rSsid.aucSsid, rSsid.ucSsidLen, prBssDesc->aucSSID, prBssDesc->ucSSIDLen);
+				p2pRoleFsmScanTargetBss(prAdapter, prP2pRoleFsmInfo, prBssDesc->ucChannelNum, prBssDesc->eBand, &rSsid);
+			}
+		}
 	}
 
 error:

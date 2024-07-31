@@ -117,6 +117,8 @@
 
 #define P2P_DEAUTH_TIMEOUT_TIME_MS 1000
 
+#define P2P_SAA_RETRY_COUNT 3
+
 /* Define the Delay time for DBDC DFS Master mode  */
 #if CFG_SUPPORT_DBDC_TC6
 #define P2P_DFS_CAC_DELAY_TIME_MS 5000
