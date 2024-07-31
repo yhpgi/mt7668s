@@ -154,6 +154,9 @@ VOID p2pFsmRunEventChGrant(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMsgHdr)
 
 		prP2pBssInfo = GET_BSS_INFO_BY_INDEX(prAdapter, prMsgChGrant->ucBssIndex);
 
+		if (!prP2pBssInfo)
+			break;
+
 		DBGLOG(P2P, TRACE, "P2P Run Event Channel Grant\n");
 
 #if CFG_SUPPORT_DBDC
