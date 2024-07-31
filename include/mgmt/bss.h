@@ -122,6 +122,8 @@ extern const PUINT_8 apucNetworkType[NETWORK_TYPE_NUM];
  */
 #define IS_BSS_INDEX_VALID(_ucBssIndex) ((_ucBssIndex) <= P2P_DEV_BSS_INDEX)
 
+#define IS_BSS_INDEX_AIS(_prAdapter, _BssIndex) (_BssIndex < KAL_AIS_NUM)
+
 #define GET_BSS_INFO_BY_INDEX(_prAdapter, _ucBssIndex) ((_prAdapter)->aprBssInfo[(_ucBssIndex)])
 
 #define bssAssignAssocID(_prStaRec) ((_prStaRec)->ucIndex + 1)

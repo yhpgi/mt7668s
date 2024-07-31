@@ -2615,7 +2615,7 @@ enum regd_state rlmDomainStateTransition(enum regd_state request_state, struct r
 {
 	enum regd_state next_state, old_state;
 #if !DBG_DISABLE_ALL_LOG
-	bool			the_same = 0;
+	bool the_same = 0;
 #endif
 
 	old_state  = g_mtk_regd_control.state;

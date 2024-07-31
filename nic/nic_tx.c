@@ -2544,7 +2544,7 @@ VOID nicTxProcessTxDoneEvent(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent
 	P_EVENT_TX_DONE_T prTxDone;
 	P_MSDU_INFO_T	  prMsduInfo;
 #if !DBG_DISABLE_ALL_LOG
-	PUINT_8			  apucBandwidt[4] = { (PUINT_8) "20", (PUINT_8) "40", (PUINT_8) "80", (PUINT_8) "160/80+80" };
+	PUINT_8 apucBandwidt[4] = { (PUINT_8) "20", (PUINT_8) "40", (PUINT_8) "80", (PUINT_8) "160/80+80" };
 #endif
 	if (u4EventBufLen < sizeof(EVENT_TX_DONE_T)) {
 		DBGLOG(INIT, ERROR, "%s: Invalid event length: %d < %d\n", __func__, u4EventBufLen, sizeof(EVENT_TX_DONE_T));

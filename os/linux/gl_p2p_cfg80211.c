@@ -2329,6 +2329,10 @@ int mtk_p2p_cfg80211_del_station(struct wiphy *wiphy, struct net_device *dev, st
 	P_MSG_P2P_CONNECTION_ABORT_T prDisconnectMsg = (P_MSG_P2P_CONNECTION_ABORT_T)NULL;
 	UINT_8						 aucBcMac[]		 = BC_MAC_ADDR;
 	UINT_8						 ucRoleIdx		 = 0;
+	UINT_8						 ucBssIdx		 = 0;
+	UINT_32						 waitRet		 = 0;
+	P_BSS_INFO_T				 prBssInfo		 = NULL;
+	P_STA_RECORD_T				 prCurrStaRec	 = NULL;
 
 	do {
 		if ((wiphy == NULL) || (dev == NULL))
@@ -2347,6 +2351,9 @@ int mtk_p2p_cfg80211_del_station(struct wiphy *wiphy, struct net_device *dev, st
 		 * VIR_MEM_TYPE);
 		 */
 
+		if (p2pFuncRoleToBssIdx(prGlueInfo->prAdapter, ucRoleIdx, &ucBssIdx) != WLAN_STATUS_SUCCESS)
+			break;
+
 		prDisconnectMsg = (P_MSG_P2P_CONNECTION_ABORT_T)cnmMemAlloc(
 				prGlueInfo->prAdapter, RAM_TYPE_MSG, sizeof(MSG_P2P_CONNECTION_ABORT_T));
 
@@ -2362,8 +2369,26 @@ int mtk_p2p_cfg80211_del_station(struct wiphy *wiphy, struct net_device *dev, st
 		prDisconnectMsg->u2ReasonCode = REASON_CODE_UNSPECIFIED;
 		prDisconnectMsg->fgSendDeauth = TRUE;
 
+		prBssInfo	 = GET_BSS_INFO_BY_INDEX(prGlueInfo->prAdapter, ucBssIdx);
+		prCurrStaRec = bssGetClientByMac(prGlueInfo->prAdapter, prBssInfo, prDisconnectMsg->aucTargetID);
 		mboxSendMsg(prGlueInfo->prAdapter, MBOX_ID_0, (P_MSG_HDR_T)prDisconnectMsg, MSG_SEND_METHOD_BUF);
 
+#if CFG_SUPPORT_802_11W
+		/* if encrypted deauth frame
+		 * is in process, pending remove key
+		 */
+		if (prBssInfo && prCurrStaRec && IS_BSS_APGO(prBssInfo) &&
+				(prBssInfo->u4RsnSelectedAKMSuite == RSN_AKM_SUITE_SAE)) {
+			reinit_completion(&prBssInfo->rDeauthComp);
+			DBGLOG(P2P, INFO, "Start deauth wait\n");
+			waitRet = wait_for_completion_timeout(&prBssInfo->rDeauthComp, MSEC_TO_JIFFIES(1000));
+			if (!waitRet) {
+				DBGLOG(RSN, INFO, "timeout\n");
+				prBssInfo->encryptedDeauthIsInProcess = FALSE;
+			} else
+				DBGLOG(RSN, INFO, "complete\n");
+		}
+#endif
 		i4Rslt = 0;
 	} while (FALSE);
 

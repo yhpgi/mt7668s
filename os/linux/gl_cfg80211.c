@@ -139,8 +139,8 @@ int mtk_cfg80211_change_iface(
 	P_GLUE_INFO_T		 prGlueInfo = NULL;
 	ENUM_PARAM_OP_MODE_T eOpMode;
 #if !DBG_DISABLE_ALL_LOG
-	WLAN_STATUS			 rStatus	= WLAN_STATUS_SUCCESS;
-	UINT_32				 u4BufLen;
+	WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
+	UINT_32		u4BufLen;
 #endif
 
 	prGlueInfo = (P_GLUE_INFO_T)wiphy_priv(wiphy);
@@ -380,9 +380,12 @@ int mtk_cfg80211_del_key(struct wiphy *wiphy, struct net_device *ndev, u8 key_in
 {
 	P_GLUE_INFO_T	   prGlueInfo = NULL;
 	WLAN_STATUS		   rStatus	  = WLAN_STATUS_SUCCESS;
+	UINT_32			   u4BufLen	  = 0;
+	INT_32			   i4Rslt	  = -EINVAL;
+	UINT_8			   ucBssIndex = 0;
+	UINT_32			   waitRet	  = 0;
+	P_BSS_INFO_T	   prBssInfo;
 	PARAM_REMOVE_KEY_T rRemoveKey;
-	UINT_32			   u4BufLen = 0;
-	INT_32			   i4Rslt	= -EINVAL;
 
 	prGlueInfo = (P_GLUE_INFO_T)wiphy_priv(wiphy);
 	ASSERT(prGlueInfo);
@@ -416,6 +419,20 @@ int mtk_cfg80211_del_key(struct wiphy *wiphy, struct net_device *ndev, u8 key_in
 		return i4Rslt;
 
 	rRemoveKey.ucBssIdx = prGlueInfo->prAdapter->prAisBssInfo->ucBssIndex;
+
+	prBssInfo = GET_BSS_INFO_BY_INDEX(prGlueInfo->prAdapter, ucBssIndex);
+
+#if CFG_SUPPORT_802_11W
+	/* if encrypted deauth frame is in process, pending remove key */
+	if (IS_BSS_INDEX_AIS(prGlueInfo->prAdapter, ucBssIndex) && prBssInfo->encryptedDeauthIsInProcess == TRUE) {
+		waitRet = wait_for_completion_timeout(&prBssInfo->rDeauthComp, MSEC_TO_JIFFIES(1000));
+		if (!waitRet) {
+			DBGLOG(RSN, INFO, "timeout\n");
+			prBssInfo->encryptedDeauthIsInProcess = FALSE;
+		} else
+			DBGLOG(RSN, INFO, "complete\n");
+	}
+#endif
 
 	rStatus =
 			kalIoctl(prGlueInfo, wlanoidSetRemoveKey, &rRemoveKey, rRemoveKey.u4Length, FALSE, FALSE, TRUE, &u4BufLen);
@@ -3661,9 +3678,9 @@ int mtk_cfg80211_testmode_get_scan_done(IN struct wiphy *wiphy, IN void *data, I
 
 #ifdef CONFIG_NL80211_TESTMODE
 #if !DBG_DISABLE_ALL_LOG
-	WLAN_STATUS rStatus	 = WLAN_STATUS_SUCCESS;
+	WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
 #endif
-	INT_32		i4Status = -EINVAL, READY_TO_BEAM = 0;
+	INT_32 i4Status = -EINVAL, READY_TO_BEAM = 0;
 
 	struct sk_buff *skb = NULL;
 

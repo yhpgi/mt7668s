@@ -110,6 +110,8 @@ extern struct delayed_work wdev_lock_workq;
 /* Define how many concurrent operation networks. */
 #define KAL_BSS_NUM 4
 
+#define KAL_AIS_NUM 1
+
 #if CFG_DUAL_P2PLIKE_INTERFACE
 #define KAL_P2P_NUM 2
 #else

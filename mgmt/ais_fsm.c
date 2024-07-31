@@ -361,6 +361,10 @@ VOID aisFsmInit(IN P_ADAPTER_T prAdapter)
 #if CFG_SUPPORT_802_11V
 	kalMemZero(&prAisSpecificBssInfo->rBTMParam, sizeof(prAisSpecificBssInfo->rBTMParam));
 #endif
+#if CFG_SUPPORT_802_11W
+	init_completion(&prAisBssInfo->rDeauthComp);
+	prAisBssInfo->encryptedDeauthIsInProcess = FALSE;
+#endif
 	/* DBGPRINTF("[2] ucBmpDeliveryAC:0x%x, ucBmpTriggerAC:0x%x, ucUapsdSp:0x%x", */
 	/* prAisBssInfo->rPmProfSetupInfo.ucBmpDeliveryAC, */
 	/* prAisBssInfo->rPmProfSetupInfo.ucBmpTriggerAC, */
@@ -3895,10 +3899,29 @@ WLAN_STATUS
 aisDeauthXmitComplete(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo, IN ENUM_TX_RESULT_CODE_T rTxDoneStatus)
 {
 	P_AIS_FSM_INFO_T prAisFsmInfo;
+	P_BSS_INFO_T	 prAisBssInfo;
+	UINT_8			 ucBssIndex = 0;
 
 	ASSERT(prAdapter);
 
+	ucBssIndex = prMsduInfo->ucBssIndex;
+	if (!IS_BSS_INDEX_AIS(prAdapter, ucBssIndex)) {
+		DBGLOG(AIS, INFO, "Use default, invalid index = %d\n", ucBssIndex);
+		ucBssIndex = AIS_DEFAULT_INDEX;
+	}
+
 	prAisFsmInfo = &(prAdapter->rWifiVar.rAisFsmInfo);
+	prAisBssInfo = (prAdapter->aprBssInfo[ucBssIndex]);
+#if CFG_SUPPORT_802_11W
+	/* Notify completion after encrypted deauth frame tx done */
+	if (prAisBssInfo->encryptedDeauthIsInProcess == TRUE) {
+		if (!completion_done(&prAisBssInfo->rDeauthComp)) {
+			DBGLOG(AIS, EVENT, "Complete rDeauthComp\n");
+			complete(&prAisBssInfo->rDeauthComp);
+		}
+	}
+	prAisBssInfo->encryptedDeauthIsInProcess = FALSE;
+#endif
 	if (rTxDoneStatus == TX_RESULT_SUCCESS || rTxDoneStatus == TX_RESULT_DROPPED_IN_DRIVER)
 		cnmTimerStopTimer(prAdapter, &prAisFsmInfo->rDeauthDoneTimer);
 

@@ -141,8 +141,7 @@ static int pm_resume_done = 0;
 const struct firmware *fw_entry;
 
 /* Default */
-static PUINT_8 apucFwName[] = { (PUINT_8)CFG_FW_FILENAME "_MT",
-	NULL };
+static PUINT_8 apucFwName[] = { (PUINT_8)CFG_FW_FILENAME "_MT", NULL };
 
 static PUINT_8 apucCr4FwName[] = { (PUINT_8)CFG_CR4_FW_FILENAME "_" HIF_NAME "_MT", (PUINT_8)CFG_CR4_FW_FILENAME "_MT",
 	NULL };
@@ -179,10 +178,10 @@ WLAN_STATUS kalFirmwareOpen(IN P_GLUE_INFO_T prGlueInfo, IN PPUINT_8 apucNameTab
 	UINT_8 ucNameIdx;
 	/* PPUINT_8 apucNameTable; */
 #if !DBG_DISABLE_ALL_LOG
-	UINT_8	ucMaxEcoVer = (sizeof(appucFwNameTable) / sizeof(PPUINT_8));
-	UINT_8	ucCurEcoVer = wlanGetEcoVersion(prGlueInfo->prAdapter);
+	UINT_8 ucMaxEcoVer = (sizeof(appucFwNameTable) / sizeof(PPUINT_8));
+	UINT_8 ucCurEcoVer = wlanGetEcoVersion(prGlueInfo->prAdapter);
 #endif
-	BOOLEAN fgResult	= FALSE;
+	BOOLEAN fgResult = FALSE;
 	int		ret;
 
 	/* Try to open FW binary */

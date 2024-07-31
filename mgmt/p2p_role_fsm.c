@@ -182,7 +182,10 @@ UINT_8 p2pRoleFsmInit(IN P_ADAPTER_T prAdapter, IN UINT_8 ucRoleIdx)
 #if (CFG_SUPPORT_DFS_MASTER == 1)
 		p2pFuncRadarInfoInit();
 #endif
-
+#if CFG_SUPPORT_802_11W
+		init_completion(&prP2pBssInfo->rDeauthComp);
+		prP2pBssInfo->encryptedDeauthIsInProcess = FALSE;
+#endif
 		/* SET_NET_PWR_STATE_IDLE(prAdapter, prP2pBssInfo->ucBssIndex); */
 
 		p2pRoleFsmStateTransition(prAdapter, prP2pRoleFsmInfo, P2P_ROLE_STATE_IDLE);
@@ -468,6 +471,17 @@ static VOID p2pRoleFsmDeauhComplete(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T 
 		DBGLOG(P2P, ERROR, "prStaRec shouldn't be NULL!\n");
 		return;
 	}
+
+#if CFG_SUPPORT_802_11W
+	/* Notify completion after encrypted deauth frame tx done */
+	if (prP2pBssInfo->encryptedDeauthIsInProcess == TRUE) {
+		if (!completion_done(&prP2pBssInfo->rDeauthComp)) {
+			DBGLOG(P2P, TRACE, "Complete rDeauthComp\n");
+			complete(&prP2pBssInfo->rDeauthComp);
+		}
+	}
+	prP2pBssInfo->encryptedDeauthIsInProcess = FALSE;
+#endif
 
 	DBGLOG(P2P, INFO, "Deauth TX Complete!\n");
 
@@ -1641,6 +1655,14 @@ VOID p2pRoleFsmRunEventConnectionAbort(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T 
 					(PFN_MGMT_TIMEOUT_FUNC)p2pRoleFsmDeauthTimeout, (ULONG)prCurrStaRec);
 
 			cnmTimerStartTimer(prAdapter, &(prCurrStaRec->rDeauthTxDoneTimer), P2P_DEAUTH_TIMEOUT_TIME_MS);
+#if CFG_SUPPORT_802_11W
+		} else if (prP2pBssInfo->u4RsnSelectedAKMSuite == RSN_AKM_SUITE_SAE) {
+			if (!completion_done(&prP2pBssInfo->rDeauthComp)) {
+				DBGLOG(P2P, INFO, "Complete rDeauthComp\n");
+				complete(&prP2pBssInfo->rDeauthComp);
+			}
+			prP2pBssInfo->encryptedDeauthIsInProcess = FALSE;
+#endif
 		}
 #if 0
 			LINK_FOR_EACH(prLinkEntry, prStaRecOfClientList) {

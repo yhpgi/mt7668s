@@ -3766,7 +3766,7 @@ WLAN_STATUS wlanGetPatchInfo(IN P_ADAPTER_T prAdapter)
 
 WLAN_STATUS wlanSetChipEcoInfo(IN P_ADAPTER_T prAdapter)
 {
-	UINT_32					 hw_version, sw_version = 0;
+	UINT_32 hw_version, sw_version = 0;
 #if !DBG_DISABLE_ALL_LOG
 	struct mt66xx_chip_info *prChipInfo = prAdapter->chip_info;
 	UINT_32					 chip_id	= prChipInfo->chip_id;
@@ -5360,8 +5360,8 @@ WLAN_STATUS wlanProcessMboxMessage(IN P_ADAPTER_T prAdapter)
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS wlanEnqueueTxPacket(IN P_ADAPTER_T prAdapter, IN P_NATIVE_PACKET prNativePacket)
 {
-	P_TX_CTRL_T		prTxCtrl;
-	P_MSDU_INFO_T	prMsduInfo;
+	P_TX_CTRL_T	  prTxCtrl;
+	P_MSDU_INFO_T prMsduInfo;
 #if !DBG_DISABLE_ALL_LOG
 	struct sk_buff *prSkb = (struct sk_buff *)prNativePacket;
 #endif
