@@ -852,8 +852,7 @@ BOOL kalSetTimer(IN P_GLUE_INFO_T prGlueInfo, IN OS_SYSTIME rInterval);
 
 WLAN_STATUS
 kalProcessRxPacket(IN P_GLUE_INFO_T prGlueInfo, IN PVOID pvPacket, IN PUINT_8 pucPacketStart, IN UINT_32 u4PacketLen,
-		/* IN PBOOLEAN           pfgIsRetain, */
-		IN BOOLEAN fgIsRetain, IN ENUM_CSUM_RESULT_T aeCSUM[]);
+		IN ENUM_CSUM_RESULT_T aeCSUM[]);
 
 WLAN_STATUS kalRxIndicatePkts(IN P_GLUE_INFO_T prGlueInfo, IN PVOID apvPkts[], IN UINT_8 ucPktNum);
 

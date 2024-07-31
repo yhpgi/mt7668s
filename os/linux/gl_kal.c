@@ -792,8 +792,7 @@ PVOID kalPacketAlloc(IN P_GLUE_INFO_T prGlueInfo, IN UINT_32 u4Size, OUT PUINT_8
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS
 kalProcessRxPacket(IN P_GLUE_INFO_T prGlueInfo, IN PVOID pvPacket, IN PUINT_8 pucPacketStart, IN UINT_32 u4PacketLen,
-		/* IN PBOOLEAN           pfgIsRetain, */
-		IN BOOLEAN fgIsRetain, IN ENUM_CSUM_RESULT_T aerCSUM[])
+		IN ENUM_CSUM_RESULT_T aerCSUM[])
 {
 	WLAN_STATUS		rStatus = WLAN_STATUS_SUCCESS;
 	struct sk_buff *skb		= (struct sk_buff *)pvPacket;

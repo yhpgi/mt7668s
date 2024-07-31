@@ -957,7 +957,6 @@ VOID nicRxProcessPktWithoutReorder(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwR
 {
 	P_RX_CTRL_T prRxCtrl;
 	P_TX_CTRL_T prTxCtrl;
-	BOOL		fgIsRetained = FALSE;
 	UINT_32		u4CurrentRxBufferCount;
 	/* P_STA_RECORD_T prStaRec = (P_STA_RECORD_T)NULL; */
 
@@ -974,37 +973,13 @@ VOID nicRxProcessPktWithoutReorder(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwR
 	ASSERT(prTxCtrl);
 
 	u4CurrentRxBufferCount = prRxCtrl->rFreeSwRfbList.u4NumElem;
-	/* QM USED = $A, AVAILABLE COUNT = $B, INDICATED TO OS = $C
-	 * TOTAL = $A + $B + $C
-	 *
-	 * Case #1 (Retain)
-	 * -------------------------------------------------------
-	 * $A + $B < THRESHOLD := $A + $B + $C < THRESHOLD + $C := $TOTAL - THRESHOLD < $C
-	 * => $C used too much, retain
-	 *
-	 * Case #2 (Non-Retain)
-	 * -------------------------------------------------------
-	 * $A + $B > THRESHOLD := $A + $B + $C > THRESHOLD + $C := $TOTAL - THRESHOLD > $C
-	 * => still available for $C to use
-	 *
-	 */
 
-#if defined(LINUX)
-	fgIsRetained = FALSE;
-#else
-	fgIsRetained = (((u4CurrentRxBufferCount + qmGetRxReorderQueuedBufferCount(prAdapter) +
-							 prTxCtrl->i4PendingFwdFrameCount) < CFG_RX_RETAINED_PKT_THRESHOLD) ?
-							TRUE :
-							FALSE);
-#endif
-
-	/* DBGLOG(RX, INFO, ("fgIsRetained = %d\n", fgIsRetained)); */
 #if CFG_ENABLE_PER_STA_STATISTICS
 	if (prSwRfb->prStaRec && (prAdapter->rWifiVar.rWfdConfigureSettings.ucWfdEnable > 0))
 		prSwRfb->prStaRec->u4TotalRxPktsNumber++;
 #endif
 	if (kalProcessRxPacket(prAdapter->prGlueInfo, prSwRfb->pvPacket, prSwRfb->pvHeader, (UINT_32)prSwRfb->u2PacketLen,
-				fgIsRetained, prSwRfb->aeCSUM) != WLAN_STATUS_SUCCESS) {
+				prSwRfb->aeCSUM) != WLAN_STATUS_SUCCESS) {
 		DBGLOG(RX, ERROR, "kalProcessRxPacket return value != WLAN_STATUS_SUCCESS\n");
 		ASSERT(0);
 
@@ -1016,8 +991,6 @@ VOID nicRxProcessPktWithoutReorder(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwR
 	if (HAL_IS_RX_DIRECT(prAdapter)) {
 		kalRxIndicateOnePkt(prAdapter->prGlueInfo, prSwRfb->pvPacket);
 		RX_ADD_CNT(prRxCtrl, RX_DATA_INDICATION_COUNT, 1);
-		if (fgIsRetained)
-			RX_ADD_CNT(prRxCtrl, RX_DATA_RETAINED_COUNT, 1);
 	} else {
 		KAL_SPIN_LOCK_DECLARATION();
 
@@ -1032,14 +1005,7 @@ VOID nicRxProcessPktWithoutReorder(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwR
 	prRxCtrl->apvIndPacket[prRxCtrl->ucNumIndPacket] = prSwRfb->pvPacket;
 	prRxCtrl->ucNumIndPacket++;
 #endif
-
-#ifndef LINUX
-	if (fgIsRetained) {
-		prRxCtrl->apvRetainedPacket[prRxCtrl->ucNumRetainedPacket] = prSwRfb->pvPacket;
-		prRxCtrl->ucNumRetainedPacket++;
-	} else
-#endif
-		prSwRfb->pvPacket = NULL;
+	prSwRfb->pvPacket = NULL;
 
 	/* Return RFB */
 	if (!timerPendingTimer(&prAdapter->rPacketDelaySetupTimer)) {
@@ -1083,9 +1049,7 @@ VOID nicRxProcessForwardPkt(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb)
 	prMsduInfo = cnmPktAlloc(prAdapter, 0);
 
 	if (prMsduInfo && kalProcessRxPacket(prAdapter->prGlueInfo, prSwRfb->pvPacket, prSwRfb->pvHeader,
-							  (UINT_32)prSwRfb->u2PacketLen,
-							  prRxCtrl->rFreeSwRfbList.u4NumElem < CFG_RX_RETAINED_PKT_THRESHOLD ? TRUE : FALSE,
-							  prSwRfb->aeCSUM) == WLAN_STATUS_SUCCESS) {
+							  (UINT_32)prSwRfb->u2PacketLen, prSwRfb->aeCSUM) == WLAN_STATUS_SUCCESS) {
 		/* parsing forward frame */
 		wlanProcessTxFrame(prAdapter, (P_NATIVE_PACKET)(prSwRfb->pvPacket));
 		/* pack into MSDU_INFO_T */
