@@ -1176,6 +1176,9 @@ VOID kalP2PGCIndicateConnectionStatus(IN P_GLUE_INFO_T prGlueInfo, IN UINT_8 ucR
 		}
 
 		if (prP2pConnInfo) {
+			/* switch netif on */
+			netif_carrier_on(prGlueP2pInfo->aprRoleHandler);
+
 			cfg80211_connect_result(prGlueP2pInfo->aprRoleHandler,
 					/* struct net_device * dev, */
 					prP2pConnInfo->aucBssid, prP2pConnInfo->aucIEBuf, prP2pConnInfo->u4BufLength, pucRxIEBuf, u2RxIELen,
@@ -1184,6 +1187,8 @@ VOID kalP2PGCIndicateConnectionStatus(IN P_GLUE_INFO_T prGlueInfo, IN UINT_8 ucR
 
 			prP2pConnInfo->eConnRequest = P2P_CONNECTION_TYPE_IDLE;
 		} else {
+			DBGLOG(INIT, INFO, "indicate disconnection event to kernel, reason=%d, locally_generated=%d\n",
+					u2StatusReason, eStatus == WLAN_STATUS_MEDIA_DISCONNECT_LOCALLY);
 			/* Disconnect, what if u2StatusReason == 0? */
 			cfg80211_disconnected(prGlueP2pInfo->aprRoleHandler,
 					/* struct net_device * dev, */

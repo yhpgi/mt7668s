@@ -3298,7 +3298,7 @@ VOID nicEventStaAgingTimeout(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent
 
 		/* Call False Auth */
 		if (prAdapter->fgIsP2PRegistered) {
-			p2pFuncDisconnect(prAdapter, prBssInfo, prStaRec, TRUE, REASON_CODE_DISASSOC_INACTIVITY);
+			p2pFuncDisconnect(prAdapter, prBssInfo, prStaRec, TRUE, REASON_CODE_DISASSOC_INACTIVITY, TRUE);
 		}
 	}
 	/* gDisStaAgingTimeoutDetection */

@@ -122,7 +122,7 @@ VOID p2pFuncUpdateBssInfoForJOIN(IN P_ADAPTER_T prAdapter, IN P_BSS_DESC_T prBss
 VOID p2pFuncAcquireCh(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIdx, IN P_P2P_CHNL_REQ_INFO_T prChnlReqInfo);
 
 VOID p2pFuncDisconnect(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prP2pBssInfo, IN P_STA_RECORD_T prStaRec,
-		IN BOOLEAN fgSendDeauth, IN UINT_16 u2ReasonCode);
+		IN BOOLEAN fgSendDeauth, IN UINT_16 u2ReasonCode, IN UINT_8 fgIsLocallyGenerated);
 
 P_BSS_INFO_T p2pFuncBSSIDFindBssInfo(IN P_ADAPTER_T prAdapter, IN PUINT_8 pucBSSID);
 
@@ -284,8 +284,8 @@ UINT_32
 p2pFuncAppendAttriExtListenTiming(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex, IN BOOLEAN fgIsAssocFrame,
 		IN PUINT_16 pu2Offset, IN PUINT_8 pucBuf, IN UINT_16 u2BufSize);
 
-VOID p2pFuncDissolve(
-		IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prP2pBssInfo, IN BOOLEAN fgSendDeauth, IN UINT_16 u2ReasonCode);
+VOID p2pFuncDissolve(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prP2pBssInfo, IN BOOLEAN fgSendDeauth,
+		IN UINT_16 u2ReasonCode, IN UINT_8 fgIsLocallyGenerated);
 
 P_IE_HDR_T
 p2pFuncGetSpecIE(IN P_ADAPTER_T prAdapter, IN PUINT_8 pucIEBuf, IN UINT_16 u2BufferLen, IN UINT_8 ucElemID,

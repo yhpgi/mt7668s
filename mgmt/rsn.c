@@ -2650,7 +2650,7 @@ UINT_8 rsnApCheckSaQueryTimeout(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prSt
 		if (prBssInfo->eCurrentOPMode == OP_MODE_ACCESS_POINT) {
 			if (bssRemoveClient(prAdapter, prBssInfo, prStaRec)) {
 				/* Indicate disconnect to Host. */
-				p2pFuncDisconnect(prAdapter, prBssInfo, prStaRec, FALSE, 0);
+				p2pFuncDisconnect(prAdapter, prBssInfo, prStaRec, FALSE, REASON_CODE_DEAUTH_LEAVING_BSS, TRUE);
 				/* Deactive BSS if PWR is IDLE and no peer */
 				if (IS_NET_PWR_STATE_IDLE(prAdapter, prBssInfo->ucBssIndex) &&
 						(bssGetClientCount(prAdapter, prBssInfo) == 0)) {

@@ -772,7 +772,7 @@ VOID p2pFuncStopGO(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prP2pBssInfo)
 
 		if ((prP2pBssInfo->eCurrentOPMode == OP_MODE_ACCESS_POINT) && (prP2pBssInfo->eIntendOPMode == OP_MODE_NUM)) {
 			/* AP is created, Beacon Updated. */
-			p2pFuncDissolve(prAdapter, prP2pBssInfo, TRUE, REASON_CODE_DEAUTH_LEAVING_BSS);
+			p2pFuncDissolve(prAdapter, prP2pBssInfo, TRUE, REASON_CODE_DEAUTH_LEAVING_BSS, TRUE);
 			prP2pBssInfo->eIntendOPMode = OP_MODE_P2P_DEVICE;
 		}
 
@@ -1769,8 +1769,8 @@ p2pFuncDisassoc(IN P_ADAPTER_T prAdapter,
  * @return (none)
  */
 /*----------------------------------------------------------------------------*/
-VOID p2pFuncDissolve(
-		IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prP2pBssInfo, IN BOOLEAN fgSendDeauth, IN UINT_16 u2ReasonCode)
+VOID p2pFuncDissolve(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prP2pBssInfo, IN BOOLEAN fgSendDeauth,
+		IN UINT_16 u2ReasonCode, IN UINT_8 fgIsLocallyGenerated)
 {
 	P_STA_RECORD_T prCurrStaRec, prStaRecNext;
 	P_LINK_T	   prClientList;
@@ -1784,16 +1784,13 @@ VOID p2pFuncDissolve(
 		case OP_MODE_INFRASTRUCTURE:
 			/* Reset station record status. */
 			if (prP2pBssInfo->prStaRecOfAP) {
-#if CFG_WPS_DISCONNECT || (KERNEL_VERSION(4, 4, 0) <= CFG80211_VERSION_CODE)
 				kalP2PGCIndicateConnectionStatus(prAdapter->prGlueInfo, (UINT_8)prP2pBssInfo->u4PrivateData, NULL, NULL,
-						0, REASON_CODE_DEAUTH_LEAVING_BSS, WLAN_STATUS_MEDIA_DISCONNECT);
-#else
-				kalP2PGCIndicateConnectionStatus(prAdapter->prGlueInfo, (UINT_8)prP2pBssInfo->u4PrivateData, NULL, NULL,
-						0, REASON_CODE_DEAUTH_LEAVING_BSS);
-#endif
+						0, REASON_CODE_DEAUTH_LEAVING_BSS,
+						fgIsLocallyGenerated ? WLAN_STATUS_MEDIA_DISCONNECT_LOCALLY : WLAN_STATUS_MEDIA_DISCONNECT);
 
 				/* 2012/02/14 frog: After formation before join group, prStaRecOfAP is NULL. */
-				p2pFuncDisconnect(prAdapter, prP2pBssInfo, prP2pBssInfo->prStaRecOfAP, fgSendDeauth, u2ReasonCode);
+				p2pFuncDisconnect(prAdapter, prP2pBssInfo, prP2pBssInfo->prStaRecOfAP, fgSendDeauth, u2ReasonCode,
+						fgIsLocallyGenerated);
 			}
 
 			/* Fix possible KE when RX Beacon & call nicPmIndicateBssConnected().
@@ -1817,7 +1814,7 @@ VOID p2pFuncDissolve(
 			LINK_FOR_EACH_ENTRY_SAFE(prCurrStaRec, prStaRecNext, prClientList, rLinkEntry, STA_RECORD_T)
 			{
 				ASSERT(prCurrStaRec);
-				p2pFuncDisconnect(prAdapter, prP2pBssInfo, prCurrStaRec, TRUE, u2ReasonCode);
+				p2pFuncDisconnect(prAdapter, prP2pBssInfo, prCurrStaRec, TRUE, u2ReasonCode, fgIsLocallyGenerated);
 			}
 			break;
 		default:
@@ -1853,7 +1850,7 @@ VOID p2pFuncDissolve(
  */
 /*----------------------------------------------------------------------------*/
 VOID p2pFuncDisconnect(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prP2pBssInfo, IN P_STA_RECORD_T prStaRec,
-		IN BOOLEAN fgSendDeauth, IN UINT_16 u2ReasonCode)
+		IN BOOLEAN fgSendDeauth, IN UINT_16 u2ReasonCode, IN UINT_8 fgIsLocallyGenerated)
 {
 	ENUM_PARAM_MEDIA_STATE_T eOriMediaStatus;
 
@@ -1885,6 +1882,8 @@ VOID p2pFuncDisconnect(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prP2pBssInfo, I
 		}
 
 		if (fgSendDeauth) {
+			prStaRec->u2ReasonCode		   = u2ReasonCode;
+			prStaRec->fgIsLocallyGenerated = fgIsLocallyGenerated;
 			/* Send deauth. */
 			authSendDeauthFrame(prAdapter, prP2pBssInfo, prStaRec, (P_SW_RFB_T)NULL, u2ReasonCode,
 					(PFN_TX_DONE_HANDLER)p2pRoleFsmRunEventDeauthTxDone);
@@ -2113,6 +2112,7 @@ p2pFuncValidateAuth(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prP2pBssInfo, IN P
 			if (timerPendingTimer(&(prStaRec->rPmfCfg.rSAQueryTimer)))
 				cnmTimerStopTimer(prAdapter, &(prStaRec->rPmfCfg.rSAQueryTimer));
 #endif
+			p2pFuncDisconnect(prAdapter, prP2pBssInfo, prStaRec, FALSE, REASON_CODE_DISASSOC_INACTIVITY, TRUE);
 		}
 	}
 
