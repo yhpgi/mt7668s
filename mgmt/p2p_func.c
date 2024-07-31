@@ -2433,7 +2433,7 @@ VOID p2pFuncValidateRxActionFrame(
 				prNetdevice = prGlueP2pInfo->prDevHandler;
 			else
 				prNetdevice = prGlueP2pInfo->aprRoleHandler;
-			if (prNetdevice && prNetdevice->name) {
+			if (prNetdevice /* && prNetdevice->name >> this comparation are never be NULL (?) */) {
 				DBGLOG(P2P, WARN, "[%s] unregistered p2p action packet filter 0x%x\n", prNetdevice->name,
 						u4PacketFilter);
 			}

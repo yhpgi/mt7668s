@@ -656,68 +656,43 @@ scanSearchExistingBssDescWithSsid(IN P_ADAPTER_T prAdapter, IN ENUM_BSS_TYPE_T e
 
 	prScanInfo = &(prAdapter->rWifiVar.rScanInfo);
 
-	switch (eBSSType) {
-	case BSS_TYPE_P2P_DEVICE:
+	if (eBSSType == BSS_TYPE_P2P_DEVICE) {
 		fgCheckSsid = FALSE;
-		/* fall through */
-	case BSS_TYPE_INFRASTRUCTURE:
+		// No break; intentional fall-through
+
+	} else if (eBSSType == BSS_TYPE_INFRASTRUCTURE) {
 #if CFG_SUPPORT_ROAMING_SKIP_ONE_AP
 		scanSearchBssDescOfRoamSsid(prAdapter);
-		/* fall through */
+		// No break; intentional fall-through
 #endif
-	case BSS_TYPE_BOW_DEVICE:
+
+	} else if (eBSSType == BSS_TYPE_BOW_DEVICE) {
 		prBssDesc = scanSearchBssDescByBssidAndSsid(prAdapter, aucBSSID, fgCheckSsid, prSsid);
-
-		/* if (eBSSType == prBssDesc->eBSSType) */
-
 		return prBssDesc;
-	case BSS_TYPE_IBSS:
+
+	} else if (eBSSType == BSS_TYPE_IBSS) {
 		prIBSSBssDesc = scanSearchBssDescByBssidAndSsid(prAdapter, aucBSSID, fgCheckSsid, prSsid);
 		prBssDesc	  = scanSearchBssDescByTAAndSsid(prAdapter, aucSrcAddr, fgCheckSsid, prSsid);
 
-		/* NOTE(Kevin):
-		 * Rules to maintain the SCAN Result:
-		 * For AdHoc -
-		 *    CASE I    We have TA1(BSSID1), but it change its BSSID to BSSID2
-		 *              -> Update TA1 entry's BSSID.
-		 *    CASE II   We have TA1(BSSID1), and get TA1(BSSID1) again
-		 *              -> Update TA1 entry's contain.
-		 *    CASE III  We have a SCAN result TA1(BSSID1), and TA2(BSSID2). Sooner or
-		 *               later, TA2 merge into TA1, we get TA2(BSSID1)
-		 *              -> Remove TA2 first and then replace TA1 entry's TA with TA2,
-		 *                 Still have only one entry of BSSID.
-		 *    CASE IV   We have a SCAN result TA1(BSSID1), and another TA2 also merge into BSSID1.
-		 *              -> Replace TA1 entry's TA with TA2, Still have only one entry.
-		 *    CASE V    New IBSS
-		 *              -> Add this one to SCAN result.
-		 */
 		if (prBssDesc) {
-			if ((!prIBSSBssDesc) ||					/* CASE I */
-					(prBssDesc == prIBSSBssDesc)) { /* CASE II */
-
+			if ((!prIBSSBssDesc) || (prBssDesc == prIBSSBssDesc)) {
 				return prBssDesc;
 			}
 
 			prBSSDescList	  = &prScanInfo->rBSSDescList;
 			prFreeBSSDescList = &prScanInfo->rFreeBSSDescList;
 
-			/* Remove this BSS Desc from the BSS Desc list */
 			LINK_REMOVE_KNOWN_ENTRY(prBSSDescList, prBssDesc);
-
-			/* Return this BSS Desc to the free BSS Desc list. */
 			LINK_INSERT_TAIL(prFreeBSSDescList, &prBssDesc->rLinkEntry);
 
 			return prIBSSBssDesc;
 		}
 
-		if (prIBSSBssDesc) { /* CASE IV */
-
+		if (prIBSSBssDesc) {
 			return prIBSSBssDesc;
 		}
-		/* CASE V */
-		break; /* Return NULL; */
-	default:
-		break;
+
+	} else {
 	}
 
 	return (P_BSS_DESC_T)NULL;
