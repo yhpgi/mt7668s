@@ -322,12 +322,12 @@ static INT_32 mtk_sdio_probe(MTK_WCN_HIF_SDIO_CLTCTX cltCtx, const MTK_WCN_HIF_S
 #else
 int mtk_sdio_probe(struct sdio_func *func, const struct sdio_device_id *id)
 {
-	int ret = 0;
-	/* int i = 0; */
-	pr_warn("start mtk_sdio_probe\n");
+    int ret;
 
-	ASSERT(func);
-	ASSERT(id);
+    dev_info(&func->dev, "Mediatek MT7668S Probe Start\n");
+
+    ASSERT(func);
+    ASSERT(id);
 
 #if 0
 	dev_warn("Basic struct size checking...\n");
@@ -350,25 +350,23 @@ int mtk_sdio_probe(struct sdio_func *func, const struct sdio_device_id *id)
 		dev_warn("info[%d]: %s\n", i, func->card->info[i]);
 #endif
 
-	sdio_claim_host(func);
-	ret = sdio_enable_func(func);
-	sdio_release_host(func);
+    sdio_claim_host(func);
+    ret = sdio_enable_func(func);
+    sdio_release_host(func);
 
-	if (ret) {
-		pr_err("sdio_enable_func failed!\n");
-		goto out;
-	}
-	/* dev_warn("sdio_enable_func done!\n"); */
+    if (ret) {
+        dev_err(&func->dev, "Mediatek MT7668S Probe FAIL [%d]\n", ret);
+        return ret;
+    }
 
-	if (pfWlanProbe((PVOID)func, (PVOID)id->driver_data) != WLAN_STATUS_SUCCESS) {
-		pr_err("pfWlanProbe fail!call pfWlanRemove()\n");
-		pfWlanRemove();
-		ret = -1;
-	}
+    if (pfWlanProbe((PVOID)func, (PVOID)id->driver_data) != WLAN_STATUS_SUCCESS) {
+        dev_err(&func->dev, "Mediatek MT7668S Probe FAIL\n");
+        pfWlanRemove();
+        return -1;
+    }
 
-out:
-	pr_warn("mtk_sdio_probe() done(%d)\n", ret);
-	return ret;
+    dev_info(&func->dev, "Mediatek MT7668S Probe Success\n");
+    return WLAN_STATUS_SUCCESS;
 }
 #endif
 
