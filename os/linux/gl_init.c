@@ -1375,16 +1375,22 @@ static int wlanStop(struct net_device *prDev)
 
 	prGlueInfo = *((P_GLUE_INFO_T *)netdev_priv(prDev));
 
-	/* CFG80211 down */
-	GLUE_ACQUIRE_SPIN_LOCK(prGlueInfo, SPIN_LOCK_NET_DEV);
-	if (prGlueInfo->prScanRequest != NULL) {
-		prScanRequest			  = prGlueInfo->prScanRequest;
-		prGlueInfo->prScanRequest = NULL;
+	if ((!prGlueInfo) || (prGlueInfo->u4ReadyFlag == 0)) {
+		DBGLOG(INIT, WARN, "driver is not ready\n");
+	} else {
+		/* CFG80211 down, report to kernel directly and run normal
+		 * scan abort procedure
+		 */
+		GLUE_ACQUIRE_SPIN_LOCK(prGlueInfo, SPIN_LOCK_NET_DEV);
+		if (prGlueInfo->prScanRequest) {
+			DBGLOG(INIT, INFO, "wlanStop abort scan!\n");
+			kalCfg80211ScanDone(prGlueInfo->prScanRequest, TRUE);
+			aisFsmStateAbort_SCAN(prGlueInfo->prAdapter);
+			prScanRequest			  = prGlueInfo->prScanRequest;
+			prGlueInfo->prScanRequest = NULL;
+		}
+		GLUE_RELEASE_SPIN_LOCK(prGlueInfo, SPIN_LOCK_NET_DEV);
 	}
-	GLUE_RELEASE_SPIN_LOCK(prGlueInfo, SPIN_LOCK_NET_DEV);
-
-	if (prScanRequest)
-		kalCfg80211ScanDone(prScanRequest, TRUE);
 
 #if CFG_AUTO_CHANNEL_SEL_SUPPORT
 	/* zero clear old acs information */
