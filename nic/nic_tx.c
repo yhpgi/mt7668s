@@ -2614,10 +2614,7 @@ VOID nicTxProcessTxDoneEvent(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent
 
 			cnmMgtPktFree(prAdapter, prMsduInfo);
 		}
-#if defined(_HIF_PCIE)
-		else if (prMsduInfo->prToken)
-			prMsduInfo->pfTxDoneHandler = NULL;
-#endif
+
 		else {
 			nicTxFreePacket(prAdapter, prMsduInfo, FALSE);
 			nicTxReturnMsduInfo(prAdapter, prMsduInfo);

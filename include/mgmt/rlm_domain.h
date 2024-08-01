@@ -426,13 +426,6 @@ typedef struct _DOMAIN_INFO_ENTRY {
 #endif
 #define WLAN_TX_PWR_LIMIT_FILE_NAME "TxPwrLimit_MT76x8.dat"
 
-#ifdef CFG_SUPPORT_DUAL_CARD_DUAL_DRIVER
-#if defined(_HIF_USB)
-#undef WLAN_TX_PWR_LIMIT_FILE_NAME
-#define WLAN_TX_PWR_LIMIT_FILE_NAME "TxPwrLimit_MT76x8_usb.dat"
-#endif
-#endif
-
 struct tx_pwr_element {
 	UINT_16 prefix;
 	UINT_8	channel_num;

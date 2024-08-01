@@ -37,7 +37,7 @@ uint64_t							u8ResetTime;
  *                              C O N S T A N T S
  ********************************************************************************
  */
-#ifdef _HIF_SDIO
+
 #define WAIT_CD_STAR_TIME 10
 #define WAIT_CD_END_TIME 30
 
@@ -51,7 +51,6 @@ uint64_t							u8ResetTime;
 #define NOTIFY_SUCCESS 0
 #define RESETTING 1
 #define NOTIFY_REPEAT 2
-#endif
 
 // update chip_reset_info.c if apcChipResetReason / apcChipResetAction have
 // changed
@@ -74,8 +73,6 @@ const char *const apcChipResetReason[RST_REASON_MAX] = {
  */
 struct rst_struct rst_data;
 
-#ifdef _HIF_SDIO
-
 BOOLEAN g_fgIsCoreDumpStart	   = FALSE;
 BOOLEAN g_fgIsCoreDumpEnd	   = FALSE;
 BOOLEAN g_fgIsNotifyWlanRemove = FALSE;
@@ -88,13 +85,11 @@ wait_queue_head_t wait_core_dump_end;
 struct timer_list wait_CD_start_timer;
 struct timer_list wait_CD_end_timer;
 
-#endif
-
 /*******************************************************************************
  *                           P R I V A T E   D A T A
  ********************************************************************************
  */
-#ifdef _HIF_SDIO
+
 BOOLEAN		   g_fgIsWifiTrig = FALSE;
 static BOOLEAN g_fgIsBTTrig	  = FALSE;
 atomic_t	   g_fgBlockBTTriggerReset;
@@ -103,26 +98,19 @@ static BOOLEAN g_fgIsBTExist		   = TRUE;
 static BOOLEAN g_fgIsCDEndTimeout	   = FALSE;
 static BOOLEAN g_fgIsNotifyBTRemoveEnd = FALSE;
 
-#endif
-#ifdef _HIF_USB
-BOOLEAN g_fgIsWifiTrig = FALSE;
-#endif
 /*******************************************************************************
  *                                 M A C R O S
  ********************************************************************************
  */
-#ifdef _HIF_SDIO
 
 #define IS_CORE_DUMP_START() (g_fgIsCoreDumpStart)
 #define IS_CORE_DUMP_END() (g_fgIsCoreDumpEnd)
-
-#endif
 
 /*******************************************************************************
  *                   F U N C T I O N   D E C L A R A T I O N S
  ********************************************************************************
  */
-#ifdef _HIF_SDIO
+
 static void resetInit(void);
 
 static INT_32 pmu_toggle(struct rst_struct *data);
@@ -149,7 +137,6 @@ static VOID set_core_dump_start(BOOLEAN fgVal);
 
 static INT_32 notify_wlan_toggle_rst_end(INT_32 reserved);
 static void	  RSTP2pDestroyWirelessDevice(void);
-#endif
 
 /*******************************************************************************
  *                              F U N C T I O N S
@@ -176,48 +163,6 @@ static void glResetTriggerUpdateCnt(void)
 		DBGLOG(INIT, ERROR, "unsupported reason %d\n", eResetReason);
 }
 
-#ifdef _HIF_USB
-BOOLEAN checkResetState(void)
-{
-	return (g_fgIsWifiTrig);
-}
-
-void RSTClearState(void)
-{
-	DBGLOG(INIT, STATE, "[RST] RSTClearState\n");
-	g_fgIsWifiTrig = FALSE;
-}
-
-VOID glResetTrigger(P_ADAPTER_T prAdapter, const UINT_8 *pucFile, UINT_32 u4Line)
-{
-	void (*btmtk_usb_toggle_rst_pin)(void);
-#if defined(CFG_AMAZON_METRICS_LOG)
-	char buf[512];
-#endif
-
-	if (!checkResetState()) {
-		glResetTriggerUpdateCnt();
-		g_fgIsWifiTrig = TRUE;
-	}
-
-	/* Call POR(Power On Reset) off->on API provided by BT driver */
-	btmtk_usb_toggle_rst_pin = (void *)kallsyms_lookup_name("btmtk_usb_toggle_rst_pin");
-
-	if (!btmtk_usb_toggle_rst_pin) {
-		DBGLOG(HAL, ERROR, "btmtk_usb_toggle_rst_pin() is not found\n");
-	} else {
-		DBGLOG(HAL, ERROR, "Trigger MT7668 POR(Power On Reset) off->on by BT driver in %s line %u\n", pucFile, u4Line);
-		btmtk_usb_toggle_rst_pin();
-
-#if defined(CFG_AMAZON_METRICS_LOG)
-		snprintf(buf, sizeof(buf), "MSTAR_usb_toggle_reset:def:pin=%i;CT;1:NR", btmtk_usb_toggle_rst_pin);
-		log_to_metrics(ANDROID_LOG_INFO, "usb_toggle_reset_metrics", buf);
-#endif
-	}
-}
-#endif
-
-#ifdef _HIF_SDIO
 VOID glResetTrigger(P_ADAPTER_T prAdapter, const UINT_8 *pucFile, UINT_32 u4Line)
 {
 	int bet = 0;
@@ -291,19 +236,6 @@ RESET_START:
 	schedule_work(&remove_work);
 	DBGLOG(INIT, STATE, "[RST] creat remove_work\n");
 }
-#endif
-
-#ifdef _HIF_PCIE
-VOID glResetTrigger(P_ADAPTER_T prAdapter, const UINT_8 *pucFile, UINT_32 u4Line)
-{
-	DBGLOG(HAL, ERROR, "pcie does not support trigger core dump yet !!\n");
-}
-
-BOOLEAN checkResetState(void)
-{
-	return FALSE;
-}
-#endif
 
 void glGetRstReason(enum _ENUM_CHIP_RESET_REASON_TYPE_T eReason)
 {
@@ -314,7 +246,6 @@ void glGetRstReason(enum _ENUM_CHIP_RESET_REASON_TYPE_T eReason)
 	eResetReason = eReason;
 }
 
-#ifdef _HIF_SDIO
 /*----------------------------------------------------------------------------*/
 /*!
  * \brief .
@@ -692,8 +623,6 @@ void RSTP2pDestroyWirelessDevice(void)
 		gprP2pRoleWdev[i] = NULL;
 	}
 }
-
-#endif
 
 /*----------------------------------------------------------------------------*/
 /*!

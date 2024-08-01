@@ -77,7 +77,7 @@
 #ifndef DBG
 #define DBG 0
 #endif
-#define _HIF_SDIO 1
+
 #define LINUX
 #define MT7668
 #define STA_P2P_MCC
@@ -303,9 +303,6 @@
  * Flags for HIFSYS Interface
  *------------------------------------------------------------------------------
  */
-#ifdef _lint
-/* #define _HIF_SDIO   1 */
-#endif
 
 /* 1(default): Enable SDIO ISR & TX/RX status enhance mode
  * 0: Disable

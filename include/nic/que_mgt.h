@@ -33,14 +33,10 @@ extern const PUINT_8 apucACI2Str[4];
 /* Queue Manager Features */
 #define QM_BURST_END_INFO_ENABLED 0 /* 1: Indicate the last TX packet to the FW for each burst */
 #define QM_FORWARDING_FAIRNESS 1	/* 1: To fairly share TX resource among active STAs */
-#if defined(_HIF_SDIO)
+
 #define QM_ADAPTIVE_TC_RESOURCE_CTRL 1 /* 1: To adaptively adjust resource for each TC */
 #define QM_FAST_TC_RESOURCE_CTRL 1	   /* 1: To fast adjust resource for EMPTY TC (assigned resource is 0) */
-#else
-#define QM_ADAPTIVE_TC_RESOURCE_CTRL 0 /* 1: To adaptively adjust resource for each TC */
-#define QM_FAST_TC_RESOURCE_CTRL 0	   /* 1: To fast adjust resource for EMPTY TC (assigned resource is 0) */
-#endif
-#define QM_PRINT_TC_RESOURCE_CTRL 0 /* 1: To print TC resource adjustment results */
+#define QM_PRINT_TC_RESOURCE_CTRL 0	   /* 1: To print TC resource adjustment results */
 /* 1: If pkt with SSN is missing, auto advance the RX reordering window */
 #define QM_RX_WIN_SSN_AUTO_ADVANCING 1
 /* 1: Indicate the packets falling behind to OS before the frame with SSN is received */

@@ -1,46 +1,20 @@
 # SPDX-License-Identifier: GPL-2.0
-ccflags-y += -I$(src)/os \
-             -I$(src)/os/linux/include \
-             -I$(src)/include \
+ccflags-y += -I$(src)/include \
              -I$(src)/include/nic \
              -I$(src)/include/mgmt \
              -I$(src)/include/chips \
-             -I$(src)/os/linux/hif/sdio/include
+             -I$(src)/sdio/include
 
 ldflags-y += --strip-debug
 
 mt7668s-objs := \
+    chips/mt6632.o \
+    chips/mt7668.o \
     common/dump.o \
     common/wlan_bow.o \
     common/wlan_lib.o \
     common/wlan_oid.o \
     common/wlan_p2p.o \
-    nic/nic.o \
-    nic/nic_cmd_event.o \
-    nic/nic_pwr_mgt.o \
-    nic/nic_rate.o \
-    nic/nic_rx.o \
-    nic/nic_tx.o \
-    nic/nic_umac.o \
-    nic/cmd_buf.o \
-    nic/que_mgt.o \
-    os/linux/gl_ate_agent.o \
-    os/linux/gl_bow.o \
-    os/linux/gl_cfg80211.o \
-    os/linux/gl_hook_api.o \
-    os/linux/gl_init.o \
-    os/linux/gl_kal.o \
-    os/linux/gl_qa_agent.o \
-    os/linux/gl_proc.o \
-    os/linux/gl_p2p.o \
-    os/linux/gl_p2p_cfg80211.o \
-    os/linux/gl_p2p_init.o \
-    os/linux/gl_p2p_kal.o \
-    os/linux/gl_rst.o \
-    os/linux/gl_vendor.o \
-    os/linux/gl_wext.o \
-    os/linux/gl_wext_priv.o \
-    os/linux/platform.o \
     mgmt/aaa_fsm.o \
     mgmt/ais_fsm.o \
     mgmt/assoc.o \
@@ -50,6 +24,7 @@ mt7668s-objs := \
     mgmt/cnm_mem.o \
     mgmt/cnm_timer.o \
     mgmt/hem_mbox.o \
+    mgmt/hs20.o \
     mgmt/mib.o \
     mgmt/p2p_assoc.o \
     mgmt/p2p_bss.o \
@@ -78,16 +53,39 @@ mt7668s-objs := \
     mgmt/swcr.o \
     mgmt/tdls.o \
     mgmt/tkip_mic.o \
-    mgmt/hs20.o \
-    mgmt/wnm.o \
     mgmt/wapi.o \
-    os/linux/hif/sdio/arm.o \
-    os/linux/hif/sdio/hal_api.o \
-    os/linux/hif/sdio/sdio.o \
-    os/linux/hif/sdio/sdio_test_driver_core.o \
-    os/linux/hif/sdio/sdio_test_driver_ops.o \
-    chips/mt6632.o \
-    chips/mt7668.o
+    mgmt/wnm.o \
+    nic/cmd_buf.o \
+    nic/nic.o \
+    nic/nic_cmd_event.o \
+    nic/nic_pwr_mgt.o \
+    nic/nic_rate.o \
+    nic/nic_rx.o \
+    nic/nic_tx.o \
+    nic/nic_umac.o \
+    nic/que_mgt.o \
+    sdio/arm.o \
+    sdio/gl_ate_agent.o \
+    sdio/gl_bow.o \
+    sdio/gl_cfg80211.o \
+    sdio/gl_hook_api.o \
+    sdio/gl_init.o \
+    sdio/gl_kal.o \
+    sdio/gl_qa_agent.o \
+    sdio/gl_p2p.o \
+    sdio/gl_p2p_cfg80211.o \
+    sdio/gl_p2p_init.o \
+    sdio/gl_p2p_kal.o \
+    sdio/gl_proc.o \
+    sdio/gl_rst.o \
+    sdio/gl_vendor.o \
+    sdio/gl_wext.o \
+    sdio/gl_wext_priv.o \
+    sdio/hal_api.o \
+    sdio/platform.o \
+    sdio/sdio.o \
+    sdio/sdio_test_driver_core.o \
+    sdio/sdio_test_driver_ops.o
 
 ifeq ($(CONFIG_MT7668S_WIFI), y)
     ccflags-y += -DCFG_BUILT_IN_DRIVER=1 \

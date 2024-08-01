@@ -35,11 +35,8 @@
  *                              C O N S T A N T S
  ********************************************************************************
  */
-#if defined(_HIF_SDIO)
+
 #define HIF_NAME "SDIO"
-#else
-#error "No HIF defined!"
-#endif
 
 /* Enable driver timing profiling */
 #define CFG_SDIO_TIMING_PROFILING 0

@@ -328,10 +328,8 @@ struct wireless_dev *mtk_p2p_cfg80211_add_iface(
 		prHif = &prGlueInfo->rHifInfo;
 		ASSERT(prHif);
 
-#if defined(_HIF_SDIO)
 #if (MTK_WCN_HIF_SDIO == 0)
 		SET_NETDEV_DEV(prNewNetDevice, &(prHif->func->dev));
-#endif
 #endif
 
 #if CFG_ENABLE_WIFI_DIRECT_CFG_80211

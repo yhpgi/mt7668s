@@ -1965,37 +1965,25 @@ reqExtQueryConfiguration(IN P_GLUE_INFO_T prGlueInfo,
 	/* Update the current radio configuration. */
 	prQueryConfig->u4Length = sizeof(PARAM_802_11_CONFIG_T);
 
-#if defined(_HIF_SDIO)
+
 	rStatus = sdio_io_ctrl(prGlueInfo,
 					wlanoidSetBeaconInterval,
 					&prQueryConfig->u4BeaconPeriod, sizeof(UINT_32), TRUE, TRUE, &u4QueryInfoLen);
-#else
-	rStatus = wlanQueryInformation(prGlueInfo->prAdapter,
-						wlanoidQueryBeaconInterval,
-						&prQueryConfig->u4BeaconPeriod, sizeof(UINT_32), &u4QueryInfoLen);
-#endif
+
 	if (rStatus != WLAN_STATUS_SUCCESS)
 		return rStatus;
-#if defined(_HIF_SDIO)
+
 	rStatus = sdio_io_ctrl(prGlueInfo,
 					wlanoidQueryAtimWindow,
 					&prQueryConfig->u4ATIMWindow, sizeof(UINT_32), TRUE, TRUE, &u4QueryInfoLen);
-#else
-	rStatus = wlanQueryInformation(prGlueInfo->prAdapter,
-						wlanoidQueryAtimWindow,
-						&prQueryConfig->u4ATIMWindow, sizeof(UINT_32), &u4QueryInfoLen);
-#endif
+
 	if (rStatus != WLAN_STATUS_SUCCESS)
 		return rStatus;
-#if defined(_HIF_SDIO)
+
 	rStatus = sdio_io_ctrl(prGlueInfo,
 					wlanoidQueryFrequency,
 					&prQueryConfig->u4DSConfig, sizeof(UINT_32), TRUE, TRUE, &u4QueryInfoLen);
-#else
-	rStatus = wlanQueryInformation(prGlueInfo->prAdapter,
-						wlanoidQueryFrequency,
-						&prQueryConfig->u4DSConfig, sizeof(UINT_32), &u4QueryInfoLen);
-#endif
+
 	if (rStatus != WLAN_STATUS_SUCCESS)
 		return rStatus;
 
@@ -2047,35 +2035,25 @@ reqExtSetConfiguration(IN P_GLUE_INFO_T prGlueInfo,
 
 	ASSERT(pvSetBuffer);
 
-#if defined(_HIF_SDIO)
+
 	rStatus = sdio_io_ctrl(prGlueInfo,
 					wlanoidSetBeaconInterval,
 					&prNewConfig->u4BeaconPeriod, sizeof(UINT_32), FALSE, TRUE, &u4SetInfoLen);
-#else
-	rStatus = wlanSetInformation(prGlueInfo->prAdapter,
-					wlanoidSetBeaconInterval,
-					&prNewConfig->u4BeaconPeriod, sizeof(UINT_32), &u4SetInfoLen);
-#endif
+
 	if (rStatus != WLAN_STATUS_SUCCESS)
 		return rStatus;
-#if defined(_HIF_SDIO)
+
 	rStatus = sdio_io_ctrl(prGlueInfo,
 					wlanoidSetAtimWindow,
 					&prNewConfig->u4ATIMWindow, sizeof(UINT_32), FALSE, TRUE, &u4SetInfoLen);
-#else
-	rStatus = wlanSetInformation(prGlueInfo->prAdapter,
-					wlanoidSetAtimWindow, &prNewConfig->u4ATIMWindow, sizeof(UINT_32), &u4SetInfoLen);
-#endif
+
 	if (rStatus != WLAN_STATUS_SUCCESS)
 		return rStatus;
-#if defined(_HIF_SDIO)
+
 	rStatus = sdio_io_ctrl(prGlueInfo,
 					wlanoidSetFrequency,
 					&prNewConfig->u4DSConfig, sizeof(UINT_32), FALSE, TRUE, &u4SetInfoLen);
-#else
-	rStatus = wlanSetInformation(prGlueInfo->prAdapter,
-					wlanoidSetFrequency, &prNewConfig->u4DSConfig, sizeof(UINT_32), &u4SetInfoLen);
-#endif
+
 
 	if (rStatus != WLAN_STATUS_SUCCESS)
 		return rStatus;

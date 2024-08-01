@@ -31,17 +31,9 @@
 enum ENUM_MEM_ID {
 	MEM_ID_NIC_ADAPTER,
 	MEM_ID_IO_BUFFER,
-#if defined(_HIF_SDIO)
+
 	MEM_ID_IO_CTRL,
 	MEM_ID_RX_DATA,
-#endif
-#if defined(_HIF_USB)
-	MEM_ID_TX_CMD,
-	MEM_ID_TX_DATA_FFA,
-	MEM_ID_TX_DATA,
-	MEM_ID_RX_EVENT,
-	MEM_ID_RX_DATA,
-#endif
 
 	MEM_ID_NUM, /* END, Do not modify */
 };
@@ -69,14 +61,7 @@ enum ENUM_MEM_ID {
  *                   F U N C T I O N   D E C L A R A T I O N S
  ********************************************************************************
  */
-#ifdef CFG_SUPPORT_DUAL_CARD_DUAL_DRIVER
-#if defined(_HIF_USB)
-PVOID preallocGetMemUSB(enum ENUM_MEM_ID memId);
-#else
+
 PVOID preallocGetMem(enum ENUM_MEM_ID memId);
-#endif
-#else
-PVOID preallocGetMem(enum ENUM_MEM_ID memId);
-#endif
 
 #endif /* _PREALLOC_H */

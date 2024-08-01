@@ -2183,8 +2183,7 @@ VOID nicRxProcessEventPacket(IN P_ADAPTER_T prAdapter, IN OUT P_SW_RFB_T prSwRfb
 		break;
 
 	case EVENT_ID_SLEEPY_INFO:
-#if defined(_HIF_USB)
-#else
+
 	{
 		P_EVENT_SLEEPY_INFO_T prEventSleepyNotify;
 
@@ -2199,8 +2198,8 @@ VOID nicRxProcessEventPacket(IN P_ADAPTER_T prAdapter, IN OUT P_SW_RFB_T prSwRfb
 			kalSetFwOwnEvent2Hif(prGlueInfo);
 #endif
 	}
-#endif
-		break;
+
+	break;
 	case EVENT_ID_BT_OVER_WIFI:
 #if CFG_ENABLE_BT_OVER_WIFI
 	{

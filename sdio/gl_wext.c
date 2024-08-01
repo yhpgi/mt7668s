@@ -2630,15 +2630,10 @@ static int wext_get_power(IN struct net_device *prNetDev, IN struct iw_request_i
 	prGlueInfo = *((P_GLUE_INFO_T *)netdev_priv(prNetDev));
 
 #if 0
-#if defined(_HIF_SDIO)
 	rStatus = sdio_io_ctrl(prGlueInfo,
 					wlanoidQuery802dot11PowerSaveProfile,
 					&ePowerMode, sizeof(ePowerMode), TRUE, TRUE, &u4BufLen);
-#else
-	rStatus = wlanQueryInformation(prGlueInfo->prAdapter,
-						wlanoidQuery802dot11PowerSaveProfile,
-						&ePowerMode, sizeof(ePowerMode), &u4BufLen);
-#endif
+
 #else
 	rStatus			   = wlanQueryInformation(
 					   prGlueInfo->prAdapter, wlanoidQuery802dot11PowerSaveProfile, &ePowerMode, sizeof(ePowerMode), &u4BufLen);

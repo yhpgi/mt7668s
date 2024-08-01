@@ -48,12 +48,7 @@
 
 #define RX_BEHIND_CONTINUOUS_THRESHOLD 256
 
-#if defined(_HIF_SDIO) && defined(WINDOWS_DDK)
-/*! On XP, maximum Tx+Rx Statue <= 64-4(HISR)*/
 #define SDIO_MAXIMUM_RX_LEN_NUM 0 /*!< 0~15 (0: un-limited) */
-#else
-#define SDIO_MAXIMUM_RX_LEN_NUM 0 /*!< 0~15 (0: un-limited) */
-#endif
 
 /* RXM Definitions */
 /* The payload format of a RX packet */

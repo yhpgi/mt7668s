@@ -1508,14 +1508,6 @@ kalHardStartXmit(struct sk_buff *prOrgSkb, IN struct net_device *prDev, P_GLUE_I
 		return WLAN_STATUS_ADAPTER_NOT_READY;
 	}
 
-#if defined(_HIF_USB)
-	if (prGlueInfo->rHifInfo.state != USB_STATE_LINK_UP) {
-		DBGLOG(INIT, WARN, "USB in suspend skip tx\n");
-		dev_kfree_skb(prOrgSkb);
-		return WLAN_STATUS_ADAPTER_NOT_READY;
-	}
-#endif
-
 	if (prGlueInfo->prAdapter->fgIsEnableLpdvt) {
 		DBGLOG(INIT, INFO, "LPDVT enable, skip this frame\n");
 		dev_kfree_skb(prOrgSkb);

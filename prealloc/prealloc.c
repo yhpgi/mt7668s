@@ -90,15 +90,7 @@ static struct PRE_MEM_BLOCK arMemBlocks[MEM_ID_NUM];
  * \retval void pointer to the memory address
  */
 /*----------------------------------------------------------------------------*/
-#ifdef CFG_SUPPORT_DUAL_CARD_DUAL_DRIVER
-#if defined(_HIF_USB)
-PVOID preallocGetMemUSB(enum ENUM_MEM_ID memId)
-#else
 PVOID preallocGetMem(enum ENUM_MEM_ID memId)
-#endif
-#else
-PVOID preallocGetMem(enum ENUM_MEM_ID memId)
-#endif
 {
 	struct PRE_MEM_BLOCK *block = NULL;
 	UINT_32				  curr = 0, count = 0;
@@ -120,15 +112,7 @@ PVOID preallocGetMem(enum ENUM_MEM_ID memId)
 	MP_Dbg("request [%s], return [%d]\n", name, curr);
 	return block->pItemArray[curr].pvBuffer;
 }
-#ifdef CFG_SUPPORT_DUAL_CARD_DUAL_DRIVER
-#if defined(_HIF_USB)
-EXPORT_SYMBOL(preallocGetMemUSB);
-#else
 EXPORT_SYMBOL(preallocGetMem);
-#endif
-#else
-EXPORT_SYMBOL(preallocGetMem);
-#endif
 static void preallocFree(void)
 {
 	INT_32				  i = 0, j = 0;
@@ -219,22 +203,10 @@ static int __init preallocInit(void)
 	u4Size = HIF_TX_COALESCING_BUFFER_SIZE > HIF_RX_COALESCING_BUFFER_SIZE ? HIF_TX_COALESCING_BUFFER_SIZE :
 																			 HIF_RX_COALESCING_BUFFER_SIZE;
 	preallocAddBlock(MEM_ID_IO_BUFFER, "IO BUFFER", 1, u4Size, GFP_KERNEL);
-#if defined(_HIF_SDIO)
+
 	preallocAddBlock(MEM_ID_IO_CTRL, "IO CTRL", 1, sizeof(ENHANCE_MODE_DATA_STRUCT_T), GFP_KERNEL);
 	preallocAddBlock(MEM_ID_RX_DATA, "RX DATA", HIF_RX_COALESCING_BUF_COUNT, HIF_RX_COALESCING_BUFFER_SIZE, GFP_KERNEL);
-#endif
-#if defined(_HIF_USB)
-	preallocAddBlock(MEM_ID_TX_CMD, "TX CMD", USB_REQ_TX_CMD_CNT, USB_TX_CMD_BUF_SIZE, GFP_KERNEL);
-	preallocAddBlock(MEM_ID_TX_DATA_FFA, "TX DATA FFA", USB_REQ_TX_DATA_FFA_CNT, USB_TX_DATA_BUFF_SIZE, GFP_KERNEL);
-#if CFG_USB_TX_AGG
-	preallocAddBlock(
-			MEM_ID_TX_DATA, "TX AGG DATA", (USB_TC_NUM * USB_REQ_TX_DATA_CNT), USB_TX_DATA_BUFF_SIZE, GFP_KERNEL);
-#else
-	preallocAddBlock(MEM_ID_TX_DATA, "TX DATA", USB_REQ_TX_DATA_CNT, USB_TX_DATA_BUFF_SIZE, GFP_KERNEL);
-#endif
-	preallocAddBlock(MEM_ID_RX_EVENT, "RX EVENT", USB_REQ_RX_EVENT_CNT, USB_RX_EVENT_BUF_SIZE, GFP_KERNEL);
-	preallocAddBlock(MEM_ID_RX_DATA, "RX DATA", USB_REQ_RX_DATA_CNT, USB_RX_DATA_BUF_SIZE, GFP_KERNEL);
-#endif
+
 	/* ADD BLOCK END */
 
 	return preallocAlloc();

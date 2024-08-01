@@ -1036,7 +1036,7 @@ BOOLEAN kalInitBowDevice(IN P_GLUE_INFO_T prGlueInfo, IN const char *prDevName)
 		prGlueInfo->rBowInfo.prDevHandler->needed_headroom += NIC_TX_HEAD_ROOM;
 		prGlueInfo->rBowInfo.prDevHandler->netdev_ops = &bow_netdev_ops;
 
-#if defined(_HIF_SDIO) && (MTK_WCN_HIF_SDIO == 0)
+#if (MTK_WCN_HIF_SDIO == 0)
 		SET_NETDEV_DEV(prGlueInfo->rBowInfo.prDevHandler, &(prHif->func->dev));
 #endif
 

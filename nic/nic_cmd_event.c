@@ -821,7 +821,7 @@ VOID nicCmdEventEnterRfTest(
 	nicResetSystemService(prAdapter);
 	nicInitMGMT(prAdapter, NULL);
 
-#if defined(_HIF_SDIO) && 0
+#if 0
 	/* 3. Disable Interrupt */
 	HAL_INTR_DISABLE(prAdapter);
 
@@ -887,7 +887,7 @@ VOID nicCmdEventEnterRfTest(
 VOID nicCmdEventLeaveRfTest(
 		IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo, IN PUINT_8 pucEventBuf, IN UINT_32 u4EventBufLen)
 {
-#if defined(_HIF_SDIO) && 0
+#if 0
 	UINT_32 u4WHISR = 0;
 	UINT_16 au2TxCount[16];
 	UINT_32 u4Value;
@@ -2167,30 +2167,6 @@ VOID nicCmdEventBatchScanResult(
 
 VOID nicEventHifCtrl(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent, IN UINT_32 u4EventBufLen)
 {
-#if defined(_HIF_USB)
-	P_EVENT_HIF_CTRL_T prEventHifCtrl;
-	if (u4EventBufLen < sizeof(EVENT_HIF_CTRL_T)) {
-		DBGLOG(NIC, ERROR, "%s: Invalid event length: %d < %d\n", __func__, u4EventBufLen, sizeof(EVENT_HIF_CTRL_T));
-		return;
-	}
-
-	prEventHifCtrl = (P_EVENT_HIF_CTRL_T)(prEvent->aucBuffer);
-	DBGLOG(HAL, STATE, "%s: EVENT_ID_HIF_CTRL\n", __func__);
-	DBGLOG(HAL, STATE, "prEventHifCtrl->ucHifType = %hhu\n", prEventHifCtrl->ucHifType);
-	DBGLOG(HAL, STATE, "prEventHifCtrl->ucHifTxTrafficStatus, prEventHifCtrl->ucHifRxTrafficStatus = %hhu, %hhu\n",
-			prEventHifCtrl->ucHifTxTrafficStatus, prEventHifCtrl->ucHifRxTrafficStatus);
-
-	if (prEventHifCtrl->ucHifTxTrafficStatus == ENUM_HIF_TRAFFIC_IDLE &&
-			prEventHifCtrl->ucHifRxTrafficStatus == ENUM_HIF_TRAFFIC_IDLE) { /* success */
-		halUSBPreSuspendDone(prAdapter, NULL, prEvent->aucBuffer);
-	} else if (prEventHifCtrl->ucHifTxTrafficStatus == ENUM_HIF_TRAFFIC_BUSY ||
-			   prEventHifCtrl->ucHifRxTrafficStatus == ENUM_HIF_TRAFFIC_BUSY) { /* busy */
-		halUSBPreSuspendTimeout(prAdapter, NULL);
-	} else if (prEventHifCtrl->ucHifTxTrafficStatus == ENUM_HIF_TRAFFIC_INVALID ||
-			   prEventHifCtrl->ucHifRxTrafficStatus == ENUM_HIF_TRAFFIC_INVALID) { /* invalid */
-		halUSBPreSuspendTimeout(prAdapter, NULL);
-	}
-#endif
 }
 
 #if CFG_SUPPORT_BUILD_DATE_CODE
@@ -2960,7 +2936,6 @@ VOID nicEventNloDone(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent, IN UIN
 
 VOID nicEventSleepyNotify(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent, IN UINT_32 u4EventBufLen)
 {
-#if !defined(_HIF_USB)
 	P_EVENT_SLEEPY_INFO_T prEventSleepyNotify;
 	if (u4EventBufLen < sizeof(EVENT_SLEEPY_INFO_T)) {
 		DBGLOG(NIC, ERROR, "%s: Invalid event length: %d < %d\n", __func__, u4EventBufLen, sizeof(EVENT_SLEEPY_INFO_T));
@@ -2975,7 +2950,6 @@ VOID nicEventSleepyNotify(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent, I
 #if CFG_SUPPORT_MULTITHREAD
 	if (prEventSleepyNotify->ucSleepyState)
 		kalSetFwOwnEvent2Hif(prAdapter->prGlueInfo);
-#endif
 #endif
 }
 

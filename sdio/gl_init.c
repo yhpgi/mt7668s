@@ -80,12 +80,8 @@ struct delayed_work wdev_lock_workq;
  *                            P U B L I C   D A T A
  ********************************************************************************
  */
-#if defined(_HIF_SDIO)
+
 #define DRIVER_NAME "mt76x8_wifi_sdio"
-#endif
-#if defined(_HIF_USB)
-#define DRIVER_NAME "mt76x8_wifi_usb"
-#endif
 
 MODULE_AUTHOR("Mediatek Ltd.");
 MODULE_AUTHOR("Yogi Hermawan");
@@ -130,13 +126,6 @@ BOOLEAN g_fgIsCalDataBackuped = FALSE;
 struct delayed_work sched_workq;
 
 #define CFG_WIFI_FILENAME "wifi.cfg"
-
-#ifdef CFG_SUPPORT_DUAL_CARD_DUAL_DRIVER
-#if defined(_HIF_USB)
-#undef CFG_WIFI_FILENAME
-#define CFG_WIFI_FILENAME "wifi_usb.cfg"
-#endif
-#endif
 
 #define CFG_EEPRM_FILENAME "EEPROM"
 #define FILE_NAME_MAX 64
@@ -2152,15 +2141,9 @@ VOID wlanGetParseConfig(P_ADAPTER_T prAdapter)
 	u4ConfigReadLen = 0;
 	if (pucConfigBuf) {
 #ifdef CFG_SUPPORT_DUAL_CARD_DUAL_DRIVER
-#if defined(_HIF_USB)
-		if (kalRequestFirmware("wifi_usb.cfg", pucConfigBuf, WLAN_CFG_FILE_BUF_SIZE, &u4ConfigReadLen,
-					prAdapter->prGlueInfo->prDev) == 0) {
-		} else
-#elif defined(_HIF_SDIO)
 		if (kalRequestFirmware("wifi_sdio.cfg", pucConfigBuf, WLAN_CFG_FILE_BUF_SIZE, &u4ConfigReadLen,
 					prAdapter->prGlueInfo->prDev) == 0) {
 		} else
-#endif
 #endif
 				if (kalRequestFirmware("wifi.cfg", pucConfigBuf, WLAN_CFG_FILE_BUF_SIZE, &u4ConfigReadLen,
 							prAdapter->prGlueInfo->prDev) == 0) {
@@ -2294,12 +2277,6 @@ WLAN_STATUS wlanExtractBufferBin(P_ADAPTER_T prAdapter)
 			kalMemZero(aucEeprom, sizeof(aucEeprom));
 
 			snprintf(aucEeprom, 32, "%s%x.bin", apucEepromName[0], chip_id);
-
-#ifdef CFG_SUPPORT_DUAL_CARD_DUAL_DRIVER
-#if defined(_HIF_USB)
-			snprintf(aucEeprom, 32, "%s%x_usb.bin", apucEepromName[0], chip_id);
-#endif
-#endif
 
 			/* 1 <3> Request buffer bin */
 			if (kalRequestFirmware(aucEeprom, pucConfigBuf, MAX_EEPROM_BUFFER_SIZE, &u4ContentLen, prGlueInfo->prDev) ==
@@ -2450,8 +2427,7 @@ label_exit:
  * \brief Wlan probe function. This function probes and initializes the device.
  *
  * \param[in] pvData     data passed by bus driver init function
- *                           _HIF_EHPI: NULL
- *                           _HIF_SDIO: sdio bus driver handle
+ *                       sdio bus driver handle
  *
  * \retval 0 Success
  * \retval negative value Failed
@@ -2497,10 +2473,8 @@ INT_32 wlanProbe(PVOID pvData, PVOID pvDriverData)
 #endif
 	do {
 		/* 4 <1> Initialize the IO port of the interface */
-		/*  GeorgeKuo: pData has different meaning for _HIF_XXX:
-		 * _HIF_EHPI: pointer to memory base variable, which will be
-		 *      initialized by glBusInit().
-		 * _HIF_SDIO: bus driver handle
+		/* GeorgeKuo: pData has different meaning for _HIF_XXX:
+		 * bus driver handle
 		 */
 
 		DBGLOG(INIT, STATE, "enter wlanProbe\n");
@@ -2891,9 +2865,7 @@ INT_32 wlanProbe(PVOID pvData, PVOID pvDriverData)
 #endif
 	}
 #if CFG_CHIP_RESET_SUPPORT
-#ifdef _HIF_SDIO
 	atomic_set(&g_fgBlockBTTriggerReset, 0);
-#endif
 #endif
 
 	if (prWaitForResetComp) {
@@ -3267,23 +3239,12 @@ static int mt76x8_wifi_remove(struct platform_device *pdev)
 	return 0;
 }
 
-#if defined(_HIF_SDIO)
 static const struct of_device_id mt76x8_wifi_ids[] = {
 	{
 			.compatible = "mediatek,mt76x8_wifi_sdio",
 	},
 	{ /* end of table */ },
 };
-#endif
-
-#if defined(_HIF_USB)
-static const struct of_device_id mt76x8_wifi_ids[] = {
-	{
-			.compatible = "mediatek,mt76x8_wifi_usb",
-	},
-	{ /* end of table */ },
-};
-#endif
 
 MODULE_DEVICE_TABLE(of, mt76x8_wifi_ids);
 
@@ -3355,11 +3316,11 @@ static int initWlan(void)
 #endif /*  CFG_DRIVER_INF_NAME_CHANGE */
 
 	wlanDebugInit();
-#ifdef _HIF_SDIO
+
 #if CFG_CHIP_RESET_SUPPORT
 	atomic_set(&g_fgBlockBTTriggerReset, 1);
 #endif
-#endif
+
 	DBGLOG(INIT, STATE, "initWlan..\n");
 
 	registerDriver();

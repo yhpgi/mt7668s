@@ -654,11 +654,8 @@ static inline void kalCfg80211ScanDone(struct cfg80211_scan_request *request, bo
 #define kalIsXdigit(c) isxdigit(c)
 
 /* defined for wince sdio driver only */
-#if defined(_HIF_SDIO)
+
 #define kalDevSetPowerState(prGlueInfo, ePowerMode) glSetPowerState(prGlueInfo, ePowerMode)
-#else
-#define kalDevSetPowerState(prGlueInfo, ePowerMode)
-#endif
 
 /*----------------------------------------------------------------------------*/
 /*!

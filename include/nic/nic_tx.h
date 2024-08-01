@@ -757,9 +757,6 @@ struct _MSDU_INFO_T {
 	UINT_8 aucTxDescBuffer[NIC_TX_DESC_AND_PADDING_LENGTH];
 #endif
 
-#if defined(_HIF_PCIE)
-	P_MSDU_TOKEN_ENTRY_T prToken;
-#endif
 	/* sanity drop flag */
 	UINT_8 fgDrop;
 };

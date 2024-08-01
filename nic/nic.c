@@ -135,15 +135,7 @@ WLAN_STATUS nicAllocateAdapterMemory(IN P_ADAPTER_T prAdapter)
 		prAdapter->u4MgtBufCachedSize = MGT_BUFFER_SIZE;
 
 #ifdef CFG_PREALLOC_MEMORY
-#ifdef CFG_SUPPORT_DUAL_CARD_DUAL_DRIVER
-#if defined(_HIF_USB)
-		prAdapter->pucMgtBufCached = preallocGetMemUSB(MEM_ID_NIC_ADAPTER);
-#else
-		prAdapter->pucMgtBufCached		  = preallocGetMem(MEM_ID_NIC_ADAPTER);
-#endif
-#else
-		prAdapter->pucMgtBufCached		  = preallocGetMem(MEM_ID_NIC_ADAPTER);
-#endif
+		prAdapter->pucMgtBufCached = preallocGetMem(MEM_ID_NIC_ADAPTER);
 #else
 		LOCAL_NIC_ALLOCATE_MEMORY(
 				prAdapter->pucMgtBufCached, prAdapter->u4MgtBufCachedSize, PHY_MEM_TYPE, "COMMON MGMT MEMORY POOL");
@@ -171,15 +163,7 @@ WLAN_STATUS nicAllocateAdapterMemory(IN P_ADAPTER_T prAdapter)
 
 		/* Allocate memory for the common coalescing buffer. */
 #ifdef CFG_PREALLOC_MEMORY
-#ifdef CFG_SUPPORT_DUAL_CARD_DUAL_DRIVER
-#if defined(_HIF_USB)
-		prAdapter->pucCoalescingBufCached = preallocGetMemUSB(MEM_ID_IO_BUFFER);
-#else
 		prAdapter->pucCoalescingBufCached = preallocGetMem(MEM_ID_IO_BUFFER);
-#endif
-#else
-		prAdapter->pucCoalescingBufCached = preallocGetMem(MEM_ID_IO_BUFFER);
-#endif
 #else
 		prAdapter->pucCoalescingBufCached = kalAllocateIOBuffer(prAdapter->u4CoalescingBufCachedSize);
 #endif
@@ -378,27 +362,6 @@ VOID nicSDIOReadIntStatus(IN P_ADAPTER_T prAdapter, OUT PUINT_32 pu4IntStatus)
 }				/* end of nicSDIOReadIntStatus() */
 #endif
 
-#if 0 /*defined(_HIF_PCIE) */
-VOID nicPCIEReadIntStatus(IN P_ADAPTER_T prAdapter, OUT PUINT_32 pu4IntStatus)
-{
-	UINT_32 u4RegValue;
-
-	*pu4IntStatus = 0;
-
-	HAL_MCR_RD(prAdapter, WPDMA_INT_STA, &u4RegValue);
-
-	if (HAL_IS_RX_DONE_INTR(u4RegValue))
-		*pu4IntStatus |= WHISR_RX0_DONE_INT;
-
-	if (HAL_IS_TX_DONE_INTR(u4RegValue))
-		*pu4IntStatus |= WHISR_TX_DONE_INT;
-
-	/* clear interrupt */
-	HAL_MCR_WR(prAdapter, WPDMA_INT_STA, u4RegValue);
-
-}
-#endif
-
 /*----------------------------------------------------------------------------*/
 /*!
  * @brief The function used to read interrupt status and then invoking
@@ -574,27 +537,6 @@ WLAN_STATUS nicInitializeAdapter(IN P_ADAPTER_T prAdapter)
 
 	return u4Status;
 }
-
-#if defined(_HIF_SPI)
-/*----------------------------------------------------------------------------*/
-/*!
- * \brief Restore the SPI Mode Select to default mode,
- *        this is important while driver is unload, and this must be last mcr
- *        since the operation will let the hif use 8bit mode access
- *
- * \param[in] prAdapter      a pointer to adapter private data structure.
- * \param[in] eGPIO2_Mode    GPIO2 operation mode
- *
- * \return (none)
- */
-/*----------------------------------------------------------------------------*/
-void nicRestoreSpiDefMode(IN P_ADAPTER_T prAdapter)
-{
-	ASSERT(prAdapter);
-
-	HAL_MCR_WR(prAdapter, MCR_WCSR, SPICSR_8BIT_MODE_DATA);
-}
-#endif
 
 /*----------------------------------------------------------------------------*/
 /*!

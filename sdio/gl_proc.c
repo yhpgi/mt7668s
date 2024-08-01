@@ -32,15 +32,9 @@
  */
 #define PROC_MAX_BUF_SIZE 3000
 #define PROC_MCR_ACCESS "mcr"
-#ifdef CFG_SUPPORT_DUAL_CARD_DUAL_DRIVER
-#if defined(_HIF_USB)
-#define PROC_ROOT_NAME "wlan_usb"
-#else
+
 #define PROC_ROOT_NAME "wlan"
-#endif
-#else
-#define PROC_ROOT_NAME "wlan"
-#endif
+
 #if CFG_SUPPORT_DEBUG_FS
 #define PROC_COUNTRY "country"
 #endif

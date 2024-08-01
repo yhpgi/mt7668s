@@ -112,20 +112,8 @@
 
 #include <linux/interrupt.h>
 
-#if defined(_HIF_USB)
-#include <linux/usb.h>
 #include <linux/mmc/sdio.h>
 #include <linux/mmc/sdio_func.h>
-#endif
-
-#if defined(_HIF_PCIE)
-#include <linux/pci.h>
-#endif
-
-#if defined(_HIF_SDIO)
-#include <linux/mmc/sdio.h>
-#include <linux/mmc/sdio_func.h>
-#endif
 
 #include <linux/random.h>
 

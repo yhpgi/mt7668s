@@ -137,10 +137,6 @@ BOOLEAN nicpmSetAcpiPowerD0(IN P_ADAPTER_T prAdapter);
 
 BOOLEAN nicpmSetAcpiPowerD3(IN P_ADAPTER_T prAdapter);
 
-#if defined(_HIF_SPI)
-void nicRestoreSpiDefMode(IN P_ADAPTER_T prAdapter);
-#endif
-
 VOID nicProcessSoftwareInterrupt(IN P_ADAPTER_T prAdapter);
 
 VOID nicProcessAbnormalInterrupt(IN P_ADAPTER_T prAdapter);

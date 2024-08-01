@@ -935,10 +935,8 @@ BOOLEAN glRegisterP2P(P_GLUE_INFO_T prGlueInfo, const char *prDevName, const cha
 		prGlueInfo->prP2PInfo[i]->prDevHandler->netdev_ops = &p2p_netdev_ops;
 		/* prGlueInfo->prP2PInfo->prDevHandler->wireless_handlers    = &mtk_p2p_wext_handler_def; */
 
-#if defined(_HIF_SDIO)
 #if (MTK_WCN_HIF_SDIO == 0)
 		SET_NETDEV_DEV(prGlueInfo->prP2PInfo[i]->prDevHandler, &(prHif->func->dev));
-#endif
 #endif
 
 #if CFG_ENABLE_WIFI_DIRECT_CFG_80211

@@ -387,7 +387,6 @@ WLAN_STATUS wlanAdapterStart(IN P_ADAPTER_T prAdapter, IN P_REG_INFO_T prRegInfo
 		u4Status = wlanCheckWifiFunc(prAdapter, TRUE);
 
 		if (u4Status == WLAN_STATUS_SUCCESS) {
-#if defined(_HIF_SDIO)
 			PUINT_32 pu4WHISR = NULL;
 			UINT_16	 au2TxCount[16];
 
@@ -404,7 +403,7 @@ WLAN_STATUS wlanAdapterStart(IN P_ADAPTER_T prAdapter, IN P_REG_INFO_T prRegInfo
 
 			if (pu4WHISR)
 				kalMemFree(pu4WHISR, PHY_MEM_TYPE, sizeof(UINT_32));
-#endif
+
 			/* Set FW download success flag */
 			prAdapter->fgIsFwDownloaded = TRUE;
 
@@ -713,11 +712,6 @@ WLAN_STATUS wlanAdapterStop(IN P_ADAPTER_T prAdapter)
 
 	nicReleaseAdapterMemory(prAdapter);
 
-#if defined(_HIF_SPI)
-	/* Note: restore the SPI Mode Select from 32 bit to default */
-	nicRestoreSpiDefMode(prAdapter);
-#endif
-
 	return u4Status;
 } /* wlanAdapterStop */
 
@@ -786,11 +780,6 @@ WLAN_STATUS wlanCheckWifiFunc(IN P_ADAPTER_T prAdapter, IN BOOLEAN fgRdyChk)
 
 	u4StartTime = kalGetTimeTick();
 	fgTimeout	= FALSE;
-
-#if defined(_HIF_USB)
-	if (prAdapter->prGlueInfo->rHifInfo.state == USB_STATE_LINK_DOWN)
-		return WLAN_STATUS_FAILURE;
-#endif
 
 	while (TRUE) {
 		if (fgRdyChk)
