@@ -475,7 +475,7 @@ static VOID p2pRoleFsmDeauthComplete(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T
 		if (prP2pBssInfo->eCurrentOPMode == OP_MODE_ACCESS_POINT)
 			DBGLOG(P2P, TRACE, "No More Client, Media Status DISCONNECTED\n");
 		else
-			DBGLOG(P2P, TRACE, "Deauth done, Media Status DISCONNECTED\n");
+			DBGLOG(P2P, TRACE, "Deauth done, Media Status DISCONNECTED. reason=%d\n", u2ReasonCode);
 		p2pChangeMediaState(prAdapter, prP2pBssInfo, PARAM_MEDIA_STATE_DISCONNECTED);
 	}
 
@@ -759,7 +759,7 @@ VOID p2pRoleFsmRunEventBeaconTimeout(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T p
 		if (prP2pBssInfo->eConnectionState == PARAM_MEDIA_STATE_CONNECTED) {
 			/* Indicate disconnect to Host. */
 			kalP2PGCIndicateConnectionStatus(prAdapter->prGlueInfo, prP2pRoleFsmInfo->ucRoleIndex, NULL, NULL, 0,
-					REASON_CODE_DISASSOC_INACTIVITY, WLAN_STATUS_MEDIA_DISCONNECT_LOCALLY);
+					REASON_CODE_DISASSOC_LEAVING_BSS, WLAN_STATUS_MEDIA_DISCONNECT_LOCALLY);
 
 			if (prP2pBssInfo->prStaRecOfAP != NULL) {
 				P_STA_RECORD_T prStaRec = prP2pBssInfo->prStaRecOfAP;
