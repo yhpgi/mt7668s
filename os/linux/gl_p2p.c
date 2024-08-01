@@ -542,63 +542,68 @@ BOOLEAN p2PAllocInfo(IN P_GLUE_INFO_T prGlueInfo, IN UINT_8 ucIdex)
 /*----------------------------------------------------------------------------*/
 BOOLEAN p2PFreeInfo(P_GLUE_INFO_T prGlueInfo)
 {
-	UINT_8 i;
+	UINT_8		 i;
+	P_ADAPTER_T	 prAdapter = prGlueInfo->prAdapter;
+	P_WIFI_VAR_T prWifiVar;
 
 	ASSERT(prGlueInfo);
-	ASSERT(prGlueInfo->prAdapter);
+	ASSERT(prAdapter);
 
-	/* free memory after p2p module is ALREADY unregistered */
-	if (prGlueInfo->prAdapter->fgIsP2PRegistered == FALSE) {
-		kalMemFree(prGlueInfo->prAdapter->prP2pInfo, VIR_MEM_TYPE, sizeof(P2P_INFO_T));
-
-		for (i = 0; i < KAL_P2P_NUM; i++)
-			if (prGlueInfo->prP2PInfo[i] != NULL) {
-				kalMemFree(prGlueInfo->prAdapter->rWifiVar.prP2PConnSettings[i], VIR_MEM_TYPE,
-						sizeof(P2P_CONNECTION_SETTINGS_T));
-
-				prGlueInfo->prAdapter->rWifiVar.prP2PConnSettings[i] = NULL;
-				kalMemFree(prGlueInfo->prAdapter->rWifiVar.prP2pSpecificBssInfo[i], VIR_MEM_TYPE,
-						sizeof(P2P_SPECIFIC_BSS_INFO_T));
-
-				prGlueInfo->prAdapter->rWifiVar.prP2pSpecificBssInfo[i] = NULL;
-#if CFG_SUPPORT_DBDC_TC6
-				if (prGlueInfo->prP2PInfo[i]->chandef) {
-					if (prGlueInfo->prP2PInfo[i]->chandef->chan) {
-						cnmMemFree(prGlueInfo->prAdapter, prGlueInfo->prP2PInfo[i]->chandef->chan);
-						prGlueInfo->prP2PInfo[i]->chandef->chan = NULL;
-					}
-					cnmMemFree(prGlueInfo->prAdapter, prGlueInfo->prP2PInfo[i]->chandef);
-					prGlueInfo->prP2PInfo[i]->chandef = NULL;
-				}
-#endif
-			}
-
-		kalMemFree(prGlueInfo->prP2PDevInfo, VIR_MEM_TYPE, sizeof(GL_P2P_DEV_INFO_T));
-
-		for (i = 0; i < KAL_P2P_NUM; i++) {
-			if (prGlueInfo->prP2PInfo[i] != NULL) {
-				kalMemFree(prGlueInfo->prP2PInfo[i], VIR_MEM_TYPE, sizeof(GL_P2P_INFO_T));
-				prGlueInfo->prP2PInfo[i] = NULL;
-			}
-		}
-
-		/* kalMemFree(prGlueInfo->prAdapter->rWifiVar.prP2pFsmInfo, VIR_MEM_TYPE, sizeof(P2P_FSM_INFO_T)); */
-
-		kalMemFree(prGlueInfo->prAdapter->rWifiVar.prP2pDevFsmInfo, VIR_MEM_TYPE, sizeof(P2P_DEV_FSM_INFO_T));
-
-		/*Reomve p2p bss scan list */
-		scanRemoveAllP2pBssDesc(prGlueInfo->prAdapter);
-
-		/*reset all pointer to NULL */
-		/*prGlueInfo->prP2PInfo[0] = NULL;*/
-		prGlueInfo->prAdapter->prP2pInfo = NULL;
-		/* prGlueInfo->prAdapter->rWifiVar.prP2pFsmInfo = NULL; */
-		prGlueInfo->prAdapter->rWifiVar.prP2pDevFsmInfo = NULL;
-
-		return TRUE;
-	} else {
+	/* Expect that prAdapter->prP2pInfo must be existing. */
+	if (prAdapter->prP2pInfo == NULL) {
+		DBGLOG(P2P, ERROR, "prAdapter->prP2pInfo is NULL\n");
 		return FALSE;
 	}
+
+	prWifiVar = &prAdapter->rWifiVar;
+
+	/* TODO: how can I sure that the specific P2P device can be freed?
+	 * The original check is that prGlueInfo->prAdapter->fgIsP2PRegistered.
+	 * For one wiphy feature, this func may be called without
+	 * (fgIsP2PRegistered == FALSE) condition.
+	 */
+	for (i = 0; i < KAL_P2P_NUM; i++) { /* clear all for now */
+		if (prGlueInfo->prP2PInfo[i] != NULL) {
+			p2pFreeMemSafe(prGlueInfo, (VOID **)&prWifiVar->prP2PConnSettings[i], sizeof(P2P_CONNECTION_SETTINGS_T));
+
+			p2pFreeMemSafe(prGlueInfo, (VOID **)&prWifiVar->prP2pSpecificBssInfo[i], sizeof(P2P_SPECIFIC_BSS_INFO_T));
+
+			p2pFreeMemSafe(prGlueInfo, (VOID **)&prGlueInfo->prP2PInfo[i], sizeof(GL_P2P_INFO_T));
+			prAdapter->prP2pInfo->u4DeviceNum--;
+		}
+
+		if (prAdapter->prP2pInfo->u4DeviceNum == i) {
+			/* all prP2PInfo are freed, and free the general part now */
+
+			p2pFreeMemSafe(prGlueInfo, (VOID **)&prAdapter->prP2pInfo, sizeof(P2P_INFO_T));
+
+			if (prGlueInfo->prP2PDevInfo) {
+				p2pFreeMemSafe(prGlueInfo, (VOID **)&prGlueInfo->prP2PDevInfo, sizeof(GL_P2P_DEV_INFO_T));
+			}
+			if (prAdapter->rWifiVar.prP2pDevFsmInfo) {
+				p2pFreeMemSafe(prGlueInfo, (VOID **)&prWifiVar->prP2pDevFsmInfo, sizeof(P2P_DEV_FSM_INFO_T));
+			}
+
+			/* Reomve p2p bss scan list */
+			scanRemoveAllP2pBssDesc(prAdapter);
+		}
+	}
+
+	return TRUE;
+}
+
+VOID p2pFreeMemSafe(P_GLUE_INFO_T prGlueInfo, VOID **pprMemInfo, UINT_32 size)
+{
+	VOID *prTmpMemInfo = NULL;
+
+	GLUE_SPIN_LOCK_DECLARATION();
+
+	GLUE_ACQUIRE_SPIN_LOCK(prGlueInfo, SPIN_LOCK_NET_DEV);
+	prTmpMemInfo = *pprMemInfo;
+	*pprMemInfo	 = NULL;
+	GLUE_RELEASE_SPIN_LOCK(prGlueInfo, SPIN_LOCK_NET_DEV);
+
+	kalMemFree(prTmpMemInfo, VIR_MEM_TYPE, size);
 }
 
 BOOLEAN p2pNetRegister(P_GLUE_INFO_T prGlueInfo, BOOLEAN fgIsRtnlLockAcquired)

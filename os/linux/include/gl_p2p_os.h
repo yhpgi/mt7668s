@@ -280,4 +280,5 @@ VOID	p2pSetSuspendMode(P_GLUE_INFO_T prGlueInfo, BOOLEAN fgEnable);
 BOOLEAN glP2pCreateWirelessDevice(P_GLUE_INFO_T prGlueInfo);
 VOID	glP2pDestroyWirelessDevice(VOID);
 VOID	p2pUpdateChannelTableByDomain(P_GLUE_INFO_T prGlueInfo);
+VOID	p2pFreeMemSafe(P_GLUE_INFO_T prGlueInfo, VOID **pprMemInfo, UINT_32 size);
 #endif
