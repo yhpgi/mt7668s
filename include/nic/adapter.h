@@ -1174,6 +1174,7 @@ struct _ADAPTER_T {
 	BOOLEAN				 fgIsP2PRegistered;
 	BOOLEAN				 p2p_scan_report_all_bss; /* flag to report all networks in p2p scan */
 	ENUM_NET_REG_STATE_T rP2PNetRegState;
+	ENUM_P2P_REG_STATE_T rP2PRegState;
 	/* BOOLEAN             fgIsWlanLaunched; */
 	P_P2P_INFO_T prP2pInfo;
 #if CFG_SUPPORT_P2P_RSSI_QUERY

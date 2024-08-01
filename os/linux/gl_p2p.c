@@ -603,19 +603,23 @@ BOOLEAN p2PFreeInfo(P_GLUE_INFO_T prGlueInfo)
 
 BOOLEAN p2pNetRegister(P_GLUE_INFO_T prGlueInfo, BOOLEAN fgIsRtnlLockAcquired)
 {
-	BOOLEAN fgDoRegister	   = FALSE;
-	BOOLEAN fgRollbackRtnlLock = FALSE;
-	BOOLEAN ret;
+	BOOLEAN		fgDoRegister	   = FALSE;
+	BOOLEAN		fgRollbackRtnlLock = FALSE;
+	BOOLEAN		ret				   = FALSE;
+	P_ADAPTER_T prAdapter		   = NULL;
 
 	GLUE_SPIN_LOCK_DECLARATION();
 
+	prAdapter = prGlueInfo->prAdapter;
+
 	ASSERT(prGlueInfo);
-	ASSERT(prGlueInfo->prAdapter);
+	ASSERT(prAdapter);
 
 	GLUE_ACQUIRE_SPIN_LOCK(prGlueInfo, SPIN_LOCK_NET_DEV);
-	if (prGlueInfo->prAdapter->rP2PNetRegState == ENUM_NET_REG_STATE_UNREGISTERED) {
-		prGlueInfo->prAdapter->rP2PNetRegState = ENUM_NET_REG_STATE_REGISTERING;
-		fgDoRegister						   = TRUE;
+	if (prAdapter->rP2PNetRegState == ENUM_NET_REG_STATE_UNREGISTERED &&
+			prAdapter->rP2PRegState == ENUM_P2P_REG_STATE_REGISTERED) {
+		prAdapter->rP2PNetRegState = ENUM_NET_REG_STATE_REGISTERING;
+		fgDoRegister			   = TRUE;
 	}
 	GLUE_RELEASE_SPIN_LOCK(prGlueInfo, SPIN_LOCK_NET_DEV);
 
@@ -639,15 +643,15 @@ BOOLEAN p2pNetRegister(P_GLUE_INFO_T prGlueInfo, BOOLEAN fgIsRtnlLockAcquired)
 
 		ret = FALSE;
 	} else {
-		prGlueInfo->prAdapter->rP2PNetRegState = ENUM_NET_REG_STATE_REGISTERED;
-		gPrP2pDev[0]						   = prGlueInfo->prP2PInfo[0]->prDevHandler;
+		prAdapter->rP2PNetRegState = ENUM_NET_REG_STATE_REGISTERED;
+		gPrP2pDev[0]			   = prGlueInfo->prP2PInfo[0]->prDevHandler;
 #if CFG_RESET_DUE_TO_REG_NETDEV_FAIL
 		prGlueInfo->prP2PInfo[0]->fgIsNetDevRegistered = TRUE;
 #endif
 		ret = TRUE;
 	}
 
-	if (prGlueInfo->prAdapter->prP2pInfo->u4DeviceNum == RUNNING_DUAL_AP_MODE) {
+	if (prAdapter->prP2pInfo->u4DeviceNum == RUNNING_DUAL_AP_MODE) {
 		/* net device initialize */
 		netif_carrier_off(prGlueInfo->prP2PInfo[1]->prDevHandler);
 		netif_tx_stop_all_queues(prGlueInfo->prP2PInfo[1]->prDevHandler);
@@ -660,8 +664,8 @@ BOOLEAN p2pNetRegister(P_GLUE_INFO_T prGlueInfo, BOOLEAN fgIsRtnlLockAcquired)
 
 			ret = FALSE;
 		} else {
-			prGlueInfo->prAdapter->rP2PNetRegState = ENUM_NET_REG_STATE_REGISTERED;
-			gPrP2pDev[1]						   = prGlueInfo->prP2PInfo[1]->prDevHandler;
+			prAdapter->rP2PNetRegState = ENUM_NET_REG_STATE_REGISTERED;
+			gPrP2pDev[1]			   = prGlueInfo->prP2PInfo[1]->prDevHandler;
 #if CFG_RESET_DUE_TO_REG_NETDEV_FAIL
 			DBGLOG(P2P, STATE, "P2P 2nd NetDev registered\n");
 			prGlueInfo->prP2PInfo[1]->fgIsNetDevRegistered = TRUE;
@@ -687,16 +691,20 @@ BOOLEAN p2pNetUnregister(P_GLUE_INFO_T prGlueInfo, BOOLEAN fgIsRtnlLockAcquired)
 	int						   iftype		= 0;
 	P_BSS_INFO_T			   prP2pBssInfo = NULL;
 	P_NETDEV_PRIVATE_GLUE_INFO prNetDevPriv = NULL;
+	P_ADAPTER_T				   prAdapter	= NULL;
 
 	GLUE_SPIN_LOCK_DECLARATION();
 
+	prAdapter = prGlueInfo->prAdapter;
+
 	ASSERT(prGlueInfo);
-	ASSERT(prGlueInfo->prAdapter);
+	ASSERT(prAdapter);
 
 	GLUE_ACQUIRE_SPIN_LOCK(prGlueInfo, SPIN_LOCK_NET_DEV);
-	if (prGlueInfo->prAdapter->rP2PNetRegState == ENUM_NET_REG_STATE_REGISTERED) {
-		prGlueInfo->prAdapter->rP2PNetRegState = ENUM_NET_REG_STATE_UNREGISTERING;
-		fgDoUnregister						   = TRUE;
+	if (prAdapter->rP2PNetRegState == ENUM_NET_REG_STATE_REGISTERED &&
+			prAdapter->rP2PRegState == ENUM_P2P_REG_STATE_REGISTERED) {
+		prAdapter->rP2PNetRegState = ENUM_NET_REG_STATE_UNREGISTERING;
+		fgDoUnregister			   = TRUE;
 	}
 	GLUE_RELEASE_SPIN_LOCK(prGlueInfo, SPIN_LOCK_NET_DEV);
 
@@ -711,7 +719,7 @@ BOOLEAN p2pNetUnregister(P_GLUE_INFO_T prGlueInfo, BOOLEAN fgIsRtnlLockAcquired)
 			/* info cfg80211 disconnect */
 			prNetDevPriv = (NETDEV_PRIVATE_GLUE_INFO *)netdev_priv(prRoleDev);
 			iftype		 = prRoleDev->ieee80211_ptr->iftype;
-			prP2pBssInfo = GET_BSS_INFO_BY_INDEX(prGlueInfo->prAdapter, prNetDevPriv->ucBssIdx);
+			prP2pBssInfo = GET_BSS_INFO_BY_INDEX(prAdapter, prNetDevPriv->ucBssIdx);
 
 			/* p2pRoleFsmUninit may call cfg80211_disconnected.
 			 * p2pRemove()->glUnregisterP2P->p2pRoleFsmUninit(),
@@ -759,7 +767,7 @@ BOOLEAN p2pNetUnregister(P_GLUE_INFO_T prGlueInfo, BOOLEAN fgIsRtnlLockAcquired)
 #endif
 
 	/* unregister the netdev and index > 0 */
-	if (prGlueInfo->prAdapter->prP2pInfo->u4DeviceNum >= 2) {
+	if (prAdapter->prP2pInfo->u4DeviceNum >= 2) {
 		for (ucRoleIdx = 1; ucRoleIdx < BSS_P2P_NUM; ucRoleIdx++) {
 			/* prepare for removal */
 			if (netif_carrier_ok(prGlueInfo->prP2PInfo[ucRoleIdx]->prDevHandler))
@@ -787,7 +795,7 @@ BOOLEAN p2pNetUnregister(P_GLUE_INFO_T prGlueInfo, BOOLEAN fgIsRtnlLockAcquired)
 	if (fgRollbackRtnlLock)
 		rtnl_lock();
 
-	prGlueInfo->prAdapter->rP2PNetRegState = ENUM_NET_REG_STATE_UNREGISTERED;
+	prAdapter->rP2PNetRegState = ENUM_NET_REG_STATE_UNREGISTERED;
 
 	return TRUE;
 }
