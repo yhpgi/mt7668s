@@ -4495,7 +4495,7 @@ DOMAIN_SEND_CMD:
 
 		pRegdom = rlmDomainSearchRegdomainFromLocalDataBase(alpha2);
 		if (!pRegdom) {
-			DBGLOG(RLM, ERROR, "%s(): Error, Cannot find the correct RegDomain. country = %s\n", __func__,
+			DBGLOG(RLM, INFO, "%s(): Error, Cannot find the correct RegDomain. country = %s\n", __func__,
 					rlmDomainGetCountryCode());
 
 			rlmDomainAssert(0);

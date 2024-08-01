@@ -2778,7 +2778,7 @@ const struct ieee80211_regdomain *rlmDomainSearchRegdomainFromLocalDataBase(char
 		idx++;
 	}
 
-	DBGLOG(RLM, ERROR, "%s(): Error, Cannot find the correct RegDomain. country = %s.\n", __func__, alpha2);
+	DBGLOG(RLM, INFO, "%s(): Error, Cannot find the correct RegDomain. country = %s.\n", __func__, alpha2);
 	DBGLOG(RLM, INFO, "	Set as default WW.\n");
 
 	return &default_regdom_ww; /*default world wide*/
@@ -2802,7 +2802,7 @@ const struct ieee80211_regdomain *rlmDomainGetLocalDefaultRegd(void)
 
 	pRegdom = rlmDomainSearchRegdomainFromLocalDataBase(alpha2);
 	if (!pRegdom) {
-		DBGLOG(RLM, ERROR, "%s(): Error, Cannot find the correct RegDomain. country = %s\n", __func__,
+		DBGLOG(RLM, INFO, "%s(): Error, Cannot find the correct RegDomain. country = %s\n", __func__,
 				rlmDomainGetCountryCode());
 		return &default_regdom_ww;
 	}
