@@ -62,12 +62,12 @@
 #define CFG_SUPPORT_DISABLE_SAP_DFS_RDD
 #define CFG_SUPPORT_LARGE_TX_PWR_LIMIT_TABLE 0
 #define CFG_SUPPORT_MULTICAST_ENHANCEMENT
-#define CFG_SUPPORT_OWE 0
+#define CFG_SUPPORT_OWE 1
 #define CFG_SUPPORT_PASSPOINT 0
 #define CFG_SUPPORT_SAE 1
 #define CFG_SUPPORT_SAP_DFS_CHANNEL 1
 #define CFG_SUPPORT_SAME_BSS_REASSOC 1
-#define CFG_SUPPORT_SUITB 0
+#define CFG_SUPPORT_SUITB 1
 #define CFG_SUPPORT_TSF_USING_BOOTTIME 1
 #define CFG_TX_DIRECT_USB 1
 #define CFG_TX_WMM_ENHANCE 1
@@ -94,19 +94,7 @@
 
 /* 2 Flags for OS capability */
 
-#if defined(_HIF_SDIO)
-#ifdef LINUX
-#ifdef CONFIG_X86
 #define MTK_WCN_HIF_SDIO 0
-#else
-#define MTK_WCN_HIF_SDIO 0
-#endif
-#else
-#define MTK_WCN_HIF_SDIO 0
-#endif
-#else
-#define MTK_WCN_HIF_SDIO 0
-#endif
 
 /* Android build-in driver switch, Mike 2016/11/11*/
 #ifndef CFG_BUILT_IN_DRIVER
