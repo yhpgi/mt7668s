@@ -414,9 +414,11 @@ static VOID p2pRoleFsmDeauthComplete(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T
 	P_BSS_INFO_T			 prP2pBssInfo	  = (P_BSS_INFO_T)NULL;
 	P_P2P_ROLE_FSM_INFO_T	 prP2pRoleFsmInfo = (P_P2P_ROLE_FSM_INFO_T)NULL;
 	ENUM_PARAM_MEDIA_STATE_T eOriMediaStatus;
-	GL_P2P_INFO_T			  *prP2PInfo;
+	P_GL_P2P_INFO_T			 prP2PInfo;
 	UINT_16					 u2ReasonCode;
 	UINT_8					 fgIsLocallyGenerated;
+
+	DBGLOG(P2P, INFO, "Deauth TX Complete!\n");
 
 	if (!prAdapter) {
 		DBGLOG(P2P, ERROR, "prAdapter shouldn't be NULL!\n");
@@ -425,6 +427,20 @@ static VOID p2pRoleFsmDeauthComplete(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T
 
 	if (!prStaRec) {
 		DBGLOG(P2P, ERROR, "prStaRec shouldn't be NULL!\n");
+		return;
+	}
+
+	prP2pBssInfo = prAdapter->aprBssInfo[prStaRec->ucBssIndex];
+	if (!prP2pBssInfo) {
+		DBGLOG(P2P, ERROR, "prP2pBssInfo shouldn't be NULL!\n");
+		return;
+	}
+
+	eOriMediaStatus	 = prP2pBssInfo->eConnectionState;
+	prP2pRoleFsmInfo = P2P_ROLE_INDEX_2_ROLE_FSM_INFO(prAdapter, prP2pBssInfo->u4PrivateData);
+
+	if (!prP2pRoleFsmInfo) {
+		DBGLOG(P2P, ERROR, "prP2pRoleFsmInfo shouldn't be NULL!\n");
 		return;
 	}
 
@@ -446,14 +462,24 @@ static VOID p2pRoleFsmDeauthComplete(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T
 	prP2pBssInfo->encryptedDeauthIsInProcess = FALSE;
 #endif
 
-	DBGLOG(P2P, INFO, "Deauth TX Complete!\n");
-
-	prP2pBssInfo = prAdapter->aprBssInfo[prStaRec->ucBssIndex];
-	ASSERT_BREAK(prP2pBssInfo != NULL);
-	eOriMediaStatus	 = prP2pBssInfo->eConnectionState;
-	prP2pRoleFsmInfo = P2P_ROLE_INDEX_2_ROLE_FSM_INFO(prAdapter, prP2pBssInfo->u4PrivateData);
-
-	ASSERT_BREAK(prP2pRoleFsmInfo != NULL);
+	/*
+	 * After EAP exchange, GO/GC will disconnect
+	 * and re-connect in short time.
+	 * GC's new station record will be removed unexpectedly at GO's side
+	 * if new GC's connection happens
+	 * when previous GO's disconnection flow is
+	 * processing. 4-way handshake will NOT be triggered.
+	 */
+	if ((prStaRec->eAuthAssocState == AAA_STATE_SEND_AUTH2 || prStaRec->eAuthAssocState == AAA_STATE_SEND_ASSOC2) &&
+			(prP2pBssInfo->eCurrentOPMode == OP_MODE_ACCESS_POINT) &&
+			(p2pFuncIsAPMode(prAdapter->rWifiVar.prP2PConnSettings[prP2pBssInfo->u4PrivateData]) == FALSE)) {
+		DBGLOG(P2P, WARN, "Skip deauth tx done since AAA fsm is in progress.\n");
+		return;
+	} else if (prStaRec->eAuthAssocState == SAA_STATE_SEND_AUTH1 ||
+			   prStaRec->eAuthAssocState == SAA_STATE_SEND_ASSOC1) {
+		DBGLOG(P2P, WARN, "Skip deauth tx done since SAA fsm is in progress.\n");
+		return;
+	}
 
 	/* Change station state. */
 	cnmStaRecChangeState(prAdapter, prStaRec, STA_STATE_1);
@@ -475,8 +501,13 @@ static VOID p2pRoleFsmDeauthComplete(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T
 		if (prP2pBssInfo->eCurrentOPMode == OP_MODE_ACCESS_POINT)
 			DBGLOG(P2P, TRACE, "No More Client, Media Status DISCONNECTED\n");
 		else
-			DBGLOG(P2P, TRACE, "Deauth done, Media Status DISCONNECTED. reason=%d\n", u2ReasonCode);
+			DBGLOG(P2P, INFO, "Deauth done, Media Status DISCONNECTED, reason=%d\n", u2ReasonCode);
 		p2pChangeMediaState(prAdapter, prP2pBssInfo, PARAM_MEDIA_STATE_DISCONNECTED);
+		if (prP2pBssInfo->eCurrentOPMode == OP_MODE_INFRASTRUCTURE) {
+			kalP2PGCIndicateConnectionStatus(prAdapter->prGlueInfo, prP2pRoleFsmInfo->ucRoleIndex, NULL, NULL, 0,
+					u2ReasonCode,
+					fgIsLocallyGenerated ? WLAN_STATUS_MEDIA_DISCONNECT_LOCALLY : WLAN_STATUS_MEDIA_DISCONNECT);
+		}
 	}
 
 	/* STOP BSS if power is IDLE */
@@ -485,16 +516,15 @@ static VOID p2pRoleFsmDeauthComplete(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T
 				(bssGetClientCount(prAdapter, prP2pBssInfo) == 0)) {
 			/* All Peer disconnected !! Stop BSS now!! */
 			p2pFuncStopComplete(prAdapter, prP2pBssInfo);
-			if (prP2pBssInfo->eCurrentOPMode == OP_MODE_INFRASTRUCTURE) {
-				kalP2PGCIndicateConnectionStatus(prAdapter->prGlueInfo, prP2pRoleFsmInfo->ucRoleIndex, NULL, NULL, 0,
-						u2ReasonCode,
-						fgIsLocallyGenerated ? WLAN_STATUS_MEDIA_DISCONNECT_LOCALLY : WLAN_STATUS_MEDIA_DISCONNECT);
-			}
-		} else if (eOriMediaStatus != prP2pBssInfo->eConnectionState)
+			p2pRoleFsmStateTransition(prAdapter, prP2pRoleFsmInfo, P2P_ROLE_STATE_IDLE);
+		} else if (eOriMediaStatus != prP2pBssInfo->eConnectionState) {
 			/* Update the Media State if necessary */
 			nicUpdateBss(prAdapter, prP2pBssInfo->ucBssIndex);
-	} else
-		p2pFuncStopComplete(prAdapter, prP2pBssInfo); /* GC : Stop BSS when Deauth done */
+		}
+	} else { /* GC : Stop BSS when Deauth done */
+		p2pFuncStopComplete(prAdapter, prP2pBssInfo);
+		p2pRoleFsmStateTransition(prAdapter, prP2pRoleFsmInfo, P2P_ROLE_STATE_IDLE);
+	}
 }
 
 VOID p2pRoleFsmDeauthTimeout(IN P_ADAPTER_T prAdapter, IN ULONG ulParamPtr)
