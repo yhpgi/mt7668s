@@ -5752,13 +5752,12 @@ UINT_32 qmDumpQueueStatus(IN P_ADAPTER_T prAdapter, IN PUINT_8 pucBuf, IN UINT_3
 			GLUE_GET_REF_CNT(prGlueInfo->i4TxPendingFrameNum),
 			GLUE_GET_REF_CNT(prGlueInfo->i4TxPendingSecurityFrameNum), GLUE_GET_REF_CNT(prGlueInfo->i4TxPendingCmdNum));
 
-#if defined(LINUX)
 	for (i = 0; i < HW_BSSID_NUM; i++) {
 		LOGBUF(pucBuf, u4Max, u4Len, "Pending BSS[%u] QLen[%u:%u:%u:%u]\n", i,
 				prGlueInfo->ai4TxPendingFrameNumPerQueue[i][0], prGlueInfo->ai4TxPendingFrameNumPerQueue[i][1],
 				prGlueInfo->ai4TxPendingFrameNumPerQueue[i][2], prGlueInfo->ai4TxPendingFrameNumPerQueue[i][3]);
 	}
-#endif
+
 	LOGBUF(pucBuf, u4Max, u4Len, "Pending FWD CNT[%d]\n", prTxCtrl->i4PendingFwdFrameCount);
 	LOGBUF(pucBuf, u4Max, u4Len, "Pending MGMT CNT[%d]\n", prTxCtrl->i4TxMgmtPendingNum);
 

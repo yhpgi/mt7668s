@@ -22,11 +22,7 @@
 #include "precomp.h"
 #include "que_mgt.h"
 
-#ifndef LINUX
-#include <limits.h>
-#else
 #include <linux/limits.h>
-#endif
 
 /*******************************************************************************
  *                              C O N S T A N T S
@@ -1946,21 +1942,6 @@ VOID nicRxProcessEventPacket(IN P_ADAPTER_T prAdapter, IN OUT P_SW_RFB_T prSwRfb
 			/* return prCmdInfo */
 			cmdBufFreeCmdInfo(prAdapter, prCmdInfo);
 		}
-#ifndef LINUX
-		if (prAdapter->rWlanInfo.eRssiTriggerType == ENUM_RSSI_TRIGGER_GREATER &&
-				prAdapter->rWlanInfo.rRssiTriggerValue >= (PARAM_RSSI)(prAdapter->rLinkQuality.cRssi)) {
-			prAdapter->rWlanInfo.eRssiTriggerType = ENUM_RSSI_TRIGGER_TRIGGERED;
-
-			kalIndicateStatusAndComplete(prGlueInfo, WLAN_STATUS_MEDIA_SPECIFIC_INDICATION,
-					(PVOID) & (prAdapter->rWlanInfo.rRssiTriggerValue), sizeof(PARAM_RSSI));
-		} else if (prAdapter->rWlanInfo.eRssiTriggerType == ENUM_RSSI_TRIGGER_LESS &&
-				   prAdapter->rWlanInfo.rRssiTriggerValue <= (PARAM_RSSI)(prAdapter->rLinkQuality.cRssi)) {
-			prAdapter->rWlanInfo.eRssiTriggerType = ENUM_RSSI_TRIGGER_TRIGGERED;
-
-			kalIndicateStatusAndComplete(prGlueInfo, WLAN_STATUS_MEDIA_SPECIFIC_INDICATION,
-					(PVOID) & (prAdapter->rWlanInfo.rRssiTriggerValue), sizeof(PARAM_RSSI));
-		}
-#endif
 
 		break;
 

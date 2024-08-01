@@ -1386,13 +1386,9 @@ wlanoidQueryP2pRssi(
 		kalMemCopy(pvQueryBuffer, &rRssi, sizeof(PARAM_RSSI));
 		return WLAN_STATUS_SUCCESS;
 	}
-#ifdef LINUX
+
 	return wlanSendSetQueryCmd(prAdapter, CMD_ID_GET_LINK_QUALITY, FALSE, TRUE, TRUE, nicCmdEventQueryLinkQuality,
 			nicOidCmdTimeoutCommon, *pu4QueryInfoLen, pvQueryBuffer, pvQueryBuffer, u4QueryBufferLen);
-#else
-	return wlanSendSetQueryCmd(prAdapter, CMD_ID_GET_LINK_QUALITY, FALSE, TRUE, TRUE, nicCmdEventQueryLinkQuality,
-			nicOidCmdTimeoutCommon, 0, NULL, pvQueryBuffer, u4QueryBufferLen);
 
-#endif
 } /* wlanoidQueryP2pRssi */
 #endif

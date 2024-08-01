@@ -870,9 +870,7 @@ typedef struct _CMD_RX_PACKET_FILTER {
  *                             D A T A   T Y P E S
  ********************************************************************************
  */
-#ifndef LINUX
-typedef UINT_8 CMD_STATUS;
-#endif
+
 /* for Event Packet (via HIF-RX) */
 typedef struct _PSE_CMD_HDR_T {
 	/* DW0 */

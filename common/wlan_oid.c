@@ -1872,17 +1872,13 @@ wlanoidSetReloadDefaults(
  * \retval WLAN_STATUS_BUFFER_TOO_SHORT
  */
 /*----------------------------------------------------------------------------*/
-#ifdef LINUX
+
 UINT_8 keyBuffer[sizeof(PARAM_KEY_T) + 16 /* LEGACY_KEY_MAX_LEN */];
 UINT_8 aucBCAddr[] = BC_MAC_ADDR;
-#endif
+
 WLAN_STATUS
 wlanoidSetAddWep(IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen)
 {
-#ifndef LINUX
-	UINT_8 keyBuffer[sizeof(PARAM_KEY_T) + 16 /* LEGACY_KEY_MAX_LEN */];
-	UINT_8 aucBCAddr[] = BC_MAC_ADDR;
-#endif
 	P_PARAM_WEP_T prNewWepKey;
 	P_PARAM_KEY_T prParamKey = (P_PARAM_KEY_T)keyBuffer;
 	UINT_32		  u4KeyId, u4SetLen;
@@ -3666,14 +3662,10 @@ wlanoidQueryRssi(
 		kalMemCopy(pvQueryBuffer, &rRssi, sizeof(PARAM_RSSI));
 		return WLAN_STATUS_SUCCESS;
 	}
-#ifdef LINUX
+
 	return wlanSendSetQueryCmd(prAdapter, CMD_ID_GET_LINK_QUALITY, FALSE, TRUE, TRUE, nicCmdEventQueryLinkQuality,
 			nicOidCmdTimeoutCommon, *pu4QueryInfoLen, pvQueryBuffer, pvQueryBuffer, u4QueryBufferLen);
-#else
-	return wlanSendSetQueryCmd(prAdapter, CMD_ID_GET_LINK_QUALITY, FALSE, TRUE, TRUE, nicCmdEventQueryLinkQuality,
-			nicOidCmdTimeoutCommon, 0, NULL, pvQueryBuffer, u4QueryBufferLen);
 
-#endif
 } /* end of wlanoidQueryRssi() */
 
 /*----------------------------------------------------------------------------*/
@@ -6829,17 +6821,8 @@ WLAN_STATUS
 wlanoidQueryMulticastList(
 		IN P_ADAPTER_T prAdapter, OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen)
 {
-#ifndef LINUX
-	ASSERT(prAdapter);
-	ASSERT(pu4QueryInfoLen);
-	if (u4QueryBufferLen)
-		ASSERT(pvQueryBuffer);
-
-	return wlanSendSetQueryCmd(prAdapter, CMD_ID_MAC_MCAST_ADDR, FALSE, TRUE, TRUE, nicCmdEventQueryMcastAddr,
-			nicOidCmdTimeoutCommon, 0, NULL, pvQueryBuffer, u4QueryBufferLen);
-#else
 	return WLAN_STATUS_SUCCESS;
-#endif
+
 } /* end of wlanoidQueryMulticastList() */
 
 /*----------------------------------------------------------------------------*/
@@ -7381,9 +7364,6 @@ wlanoidSetDisassociate(
 	} else {
 		ret = WLAN_STATUS_NOT_ACCEPTED;
 	}
-#if !defined(LINUX)
-	prAdapter->fgIsRadioOff = TRUE;
-#endif
 
 	return ret;
 } /* wlanoidSetDisassociate */

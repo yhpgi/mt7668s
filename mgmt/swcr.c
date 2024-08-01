@@ -180,13 +180,12 @@ void dumpQueue(P_ADAPTER_T prAdapter)
 	DBGLOG(SW4, INFO, "BMC or unknown TxQueue Len %u\n", prQM->arTxQueue[0].u4NumElem);
 	DBGLOG(SW4, INFO, "Pending %d\n", prGlueInfo->i4TxPendingFrameNum);
 	DBGLOG(SW4, INFO, "Pending Security %d\n", prGlueInfo->i4TxPendingSecurityFrameNum);
-#if defined(LINUX)
+
 	for (i = 0; i < 4; i++) {
 		for (j = 0; j < CFG_MAX_TXQ_NUM; j++) {
 			DBGLOG(SW4, INFO, "Pending Q[%u][%u] %d\n", i, j, prGlueInfo->ai4TxPendingFrameNumPerQueue[i][j]);
 		}
 	}
-#endif
 
 	DBGLOG(SW4, INFO, " rFreeSwRfbList %u\n", prAdapter->rRxCtrl.rFreeSwRfbList.u4NumElem);
 	DBGLOG(SW4, INFO, " rReceivedRfbList %u\n", prAdapter->rRxCtrl.rReceivedRfbList.u4NumElem);

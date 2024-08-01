@@ -603,10 +603,6 @@ VOID nicCmdEventSetDisassociate(
 	}
 
 	kalIndicateStatusAndComplete(prAdapter->prGlueInfo, WLAN_STATUS_MEDIA_DISCONNECT, NULL, 0);
-
-#if !defined(LINUX)
-	prAdapter->fgIsRadioOff = TRUE;
-#endif
 }
 
 VOID nicCmdEventSetIpAddress(
@@ -1627,7 +1623,6 @@ UINT_32 TsfRawData2IqFmt(P_EVENT_DUMP_MEM_T prEventDumpMem)
 		/* Store memory dump into sdcard,
 		 * path /sdcard/dump_<current  system tick>_<memory address>_<memory length>.hex
 		 */
-#if defined(LINUX)
 
 		/*if blbist mkdir undre /data/blbist, the dump files wouls put on it */
 		scnprintf(aucPathWF0, sizeof(aucPathWF0), "/tmp/dump_out_%05ld_WF0.txt", g_u2DumpIndex);
@@ -1658,12 +1653,6 @@ UINT_32 TsfRawData2IqFmt(P_EVENT_DUMP_MEM_T prEventDumpMem)
 		} else
 			kalTrunkPath(aucPathRAWWF1);
 
-#else
-		kal_sprintf_ddk(aucPathWF0, sizeof(aucPathWF0), u4CurTimeTick, prEventDumpMem->u4Address,
-				prEventDumpMem->u4Length + prEventDumpMem->u4RemainLength);
-		kal_sprintf_ddk(aucPathWF1, sizeof(aucPathWF1), u4CurTimeTick, prEventDumpMem->u4Address,
-				prEventDumpMem->u4Length + prEventDumpMem->u4RemainLength);
-#endif
 		/* fgAppend = FALSE; */
 	}
 
@@ -1950,7 +1939,6 @@ VOID nicEventQueryMemDump(IN P_ADAPTER_T prAdapter, IN PUINT_8 pucEventBuf, IN U
 		 * path /sdcard/dump_<current  system tick>_<memory address>_<memory length>.hex
 		 */
 		u4CurTimeTick = kalGetTimeTick();
-#if defined(LINUX)
 
 		/*if blbist mkdir undre /data/blbist, the dump files wouls put on it */
 		snprintf(aucPath, sizeof(aucPath), "/dump_%05ld.hex", g_u2DumpIndex);
@@ -1958,10 +1946,7 @@ VOID nicEventQueryMemDump(IN P_ADAPTER_T prAdapter, IN PUINT_8 pucEventBuf, IN U
 			kalMemSet(aucPath, 0x00, 256);
 			snprintf(aucPath, sizeof(aucPath), "/data/dump_%05ld.hex", g_u2DumpIndex);
 		}
-#else
-		kal_sprintf_ddk(aucPath, sizeof(aucPath), u4CurTimeTick, prEventDumpMem->u4Address,
-				prEventDumpMem->u4Length + prEventDumpMem->u4RemainLength);
-#endif
+
 		kalWriteToFile(aucPath, FALSE, &prEventDumpMem->aucBuffer[0], prEventDumpMem->u4Length);
 	} else {
 		/* Append current memory dump to the hex file */
@@ -2052,7 +2037,6 @@ VOID nicCmdEventQueryMemDump(
 			 * path /sdcard/dump_<current  system tick>_<memory address>_<memory length>.hex
 			 */
 			u4CurTimeTick = kalGetTimeTick();
-#if defined(LINUX)
 
 			/* PeiHsuan add for avoiding out of memory 20160801 */
 			if (g_u2DumpIndex >= 20)
@@ -2067,11 +2051,7 @@ VOID nicCmdEventQueryMemDump(
 				kalTrunkPath(aucPath);
 
 			DBGLOG(INIT, INFO, "iCap Create New Dump File dump_%05ld.hex\n", g_u2DumpIndex);
-#else
-			kal_sprintf_ddk(aucPath, sizeof(aucPath), u4CurTimeTick, prEventDumpMem->u4Address,
-					prEventDumpMem->u4Length + prEventDumpMem->u4RemainLength);
-			/* strcpy(aucPath, "dump.hex"); */
-#endif
+
 			kalWriteToFile(aucPath, FALSE, &prEventDumpMem->aucBuffer[0], prEventDumpMem->u4Length);
 		} else {
 			if (kalCheckPath(aucPath) == -1)
@@ -2099,21 +2079,9 @@ write_file_done:
 			}
 			g_bIcapEnable  = FALSE;
 			g_bCaptureDone = TRUE;
-#if defined(LINUX)
-
 			g_u2DumpIndex++;
 
-#else
-			kal_sprintf_done_ddk(aucPath_done, sizeof(aucPath_done));
-			kalWriteToFile(aucPath_done, FALSE, aucPath_done, sizeof(aucPath_done));
-#endif
 		} else {
-#if defined(LINUX)
-
-#else /* 2013/05/26 fw would try to send the buffer successfully */
-			/* The memory dump request is not finished, Send next command */
-			wlanSendMemDumpCmd(prAdapter, prCmdInfo->pvInformationBuffer, prCmdInfo->u4InformationBufferLength);
-#endif
 		}
 	}
 
@@ -2730,7 +2698,7 @@ VOID nicEventLinkQuality(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent, IN
 #else
 	/*only support ais query */
 	{
-		UINT_8 ucBssIndex;
+		UINT_8		 ucBssIndex;
 		P_BSS_INFO_T prBssInfo;
 		if (u4EventBufLen < sizeof(EVENT_LINK_QUALITY_V2)) {
 			DBGLOG(NIC, ERROR, "%s: Invalid event length: %d < %d\n", __func__, u4EventBufLen,
@@ -2765,21 +2733,6 @@ VOID nicEventLinkQuality(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent, IN
 		/* return prCmdInfo */
 		cmdBufFreeCmdInfo(prAdapter, prCmdInfo);
 	}
-#ifndef LINUX
-	if (prAdapter->rWlanInfo.eRssiTriggerType == ENUM_RSSI_TRIGGER_GREATER &&
-			prAdapter->rWlanInfo.rRssiTriggerValue >= (PARAM_RSSI)(prAdapter->rLinkQuality.cRssi)) {
-		prAdapter->rWlanInfo.eRssiTriggerType = ENUM_RSSI_TRIGGER_TRIGGERED;
-
-		kalIndicateStatusAndComplete(prAdapter->prGlueInfo, WLAN_STATUS_MEDIA_SPECIFIC_INDICATION,
-				(PVOID) & (prAdapter->rWlanInfo.rRssiTriggerValue), sizeof(PARAM_RSSI));
-	} else if (prAdapter->rWlanInfo.eRssiTriggerType == ENUM_RSSI_TRIGGER_LESS &&
-			   prAdapter->rWlanInfo.rRssiTriggerValue <= (PARAM_RSSI)(prAdapter->rLinkQuality.cRssi)) {
-		prAdapter->rWlanInfo.eRssiTriggerType = ENUM_RSSI_TRIGGER_TRIGGERED;
-
-		kalIndicateStatusAndComplete(prAdapter->prGlueInfo, WLAN_STATUS_MEDIA_SPECIFIC_INDICATION,
-				(PVOID) & (prAdapter->rWlanInfo.rRssiTriggerValue), sizeof(PARAM_RSSI));
-	}
-#endif
 }
 
 VOID nicEventLayer0ExtMagic(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent, IN UINT_32 u4EventBufLen)

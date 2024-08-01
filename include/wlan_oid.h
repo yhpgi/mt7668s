@@ -536,13 +536,11 @@ typedef struct _PARAM_PMKID_CANDIDATE_T {
 	UINT_32			  u4Flags;
 } PARAM_PMKID_CANDIDATE_T, *P_PARAM_PMKID_CANDIDATE_T;
 
-/* #ifdef LINUX */
 typedef struct _PARAM_PMKID_CANDIDATE_LIST_T {
 	UINT_32					u4Version;		 /*!< Version */
 	UINT_32					u4NumCandidates; /*!< How many candidates follow */
 	PARAM_PMKID_CANDIDATE_T arCandidateList[1];
 } PARAM_PMKID_CANDIDATE_LIST_T, *P_PARAM_PMKID_CANDIDATE_LIST_T;
-/* #endif */
 
 #define NL80211_KCK_LEN 16
 #define NL80211_KEK_LEN 16

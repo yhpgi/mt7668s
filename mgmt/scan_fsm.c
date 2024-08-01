@@ -880,10 +880,9 @@ scnFsmSchedScanRequest(IN P_ADAPTER_T prAdapter, IN UINT_8 ucSsidNum, IN P_PARAM
 	prCmdNloReq->u2SlowScanPeriod	   = prNloParam->u2SlowScanPeriod;
 	prCmdNloReq->ucEntryNum			   = prNloParam->ucMatchSSIDNum;
 
-#ifdef LINUX
 	prCmdNloReq->ucFlag = SCAN_NLO_CHECK_SSID_ONLY;
 	DBGLOG(SCN, INFO, "LINUX only check SSID for PNO SCAN\n");
-#endif
+
 	for (i = 0; i < prNloParam->ucMatchSSIDNum; i++) {
 		COPY_SSID(prCmdNloReq->arNetworkList[i].aucSSID, prCmdNloReq->arNetworkList[i].ucSSIDLength,
 				prNloParam->aucMatchSSID[i], prNloParam->ucMatchSSIDLen[i]);

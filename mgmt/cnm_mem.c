@@ -331,13 +331,9 @@ PVOID cnmMemAlloc(IN P_ADAPTER_T prAdapter, IN ENUM_RAM_TYPE_T eRamType, IN UINT
 	/* kalMemAlloc() shall not included in spin_lock */
 	KAL_RELEASE_SPIN_LOCK(prAdapter, eRamType == RAM_TYPE_MSG ? SPIN_LOCK_MSG_BUF : SPIN_LOCK_MGT_BUF);
 
-#ifdef LINUX
 	pvMemory = (PVOID)kalMemAlloc(u4Length, PHY_MEM_TYPE);
 	if (!pvMemory)
 		DBGLOG(MEM, WARN, "kmalloc fail: %u\n", u4Length);
-#else
-	pvMemory = (PVOID)NULL;
-#endif
 
 #if CFG_DBG_MGT_BUF
 	if (pvMemory)
@@ -385,13 +381,8 @@ VOID cnmMemFree(IN P_ADAPTER_T prAdapter, IN PVOID pvMemory)
 		ASSERT(u4BlockIndex < MAX_NUM_OF_BUF_BLOCKS);
 		eRamType = RAM_TYPE_BUF;
 	} else {
-#ifdef LINUX
 		/* For Linux, it is supported because size is not needed */
 		kalMemFree(pvMemory, PHY_MEM_TYPE, 0);
-#else
-		/* For Windows, it is not supported because of no size argument */
-		ASSERT(0);
-#endif
 
 #if CFG_DBG_MGT_BUF
 		GLUE_INC_REF_CNT(prAdapter->u4MemFreeDynamicCount);

@@ -78,7 +78,6 @@
 #define DBG 0
 #endif
 
-#define LINUX
 #define MT7668
 #define STA_P2P_MCC
 #undef MT6620
@@ -132,13 +131,8 @@
 #define CFG_SUPPORT_DEBUG_FS 0
 #endif
 
-#ifndef LINUX
-#define CFG_FW_FILENAME L"WIFI_RAM_CODE"
-#define CFG_CR4_FW_FILENAME L"WIFI_RAM_CODE2"
-#else
 #define CFG_FW_FILENAME "WIFI_RAM_CODE"
 #define CFG_CR4_FW_FILENAME "WIFI_RAM_CODE2"
-#endif
 
 #ifndef CFG_MET_PACKET_TRACE_SUPPORT
 #define CFG_MET_PACKET_TRACE_SUPPORT 0 /*move to wlan/MAKEFILE */
@@ -153,11 +147,7 @@
  *------------------------------------------------------------------------------
  */
 
-#ifndef LINUX
-#define CFG_SUPPORT_CFG_FILE 0
-#else
 #define CFG_SUPPORT_CFG_FILE 1
-#endif
 
 #define CFG_SUPPORT_802_11D 1 /*!< 1(default): Enable 802.11d */
 							  /* 0: Disable */
@@ -431,11 +421,7 @@
 
 #define CFG_RX_REORDER_Q_THRESHOLD 8
 
-#ifndef LINUX
-#define CFG_RX_RETAINED_PKT_THRESHOLD (CFG_NUM_OF_RX0_HIF_DESC + CFG_NUM_OF_RX1_HIF_DESC + CFG_NUM_OF_QM_RX_PKT_NUM)
-#else
 #define CFG_RX_RETAINED_PKT_THRESHOLD 0
-#endif
 
 /*! Maximum RX packet size, if exceed this value, drop incoming packet */
 /* 7.2.3 Maganement frames */
@@ -611,7 +597,6 @@
  *------------------------------------------------------------------------------
  */
 
-#ifdef LINUX
 #ifdef CONFIG_X86
 #define CFG_ENABLE_WIFI_DIRECT 1
 #define CFG_SUPPORT_802_11W 1
@@ -621,10 +606,6 @@
 #define CFG_SUPPORT_802_11W 1 /*!< 0(default): Disable 802.11W */
 #define CONFIG_SUPPORT_GTK_REKEY 1
 #endif
-#else /* !LINUX */
-#define CFG_ENABLE_WIFI_DIRECT 0
-#define CFG_SUPPORT_802_11W 0 /* Not support at WinXP */
-#endif						  /* LINUX */
 
 #define CFG_SUPPORT_PERSISTENT_GROUP 0
 

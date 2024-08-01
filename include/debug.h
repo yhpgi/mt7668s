@@ -52,11 +52,8 @@ extern uint8_t empty_mac[];
 #define DBG_CLASS_TEMP BIT(7)
 #define DBG_CLASS_MASK BITS(0, 7)
 
-#if defined(LINUX)
 #define DBG_PRINTF_64BIT_DEC "lld"
-#else /* Windows */
-#define DBG_PRINTF_64BIT_DEC "I64d"
-#endif
+
 #define DBG_ALL_MODULE_IDX 0xFFFFFFFF
 /*******************************************************************************
  *                             D A T A   T Y P E S
