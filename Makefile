@@ -8,7 +8,6 @@ ccflags-y += -I$(src)/include \
 ldflags-y += --strip-debug
 
 mt7668s-objs := \
-    chips/mt6632.o \
     chips/mt7668.o \
     common/dump.o \
     common/wlan_bow.o \
@@ -27,7 +26,6 @@ mt7668s-objs := \
     mgmt/hs20.o \
     mgmt/mib.o \
     mgmt/p2p_assoc.o \
-    mgmt/p2p_bss.o \
     mgmt/p2p_dev_fsm.o \
     mgmt/p2p_dev_state.o \
     mgmt/p2p_fsm.o \
@@ -44,7 +42,6 @@ mt7668s-objs := \
     mgmt/rlm.o \
     mgmt/rlm_domain.o \
     mgmt/rlm_obss.o \
-    mgmt/rlm_protection.o \
     mgmt/roaming_fsm.o \
     mgmt/rsn.o \
     mgmt/saa_fsm.o \
@@ -64,7 +61,6 @@ mt7668s-objs := \
     nic/nic_tx.o \
     nic/nic_umac.o \
     nic/que_mgt.o \
-    sdio/arm.o \
     sdio/gl_ate_agent.o \
     sdio/gl_bow.o \
     sdio/gl_cfg80211.o \

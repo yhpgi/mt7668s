@@ -24,10 +24,6 @@
 #include <linux/timer.h>
 #include <linux/mmc/card.h>
 
-#if defined(CFG_AMAZON_METRICS_LOG)
-#include <linux/metricslog.h>
-#endif
-
 #if CFG_CHIP_RESET_SUPPORT
 static void							glResetTriggerUpdateCnt(void);
 enum _ENUM_CHIP_RESET_REASON_TYPE_T eResetReason;

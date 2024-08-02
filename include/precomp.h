@@ -143,7 +143,6 @@
 
 #if CFG_ENABLE_WIFI_DIRECT
 #include "p2p_rlm_obss.h"
-#include "p2p_bss.h"
 #include "p2p.h"
 
 #include "p2p_rlm.h"

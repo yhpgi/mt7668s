@@ -78,13 +78,7 @@
 #define DBG 0
 #endif
 
-#define MT7668
 #define STA_P2P_MCC
-#undef MT6620
-#undef MT6628
-#undef MT5931
-#undef MT6630
-#undef MT6632
 #define WLAN_INCLUDE_PROC 1
 
 #ifndef CFG_MESON_G12A_PATCH
@@ -1111,10 +1105,6 @@
 
 #ifndef CFG_IOCTL_WAIT_FOR_COMPLETION_TIMEOUT
 #define CFG_IOCTL_WAIT_FOR_COMPLETION_TIMEOUT 0
-#endif
-
-#ifndef CFG_FTV_64888_PATCH
-#define CFG_FTV_64888_PATCH 0
 #endif
 
 #ifndef CFG_RESET_DUE_TO_REG_NETDEV_FAIL
