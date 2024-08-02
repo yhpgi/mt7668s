@@ -1575,7 +1575,7 @@ BOOL kalDevKickData(IN P_GLUE_INFO_T prGlueInfo)
  * \retval FALSE         operation fail
  */
 /*----------------------------------------------------------------------------*/
-#if CFG_FTV_62866_PATCH
+#if CFG_MESON_G12A_PATCH
 WLAN_STATUS kalDevWriteCmd(IN P_GLUE_INFO_T prGlueInfo, IN P_CMD_INFO_T prCmdInfo, IN UINT_8 ucTC)
 #else
 BOOL kalDevWriteCmd(IN P_GLUE_INFO_T prGlueInfo, IN P_CMD_INFO_T prCmdInfo, IN UINT_8 ucTC)
@@ -1593,7 +1593,7 @@ BOOL kalDevWriteCmd(IN P_GLUE_INFO_T prGlueInfo, IN P_CMD_INFO_T prCmdInfo, IN U
 
 	if (TFCB_FRAME_PAD_TO_DW(prCmdInfo->u4TxdLen + prCmdInfo->u4TxpLen) > prAdapter->u4CoalescingBufCachedSize) {
 		DBGLOG(HAL, ERROR, "Command TX buffer underflow!\n");
-#if CFG_FTV_62866_PATCH
+#if CFG_MESON_G12A_PATCH
 		return WLAN_STATUS_FAILURE;
 #else
 		return FALSE;
@@ -1629,7 +1629,7 @@ BOOL kalDevWriteCmd(IN P_GLUE_INFO_T prGlueInfo, IN P_CMD_INFO_T prCmdInfo, IN U
 	prGlueInfo->rHifInfo.au4PendingTxDoneCount[ucTC]++;
 
 	prGlueInfo->rHifInfo.rStatCounter.u4CmdPktWriteCnt++;
-#if CFG_FTV_62866_PATCH
+#if CFG_MESON_G12A_PATCH
 	return WLAN_STATUS_SUCCESS;
 #else
 	return TRUE;

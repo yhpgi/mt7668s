@@ -194,7 +194,7 @@
 		kalDevKickData(_prAdapter->prGlueInfo); \
 	}
 
-#if CFG_FTV_62866_PATCH
+#if CFG_MESON_G12A_PATCH
 #define HAL_WRITE_TX_CMD(_prAdapter, _prCmdInfo, _ucTC) \
 	({ \
 		uint32_t retval; \

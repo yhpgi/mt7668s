@@ -860,7 +860,7 @@ BOOL kalDevPortWrite(
 		P_GLUE_INFO_T prGlueInfo, IN UINT_16 u2Port, IN UINT_32 u2Len, IN PUINT_8 pucBuf, IN UINT_32 u2ValidInBufSize);
 
 BOOL kalDevWriteData(IN P_GLUE_INFO_T prGlueInfo, IN P_MSDU_INFO_T prMsduInfo);
-#if CFG_FTV_62866_PATCH
+#if CFG_MESON_G12A_PATCH
 WLAN_STATUS kalDevWriteCmd(IN P_GLUE_INFO_T prGlueInfo, IN P_CMD_INFO_T prCmdInfo, IN UINT_8 ucTC);
 #else
 BOOL				  kalDevWriteCmd(IN P_GLUE_INFO_T prGlueInfo, IN P_CMD_INFO_T prCmdInfo, IN UINT_8 ucTC);

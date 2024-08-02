@@ -1878,7 +1878,7 @@ WLAN_STATUS nicTxCmd(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo, IN UIN
 	P_MSDU_INFO_T	prMsduInfo;
 	P_TX_CTRL_T		prTxCtrl;
 	struct sk_buff *skb;
-#if CFG_FTV_62866_PATCH
+#if CFG_MESON_G12A_PATCH
 	uint32_t ret = WLAN_STATUS_SUCCESS;
 #endif
 
@@ -1902,7 +1902,7 @@ WLAN_STATUS nicTxCmd(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo, IN UIN
 		prCmdInfo->pucTxp	= skb->data;
 		prCmdInfo->u4TxpLen = skb->len;
 
-#if CFG_FTV_62866_PATCH
+#if CFG_MESON_G12A_PATCH
 		ret = HAL_WRITE_TX_CMD(prAdapter, prCmdInfo, ucTC);
 #else
 		HAL_WRITE_TX_CMD(prAdapter, prCmdInfo, ucTC);
@@ -1936,7 +1936,7 @@ WLAN_STATUS nicTxCmd(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo, IN UIN
 		prCmdInfo->pucTxp	= prMsduInfo->prPacket;
 		prCmdInfo->u4TxpLen = prMsduInfo->u2FrameLength;
 
-#if CFG_FTV_62866_PATCH
+#if CFG_MESON_G12A_PATCH
 		ret = HAL_WRITE_TX_CMD(prAdapter, prCmdInfo, ucTC);
 #else
 		HAL_WRITE_TX_CMD(prAdapter, prCmdInfo, ucTC);
@@ -1987,7 +1987,7 @@ WLAN_STATUS nicTxCmd(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo, IN UIN
 		prCmdInfo->pucTxp	   = NULL;
 		prCmdInfo->u4TxpLen	   = 0;
 
-#if CFG_FTV_62866_PATCH
+#if CFG_MESON_G12A_PATCH
 		ret = HAL_WRITE_TX_CMD(prAdapter, prCmdInfo, ucTC);
 		DBGLOG(INIT, TRACE, "TX CMD: ID[0x%02X] SEQ[%u] SET[%u] LEN[%u] status[%x]\n", prWifiCmd->ucCID,
 				prWifiCmd->ucSeqNum, prWifiCmd->ucSetQuery, prWifiCmd->u2Length, ret);
@@ -1999,7 +1999,7 @@ WLAN_STATUS nicTxCmd(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo, IN UIN
 #endif
 	}
 
-#if CFG_FTV_62866_PATCH
+#if CFG_MESON_G12A_PATCH
 	return ret;
 #else
 	return WLAN_STATUS_SUCCESS;

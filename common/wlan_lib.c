@@ -1177,7 +1177,7 @@ WLAN_STATUS wlanTxCmdMthread(IN P_ADAPTER_T prAdapter)
 	 *	UINT_32 u4Address;
 	 */
 	UINT_32 u4TxDoneQueueSize;
-#if CFG_FTV_62866_PATCH
+#if CFG_MESON_G12A_PATCH
 	UINT_32 tx_status;
 	UINT_32 tx_retry_cnt = 0;
 #endif
@@ -1210,7 +1210,7 @@ WLAN_STATUS wlanTxCmdMthread(IN P_ADAPTER_T prAdapter)
 		prCmdInfo					= (P_CMD_INFO_T)prQueueEntry;
 		prCmdInfo->pfHifTxCmdDoneCb = wlanTxCmdDoneCb;
 
-#if CFG_FTV_62866_PATCH
+#if CFG_MESON_G12A_PATCH
 		if (tx_retry_cnt == 0) {
 			if ((!prCmdInfo->fgSetQuery) || (prCmdInfo->fgNeedResp)) {
 				KAL_ACQUIRE_SPIN_LOCK(prAdapter, SPIN_LOCK_CMD_PENDING);
@@ -1257,7 +1257,7 @@ WLAN_STATUS wlanTxCmdMthread(IN P_ADAPTER_T prAdapter)
 		GLUE_DEC_REF_CNT(prAdapter->prGlueInfo->i4TxPendingCmdNum);
 		QUEUE_REMOVE_HEAD(prTempCmdQue, prQueueEntry, P_QUE_ENTRY_T);
 
-#if CFG_FTV_62866_PATCH
+#if CFG_MESON_G12A_PATCH
 		if (tx_retry_cnt) {
 			P_WIFI_CMD_T prWifiCmd = (P_WIFI_CMD_T)prCmdInfo->pucInfoBuffer;
 
