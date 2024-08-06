@@ -12,19 +12,12 @@
 #ifndef _HIF_H
 #define _HIF_H
 
-#if MTK_WCN_HIF_SDIO
-#include "hif_sdio.h"
-#endif
-
 /*******************************************************************************
  *                         C O M P I L E R   F L A G S
  ********************************************************************************
  */
-#if MTK_WCN_HIF_SDIO
-#define HIF_SDIO_SUPPORT_GPIO_SLEEP_MODE 1
-#else
+
 #define HIF_SDIO_SUPPORT_GPIO_SLEEP_MODE 0
-#endif
 
 /*******************************************************************************
  *                    E X T E R N A L   R E F E R E N C E S
@@ -174,13 +167,7 @@ typedef struct _SDIO_RX_COALESCING_BUF_T {
 ** layer info structure.
 */
 typedef struct _GL_HIF_INFO_T {
-#if MTK_WCN_HIF_SDIO
-	MTK_WCN_HIF_SDIO_CLTCTX cltCtx;
-
-	const MTK_WCN_HIF_SDIO_FUNCINFO *prFuncInfo;
-#else
 	struct sdio_func *func;
-#endif
 
 	P_SDIO_CTRL_T prSDIOCtrl;
 
@@ -193,7 +180,7 @@ typedef struct _GL_HIF_INFO_T {
 	/*17 = TC_NUM*/
 	UINT_32 au4PendingTxDoneCount[17];
 #else
-	UINT_32			  au4PendingTxDoneCount[6];
+	UINT_32 au4PendingTxDoneCount[6];
 #endif
 	/* Statistic counter */
 	SDIO_STAT_COUNTER_T rStatCounter;

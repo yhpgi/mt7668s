@@ -31,10 +31,6 @@
 #include "wlan_lib.h"
 #include "wlan_oid.h"
 
-#if CFG_ENABLE_BT_OVER_WIFI
-#include "nic/bow.h"
-#endif
-
 #include "linux/kallsyms.h"
 /*#include <linux/ftrace_event.h>*/
 
@@ -198,9 +194,7 @@ typedef enum _ENUM_KAL_NETWORK_TYPE_INDEX_T {
 #if CFG_ENABLE_WIFI_DIRECT
 	KAL_NETWORK_TYPE_P2P_INDEX,
 #endif
-#if CFG_ENABLE_BT_OVER_WIFI
-	KAL_NETWORK_TYPE_BOW_INDEX,
-#endif
+
 	KAL_NETWORK_TYPE_INDEX_NUM
 } ENUM_KAL_NETWORK_TYPE_INDEX_T;
 
@@ -209,16 +203,6 @@ typedef enum _ENUM_KAL_MEM_ALLOCATION_TYPE_E {
 	VIR_MEM_TYPE, /* virtually continuous */
 	MEM_TYPE_NUM
 } ENUM_KAL_MEM_ALLOCATION_TYPE;
-
-#ifdef CONFIG_ANDROID /* Defined in Android kernel source */
-#if (KERNEL_VERSION(4, 9, 0) <= LINUX_VERSION_CODE)
-typedef struct wakeup_source KAL_WAKE_LOCK_T, *P_KAL_WAKE_LOCK_T;
-#else
-typedef struct wake_lock KAL_WAKE_LOCK_T, *P_KAL_WAKE_LOCK_T;
-#endif
-#else
-typedef UINT_32	   KAL_WAKE_LOCK_T, *P_KAL_WAKE_LOCK_T;
-#endif
 
 #if CFG_SUPPORT_AGPS_ASSIST
 typedef enum _ENUM_MTK_AGPS_ATTR {
@@ -480,32 +464,6 @@ static inline void kalCfg80211ScanDone(struct cfg80211_scan_request *request, bo
 	} while (0)
 
 /*----------------------------------------------------------------------------*/
-/* Macros of wake_lock operations for using in Driver Layer                   */
-/*----------------------------------------------------------------------------*/
-#if defined(CONFIG_ANDROID) && (CFG_ENABLE_WAKE_LOCK)
-/* CONFIG_ANDROID is defined in Android kernel source */
-#define KAL_WAKE_LOCK_INIT(_prAdapter, _prWakeLock, _pcName) wake_lock_init(_prWakeLock, WAKE_LOCK_SUSPEND, _pcName)
-
-#define KAL_WAKE_LOCK_DESTROY(_prAdapter, _prWakeLock) wake_lock_destroy(_prWakeLock)
-
-#define KAL_WAKE_LOCK(_prAdapter, _prWakeLock) wake_lock(_prWakeLock)
-
-#define KAL_WAKE_LOCK_TIMEOUT(_prAdapter, _prWakeLock, _u4Timeout) wake_lock_timeout(_prWakeLock, _u4Timeout)
-
-#define KAL_WAKE_UNLOCK(_prAdapter, _prWakeLock) wake_unlock(_prWakeLock)
-
-#define KAL_WAKE_LOCK_ACTIVE(_prAdapter, _prWakeLock) wake_lock_active(_prWakeLock)
-
-#else
-#define KAL_WAKE_LOCK_INIT(_prAdapter, _prWakeLock, _pcName)
-#define KAL_WAKE_LOCK_DESTROY(_prAdapter, _prWakeLock)
-#define KAL_WAKE_LOCK(_prAdapter, _prWakeLock)
-#define KAL_WAKE_LOCK_TIMEOUT(_prAdapter, _prWakeLock, _u4Timeout)
-#define KAL_WAKE_UNLOCK(_prAdapter, _prWakeLock)
-#define KAL_WAKE_LOCK_ACTIVE(_prAdapter, _prWakeLock)
-#endif
-
-/*----------------------------------------------------------------------------*/
 /*!
  * \brief Cache memory allocation
  *
@@ -731,16 +689,6 @@ extern int __printk_ratelimit(const char *func);
 		panic("Oops"); \
 	} while (0)
 
-#if CFG_ENABLE_AEE_MSG
-#define kalSendAeeException aee_kernel_exception
-#define kalSendAeeWarning aee_kernel_warning
-#define kalSendAeeReminding aee_kernel_reminding
-#else
-#define kalSendAeeException(_module, _desc, ...)
-#define kalSendAeeWarning(_module, _desc, ...)
-#define kalSendAeeReminding(_module, _desc, ...)
-#endif
-
 #define PRINTF_ARG(...) __VA_ARGS__
 #define SPRINTF(buf, arg) \
 	{ \
@@ -931,36 +879,6 @@ VOID kalOidCmdClearance(IN P_GLUE_INFO_T prGlueInfo);
 VOID kalOidClearance(IN P_GLUE_INFO_T prGlueInfo);
 
 VOID kalEnqueueCommand(IN P_GLUE_INFO_T prGlueInfo, IN P_QUE_ENTRY_T prQueueEntry);
-
-#if CFG_ENABLE_BT_OVER_WIFI
-/*----------------------------------------------------------------------------*/
-/* Bluetooth over Wi-Fi handling                                              */
-/*----------------------------------------------------------------------------*/
-VOID kalIndicateBOWEvent(IN P_GLUE_INFO_T prGlueInfo, IN P_AMPC_EVENT prEvent);
-
-ENUM_BOW_DEVICE_STATE kalGetBowState(IN P_GLUE_INFO_T prGlueInfo, IN PARAM_MAC_ADDRESS rPeerAddr);
-
-BOOLEAN kalSetBowState(IN P_GLUE_INFO_T prGlueInfo, IN ENUM_BOW_DEVICE_STATE eBowState, PARAM_MAC_ADDRESS rPeerAddr);
-
-ENUM_BOW_DEVICE_STATE kalGetBowGlobalState(IN P_GLUE_INFO_T prGlueInfo);
-
-UINT_32 kalGetBowFreqInKHz(IN P_GLUE_INFO_T prGlueInfo);
-
-UINT_8 kalGetBowRole(IN P_GLUE_INFO_T prGlueInfo, IN PARAM_MAC_ADDRESS rPeerAddr);
-
-VOID kalSetBowRole(IN P_GLUE_INFO_T prGlueInfo, IN UINT_8 ucRole, IN PARAM_MAC_ADDRESS rPeerAddr);
-
-UINT_8 kalGetBowAvailablePhysicalLinkCount(IN P_GLUE_INFO_T prGlueInfo);
-
-#if CFG_BOW_SEPARATE_DATA_PATH
-/*----------------------------------------------------------------------------*/
-/* Bluetooth over Wi-Fi Net Device Init/Uninit                                */
-/*----------------------------------------------------------------------------*/
-BOOLEAN kalInitBowDevice(IN P_GLUE_INFO_T prGlueInfo, IN const char *prDevName);
-
-BOOLEAN kalUninitBowDevice(IN P_GLUE_INFO_T prGlueInfo);
-#endif /* CFG_BOW_SEPARATE_DATA_PATH */
-#endif /* CFG_ENABLE_BT_OVER_WIFI */
 
 /*----------------------------------------------------------------------------*/
 /* Security Frame Clearance                                                   */

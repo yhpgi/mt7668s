@@ -138,11 +138,8 @@ typedef enum _ENUM_DBG_ASSERT_PATH_T {
 	DBG_ASSERT_PATH_WMT
 } ENUM_DBG_ASSERT_PATH_T,
 		*P_ENUM_DBG_ASSERT_PATH_T;
-#if MTK_WCN_HIF_SDIO
-#define DBG_ASSERT_PATH_DEFAULT DBG_ASSERT_PATH_WMT
-#else
+
 #define DBG_ASSERT_PATH_DEFAULT DBG_ASSERT_PATH_WIFI
-#endif
 #define DBG_ASSERT_CTRL_LEVEL_DEFAULT DBG_ASSERT_CTRL_LEVEL_ERROR
 /*******************************************************************************
  *                            P U B L I C   D A T A

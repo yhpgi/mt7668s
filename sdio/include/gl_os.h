@@ -54,14 +54,6 @@
 
 #define DRV_NAME "[" CHIP_NAME "]: "
 
-/* Define if target platform is Android.
- * It should already be defined in Android kernel source
- */
-#ifndef CONFIG_ANDROID
-/* #define CONFIG_ANDROID      0 */
-
-#endif
-
 /* for CFG80211 IE buffering mechanism */
 #define CFG_CFG80211_IE_BUF_LEN (512)
 
@@ -77,13 +69,7 @@
 #include <linux/jiffies.h> /* jiffies */
 #include <linux/delay.h>   /* udelay and mdelay macro */
 
-#ifdef CONFIG_HAS_WAKELOCK
-#include <linux/wakelock.h>
-#endif
-
-#if LINUX_VERSION_CODE > KERNEL_VERSION(2, 6, 12)
 #include <linux/irq.h> /* IRQT_FALLING */
-#endif
 
 #include <linux/netdevice.h>   /* struct net_device, struct net_device_stats */
 #include <linux/etherdevice.h> /* for eth_type_trans() function */
@@ -159,7 +145,6 @@
 #include "typedef.h"
 #include "queue.h"
 #include "gl_kal.h"
-#include "gl_rst.h"
 #include "hif.h"
 
 #if CFG_SUPPORT_TDLS
@@ -171,17 +156,6 @@
 #include "wlan_lib.h"
 #include "wlan_oid.h"
 
-#if CFG_ENABLE_AEE_MSG
-#ifdef CONFIG_ANDROID
-#include <mt-plat/aee.h>
-#else
-#include <linux/aee.h>
-#endif
-#endif
-
-#if CFG_MET_TAG_SUPPORT
-#include <mt-plat/met_drv.h>
-#endif
 #include <linux/time.h>
 #include <linux/capability.h>
 #include <linux/skbuff.h>
@@ -382,31 +356,6 @@ typedef struct _GL_IO_REQ_T {
 	UINT_32				 u4Timeout;
 } GL_IO_REQ_T, *P_GL_IO_REQ_T;
 
-#if CFG_ENABLE_BT_OVER_WIFI
-typedef struct _GL_BOW_INFO {
-	BOOLEAN fgIsRegistered;
-	dev_t	u4DeviceNumber;						  /* dynamic device number */
-	/* struct kfifo            *prKfifo;       */ /* for buffering indicated events */
-	struct kfifo rKfifo;						  /* for buffering indicated events */
-	spinlock_t	 rSpinLock;						  /* spin lock for kfifo */
-	struct cdev	 cdev;
-	UINT_32		 u4FreqInKHz; /* frequency */
-
-	UINT_8				  aucRole[CFG_BOW_PHYSICAL_LINK_NUM]; /* 0: Responder, 1: Initiator */
-	ENUM_BOW_DEVICE_STATE aeState[CFG_BOW_PHYSICAL_LINK_NUM];
-	PARAM_MAC_ADDRESS	  arPeerAddr[CFG_BOW_PHYSICAL_LINK_NUM];
-
-	wait_queue_head_t outq;
-
-#if CFG_BOW_SEPARATE_DATA_PATH
-	/* Device handle */
-	struct net_device *prDevHandler;
-	BOOLEAN			   fgIsNetRegistered;
-#endif
-
-} GL_BOW_INFO, *P_GL_BOW_INFO;
-#endif
-
 /*
  * type definition of pointer to p2p structure
  */
@@ -548,10 +497,6 @@ struct _GLUE_INFO_T {
 	UINT_16 u2WapiAssocInfoIESz;
 #endif
 
-#if CFG_ENABLE_BT_OVER_WIFI
-	GL_BOW_INFO rBowInfo;
-#endif
-
 #if CFG_ENABLE_WIFI_DIRECT
 	P_GL_P2P_DEV_INFO_T prP2PDevInfo;
 	P_GL_P2P_INFO_T		prP2PInfo[KAL_P2P_NUM];
@@ -613,11 +558,6 @@ struct _GLUE_INFO_T {
 	BOOLEAN fgIs6Dad;
 	UINT_8	aucDADipv6[16];
 #endif /* CFG_SUPPORT_PASSPOINT */
-
-#if defined(CONFIG_ANDROID) && (CFG_ENABLE_WAKE_LOCK)
-	KAL_WAKE_LOCK_T rIntrWakeLock;
-	KAL_WAKE_LOCK_T rTimeoutWakeLock;
-#endif
 
 #if CFG_MET_PACKET_TRACE_SUPPORT
 	BOOLEAN fgMetProfilingEn;
@@ -852,30 +792,6 @@ typedef struct _PACKET_PRIVATE_DATA {
 
 #define DbgPrint(...)
 
-#if CFG_MET_TAG_SUPPORT
-#define GL_MET_TAG_START(_id, _name) met_tag_start(_id, _name)
-#define GL_MET_TAG_END(_id, _name) met_tag_end(_id, _name)
-#define GL_MET_TAG_ONESHOT(_id, _name, _value) met_tag_oneshot(_id, _name, _value)
-#define GL_MET_TAG_DISABLE(_id) met_tag_disable(_id)
-#define GL_MET_TAG_ENABLE(_id) met_tag_enable(_id)
-#define GL_MET_TAG_REC_ON() met_tag_record_on()
-#define GL_MET_TAG_REC_OFF() met_tag_record_off()
-#define GL_MET_TAG_INIT() met_tag_init()
-#define GL_MET_TAG_UNINIT() met_tag_uninit()
-#else
-#define GL_MET_TAG_START(_id, _name)
-#define GL_MET_TAG_END(_id, _name)
-#define GL_MET_TAG_ONESHOT(_id, _name, _value)
-#define GL_MET_TAG_DISABLE(_id)
-#define GL_MET_TAG_ENABLE(_id)
-#define GL_MET_TAG_REC_ON()
-#define GL_MET_TAG_REC_OFF()
-#define GL_MET_TAG_INIT()
-#define GL_MET_TAG_UNINIT()
-#endif
-
-#define MET_TAG_ID 0
-
 /*----------------------------------------------------------------------------*/
 /* Macros of Data Type Check                                                  */
 /*----------------------------------------------------------------------------*/
@@ -932,12 +848,6 @@ INT_32 procUninitProcFs(VOID);
 INT_32 procInitProcfs(struct net_device *prDev, char *pucDevName);
 #endif /* WLAN_INCLUDE_PROC */
 
-#if CFG_ENABLE_BT_OVER_WIFI
-BOOLEAN glRegisterAmpc(P_GLUE_INFO_T prGlueInfo);
-
-BOOLEAN glUnregisterAmpc(P_GLUE_INFO_T prGlueInfo);
-#endif
-
 #if CFG_ENABLE_WIFI_DIRECT
 void p2pSetMulticastListWorkQueueWrapper(P_GLUE_INFO_T prGlueInfo);
 #endif
@@ -988,11 +898,6 @@ extern void wlanUnregisterNotifier(void);
 
 extern void wlanRegisterRebootNotifier(void);
 extern void wlanUnregisterRebootNotifier(void);
-
-#if (MTK_WCN_HIF_SDIO && CFG_SUPPORT_MTK_ANDROID_KK)
-typedef int (*set_p2p_mode)(struct net_device *netdev, PARAM_CUSTOM_P2P_SET_STRUCT_T p2pmode);
-extern void register_set_p2p_mode_handler(set_p2p_mode handler);
-#endif
 
 #if CFG_ENABLE_EARLY_SUSPEND
 extern int glRegisterEarlySuspend(

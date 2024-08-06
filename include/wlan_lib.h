@@ -1331,10 +1331,6 @@ VOID wlanNotifyFwSuspend(P_GLUE_INFO_T prGlueInfo, struct net_device *prDev, BOO
 
 VOID wlanClearPendingInterrupt(IN P_ADAPTER_T prAdapter);
 
-#if (MTK_WCN_HIF_SDIO && CFG_WMT_WIFI_PATH_SUPPORT)
-extern INT_32 mtk_wcn_wmt_wifi_fem_cfg_report(PVOID pvInfoBuf);
-#endif
-
 UINT_8 wlanGetAntPathType(IN P_ADAPTER_T prAdapter, IN enum ENUM_WF_PATH_FAVOR_T eWfPathFavor, IN UINT_8 ucBssIndex);
 
 UINT_8 wlanGetSpeIdx(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex, IN enum ENUM_WF_PATH_FAVOR_T eWfPathFavor);

@@ -328,9 +328,7 @@ struct wireless_dev *mtk_p2p_cfg80211_add_iface(
 		prHif = &prGlueInfo->rHifInfo;
 		ASSERT(prHif);
 
-#if (MTK_WCN_HIF_SDIO == 0)
 		SET_NETDEV_DEV(prNewNetDevice, &(prHif->func->dev));
-#endif
 
 #if CFG_ENABLE_WIFI_DIRECT_CFG_80211
 		prWdev = kzalloc(sizeof(struct wireless_dev), GFP_KERNEL);
@@ -2592,13 +2590,6 @@ int mtk_p2p_cfg80211_change_iface(IN struct wiphy *wiphy, IN struct net_device *
 
 		DBGLOG(P2P, TRACE, "mtk_p2p_cfg80211_change_iface.\n");
 
-#if CFG_CHIP_RESET_SUPPORT
-		if (kalIsResetting()) {
-			DBGLOG(INIT, WARN, "wlan is halt, skip reg callback");
-			return -EFAULT;
-		}
-#endif
-
 		if (ndev->ieee80211_ptr)
 			ndev->ieee80211_ptr->iftype = type;
 
@@ -2730,19 +2721,10 @@ void mtk_p2p_cfg80211_mgmt_frame_register(
 	PUINT_32			  pu4P2pPacketFilter = NULL;
 	P_P2P_ROLE_FSM_INFO_T prP2pRoleFsmInfo	 = (P_P2P_ROLE_FSM_INFO_T)NULL;
 
-#if CFG_CHIP_RESET_SUPPORT
-	if (checkResetState() || g_u4HaltFlag) {
-		DBGLOG(INIT, WARN, "wlan is halt, skip reg callback");
-		return;
-	}
-	rst_data.entry_conut++;
-	DBGLOG(INIT, TRACE, "entry_conut = %d\n", rst_data.entry_conut);
-#else
 	if (g_u4HaltFlag) {
 		DBGLOG(RLM, WARN, "wlan is halt, skip reg callback\n");
 		return;
 	}
-#endif
 
 	do {
 		if ((wiphy == NULL) || (wdev == NULL))
@@ -2820,11 +2802,6 @@ void mtk_p2p_cfg80211_mgmt_frame_register(
 #endif
 
 	} while (FALSE);
-
-#if CFG_CHIP_RESET_SUPPORT
-	rst_data.entry_conut--;
-	DBGLOG(INIT, TRACE, "entry_conut = %d\n", rst_data.entry_conut);
-#endif
 
 } /* mtk_p2p_cfg80211_mgmt_frame_register */
 

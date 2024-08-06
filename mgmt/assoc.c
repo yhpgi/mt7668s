@@ -247,21 +247,6 @@ static __KAL_INLINE__ VOID assocBuildReAssocReqFrameCommonIEs(IN P_ADAPTER_T prA
 		pucBuffer = p2pBuildReAssocReqFrameCommonIEs(prAdapter, prMsduInfo, pucBuffer);
 
 #endif
-#if CFG_ENABLE_BT_OVER_WIFI
-	else if (IS_STA_BOW_TYPE(prStaRec)) {
-		SSID_IE(pucBuffer)->ucId = ELEM_ID_SSID;
-
-		/* NOTE(Kevin): We copy the SSID from CONNECTION_SETTINGS for the case of
-		 * Passive Scan and the target BSS didn't broadcast SSID on its Beacon Frame.
-		 */
-
-		COPY_SSID(SSID_IE(pucBuffer)->aucSSID, SSID_IE(pucBuffer)->ucLength, prConnSettings->aucSSID,
-				prConnSettings->ucSSIDLen);
-
-		prMsduInfo->u2FrameLength += IE_SIZE(pucBuffer);
-		pucBuffer += IE_SIZE(pucBuffer);
-	}
-#endif
 
 	/* NOTE(Kevin 2008/12/19): 16.3.6.3 MLME-ASSOCIATE.indication -
 	 * SupportedRates - The set of data rates that are supported by the STA
@@ -1153,11 +1138,13 @@ WLAN_STATUS assocProcessRxAssocReqFrame(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T 
 	UINT_16					  u2Offset	   = 0;
 	UINT_16					  u2StatusCode = STATUS_CODE_SUCCESSFUL;
 	UINT_16					  u2RxFrameCtrl;
-	UINT_16					  u2BSSBasicRateSet;
 	UINT_8					  ucFixedFieldLength;
-	BOOLEAN					  fgIsUnknownBssBasicRate;
 	BOOLEAN					  fgIsHT = FALSE, fgIsTKIP = FALSE;
 	UINT_32					  i;
+#if 0
+	BOOLEAN					fgIsUnknownBssBasicRate;
+	UINT_16					u2BSSBasicRateSet;
+#endif
 
 	if (!prAdapter || !prSwRfb || !pu2StatusCode) {
 		DBGLOG(SAA, WARN, "Invalid parameters, ignore this pkt!\n");
@@ -1346,6 +1333,10 @@ WLAN_STATUS assocProcessRxAssocReqFrame(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T 
 			break;
 		}
 		/* Ignore any Basic Bit */
+#if 0
+		/*!
+		 * FIXME
+		 */
 		rateGetRateSetFromIEs(prIeSupportedRate, prIeExtSupportedRate, &prStaRec->u2OperationalRateSet,
 				&u2BSSBasicRateSet, &fgIsUnknownBssBasicRate);
 
@@ -1354,6 +1345,7 @@ WLAN_STATUS assocProcessRxAssocReqFrame(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T 
 			DBGLOG(SAA, WARN, "Basic rate not supported!\n");
 			break;
 		}
+#endif
 
 		/* Accpet the Sta, update BSSBasicRateSet from Bss */
 		prStaRec->u2BSSBasicRateSet		= prBssInfo->u2BSSBasicRateSet;

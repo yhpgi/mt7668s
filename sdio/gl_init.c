@@ -50,12 +50,6 @@ uint8_t empty_mac[6] = { 0 };
 
 struct wireless_dev *gprWdev;
 
-#ifdef CFG_SKIP_RESET_DURING_SUSPEND
-#ifdef CONFIG_ANDROID
-KAL_WAKE_LOCK_T g_suspend_wakelock;
-#endif
-#endif
-
 struct completion  rWaitForResetComp;
 struct completion *prWaitForResetComp = NULL;
 
@@ -118,10 +112,6 @@ static WLANDEV_INFO_T arWlanDevInfo[CFG_MAX_WLAN_DEVICES] = { { 0 } };
 
 static UINT_32 u4WlanDevNum; /* How many NICs coexist now */
 
-#if CFG_SUPPORT_CAL_RESULT_BACKUP_TO_HOST
-BOOLEAN g_fgIsCalDataBackuped = FALSE;
-#endif
-
 /**20150205 added work queue for sched_scan to avoid cfg80211 stop schedule scan dead loack**/
 struct delayed_work sched_workq;
 
@@ -132,17 +122,6 @@ struct delayed_work sched_workq;
 
 #if (CFG_EFUSE_BUFFER_MODE_DELAY_CAL == 1)
 static PUINT_8 apucEepromName[] = { (PUINT_8)CFG_EEPRM_FILENAME "_MT", NULL };
-#endif
-
-#if CFG_CHIP_RESET_SUPPORT
-static int g_u4ProbeChipResetTimes;
-#define PROBE_CHIP_RESET_LIMIT 3
-static int g_wlan_removing = 0;
-int		   IS_WLAN_REMOVING(void)
-{
-	return g_wlan_removing;
-}
-
 #endif
 
 int CFG80211_Suspend(struct wiphy *wiphy, struct cfg80211_wowlan *wow)
@@ -1720,23 +1699,10 @@ struct wireless_dev *wlanGetWirelessDevice(void)
 
 VOID wlanWakeLockInit(P_GLUE_INFO_T prGlueInfo)
 {
-#ifdef CONFIG_ANDROID
-	KAL_WAKE_LOCK_INIT(NULL, &prGlueInfo->rIntrWakeLock, "WLAN interrupt");
-	KAL_WAKE_LOCK_INIT(NULL, &prGlueInfo->rTimeoutWakeLock, "WLAN timeout");
-#endif
 }
 
 VOID wlanWakeLockUninit(P_GLUE_INFO_T prGlueInfo)
 {
-#if defined(CONFIG_ANDROID) && (CFG_ENABLE_WAKE_LOCK)
-	if (KAL_WAKE_LOCK_ACTIVE(NULL, &prGlueInfo->rIntrWakeLock))
-		KAL_WAKE_UNLOCK(NULL, &prGlueInfo->rIntrWakeLock);
-	KAL_WAKE_LOCK_DESTROY(NULL, &prGlueInfo->rIntrWakeLock);
-
-	if (KAL_WAKE_LOCK_ACTIVE(NULL, &prGlueInfo->rTimeoutWakeLock))
-		KAL_WAKE_UNLOCK(NULL, &prGlueInfo->rTimeoutWakeLock);
-	KAL_WAKE_LOCK_DESTROY(NULL, &prGlueInfo->rTimeoutWakeLock);
-#endif
 }
 
 /*----------------------------------------------------------------------------*/
@@ -1904,16 +1870,6 @@ static struct wireless_dev  *wlanNetCreate(PVOID pvData, PVOID pvDriverData)
 	/* Init wakelock */
 	wlanWakeLockInit(prGlueInfo);
 
-#ifdef CFG_SKIP_RESET_DURING_SUSPEND
-#ifdef CONFIG_ANDROID
-#if (KERNEL_VERSION(4, 9, 0) <= LINUX_VERSION_CODE)
-	wakeup_source_init(&g_suspend_wakelock, "WLAN suspend");
-#else
-	wake_lock_init(&g_suspend_wakelock, WAKE_LOCK_SUSPEND, "WLAN suspend");
-#endif
-#endif
-#endif
-
 	/* main thread is created in this function */
 #if CFG_SUPPORT_MULTITHREAD
 	init_waitqueue_head(&prGlueInfo->waitq_rx);
@@ -2079,11 +2035,7 @@ int set_p2p_mode_handler(struct net_device *netdev, PARAM_CUSTOM_P2P_SET_STRUCT_
 	rSetP2P.u4Enable = p2pmode.u4Enable;
 	rSetP2P.u4Mode	 = p2pmode.u4Mode;
 
-#if CFG_CHIP_RESET_SUPPORT
-	if ((!rSetP2P.u4Enable) && (kalIsResetting() == FALSE)) {
-#else
 	if (!rSetP2P.u4Enable) {
-#endif
 		p2pNetUnregister(prGlueInfo, FALSE);
 	}
 
@@ -2098,15 +2050,7 @@ int set_p2p_mode_handler(struct net_device *netdev, PARAM_CUSTOM_P2P_SET_STRUCT_
 
 	DBGLOG(INIT, INFO, "set_p2p_mode_handler ret = 0x%08lx\n", (UINT_32)rWlanStatus);
 
-	/* Need to check fgIsP2PRegistered, in case of whole chip reset.
-	 * in this case, kalIOCTL return success always,
-	 * and prGlueInfo->prP2PInfo[0] may be NULL
-	 */
-#if CFG_CHIP_RESET_SUPPORT
-	if ((rSetP2P.u4Enable) && (prGlueInfo->prAdapter->fgIsP2PRegistered) && (kalIsResetting() == FALSE)) {
-#else
 	if ((rSetP2P.u4Enable) && (prGlueInfo->prAdapter->fgIsP2PRegistered)) {
-#endif
 		ret = p2pNetRegister(prGlueInfo, FALSE);
 	}
 
@@ -2443,9 +2387,7 @@ INT_32 wlanProbe(PVOID pvData, PVOID pvDriverData)
 	INT_32				 i4Status	   = 0;
 	BOOL				 bRet		   = FALSE;
 	P_REG_INFO_T		 prRegInfo;
-#if (MTK_WCN_HIF_SDIO && CFG_WMT_WIFI_PATH_SUPPORT)
-	INT_32 i4RetVal = 0;
-#endif
+
 #if CFG_SUPPORT_REPLAY_DETECTION
 	UINT_8 ucRpyDetectOffload;
 #endif
@@ -2463,14 +2405,7 @@ INT_32 wlanProbe(PVOID pvData, PVOID pvDriverData)
 	dev_warn("func->vendor=0x%x\n", func->vendor);
 	dev_warn("func->device=0x%x\n", func->device);
 #endif
-#if CFG_CHIP_RESET_SUPPORT
-	/* [RST] In case wlanRemove not finished yet normally,
-	 *       but wifi probe called directly.
-	 *       The IS_WLAN_REMOVING() and kalIsResetting() will return FALSE,
-	 *       so that IOCTL won't be skipped from now on.
-	 */
-	g_wlan_removing = 0;
-#endif
+
 	do {
 		/* 4 <1> Initialize the IO port of the interface */
 		/* GeorgeKuo: pData has different meaning for _HIF_XXX:
@@ -2534,14 +2469,6 @@ INT_32 wlanProbe(PVOID pvData, PVOID pvDriverData)
 
 		DBGLOG(INIT, INFO, "WifiPath Init=0x%x\n", prAdapter->rWifiFemCfg.u2WifiPath);
 
-#if (MTK_WCN_HIF_SDIO && CFG_WMT_WIFI_PATH_SUPPORT)
-		i4RetVal = mtk_wcn_wmt_wifi_fem_cfg_report((PVOID)&prAdapter->rWifiFemCfg);
-
-		if (i4RetVal)
-			DBGLOG(INIT, WARN, "Get WifiPath from WMT drv FAIL\n");
-		else
-			DBGLOG(INIT, INFO, "Get WifiPath from WMT drv Success WifiPath=0x%x\n", prAdapter->rWifiFemCfg.u2WifiPath);
-#endif
 		/* 4 <5> Start Device */
 		prRegInfo = &prGlueInfo->rRegInfo;
 
@@ -2729,24 +2656,16 @@ INT_32 wlanProbe(PVOID pvData, PVOID pvDriverData)
 		kalMetInit(prGlueInfo);
 #endif
 
-#if CFG_ENABLE_BT_OVER_WIFI
-		prGlueInfo->rBowInfo.fgIsNetRegistered = FALSE;
-		prGlueInfo->rBowInfo.fgIsRegistered	   = FALSE;
-		glRegisterAmpc(prGlueInfo);
-#endif
-
-#if (CFG_ENABLE_WIFI_DIRECT && MTK_WCN_HIF_SDIO && CFG_SUPPORT_MTK_ANDROID_KK)
-		register_set_p2p_mode_handler(set_p2p_mode_handler);
-#elif (CFG_ENABLE_WIFI_DIRECT)
+#if (CFG_ENABLE_WIFI_DIRECT)
 		if (prAdapter->rWifiVar.u4RegP2pIfAtProbe) {
 			PARAM_CUSTOM_P2P_SET_STRUCT_T rSetP2P;
 
 			rSetP2P.u4Enable = 1;
 
 #ifdef CFG_DRIVER_INITIAL_RUNNING_MODE
-			rSetP2P.u4Mode	 = CFG_DRIVER_INITIAL_RUNNING_MODE;
+			rSetP2P.u4Mode = CFG_DRIVER_INITIAL_RUNNING_MODE;
 #else
-			 rSetP2P.u4Mode = RUNNING_P2P_MODE;
+			rSetP2P.u4Mode = RUNNING_P2P_MODE;
 #endif /* CFG_DRIVER_RUNNING_MODE */
 			if (set_p2p_mode_handler(prWdev->netdev, rSetP2P) == 0)
 				DBGLOG(INIT, STATE, "%s: p2p device registered\n", __func__);
@@ -2806,28 +2725,6 @@ INT_32 wlanProbe(PVOID pvData, PVOID pvDriverData)
 			DBGLOG(INIT, ERROR, "wlanProbe: init MET procfs failed\n");
 #endif
 
-#if CFG_MET_TAG_SUPPORT
-		if (met_tag_init() != 0)
-			DBGLOG(INIT, ERROR, "MET_TAG_INIT error!\n");
-#endif
-
-#if CFG_SUPPORT_CAL_RESULT_BACKUP_TO_HOST
-		/* Calibration Backup Flow */
-		if (!g_fgIsCalDataBackuped) {
-			if (rlmTriggerCalBackup(prGlueInfo->prAdapter, g_fgIsCalDataBackuped) == WLAN_STATUS_FAILURE) {
-				DBGLOG(RFTEST, INFO, "Error : Boot Time Wi-Fi Enable Fail........\n");
-				return -1;
-			}
-
-			g_fgIsCalDataBackuped = TRUE;
-		} else {
-			if (rlmTriggerCalBackup(prGlueInfo->prAdapter, g_fgIsCalDataBackuped) == WLAN_STATUS_FAILURE) {
-				DBGLOG(RFTEST, INFO, "Error : Normal Wi-Fi Enable Fail........\n");
-				return -1;
-			}
-		}
-#endif
-
 #if CFG_SUPPORT_REPLAY_DETECTION
 		ucRpyDetectOffload = prAdapter->rWifiVar.ucRpyDetectOffload;
 
@@ -2840,9 +2737,6 @@ INT_32 wlanProbe(PVOID pvData, PVOID pvDriverData)
 		}
 #endif
 
-#if CFG_CHIP_RESET_SUPPORT
-		g_u4ProbeChipResetTimes = 0;
-#endif
 		DBGLOG(INIT, STATE, "wlanProbe: probe success\n");
 		set_bit(GLUE_FLAG_ADAPT_RDY_BIT, &prGlueInfo->ulFlag);
 
@@ -2855,18 +2749,7 @@ INT_32 wlanProbe(PVOID pvData, PVOID pvDriverData)
 
 		glBusFreeIrq(prGlueInfo->prDevHandler, prGlueInfo);
 		DBGLOG(INIT, ERROR, "wlanProbe: probe failed\n");
-
-#if CFG_CHIP_RESET_SUPPORT
-		if (g_u4ProbeChipResetTimes < PROBE_CHIP_RESET_LIMIT) {
-			DBGLOG(INIT, ERROR, "wlanProbe: trigger whole reset\n");
-			g_u4ProbeChipResetTimes++;
-			GL_RESET_TRIGGER(prAdapter, RST_PROBE_FAIL);
-		}
-#endif
 	}
-#if CFG_CHIP_RESET_SUPPORT
-	atomic_set(&g_fgBlockBTTriggerReset, 0);
-#endif
 
 	if (prWaitForResetComp) {
 		complete(prWaitForResetComp);
@@ -2916,9 +2799,7 @@ VOID wlanRemove(VOID)
 		DBGLOG(INIT, ERROR, "0 == u4WlanDevNum\n");
 		return;
 	}
-#if (CFG_ENABLE_WIFI_DIRECT && MTK_WCN_HIF_SDIO && CFG_SUPPORT_MTK_ANDROID_KK)
-	register_set_p2p_mode_handler(NULL);
-#endif
+
 	if (u4WlanDevNum > 0 && u4WlanDevNum <= CFG_MAX_WLAN_DEVICES) {
 		prDev		  = arWlanDevInfo[u4WlanDevNum - 1].prDev;
 		prWlandevInfo = &arWlanDevInfo[u4WlanDevNum - 1];
@@ -2937,21 +2818,11 @@ VOID wlanRemove(VOID)
 		free_netdev(prDev);
 		return;
 	}
-#if CFG_CHIP_RESET_SUPPORT
-	g_wlan_removing = 1;
-#endif
+
 	prAdapter = prGlueInfo->prAdapter;
 
 #ifdef CONFIG_PM_SLEEP
 	unregister_pm_notifier(&pm_resume_notifier_func);
-#endif
-
-#if CFG_ENABLE_BT_OVER_WIFI
-	if (prGlueInfo->rBowInfo.fgIsNetRegistered) {
-		bowNotifyAllLinkDisconnected(prGlueInfo->prAdapter);
-		/* wait 300ms for BoW module to send deauth */
-		kalMsleep(300);
-	}
 #endif
 
 	if (prGlueInfo->eParamMediaStateIndicated == PARAM_MEDIA_STATE_CONNECTED) {
@@ -3026,20 +2897,6 @@ VOID wlanRemove(VOID)
 	/* Destroy wakelock */
 	wlanWakeLockUninit(prGlueInfo);
 
-#ifdef CFG_SKIP_RESET_DURING_SUSPEND
-#ifdef CONFIG_ANDROID
-#if (KERNEL_VERSION(4, 9, 0) <= LINUX_VERSION_CODE)
-	if (g_suspend_wakelock.active)
-		__pm_relax(&g_suspend_wakelock);
-	wakeup_source_trash(&g_suspend_wakelock);
-#else
-	if (wake_lock_active(&g_suspend_wakelock))
-		wake_unlock(&g_suspend_wakelock);
-	wake_lock_destroy(&g_suspend_wakelock);
-#endif
-#endif
-#endif
-
 	kalMemSet(&(prGlueInfo->prAdapter->rWlanInfo), 0, sizeof(WLAN_INFO_T));
 
 #if CFG_ENABLE_WIFI_DIRECT
@@ -3050,11 +2907,6 @@ VOID wlanRemove(VOID)
 		/*p2pRemove must before wlanAdapterStop */
 		p2pRemove(prGlueInfo);
 	}
-#endif
-
-#if CFG_ENABLE_BT_OVER_WIFI
-	if (prGlueInfo->rBowInfo.fgIsRegistered)
-		glUnregisterAmpc(prGlueInfo);
 #endif
 
 #ifdef CFG_GET_TEMPURATURE
@@ -3069,12 +2921,7 @@ VOID wlanRemove(VOID)
 	kalMetRemoveProcfs(prGlueInfo);
 #endif
 
-#if CFG_MET_TAG_SUPPORT
-	if (GL_MET_TAG_UNINIT() != 0)
-		DBGLOG(INIT, ERROR, "MET_TAG_UNINIT error!\n");
-#endif
-
-		/* 4 <4> wlanAdapterStop */
+	/* 4 <4> wlanAdapterStop */
 #if CFG_SUPPORT_AGPS_ASSIST
 	kalIndicateAgpsNotify(prAdapter, AGPS_EVENT_WLAN_OFF, NULL, 0);
 #endif
@@ -3114,9 +2961,7 @@ VOID wlanRemove(VOID)
 
 	/* 4 <9> Unregister notifier callback */
 	wlanUnregisterNotifier();
-#if CFG_CHIP_RESET_SUPPORT
-	g_wlan_removing = 0;
-#endif
+
 	DBGLOG(INIT, STATE, "Remove wlan done\n");
 } /* end of wlanRemove() */
 
@@ -3301,10 +3146,6 @@ static int initWlan(void)
 {
 	int ret = 0;
 
-#if CFG_CHIP_RESET_SUPPORT
-	rst_data.entry_conut = 0;
-#endif
-
 #ifdef CFG_DRIVER_INF_NAME_CHANGE
 
 	if (kalStrLen(gprifnamesta) > CUSTOM_IFNAMESIZ || kalStrLen(gprifnamep2p) > CUSTOM_IFNAMESIZ ||
@@ -3316,10 +3157,6 @@ static int initWlan(void)
 #endif /*  CFG_DRIVER_INF_NAME_CHANGE */
 
 	wlanDebugInit();
-
-#if CFG_CHIP_RESET_SUPPORT
-	atomic_set(&g_fgBlockBTTriggerReset, 1);
-#endif
 
 	DBGLOG(INIT, STATE, "initWlan..\n");
 
@@ -3393,21 +3230,7 @@ void wlanUnregisterRebootNotifier(void)
 	unregister_reboot_notifier(&mt7668s_reboot_notifier);
 }
 
-#if ((MTK_WCN_HIF_SDIO == 1) && (CFG_BUILT_IN_DRIVER == 1))
-
-int mtk_wcn_wlan_gen4_init(void)
-{
-	return initWlan();
-}
-EXPORT_SYMBOL(mtk_wcn_wlan_gen4_init);
-
-void mtk_wcn_wlan_gen4_exit(void)
-{
-	return exitWlan();
-}
-EXPORT_SYMBOL(mtk_wcn_wlan_gen4_exit);
-
-#elif ((MTK_WCN_HIF_SDIO == 0) && (CFG_BUILT_IN_DRIVER == 1))
+#if ((CFG_BUILT_IN_DRIVER == 1))
 
 device_initcall(initWlan);
 

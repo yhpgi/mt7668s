@@ -2586,7 +2586,7 @@ VOID p2pFuncParseBeaconContent(
 						break;
 					}
 				}
-				DBGLOG(RSN, ERROR, "bcn mfpc:%d, mfpr:%d, sha256:%d\n", prP2pBssInfo->rApPmfCfg.fgMfpc,
+				DBGLOG_RATELIMIT(RSN, INFO, "bcn mfpc:%d, mfpr:%d, sha256:%d\n", prP2pBssInfo->rApPmfCfg.fgMfpc,
 						prP2pBssInfo->rApPmfCfg.fgMfpr, prP2pBssInfo->rApPmfCfg.fgSha256);
 #endif
 

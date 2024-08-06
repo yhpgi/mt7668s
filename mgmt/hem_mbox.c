@@ -57,11 +57,6 @@ static PUINT_8 apucDebugMsg[] = { (PUINT_8)DISP_STRING("MID_MNY_CNM_CH_REQ"),
 	(PUINT_8)DISP_STRING("MID_AIS_SAA_FSM_START"), (PUINT_8)DISP_STRING("MID_AIS_SAA_FSM_ABORT"),
 	(PUINT_8)DISP_STRING("MID_SAA_AIS_JOIN_COMPLETE"),
 
-#if CFG_ENABLE_BT_OVER_WIFI
-	(PUINT_8)DISP_STRING("MID_BOW_SAA_FSM_START"), (PUINT_8)DISP_STRING("MID_BOW_SAA_FSM_ABORT"),
-	(PUINT_8)DISP_STRING("MID_SAA_BOW_JOIN_COMPLETE"),
-#endif
-
 #if CFG_ENABLE_WIFI_DIRECT
 	(PUINT_8)DISP_STRING("MID_P2P_SAA_FSM_START"), (PUINT_8)DISP_STRING("MID_P2P_SAA_FSM_ABORT"),
 	(PUINT_8)DISP_STRING("MID_SAA_P2P_JOIN_COMPLETE"),
@@ -113,11 +108,7 @@ static MSG_HNDL_ENTRY_T arMsgMapTable[] = { { MID_MNY_CNM_CH_REQ, cnmChMngrReque
 	{ MID_CNM_P2P_RADAR_DETECT, p2pRoleFsmRunEventRadarDet }, { MID_CNM_P2P_CSA_DONE, p2pRoleFsmRunEventCsaDone },
 #endif
 
-#if CFG_ENABLE_BT_OVER_WIFI
-	{ MID_CNM_BOW_CH_GRANT, bowRunEventChGrant },
-#else
 	{ MID_CNM_BOW_CH_GRANT, mboxDummy },
-#endif
 
 	/*--------------------------------------------------*/
 	/* SCN Module Mailbox Messages                      */
@@ -135,11 +126,8 @@ static MSG_HNDL_ENTRY_T arMsgMapTable[] = { { MID_MNY_CNM_CH_REQ, cnmChMngrReque
 	{ MID_SCN_P2P_SCAN_DONE, mboxDummy },
 #endif
 
-#if CFG_ENABLE_BT_OVER_WIFI
-	{ MID_SCN_BOW_SCAN_DONE, bowResponderScanDone },
-#else
 	{ MID_SCN_BOW_SCAN_DONE, mboxDummy },
-#endif
+
 	{ MID_SCN_RLM_SCAN_DONE, rlmObssScanDone },
 
 	/*--------------------------------------------------*/
@@ -148,14 +136,6 @@ static MSG_HNDL_ENTRY_T arMsgMapTable[] = { { MID_MNY_CNM_CH_REQ, cnmChMngrReque
 	{ MID_OID_AIS_FSM_JOIN_REQ, aisFsmRunEventAbort }, { MID_OID_AIS_FSM_ABORT, aisFsmRunEventAbort },
 	{ MID_AIS_SAA_FSM_START, saaFsmRunEventStart }, { MID_AIS_SAA_FSM_ABORT, saaFsmRunEventAbort },
 	{ MID_SAA_AIS_JOIN_COMPLETE, aisFsmRunEventJoinComplete },
-
-#if CFG_ENABLE_BT_OVER_WIFI
-	/*--------------------------------------------------*/
-	/* BOW Module Mailbox Messages                      */
-	/*--------------------------------------------------*/
-	{ MID_BOW_SAA_FSM_START, saaFsmRunEventStart }, { MID_BOW_SAA_FSM_ABORT, saaFsmRunEventAbort },
-	{ MID_SAA_BOW_JOIN_COMPLETE, bowFsmRunEventJoinComplete },
-#endif
 
 #if CFG_ENABLE_WIFI_DIRECT /*set in gl_p2p_init.c */
 	{ MID_P2P_SAA_FSM_START, saaFsmRunEventStart }, { MID_P2P_SAA_FSM_ABORT, saaFsmRunEventAbort },

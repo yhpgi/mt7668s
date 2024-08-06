@@ -87,9 +87,6 @@ static RX_EVENT_HANDLER_T arEventTable[] = {
 	{ EVENT_ID_NLO_DONE, nicEventNloDone },
 	{ EVENT_ID_TX_DONE, nicTxProcessTxDoneEvent },
 	{ EVENT_ID_SLEEPY_INFO, nicEventSleepyNotify },
-#if CFG_ENABLE_BT_OVER_WIFI
-	{ EVENT_ID_BT_OVER_WIFI, nicEventBtOverWifi },
-#endif
 	{ EVENT_ID_STATISTICS, nicEventStatistics },
 	{ EVENT_ID_WLAN_INFO, nicEventWlanInfo },
 	{ EVENT_ID_MIB_INFO, nicEventMibInfo },
@@ -116,9 +113,6 @@ static RX_EVENT_HANDLER_T arEventTable[] = {
 	{ EVENT_ID_DUMP_MEM, nicEventDumpMem },
 #if CFG_ASSERT_DUMP
 	{ EVENT_ID_ASSERT_DUMP, nicEventAssertDump },
-#endif
-#if CFG_SUPPORT_CAL_RESULT_BACKUP_TO_HOST
-	{ EVENT_ID_CAL_ALL_DONE, nicEventCalAllDone },
 #endif
 	{ EVENT_ID_HIF_CTRL, nicEventHifCtrl },
 	{ EVENT_ID_RDD_SEND_PULSE, nicEventRddSendPulse },
@@ -2181,47 +2175,6 @@ VOID nicRxProcessEventPacket(IN P_ADAPTER_T prAdapter, IN OUT P_SW_RFB_T prSwRfb
 	}
 
 	break;
-	case EVENT_ID_BT_OVER_WIFI:
-#if CFG_ENABLE_BT_OVER_WIFI
-	{
-		UINT_8 aucTmp[sizeof(AMPC_EVENT) + sizeof(BOW_LINK_DISCONNECTED)];
-		P_EVENT_BT_OVER_WIFI prEventBtOverWifi;
-		P_AMPC_EVENT prBowEvent;
-		P_BOW_LINK_CONNECTED prBowLinkConnected;
-		P_BOW_LINK_DISCONNECTED prBowLinkDisconnected;
-
-		prEventBtOverWifi = (P_EVENT_BT_OVER_WIFI)(prEvent->aucBuffer);
-
-		/* construct event header */
-		prBowEvent = (P_AMPC_EVENT)aucTmp;
-
-		if (prEventBtOverWifi->ucLinkStatus == 0) {
-			/* Connection */
-			prBowEvent->rHeader.ucEventId = BOW_EVENT_ID_LINK_CONNECTED;
-			prBowEvent->rHeader.ucSeqNumber = 0;
-			prBowEvent->rHeader.u2PayloadLength = sizeof(BOW_LINK_CONNECTED);
-
-			/* fill event body */
-			prBowLinkConnected = (P_BOW_LINK_CONNECTED)(prBowEvent->aucPayload);
-			prBowLinkConnected->rChannel.ucChannelNum = prEventBtOverWifi->ucSelectedChannel;
-			kalMemZero(prBowLinkConnected->aucPeerAddress, MAC_ADDR_LEN); /* @FIXME */
-
-			kalIndicateBOWEvent(prAdapter->prGlueInfo, prBowEvent);
-		} else {
-			/* Disconnection */
-			prBowEvent->rHeader.ucEventId = BOW_EVENT_ID_LINK_DISCONNECTED;
-			prBowEvent->rHeader.ucSeqNumber = 0;
-			prBowEvent->rHeader.u2PayloadLength = sizeof(BOW_LINK_DISCONNECTED);
-
-			/* fill event body */
-			prBowLinkDisconnected = (P_BOW_LINK_DISCONNECTED)(prBowEvent->aucPayload);
-			prBowLinkDisconnected->ucReason = 0;							 /* @FIXME */
-			kalMemZero(prBowLinkDisconnected->aucPeerAddress, MAC_ADDR_LEN); /* @FIXME */
-
-			kalIndicateBOWEvent(prAdapter->prGlueInfo, prBowEvent);
-		}
-	} break;
-#endif
 	case EVENT_ID_STATISTICS:
 		/* buffer statistics for further query */
 		prAdapter->fgIsStatValid = TRUE;
@@ -2322,12 +2275,7 @@ VOID nicRxProcessEventPacket(IN P_ADAPTER_T prAdapter, IN OUT P_SW_RFB_T prSwRfb
 			else if (prBssInfo->eNetworkType == NETWORK_TYPE_P2P)
 				p2pRoleFsmRunEventBeaconTimeout(prAdapter, prBssInfo);
 #endif
-#if CFG_ENABLE_BT_OVER_WIFI
-			else if (GET_BSS_INFO_BY_INDEX(prAdapter, prEventBssBeaconTimeout->ucBssIndex)->eNetworkType ==
-					 NETWORK_TYPE_BOW) {
-				/* ToDo:: Nothing */
-			}
-#endif
+
 			else {
 				DBGLOG(RX, ERROR, "EVENT_ID_BSS_BEACON_TIMEOUT: (ucBssIndex = %d)\n",
 						prEventBssBeaconTimeout->ucBssIndex);

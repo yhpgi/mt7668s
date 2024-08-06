@@ -364,10 +364,7 @@ VOID cnmChMngrHandleChEvent(P_ADAPTER_T prAdapter, P_WIFI_EVENT_T prEvent, IN UI
 	else if (prAdapter->fgIsP2PRegistered && IS_BSS_P2P(prBssInfo))
 		prChResp->rMsgHdr.eMsgId = MID_CNM_P2P_CH_GRANT;
 #endif
-#if CFG_ENABLE_BT_OVER_WIFI
-	else if (IS_BSS_BOW(prBssInfo))
-		prChResp->rMsgHdr.eMsgId = MID_CNM_BOW_CH_GRANT;
-#endif
+
 	else {
 		cnmMemFree(prAdapter, prChResp);
 		return;
@@ -589,15 +586,6 @@ BOOLEAN cnmAisInfraChannelFixed(P_ADAPTER_T prAdapter, P_ENUM_BAND_T prBand, PUI
 			}
 		}
 #endif
-
-#if CFG_ENABLE_BT_OVER_WIFI && CFG_BOW_LIMIT_AIS_CHNL
-		if (prBssInfo->eNetworkType == NETWORK_TYPE_BOW) {
-			*prBand			   = prBssInfo->eBand;
-			*pucPrimaryChannel = prBssInfo->ucPrimaryChannel;
-
-			return TRUE;
-		}
-#endif
 	}
 
 	return FALSE;
@@ -636,34 +624,6 @@ BOOLEAN cnmAisDetectP2PChannel(P_ADAPTER_T prAdapter, P_ENUM_BAND_T prBand, PUIN
 /*----------------------------------------------------------------------------*/
 VOID cnmAisInfraConnectNotify(P_ADAPTER_T prAdapter)
 {
-#if CFG_ENABLE_BT_OVER_WIFI
-	P_BSS_INFO_T prBssInfo, prAisBssInfo, prBowBssInfo;
-	UINT_8		 i;
-
-	ASSERT(prAdapter);
-
-	prAisBssInfo = NULL;
-	prBowBssInfo = NULL;
-
-	for (i = 0; i < BSS_INFO_NUM; i++) {
-		prBssInfo = prAdapter->aprBssInfo[i];
-
-		if (prBssInfo && IS_BSS_ACTIVE(prBssInfo)) {
-			if (IS_BSS_AIS(prBssInfo))
-				prAisBssInfo = prBssInfo;
-			else if (IS_BSS_BOW(prBssInfo))
-				prBowBssInfo = prBssInfo;
-		}
-	}
-
-	if (prAisBssInfo && prBowBssInfo && RLM_NET_PARAM_VALID(prAisBssInfo) && RLM_NET_PARAM_VALID(prBowBssInfo)) {
-		if (prAisBssInfo->eBand != prBowBssInfo->eBand ||
-				prAisBssInfo->ucPrimaryChannel != prBowBssInfo->ucPrimaryChannel) {
-			/* Notify BOW to do deactivation */
-			bowNotifyAllLinkDisconnected(prAdapter);
-		}
-	}
-#endif
 }
 
 /*----------------------------------------------------------------------------*/
@@ -724,13 +684,6 @@ BOOLEAN cnmP2PIsPermitted(P_ADAPTER_T prAdapter)
 				fgBowIsActive = TRUE;
 		}
 	}
-
-#if CFG_ENABLE_BT_OVER_WIFI
-	if (fgBowIsActive) {
-		/* Notify BOW to do deactivation */
-		bowNotifyAllLinkDisconnected(prAdapter);
-	}
-#endif
 
 	return TRUE;
 }

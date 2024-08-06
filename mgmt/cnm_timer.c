@@ -56,41 +56,6 @@
 
 /*----------------------------------------------------------------------------*/
 /*!
- * \brief This routine is called to set the time to do the time out check.
- *
- * \param[in] rTimeout Time out interval from current time.
- *
- * \retval TRUE Success.
- *
- */
-/*----------------------------------------------------------------------------*/
-static BOOLEAN cnmTimerSetTimer(IN P_ADAPTER_T prAdapter, IN OS_SYSTIME rTimeout)
-{
-	P_ROOT_TIMER prRootTimer;
-	BOOLEAN		 fgNeedWakeLock;
-
-	ASSERT(prAdapter);
-
-	prRootTimer = &prAdapter->rRootTimer;
-
-	kalSetTimer(prAdapter->prGlueInfo, rTimeout);
-
-	if (rTimeout <= SEC_TO_SYSTIME(WAKE_LOCK_MAX_TIME)) {
-		fgNeedWakeLock = TRUE;
-
-		if (!prRootTimer->fgWakeLocked) {
-			KAL_WAKE_LOCK(prAdapter, &prRootTimer->rWakeLock);
-			prRootTimer->fgWakeLocked = TRUE;
-		}
-	} else {
-		fgNeedWakeLock = FALSE;
-	}
-
-	return fgNeedWakeLock;
-}
-
-/*----------------------------------------------------------------------------*/
-/*!
  * \brief This routines is called to initialize a root timer.
  *
  * \param[in] prAdapter
@@ -113,9 +78,6 @@ VOID cnmTimerInitialize(IN P_ADAPTER_T prAdapter)
 	KAL_ACQUIRE_SPIN_LOCK(prAdapter, SPIN_LOCK_TIMER);
 	LINK_INITIALIZE(&prRootTimer->rLinkHead);
 	KAL_RELEASE_SPIN_LOCK(prAdapter, SPIN_LOCK_TIMER);
-
-	KAL_WAKE_LOCK_INIT(prAdapter, &prRootTimer->rWakeLock, "WLAN Timer");
-	prRootTimer->fgWakeLocked = FALSE;
 }
 
 /*----------------------------------------------------------------------------*/
@@ -137,12 +99,6 @@ VOID cnmTimerDestroy(IN P_ADAPTER_T prAdapter)
 	ASSERT(prAdapter);
 
 	prRootTimer = &prAdapter->rRootTimer;
-
-	if (prRootTimer->fgWakeLocked) {
-		KAL_WAKE_UNLOCK(prAdapter, &prRootTimer->rWakeLock);
-		prRootTimer->fgWakeLocked = FALSE;
-	}
-	KAL_WAKE_LOCK_DESTROY(prAdapter, &prRootTimer->rWakeLock);
 
 	KAL_ACQUIRE_SPIN_LOCK(prAdapter, SPIN_LOCK_TIMER);
 	LINK_INITIALIZE(&prRootTimer->rLinkHead);
@@ -229,11 +185,6 @@ static VOID cnmTimerStopTimer_impl(IN P_ADAPTER_T prAdapter, IN P_TIMER_T prTime
 		 */
 		if (LINK_IS_EMPTY(&prRootTimer->rLinkHead)) {
 			kalCancelTimer(prAdapter->prGlueInfo);
-
-			if (fgAcquireSpinlock && prRootTimer->fgWakeLocked) {
-				KAL_WAKE_UNLOCK(prAdapter, &prRootTimer->rWakeLock);
-				prRootTimer->fgWakeLocked = FALSE;
-			}
 		}
 	}
 
@@ -311,7 +262,6 @@ VOID cnmTimerStartTimer(IN P_ADAPTER_T prAdapter, IN P_TIMER_T prTimer, IN UINT_
 	/* If no timer pending or the fast time interval is used. */
 	if (LINK_IS_EMPTY(prTimerList) || TIME_BEFORE(rExpiredSysTime, prRootTimer->rNextExpiredSysTime)) {
 		prRootTimer->rNextExpiredSysTime = rExpiredSysTime;
-		cnmTimerSetTimer(prAdapter, rTimeoutSystime);
 	}
 
 	/* Add this timer to checking list */
@@ -397,14 +347,6 @@ VOID cnmTimerDoTimeOutCheck(IN P_ADAPTER_T prAdapter)
 	fgNeedWakeLock = FALSE;
 	if (!LINK_IS_EMPTY(prTimerList)) {
 		ASSERT(TIME_AFTER(prRootTimer->rNextExpiredSysTime, rCurSysTime));
-
-		fgNeedWakeLock = cnmTimerSetTimer(
-				prAdapter, (OS_SYSTIME)((INT_32)prRootTimer->rNextExpiredSysTime - (INT_32)rCurSysTime));
-	}
-
-	if (prRootTimer->fgWakeLocked && !fgNeedWakeLock) {
-		KAL_WAKE_UNLOCK(prAdapter, &prRootTimer->rWakeLock);
-		prRootTimer->fgWakeLocked = FALSE;
 	}
 
 	/* release spin lock */

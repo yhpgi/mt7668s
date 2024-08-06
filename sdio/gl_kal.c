@@ -103,13 +103,9 @@ static PPUINT_8 appucFwNameTable[] = { apucFwName };
 #endif
 #if CFG_ASSERT_DUMP
 /* Core dump debug usage */
-#if MTK_WCN_HIF_SDIO
-PUINT_8 apucCorDumpN9FileName  = "/data/misc/wifi/FW_DUMP_N9";
-PUINT_8 apucCorDumpCr4FileName = "/data/misc/wifi/FW_DUMP_Cr4";
-#else
+
 PUINT_8 apucCorDumpN9FileName  = "/tmp/FW_DUMP_N9";
 PUINT_8 apucCorDumpCr4FileName = "/tmp/FW_DUMP_Cr4";
-#endif
 #endif
 /*----------------------------------------------------------------------------*/
 /*!
@@ -787,9 +783,6 @@ WLAN_STATUS kalRxIndicatePkts(IN P_GLUE_INFO_T prGlueInfo, IN PVOID apvPkts[], I
 	for (ucIdx = 0; ucIdx < ucPktNum; ucIdx++)
 		kalRxIndicateOnePkt(prGlueInfo, apvPkts[ucIdx]);
 
-	KAL_WAKE_LOCK_TIMEOUT(prGlueInfo->prAdapter, &prGlueInfo->rTimeoutWakeLock,
-			MSEC_TO_JIFFIES(prGlueInfo->prAdapter->rWifiVar.u4WakeLockRxTimeout));
-
 	return WLAN_STATUS_SUCCESS;
 }
 
@@ -852,13 +845,7 @@ WLAN_STATUS kalRxIndicateOnePkt(IN P_GLUE_INFO_T prGlueInfo, IN PVOID pvPkt)
 		prNetDev = prGlueInfo->prDevHandler;
 #endif
 	} else if (GLUE_GET_PKT_IS_PAL(prSkb)) {
-		/* BOW */
-#if CFG_ENABLE_BT_OVER_WIFI && CFG_BOW_SEPARATE_DATA_PATH
-		if (prGlueInfo->rBowInfo.fgIsNetRegistered)
-			prNetDev = prGlueInfo->rBowInfo.prDevHandler;
-#else
 		prNetDev = prGlueInfo->prDevHandler;
-#endif
 	} else {
 		/* AIS */
 		prNetDev = prGlueInfo->prDevHandler;
@@ -1121,15 +1108,7 @@ VOID kalIndicateStatusAndComplete(
 
 #else
 
-#ifdef CONFIG_ANDROID
-#if LINUX_VERSION_CODE == KERNEL_VERSION(3, 10, 0)
-			/* Don't indicate disconnection to upper layer for ANDROID kernel 3.10 */
-			/* since cfg80211 will indicate disconnection to wpa_supplicant for this kernel */
-			if (eStatus == WLAN_STATUS_MEDIA_DISCONNECT)
-#endif
-#endif
 			{
-
 				if (prBssInfo)
 					u2DeauthReason = prBssInfo->u2DeauthReason;
 				/* CFG80211 Indication */
@@ -2178,11 +2157,6 @@ kalIoctlTimeout(IN P_GLUE_INFO_T prGlueInfo, IN PFN_OID_HANDLER_FUNC pfnOidHandl
 	UINT_32		  completion_timeout = 0;
 #endif
 
-#if CFG_CHIP_RESET_SUPPORT
-	if (kalIsResetting())
-		return WLAN_STATUS_SUCCESS;
-#endif
-
 	if (wlanIsChipAssert(prGlueInfo->prAdapter))
 		return WLAN_STATUS_SUCCESS;
 
@@ -2244,10 +2218,6 @@ kalIoctlTimeout(IN P_GLUE_INFO_T prGlueInfo, IN PFN_OID_HANDLER_FUNC pfnOidHandl
 	 */
 	smp_mb();
 	set_bit(GLUE_FLAG_OID_BIT, &prGlueInfo->ulFlag);
-
-	/* <7.1> Hold wakelock to ensure OS won't be suspended */
-	KAL_WAKE_LOCK_TIMEOUT(prGlueInfo->prAdapter, &prGlueInfo->rTimeoutWakeLock,
-			MSEC_TO_JIFFIES(prGlueInfo->prAdapter->rWifiVar.u4WakeLockThreadWakeup));
 
 	/* <8> Wake up main thread to handle kick start the I/O request.
 	 * Use memory barrier to ensure set bit is done and then wake up main
@@ -2746,12 +2716,6 @@ int hif_thread(void *data)
 	struct net_device *dev		  = data;
 	P_GLUE_INFO_T	   prGlueInfo = *((P_GLUE_INFO_T *)netdev_priv(dev));
 	int				   ret		  = 0;
-#if defined(CONFIG_ANDROID) && (CFG_ENABLE_WAKE_LOCK)
-	KAL_WAKE_LOCK_T rHifThreadWakeLock;
-#endif
-
-	KAL_WAKE_LOCK_INIT(prGlueInfo->prAdapter, &rHifThreadWakeLock, "WLAN hif_thread");
-	KAL_WAKE_LOCK(prGlueInfo->prAdapter, &rHifThreadWakeLock);
 
 	DBGLOG(INIT, INFO, "%s:%u starts running...\n", KAL_GET_CURRENT_THREAD_NAME(), KAL_GET_CURRENT_THREAD_ID());
 
@@ -2765,10 +2729,6 @@ int hif_thread(void *data)
 			break;
 		}
 
-		/* Unlock wakelock if hif_thread going to idle */
-		if (!(prGlueInfo->ulFlag & GLUE_FLAG_HIF_PROCESS))
-			KAL_WAKE_UNLOCK(prGlueInfo->prAdapter, &rHifThreadWakeLock);
-
 		/*
 		 * sleep on waitqueue if no events occurred. Event contain (1) GLUE_FLAG_INT
 		 * (2) GLUE_FLAG_OID (3) GLUE_FLAG_TXREQ (4) GLUE_FLAG_HALT
@@ -2777,10 +2737,7 @@ int hif_thread(void *data)
 		do {
 			ret = wait_event_interruptible(prGlueInfo->waitq_hif, ((prGlueInfo->ulFlag & GLUE_FLAG_HIF_PROCESS) != 0));
 		} while (ret != 0);
-#if defined(CONFIG_ANDROID) && (CFG_ENABLE_WAKE_LOCK)
-		if (!KAL_WAKE_LOCK_ACTIVE(prGlueInfo->prAdapter, &rHifThreadWakeLock))
-			KAL_WAKE_LOCK(prGlueInfo->prAdapter, &rHifThreadWakeLock);
-#endif
+
 		wlanAcquirePowerControl(prGlueInfo->prAdapter);
 
 		/* Handle Interrupt */
@@ -2822,11 +2779,6 @@ int hif_thread(void *data)
 	}
 
 	complete(&prGlueInfo->rHifHaltComp);
-#if defined(CONFIG_ANDROID) && (CFG_ENABLE_WAKE_LOCK)
-	if (KAL_WAKE_LOCK_ACTIVE(prGlueInfo->prAdapter, &rHifThreadWakeLock))
-		KAL_WAKE_UNLOCK(prGlueInfo->prAdapter, &rHifThreadWakeLock);
-	KAL_WAKE_LOCK_DESTROY(prGlueInfo->prAdapter, &rHifThreadWakeLock);
-#endif
 
 	DBGLOG(INIT, INFO, "%s:%u stopped!\n", KAL_GET_CURRENT_THREAD_NAME(), KAL_GET_CURRENT_THREAD_ID());
 
@@ -2843,16 +2795,11 @@ int rx_thread(void *data)
 	P_QUE_ENTRY_T prQueueEntry = NULL;
 
 	int ret = 0;
-#if defined(CONFIG_ANDROID) && (CFG_ENABLE_WAKE_LOCK)
-	KAL_WAKE_LOCK_T rRxThreadWakeLock;
-#endif
+
 	UINT_32 u4LoopCount;
 
 	/* for spin lock acquire and release */
 	KAL_SPIN_LOCK_DECLARATION();
-
-	KAL_WAKE_LOCK_INIT(prGlueInfo->prAdapter, &rRxThreadWakeLock, "WLAN rx_thread");
-	KAL_WAKE_LOCK(prGlueInfo->prAdapter, &rRxThreadWakeLock);
 
 	DBGLOG(INIT, INFO, "%s:%u starts running...\n", KAL_GET_CURRENT_THREAD_NAME(), KAL_GET_CURRENT_THREAD_ID());
 
@@ -2868,20 +2815,13 @@ int rx_thread(void *data)
 			break;
 		}
 
-		/* Unlock wakelock if rx_thread going to idle */
-		if (!(prGlueInfo->ulFlag & GLUE_FLAG_RX_PROCESS))
-			KAL_WAKE_UNLOCK(prGlueInfo->prAdapter, &rRxThreadWakeLock);
-
 		/*
 		 * sleep on waitqueue if no events occurred.
 		 */
 		do {
 			ret = wait_event_interruptible(prGlueInfo->waitq_rx, ((prGlueInfo->ulFlag & GLUE_FLAG_RX_PROCESS) != 0));
 		} while (ret != 0);
-#if defined(CONFIG_ANDROID) && (CFG_ENABLE_WAKE_LOCK)
-		if (!KAL_WAKE_LOCK_ACTIVE(prGlueInfo->prAdapter, &rRxThreadWakeLock))
-			KAL_WAKE_LOCK(prGlueInfo->prAdapter, &rRxThreadWakeLock);
-#endif
+
 		if (test_and_clear_bit(GLUE_FLAG_RX_TO_OS_BIT, &prGlueInfo->ulFlag)) {
 			u4LoopCount = prGlueInfo->prAdapter->rWifiVar.u4Rx2OsLoopCount;
 
@@ -2897,20 +2837,12 @@ int rx_thread(void *data)
 						QUEUE_REMOVE_HEAD(prTempRxQue, prQueueEntry, P_QUE_ENTRY_T);
 						kalRxIndicateOnePkt(prGlueInfo, (PVOID)GLUE_GET_PKT_DESCRIPTOR(prQueueEntry));
 					}
-
-					KAL_WAKE_LOCK_TIMEOUT(prGlueInfo->prAdapter, &prGlueInfo->rTimeoutWakeLock,
-							MSEC_TO_JIFFIES(prGlueInfo->prAdapter->rWifiVar.u4WakeLockRxTimeout));
 				}
 			}
 		}
 	}
 
 	complete(&prGlueInfo->rRxHaltComp);
-#if defined(CONFIG_ANDROID) && (CFG_ENABLE_WAKE_LOCK)
-	if (KAL_WAKE_LOCK_ACTIVE(prGlueInfo->prAdapter, &rRxThreadWakeLock))
-		KAL_WAKE_UNLOCK(prGlueInfo->prAdapter, &rRxThreadWakeLock);
-	KAL_WAKE_LOCK_DESTROY(prGlueInfo->prAdapter, &rRxThreadWakeLock);
-#endif
 
 	DBGLOG(INIT, INFO, "%s:%u stopped!\n", KAL_GET_CURRENT_THREAD_NAME(), KAL_GET_CURRENT_THREAD_ID());
 
@@ -2938,9 +2870,6 @@ int main_thread(void *data)
 	P_GL_IO_REQ_T	   prIoReq		  = NULL;
 	int				   ret			  = 0;
 	BOOLEAN			   fgNeedHwAccess = FALSE;
-#if defined(CONFIG_ANDROID) && (CFG_ENABLE_WAKE_LOCK)
-	KAL_WAKE_LOCK_T rTxThreadWakeLock;
-#endif
 
 #if CFG_SUPPORT_MULTITHREAD
 	prGlueInfo->u4TxThreadPid = KAL_GET_CURRENT_THREAD_ID();
@@ -2950,9 +2879,6 @@ int main_thread(void *data)
 	ASSERT(prGlueInfo);
 	ASSERT(prGlueInfo->prAdapter);
 	set_user_nice(current, prGlueInfo->prAdapter->rWifiVar.cThreadNice);
-
-	KAL_WAKE_LOCK_INIT(prGlueInfo->prAdapter, &rTxThreadWakeLock, "WLAN main_thread");
-	KAL_WAKE_LOCK(prGlueInfo->prAdapter, &rTxThreadWakeLock);
 
 	DBGLOG(INIT, INFO, "%s:%u starts running...\n", KAL_GET_CURRENT_THREAD_NAME(), KAL_GET_CURRENT_THREAD_ID());
 
@@ -2968,10 +2894,6 @@ int main_thread(void *data)
 			break;
 		}
 
-		/* Unlock wakelock if main_thread going to idle */
-		if (!(prGlueInfo->ulFlag & GLUE_FLAG_MAIN_PROCESS))
-			KAL_WAKE_UNLOCK(prGlueInfo->prAdapter, &rTxThreadWakeLock);
-
 		/*
 		 * sleep on waitqueue if no events occurred. Event contain (1) GLUE_FLAG_INT
 		 * (2) GLUE_FLAG_OID (3) GLUE_FLAG_TXREQ (4) GLUE_FLAG_HALT
@@ -2980,10 +2902,6 @@ int main_thread(void *data)
 		do {
 			ret = wait_event_interruptible(prGlueInfo->waitq, ((prGlueInfo->ulFlag & GLUE_FLAG_MAIN_PROCESS) != 0));
 		} while (ret != 0);
-#if defined(CONFIG_ANDROID) && (CFG_ENABLE_WAKE_LOCK)
-		if (!KAL_WAKE_LOCK_ACTIVE(prGlueInfo->prAdapter, &rTxThreadWakeLock))
-			KAL_WAKE_LOCK(prGlueInfo->prAdapter, &rTxThreadWakeLock);
-#endif
 
 #if CFG_ENABLE_WIFI_DIRECT
 		/*run p2p multicast list work. */
@@ -3161,11 +3079,6 @@ int main_thread(void *data)
 	wlanReleasePendingOid(prGlueInfo->prAdapter, 0);
 
 	complete(&prGlueInfo->rHaltComp);
-#if defined(CONFIG_ANDROID) && (CFG_ENABLE_WAKE_LOCK)
-	if (KAL_WAKE_LOCK_ACTIVE(prGlueInfo->prAdapter, &rTxThreadWakeLock))
-		KAL_WAKE_UNLOCK(prGlueInfo->prAdapter, &rTxThreadWakeLock);
-	KAL_WAKE_LOCK_DESTROY(prGlueInfo->prAdapter, &rTxThreadWakeLock);
-#endif
 
 	DBGLOG(INIT, INFO, "%s:%u stopped!\n", KAL_GET_CURRENT_THREAD_NAME(), KAL_GET_CURRENT_THREAD_ID());
 
@@ -3725,8 +3638,6 @@ VOID kalSetEvent(P_GLUE_INFO_T pr)
 
 VOID kalSetIntEvent(P_GLUE_INFO_T pr)
 {
-	KAL_WAKE_LOCK(pr->prAdapter, &pr->rIntrWakeLock);
-
 	set_bit(GLUE_FLAG_INT_BIT, &pr->ulFlag);
 
 	/* when we got interrupt, we wake up servie thread */
@@ -3743,9 +3654,6 @@ VOID kalSetTxEvent2Hif(P_GLUE_INFO_T pr)
 	if (!pr->hif_thread)
 		return;
 
-	KAL_WAKE_LOCK_TIMEOUT(
-			pr->prAdapter, &pr->rTimeoutWakeLock, MSEC_TO_JIFFIES(pr->prAdapter->rWifiVar.u4WakeLockThreadWakeup));
-
 	set_bit(GLUE_FLAG_HIF_TX_BIT, &pr->ulFlag);
 	wake_up_interruptible(&pr->waitq_hif);
 }
@@ -3754,9 +3662,6 @@ VOID kalSetFwOwnEvent2Hif(P_GLUE_INFO_T pr)
 {
 	if (!pr->hif_thread)
 		return;
-
-	KAL_WAKE_LOCK_TIMEOUT(
-			pr->prAdapter, &pr->rTimeoutWakeLock, MSEC_TO_JIFFIES(pr->prAdapter->rWifiVar.u4WakeLockThreadWakeup));
 
 	set_bit(GLUE_FLAG_HIF_FW_OWN_BIT, &pr->ulFlag);
 	wake_up_interruptible(&pr->waitq_hif);
@@ -3767,9 +3672,6 @@ VOID kalSetTxEvent2Rx(P_GLUE_INFO_T pr)
 	if (!pr->rx_thread)
 		return;
 
-	KAL_WAKE_LOCK_TIMEOUT(
-			pr->prAdapter, &pr->rTimeoutWakeLock, MSEC_TO_JIFFIES(pr->prAdapter->rWifiVar.u4WakeLockThreadWakeup));
-
 	set_bit(GLUE_FLAG_RX_TO_OS_BIT, &pr->ulFlag);
 	wake_up_interruptible(&pr->waitq_rx);
 }
@@ -3778,9 +3680,6 @@ VOID kalSetTxCmdEvent2Hif(P_GLUE_INFO_T pr)
 {
 	if (!pr->hif_thread)
 		return;
-
-	KAL_WAKE_LOCK_TIMEOUT(
-			pr->prAdapter, &pr->rTimeoutWakeLock, MSEC_TO_JIFFIES(pr->prAdapter->rWifiVar.u4WakeLockThreadWakeup));
 
 	set_bit(GLUE_FLAG_HIF_TX_CMD_BIT, &pr->ulFlag);
 	wake_up_interruptible(&pr->waitq_hif);
@@ -5495,7 +5394,7 @@ INT_32 kalPmResumeHandler(struct notifier_block *notifier, unsigned long pm_even
 
 void kal_sched_set(struct task_struct *p, int policy, const struct sched_param *param, int nice)
 {
-#if !defined(CONFIG_ANDROID) && (KERNEL_VERSION(5, 9, 0) <= LINUX_VERSION_CODE)
+#if KERNEL_VERSION(5, 9, 0) <= LINUX_VERSION_CODE
 	/* apply auto-detection based on function description
 	 * TODO:
 	 * kernel prefer modify "current" only, add sanity here?

@@ -31,9 +31,6 @@
 #if CFG_ENABLE_WIFI_DIRECT
 #include "gl_p2p_os.h"
 #endif
-#if CFG_CHIP_RESET_SUPPORT
-#include "gl_rst.h"
-#endif
 
 /*
  * #if CFG_SUPPORT_QA_TOOL
@@ -2291,10 +2288,6 @@ static WLAN_STATUS reqExtSetAcpiDevicePowerState(
 
 #define CMD_SET_DBDC "SET_DBDC"
 
-#if CFG_SUPPORT_CAL_RESULT_BACKUP_TO_HOST
-#define CMD_SET_CALBACKUP_TEST_DRV_FW "SET_CALBACKUP_TEST_DRV_FW"
-#endif
-
 #define CMD_SET_P2P_PS "SET_P2P_PS"
 #define CMD_SET_P2P_NOA "SET_P2P_NOA"
 
@@ -2312,11 +2305,6 @@ static WLAN_STATUS reqExtSetAcpiDevicePowerState(
 #define CMD_DETC_ANT_DIV_ARG_NUM 1
 #define CMD_SWH_ANT_DIV_ARG_NUM 1
 
-#endif
-
-#if CFG_CHIP_RESET_SUPPORT
-#define CMD_GET_FW_RESET_CNT "GET_FW_RESET_CNT"
-#define CMD_RESET_FW_RESET_CNT "RST_FW_RESET_CNT"
 #endif
 
 #define CMD_SEND_BEACONTIMEOUT "SEND_BEACONTIMEOUT"
@@ -8593,164 +8581,6 @@ int priv_driver_set_miracast(IN struct net_device *prNetDev, IN char *pcCommand,
 	return i4BytesWritten;
 }
 
-#if CFG_SUPPORT_CAL_RESULT_BACKUP_TO_HOST
-/*
- * Memo
- * 00 : Reset All Cal Data in Driver
- * 01 : Trigger All Cal Function
- * 02 : Get Thermal Temp from FW
- * 03 : Get Cal Data Size from FW
- * 04 : Get Cal Data from FW (Rom)
- * 05 : Get Cal Data from FW (Ram)
- * 06 : Print Cal Data in Driver (Rom)
- * 07 : Print Cal Data in Driver (Ram)
- * 08 : Print Cal Data in FW (Rom)
- * 09 : Print Cal Data in FW (Ram)
- * 10 : Send Cal Data to FW (Rom)
- * 11 : Send Cal Data to FW (Ram)
- */
-static int priv_driver_set_calbackup_test_drv_fw(IN struct net_device *prNetDev, IN char *pcCommand, IN int i4TotalLen)
-{
-	P_GLUE_INFO_T prGlueInfo	 = NULL;
-	WLAN_STATUS	  rStatus		 = WLAN_STATUS_SUCCESS;
-	INT_32		  i4BytesWritten = 0;
-	INT_32		  i4Argc		 = 0;
-	PCHAR		  apcArgv[WLAN_CFG_ARGV_MAX];
-	UINT_32		  u4Ret, u4GetInput = 0xFFFFFFFF;
-	INT_32		  i4ArgNum = 2;
-
-	ASSERT(prNetDev);
-	if (GLUE_CHK_PR2(prNetDev, pcCommand) == FALSE)
-		return -1;
-	prGlueInfo = *((P_GLUE_INFO_T *)netdev_priv(prNetDev));
-
-	DBGLOG(RFTEST, INFO, "%s\r\n", __func__);
-
-	DBGLOG(REQ, LOUD, "command is %s\n", pcCommand);
-	wlanCfgParseArgument(pcCommand, &i4Argc, apcArgv);
-	DBGLOG(REQ, LOUD, "argc is %i\n", i4Argc);
-
-	if (i4Argc >= i4ArgNum) {
-		u4Ret = kalkStrtou32(apcArgv[1], 0, &u4GetInput);
-		if (u4Ret) {
-			DBGLOG(RFTEST, INFO, "priv_driver_set_calbackup_test_drv_fw Parsing Fail\n");
-			return -1;
-		}
-
-		if (u4GetInput == 0) {
-			DBGLOG(RFTEST, INFO, "(New Flow) CMD#0 : Reset All Cal Data in Driver.\n");
-			/* (New Flow 20160720) Step 0 : Reset All Cal Data Structure */
-			memset(&g_rBackupCalDataAllV2, 1, sizeof(RLM_CAL_RESULT_ALL_V2_T));
-			g_rBackupCalDataAllV2.u4MagicNum1 = 6632;
-			g_rBackupCalDataAllV2.u4MagicNum2 = 6632;
-		} else if (u4GetInput == 1) {
-			DBGLOG(RFTEST, INFO, "CMD#1 : Trigger FW Do All Cal.\n");
-			/* Step 1 : Trigger All Cal Function */
-
-			rStatus = rlmCalBackup(prGlueInfo->prAdapter, 1, 2, 0);
-			DBGLOG(RFTEST, INFO, "Trigger FW Do All Cal, rStatus = 0x%08x\n", rStatus);
-		} else if (u4GetInput == 2) {
-			DBGLOG(RFTEST, INFO, "(New Flow) CMD#2 : Get Thermal Temp from FW.\n");
-			/* (New Flow 20160720) Step 2 : Get Thermal Temp from FW */
-
-			rStatus = rlmCalBackup(prGlueInfo->prAdapter, 0, 0, 0);
-			DBGLOG(RFTEST, INFO, "Get Thermal Temp from FW, rStatus = 0x%08x\n", rStatus);
-
-		} else if (u4GetInput == 3) {
-			DBGLOG(RFTEST, INFO, "(New Flow) CMD#3 : Get Cal Data Size from FW.\n");
-			/* (New Flow 20160720) Step 3 : Get Cal Data Size from FW */
-
-			rStatus = rlmCalBackup(prGlueInfo->prAdapter, 0, 1, 0);
-			DBGLOG(RFTEST, INFO, "Get Rom Cal Data Size, rStatus = 0x%08x\n", rStatus);
-
-			rStatus = rlmCalBackup(prGlueInfo->prAdapter, 0, 1, 1);
-			DBGLOG(RFTEST, INFO, "Get Ram Cal Data Size, rStatus = 0x%08x\n", rStatus);
-
-		} else if (u4GetInput == 4) {
-#if 1
-			DBGLOG(RFTEST, INFO, "(New Flow) CMD#4 : Print Cal Data in FW (Ram) (Part 1 - [0]~[3327]).\n");
-			/* Debug Use : Print Cal Data in FW (Ram) */
-			rStatus = rlmCalBackup(prGlueInfo->prAdapter, 4, 6, 1);
-			DBGLOG(RFTEST, INFO, "Print Cal Data in FW (Ram), rStatus = 0x%08x\n", rStatus);
-#else /* For Temp Use this Index */
-			DBGLOG(RFTEST, INFO, "(New Flow) CMD#4 : Get Cal Data from FW (Rom). Start!!!!!!!!!!!\n");
-			DBGLOG(RFTEST, INFO, "Thermal Temp = %d\n", g_rBackupCalDataAllV2.u4ThermalInfo);
-			DBGLOG(RFTEST, INFO, "Total Length (Rom) = %d\n", g_rBackupCalDataAllV2.u4ValidRomCalDataLength);
-			/* (New Flow 20160720) Step 3 : Get Cal Data from FW */
-
-			rStatus = rlmCalBackup(prGlueInfo->prAdapter, 2, 4, 0);
-			DBGLOG(RFTEST, INFO, "Get Cal Data from FW (Rom), rStatus = 0x%08x\n", rStatus);
-#endif
-		} else if (u4GetInput == 5) {
-#if 1
-			DBGLOG(RFTEST, INFO, "(New Flow) CMD#5 : Print RAM Cal Data in Driver (Part 1 - [0]~[3327]).\n");
-			DBGLOG(RFTEST, INFO, "==================================================================\n");
-			/* RFTEST_INFO_LOGDUMP32(&(g_rBackupCalDataAllV2.au4RamCalData[0]), 3328*sizeof(UINT_32)); */
-			DBGLOG(RFTEST, INFO, "==================================================================\n");
-			DBGLOG(RFTEST, INFO, "Dumped Ram Cal Data Szie : %d bytes\n", 3328 * sizeof(UINT_32));
-			DBGLOG(RFTEST, INFO, "Total Ram Cal Data Szie : %d bytes\n", g_rBackupCalDataAllV2.u4ValidRamCalDataLength);
-			DBGLOG(RFTEST, INFO, "==================================================================\n");
-#else /* For Temp Use this Index */
-			DBGLOG(RFTEST, INFO, "(New Flow) CMD#5 : Get Cal Data from FW (Ram). Start!!!!!!!!!!!\n");
-			DBGLOG(RFTEST, INFO, "Thermal Temp = %d\n", g_rBackupCalDataAllV2.u4ThermalInfo);
-			DBGLOG(RFTEST, INFO, "Total Length (Ram) = %d\n", g_rBackupCalDataAllV2.u4ValidRamCalDataLength);
-			/* (New Flow 20160720) Step 3 : Get Cal Data from FW */
-
-			rStatus = rlmCalBackup(prGlueInfo->prAdapter, 2, 4, 1);
-			DBGLOG(RFTEST, INFO, "Get Cal Data from FW (Ram), rStatus = 0x%08x\n", rStatus);
-#endif
-		} else if (u4GetInput == 6) {
-			DBGLOG(RFTEST, INFO, "(New Flow) CMD#6 : Print ROM Cal Data in Driver.\n");
-			DBGLOG(RFTEST, INFO, "==================================================================\n");
-			/* RFTEST_INFO_LOGDUMP32(&(g_rBackupCalDataAllV2.au4RomCalData[0]), */
-			/* g_rBackupCalDataAllV2.u4ValidRomCalDataLength); */
-			DBGLOG(RFTEST, INFO, "==================================================================\n");
-			DBGLOG(RFTEST, INFO, "Total Rom Cal Data Szie : %d bytes\n", g_rBackupCalDataAllV2.u4ValidRomCalDataLength);
-			DBGLOG(RFTEST, INFO, "==================================================================\n");
-		} else if (u4GetInput == 7) {
-			DBGLOG(RFTEST, INFO, "(New Flow) CMD#7 : Print RAM Cal Data in Driver (Part 2 - [3328]~[6662]).\n");
-			DBGLOG(RFTEST, INFO, "==================================================================\n");
-			/* RFTEST_INFO_LOGDUMP32(&(g_rBackupCalDataAllV2.au4RamCalData[3328]), */
-			/*(g_rBackupCalDataAllV2.u4ValidRamCalDataLength - 3328*sizeof(UINT_32))); */
-			DBGLOG(RFTEST, INFO, "==================================================================\n");
-			DBGLOG(RFTEST, INFO, "Dumped Ram Cal Data Szie : %d bytes\n",
-					(g_rBackupCalDataAllV2.u4ValidRamCalDataLength - 3328 * sizeof(UINT_32)));
-			DBGLOG(RFTEST, INFO, "Total Ram Cal Data Szie : %d bytes\n", g_rBackupCalDataAllV2.u4ValidRamCalDataLength);
-			DBGLOG(RFTEST, INFO, "==================================================================\n");
-		} else if (u4GetInput == 8) {
-			DBGLOG(RFTEST, INFO, "(New Flow) CMD#8 : Print Cal Data in FW (Rom).\n");
-			/* Debug Use : Print Cal Data in FW (Rom) */
-
-			rStatus = rlmCalBackup(prGlueInfo->prAdapter, 4, 6, 0);
-			DBGLOG(RFTEST, INFO, "Print Cal Data in FW (Rom), rStatus = 0x%08x\n", rStatus);
-
-		} else if (u4GetInput == 9) {
-			DBGLOG(RFTEST, INFO, "(New Flow) CMD#9 : Print Cal Data in FW (Ram) (Part 2 - [3328]~[6662]).\n");
-			/* Debug Use : Print Cal Data in FW (Ram) */
-
-			rStatus = rlmCalBackup(prGlueInfo->prAdapter, 4, 6, 2);
-			DBGLOG(RFTEST, INFO, "Print Cal Data in FW (Ram), rStatus = 0x%08x\n", rStatus);
-
-		} else if (u4GetInput == 10) {
-			DBGLOG(RFTEST, INFO, "(New Flow) CMD#10 : Send Cal Data to FW (Rom).\n");
-			/* Send Cal Data to FW (Rom) */
-
-			rStatus = rlmCalBackup(prGlueInfo->prAdapter, 3, 5, 0);
-			DBGLOG(RFTEST, INFO, "Send Cal Data to FW (Rom), rStatus = 0x%08x\n", rStatus);
-
-		} else if (u4GetInput == 11) {
-			DBGLOG(RFTEST, INFO, "(New Flow) CMD#11 : Send Cal Data to FW (Ram).\n");
-			/* Send Cal Data to FW (Ram) */
-
-			rStatus = rlmCalBackup(prGlueInfo->prAdapter, 3, 5, 1);
-			DBGLOG(RFTEST, INFO, "Send Cal Data to FW (Ram), rStatus = 0x%08x\n", rStatus);
-		}
-	}
-
-	return i4BytesWritten;
-} /* priv_driver_set_calbackup_test_drv_fw */
-#endif
-
 #if CFG_WOW_SUPPORT
 static int priv_driver_set_wow(IN struct net_device *prNetDev, IN char *pcCommand, IN int i4TotalLen)
 {
@@ -13253,82 +13083,6 @@ static int priv_driver_get_disconnect_reason(IN struct net_device *prNetDev, IN 
 	return i4BytesWritten;
 }
 
-#if CFG_CHIP_RESET_SUPPORT
-static int priv_driver_get_chip_reset_cnt(IN struct net_device *prNetDev, IN char *pcCommand, IN int i4TotalLen)
-{
-	struct GLUE_INFO		 *prGlueInfo		= NULL;
-	int32_t					 i4BytesWritten = 0;
-	uint32_t				 i				= 0;
-	extern const char *const apcChipResetReason[];
-
-	typedef uint32_t (*p_get_func_type)(uint32_t);
-	p_get_func_type get_func;
-	char		   *reason_func_name = "getChipResetReasonCnt";
-	void		   *pvAddrReason	 = NULL;
-
-	if (!prNetDev) {
-		DBGLOG(REQ, ERROR, "prNetDev == NULL unexpected\n");
-		return WLAN_STATUS_FAILURE;
-	}
-
-	if (GLUE_CHK_PR2(prNetDev, pcCommand) == FALSE)
-		return -1;
-
-	prGlueInfo = *((struct GLUE_INFO **)netdev_priv(prNetDev));
-
-	DBGLOG(REQ, LOUD, "command is %s\n", pcCommand);
-
-	LOGBUF(pcCommand, i4TotalLen, i4BytesWritten, "\n");
-	pvAddrReason = (void *)kallsyms_lookup_name(reason_func_name);
-
-	if (pvAddrReason) {
-		get_func = (p_get_func_type)pvAddrReason;
-
-		for (i = 0; i < RST_REASON_MAX; i++) {
-			LOGBUF(pcCommand, i4TotalLen, i4BytesWritten, "\t[%s] = %d\n", apcChipResetReason[i], get_func(i));
-		}
-	} else {
-		DBGLOG(REQ, ERROR, "%s does not exist\n", reason_func_name);
-	}
-
-	LOGBUF(pcCommand, i4TotalLen, i4BytesWritten, "\n");
-
-	return i4BytesWritten;
-}
-static int priv_driver_rst_chip_rst_cnt(IN struct net_device *prNetDev, IN char *pcCommand, IN int i4TotalLen)
-{
-	struct GLUE_INFO *prGlueInfo	 = NULL;
-	int32_t			  i4BytesWritten = 0;
-
-	typedef void (*p_rst_func_type)(void);
-	p_rst_func_type rst_func;
-	char		   *reason_func_name = "rstChipResetReasonCnt";
-	void		   *pvAddrReason	 = NULL;
-
-	if (!prNetDev) {
-		DBGLOG(REQ, ERROR, "prNetDev == NULL unexpected\n");
-		return WLAN_STATUS_FAILURE;
-	}
-
-	if (GLUE_CHK_PR2(prNetDev, pcCommand) == FALSE)
-		return -1;
-
-	prGlueInfo = *((struct GLUE_INFO **)netdev_priv(prNetDev));
-
-	DBGLOG(REQ, LOUD, "command is %s\n", pcCommand);
-
-	pvAddrReason = (void *)kallsyms_lookup_name(reason_func_name);
-
-	if (pvAddrReason) {
-		rst_func = (p_rst_func_type)pvAddrReason;
-		rst_func();
-	} else {
-		DBGLOG(REQ, ERROR, "%s does not exist\n", reason_func_name);
-	}
-	return i4BytesWritten;
-}
-#endif
-
 #if CFG_SUPPORT_802_11V_BSS_TRANSITION_MGT
 static int priv_driver_bss_transition_query(IN struct net_device *prNetDev, IN char *pcCommand, IN int i4TotalLen)
 {
@@ -13479,20 +13233,7 @@ INT_32 priv_driver_cmds(IN struct net_device *prNetDev, IN PCHAR pcCommand, IN I
 	P_GLUE_INFO_T prGlueInfo	 = NULL;
 	INT_32		  i4BytesWritten = 0;
 
-#if CFG_CHIP_RESET_SUPPORT
-	if (g_u4HaltFlag || checkResetState()) {
-		DBGLOG(INIT, WARN, "wlan is halt, skip priv_driver_cmds\n");
-		return -1;
-	}
-	rst_data.entry_conut++;
-	DBGLOG(INIT, TRACE, "entry_conut = %d\n", rst_data.entry_conut);
-#endif
-
 	if (GLUE_CHK_PR2(prNetDev, pcCommand) == FALSE) {
-#if CFG_CHIP_RESET_SUPPORT
-		rst_data.entry_conut--;
-		DBGLOG(INIT, TRACE, "entry_conut = %d\n", rst_data.entry_conut);
-#endif
 		return -1;
 	}
 
@@ -13648,10 +13389,7 @@ INT_32 priv_driver_cmds(IN struct net_device *prNetDev, IN PCHAR pcCommand, IN I
 		i4BytesWritten = priv_driver_set_abd123_detect_mode(prNetDev, pcCommand, i4TotalLen);
 	}
 #endif
-#if CFG_SUPPORT_CAL_RESULT_BACKUP_TO_HOST
-	else if (strnicmp(pcCommand, CMD_SET_CALBACKUP_TEST_DRV_FW, strlen(CMD_SET_CALBACKUP_TEST_DRV_FW)) == 0)
-		i4BytesWritten = priv_driver_set_calbackup_test_drv_fw(prNetDev, pcCommand, i4TotalLen);
-#endif
+
 #if CFG_WOW_SUPPORT
 	else if (strnicmp(pcCommand, CMD_WOW_START, strlen(CMD_WOW_START)) == 0)
 		i4BytesWritten = priv_driver_set_wow(prNetDev, pcCommand, i4TotalLen);
@@ -13895,12 +13633,7 @@ INT_32 priv_driver_cmds(IN struct net_device *prNetDev, IN PCHAR pcCommand, IN I
 		i4BytesWritten = priv_driver_send_beacon_timeout(prNetDev, pcCommand, i4TotalLen);
 	} else if (strnicmp(pcCommand, CMD_GET_DISCONNECT_REASON, strlen(CMD_GET_DISCONNECT_REASON)) == 0) {
 		i4BytesWritten = priv_driver_get_disconnect_reason(prNetDev, pcCommand, i4TotalLen);
-#if CFG_CHIP_RESET_SUPPORT
-	} else if (!strnicmp(pcCommand, CMD_GET_FW_RESET_CNT, strlen(CMD_GET_FW_RESET_CNT))) {
-		i4BytesWritten = priv_driver_get_chip_reset_cnt(prNetDev, pcCommand, i4TotalLen);
-	} else if (!strnicmp(pcCommand, CMD_RESET_FW_RESET_CNT, strlen(CMD_RESET_FW_RESET_CNT))) {
-		i4BytesWritten = priv_driver_rst_chip_rst_cnt(prNetDev, pcCommand, i4TotalLen);
-#endif
+
 	} else if (strnicmp(pcCommand, CMD_GET_1XTX_STATUS, strlen(CMD_GET_1XTX_STATUS)) == 0) {
 		i4BytesWritten = priv_driver_get_1xtx_status(prNetDev, pcCommand, i4TotalLen);
 	} else if (strnicmp(pcCommand, CMD_TEST_1XTX_STATUS, strlen(CMD_TEST_1XTX_STATUS)) == 0) {
@@ -13934,10 +13667,7 @@ INT_32 priv_driver_cmds(IN struct net_device *prNetDev, IN PCHAR pcCommand, IN I
 			i4BytesWritten++;
 		}
 	}
-#if CFG_CHIP_RESET_SUPPORT
-	rst_data.entry_conut--;
-	DBGLOG(INIT, TRACE, "entry_conut = %d\n", rst_data.entry_conut);
-#endif
+
 	return i4BytesWritten;
 
 } /* priv_driver_cmds */

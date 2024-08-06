@@ -24,15 +24,11 @@
  */
 #include "precomp.h"
 
-#if MTK_WCN_HIF_SDIO
-#include "hif_sdio.h"
-#else
 #include <linux/mmc/card.h>
 #include <linux/mmc/host.h>
 #include <linux/mmc/sdio.h>
 #include <linux/mmc/sdio_func.h> /* sdio_readl(), etc */
 #include <linux/mmc/sdio_ids.h>
-#endif
 
 #include <linux/mm.h>
 #ifndef CONFIG_X86
@@ -322,19 +318,12 @@ BOOLEAN halSetDriverOwn(IN P_ADAPTER_T prAdapter)
 															  MSEC_TO_SYSTIME(LP_OWN_BACK_FAILED_LOG_SKIP_MS))) {
 				DBGLOG(INIT, ERROR, "LP cannot be own back, Timeout[%u](%ums), BusAccessError[%u]", fgTimeout,
 						kalGetTimeTick() - u4CurrTick, fgIsBusAccessFailed);
-#if CFG_CHIP_RESET_SUPPORT
-				DBGLOG(INIT, ERROR, "Resetting[%u], CardRemoved[%u] NoAck[%u] Cnt[%u]\n", kalIsResetting(),
-						kalIsCardRemoved(prAdapter->prGlueInfo), wlanIsChipNoAck(prAdapter),
-						prAdapter->u4OwnFailedCount);
-#endif
+
 				DBGLOG(INIT, INFO, "Skip LP own back failed log for next %ums\n", LP_OWN_BACK_FAILED_LOG_SKIP_MS);
 
 				prAdapter->u4OwnFailedLogCount++;
 				if (prAdapter->u4OwnFailedLogCount > LP_OWN_BACK_FAILED_RESET_CNT) {
 					/* Trigger RESET */
-#if CFG_CHIP_RESET_SUPPORT
-					GL_RESET_TRIGGER(prAdapter, RST_DRV_OWN_FAIL);
-#endif
 				}
 				GET_CURRENT_SYSTIME(&prAdapter->rLastOwnFailedLogTime);
 			}
@@ -387,20 +376,12 @@ BOOLEAN halSetDriverOwn(IN P_ADAPTER_T prAdapter)
 				halPrintMailbox(prAdapter);
 				halPollDbgCr(prAdapter, LP_OWN_BACK_FAILED_DBGCR_POLL_ROUND);
 #endif
-#if CFG_CHIP_RESET_SUPPORT
-				DBGLOG(INIT, ERROR, "Resetting[%u], CardRemoved[%u] NoAck[%u] Timeout[%u](%u - %u)ms\n",
-						kalIsResetting(), kalIsCardRemoved(prAdapter->prGlueInfo), wlanIsChipNoAck(prAdapter),
-						fgTimeout, kalGetTimeTick(), u4CurrTick);
-#endif
 
 				DBGLOG(INIT, INFO, "Skip waiting CR4 ready for next %ums\n", LP_OWN_BACK_FAILED_LOG_SKIP_MS);
 				fgStatus = FALSE;
 
 				if (fgTimeout) {
 					/* Trigger RESET */
-#if CFG_CHIP_RESET_SUPPORT
-					GL_RESET_TRIGGER(prAdapter, RST_DRV_OWN_FAIL);
-#endif
 				}
 
 				break;
@@ -1663,10 +1644,9 @@ UINT_32 halGetValidCoalescingBufSize(IN P_ADAPTER_T prAdapter)
 {
 	P_GL_HIF_INFO_T prHifInfo;
 	UINT_32			u4BufSize;
-#if (MTK_WCN_HIF_SDIO == 0)
+
 	struct sdio_func *prSdioFunc;
 	UINT_32			  u4RuntimeMaxBuf;
-#endif
 
 	prHifInfo = &prAdapter->prGlueInfo->rHifInfo;
 
@@ -1675,7 +1655,6 @@ UINT_32 halGetValidCoalescingBufSize(IN P_ADAPTER_T prAdapter)
 	else
 		u4BufSize = HIF_RX_COALESCING_BUFFER_SIZE;
 
-#if (MTK_WCN_HIF_SDIO == 0)
 	prSdioFunc = prHifInfo->func;
 
 	/* Check host capability */
@@ -1705,7 +1684,6 @@ UINT_32 halGetValidCoalescingBufSize(IN P_ADAPTER_T prAdapter)
 			prSdioFunc->card->host->max_req_size, prSdioFunc->card->host->max_seg_size,
 			prSdioFunc->card->host->max_segs, prSdioFunc->card->host->max_blk_size,
 			prSdioFunc->card->host->max_blk_count, prSdioFunc->cur_blksize);
-#endif
 
 	return u4BufSize;
 }
@@ -1838,9 +1816,6 @@ VOID halProcessSoftwareInterrupt(IN P_ADAPTER_T prAdapter)
 
 	if ((u4IntrBits & WHISR_D2H_SW_ASSERT_INFO_INT) != 0) {
 		halPrintFirmwareAssertInfo(prAdapter);
-#if CFG_CHIP_RESET_SUPPORT
-		GL_RESET_TRIGGER(prAdapter, RST_PROCESS_ABNORMAL_INT);
-#endif
 	}
 
 	if (u4IntrBits & WHISR_D2H_WKUP_BY_RX_PACKET)

@@ -10,7 +10,6 @@ ldflags-y += --strip-debug
 mt7668s-objs := \
     chips/mt7668.o \
     common/dump.o \
-    common/wlan_bow.o \
     common/wlan_lib.o \
     common/wlan_oid.o \
     common/wlan_p2p.o \
@@ -62,7 +61,6 @@ mt7668s-objs := \
     nic/nic_umac.o \
     nic/que_mgt.o \
     sdio/gl_ate_agent.o \
-    sdio/gl_bow.o \
     sdio/gl_cfg80211.o \
     sdio/gl_hook_api.o \
     sdio/gl_init.o \
@@ -73,15 +71,12 @@ mt7668s-objs := \
     sdio/gl_p2p_init.o \
     sdio/gl_p2p_kal.o \
     sdio/gl_proc.o \
-    sdio/gl_rst.o \
     sdio/gl_vendor.o \
     sdio/gl_wext.o \
     sdio/gl_wext_priv.o \
     sdio/hal_api.o \
     sdio/platform.o \
-    sdio/sdio.o \
-    sdio/sdio_test_driver_core.o \
-    sdio/sdio_test_driver_ops.o
+    sdio/sdio.o
 
 ifeq ($(CONFIG_MT7668S_WIFI), y)
     ccflags-y += -DCFG_BUILT_IN_DRIVER=1 \

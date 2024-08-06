@@ -87,22 +87,6 @@ VOID secInit(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex)
 	prBssInfo->u4RsnSelectedPairwiseCipher = 0;
 	prBssInfo->u4RsnSelectedAKMSuite	   = 0;
 
-#if 0 /* CFG_ENABLE_WIFI_DIRECT */
-	prBssInfo = &prAdapter->rWifiVar.arBssInfo[NETWORK_TYPE_P2P];
-
-	prBssInfo->u4RsnSelectedGroupCipher = RSN_CIPHER_SUITE_CCMP;
-	prBssInfo->u4RsnSelectedPairwiseCipher = RSN_CIPHER_SUITE_CCMP;
-	prBssInfo->u4RsnSelectedAKMSuite = RSN_AKM_SUITE_PSK;
-#endif
-
-#if 0 /* CFG_ENABLE_BT_OVER_WIFI */
-	prBssInfo = &prAdapter->rWifiVar.arBssInfo[NETWORK_TYPE_BOW];
-
-	prBssInfo->u4RsnSelectedGroupCipher = RSN_CIPHER_SUITE_CCMP;
-	prBssInfo->u4RsnSelectedPairwiseCipher = RSN_CIPHER_SUITE_CCMP;
-	prBssInfo->u4RsnSelectedAKMSuite = RSN_AKM_SUITE_PSK;
-#endif
-
 	prAdapter->rMib.dot11RSNAConfigPairwiseCiphersTable[0].dot11RSNAConfigPairwiseCipher = WPA_CIPHER_SUITE_WEP40;
 	prAdapter->rMib.dot11RSNAConfigPairwiseCiphersTable[1].dot11RSNAConfigPairwiseCipher = WPA_CIPHER_SUITE_TKIP;
 	prAdapter->rMib.dot11RSNAConfigPairwiseCiphersTable[2].dot11RSNAConfigPairwiseCipher = WPA_CIPHER_SUITE_CCMP;

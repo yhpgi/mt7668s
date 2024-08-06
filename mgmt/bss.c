@@ -1222,10 +1222,6 @@ WLAN_STATUS bssProcessProbeRequest(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwR
 					(prBssInfo->ucBssIndex == P2P_DEV_BSS_INDEX), (UINT_8)prBssInfo->u4PrivateData);
 		}
 #endif
-#if CFG_ENABLE_BT_OVER_WIFI
-		else if (prBssInfo->eNetworkType == NETWORK_TYPE_BOW)
-			fgReplyProbeResp = bowValidateProbeReq(prAdapter, prSwRfb, &u4CtrlFlagsForProbeResp);
-#endif
 
 		if (fgReplyProbeResp) {
 			if (nicTxGetFreeCmdCount(prAdapter) > (CFG_TX_MAX_CMD_PKT_NUM / 2)) {

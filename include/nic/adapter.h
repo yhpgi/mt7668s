@@ -644,11 +644,6 @@ typedef struct _WIFI_VAR_T {
 
 #endif /* CFG_ENABLE_WIFI_DIRECT */
 
-#if CFG_ENABLE_BT_OVER_WIFI
-	BOW_SPECIFIC_BSS_INFO_T rBowSpecificBssInfo;
-	BOW_FSM_INFO_T			rBowFsmInfo;
-#endif /* CFG_ENABLE_BT_OVER_WIFI */
-
 	WLAN_TABLE_T arWtbl[WTBL_SIZE];
 
 	DEAUTH_INFO_T arDeauthInfo[MAX_DEAUTH_INFO_COUNT];
@@ -939,10 +934,7 @@ typedef struct _WIFI_VAR_T {
 typedef struct {
 	LINK_T	   rLinkHead;
 	OS_SYSTIME rNextExpiredSysTime;
-#if defined(CONFIG_ANDROID) && (CFG_ENABLE_WAKE_LOCK)
-	KAL_WAKE_LOCK_T rWakeLock;
-#endif
-	BOOLEAN fgWakeLocked;
+	BOOLEAN	   fgWakeLocked;
 } ROOT_TIMER, *P_ROOT_TIMER;
 
 /* FW/DRV/NVRAM version information */

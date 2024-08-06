@@ -51,9 +51,6 @@
 #ifdef CFG_GET_TEMPURATURE
 #define PROC_GET_TEMPETATURE "get_temperature"
 #endif
-#if CFG_CHIP_RESET_SUPPORT
-#define PROC_RESET_CMD "reset"
-#endif
 
 #define PROC_MCR_ACCESS_MAX_USER_INPUT_LEN 20
 #define PROC_RX_STATISTICS_MAX_USER_INPUT_LEN 10
@@ -774,52 +771,6 @@ static ssize_t proc_get_temperature(struct file *filp, char __user *buf, size_t 
 	return pos;
 }
 #endif
-#if CFG_CHIP_RESET_SUPPORT
-static ssize_t procReset(struct file *filp, char __user *buf, size_t count, loff_t *f_pos)
-{
-	uint8_t		*pucProcBuf = kalMemZAlloc(PROC_MAX_BUF_SIZE, VIR_MEM_TYPE);
-	UINT_8	   *temp		 = NULL;
-	UINT_32		  u4CopySize = 0;
-	INT_32		  i4Pos		 = 0;
-	P_GLUE_INFO_T prGlueInfo = NULL;
-	P_ADAPTER_T	  prAdapter	 = NULL;
-	int32_t		  i4Ret		 = 0;
-
-	prGlueInfo = g_prGlueInfo_proc;
-	temp	   = pucProcBuf;
-
-	if (!prGlueInfo) {
-		i4Ret = 0;
-		goto freeBuf;
-	}
-	prAdapter = prGlueInfo->prAdapter;
-
-	/* if *f_ops>0, we should return 0 to make cat command exit */
-	if (*f_pos > 0 || buf == NULL || pucProcBuf == NULL) {
-		i4Ret = 0;
-		goto freeBuf;
-	}
-
-	i4Pos = scnprintf(temp, (PROC_MAX_BUF_SIZE - i4Pos), "Reset\n");
-
-	GL_RESET_TRIGGER(prAdapter, RST_CMD_TRIGGER);
-	u4CopySize = i4Pos;
-	if (u4CopySize > count)
-		u4CopySize = count;
-	if (copy_to_user(buf, pucProcBuf, u4CopySize)) {
-		DBGLOG(INIT, ERROR, "copy to user failed\n");
-		i4Ret = -EFAULT;
-		goto freeBuf;
-	}
-
-	*f_pos += u4CopySize;
-	i4Ret = u4CopySize;
-freeBuf:
-	if (pucProcBuf)
-		kalMemFree(pucProcBuf, VIR_MEM_TYPE, PROC_MAX_BUF_SIZE);
-	return i4Ret;
-}
-#endif
 
 #if KERNEL_VERSION(5, 6, 0) <= LINUX_VERSION_CODE
 static const struct proc_ops dbglevel_ops = {
@@ -857,12 +808,6 @@ static const struct proc_ops get_txpwr_tbl_ops = {
 #ifdef CFG_GET_TEMPURATURE
 static const struct proc_ops get_temperature_ops = {
 	.proc_read = proc_get_temperature,
-};
-#endif
-
-#if CFG_CHIP_RESET_SUPPORT
-static const struct proc_ops reset_ops = {
-	.proc_read = procReset,
 };
 #endif
 
@@ -910,13 +855,6 @@ static const struct file_operations get_txpwr_tbl_ops = {
 static const struct file_operations get_temperature_ops = {
 	.owner = THIS_MODULE,
 	.read  = proc_get_temperature,
-};
-#endif
-
-#if CFG_CHIP_RESET_SUPPORT
-static const struct file_operations reset_ops = {
-	.owner = THIS_MODULE,
-	.read  = procReset,
 };
 #endif
 
@@ -1182,9 +1120,7 @@ INT_32 procRemoveProcfs(VOID)
 #if CFG_SUPPORT_DEBUG_FS
 	remove_proc_entry(PROC_COUNTRY, gprProcRoot);
 #endif
-#if CFG_CHIP_RESET_SUPPORT
-	remove_proc_entry(PROC_RESET_CMD, gprProcRoot);
-#endif
+
 	return 0;
 } /* end of procRemoveProcfs() */
 
@@ -1250,13 +1186,7 @@ INT_32 procCreateFsEntry(P_GLUE_INFO_T prGlueInfo)
 		DBGLOG(INIT, ERROR, "Unable to create /proc entry dbgLevel\n\r");
 		return -1;
 	}
-#if CFG_CHIP_RESET_SUPPORT
-	prEntry = proc_create(PROC_RESET_CMD, 0660, gprProcRoot, &reset_ops);
-	if (prEntry == NULL) {
-		DBGLOG(INIT, ERROR, "Unable to create /proc entry for driver command\n\r");
-		return -1;
-	}
-#endif
+
 	return 0;
 }
 

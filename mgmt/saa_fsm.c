@@ -496,28 +496,7 @@ saaFsmSendEventJoinComplete(
 		return WLAN_STATUS_SUCCESS;
 	}
 #endif
-#if CFG_ENABLE_BT_OVER_WIFI
-	else if (IS_STA_BOW_TYPE(prStaRec)) {
-		/* @TODO: BOW handler */
 
-		P_MSG_SAA_FSM_COMP_T prSaaFsmCompMsg;
-
-		prSaaFsmCompMsg = cnmMemAlloc(prAdapter, RAM_TYPE_MSG, sizeof(MSG_SAA_FSM_COMP_T));
-		if (!prSaaFsmCompMsg)
-			return WLAN_STATUS_RESOURCES;
-
-		prSaaFsmCompMsg->rMsgHdr.eMsgId = MID_SAA_BOW_JOIN_COMPLETE;
-		prSaaFsmCompMsg->ucSeqNum		= prStaRec->ucAuthAssocReqSeqNum;
-		prSaaFsmCompMsg->rJoinStatus	= rJoinStatus;
-		prSaaFsmCompMsg->prStaRec		= prStaRec;
-		prSaaFsmCompMsg->prSwRfb		= prSwRfb;
-
-		/* NOTE(Kevin): Set to UNBUF for immediately JOIN complete */
-		mboxSendMsg(prAdapter, MBOX_ID_0, (P_MSG_HDR_T)prSaaFsmCompMsg, MSG_SEND_METHOD_UNBUF);
-
-		return WLAN_STATUS_SUCCESS;
-	}
-#endif
 	else {
 		DBGLOG(SAA, ERROR, "Invalid case in %s.\n", __func__);
 		return WLAN_STATUS_FAILURE;
@@ -659,13 +638,6 @@ saaFsmRunEventTxDone(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo, IN E
 		return WLAN_STATUS_INVALID_PACKET;
 
 	ASSERT(prStaRec);
-
-#if CFG_CHIP_RESET_SUPPORT
-	if (kalIsResetting()) {
-		DBGLOG(SAA, WARN, "Skip TxDone event due to chip resetting\n");
-		return WLAN_STATUS_SUCCESS;
-	}
-#endif
 
 	DBGLOG(SAA, LOUD, "EVENT-TX DONE: Current Time = %d\n", kalGetTimeTick());
 
@@ -1397,10 +1369,7 @@ WLAN_STATUS saaFsmRunEventRxDeauth(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwR
 			p2pRoleFsmRunEventRxDeauthentication(prAdapter, prStaRec, prSwRfb);
 		}
 #endif
-#if CFG_ENABLE_BT_OVER_WIFI
-		else if (IS_STA_BOW_TYPE(prStaRec))
-			bowRunEventRxDeAuth(prAdapter, prStaRec, prSwRfb);
-#endif
+
 		else
 			ASSERT(0);
 
@@ -1666,44 +1635,6 @@ WLAN_STATUS saaFsmRunEventRxDisassoc(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prS
 			DBGLOG(SAA, INFO, "notification of RX disassociation Done\n");
 #endif
 			p2pRoleFsmRunEventRxDisassociation(prAdapter, prStaRec, prSwRfb);
-		}
-#endif
-#if CFG_ENABLE_BT_OVER_WIFI
-		else if (IS_STA_BOW_TYPE(prStaRec)) {
-			/* ToDo:: nothing */
-			/* TODO(Kevin) */
-#if CFG_SUPPORT_CFG80211_AUTH
-			DBGLOG(SAA, INFO, "notification of RX disassociation %d\n", prSwRfb->u2PacketLen);
-			if (wdev->current_bss) {
-#if (KERNEL_VERSION(3, 11, 0) <= CFG80211_VERSION_CODE)
-#if CFG_WDEV_LOCK_THREAD_SUPPORT
-				if (in_interrupt()) {
-					pFrameBuf			 = kalMemAlloc(prSwRfb->u2PacketLen, PHY_MEM_TYPE);
-					fgIsInterruptContext = TRUE;
-				} else {
-					pFrameBuf			 = kalMemAlloc(prSwRfb->u2PacketLen, VIR_MEM_TYPE);
-					fgIsInterruptContext = FALSE;
-				}
-
-				if (!pFrameBuf) {
-					DBGLOG(SAA, ERROR, "Alloc buffer for frame failed\n");
-					return WLAN_STATUS_RESOURCES;
-				}
-
-				kalMemCopy((PVOID)pFrameBuf, (PVOID)prDisassocFrame, prSwRfb->u2PacketLen);
-				kalWDevLockThread(prAdapter->prGlueInfo, prAdapter->prGlueInfo->prDevHandler, CFG80211_RX_MLME_MGMT,
-						pFrameBuf, prSwRfb->u2PacketLen, NULL, 0, fgIsInterruptContext);
-#else
-				cfg80211_rx_mlme_mgmt(
-						prAdapter->prGlueInfo->prDevHandler, (PUINT_8)prDisassocFrame, (size_t)prSwRfb->u2PacketLen);
-#endif
-#else
-				cfg80211_send_disassoc(
-						prAdapter->prGlueInfo->prDevHandler, (PUINT_8)prDisassocFrame, (size_t)prSwRfb->u2PacketLen);
-#endif
-			}
-			DBGLOG(SAA, INFO, "notification of RX disassociation Done\n");
-#endif
 		}
 #endif
 		else

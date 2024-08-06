@@ -29,7 +29,6 @@
 
 #define BUILD_DBG_MSG 1
 #define BUILD_QA_DBG 1
-#define CFG_CHIP_RESET_SUPPORT 0
 #define CFG_DEFAULT_DBG_LEVEL 0xF
 #define CFG_DRIVER_INITIAL_RUNNING_MODE 3
 #define CFG_DUMP_TXPOWR_TABLE
@@ -38,20 +37,19 @@
 #define CFG_ENABLE_EFUSE_MAC_ADDR 1
 #define CFG_ENABLE_GTK_FRAME_FILTER 0
 #define CFG_ENABLE_PS_INTV_CTRL 1
-#define CFG_ENABLE_WAKE_LOCK 0
-#define CFG_GARP_KEEPALIVE 0
+
 #define CFG_HS20_DEBUG 0
 #define CFG_IPI_2CHAIN_SUPPORT 1
 #define CFG_KEY_ERROR_STATISTIC_RECOVERY 1
 #define CFG_MET_PACKET_TRACE_SUPPORT 1
-#define CFG_MET_TAG_SUPPORT 0
+
 #define CFG_NUM_DIFFERENT_CHANNELS_P2P 1
 #define CFG_NUM_DIFFERENT_CHANNELS_STA 1
 #define CFG_P2P_SCAN_REPORT_ALL_BSS 0
 #define CFG_RX_DIRECT_USB 1
 #define CFG_RX_SINGLE_CHAIN_SUPPORT 1
 #define CFG_SCAN_CHANNEL_SPECIFIED 1
-#define CFG_SUPPORT_AEE 0
+
 #define CFG_SUPPORT_AGPS_ASSIST 1
 #define CFG_SUPPORT_CHNL_CONFLICT_REVISE 0
 #define CFG_SUPPORT_CFG80211_AUTH 1
@@ -87,8 +85,6 @@
 
 /* 2 Flags for OS capability */
 
-#define MTK_WCN_HIF_SDIO 0
-
 /* Android build-in driver switch, Mike 2016/11/11*/
 #ifndef CFG_BUILT_IN_DRIVER
 #define CFG_BUILT_IN_DRIVER 0
@@ -98,12 +94,6 @@
 /* work around for any alps K3.18 platform*/
 #ifndef CFG_WPS_DISCONNECT
 #define CFG_WPS_DISCONNECT 0
-#endif
-
-#if (CFG_SUPPORT_AEE == 1)
-#define CFG_ENABLE_AEE_MSG 1
-#else
-#define CFG_ENABLE_AEE_MSG 0
 #endif
 
 #define CFG_SUPPORT_MTK_ANDROID_KK 1
@@ -130,10 +120,6 @@
 
 #ifndef CFG_MET_PACKET_TRACE_SUPPORT
 #define CFG_MET_PACKET_TRACE_SUPPORT 0 /*move to wlan/MAKEFILE */
-#endif
-
-#ifndef CFG_MET_TAG_SUPPORT
-#define CFG_MET_TAG_SUPPORT 0
 #endif
 
 /*------------------------------------------------------------------------------
@@ -215,17 +201,6 @@
 #define CFG_SUPPORT_FAKE_EAPOL_DETECTION 0
 /* Enable TKIP MIC ERROR Detection */
 #define CFG_SUPPORT_TKIP_MICERROR_DETECTION 0
-#endif
-
-/* Enable Android wake_lock operations */
-#ifdef CONFIG_HAS_WAKELOCK
-#ifndef CFG_ENABLE_WAKE_LOCK
-#define CFG_ENABLE_WAKE_LOCK 1
-#endif
-
-#else
-#undef CFG_ENABLE_WAKE_LOCK
-#define CFG_ENABLE_WAKE_LOCK 0
 #endif
 
 /*------------------------------------------------------------------------------
@@ -559,18 +534,6 @@
  * Flags of Bluetooth-over-WiFi (BT 3.0 + HS) support
  *------------------------------------------------------------------------------
  */
-
-#define CFG_ENABLE_BT_OVER_WIFI 0
-
-#define CFG_BOW_SEPARATE_DATA_PATH 1
-
-#define CFG_BOW_PHYSICAL_LINK_NUM 4
-
-#define CFG_BOW_LIMIT_AIS_CHNL 1
-
-#define CFG_BOW_SUPPORT_11N 1
-
-#define CFG_BOW_RATE_LIMITATION 1
 
 /*------------------------------------------------------------------------------
  * Flags of Wi-Fi Direct support
@@ -996,24 +959,6 @@
  *------------------------------------------------------------------------------
  */
 #define CFG_SUPPORT_ANT_SELECT 1
-
-/*------------------------------------------------------------------------------
- * Flags for a Goal for MT6632 : Cal Result Backup in Host or NVRam when Android Boot
- *------------------------------------------------------------------------------
- */
-#if 0 /*(MTK_WCN_HIF_SDIO) : 20161003 Default Off, later will enable by MTK_WCN_HIF_SDIO */
-#define CFG_SUPPORT_CAL_RESULT_BACKUP_TO_HOST 1
-#define CFG_SUPPORT_CAL_RESULT_BACKUP_TO_HOST_DBGLOG 0
-#else
-#define CFG_SUPPORT_CAL_RESULT_BACKUP_TO_HOST 0
-#define CFG_SUPPORT_CAL_RESULT_BACKUP_TO_HOST_DBGLOG 0
-#endif
-
-/*------------------------------------------------------------------------------
- * Enable SDIO 1-bit Data Mode. (Usually debug only)
- *------------------------------------------------------------------------------
- */
-#define CFG_SDIO_1BIT_DATA_MODE 0
 
 /*------------------------------------------------------------------------------
  * Single Sku

@@ -26,15 +26,11 @@
 #include "gl_os.h"
 #include "precomp.h"
 
-#if MTK_WCN_HIF_SDIO
-#include "hif_sdio.h"
-#else
 #include <linux/mmc/card.h>
 #include <linux/mmc/host.h>
 #include <linux/mmc/sdio.h>
 #include <linux/mmc/sdio_func.h> /* sdio_readl(), etc */
 #include <linux/mmc/sdio_ids.h>
-#endif
 
 #include <linux/mm.h>
 #ifndef CONFIG_X86
@@ -42,10 +38,6 @@
 #endif
 
 #include "mt66xx_reg.h"
-
-#if (CFG_SDIO_1BIT_DATA_MODE == 1)
-#include "test_driver_sdio_ops.h"
-#endif
 
 /*******************************************************************************
  *                              C O N S T A N T S
@@ -58,39 +50,6 @@
 #define HIF_SDIO_ACCESS_RETRY_LIMIT 3
 #define HIF_SDIO_INTERRUPT_RESPONSE_TIMEOUT (15000)
 
-#if MTK_WCN_HIF_SDIO
-
-/*
- * function prototypes
- *
- */
-
-static INT_32 mtk_sdio_probe(MTK_WCN_HIF_SDIO_CLTCTX, const MTK_WCN_HIF_SDIO_FUNCINFO *);
-
-static INT_32 mtk_sdio_remove(MTK_WCN_HIF_SDIO_CLTCTX);
-static INT_32 mtk_sdio_interrupt(MTK_WCN_HIF_SDIO_CLTCTX);
-
-/*
- * sdio function info table
- */
-
-static MTK_WCN_HIF_SDIO_FUNCINFO funcInfo[] = {
-	{ MTK_WCN_HIF_SDIO_FUNC(0x037a, 0x6602, 0x1, 512) },
-};
-
-static MTK_WCN_SDIO_DRIVER_DATA_MAPPING sdio_driver_data_mapping[] = {
-	{ 0x6602, &mt66xx_driver_data_mt6632 },
-};
-
-static MTK_WCN_HIF_SDIO_CLTINFO cltInfo = {
-	.func_tbl		= funcInfo,
-	.func_tbl_size	= sizeof(funcInfo) / sizeof(MTK_WCN_HIF_SDIO_FUNCINFO),
-	.hif_clt_probe	= mtk_sdio_probe,
-	.hif_clt_remove = mtk_sdio_remove,
-	.hif_clt_irq	= mtk_sdio_interrupt,
-};
-
-#else
 /*
  * function prototypes
  *
@@ -108,8 +67,6 @@ const struct sdio_device_id mtk_sdio_ids[] = {
 
 MODULE_DEVICE_TABLE(sdio, mtk_sdio_ids);
 
-#endif
-
 /*******************************************************************************
  *                             D A T A   T Y P E S
  ********************************************************************************
@@ -126,7 +83,7 @@ MODULE_DEVICE_TABLE(sdio, mtk_sdio_ids);
  */
 static probe_card  pfWlanProbe;
 static remove_card pfWlanRemove;
-#if (MTK_WCN_HIF_SDIO == 0)
+
 static const struct dev_pm_ops mtk_sdio_pm_ops = {
 	.suspend = mtk_sdio_pm_suspend,
 	.resume	 = mtk_sdio_pm_resume,
@@ -140,7 +97,6 @@ static struct sdio_driver mtk_sdio_driver = { .name = "wlan", /* "MTK SDIO WLAN 
 													   .owner = THIS_MODULE,
 													   .pm	  = &mtk_sdio_pm_ops,
 	   } };
-#endif
 
 /*******************************************************************************
  *                                 M A C R O S
@@ -167,39 +123,6 @@ static struct sdio_driver mtk_sdio_driver = { .name = "wlan", /* "MTK SDIO WLAN 
  * \return void
  */
 /*----------------------------------------------------------------------------*/
-
-#if MTK_WCN_HIF_SDIO
-
-static INT_32 mtk_sdio_interrupt(MTK_WCN_HIF_SDIO_CLTCTX cltCtx)
-{
-	P_GLUE_INFO_T prGlueInfo = NULL;
-	INT_32		  ret		 = 0;
-
-	prGlueInfo = mtk_wcn_hif_sdio_get_drvdata(cltCtx);
-
-	/* ASSERT(prGlueInfo); */
-
-	if (!prGlueInfo) {
-		/* printk(KERN_INFO DRV_NAME"No glue info in mtk_sdio_interrupt()\n"); */
-		return -HIF_SDIO_ERR_FAIL;
-	}
-
-	if (prGlueInfo->ulFlag & GLUE_FLAG_HALT) {
-		/* printk(KERN_INFO DRV_NAME"GLUE_FLAG_HALT skip INT\n"); */
-		ret = mtk_wcn_hif_sdio_writeb(cltCtx, MCR_WHLPCR, WHLPCR_INT_EN_CLR);
-		return ret;
-	}
-
-	ret = mtk_wcn_hif_sdio_writeb(cltCtx, MCR_WHLPCR, WHLPCR_INT_EN_CLR);
-
-	prGlueInfo->rHifInfo.fgIsPendingInt = FALSE;
-
-	kalSetIntEvent(prGlueInfo);
-
-	return ret;
-}
-
-#else
 static void mtk_sdio_interrupt(struct sdio_func *func)
 {
 	P_GLUE_INFO_T prGlueInfo = NULL;
@@ -224,7 +147,6 @@ static void mtk_sdio_interrupt(struct sdio_func *func)
 
 	kalSetIntEvent(prGlueInfo);
 }
-#endif
 
 /*----------------------------------------------------------------------------*/
 /*!
@@ -236,43 +158,6 @@ static void mtk_sdio_interrupt(struct sdio_func *func)
  * \return void
  */
 /*----------------------------------------------------------------------------*/
-
-#if MTK_WCN_HIF_SDIO
-
-/* FIXME: global variable */
-static const MTK_WCN_HIF_SDIO_FUNCINFO *prFunc;
-
-static INT_32 mtk_sdio_probe(MTK_WCN_HIF_SDIO_CLTCTX cltCtx, const MTK_WCN_HIF_SDIO_FUNCINFO *prFuncInfo)
-{
-	INT_32 ret			= HIF_SDIO_ERR_SUCCESS;
-	INT_32 i			= 0;
-	INT_32 dd_table_len = sizeof(sdio_driver_data_mapping) / sizeof(MTK_WCN_SDIO_DRIVER_DATA_MAPPING);
-	struct mt66xx_hif_driver_data *sdio_driver_data = NULL;
-
-	prFunc = prFuncInfo;
-
-	for (i = 0; i < dd_table_len; i++) {
-		if (prFunc->card_id == sdio_driver_data_mapping[i].card_id) {
-			sdio_driver_data = sdio_driver_data_mapping[i].mt66xx_driver_data;
-			break;
-		}
-	}
-
-	if (sdio_driver_data == NULL) {
-		DBGLOG(HAL, ERROR, "sdio probe error: %x driver data not found!\n", prFunc->card_id);
-		return HIF_SDIO_ERR_UNSUP_CARD_ID;
-	}
-
-	if (pfWlanProbe((PVOID)&cltCtx, (PVOID)sdio_driver_data) != WLAN_STATUS_SUCCESS) {
-		/* printk(KERN_WARNING DRV_NAME"pfWlanProbe fail!call pfWlanRemove()\n"); */
-		pfWlanRemove();
-		ret = -(HIF_SDIO_ERR_FAIL);
-	} else {
-		/* printk(KERN_INFO DRV_NAME"mtk_wifi_sdio_probe() done(%d)\n", ret); */
-	}
-	return ret;
-}
-#else
 int mtk_sdio_probe(struct sdio_func *func, const struct sdio_device_id *id)
 {
 	int ret;
@@ -321,18 +206,7 @@ int mtk_sdio_probe(struct sdio_func *func, const struct sdio_device_id *id)
 	dev_info(&func->dev, "Mediatek MT7668S Probe Success\n");
 	return WLAN_STATUS_SUCCESS;
 }
-#endif
 
-#if MTK_WCN_HIF_SDIO
-INT_32 mtk_sdio_remove(MTK_WCN_HIF_SDIO_CLTCTX cltCtx)
-{
-	INT_32 ret = HIF_SDIO_ERR_SUCCESS;
-	/* printk(KERN_INFO DRV_NAME"pfWlanRemove done\n"); */
-	pfWlanRemove();
-
-	return ret;
-}
-#else
 void mtk_sdio_remove(struct sdio_func *func)
 {
 	/* printk(KERN_INFO DRV_NAME"mtk_sdio_remove()\n"); */
@@ -348,9 +222,7 @@ void mtk_sdio_remove(struct sdio_func *func)
 
 	/* printk(KERN_INFO DRV_NAME"mtk_sdio_remove() done\n"); */
 }
-#endif
 
-#if (MTK_WCN_HIF_SDIO == 0)
 static int mtk_sdio_pm_suspend(struct device *pDev)
 {
 	int				  ret = 0, wait = 0;
@@ -514,7 +386,6 @@ int mtk_sdio_async_irq_enable(struct sdio_func *func)
 	return TRUE;
 }
 #endif
-#endif
 
 /*----------------------------------------------------------------------------*/
 /*!
@@ -539,10 +410,6 @@ WLAN_STATUS glRegisterBus(probe_card pfProbe, remove_card pfRemove)
 	pfWlanProbe	 = pfProbe;
 	pfWlanRemove = pfRemove;
 
-#if MTK_WCN_HIF_SDIO
-	/* register MTK sdio client */
-	ret = ((mtk_wcn_hif_sdio_client_reg(&cltInfo) == HIF_SDIO_ERR_SUCCESS) ? WLAN_STATUS_SUCCESS : WLAN_STATUS_FAILURE);
-#else
 	mtk_sdio_driver.probe  = mtk_sdio_probe;
 	mtk_sdio_driver.remove = mtk_sdio_remove;
 
@@ -550,7 +417,6 @@ WLAN_STATUS glRegisterBus(probe_card pfProbe, remove_card pfRemove)
 	mtk_sdio_driver.drv.resume	= mtk_sdio_resume;
 
 	ret = (sdio_register_driver(&mtk_sdio_driver) == 0) ? WLAN_STATUS_SUCCESS : WLAN_STATUS_FAILURE;
-#endif
 
 	return ret;
 } /* end of glRegisterBus() */
@@ -569,12 +435,8 @@ VOID glUnregisterBus(remove_card pfRemove)
 	ASSERT(pfRemove);
 	pfRemove();
 
-#if MTK_WCN_HIF_SDIO
-	/* unregister MTK sdio client */
-	mtk_wcn_hif_sdio_client_unreg(&cltInfo);
-#else
 	sdio_unregister_driver(&mtk_sdio_driver);
-#endif
+
 } /* end of glUnregisterBus() */
 
 /*----------------------------------------------------------------------------*/
@@ -598,13 +460,6 @@ VOID glSetHifInfo(P_GLUE_INFO_T prGlueInfo, ULONG ulCookie)
 	QUEUE_INITIALIZE(&prHif->rRxDeAggQueue);
 	QUEUE_INITIALIZE(&prHif->rRxFreeBufQueue);
 
-#if MTK_WCN_HIF_SDIO
-	/* prHif->prFuncInfo = ((MTK_WCN_HIF_SDIO_FUNCINFO *) u4Cookie); */
-	prHif->prFuncInfo = prFunc;
-	prHif->cltCtx	  = *((MTK_WCN_HIF_SDIO_CLTCTX *)ulCookie);
-	mtk_wcn_hif_sdio_set_drvdata(prHif->cltCtx, prGlueInfo);
-
-#else
 	prHif->func = (struct sdio_func *)ulCookie;
 
 	/* printk(KERN_INFO DRV_NAME"prHif->func->dev = 0x%p\n", &prHif->func->dev); */
@@ -615,7 +470,6 @@ VOID glSetHifInfo(P_GLUE_INFO_T prGlueInfo, ULONG ulCookie)
 	sdio_set_drvdata(prHif->func, prGlueInfo);
 
 	SET_NETDEV_DEV(prGlueInfo->prDevHandler, &prHif->func->dev);
-#endif
 
 	/* Reset statistic counter */
 	kalMemZero(&prHif->rStatCounter, sizeof(SDIO_STAT_COUNTER_T));
@@ -625,11 +479,6 @@ VOID glSetHifInfo(P_GLUE_INFO_T prGlueInfo, ULONG ulCookie)
 
 	mutex_init(&prHif->rRxFreeBufQueMutex);
 	mutex_init(&prHif->rRxDeAggQueMutex);
-#if CFG_CHIP_RESET_SUPPORT
-	rst_data.func = prGlueInfo->rHifInfo.func;
-	mutex_init(&(rst_data.rst_mutex));
-	/* dev_warn("[RST]set rst_data.func = 0x%p\n", rst_data.func); */
-#endif
 
 } /* end of glSetHifInfo() */
 
@@ -662,7 +511,6 @@ VOID glClearHifInfo(P_GLUE_INFO_T prGlueInfo)
 /*----------------------------------------------------------------------------*/
 BOOL glBusInit(PVOID pvData)
 {
-#if (MTK_WCN_HIF_SDIO == 0)
 	int				  ret  = 0;
 	struct sdio_func *func = NULL;
 
@@ -671,14 +519,6 @@ BOOL glBusInit(PVOID pvData)
 	func = (struct sdio_func *)pvData;
 
 	sdio_claim_host(func);
-
-#if (CFG_SDIO_1BIT_DATA_MODE == 1)
-	ret = sdio_disable_wide(func->card);
-	if (ret)
-		DBGLOG(HAL, ERROR, "glBusInit() Error at enabling SDIO 1-BIT data mode.\n");
-	else
-		DBGLOG(HAL, INFO, "glBusInit() SDIO 1-BIT data mode is working.\n");
-#endif
 
 #if (CFG_SDIO_ASYNC_IRQ_AUTO_ENABLE == 1)
 	ret = mtk_sdio_async_irq_enable(func);
@@ -705,7 +545,7 @@ BOOL glBusInit(PVOID pvData)
 	/* printk(KERN_INFO DRV_NAME"param: func->max_blksize(%d)\n", func->max_blksize); */
 	/* printk(KERN_INFO DRV_NAME"param: func->card->host->max_blk_size(%d)\n", func->card->host->max_blk_size); */
 	/* printk(KERN_INFO DRV_NAME"param: func->card->host->max_blk_count(%d)\n", func->card->host->max_blk_count); */
-#endif
+
 	return TRUE;
 } /* end of glBusInit() */
 
@@ -754,13 +594,9 @@ INT_32 glBusSetIrq(PVOID pvData, PVOID pfnIsr, PVOID pvCookie)
 
 	prHifInfo = &prGlueInfo->rHifInfo;
 
-#if (MTK_WCN_HIF_SDIO == 0)
 	sdio_claim_host(prHifInfo->func);
 	ret = sdio_claim_irq(prHifInfo->func, mtk_sdio_interrupt);
 	sdio_release_host(prHifInfo->func);
-#else
-	mtk_wcn_hif_sdio_enable_irq(prHifInfo->cltCtx, TRUE);
-#endif
 
 	prHifInfo->fgIsPendingInt = FALSE;
 
@@ -797,13 +633,11 @@ VOID glBusFreeIrq(PVOID pvData, PVOID pvCookie)
 	}
 
 	prHifInfo = &prGlueInfo->rHifInfo;
-#if (MTK_WCN_HIF_SDIO == 0)
+
 	sdio_claim_host(prHifInfo->func);
 	sdio_release_irq(prHifInfo->func);
 	sdio_release_host(prHifInfo->func);
-#else
-	mtk_wcn_hif_sdio_enable_irq(prHifInfo->cltCtx, FALSE);
-#endif
+
 } /* end of glBusreeIrq() */
 
 BOOLEAN glIsReadClearReg(UINT_32 u4Address)
@@ -857,13 +691,9 @@ BOOL kalDevRegRead(IN P_GLUE_INFO_T prGlueInfo, IN UINT_32 u4Register, OUT PUINT
 #endif
 
 	do {
-#if MTK_WCN_HIF_SDIO
-		ret = mtk_wcn_hif_sdio_readl(prGlueInfo->rHifInfo.cltCtx, u4Register, (PUINT_32)pu4Value);
-#else
 		sdio_claim_host(prGlueInfo->rHifInfo.func);
 		*pu4Value = sdio_readl(prGlueInfo->rHifInfo.func, u4Register, &ret);
 		sdio_release_host(prGlueInfo->rHifInfo.func);
-#endif
 
 		if (ret || ucRetryCount) {
 			/* DBGLOG(HAL, ERROR,
@@ -883,18 +713,7 @@ BOOL kalDevRegRead(IN P_GLUE_INFO_T prGlueInfo, IN UINT_32 u4Register, OUT PUINT
 	} while (ret);
 
 	if (ret) {
-#if CFG_CHIP_RESET_SUPPORT
-		P_ADAPTER_T prAdapter = NULL;
-#endif
-		kalSendAeeWarning(HIF_SDIO_ERR_TITLE_STR, HIF_SDIO_ERR_DESC_STR "sdio_readl() reports error: %x retry: %u", ret,
-				ucRetryCount);
 		DBGLOG(HAL, ERROR, "sdio_readl() reports error: %x retry: %u\n", ret, ucRetryCount);
-#if CFG_CHIP_RESET_SUPPORT
-		prAdapter				 = prGlueInfo->prAdapter;
-		prAdapter->fgIsChipNoAck = TRUE;
-		DBGLOG(HAL, ERROR, "fgIsChipNoAck = %d\n", prAdapter->fgIsChipNoAck);
-		GL_RESET_TRIGGER(prAdapter, RST_HIF_FAIL);
-#endif
 	}
 	return (ret) ? FALSE : TRUE;
 } /* end of kalDevRegRead() */
@@ -991,13 +810,9 @@ BOOL kalDevRegWrite(IN P_GLUE_INFO_T prGlueInfo, IN UINT_32 u4Register, IN UINT_
 #endif
 
 	do {
-#if MTK_WCN_HIF_SDIO
-		ret = mtk_wcn_hif_sdio_writel(prGlueInfo->rHifInfo.cltCtx, u4Register, u4Value);
-#else
 		sdio_claim_host(prGlueInfo->rHifInfo.func);
 		sdio_writel(prGlueInfo->rHifInfo.func, u4Value, u4Register, &ret);
 		sdio_release_host(prGlueInfo->rHifInfo.func);
-#endif
 
 		if (ret || ucRetryCount) {
 			/* DBGLOG(HAL, ERROR,
@@ -1013,18 +828,7 @@ BOOL kalDevRegWrite(IN P_GLUE_INFO_T prGlueInfo, IN UINT_32 u4Register, IN UINT_
 	} while (ret);
 
 	if (ret) {
-#if CFG_CHIP_RESET_SUPPORT
-		P_ADAPTER_T prAdapter = NULL;
-#endif
-		kalSendAeeWarning(HIF_SDIO_ERR_TITLE_STR, HIF_SDIO_ERR_DESC_STR "sdio_writel() reports error: %x retry: %u",
-				ret, ucRetryCount);
 		DBGLOG(HAL, ERROR, "sdio_writel() reports error: %x retry: %u\n", ret, ucRetryCount);
-#if CFG_CHIP_RESET_SUPPORT
-		prAdapter				 = prGlueInfo->prAdapter;
-		prAdapter->fgIsChipNoAck = TRUE;
-		DBGLOG(HAL, ERROR, "fgIsChipNoAck = %d\n", prAdapter->fgIsChipNoAck);
-		GL_RESET_TRIGGER(prAdapter, RST_HIF_FAIL);
-#endif
 	}
 
 	return (ret) ? FALSE : TRUE;
@@ -1118,9 +922,7 @@ BOOL kalDevPortRead(IN P_GLUE_INFO_T prGlueInfo, IN UINT_16 u2Port, IN UINT_32 u
 	int				ret		  = 0;
 	int				bNum	  = 0;
 
-#if (MTK_WCN_HIF_SDIO == 0)
 	struct sdio_func *prSdioFunc = NULL;
-#endif
 
 #if DBG
 	/* printk(KERN_INFO DRV_NAME"++kalDevPortRead++ buf:0x%p, port:0x%x, length:%d\n", pucBuf, u2Port, u4Len); */
@@ -1144,7 +946,6 @@ BOOL kalDevPortRead(IN P_GLUE_INFO_T prGlueInfo, IN UINT_16 u2Port, IN UINT_32 u
 		return FALSE;
 	}
 
-#if (MTK_WCN_HIF_SDIO == 0)
 	prSdioFunc = prHifInfo->func;
 
 	ASSERT(prSdioFunc->cur_blksize > 0);
@@ -1176,36 +977,9 @@ BOOL kalDevPortRead(IN P_GLUE_INFO_T prGlueInfo, IN UINT_16 u2Port, IN UINT_32 u
 	}
 
 	sdio_release_host(prSdioFunc);
-#else
-
-	/* Split buffer into multiple single block to workaround hifsys */
-	while (count >= (prGlueInfo->rHifInfo).prFuncInfo->blk_sz) {
-		count -= ((prGlueInfo->rHifInfo).prFuncInfo->blk_sz);
-		bNum++;
-	}
-	if (count > 0 && bNum > 0)
-		bNum++;
-
-	if (bNum > 0) {
-		ret = mtk_wcn_hif_sdio_read_buf(prGlueInfo->rHifInfo.cltCtx, u2Port, (PUINT_32)pucDst,
-				((prGlueInfo->rHifInfo).prFuncInfo->blk_sz) * bNum);
-	} else {
-		ret = mtk_wcn_hif_sdio_read_buf(prGlueInfo->rHifInfo.cltCtx, u2Port, (PUINT_32)pucDst, count);
-	}
-#endif
 
 	if (ret) {
-#if CFG_CHIP_RESET_SUPPORT
-		P_ADAPTER_T prAdapter = NULL;
-#endif
-		kalSendAeeWarning(HIF_SDIO_ERR_TITLE_STR, HIF_SDIO_ERR_DESC_STR "sdio_readsb() reports error: %x", ret);
 		DBGLOG(HAL, ERROR, "sdio_readsb() reports error: %x\n", ret);
-#if CFG_CHIP_RESET_SUPPORT
-		prAdapter				 = prGlueInfo->prAdapter;
-		prAdapter->fgIsChipNoAck = TRUE;
-		DBGLOG(HAL, ERROR, "fgIsChipNoAck = %d\n", prAdapter->fgIsChipNoAck);
-		GL_RESET_TRIGGER(prAdapter, RST_HIF_FAIL);
-#endif
 	}
 	return (ret) ? FALSE : TRUE;
 
@@ -1228,15 +1002,12 @@ BOOL kalDevPortRead(IN P_GLUE_INFO_T prGlueInfo, IN UINT_16 u2Port, IN UINT_32 u
 BOOL kalDevPortWrite(IN P_GLUE_INFO_T prGlueInfo, IN UINT_16 u2Port, IN UINT_32 u4Len, IN PUINT_8 pucBuf,
 		IN UINT_32 u4ValidInBufSize)
 {
-	P_GL_HIF_INFO_T prHifInfo = NULL;
-	PUINT_8			pucSrc	  = NULL;
-	int				count	  = u4Len;
-	int				ret		  = 0;
-	int				bNum	  = 0;
-
-#if (MTK_WCN_HIF_SDIO == 0)
+	P_GL_HIF_INFO_T	  prHifInfo	 = NULL;
+	PUINT_8			  pucSrc	 = NULL;
+	int				  count		 = u4Len;
+	int				  ret		 = 0;
+	int				  bNum		 = 0;
 	struct sdio_func *prSdioFunc = NULL;
-#endif
 
 #if DBG
 	/* printk(KERN_INFO DRV_NAME"++kalDevPortWrite++ buf:0x%p, port:0x%x, length:%d\n", pucBuf, u2Port, u2Len); */
@@ -1260,7 +1031,6 @@ BOOL kalDevPortWrite(IN P_GLUE_INFO_T prGlueInfo, IN UINT_16 u2Port, IN UINT_32 
 	}
 #endif
 
-#if (MTK_WCN_HIF_SDIO == 0)
 	prSdioFunc = prHifInfo->func;
 	ASSERT(prSdioFunc->cur_blksize > 0);
 
@@ -1292,35 +1062,9 @@ BOOL kalDevPortWrite(IN P_GLUE_INFO_T prGlueInfo, IN UINT_16 u2Port, IN UINT_32 
 	}
 
 	sdio_release_host(prSdioFunc);
-#else
-	/* Split buffer into multiple single block to workaround hifsys */
-	while (count >= ((prGlueInfo->rHifInfo).prFuncInfo->blk_sz)) {
-		count -= ((prGlueInfo->rHifInfo).prFuncInfo->blk_sz);
-		bNum++;
-	}
-	if (count > 0 && bNum > 0)
-		bNum++;
-
-	if (bNum > 0) { /* block mode */
-		ret = mtk_wcn_hif_sdio_write_buf(prGlueInfo->rHifInfo.cltCtx, u2Port, (PUINT_32)pucSrc,
-				((prGlueInfo->rHifInfo).prFuncInfo->blk_sz) * bNum);
-	} else { /* byte mode */
-		ret = mtk_wcn_hif_sdio_write_buf(prGlueInfo->rHifInfo.cltCtx, u2Port, (PUINT_32)pucSrc, count);
-	}
-#endif
 
 	if (ret) {
-#if CFG_CHIP_RESET_SUPPORT
-		P_ADAPTER_T prAdapter = NULL;
-#endif
-		kalSendAeeWarning(HIF_SDIO_ERR_TITLE_STR, HIF_SDIO_ERR_DESC_STR "sdio_writesb() reports error: %x", ret);
 		DBGLOG(HAL, ERROR, "sdio_writesb() reports error: %x\n", ret);
-#if CFG_CHIP_RESET_SUPPORT
-		prAdapter				 = prGlueInfo->prAdapter;
-		prAdapter->fgIsChipNoAck = TRUE;
-		DBGLOG(HAL, ERROR, "fgIsChipNoAck = %d\n", prAdapter->fgIsChipNoAck);
-		GL_RESET_TRIGGER(prAdapter, RST_HIF_FAIL);
-#endif
 	}
 	return (ret) ? FALSE : TRUE;
 
@@ -1413,25 +1157,12 @@ BOOL kalDevWriteWithSdioCmd52(IN P_GLUE_INFO_T prGlueInfo, IN UINT_32 u4Addr, IN
 	}
 #endif
 
-#if (MTK_WCN_HIF_SDIO == 0)
 	sdio_claim_host(prGlueInfo->rHifInfo.func);
 	sdio_writeb(prGlueInfo->rHifInfo.func, ucData, u4Addr, &ret);
 	sdio_release_host(prGlueInfo->rHifInfo.func);
-#else
-	ret = mtk_wcn_hif_sdio_writeb(prGlueInfo->rHifInfo.cltCtx, u4Addr, ucData);
-#endif
 
 	if (ret) {
-#if CFG_CHIP_RESET_SUPPORT
-		P_ADAPTER_T prAdapter = prGlueInfo->prAdapter;
-#endif
-		kalSendAeeWarning(HIF_SDIO_ERR_TITLE_STR, HIF_SDIO_ERR_DESC_STR "sdio_writeb() reports error: %x", ret);
 		DBGLOG(HAL, ERROR, "sdio_writeb() reports error: %x\n", ret);
-#if CFG_CHIP_RESET_SUPPORT
-		prAdapter->fgIsChipNoAck = TRUE;
-		DBGLOG(HAL, ERROR, "fgIsChipNoAck = %d\n", prAdapter->fgIsChipNoAck);
-		GL_RESET_TRIGGER(prAdapter, RST_HIF_FAIL);
-#endif
 	}
 
 	return (ret) ? FALSE : TRUE;
@@ -1638,30 +1369,17 @@ BOOL kalDevWriteCmd(IN P_GLUE_INFO_T prGlueInfo, IN P_CMD_INFO_T prCmdInfo, IN U
 
 void glGetDev(PVOID ctx, struct device **dev)
 {
-#if MTK_WCN_HIF_SDIO
-	mtk_wcn_hif_sdio_get_dev(*((MTK_WCN_HIF_SDIO_CLTCTX *)ctx), dev);
-#else
 	*dev = &((struct sdio_func *)ctx)->dev;
-#endif
 }
 
 void glGetHifDev(P_GL_HIF_INFO_T prHif, struct device **dev)
 {
-#if MTK_WCN_HIF_SDIO
-	mtk_wcn_hif_sdio_get_dev(prHif->cltCtx, dev);
-#else
 	*dev = &(prHif->func->dev);
-#endif
 }
 
 BOOLEAN glWakeupSdio(P_GLUE_INFO_T prGlueInfo)
 {
 	BOOLEAN fgSuccess = TRUE;
-
-#if (HIF_SDIO_SUPPORT_GPIO_SLEEP_MODE && MTK_WCN_HIF_SDIO)
-	if (mtk_wcn_hif_sdio_wake_up_ctrl(prGlueInfo->rHifInfo.cltCtx) != 0)
-		fgSuccess = FALSE;
-#endif
 
 	return fgSuccess;
 }

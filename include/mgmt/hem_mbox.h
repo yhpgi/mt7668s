@@ -72,15 +72,6 @@ typedef enum _ENUM_MSG_ID_T {
 	MID_AIS_SAA_FSM_ABORT,	   /* AIS notify SAA for Aborting authentication/association fsm */
 	MID_SAA_AIS_JOIN_COMPLETE, /* SAA notify AIS for indicating join complete */
 
-#if CFG_ENABLE_BT_OVER_WIFI
-	/*--------------------------------------------------*/
-	/* BOW Module Mailbox Messages                      */
-	/*--------------------------------------------------*/
-	MID_BOW_SAA_FSM_START,	   /* BOW notify SAA for Starting authentication/association fsm */
-	MID_BOW_SAA_FSM_ABORT,	   /* BOW notify SAA for Aborting authentication/association fsm */
-	MID_SAA_BOW_JOIN_COMPLETE, /* SAA notify BOW for indicating join complete */
-#endif
-
 #if CFG_ENABLE_WIFI_DIRECT
 	/*--------------------------------------------------*/
 	/* P2P Module Mailbox Messages                      */

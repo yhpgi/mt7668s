@@ -754,10 +754,7 @@ VOID wlanIST(IN P_ADAPTER_T prAdapter)
 	ACQUIRE_POWER_CONTROL_FROM_PM(prAdapter);
 
 	nicProcessIST(prAdapter);
-#if defined(CONFIG_ANDROID) && (CFG_ENABLE_WAKE_LOCK)
-	if (KAL_WAKE_LOCK_ACTIVE(prAdapter, &prAdapter->prGlueInfo->rIntrWakeLock))
-		KAL_WAKE_UNLOCK(prAdapter, &prAdapter->prGlueInfo->rIntrWakeLock);
-#endif
+
 	nicEnableInterrupt(prAdapter);
 
 	RECLAIM_POWER_CONTROL_TO_PM(prAdapter, FALSE);
@@ -1720,11 +1717,6 @@ VOID wlanReleasePendingOid(IN P_ADAPTER_T prAdapter, IN ULONG ulParamPtr)
 			}
 
 			prAdapter->fgIsChipNoAck = TRUE;
-#if CFG_CHIP_RESET_SUPPORT
-			DBGLOG(HAL, ERROR, "fgIsChipNoAck = %d\n", prAdapter->fgIsChipNoAck);
-			if (!checkResetState())
-				GL_RESET_TRIGGER(prAdapter, RST_OID_TIMEOUT);
-#endif
 		}
 		set_bit(GLUE_FLAG_HIF_PRT_HIF_DBG_INFO_BIT, &(prAdapter->prGlueInfo->ulFlag));
 	}
@@ -2246,10 +2238,6 @@ WLAN_STATUS wlanSendNicPowerCtrlCmd(IN P_ADAPTER_T prAdapter, IN UINT_8 ucPowerM
 				DBGLOG(INIT, ERROR, "Fail to get TX resource return within timeout\n");
 				status					 = WLAN_STATUS_FAILURE;
 				prAdapter->fgIsChipNoAck = TRUE;
-#if CFG_CHIP_RESET_SUPPORT
-				DBGLOG(HAL, ERROR, "fgIsChipNoAck = %d\n", prAdapter->fgIsChipNoAck);
-				GL_RESET_TRIGGER(prAdapter, RST_DRV_OWN_FAIL);
-#endif
 				break;
 			}
 			continue;
@@ -3561,13 +3549,11 @@ WLAN_STATUS wlanDownloadFW(IN P_ADAPTER_T prAdapter)
 
 	HAL_ENABLE_FWDL(prAdapter, TRUE);
 
-#if (MTK_WCN_HIF_SDIO == 0)
 	if (wlanDownloadPatch(prAdapter) != WLAN_STATUS_SUCCESS) {
 		DBGLOG(INIT, ERROR, "Patch download failed\n");
 		HAL_ENABLE_FWDL(prAdapter, FALSE);
 		return WLAN_STATUS_FAILURE;
 	}
-#endif
 
 	DBGLOG(INIT, INFO, "FW download Start\n");
 
@@ -8464,11 +8450,7 @@ BOOLEAN wlanIsChipNoAck(IN P_ADAPTER_T prAdapter)
 {
 	BOOLEAN fgIsNoAck;
 
-	fgIsNoAck = prAdapter->fgIsChipNoAck
-#if CFG_CHIP_RESET_SUPPORT
-				|| kalIsResetting()
-#endif
-				|| fgIsBusAccessFailed;
+	fgIsNoAck = prAdapter->fgIsChipNoAck || fgIsBusAccessFailed;
 
 	return fgIsNoAck;
 }

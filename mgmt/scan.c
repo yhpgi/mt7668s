@@ -1121,10 +1121,6 @@ P_BSS_DESC_T scanAddToBssDesc(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb)
 		eBSSType = BSS_TYPE_P2P_DEVICE;
 		break;
 
-#if CFG_ENABLE_BT_OVER_WIFI
-		/* @TODO: add rule to identify BOW beacons */
-#endif
-
 	default:
 		return NULL;
 	}
