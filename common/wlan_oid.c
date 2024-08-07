@@ -11696,34 +11696,6 @@ wlanoidGetTxPwrTbl(
 }
 #endif
 
-#ifdef CFG_GET_TEMPURATURE
-WLAN_STATUS
-wlanoidGetTemperature(P_ADAPTER_T prAdapter, PVOID pvQueryBuffer, UINT_32 u4QueryBufferLen, PUINT_32 pu4QueryInfoLen)
-{
-	struct EVENT_GET_TEMPERATURE temp;
-	kalMemZero(&temp, sizeof(struct EVENT_GET_TEMPERATURE));
-
-	if (!prAdapter || !pvQueryBuffer || !pu4QueryInfoLen)
-		return WLAN_STATUS_INVALID_DATA;
-
-	if (prAdapter->rAcpiState == ACPI_STATE_D3) {
-		DBGLOG(REQ, WARN, "Fail in query receive error! (Adapter not ready). ACPI=D%d, Radio=%d\n",
-				prAdapter->rAcpiState, prAdapter->fgIsRadioOff);
-		*pu4QueryInfoLen = sizeof(UINT_32);
-		return WLAN_STATUS_ADAPTER_NOT_READY;
-	} else if (u4QueryBufferLen < sizeof(int)) {
-		DBGLOG(REQ, WARN, "Too short length %ld\n", u4QueryBufferLen);
-		return WLAN_STATUS_INVALID_LENGTH;
-	} else if (prAdapter->fgTestMode == TRUE) {
-		/*DBGLOG(REQ, WARN, "Not supported in Test Mode\n");*/
-		return WLAN_STATUS_NOT_SUPPORTED;
-	}
-
-	return wlanSendSetQueryCmd(prAdapter, CMD_ID_GET_TEMPERATURE, FALSE, TRUE, TRUE, nicCmdEventGetTemperature,
-			nicOidCmdTimeoutCommon, sizeof(temp), (PUINT_8)&temp, pvQueryBuffer, u4QueryBufferLen);
-}
-#endif
-
 uint32_t wlanGetSupportedFeatureSet(IN P_GLUE_INFO_T prGlueInfo)
 {
 	uint32_t	 u4FeatureSet = WIFI_HAL_FEATURE_SET;

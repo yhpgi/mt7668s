@@ -2809,10 +2809,6 @@ WLAN_STATUS
 wlanoidGetTxPwrTbl(
 		IN P_ADAPTER_T prAdapter, IN PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
 #endif
-#ifdef CFG_GET_TEMPURATURE
-WLAN_STATUS
-wlanoidGetTemperature(P_ADAPTER_T prAdapter, PVOID pvQueryBuffer, UINT_32 u4QueryBufferLen, PUINT_32 pu4QueryInfoLen);
-#endif
 
 uint32_t wlanGetSupportedFeatureSet(IN P_GLUE_INFO_T prGlueInfo);
 

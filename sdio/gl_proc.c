@@ -48,9 +48,6 @@
 #ifdef CFG_DUMP_TXPOWR_TABLE
 #define PROC_GET_TXPWR_TBL "get_txpwr_tbl"
 #endif
-#ifdef CFG_GET_TEMPURATURE
-#define PROC_GET_TEMPETATURE "get_temperature"
-#endif
 
 #define PROC_MCR_ACCESS_MAX_USER_INPUT_LEN 20
 #define PROC_RX_STATISTICS_MAX_USER_INPUT_LEN 10
@@ -734,44 +731,6 @@ out:
 }
 #endif
 
-#ifdef CFG_GET_TEMPURATURE
-static ssize_t proc_get_temperature(struct file *filp, char __user *buf, size_t count, loff_t *f_pos)
-{
-	P_GLUE_INFO_T prGlueInfo;
-	unsigned int  pos = 0, buf_len = 128, oid_len;
-	char		 *buffer;
-	int			  temperature = 0;
-	WLAN_STATUS	  rStatus	  = WLAN_STATUS_SUCCESS;
-
-	if (*f_pos > 0)
-		return 0;
-
-	prGlueInfo = g_prGlueInfo_proc;
-	if (!prGlueInfo)
-		return -EFAULT;
-
-	buffer = (char *)kalMemAlloc(buf_len, VIR_MEM_TYPE);
-	if (!buffer)
-		return -ENOMEM;
-
-	rStatus =
-			kalIoctl(prGlueInfo, wlanoidGetTemperature, &temperature, sizeof(temperature), TRUE, TRUE, TRUE, &oid_len);
-
-	pos = kalScnprintf(buffer, buf_len, "Temperature = %d\n", temperature);
-
-	if (pos > count)
-		pos = count;
-	if (copy_to_user(buf, buffer, pos)) {
-		DBGLOG(INIT, ERROR, "copy to user failed\n");
-		return -EFAULT;
-	}
-
-	*f_pos += pos;
-
-	return pos;
-}
-#endif
-
 #if KERNEL_VERSION(5, 6, 0) <= LINUX_VERSION_CODE
 static const struct proc_ops dbglevel_ops = {
 	.proc_read	= procDbgLevelRead,
@@ -804,13 +763,6 @@ static const struct proc_ops get_txpwr_tbl_ops = {
 	.proc_read = procGetTxpwrTblRead,
 };
 #endif
-
-#ifdef CFG_GET_TEMPURATURE
-static const struct proc_ops get_temperature_ops = {
-	.proc_read = proc_get_temperature,
-};
-#endif
-
 #else
 
 static const struct file_operations dbglevel_ops = {
@@ -850,14 +802,6 @@ static const struct file_operations get_txpwr_tbl_ops = {
 	.read  = procGetTxpwrTblRead,
 };
 #endif
-
-#ifdef CFG_GET_TEMPURATURE
-static const struct file_operations get_temperature_ops = {
-	.owner = THIS_MODULE,
-	.read  = proc_get_temperature,
-};
-#endif
-
 #endif
 
 /*******************************************************************************
@@ -1114,9 +1058,6 @@ INT_32 procRemoveProcfs(VOID)
 #ifdef CFG_DUMP_TXPOWR_TABLE
 	remove_proc_entry(PROC_GET_TXPWR_TBL, gprProcRoot);
 #endif
-#ifdef CFG_GET_TEMPURATURE
-	remove_proc_entry(PROC_GET_TEMPETATURE, gprProcRoot);
-#endif
 #if CFG_SUPPORT_DEBUG_FS
 	remove_proc_entry(PROC_COUNTRY, gprProcRoot);
 #endif
@@ -1168,13 +1109,6 @@ INT_32 procCreateFsEntry(P_GLUE_INFO_T prGlueInfo)
 
 #ifdef CFG_DUMP_TXPOWR_TABLE
 	prEntry = proc_create(PROC_GET_TXPWR_TBL, 0664, gprProcRoot, &get_txpwr_tbl_ops);
-	if (prEntry == NULL) {
-		DBGLOG(INIT, ERROR, "Unable to create /proc entry efuse\n\r");
-		return -1;
-	}
-#endif
-#ifdef CFG_GET_TEMPURATURE
-	prEntry = proc_create(PROC_GET_TEMPETATURE, 0664, gprProcRoot, &get_temperature_ops);
 	if (prEntry == NULL) {
 		DBGLOG(INIT, ERROR, "Unable to create /proc entry efuse\n\r");
 		return -1;

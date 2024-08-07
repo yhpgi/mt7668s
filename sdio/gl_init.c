@@ -2647,9 +2647,6 @@ INT_32 wlanProbe(PVOID pvData, PVOID pvDriverData)
 			DBGLOG(INIT, ERROR, "wlanProbe: init procfs failed\n");
 			break;
 		}
-#endif /* WLAN_INCLUDE_PROC */
-#ifdef CFG_GET_TEMPURATURE
-		wifi_temp_sensor_register(prGlueInfo);
 #endif
 
 #if CFG_MET_PACKET_TRACE_SUPPORT
@@ -2905,9 +2902,6 @@ VOID wlanRemove(VOID)
 	}
 #endif
 
-#ifdef CFG_GET_TEMPURATURE
-	wifi_temp_sensor_deregister();
-#endif
 	/* 4 <3> Remove /proc filesystem. */
 #if WLAN_INCLUDE_PROC
 	procRemoveProcfs();
@@ -3158,9 +3152,6 @@ static int initWlan(void)
 
 	registerDriver();
 
-#ifdef CFG_GET_TEMPURATURE
-	ret = wifi_temp_sensor_init();
-#endif
 	DBGLOG(INIT, STATE, "initWlan end\n");
 
 	return ret;
@@ -3183,10 +3174,6 @@ static VOID exitWlan(void)
 
 	if (prWaitForResetComp)
 		wait_for_completion_interruptible_timeout(prWaitForResetComp, SEC_TO_SYSTIME(5));
-
-#ifdef CFG_GET_TEMPURATURE
-	wifi_temp_sensor_exit();
-#endif
 
 	unregisterDriver();
 	DBGLOG(INIT, STATE, "exitWlan end\n");

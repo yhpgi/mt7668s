@@ -3505,10 +3505,6 @@ VOID nicEventGetGtkDataSync(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent,
 VOID nicCmdEventGetTxPwrTbl(
 		IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo, IN PUINT_8 pucEventBuf, IN UINT_32 u4EventBufLen);
 #endif
-#ifdef CFG_GET_TEMPURATURE
-VOID nicCmdEventGetTemperature(
-		P_ADAPTER_T prAdapter, P_CMD_INFO_T prCmdInfo, PUINT_8 pucEventBuf, IN UINT_32 u4EventBufLen);
-#endif
 
 /*******************************************************************************
  *                              F U N C T I O N S
