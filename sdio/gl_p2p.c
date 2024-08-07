@@ -733,11 +733,7 @@ BOOLEAN p2pNetUnregister(P_GLUE_INFO_T prGlueInfo, BOOLEAN fgIsRtnlLockAcquired)
 
 			if ((prP2pBssInfo != NULL) && (prP2pBssInfo->eConnectionState == PARAM_MEDIA_STATE_CONNECTED) &&
 					((iftype == NL80211_IFTYPE_P2P_CLIENT) || (iftype == NL80211_IFTYPE_STATION))) {
-#if CFG_WPS_DISCONNECT || (KERNEL_VERSION(4, 4, 0) <= CFG80211_VERSION_CODE)
 				cfg80211_disconnected(prRoleDev, 0, NULL, 0, TRUE, GFP_KERNEL);
-#else
-				cfg80211_disconnected(prRoleDev, 0, NULL, 0, GFP_KERNEL);
-#endif
 			}
 		}
 

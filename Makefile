@@ -78,29 +78,11 @@ mt7668s-objs := \
     sdio/platform.o \
     sdio/sdio.o
 
-ifeq ($(CONFIG_MT7668S_WIFI), y)
-    ccflags-y += -DCFG_BUILT_IN_DRIVER=1 \
-                 -DCFG_WPS_DISCONNECT=1
-else
-    ccflags-y += -DCFG_BUILT_IN_DRIVER=0
-endif
-
 ifeq ($(CONFIG_MT7668S_WIFI_PREALLOC), y)
     ccflags-y += -DCFG_PREALLOC_MEMORY \
                  -I$(src)/prealloc/include
     mt7668s_prealloc-objs := prealloc/prealloc.o
     obj-$(CONFIG_MT7668S_WIFI) += mt7668s_prealloc.o
-endif
-
-ifneq ($(CFG_CFG80211_VERSION),)
-    VERSION_STR := $(subst ",,$(subst ., ,$(subst -, ,$(subst v,,$(CFG_CFG80211_VERSION)))))
-    $(info VERSION_STR=$(VERSION_STR))
-    X := $(firstword $(VERSION_STR))
-    Y := $(word 2, $(VERSION_STR))
-    Z := $(word 3, $(VERSION_STR))
-    VERSION := $(shell echo "$$(( $X * 65536 + $Y * 256 + $Z))")
-    ccflags-y += -DCFG_CFG80211_VERSION=$(VERSION)
-    $(info DCFG_CFG80211_VERSION=$(VERSION))
 endif
 
 ifeq ($(CONFIG_MT7668S_WIFI_MESON_G12A_PATCH),y)

@@ -4026,7 +4026,6 @@ INT_32 mtk_cfg80211_process_str_cmd(P_GLUE_INFO_T prGlueInfo, PUINT_8 cmd, INT_3
 
 #if (CFG_SUPPORT_SINGLE_SKU == 1)
 
-#if (CFG_BUILT_IN_DRIVER == 0)
 bool is_world_regdom(char *alpha2)
 {
 	if (!alpha2)
@@ -4034,7 +4033,6 @@ bool is_world_regdom(char *alpha2)
 
 	return (alpha2[0] == '0') && (alpha2[1] == '0');
 }
-#endif
 
 enum regd_state regd_state_machine(IN struct regulatory_request *pRequest)
 {

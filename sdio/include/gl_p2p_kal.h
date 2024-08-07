@@ -169,16 +169,10 @@ VOID kalP2PIndicateMgmtTxStatus(IN P_GLUE_INFO_T prGlueInfo, IN P_MSDU_INFO_T pr
 VOID kalP2PIndicateChannelExpired(IN P_GLUE_INFO_T prGlueInfo, IN UINT_64 u8SeqNum, IN UINT_32 u4ChannelNum,
 		IN ENUM_BAND_T eBand, IN ENUM_CHNL_EXT_T eSco);
 
-#if CFG_WPS_DISCONNECT || (KERNEL_VERSION(4, 4, 0) <= CFG80211_VERSION_CODE)
 VOID kalP2PGCIndicateConnectionStatus(IN P_GLUE_INFO_T prGlueInfo, IN UINT_8 ucRoleIndex,
 		IN P_P2P_CONNECTION_REQ_INFO_T prP2pConnInfo, IN PUINT_8 pucRxIEBuf, IN UINT_16 u2RxIELen,
 		IN UINT_16 u2StatusReason, IN WLAN_STATUS eStatus);
-#else
-VOID kalP2PGCIndicateConnectionStatus(IN P_GLUE_INFO_T prGlueInfo, IN UINT_8 ucRoleIndex,
-		IN P_P2P_CONNECTION_REQ_INFO_T prP2pConnInfo, IN PUINT_8 pucRxIEBuf, IN UINT_16 u2RxIELen,
-		IN UINT_16 u2StatusReason);
 
-#endif
 VOID kalP2PGOStationUpdate(
 		IN P_GLUE_INFO_T prGlueInfo, IN UINT_8 ucRoleIndex, IN P_STA_RECORD_T prCliStaRec, IN BOOLEAN fgIsNew);
 

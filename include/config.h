@@ -85,19 +85,6 @@
 
 /* 2 Flags for OS capability */
 
-/* Android build-in driver switch, Mike 2016/11/11*/
-#ifndef CFG_BUILT_IN_DRIVER
-#define CFG_BUILT_IN_DRIVER 0
-#endif
-
-/* Mike 2016/09/01 ALPS update K3.18 80211_disconnect to K4.4 version*/
-/* work around for any alps K3.18 platform*/
-#ifndef CFG_WPS_DISCONNECT
-#define CFG_WPS_DISCONNECT 0
-#endif
-
-#define CFG_SUPPORT_MTK_ANDROID_KK 1
-
 #define CFG_ENABLE_EARLY_SUSPEND 0
 #define CFG_ENABLE_NET_DEV_NOTIFY 1
 

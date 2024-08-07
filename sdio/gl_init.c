@@ -2826,11 +2826,7 @@ VOID wlanRemove(VOID)
 #endif
 
 	if (prGlueInfo->eParamMediaStateIndicated == PARAM_MEDIA_STATE_CONNECTED) {
-#if CFG_WPS_DISCONNECT || (KERNEL_VERSION(4, 2, 0) <= CFG80211_VERSION_CODE)
 		cfg80211_disconnected(prGlueInfo->prDevHandler, 0, NULL, 0, TRUE, GFP_KERNEL);
-#else
-		cfg80211_disconnected(prGlueInfo->prDevHandler, 0, NULL, 0, GFP_KERNEL);
-#endif
 		kalMsleep(500);
 	}
 
@@ -3230,13 +3226,5 @@ void wlanUnregisterRebootNotifier(void)
 	unregister_reboot_notifier(&mt7668s_reboot_notifier);
 }
 
-#if ((CFG_BUILT_IN_DRIVER == 1))
-
-device_initcall(initWlan);
-
-#else
-
 module_init(initWlan);
 module_exit(exitWlan);
-
-#endif

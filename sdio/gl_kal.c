@@ -1096,7 +1096,6 @@ VOID kalIndicateStatusAndComplete(
 		) {
 			P_BSS_INFO_T prBssInfo = prGlueInfo->prAdapter->prAisBssInfo;
 			UINT_16 u2DeauthReason = 0;
-#if CFG_WPS_DISCONNECT || (KERNEL_VERSION(4, 4, 0) <= CFG80211_VERSION_CODE)
 
 			if (prBssInfo)
 				u2DeauthReason = prBssInfo->u2DeauthReason;
@@ -1105,17 +1104,6 @@ VOID kalIndicateStatusAndComplete(
 					(eStatus == WLAN_STATUS_MEDIA_DISCONNECT_LOCALLY));
 			cfg80211_disconnected(prGlueInfo->prDevHandler, u2DeauthReason, NULL, 0,
 					eStatus == WLAN_STATUS_MEDIA_DISCONNECT_LOCALLY, flags);
-
-#else
-
-			{
-				if (prBssInfo)
-					u2DeauthReason = prBssInfo->u2DeauthReason;
-				/* CFG80211 Indication */
-				cfg80211_disconnected(prGlueInfo->prDevHandler, u2DeauthReason, NULL, 0, flags);
-			}
-
-#endif
 		}
 #endif
 

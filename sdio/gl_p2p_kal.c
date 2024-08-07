@@ -1103,7 +1103,7 @@ VOID kalP2PIndicateRxMgmtFrame(
 	} while (FALSE);
 
 } /* kalP2PIndicateRxMgmtFrame */
-#if CFG_WPS_DISCONNECT || (KERNEL_VERSION(4, 4, 0) <= CFG80211_VERSION_CODE)
+
 VOID kalP2PGCIndicateConnectionStatus(IN P_GLUE_INFO_T prGlueInfo, IN UINT_8 ucRoleIndex,
 		IN P_P2P_CONNECTION_REQ_INFO_T prP2pConnInfo, IN PUINT_8 pucRxIEBuf, IN UINT_16 u2RxIELen,
 		IN UINT_16 u2StatusReason, IN WLAN_STATUS eStatus)
@@ -1148,49 +1148,6 @@ VOID kalP2PGCIndicateConnectionStatus(IN P_GLUE_INFO_T prGlueInfo, IN UINT_8 ucR
 	} while (FALSE);
 
 } /* kalP2PGCIndicateConnectionStatus */
-
-#else
-VOID kalP2PGCIndicateConnectionStatus(IN P_GLUE_INFO_T prGlueInfo, IN UINT_8 ucRoleIndex,
-		IN P_P2P_CONNECTION_REQ_INFO_T prP2pConnInfo, IN PUINT_8 pucRxIEBuf, IN UINT_16 u2RxIELen,
-		IN UINT_16 u2StatusReason)
-{
-	P_GL_P2P_INFO_T prGlueP2pInfo = (P_GL_P2P_INFO_T)NULL;
-
-	do {
-		if (prGlueInfo == NULL) {
-			ASSERT(FALSE);
-			break;
-		}
-
-		prGlueP2pInfo = prGlueInfo->prP2PInfo[ucRoleIndex];
-
-		/* This exception occurs at wlanRemove. */
-		if ((prGlueP2pInfo == NULL) || (prGlueP2pInfo->aprRoleHandler == NULL) ||
-				(prGlueInfo->prAdapter->rP2PNetRegState != ENUM_NET_REG_STATE_REGISTERED) ||
-				((prGlueInfo->ulFlag & GLUE_FLAG_HALT) == 1)) {
-			break;
-		}
-
-		if (prP2pConnInfo) {
-			cfg80211_connect_result(prGlueP2pInfo->aprRoleHandler,
-					/* struct net_device * dev, */
-					prP2pConnInfo->aucBssid, prP2pConnInfo->aucIEBuf, prP2pConnInfo->u4BufLength, pucRxIEBuf, u2RxIELen,
-					u2StatusReason, GFP_KERNEL);
-			/* gfp_t gfp */ /* allocation flags */
-
-			prP2pConnInfo->eConnRequest = P2P_CONNECTION_TYPE_IDLE;
-		} else {
-			/* Disconnect, what if u2StatusReason == 0? */
-			cfg80211_disconnected(prGlueP2pInfo->aprRoleHandler,
-					/* struct net_device * dev, */
-					u2StatusReason, pucRxIEBuf, u2RxIELen, GFP_KERNEL);
-		}
-
-	} while (FALSE);
-
-} /* kalP2PGCIndicateConnectionStatus */
-
-#endif
 
 VOID kalP2PGOStationUpdate(
 		IN P_GLUE_INFO_T prGlueInfo, IN UINT_8 ucRoleIndex, IN P_STA_RECORD_T prCliStaRec, IN BOOLEAN fgIsNew)
