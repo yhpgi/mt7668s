@@ -959,7 +959,7 @@ VOID saaFsmRunEventRxAuth(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb)
 
 			kalMemCopy((PVOID)pFrameBuf, (PVOID)prAuthFrame, prSwRfb->u2PacketLen);
 			kalWDevLockThread(prGlueInfo, prGlueInfo->prDevHandler, CFG80211_RX_MLME_MGMT, pFrameBuf,
-					prSwRfb->u2PacketLen, NULL, 0, fgIsInterruptContext);
+					prSwRfb->u2PacketLen, NULL, 0, NULL, 0, fgIsInterruptContext);
 #else
 			cfg80211_rx_mlme_mgmt(prGlueInfo->prDevHandler, (const u8 *)prAuthFrame, (size_t)prSwRfb->u2PacketLen);
 #endif
@@ -1311,7 +1311,7 @@ WLAN_STATUS saaFsmRunEventRxDeauth(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwR
 
 					kalMemCopy((PVOID)pFrameBuf, (PVOID)prDeauthFrame, prSwRfb->u2PacketLen);
 					kalWDevLockThread(prAdapter->prGlueInfo, prAdapter->prGlueInfo->prDevHandler, CFG80211_RX_MLME_MGMT,
-							pFrameBuf, prSwRfb->u2PacketLen, NULL, 0, fgIsInterruptContext);
+							pFrameBuf, prSwRfb->u2PacketLen, NULL, 0, NULL, 0, fgIsInterruptContext);
 #else
 					cfg80211_rx_mlme_mgmt(
 							prAdapter->prGlueInfo->prDevHandler, (PUINT_8)prDeauthFrame, (size_t)prSwRfb->u2PacketLen);
@@ -1350,7 +1350,7 @@ WLAN_STATUS saaFsmRunEventRxDeauth(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwR
 
 			kalMemCopy((PVOID)pFrameBuf, (PVOID)prDeauthFrame, prSwRfb->u2PacketLen);
 			kalWDevLockThread(prAdapter->prGlueInfo, prAdapter->prGlueInfo->prP2PInfo[ucRoleIdx]->aprRoleHandler,
-					CFG80211_RX_MLME_MGMT, pFrameBuf, prSwRfb->u2PacketLen, NULL, 0, fgIsInterruptContext);
+					CFG80211_RX_MLME_MGMT, pFrameBuf, prSwRfb->u2PacketLen, NULL, 0, NULL, 0, fgIsInterruptContext);
 #else
 			cfg80211_rx_mlme_mgmt(prAdapter->prGlueInfo->prP2PInfo[ucRoleIdx]->aprRoleHandler, (PUINT_8)prDeauthFrame,
 					(size_t)prSwRfb->u2PacketLen);
@@ -1574,7 +1574,8 @@ WLAN_STATUS saaFsmRunEventRxDisassoc(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prS
 
 						kalMemCopy((PVOID)pFrameBuf, (PVOID)prDisassocFrame, prSwRfb->u2PacketLen);
 						kalWDevLockThread(prAdapter->prGlueInfo, prAdapter->prGlueInfo->prDevHandler,
-								CFG80211_RX_MLME_MGMT, pFrameBuf, prSwRfb->u2PacketLen, NULL, 0, fgIsInterruptContext);
+								CFG80211_RX_MLME_MGMT, pFrameBuf, prSwRfb->u2PacketLen, NULL, 0, NULL, 0,
+								fgIsInterruptContext);
 #else
 						cfg80211_rx_mlme_mgmt(prAdapter->prGlueInfo->prDevHandler, (PUINT_8)prDisassocFrame,
 								(size_t)prSwRfb->u2PacketLen);
@@ -1617,7 +1618,7 @@ WLAN_STATUS saaFsmRunEventRxDisassoc(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prS
 
 				kalMemCopy((PVOID)pFrameBuf, (PVOID)prDisassocFrame, prSwRfb->u2PacketLen);
 				kalWDevLockThread(prAdapter->prGlueInfo, prAdapter->prGlueInfo->prP2PInfo[ucRoleIdx]->aprRoleHandler,
-						CFG80211_RX_MLME_MGMT, pFrameBuf, prSwRfb->u2PacketLen, NULL, 0, fgIsInterruptContext);
+						CFG80211_RX_MLME_MGMT, pFrameBuf, prSwRfb->u2PacketLen, NULL, 0, NULL, 0, fgIsInterruptContext);
 #else
 				cfg80211_rx_mlme_mgmt(prAdapter->prGlueInfo->prP2PInfo[ucRoleIdx]->aprRoleHandler,
 						(PUINT_8)prDisassocFrame, (size_t)prSwRfb->u2PacketLen);

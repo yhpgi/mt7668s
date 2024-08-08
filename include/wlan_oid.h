@@ -1938,10 +1938,8 @@ typedef struct _PARAM_WDEV_LOCK_THREAD_T {
 	struct cfg80211_bss				*pBss;
 	UINT_32							  uapsd_queues;
 	BOOLEAN							  fgIsInterruptContext;
-#if (KERNEL_VERSION(5, 1, 0) <= CFG80211_VERSION_CODE)
-	const u8 *req_ies;
-	size_t	  req_ies_len;
-#endif
+	const u8						 *req_ies;
+	size_t							  req_ies_len;
 } PARAM_WDEV_LOCK_THREAD_T, *P_PARAM_WDEV_LOCK_THREAD_T;
 #endif
 #endif

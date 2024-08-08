@@ -1057,7 +1057,7 @@ VOID kalSchedScanStopped(IN P_GLUE_INFO_T prGlueInfo);
 #if CFG_WDEV_LOCK_THREAD_SUPPORT
 VOID kalWDevLockThread(IN P_GLUE_INFO_T prGlueInfo, IN struct net_device *pDev, IN enum ENUM_CFG80211_WDEV_LOCK_FUNC fn,
 		IN PUINT_8 pFrameBuf, IN size_t frameLen, IN struct cfg80211_bss *pBss, IN INT_32 uapsd_queues,
-		IN BOOLEAN fgIsInterruptContext);
+		const u8 *req_ies, size_t req_ies_len, IN BOOLEAN fgIsInterruptContext);
 #endif
 #endif
 

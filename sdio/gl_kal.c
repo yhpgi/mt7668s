@@ -1171,7 +1171,7 @@ VOID kalIndicateStatusAndComplete(
 #if CFG_WDEV_LOCK_THREAD_SUPPORT
 			kalWDevLockThread(prGlueInfo, prGlueInfo->prDevHandler,
 					(eStatus == WLAN_STATUS_JOIN_TIMEOUT) ? (CFG80211_ASSOC_TIMEOUT) : (CFG80211_ABANDON_ASSOC), NULL,
-					0, prConnSettings->bss, 0, FALSE);
+					0, prConnSettings->bss, 0, NULL, 0, FALSE);
 #else
 #if (KERNEL_VERSION(4, 4, 41) <= CFG80211_VERSION_CODE)
 			if (eStatus == WLAN_STATUS_JOIN_ABORT) {
@@ -1228,7 +1228,7 @@ VOID kalIndicateStatusAndComplete(
 			kalMemCopy((PVOID)prFrameBuf, (PVOID)pvBuf, u4BufLen);
 
 			kalWDevLockThread(prGlueInfo, prGlueInfo->prDevHandler, CFG80211_RX_ASSOC_RESP, prFrameBuf, u4BufLen,
-					prConnSettings->bss, 0, fgIsInterruptContext);
+					prConnSettings->bss, 0, NULL, 0, fgIsInterruptContext);
 #else
 #if (KERNEL_VERSION(3, 18, 0) <= CFG80211_VERSION_CODE)
 			cfg80211_rx_assoc_resp(
@@ -4384,7 +4384,7 @@ VOID kalSchedScanStopped(IN P_GLUE_INFO_T prGlueInfo)
 #if CFG_WDEV_LOCK_THREAD_SUPPORT
 VOID kalWDevLockThread(IN P_GLUE_INFO_T prGlueInfo, IN struct net_device *pDev, IN enum ENUM_CFG80211_WDEV_LOCK_FUNC fn,
 		IN PUINT_8 pFrameBuf, IN size_t frameLen, IN struct cfg80211_bss *pBss, IN INT_32 uapsd_queues,
-		IN BOOLEAN fgIsInterruptContext)
+		const u8 *req_ies, size_t req_ies_len, IN BOOLEAN fgIsInterruptContext)
 {
 	P_PARAM_WDEV_LOCK_THREAD_T pParamWDevLock = NULL;
 	GLUE_SPIN_LOCK_DECLARATION();
@@ -4409,6 +4409,8 @@ VOID kalWDevLockThread(IN P_GLUE_INFO_T prGlueInfo, IN struct net_device *pDev, 
 	pParamWDevLock->fn					 = fn;
 	pParamWDevLock->pFrameBuf			 = pFrameBuf;
 	pParamWDevLock->frameLen			 = frameLen;
+	pParamWDevLock->req_ies				 = req_ies;
+	pParamWDevLock->req_ies_len			 = req_ies_len;
 	pParamWDevLock->fgIsInterruptContext = fgIsInterruptContext;
 	if (pBss) {
 		cfg80211_ref_bss(priv_to_wiphy(prGlueInfo), pBss);

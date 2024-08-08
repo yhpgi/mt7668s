@@ -996,7 +996,7 @@ WLAN_STATUS assocSendDisAssocFrame(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T p
 			kalMemCopy((void *)pFrameBuf, (void *)prDisassocFrame, prMsduInfo->u2FrameLength);
 
 			kalWDevLockThread(prAdapter->prGlueInfo, prAdapter->prGlueInfo->prDevHandler, CFG80211_TX_MLME_MGMT,
-					pFrameBuf, prMsduInfo->u2FrameLength, NULL, 0, fgIsInterruptContext);
+					pFrameBuf, prMsduInfo->u2FrameLength, NULL, 0, NULL, 0, fgIsInterruptContext);
 #else
 			cfg80211_tx_mlme_mgmt(
 					prAdapter->prGlueInfo->prDevHandler, (UINT_8 *)prDisassocFrame, (size_t)prMsduInfo->u2FrameLength);
@@ -1026,7 +1026,8 @@ WLAN_STATUS assocSendDisAssocFrame(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T p
 
 			kalMemCopy((PVOID)pFrameBuf, (PVOID)prDisassocFrame, prMsduInfo->u2FrameLength);
 			kalWDevLockThread(prAdapter->prGlueInfo, prAdapter->prGlueInfo->prP2PInfo[ucRoleIdx]->aprRoleHandler,
-					CFG80211_TX_MLME_MGMT, pFrameBuf, prMsduInfo->u2FrameLength, NULL, 0, fgIsInterruptContext);
+					CFG80211_TX_MLME_MGMT, pFrameBuf, prMsduInfo->u2FrameLength, NULL, 0, NULL, 0,
+					fgIsInterruptContext);
 #else
 			cfg80211_tx_mlme_mgmt(prAdapter->prGlueInfo->prP2PInfo[ucRoleIdx]->aprRoleHandler, (PUINT_8)prDisassocFrame,
 					(size_t)prMsduInfo->u2FrameLength);

@@ -1013,7 +1013,7 @@ authSendDeauthFrame(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prBssInfo, IN P_ST
 			kalMemCopy((void *)pFrameBuf, (void *)prDeauthFrame, prMsduInfo->u2FrameLength);
 
 			kalWDevLockThread(prAdapter->prGlueInfo, prAdapter->prGlueInfo->prDevHandler, CFG80211_TX_MLME_MGMT,
-					pFrameBuf, prMsduInfo->u2FrameLength, NULL, 0, fgIsInterruptContext);
+					pFrameBuf, prMsduInfo->u2FrameLength, NULL, 0, NULL, 0, fgIsInterruptContext);
 #else
 			cfg80211_tx_mlme_mgmt(
 					prAdapter->prGlueInfo->prDevHandler, (PUINT_8)prDeauthFrame, (size_t)prMsduInfo->u2FrameLength);
@@ -1042,7 +1042,8 @@ authSendDeauthFrame(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prBssInfo, IN P_ST
 
 			kalMemCopy((PVOID)pFrameBuf, (PVOID)prDeauthFrame, prMsduInfo->u2FrameLength);
 			kalWDevLockThread(prAdapter->prGlueInfo, prAdapter->prGlueInfo->prP2PInfo[ucRoleIdx]->aprRoleHandler,
-					CFG80211_TX_MLME_MGMT, pFrameBuf, prMsduInfo->u2FrameLength, NULL, 0, fgIsInterruptContext);
+					CFG80211_TX_MLME_MGMT, pFrameBuf, prMsduInfo->u2FrameLength, NULL, 0, NULL, 0,
+					fgIsInterruptContext);
 #else
 			cfg80211_tx_mlme_mgmt(prAdapter->prGlueInfo->prP2PInfo[ucRoleIdx]->aprRoleHandler, (PUINT_8)prDeauthFrame,
 					(size_t)prMsduInfo->u2FrameLength);
