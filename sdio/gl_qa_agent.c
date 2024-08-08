@@ -579,30 +579,6 @@ static INT_32 HQA_SetRxPath(struct net_device *prNetDev, IN union iwreq_data *pr
 
 	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_SetRxPath\n");
 
-#if 0
-	prGlueInfo = *((P_GLUE_INFO_T *) netdev_priv(prNetDev));
-
-	memcpy(&Value, HqaCmdFrame->Data + 4 * 0, 2);
-	Value = ntohs(Value);
-
-	DBGLOG(RFTEST, INFO, "MT6632 : QA_AGENT HQA_SetRxPath Value : %d\n", Value);
-
-	rRfATInfo.u4FuncIndex = RF_AT_FUNCID_SET_RX_PATH;
-	rRfATInfo.u4FuncData = (UINT_32) ((Value << 16) || (0 & BITS(0, 15)));
-
-	i4Ret = kalIoctl(prGlueInfo,	/* prGlueInfo */
-			wlanoidRftestSetAutoTest,	/* pfnOidHandler */
-			&rRfATInfo,	/* pvInfoBuf */
-			sizeof(rRfATInfo),	/* u4InfoBufLen */
-			FALSE,	/* fgRead */
-			FALSE,	/* fgWaitResp */
-			TRUE,	/* fgCmd */
-			&u4BufLen);	/* pu4QryInfoLen */
-
-	if (i4Ret != WLAN_STATUS_SUCCESS)
-		return -EFAULT;
-#endif
-
 	ResponseToQA(HqaCmdFrame, prIwReqData, 2, i4Ret);
 
 	return i4Ret;
@@ -1944,16 +1920,6 @@ static INT_32 HQA_WriteEEPROM(struct net_device *prNetDev, IN union iwreq_data *
 	u4WriteData = ntohs(u4WriteData);
 
 	prGlueInfo = *((P_GLUE_INFO_T *)netdev_priv(prNetDev));
-#if 0
-    /* Read */
-	DBGLOG(INIT, INFO, "MT6632 : QA_AGENT HQA_ReadEEPROM\n");
-	kalMemSet(&rAccessEfuseInfoRead, 0, sizeof(PARAM_CUSTOM_ACCESS_EFUSE_T));
-	rAccessEfuseInfoRead.u4Address = (Offset / EFUSE_BLOCK_SIZE) * EFUSE_BLOCK_SIZE;
-	rStatus = kalIoctl(prGlueInfo,
-				wlanoidQueryProcessAccessEfuseRead,
-				&rAccessEfuseInfoRead,
-				sizeof(PARAM_CUSTOM_ACCESS_EFUSE_T), FALSE, FALSE, TRUE, &u4BufLen);
-#endif
 
 	/* Write */
 	DBGLOG(INIT, INFO, "HQA_WriteEEPROM : QA_AGENT HQA_WriteEEPROM\n");
@@ -2059,12 +2025,6 @@ static INT_32 HQA_ReadBulkEEPROM(
 
 		Offset = Offset % EFUSE_BLOCK_SIZE;
 
-#if 0
-		for (u4Loop = 0; u4Loop < 16; u4Loop++) {
-			DBGLOG(INIT, INFO, "MT6632:QA_AGENT HQA_ReadBulkEEPROM Efuse Offset=%x u4Loop=%d u4Value=%x\n",
-			Offset, u4Loop, prGlueInfo->prAdapter->aucEepromVaule[u4Loop]);
-		}
-#endif
 		for (u4Loop = 0; u4Loop < Len; u4Loop += 2) {
 			u4TotalOffset = Offset + u4Loop;
 			if (u4TotalOffset >= EFUSE_BLOCK_SIZE - 1) {
@@ -2102,48 +2062,6 @@ static INT_32 HQA_ReadBulkEEPROM(
 	}
 #endif
 
-	/*kfree(Buffer);*/
-
-	/* Read from buffer array in driver */
-	/* Pass these data to FW also */
-#if 0
-	for (i = 0 ; i < Len ; i += 2) {
-		memcpy(&u2Temp, uacEEPROMImage + Offset + i, 2);
-		u2Temp = ntohs(u2Temp);
-		memcpy(HqaCmdFrame->Data + 2 + i, &u2Temp, 2);
-	}
-#endif
-	/* For SA Buffer Mode Temp Solution */
-#if 0
-	if (Offset == 0x4A0 && !g_BufferDownload) {
-
-		UINT_16 u2InitAddr = 0x000;
-		UINT_32 i = 0, j = 0;
-		UINT_32 u4BufLen = 0;
-		WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
-		P_GLUE_INFO_T prGlueInfo = NULL;
-		PARAM_CUSTOM_EFUSE_BUFFER_MODE_T rSetEfuseBufModeInfo;
-
-		prGlueInfo = *((P_GLUE_INFO_T *) netdev_priv(prNetDev));
-
-		for (i = 0 ; i < MAX_EEPROM_BUFFER_SIZE/16 ; i++) {
-			for (j = 0 ; j < 16 ; j++) {
-				rSetEfuseBufModeInfo.aBinContent[j].u2Addr = u2InitAddr;
-				rSetEfuseBufModeInfo.aBinContent[j].ucValue = uacEEPROMImage[u2InitAddr];
-				u2InitAddr += 1;
-			}
-
-			rSetEfuseBufModeInfo.ucSourceMode = 1;
-			rSetEfuseBufModeInfo.ucCount = EFUSE_CONTENT_SIZE;
-			rStatus = kalIoctl(prGlueInfo,
-						wlanoidSetEfusBufferMode,
-						&rSetEfuseBufModeInfo,
-						sizeof(PARAM_CUSTOM_EFUSE_BUFFER_MODE_T), FALSE, FALSE, TRUE, &u4BufLen);
-		}
-
-		g_BufferDownload = TRUE;
-	}
-#endif
 	ResponseToQA(HqaCmdFrame, prIwReqData, 2 + Len, i4Ret);
 
 	return i4Ret;
@@ -2214,22 +2132,10 @@ static INT_32 HQA_WriteBulkEEPROM(
 
 		kalMemCopy((UINT_8 *)Buffer, (UINT_8 *)HqaCmdFrame->Data + 4, Len);
 
-#if 0
-		for (u4Loop = 0; u4Loop < (Len)/2; u4Loop++) {
-
-			DBGLOG(INIT, INFO, "MT6632 : QA_AGENT HQA_WriteBulkEEPROM u4Loop=%d  u4Value=%x\n",
-				u4Loop, Buffer[u4Loop]);
-		}
-#endif
-
 		if (g_ucEepromCurrentMode == BUFFER_BIN_MODE) {
 			/* EEPROM */
 			DBGLOG(INIT, INFO, "Direct EEPROM buffer, offset=%x, len=%x\n", Offset, Len);
-#if 0
-			for (i = 0; i < EFUSE_BLOCK_SIZE; i++)
-				memcpy(uacEEPROMImage + Offset + i, Buffer + i, 1);
 
-#endif
 			if (Len > 2) {
 				for (u4Loop = 0; u4Loop < EFUSE_BLOCK_SIZE / 2; u4Loop++) {
 					Buffer[u4Loop]			   = ntohs(Buffer[u4Loop]);
@@ -6924,7 +6830,6 @@ static INT_32 hqa_start_tx_ext(
 	MT_ATESetDBDCBandIndex(prNetDev, u4Band_idx);
 	MT_ATESetTxCount(prNetDev, u4Pkt_cnt);
 
-#if 1
 	if (u4Phymode == 1) {
 		u4Phymode = 0;
 		u4Rate += 4;
@@ -6957,7 +6862,6 @@ static INT_32 hqa_start_tx_ext(
 
 		MT_ATESetRate(prNetDev, u4Rate);
 	}
-#endif
 
 	MT_ATESetTxPower0(prNetDev, u4Pwr);
 	MT_ATESetTxSTBC(prNetDev, u4Stbc);

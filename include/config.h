@@ -34,11 +34,8 @@
 #define CFG_DUMP_TXPOWR_TABLE
 #define CFG_ENABLE_1RPD_MMPS_CTRL 1
 #define CFG_ENABLE_DEWEIGHTING_CTRL 1
-#define CFG_ENABLE_EFUSE_MAC_ADDR 1
-#define CFG_ENABLE_GTK_FRAME_FILTER 0
 #define CFG_ENABLE_PS_INTV_CTRL 1
 
-#define CFG_HS20_DEBUG 0
 #define CFG_IPI_2CHAIN_SUPPORT 1
 #define CFG_KEY_ERROR_STATISTIC_RECOVERY 1
 #define CFG_MET_PACKET_TRACE_SUPPORT 1
@@ -61,17 +58,12 @@
 #define CFG_SUPPORT_LARGE_TX_PWR_LIMIT_TABLE 0
 #define CFG_SUPPORT_MULTICAST_ENHANCEMENT
 #define CFG_SUPPORT_OWE 1
-#define CFG_SUPPORT_PASSPOINT 0
 #define CFG_SUPPORT_SAE 1
 #define CFG_SUPPORT_SAP_DFS_CHANNEL 1
 #define CFG_SUPPORT_SAME_BSS_REASSOC 1
 #define CFG_SUPPORT_SUITB 1
 #define CFG_SUPPORT_TSF_USING_BOOTTIME 1
-#define CFG_TX_DIRECT_USB 1
 #define CFG_TX_WMM_ENHANCE 1
-#define CFG_USB_REQ_RX_DATA_CNT 4
-#define CFG_USB_REQ_TX_DATA_CNT 2
-#define CFG_USB_REQ_TX_DATA_FFA_CNT 6
 #ifndef DBG
 #define DBG 0
 #endif
@@ -147,7 +139,6 @@
 #endif
 
 #define CFG_SUPPORT_BFEE 1
-#define CFG_SUPPORT_WAPI 0
 
 /* Enable QA Tool Support */
 #define CFG_SUPPORT_QA_TOOL 1
@@ -195,12 +186,6 @@
  *------------------------------------------------------------------------------
  */
 #define CFG_SUPPORT_BUFFER_MODE 1
-
-/*------------------------------------------------------------------------------
- * SLT Option
- *------------------------------------------------------------------------------
- */
-#define CFG_SLT_SUPPORT 0
 
 #ifdef NDIS60_MINIPORT
 #define CFG_NATIVE_802_11 1
@@ -302,13 +287,6 @@
 #define CFG_USB_TX_HANDLE_IN_HIF_THREAD 0
 #define CFG_USB_RX_HANDLE_IN_HIF_THREAD 0
 
-#ifndef CFG_TX_DIRECT_USB
-#define CFG_TX_DIRECT_USB 1
-#endif
-#ifndef CFG_RX_DIRECT_USB
-#define CFG_RX_DIRECT_USB 1
-#endif
-
 #define CFG_HW_WMM_BY_BSS 1
 /*------------------------------------------------------------------------------
  * Flags and Parameters for Integration
@@ -353,20 +331,8 @@
  *------------------------------------------------------------------------------
  */
 
-/*------------------------------------------------------------------------------
- * CONFIG_TITLE : Move BA from FW to Driver
- * OWNER            : Puff Wen
- * Description  : Move BA from FW to Driver
- *------------------------------------------------------------------------------
- */
-#define CFG_M0VE_BA_TO_DRIVER 0
-
 /*! Max. descriptor number - sync. with firmware */
-#if CFG_SLT_SUPPORT
-#define CFG_NUM_OF_RX0_HIF_DESC 42
-#else
 #define CFG_NUM_OF_RX0_HIF_DESC 16
-#endif
 #define CFG_NUM_OF_RX1_HIF_DESC 2
 
 /*! Max. buffer hold by QM */
@@ -389,9 +355,6 @@
 
 /*! RX BA capability */
 #define CFG_NUM_OF_RX_BA_AGREEMENTS 8
-#if CFG_M0VE_BA_TO_DRIVER
-#define CFG_RX_BA_MAX_WINSIZE 64
-#endif
 #define CFG_RX_BA_INC_SIZE 64
 #define CFG_RX_MAX_BA_TID_NUM 8
 #define CFG_RX_REORDERING_ENABLED 1
@@ -438,7 +401,6 @@
 
 #define CFG_INIT_UAPSD_AC_BMP 0 /* (BIT(3) | BIT(2) | BIT(1) | BIT(0)) */
 
-/* #define CFG_SUPPORT_WAPI                        0 */
 #define CFG_SUPPORT_WPS 1
 #define CFG_SUPPORT_WPS2 1
 

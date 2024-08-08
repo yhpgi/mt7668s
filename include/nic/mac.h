@@ -44,9 +44,7 @@
 
 #define ETH_P_1X 0x888E
 #define ETH_P_PRE_1X 0x88C7
-#if CFG_SUPPORT_WAPI
-#define ETH_WPI_1X 0x88B4
-#endif
+// #define ETH_WPI_1X 0x88B4
 #define ETH_EAPOL_KEY 3
 
 /* 802.3 Frame If Ether Type/Len <= 1500 */
@@ -133,8 +131,6 @@
 		0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF \
 	}
 
-#if 1
-
 #define ETH_HLEN 14
 #define ETH_TYPE_LEN_OFFSET 12
 
@@ -149,8 +145,6 @@
 #define SOURCE_PORT_LEN 2
 
 #define LOOK_AHEAD_LEN (ETH_HLEN + IP_HEADER_LEN + SOURCE_PORT_LEN)
-
-#endif
 
 /* Ethernet Frame Field Size, in byte */
 #define ETHER_HEADER_LEN 14
@@ -1227,15 +1221,6 @@
 #define IW_IE_LENGTH_ANO_HESSID 7
 #define IW_IE_LENGTH_ANO_VENUE_HESSID 9
 
-#if CFG_SUPPORT_PASSPOINT
-/* HOTSPOT 2.0 Indication IE*/
-#define ELEM_MAX_LEN_HS20_INDICATION 5
-#define ELEM_MIN_LEN_HS20_INDICATION 4
-
-/* Hotspot Configuration*/
-#define ELEM_HS_CONFIG_DGAF_DISABLED_MASK BIT(0) /* Downstream Group-Addressed Forwarding */
-#endif											 /* CFG_SUPPORT_PASSPOINT */
-
 /* MTK Vendor Specific OUI */
 #define ELEM_MIN_LEN_MTK_OUI 7
 #define VENDOR_OUI_MTK \
@@ -1362,10 +1347,6 @@
 #define VENDOR_OUI_TYPE_WPS 4
 #define VENDOR_OUI_TYPE_P2P 9
 #define VENDOR_OUI_TYPE_WFD 10
-
-#if CFG_SUPPORT_PASSPOINT
-#define VENDOR_OUI_TYPE_HS20 16
-#endif /* CFG_SUPPORT_PASSPOINT */
 
 #define VENDOR_OUI_TYPE_LEN 4 /* Length of OUI and Type */
 
@@ -2658,17 +2639,6 @@ typedef struct _IE_WFA_T {
 	/*!< Please be noted. WPA defines a 16 bit field version */
 	/* instead of one subtype field and one version field */
 } __KAL_ATTRIB_PACKED__ IE_WFA_T, *P_IE_WFA_T;
-
-#if CFG_SUPPORT_PASSPOINT
-/* HS20 3.1 - HS 2.0 Indication Information Element */
-typedef struct _IE_HS20_INDICATION_T {
-	UINT_8 ucId;			/* Element ID */
-	UINT_8 ucLength;		/* Length */
-	UINT_8 aucOui[3];		/* OUI */
-	UINT_8 ucType;			/* Type */
-	UINT_8 ucHotspotConfig; /* Hotspot Configuration */
-} __KAL_ATTRIB_PACKED__ IE_HS20_INDICATION_T, *P_IE_HS20_INDICATION_T;
-#endif /* CFG_SUPPORT_PASSPOINT */
 
 /* WAPI Information element format */
 typedef struct _WAPI_INFO_ELEM_T {

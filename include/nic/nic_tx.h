@@ -748,9 +748,6 @@ struct _MSDU_INFO_T {
 	/* UINT_8 ucPsSessionID; */ /* PS Session ID specified by the FW for the STA */
 								/* TRUE means this is the last packet of the burst for (STA, TID) */
 								/* BOOLEAN fgIsBurstEnd; */
-#if CFG_M0VE_BA_TO_DRIVER
-	UINT_8 ucTID;
-#endif
 
 #if CFG_SUPPORT_MULTITHREAD
 	/* Compose TxDesc in main_thread and place here */

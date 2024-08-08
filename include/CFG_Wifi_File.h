@@ -123,39 +123,6 @@ typedef struct _PWR_PARAM_T {
 	UINT_32 u4RefValue2;
 } PWR_PARAM_T, *P_PWR_PARAM_T;
 
-#if 0
-typedef struct _MT6620_CFG_PARAM_STRUCT {
-	/* 256 bytes of MP data */
-	UINT_16 u2Part1OwnVersion;
-	UINT_16 u2Part1PeerVersion;
-	UINT_8 aucMacAddress[6];
-	UINT_8 aucCountryCode[2];
-	TX_PWR_PARAM_T rTxPwr;
-	UINT_8 aucEFUSE[144];
-	UINT_8 ucTxPwrValid;
-	UINT_8 ucSupport5GBand;
-	UINT_8 fg2G4BandEdgePwrUsed;
-	INT_8 cBandEdgeMaxPwrCCK;
-	INT_8 cBandEdgeMaxPwrOFDM20;
-	INT_8 cBandEdgeMaxPwrOFDM40;
-
-	UINT_8 ucRegChannelListMap;
-	UINT_8 ucRegChannelListIndex;
-	UINT_8 aucRegSubbandInfo[36];
-
-	UINT_8 aucReserved2[256 - 240];
-
-	/* 256 bytes of function data */
-	UINT_16 u2Part2OwnVersion;
-	UINT_16 u2Part2PeerVersion;
-	UINT_8 uc2G4BwFixed20M;
-	UINT_8 uc5GBwFixed20M;
-	UINT_8 ucEnable5GBand;
-	UINT_8 aucPreTailReserved;
-	UINT_8 aucTailReserved[256 - 8];
-} MT6620_CFG_PARAM_STRUCT, *P_MT6620_CFG_PARAM_STRUCT, WIFI_CFG_PARAM_STRUCT, *P_WIFI_CFG_PARAM_STRUCT;
-#else
-
 typedef struct _AC_PWR_SETTING_STRUCT {
 	UINT_8 c11AcTxPwr_BPSK;
 	UINT_8 c11AcTxPwr_QPSK;
@@ -251,7 +218,6 @@ typedef struct _MT6620_CFG_PARAM_STRUCT {
 	UINT_8					aucTailReserved[256 - 15];
 } MT6620_CFG_PARAM_STRUCT, *P_MT6620_CFG_PARAM_STRUCT, WIFI_CFG_PARAM_STRUCT, *P_WIFI_CFG_PARAM_STRUCT;
 
-#endif
 /*******************************************************************************
  *                           P R I V A T E   D A T A
  ********************************************************************************

@@ -305,10 +305,6 @@ VOID rlmReqGenerateExtCapIE(P_ADAPTER_T prAdapter, P_MSDU_INFO_T prMsduInfo)
 	if ((prAdapter->rWifiVar.ucAvailablePhyTypeSet & PHY_TYPE_SET_802_11N) &&
 			(!prStaRec || (prStaRec->ucPhyTypeSet & PHY_TYPE_SET_802_11N)))
 		rlmFillExtCapIE(prAdapter, prBssInfo, prMsduInfo);
-#if CFG_SUPPORT_PASSPOINT
-	else if (prAdapter->prGlueInfo->fgConnectHS20AP == TRUE)
-		hs20FillExtCapIE(prAdapter, prBssInfo, prMsduInfo);
-#endif /* CFG_SUPPORT_PASSPOINT */
 }
 
 /*----------------------------------------------------------------------------*/
@@ -734,11 +730,7 @@ static VOID rlmFillExtCapIE(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo, P_MSD
 	prExtCap = (P_EXT_CAP_T)(((PUINT_8)prMsduInfo->prPacket) + prMsduInfo->u2FrameLength);
 
 	prExtCap->ucId = ELEM_ID_EXTENDED_CAP;
-#if 0 /* CFG_SUPPORT_HOTSPOT_2_0 */
-	if (prAdapter->prGlueInfo->fgConnectHS20AP == TRUE)
-		prExtCap->ucLength = ELEM_MAX_LEN_EXT_CAP;
-	else
-#endif
+
 	prExtCap->ucLength = 1;
 
 	/* Reset memory */
@@ -780,18 +772,6 @@ static VOID rlmFillExtCapIE(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo, P_MSD
 		SET_EXT_CAP(prExtCap->aucCapabilities, ELEM_MAX_LEN_EXT_CAP, ELEM_EXT_CAP_OP_MODE_NOTIFICATION_BIT);
 	}
 #endif
-
-#if CFG_SUPPORT_PASSPOINT
-	if (prAdapter->prGlueInfo->fgConnectHS20AP == TRUE) {
-		if (prExtCap->ucLength < ELEM_MAX_LEN_EXT_CAP)
-			prExtCap->ucLength = ELEM_MAX_LEN_EXT_CAP;
-
-		SET_EXT_CAP(prExtCap->aucCapabilities, ELEM_MAX_LEN_EXT_CAP, ELEM_EXT_CAP_INTERWORKING_BIT);
-
-		/* For R2 WNM-Notification */
-		SET_EXT_CAP(prExtCap->aucCapabilities, ELEM_MAX_LEN_EXT_CAP, ELEM_EXT_CAP_WNM_NOTIFICATION_BIT);
-	}
-#endif /* CFG_SUPPORT_PASSPOINT */
 
 #if CFG_SUPPORT_802_11V_BSS_TRANSITION_MGT
 	prExtCap->ucLength = ELEM_MAX_LEN_EXT_CAP;
@@ -1234,17 +1214,6 @@ static VOID rlmFillVhtCapIE(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo, P_MSD
 		prVhtSupportedMcsSet->u2TxMcsMap |= (ucMcsMap << ucOffset);
 	}
 
-#if 0
-	for (i = 0; i < wlanGetSupportNss(prAdapter, prBssInfo->ucBssIndex); i++) {
-		UINT_8 ucOffset = i * 2;
-
-		prVhtSupportedMcsSet->u2RxMcsMap &=
-			((VHT_CAP_INFO_MCS_MAP_MCS9 << ucOffset) & BITS(ucOffset, ucOffset + 1));
-		prVhtSupportedMcsSet->u2TxMcsMap &=
-			((VHT_CAP_INFO_MCS_MAP_MCS9 << ucOffset) & BITS(ucOffset, ucOffset + 1));
-	}
-#endif
-
 	prVhtSupportedMcsSet->u2RxHighestSupportedDataRate = VHT_CAP_INFO_DEFAULT_HIGHEST_DATA_RATE;
 	prVhtSupportedMcsSet->u2TxHighestSupportedDataRate = VHT_CAP_INFO_DEFAULT_HIGHEST_DATA_RATE;
 
@@ -1281,20 +1250,6 @@ VOID rlmFillVhtOpIE(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo, P_MSDU_INFO_T
 	prVhtOp->ucVhtOperation[0] = prBssInfo->ucVhtChannelWidth; /* (UINT8)VHT_OP_CHANNEL_WIDTH_80; */
 	prVhtOp->ucVhtOperation[1] = prBssInfo->ucVhtChannelFrequencyS1;
 	prVhtOp->ucVhtOperation[2] = prBssInfo->ucVhtChannelFrequencyS2;
-
-#if 0
-	if (cnmGetBssMaxBw(prAdapter, prBssInfo->ucBssIndex) < MAX_BW_80MHZ) {
-		prVhtOp->ucVhtOperation[0] = VHT_OP_CHANNEL_WIDTH_20_40;
-		prVhtOp->ucVhtOperation[1] = 0;
-		prVhtOp->ucVhtOperation[2] = 0;
-	} else if (cnmGetBssMaxBw(prAdapter, prBssInfo->ucBssIndex) == MAX_BW_80MHZ) {
-		prVhtOp->ucVhtOperation[0] = VHT_OP_CHANNEL_WIDTH_80;
-		prVhtOp->ucVhtOperation[1] = nicGetVhtS1(prBssInfo->ucPrimaryChannel);
-		prVhtOp->ucVhtOperation[2] = 0;
-	} else {
-		/* TODO: BW80 + 80/160 support */
-	}
-#endif
 
 	prVhtOp->u2VhtBasicMcsSet = prBssInfo->u2VhtBasicMcsSet;
 
@@ -2035,10 +1990,6 @@ static UINT_8 rlmRecIeInfoForClient(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInf
 		prBssInfo->eBssSCO				   = CHNL_EXT_SCN;
 		prBssInfo->ucHtOpInfo1 &= ~(HT_OP_INFO1_SCO | HT_OP_INFO1_STA_CHNL_WIDTH);
 	}
-#if CFG_SUPPORT_QUIET && 0
-	if (!fgHasQuietIE)
-		rrmQuietIeNotExist(prAdapter, prBssInfo);
-#endif
 
 	/* Check if OBSS scan process will launch */
 	if (!prAdapter->fgEnOnlineScan || !prObssScnParam || !(prStaRec->u2HtCapInfo & HT_CAP_INFO_SUP_CHNL_WIDTH) ||
@@ -2291,21 +2242,6 @@ static BOOLEAN rlmRecBcnInfoForClient(
 	ASSERT(prBssInfo && prSwRfb);
 	ASSERT(pucIE);
 
-#if 0 /* SW migration 2010/8/20 */
-	/* Note: we shall not update parameters when scanning, otherwise
-	 *       channel and bandwidth will not be correct or asserted failure
-	 *       during scanning.
-	 * Note: remove channel checking. All received Beacons should be processed
-	 *       if measurement or other actions are executed in adjacent channels
-	 *       and Beacon content checking mechanism is not disabled.
-	 */
-	if (IS_SCAN_ACTIVE()
-	    /* || prBssInfo->ucPrimaryChannel != CHNL_NUM_BY_SWRFB(prSwRfb) */
-		) {
-		return FALSE;
-	}
-#endif
-
 	/* Handle change of slot time */
 	prBssInfo->u2CapInfo = ((P_WLAN_BEACON_FRAME_T)(prSwRfb->pvHeader))->u2CapInfo;
 	prBssInfo->fgUseShortSlotTime =
@@ -2436,10 +2372,6 @@ VOID rlmProcessAssocRsp(P_ADAPTER_T prAdapter, P_SW_RFB_T prSwRfb, PUINT_8 pucIE
 				ucPriChannel);
 	}
 	/*Avoid wrong primary channel info in HT operation IE info when accept association response */
-#if 0
-	if (ucPriChannel > 0)
-		prBssInfo->ucPrimaryChannel = ucPriChannel;
-#endif
 
 	if (!RLM_NET_IS_11N(prBssInfo) || !(prStaRec->u2HtCapInfo & HT_CAP_INFO_SUP_CHNL_WIDTH))
 		prBssInfo->fg40mBwAllowed = FALSE;
@@ -3323,27 +3255,11 @@ static VOID msmtComposeReportFrame(
 	prTxFrame->ucDialogToken = prStaRec->ucSmDialogToken;
 	prMeasurementRepIE->ucId = ELEM_ID_MEASUREMENT_REPORT;
 
-#if 0
-	if (prStaRec->ucSmMsmtRequestMode == ELEM_RM_TYPE_BASIC_REQ) {
-		prMeasurementRepIE->ucLength = sizeof(SM_BASIC_REPORT_T) + 3;
-		u2PayloadLen = ACTION_SM_MEASURE_REPORT_LEN+ACTION_SM_BASIC_REPORT_LEN;
-	} else if (prStaRec->ucSmMsmtRequestMode == ELEM_RM_TYPE_CCA_REQ) {
-		prMeasurementRepIE->ucLength = sizeof(SM_CCA_REPORT_T) + 3;
-		u2PayloadLen = ACTION_SM_MEASURE_REPORT_LEN+ACTION_SM_CCA_REPORT_LEN;
-	} else if (prStaRec->ucSmMsmtRequestMode == ELEM_RM_TYPE_RPI_HISTOGRAM_REQ) {
-		prMeasurementRepIE->ucLength = sizeof(SM_RPI_REPORT_T) + 3;
-		u2PayloadLen = ACTION_SM_MEASURE_REPORT_LEN+ACTION_SM_PRI_REPORT_LEN;
-	} else {
-		prMeasurementRepIE->ucLength = 3;
-		u2PayloadLen = ACTION_SM_MEASURE_REPORT_LEN;
-	}
-#else
 	prMeasurementRepIE->ucLength		  = 3;
 	u2PayloadLen						  = ACTION_SM_MEASURE_REPORT_LEN;
 	prMeasurementRepIE->ucToken			  = prStaRec->ucSmMsmtToken;
 	prMeasurementRepIE->ucReportMode	  = BIT(1);
 	prMeasurementRepIE->ucMeasurementType = prStaRec->ucSmMsmtRequestMode;
-#endif
 
 	/* 4 Update information of MSDU_INFO_T */
 	TX_SET_MMPDU(prAdapter, prMsduInfo, prStaRec->ucBssIndex, prStaRec->ucIndex, WLAN_MAC_MGMT_HEADER_LEN,

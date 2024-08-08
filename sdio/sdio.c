@@ -167,27 +167,6 @@ int mtk_sdio_probe(struct sdio_func *func, const struct sdio_device_id *id)
 	ASSERT(func);
 	ASSERT(id);
 
-#if 0
-	dev_warn("Basic struct size checking...\n");
-	dev_warn("sizeof(struct device) = %d\n", sizeof(struct device));
-	dev_warn("sizeof(struct mmc_host) = %d\n", sizeof(struct mmc_host));
-	dev_warn("sizeof(struct mmc_card) = %d\n", sizeof(struct mmc_card));
-	dev_warn("sizeof(struct mmc_driver) = %d\n", sizeof(struct mmc_driver));
-	dev_warn("sizeof(struct mmc_data) = %d\n", sizeof(struct mmc_data));
-	dev_warn("sizeof(struct mmc_command) = %d\n",
-			sizeof(struct mmc_command));
-	dev_warn("sizeof(struct mmc_request) = %d\n",
-			sizeof(struct mmc_request));
-	dev_warn("sizeof(struct sdio_func) = %d\n", sizeof(struct sdio_func));
-
-	dev_warn("Card information checking...\n");
-	dev_warn("func = 0x%p\n", func);
-	dev_warn("Number of info = %d:\n", func->card->num_info);
-
-	for (i = 0; i < func->card->num_info; i++)
-		dev_warn("info[%d]: %s\n", i, func->card->info[i]);
-#endif
-
 	sdio_claim_host(func);
 	ret = sdio_enable_func(func);
 	sdio_release_host(func);
@@ -682,25 +661,12 @@ BOOL kalDevRegRead(IN P_GLUE_INFO_T prGlueInfo, IN UINT_32 u4Register, OUT PUINT
 	ASSERT(prGlueInfo);
 	ASSERT(pu4Value);
 
-#if 0
-	prAdapter = container_of(&prGlueInfo, ADAPTER_T, prGlueInfo);
-	if (prAdapter->fgIsChipNoAck == TRUE) {
-		DBGLOG(RSN, ERROR, "wlan is halt, skip sdio r/w\n");
-		return FALSE;
-	}
-#endif
-
 	do {
 		sdio_claim_host(prGlueInfo->rHifInfo.func);
 		*pu4Value = sdio_readl(prGlueInfo->rHifInfo.func, u4Register, &ret);
 		sdio_release_host(prGlueInfo->rHifInfo.func);
 
 		if (ret || ucRetryCount) {
-			/* DBGLOG(HAL, ERROR,
-			 *  ("sdio_readl() addr: 0x%08x value: 0x%08x status: %x retry: %u\n",
-			 *  u4Register, (unsigned int)*pu4Value, (unsigned int)ret, ucRetryCount));
-			 */
-
 			if (glIsReadClearReg(u4Register) && (ucRetryCount == 0)) {
 				/* Read Snapshot CR instead */
 				u4Register = MCR_WSR;
@@ -802,24 +768,10 @@ BOOL kalDevRegWrite(IN P_GLUE_INFO_T prGlueInfo, IN UINT_32 u4Register, IN UINT_
 
 	ASSERT(prGlueInfo);
 
-#if 0
-	if (prAdapter->fgIsChipNoAck == TRUE) {
-		DBGLOG(RSN, ERROR, "wlan is halt, skip sdio r/w\n");
-		return FALSE;
-	}
-#endif
-
 	do {
 		sdio_claim_host(prGlueInfo->rHifInfo.func);
 		sdio_writel(prGlueInfo->rHifInfo.func, u4Value, u4Register, &ret);
 		sdio_release_host(prGlueInfo->rHifInfo.func);
-
-		if (ret || ucRetryCount) {
-			/* DBGLOG(HAL, ERROR,
-			 *  ("sdio_writel() addr: 0x%x status: %x retry: %u\n", u4Register,
-			 *  ret, ucRetryCount));
-			 */
-		}
 
 		ucRetryCount++;
 		if (ucRetryCount > HIF_SDIO_ACCESS_RETRY_LIMIT)
@@ -929,12 +881,7 @@ BOOL kalDevPortRead(IN P_GLUE_INFO_T prGlueInfo, IN UINT_16 u2Port, IN UINT_32 u
 #endif
 
 	ASSERT(prGlueInfo);
-#if 0
-	if (prAdapter->fgIsChipNoAck == TRUE) {
-		DBGLOG(RSN, ERROR, "wlan is halt, skip sdio r/w\n");
-		return FALSE;
-	}
-#endif
+
 	prHifInfo = &prGlueInfo->rHifInfo;
 
 	ASSERT(pucBuf);
@@ -1020,16 +967,6 @@ BOOL kalDevPortWrite(IN P_GLUE_INFO_T prGlueInfo, IN UINT_16 u2Port, IN UINT_32 
 	pucSrc = pucBuf;
 
 	ASSERT(u4Len <= u4ValidInBufSize);
-
-#if 0
-	P_ADAPTER_T prAdapter = NULL;
-
-	prAdapter = container_of(&prGlueInfo, ADAPTER_T, prGlueInfo);
-	if (prAdapter->fgIsChipNoAck == TRUE) {
-		DBGLOG(RSN, ERROR, "wlan is halt, skip sdio r/w\n");
-		return FALSE;
-	}
-#endif
 
 	prSdioFunc = prHifInfo->func;
 	ASSERT(prSdioFunc->cur_blksize > 0);
@@ -1147,15 +1084,6 @@ VOID kalDevReadIntStatus(IN P_ADAPTER_T prAdapter, OUT PUINT_32 pu4IntStatus)
 BOOL kalDevWriteWithSdioCmd52(IN P_GLUE_INFO_T prGlueInfo, IN UINT_32 u4Addr, IN UINT_8 ucData)
 {
 	int ret = 0;
-
-#if 0
-	P_ADAPTER_T prAdapter = container_of(&prGlueInfo, ADAPTER_T,
-								prGlueInfo);
-	if (prAdapter->fgIsChipNoAck == TRUE) {
-		DBGLOG(RSN, ERROR, "wlan is halt, skip sdio r/w\n");
-		return FALSE;
-	}
-#endif
 
 	sdio_claim_host(prGlueInfo->rHifInfo.func);
 	sdio_writeb(prGlueInfo->rHifInfo.func, ucData, u4Addr, &ret);

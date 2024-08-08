@@ -817,55 +817,6 @@ VOID nicCmdEventEnterRfTest(
 	nicResetSystemService(prAdapter);
 	nicInitMGMT(prAdapter, NULL);
 
-#if 0
-	/* 3. Disable Interrupt */
-	HAL_INTR_DISABLE(prAdapter);
-
-	/* 4. Block til firmware completed entering into RF test mode */
-	kalMsleep(500);
-	while (1) {
-		UINT_32 u4Value;
-
-		HAL_MCR_RD(prAdapter, MCR_WCIR, &u4Value);
-
-		if (u4Value & WCIR_WLAN_READY) {
-			break;
-		} else if (kalIsCardRemoved(prAdapter->prGlueInfo) == TRUE || fgIsBusAccessFailed == TRUE) {
-			if (prCmdInfo->fgIsOid) {
-				/* Update Set Information Length */
-				kalOidComplete(prAdapter->prGlueInfo, prCmdInfo->fgSetQuery, prCmdInfo->u4SetInfoLen,
-						WLAN_STATUS_NOT_SUPPORTED);
-			}
-			return;
-		}
-		kalMsleep(10);
-	}
-
-	/* 5. Clear Interrupt Status */
-	{
-		UINT_32 u4WHISR = 0;
-		UINT_16 au2TxCount[16];
-
-		HAL_READ_INTR_STATUS(prAdapter, 4, (PUINT_8)&u4WHISR);
-		if (HAL_IS_TX_DONE_INTR(u4WHISR))
-			HAL_READ_TX_RELEASED_COUNT(prAdapter, au2TxCount);
-	}
-	/* 6. Reset TX Counter */
-	nicTxResetResource(prAdapter);
-
-#if CFG_ENABLE_WIFI_DIRECT
-	if (prAdapter->fgIsP2PRegistered) {
-		DBGLOG(INIT, INFO, "p2pNetUnregister...\n");
-		p2pNetUnregister(prAdapter->prGlueInfo, TRUE);
-		DBGLOG(INIT, INFO, "p2pRemove...\n");
-		/*p2pRemove must before wlanAdapterStop */
-		p2pRemove(prAdapter->prGlueInfo);
-	}
-#endif
-	/* 7. Re-enable Interrupt */
-	HAL_INTR_ENABLE(prAdapter);
-#endif
-
 	/* 8. completion indication */
 	if (prCmdInfo->fgIsOid) {
 		/* Update Set Information Length */
@@ -883,42 +834,6 @@ VOID nicCmdEventEnterRfTest(
 VOID nicCmdEventLeaveRfTest(
 		IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo, IN PUINT_8 pucEventBuf, IN UINT_32 u4EventBufLen)
 {
-#if 0
-	UINT_32 u4WHISR = 0;
-	UINT_16 au2TxCount[16];
-	UINT_32 u4Value;
-
-	/* 1. Disable Interrupt */
-	HAL_INTR_DISABLE(prAdapter);
-
-	/* 2. Block until firmware completed leaving from RF test mode */
-	kalMsleep(500);
-	while (1) {
-		HAL_MCR_RD(prAdapter, MCR_WCIR, &u4Value);
-
-		if (u4Value & WCIR_WLAN_READY) {
-			break;
-		} else if (kalIsCardRemoved(prAdapter->prGlueInfo) == TRUE || fgIsBusAccessFailed == TRUE) {
-			if (prCmdInfo->fgIsOid) {
-				/* Update Set Information Length */
-				kalOidComplete(prAdapter->prGlueInfo, prCmdInfo->fgSetQuery, prCmdInfo->u4SetInfoLen,
-						WLAN_STATUS_NOT_SUPPORTED);
-			}
-			return;
-		}
-		kalMsleep(10);
-	}
-	/* 3. Clear Interrupt Status */
-	HAL_READ_INTR_STATUS(prAdapter, 4, (PUINT_8)&u4WHISR);
-	if (HAL_IS_TX_DONE_INTR(u4WHISR))
-		HAL_READ_TX_RELEASED_COUNT(prAdapter, au2TxCount);
-	/* 4. Reset TX Counter */
-	nicTxResetResource(prAdapter);
-
-	/* 5. Re-enable Interrupt */
-	HAL_INTR_ENABLE(prAdapter);
-#endif
-
 	/* 6. set driver-land variable */
 	prAdapter->fgTestMode = FALSE;
 	prAdapter->fgIcapMode = FALSE;
@@ -1676,14 +1591,7 @@ UINT_32 TsfRawData2IqFmt(P_EVENT_DUMP_MEM_T prEventDumpMem)
 			return -1;
 		}
 		memcpy((UINT_8 *)&icapBusData + ucDstOffset, &prEventDumpMem->aucBuffer[0] + u4SrcOffset, u4CpyLen);
-#if 0
-		if (prEventDumpMem->eIcapContent == ICAP_CONTENT_ADC) {
-			sprintf(aucDataWF0, "%8d,%8d\n", icapBusData.rAdcBusData.u4Dcoc0I,
-				icapBusData.rAdcBusData.u4Dcoc0Q);
-			sprintf(aucDataWF1, "%8d,%8d\n", icapBusData.rAdcBusData.u4Dcoc1I,
-				icapBusData.rAdcBusData.u4Dcoc1Q);
-		}
-#endif
+
 		if (prEventDumpMem->eIcapContent == ICAP_CONTENT_FIIQ || prEventDumpMem->eIcapContent == ICAP_CONTENT_FDIQ) {
 			u4DataWLenF0 = scnprintf(pucDataWF0, u4DataWBufSize, "%8d,%8d\n", icapBusData.rIqcBusData.u4Iqc0I,
 					icapBusData.rIqcBusData.u4Iqc0Q);
@@ -2715,28 +2623,6 @@ VOID nicEventMicErrorInfo(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent, I
 		rsnTkipHandleMICFailure(prAdapter, prStaRec, (BOOLEAN)prMicError->u4Flags);
 	else
 		DBGLOG(RSN, INFO, "No STA rec!!\n");
-#if 0
-	prAuthEvent = (P_PARAM_AUTH_EVENT_T) prAdapter->aucIndicationEventBuffer;
-
-	/* Status type: Authentication Event */
-	prAuthEvent->rStatus.eStatusType = ENUM_STATUS_TYPE_AUTHENTICATION;
-
-	/* Authentication request */
-	prAuthEvent->arRequest[0].u4Length = sizeof(PARAM_AUTH_REQUEST_T);
-	kalMemCopy((PVOID) prAuthEvent->arRequest[0].arBssid,
-			(PVOID) prAdapter->rWlanInfo.rCurrBssId.arMacAddress,	/* whsu:Todo? */
-			PARAM_MAC_ADDR_LEN);
-
-	if (prMicError->u4Flags != 0)
-		prAuthEvent->arRequest[0].u4Flags = PARAM_AUTH_REQUEST_GROUP_ERROR;
-	else
-		prAuthEvent->arRequest[0].u4Flags = PARAM_AUTH_REQUEST_PAIRWISE_ERROR;
-
-	kalIndicateStatusAndComplete(prAdapter->prGlueInfo,
-					WLAN_STATUS_MEDIA_SPECIFIC_INDICATION,
-					(PVOID) prAuthEvent,
-					sizeof(PARAM_STATUS_INDICATION_T) + sizeof(PARAM_AUTH_REQUEST_T));
-#endif
 }
 
 VOID nicEventScanDone(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent, IN UINT_32 u4EventBufLen)
@@ -3512,24 +3398,14 @@ VOID nicEventGetGtkDataSync(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent,
 	prDetRplyInfo->ucCurKeyId = prGtkData->ucCurKeyId;
 	ucCurKeyId				  = prDetRplyInfo->ucCurKeyId;
 
-	/* index bounds check */
 	if (ucCurKeyId >= 4) {
 		DBGLOG(RSN, WARN, "Invalid KeyId of PN: %d, out of bound.\n", ucCurKeyId);
 		return;
 	}
 	kalMemZero(prDetRplyInfo->arReplayPNInfo[ucCurKeyId].auPN, NL80211_REPLAY_CTR_LEN);
-
-#if 0
-	/* if Drv alread rx a new PN value large than fw PN, then skip PN update */
-	if (qmRxDetectReplay(prGtkData->aucReplayCtr,
-		prDetRplyInfo->arReplayPNInfo[ucCurKeyId].auPN))
-		return;
-#endif
-
 	kalMemCopy(prDetRplyInfo->arReplayPNInfo[ucCurKeyId].auPN, prGtkData->aucReplayCtr, 6);
 
 	DBGLOG(RSN, INFO, "Get BC/MC PN update from fw.\n");
-
 	DBGLOG_MEM8(RSN, INFO, (PUINT_8)prDetRplyInfo->arReplayPNInfo[ucCurKeyId].auPN, NL80211_REPLAY_CTR_LEN);
 }
 

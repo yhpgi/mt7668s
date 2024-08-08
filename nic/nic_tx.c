@@ -278,7 +278,7 @@ WLAN_STATUS nicTxAcquireResource(IN P_ADAPTER_T prAdapter, IN UINT_8 ucTC, IN UI
 
 	if (fgReqLock)
 		KAL_ACQUIRE_SPIN_LOCK(prAdapter, SPIN_LOCK_TX_RESOURCE);
-#if 1
+
 	if (prTc->au4FreePageCount[ucTC] >= u4PageCount) {
 		prTc->au4FreePageCount[ucTC] -= u4PageCount;
 		prTc->au4FreeBufferCount[ucTC] = (prTc->au4FreePageCount[ucTC] / NIC_TX_MAX_PAGE_PER_FRAME);
@@ -288,13 +288,7 @@ WLAN_STATUS nicTxAcquireResource(IN P_ADAPTER_T prAdapter, IN UINT_8 ucTC, IN UI
 
 		u4Status = WLAN_STATUS_SUCCESS;
 	}
-#else
-	if (prTxCtrl->rTc.au4FreePageCount[ucTC] > 0) {
-		prTxCtrl->rTc.au4FreePageCount[ucTC] -= 1;
 
-		u4Status = WLAN_STATUS_SUCCESS;
-	}
-#endif
 	if (fgReqLock)
 		KAL_RELEASE_SPIN_LOCK(prAdapter, SPIN_LOCK_TX_RESOURCE);
 
@@ -331,28 +325,11 @@ WLAN_STATUS nicTxPollingResource(IN P_ADAPTER_T prAdapter, IN UINT_8 ucTC)
 		return WLAN_STATUS_SUCCESS;
 
 	while (i-- > 0) {
-#if 1
 		u4Status = halTxPollingResource(prAdapter, ucTC);
 		if (u4Status == WLAN_STATUS_RESOURCES)
 			kalMsleep(NIC_TX_RESOURCE_POLLING_DELAY_MSEC);
 		else
 			break;
-#else
-		HAL_READ_TX_RELEASED_COUNT(prAdapter, au4WTSR);
-
-		if (kalIsCardRemoved(prAdapter->prGlueInfo) == TRUE || fgIsBusAccessFailed == TRUE) {
-			u4Status = WLAN_STATUS_FAILURE;
-			break;
-		} else if (halTxReleaseResource(prAdapter, (PUINT_16)au4WTSR)) {
-			if (prTxCtrl->rTc.au4FreeBufferCount[ucTC] > 0) {
-				u4Status = WLAN_STATUS_SUCCESS;
-				break;
-			}
-			kalMsleep(NIC_TX_RESOURCE_POLLING_DELAY_MSEC);
-		} else {
-			kalMsleep(NIC_TX_RESOURCE_POLLING_DELAY_MSEC);
-		}
-#endif
 	}
 
 #if DBG
@@ -1101,11 +1078,6 @@ VOID nicTxComposeDesc(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo, IN 
 	/* WLAN index */
 	prMsduInfo->ucWlanIndex = nicTxGetWlanIdx(prAdapter, prMsduInfo->ucBssIndex, prMsduInfo->ucStaRecIndex);
 
-#if 0 /* DBG */
-	DBGLOG(RSN, INFO,
-			"Tx WlanIndex = %d eAuthMode = %d\n", prMsduInfo->ucWlanIndex,
-			prAdapter->rWifiVar.rConnSettings.eAuthMode);
-#endif
 	HAL_MAC_TX_DESC_SET_WLAN_INDEX(prTxDesc, prMsduInfo->ucWlanIndex);
 
 	/* Header format */
@@ -1402,14 +1374,8 @@ VOID nicTxFillDesc(
 	if (nicTxIsTXDTemplateAllowed(prAdapter, prMsduInfo, prStaRec) &&
 			prStaRec->aprTxDescTemplate[prMsduInfo->ucUserPriority]) {
 		prTxDescTemplate = prStaRec->aprTxDescTemplate[prMsduInfo->ucUserPriority];
-#if 1
+
 		u4TxDescLength = NIC_TX_DESC_LONG_FORMAT_LENGTH;
-#else
-		if (HAL_MAC_TX_DESC_IS_LONG_FORMAT(prTxDescTemplate))
-			u4TxDescLength = NIC_TX_DESC_LONG_FORMAT_LENGTH;
-		else
-			u4TxDescLength = NIC_TX_DESC_SHORT_FORMAT_LENGTH;
-#endif
 
 		kalMemCopy(prTxDesc, prTxDescTemplate, u4TxDescLength + u4TxDescAppendLength);
 
@@ -1584,7 +1550,7 @@ WLAN_STATUS nicTxGenerateDescTemplate(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_
 #if (HIF_TX_RSRC_WMM_ENHANCE == 1)
 			u4TxDescSize = arTcTrafficSettings[ucRefTc].u4TxDescLength;
 #else
-			u4TxDescSize   = arTcTrafficSettings[ucTc].u4TxDescLength;
+			   u4TxDescSize = arTcTrafficSettings[ucTc].u4TxDescLength;
 #endif
 
 			/* Include TxD append */
@@ -1772,20 +1738,7 @@ void nicTxMsduDoneCb(IN P_GLUE_INFO_T prGlueInfo, IN P_QUE_T prQue)
 		while (prMsduInfo) {
 			prNextMsduInfo = (P_MSDU_INFO_T)QUEUE_GET_NEXT_ENTRY(&prMsduInfo->rQueEntry);
 
-#if 1
 			nicTxFreePacket(prAdapter, prMsduInfo, FALSE);
-#else
-			prNativePacket = prMsduInfo->prPacket;
-
-			/* Free MSDU_INFO */
-			if (prMsduInfo->eSrc == TX_PACKET_OS) {
-				wlanTxProfilingTagMsdu(prAdapter, prMsduInfo, TX_PROF_TAG_DRV_TX_DONE);
-				kalSendComplete(prAdapter->prGlueInfo, prNativePacket, WLAN_STATUS_SUCCESS);
-				prMsduInfo->prPacket = NULL;
-			} else if (prMsduInfo->eSrc == TX_PACKET_FORWARDING) {
-				GLUE_DEC_REF_CNT(prTxCtrl->i4PendingFwdFrameCount);
-			}
-#endif
 
 			if (!prMsduInfo->pfTxDoneHandler)
 				QUEUE_INSERT_TAIL(prFreeQueue, (P_QUE_ENTRY_T)prMsduInfo);
@@ -2141,23 +2094,8 @@ VOID nicTxFreeMsduInfoPacket(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduIn
 	while (prMsduInfo) {
 		prNativePacket = prMsduInfo->prPacket;
 
-#if 1
 		nicTxFreePacket(prAdapter, prMsduInfo, TRUE);
-#else
-		if (prMsduInfo->eSrc == TX_PACKET_OS) {
-			if (prNativePacket)
-				kalSendComplete(prAdapter->prGlueInfo, prNativePacket, WLAN_STATUS_FAILURE);
-			/*get per-AC Tx drop packets */
-			wlanUpdateTxStatistics(prAdapter, prMsduInfo, TRUE);
-		} else if (prMsduInfo->eSrc == TX_PACKET_MGMT) {
-			if (prMsduInfo->pfTxDoneHandler)
-				prMsduInfo->pfTxDoneHandler(prAdapter, prMsduInfo, TX_RESULT_DROPPED_IN_DRIVER);
-			if (prNativePacket)
-				cnmMemFree(prAdapter, prNativePacket);
-		} else if (prMsduInfo->eSrc == TX_PACKET_FORWARDING) {
-			GLUE_DEC_REF_CNT(prTxCtrl->i4PendingFwdFrameCount);
-		}
-#endif
+
 		prMsduInfo = (P_MSDU_INFO_T)QUEUE_GET_NEXT_ENTRY((P_QUE_ENTRY_T)prMsduInfo);
 	}
 }
@@ -2333,21 +2271,7 @@ WLAN_STATUS nicTxAdjustTcq(IN P_ADAPTER_T prAdapter)
 		}
 
 		KAL_RELEASE_SPIN_LOCK(prAdapter, SPIN_LOCK_TX_RESOURCE);
-#if 0
-		DBGLOG(TX, LOUD,
-				"TCQ Status Free Page:Buf[%03u:%02u, %03u:%02u, %03u:%02u, %03u:%02u, %03u:%02u, %03u:%02u]\n",
-				prTcqStatus->au4FreePageCount[TC0_INDEX],
-				prTcqStatus->au4FreeBufferCount[TC0_INDEX],
-				prTcqStatus->au4FreePageCount[TC1_INDEX],
-				prTcqStatus->au4FreeBufferCount[TC1_INDEX],
-				prTcqStatus->au4FreePageCount[TC2_INDEX],
-				prTcqStatus->au4FreeBufferCount[TC2_INDEX],
-				prTcqStatus->au4FreePageCount[TC3_INDEX],
-				prTcqStatus->au4FreeBufferCount[TC3_INDEX],
-				prTcqStatus->au4FreePageCount[TC4_INDEX],
-				prTcqStatus->au4FreeBufferCount[TC4_INDEX],
-				prTcqStatus->au4FreePageCount[TC5_INDEX], prTcqStatus->au4FreeBufferCount[TC5_INDEX]);
-#endif
+
 		DBGLOG(TX, LOUD, "TCQ Status Max Page:Buf[%03u:%02u, %03u:%02u, %03u:%02u, %03u:%02u, %03u:%02u, %03u:%02u]\n",
 				prTcqStatus->au4MaxNumOfPage[TC0_INDEX], prTcqStatus->au4MaxNumOfBuffer[TC0_INDEX],
 				prTcqStatus->au4MaxNumOfPage[TC1_INDEX], prTcqStatus->au4MaxNumOfBuffer[TC1_INDEX],
@@ -2494,16 +2418,12 @@ WLAN_STATUS nicTxInitResetResource(IN P_ADAPTER_T prAdapter)
 
 BOOLEAN nicTxProcessMngPacket(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo)
 {
-#if 0
-	UINT_16 u2RateCode;
-#endif
 	P_BSS_INFO_T   prBssInfo;
 	P_STA_RECORD_T prStaRec;
 
 	if (prMsduInfo->eSrc != TX_PACKET_MGMT)
 		return FALSE;
 
-	/* Sanity check */
 	if (!prMsduInfo->prPacket)
 		return FALSE;
 
@@ -2523,20 +2443,9 @@ BOOLEAN nicTxProcessMngPacket(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduI
 	prMsduInfo->fgIsTXDTemplateValid = FALSE;
 
 	/* Fixed Rate */
-	if (prMsduInfo->ucRateMode == MSDU_RATE_MODE_AUTO) {
-#if 0
-		prMsduInfo->ucRateMode = MSDU_RATE_MODE_MANUAL_DESC;
-
-		if (prStaRec)
-			u2RateCode = prStaRec->u2HwDefaultFixedRateCode;
-		else
-			u2RateCode = prBssInfo->u2HwDefaultFixedRateCode;
-
-		nicTxSetPktFixedRateOption(prMsduInfo, u2RateCode, FIX_BW_NO_FIXED, FALSE, FALSE);
-#else
+	if (prMsduInfo->ucRateMode == MSDU_RATE_MODE_AUTO)
 		nicTxSetPktLowestFixedRate(prAdapter, prMsduInfo);
-#endif
-	}
+
 #if CFG_SUPPORT_MULTITHREAD
 	nicTxFillDesc(prAdapter, prMsduInfo, prMsduInfo->aucTxDescBuffer, NULL);
 #endif
@@ -3024,10 +2933,7 @@ VOID nicTxFillDescByPktOption(P_MSDU_INFO_T prMsduInfo, P_HW_MAC_TX_DESC_T prTxD
 
 	if (u4PktOption & MSDU_OPT_SW_HTC)
 		HAL_MAC_TX_DESC_SET_HTC_EXIST(prTxDesc);
-#if 0
-	if (u4PktOption & MSDU_OPT_SW_BAR_SN)
-		HAL_MAC_TX_DESC_SET_SW_BAR_SSN(prTxDesc);
-#endif
+
 	if (u4PktOption & MSDU_OPT_MANUAL_SN) {
 		HAL_MAC_TX_DESC_SET_TXD_SN_VALID(prTxDesc);
 		HAL_MAC_TX_DESC_SET_SEQUENCE_NUMBER(prTxDesc, prMsduInfo->u2SwSN);

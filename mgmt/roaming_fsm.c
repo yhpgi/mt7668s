@@ -44,13 +44,7 @@
 static PUINT_8 apucDebugRoamingState[ROAMING_STATE_NUM] = { (PUINT_8)DISP_STRING("IDLE"),
 	(PUINT_8)DISP_STRING("DECISION"), (PUINT_8)DISP_STRING("DISCOVERY"), (PUINT_8)DISP_STRING("ROAM") };
 #endif
-#if 0
-static PUINT_8 apucDebugRoamingReason[ROAMING_REASON_NUM] = {
-	(PUINT_8) DISP_STRING("ROAMING_REASON_POOR_RCPI"),
-	(PUINT_8) DISP_STRING("ROAMING_REASON_TX_ERR"),
-	(PUINT_8) DISP_STRING("ROAMING_REASON_RETRY")
-};
-#endif
+
 /*******************************************************************************
  *                                 M A C R O S
  ********************************************************************************
@@ -553,17 +547,8 @@ WLAN_STATUS roamingFsmProcessEvent(IN P_ADAPTER_T prAdapter, IN P_CMD_ROAMING_TR
 {
 	DBGLOG(ROAMING, LOUD, "ROAMING Process Events: Current Time = %ld\n", kalGetTimeTick());
 
-	if (prTransit->u2Event == ROAMING_EVENT_DISCOVERY) {
+	if (prTransit->u2Event == ROAMING_EVENT_DISCOVERY)
 		roamingFsmRunEventDiscovery(prAdapter, prTransit);
-
-#if 0
-	DBGLOG(ROAMING, INFO, "RX ROAMING_EVENT_DISCOVERY RCPI[%d] Thr[%d] Reason[%d] Time[%ld]\n",
-		prTransit->u2Data,
-		prTransit->u2RcpiLowThreshold,
-		prTransit->eReason,
-		prTransit->u4RoamingTriggerTime);
-#endif
-	}
 
 	return WLAN_STATUS_SUCCESS;
 }

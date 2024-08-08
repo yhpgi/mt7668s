@@ -124,21 +124,21 @@ typedef struct _INIT_WIFI_CMD_T {
 	UINT_8 ucPktTypeID; /* Must be 0xA0 (CMD Packet) */
 	UINT_8 ucReserved;
 	UINT_8 ucSeqNum;
-#if 1
+
 	UINT_8 ucD2B0Rev;	   /* padding fields, hw may auto modify this field */
 	UINT_8 ucExtenCID;	   /* Extend CID */
 	UINT_8 ucS2DIndex;	   /* Index for Src to Dst in CMD usage */
 	UINT_8 ucExtCmdOption; /* Extend CID option */
 
 	UINT_32 au4D3toD7Rev[5]; /* padding fields */
-#endif
+
 	UINT_8 aucBuffer[0];
 } INIT_WIFI_CMD_T, *P_INIT_WIFI_CMD_T;
 
 typedef struct _INIT_HIF_TX_HEADER_T {
 	UINT_16 u2TxByteCount; /* Max value is over 2048 */
 	UINT_16 u2PQ_ID;	   /* Must be 0x8000 (Port1, Queue 0) */
-#if 1
+
 	UINT_8	ucWlanIdx;
 	UINT_8	ucHeaderFormat;
 	UINT_8	ucHeaderPadding;
@@ -148,7 +148,7 @@ typedef struct _INIT_HIF_TX_HEADER_T {
 
 	UINT_16 u2Length;
 	UINT_16 u2PqId;
-#endif
+
 	INIT_WIFI_CMD_T rInitWifiCmd;
 } INIT_HIF_TX_HEADER_T, *P_INIT_HIF_TX_HEADER_T;
 
@@ -206,9 +206,8 @@ typedef struct _INIT_CMD_ACCESS_REG {
 
 /* Events */
 typedef struct _INIT_WIFI_EVENT_T {
-#if 1
 	UINT_32 au4HwMacRxDesc[4];
-#endif
+
 	UINT_16 u2RxByteCount;
 	UINT_16 u2PacketType; /* Must be filled with 0xE000 (EVENT Packet) */
 	UINT_8	ucEID;

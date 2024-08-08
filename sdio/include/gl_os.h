@@ -133,10 +133,6 @@
 #include <net/if_inet6.h>
 #endif
 
-#if CFG_SUPPORT_PASSPOINT
-#include <net/addrconf.h>
-#endif /* CFG_SUPPORT_PASSPOINT */
-
 #if KERNEL_VERSION(3, 8, 0) <= CFG80211_VERSION_CODE
 #include <uapi/linux/nl80211.h>
 #endif
@@ -491,11 +487,9 @@ struct _GLUE_INFO_T {
 	UINT_32 u4ExtCfgLength; /* 0 means data is NOT valid */
 #endif
 
-#if 1 /* CFG_SUPPORT_WAPI */
 	/* Should be large than the PARAM_WAPI_ASSOC_INFO_T */
 	UINT_8	aucWapiAssocInfoIEs[42];
 	UINT_16 u2WapiAssocInfoIESz;
-#endif
 
 #if CFG_ENABLE_WIFI_DIRECT
 	P_GL_P2P_DEV_INFO_T prP2PDevInfo;
@@ -547,18 +541,6 @@ struct _GLUE_INFO_T {
 
 	BOOLEAN fgIsInSuspendMode;
 
-#if CFG_SUPPORT_PASSPOINT
-	UINT_8	aucHS20AssocInfoIE[200]; /*for Assoc req */
-	UINT_16 u2HS20AssocInfoIELen;
-	UINT_8	ucHotspotConfig;
-	BOOLEAN fgConnectHS20AP;
-
-	BOOLEAN fgIsDad;
-	UINT_8	aucDADipv4[4];
-	BOOLEAN fgIs6Dad;
-	UINT_8	aucDADipv6[16];
-#endif /* CFG_SUPPORT_PASSPOINT */
-
 #if CFG_MET_PACKET_TRACE_SUPPORT
 	BOOLEAN fgMetProfilingEn;
 	UINT_16 u2MetUdpPort;
@@ -608,10 +590,6 @@ enum TestModeCmdType {
 	NUM_OF_TESTMODE_CMD_ID
 };
 
-#if CFG_SUPPORT_PASSPOINT
-enum Hs20CmdType { HS20_CMD_ID_SET_BSSID_POOL = 0, NUM_OF_HS20_CMD_ID };
-#endif /* CFG_SUPPORT_PASSPOINT */
-
 typedef struct _NL80211_DRIVER_TEST_MODE_PARAMS {
 	UINT_32 index;
 	UINT_32 buflen;
@@ -646,22 +624,6 @@ typedef struct _NL80211_DRIVER_SET_KEY_EXTS {
 	UINT_8							key_len;
 	struct iw_encode_exts			ext;
 } NL80211_DRIVER_SET_KEY_EXTS, *P_NL80211_DRIVER_SET_KEY_EXTS;
-
-#if CFG_SUPPORT_PASSPOINT
-
-struct param_hs20_set_bssid_pool {
-	UINT_8 fgBssidPoolIsEnable;
-	UINT_8 ucNumBssidPool;
-	UINT_8 arBssidPool[8][ETH_ALEN];
-};
-
-struct wpa_driver_hs20_data_s {
-	NL80211_DRIVER_TEST_MODE_PARAMS	 hdr;
-	enum Hs20CmdType				 CmdType;
-	struct param_hs20_set_bssid_pool hs20_set_bssid_pool;
-};
-
-#endif /* CFG_SUPPORT_PASSPOINT */
 
 #endif
 

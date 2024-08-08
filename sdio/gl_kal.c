@@ -809,17 +809,6 @@ WLAN_STATUS kalRxIndicateOnePkt(IN P_GLUE_INFO_T prGlueInfo, IN PVOID pvPkt)
 
 	prSkb	   = pvPkt;
 	prChipInfo = prGlueInfo->prAdapter->chip_info;
-#if DBG && 0
-	do {
-		PUINT_8 pu4Head		= (PUINT_8)&prSkb->cb[0];
-		UINT_32 u4HeadValue = 0;
-
-		kalMemCopy(&u4HeadValue, pu4Head, sizeof(u4HeadValue));
-		DBGLOG(RX, TRACE, "prSkb->head = 0x%p, prSkb->cb = 0x%lx\n", pu4Head, u4HeadValue);
-	} while (0);
-#endif
-
-#if 1
 
 	prNetDev = (struct net_device *)wlanGetNetInterfaceByBssIdx(prGlueInfo, GLUE_GET_PKT_BSS_IDX(prSkb));
 	if (!prNetDev)
@@ -830,29 +819,7 @@ WLAN_STATUS kalRxIndicateOnePkt(IN P_GLUE_INFO_T prGlueInfo, IN PVOID pvPkt)
 #endif
 	prNetDev->stats.rx_bytes += prSkb->len;
 	prNetDev->stats.rx_packets++;
-#else
-	if (GLUE_GET_PKT_IS_P2P(prSkb)) {
-		/* P2P */
-#if CFG_ENABLE_WIFI_DIRECT
-		if (prGlueInfo->prAdapter->fgIsP2PRegistered)
-			prNetDev = kalP2PGetDevHdlr(prGlueInfo);
-		/* prNetDev->stats.rx_bytes += prSkb->len; */
-		/* prNetDev->stats.rx_packets++; */
-		prGlueInfo->prP2PInfo[0]->rNetDevStats.rx_bytes += prSkb->len;
-		prGlueInfo->prP2PInfo[0]->rNetDevStats.rx_packets++;
 
-#else
-		prNetDev = prGlueInfo->prDevHandler;
-#endif
-	} else if (GLUE_GET_PKT_IS_PAL(prSkb)) {
-		prNetDev = prGlueInfo->prDevHandler;
-	} else {
-		/* AIS */
-		prNetDev = prGlueInfo->prDevHandler;
-		prGlueInfo->rNetDevStats.rx_bytes += prSkb->len;
-		prGlueInfo->rNetDevStats.rx_packets++;
-	}
-#endif
 #if KERNEL_VERSION(4, 11, 0) > CFG80211_VERSION_CODE
 	prNetDev->last_rx = jiffies;
 #endif
@@ -1077,9 +1044,7 @@ VOID kalIndicateStatusAndComplete(
 		 */
 		/* switch netif off */
 
-#if 1 /* CONSOLE_MESSAGE */
 		DBGLOG(INIT, INFO, "[wifi] %s netif_carrier_off\n", prGlueInfo->prDevHandler->name);
-#endif
 
 		if (prGlueInfo->prAdapter->fgIsChipAssert)
 			flags = GFP_ATOMIC;
@@ -1128,13 +1093,6 @@ VOID kalIndicateStatusAndComplete(
 			kalCfg80211ScanDone(prScanRequest, FALSE);
 
 		break;
-
-#if 0
-	case WLAN_STATUS_MSDU_OK:
-		if (netif_running(prGlueInfo->prDevHandler))
-			netif_wake_queue(prGlueInfo->prDevHandler);
-		break;
-#endif
 
 	case WLAN_STATUS_MEDIA_SPECIFIC_INDICATION:
 		if (pStatus) {
@@ -1420,27 +1378,16 @@ BOOLEAN kalIsPairwiseEapolPacket(IN P_NATIVE_PACKET prPacket)
 	UINT_16			u2KeyInfo = 0;
 
 	WLAN_GET_FIELD_BE16(&pucPacket[ETHER_HEADER_LEN - ETHER_TYPE_LEN], &u2EthType);
-#if CFG_SUPPORT_WAPI
-	/* prBssInfo && prBssInfo->eNetworkType == NETWORK_TYPE_AIS && wlanQueryWapiMode(prAdapter) */
-	if (u2EthType == ETH_WPI_1X)
-		return TRUE;
-#endif
+
 	if (u2EthType != ETH_P_1X)
 		return FALSE;
 	u2KeyInfo = pucPacket[5 + ETHER_HEADER_LEN] << 8 | pucPacket[6 + ETHER_HEADER_LEN];
-#if 1
+
 	/* BIT3 is pairwise key bit, and check SM is 0.  it means this is 4-way handshake frame */
 	DBGLOG(RSN, INFO, "u2KeyInfo=%d\n", u2KeyInfo);
 	if ((u2KeyInfo & BIT(3)) && !(u2KeyInfo & BIT(13)))
 		return TRUE;
-#else
-	/* BIT3 is pairwise key bit, bit 8 is key mic bit.
-	 *   only the two bits are set, it means this is 4-way handshake 4/4  or 2/4 frame
-	 */
-	DBGLOG(RSN, INFO, "u2KeyInfo=%d\n", u2KeyInfo);
-	if ((u2KeyInfo & (BIT(3) | BIT(8))) == (BIT(3) | BIT(8)))
-		return TRUE;
-#endif
+
 	return FALSE;
 }
 
@@ -1655,25 +1602,6 @@ VOID kalSendCompleteAndAwakeQueue(IN P_GLUE_INFO_T prGlueInfo, IN PVOID pvPacket
 
 	ucBssIndex = GLUE_GET_PKT_BSS_IDX(pvPacket);
 
-#if 0
-	if ((GLUE_GET_REF_CNT(prGlueInfo->i4TxPendingFrameNum) <= 0)) {
-		UINT_8 ucBssIdx;
-		UINT_16 u2QIdx;
-
-		DBGLOG(INIT, INFO, "TxPendingFrameNum[%u] CurFrameId[%u]\n", prGlueInfo->i4TxPendingFrameNum,
-				GLUE_GET_PKT_ARRIVAL_TIME(pvPacket));
-
-		for (ucBssIdx = 0; ucBssIdx < HW_BSSID_NUM; ucBssIdx++) {
-			for (u2QIdx = 0; u2QIdx < CFG_MAX_TXQ_NUM; u2QIdx++) {
-				DBGLOG(INIT, INFO, "BSS[%u] Q[%u] TxPendingFrameNum[%u]\n",
-						ucBssIdx, u2QIdx, prGlueInfo->ai4TxPendingFrameNumPerQueue[ucBssIdx][u2QIdx]);
-			}
-		}
-	}
-
-	ASSERT((GLUE_GET_REF_CNT(prGlueInfo->i4TxPendingFrameNum) > 0));
-#endif
-
 	GLUE_DEC_REF_CNT(prGlueInfo->i4TxPendingFrameNum);
 	GLUE_DEC_REF_CNT(prGlueInfo->ai4TxPendingFrameNumPerQueue[ucBssIndex][u2QueueIdx]);
 
@@ -1843,10 +1771,7 @@ kalIPv4FrameClassifier(
 			}
 
 			WLAN_GET_FIELD_BE32(&prBootp->aucOptions[0], &u4DhcpMagicCode);
-#if 0
-			DBGLOG(INIT, INFO, "DHCP MGC[0x%08x] XID[%u] OPT[%u] TYPE[%u]\n",
-					u4DhcpMagicCode, prBootp->u4TransId, prBootp->aucOptions[4], prBootp->aucOptions[6]);
-#endif
+
 			if (u4DhcpMagicCode == DHCP_MAGIC_NUMBER) {
 				UINT_32 u4Xid;
 
@@ -1936,32 +1861,6 @@ kalQoSFrameClassifierAndPacketInfo(
 		kalIPv4FrameClassifier(prGlueInfo, prPacket, pucNextProtocol, prTxPktInfo);
 		break;
 
-#if 0
-		/* IPv6 */
-	case ETH_P_IPV6:
-		{
-			PUINT_8 pucIpHdr = pucNextProtocol;
-			UINT_8 ucIpVersion;
-
-			/* IPv6 header length check */
-			if (u4PacketLen < (ucEthTypeLenOffset + ETHER_TYPE_LEN + IPV6_HDR_LEN)) {
-				DBGLOG(INIT, WARN, "Invalid IPv6 packet length: %lu\n", u4PacketLen);
-				return FALSE;
-			}
-
-			/* IPv6 version check */
-			ucIpVersion = (pucIpHdr[0] & IP_VERSION_MASK) >> IP_VERSION_OFFSET;
-			if (ucIpVersion != IP_VERSION_6) {
-				DBGLOG(INIT, WARN, "Invalid IPv6 packet version: %u\n", ucIpVersion);
-				return FALSE;
-			}
-
-			/* Get the DSCP value from the header of IP packet. */
-			ucUserPriority = ((pucIpHdr[0] & IPV6_HDR_TC_PREC_MASK) >> IPV6_HDR_TC_PREC_OFFSET);
-		}
-		break;
-#endif
-
 	case ETH_P_ARP: {
 		UINT_16 u2ArpOp;
 
@@ -1976,9 +1875,6 @@ kalQoSFrameClassifierAndPacketInfo(
 
 	case ETH_P_1X:
 	case ETH_P_PRE_1X:
-#if CFG_SUPPORT_WAPI
-	case ETH_WPI_1X:
-#endif
 		prTxPktInfo->u2Flag |= BIT(ENUM_PKT_1X);
 		DBGLOG(RSN, INFO, "T1x like normal data, PKT[0x%p]\n", prPacket);
 
@@ -1995,10 +1891,6 @@ kalQoSFrameClassifierAndPacketInfo(
 					prTxPktInfo->u2Flag |= BIT(ENUM_PKT_NON_PROTECTED_1X);
 			}
 		}
-#if CFG_SUPPORT_WAPI
-		else if (u2EtherTypeLen == ETH_WPI_1X)
-			prTxPktInfo->u2Flag |= BIT(ENUM_PKT_NON_PROTECTED_1X);
-#endif
 		break;
 
 	default:
@@ -2239,17 +2131,6 @@ kalIoctlTimeout(IN P_GLUE_INFO_T prGlueInfo, IN PFN_OID_HANDLER_FUNC pfnOidHandl
 		else
 			ret = prIoReq->rStatus;
 	}
-#if 0
-	{
-		/* Case 2: timeout */
-		/* clear pending OID's cmd in CMD queue */
-		if (fgCmd) {
-			prGlueInfo->u4TimeoutFlag = 1;
-			wlanReleasePendingOid(prGlueInfo->prAdapter, 0);
-		}
-		ret = WLAN_STATUS_FAILURE;
-	}
-#endif
 
 	/* <10> Clear bit for error handling */
 	clear_bit(GLUE_FLAG_OID_BIT, &prGlueInfo->ulFlag);
@@ -2634,27 +2515,7 @@ VOID kalProcessTxReq(P_GLUE_INFO_T prGlueInfo, PBOOLEAN pfgNeedHwAccess)
 					break;
 
 				u4Status = kalProcessTxPacket(prGlueInfo, (struct sk_buff *)GLUE_GET_PKT_DESCRIPTOR(prQueueEntry));
-#if 0
-				prSkb = (struct sk_buff *)GLUE_GET_PKT_DESCRIPTOR(prQueueEntry);
-				ASSERT(prSkb);
-				if (prSkb == NULL) {
-					DBGLOG(INIT, WARN, "prSkb == NULL in tx\n");
-					continue;
-				}
 
-				/* Handle security frame */
-				if (GLUE_GET_PKT_IS_1X(prSkb)) {
-					if (wlanProcessSecurityFrame(prGlueInfo->prAdapter, (P_NATIVE_PACKET) prSkb)) {
-						u4Status = WLAN_STATUS_SUCCESS;
-						GLUE_INC_REF_CNT(prGlueInfo->i4TxPendingSecurityFrameNum);
-					} else {
-						u4Status = WLAN_STATUS_RESOURCES;
-					}
-				}
-				/* Handle normal frame */
-				else
-					u4Status = wlanEnqueueTxPacket(prGlueInfo->prAdapter, (P_NATIVE_PACKET) prSkb);
-#endif
 				/* Enqueue packet back into TxQueue if resource is not enough */
 				if (u4Status == WLAN_STATUS_RESOURCES) {
 					QUEUE_INSERT_TAIL(prTempReturnQue, prQueueEntry);
@@ -3049,11 +2910,6 @@ int main_thread(void *data)
 			kalSetEvent(prGlueInfo);
 #endif
 	}
-
-#if 0
-	if (fgNeedHwAccess == TRUE)
-		wlanReleasePowerControl(prGlueInfo->prAdapter);
-#endif
 
 	/* flush the pending TX packets */
 	if (GLUE_GET_REF_CNT(prGlueInfo->i4TxPendingFrameNum) > 0)
@@ -3955,14 +3811,6 @@ VOID kalGetChannelList(IN P_GLUE_INFO_T prGlueInfo, IN ENUM_BAND_T eSpecificBand
 /*----------------------------------------------------------------------------*/
 BOOL kalIsAPmode(IN P_GLUE_INFO_T prGlueInfo)
 {
-#if 0 /* Marked for MT6630 (New ucBssIndex) */
-#if CFG_ENABLE_WIFI_DIRECT
-	if (IS_NET_ACTIVE(prGlueInfo->prAdapter, NETWORK_TYPE_P2P_INDEX) &&
-		p2pFuncIsAPMode(prGlueInfo->prAdapter->rWifiVar.prP2pFsmInfo))
-		return TRUE;
-#endif
-#endif
-
 	return FALSE;
 }
 
@@ -4515,13 +4363,12 @@ VOID kalSchedScanStopped(IN P_GLUE_INFO_T prGlueInfo)
 
 	ASSERT(prGlueInfo);
 
-#if 1
 	/* 1. reset first for newly incoming request */
 	GLUE_ACQUIRE_SPIN_LOCK(prGlueInfo, SPIN_LOCK_NET_DEV);
 	if (prGlueInfo->prSchedScanRequest != NULL)
 		prGlueInfo->prSchedScanRequest = NULL;
 	GLUE_RELEASE_SPIN_LOCK(prGlueInfo, SPIN_LOCK_NET_DEV);
-#endif
+
 	DBGLOG(SCN, INFO, "cfg80211_sched_scan_stopped send event\n");
 
 	/* 2. indication to cfg80211 */
@@ -4810,10 +4657,6 @@ BOOLEAN kalMetCheckProfilingPacket(IN P_GLUE_INFO_T prGlueInfo, IN P_NATIVE_PACK
 
 				/* Store IP ID for Tag */
 				WLAN_GET_FIELD_BE16(&pucIpHdr[IPV4_HDR_IP_IDENTIFICATION_OFFSET], &u2IpId);
-#if 0
-					DBGLOG(INIT, INFO, "TX PKT PROTOCOL[0x%x] UDP DST port[%u] IP_ID[%u]\n",
-							pucIpHdr[IPV4_HDR_IP_PROTOCOL_OFFSET], u2UdpDstPort, u2IpId);
-#endif
 				GLUE_SET_PKT_IP_ID(prPacket, u2IpId);
 
 				return TRUE;
@@ -4856,23 +4699,14 @@ VOID kalMetTagPacket(IN P_GLUE_INFO_T prGlueInfo, IN P_NATIVE_PACKET prPacket, I
 		if (kalMetCheckProfilingPacket(prGlueInfo, prPacket)) {
 			/* trace_printk("S|%d|%s|%d\n", current->pid, "WIFI-CHIP", GLUE_GET_PKT_IP_ID(prPacket)); */
 			__mt_update_tracing_mark_write_addr();
-#if 0 /* #ifdef CONFIG_TRACING */ /* #if CFG_MET_PACKET_TRACE_SUPPORT */
-			event_trace_printk(tracing_mark_write_addr, "S|%d|%s|%d\n", current->tgid, "WIFI-CHIP",
-						GLUE_GET_PKT_IP_ID(prPacket));
-#endif
+
 			GLUE_SET_PKT_FLAG_PROF_MET(prPacket);
 		}
 		break;
 
 	case TX_PROF_TAG_DRV_TX_DONE:
-		if (GLUE_GET_PKT_IS_PROF_MET(prPacket)) {
-			/* trace_printk("F|%d|%s|%d\n", current->pid, "WIFI-CHIP", GLUE_GET_PKT_IP_ID(prPacket)); */
+		if (GLUE_GET_PKT_IS_PROF_MET(prPacket))
 			__mt_update_tracing_mark_write_addr();
-#if 0 /* #ifdef CONFIG_TRACING */ /* #if CFG_MET_PACKET_TRACE_SUPPORT */
-			event_trace_printk(tracing_mark_write_addr, "F|%d|%s|%d\n", current->tgid, "WIFI-CHIP",
-						GLUE_GET_PKT_IP_ID(prPacket));
-#endif
-		}
 		break;
 
 	case TX_PROF_TAG_MAC_TX_DONE:
@@ -4889,45 +4723,6 @@ VOID kalMetInit(IN P_GLUE_INFO_T prGlueInfo)
 	prGlueInfo->u2MetUdpPort	 = 0;
 }
 
-/*----------------------------------------------------------------------------*/
-/*!
- * \brief The PROC function for adjusting Debug Level to turn on/off debugging message.
- *
- * \param[in] file   pointer to file.
- * \param[in] buffer Buffer from user space.
- * \param[in] count  Number of characters to write
- * \param[in] data   Pointer to the private data structure.
- *
- * \return number of characters write from User Space.
- */
-/*----------------------------------------------------------------------------*/
-#if 0
-static ssize_t kalMetWriteProcfs(struct file *file, const char __user *buffer, size_t count, loff_t *off)
-{
-	char acBuf[128 + 1];	/* + 1 for "\0" */
-	UINT_32 u4CopySize;
-	int u16MetUdpPort;
-	int u8MetProfEnable;
-
-	IN P_GLUE_INFO_T prGlueInfo;
-
-	u4CopySize = (count < (sizeof(acBuf) - 1)) ? count : (sizeof(acBuf) - 1);
-	if (copy_from_user(acBuf, buffer, u4CopySize)) {
-		DBGLOG(INIT, ERROR, "error of copy from user\n");
-		return -EFAULT;
-	}
-	acBuf[u4CopySize] = '\0';
-
-	if (sscanf(acBuf, " %d %d", &u8MetProfEnable, &u16MetUdpPort) == 2)
-		DBGLOG(INIT, INFO, "MET_PROF: Write MET PROC Enable=%d UDP_PORT=%d\n", u8MetProfEnable, u16MetUdpPort);
-	if (pMetGlobalData != NULL) {
-		prGlueInfo = (P_GLUE_INFO_T) pMetGlobalData;
-		prGlueInfo->fgMetProfilingEn = (BOOLEAN) u8MetProfEnable;
-		prGlueInfo->u2MetUdpPort = (UINT_16) u16MetUdpPort;
-	}
-	return count;
-}
-#endif
 static ssize_t kalMetCtrlWriteProcfs(struct file *file, const char __user *buffer, size_t count, loff_t *off)
 {
 	char	acBuf[128 + 1]; /* + 1 for "\0" */
@@ -4976,11 +4771,6 @@ static ssize_t kalMetPortWriteProcfs(struct file *file, const char __user *buffe
 	return count;
 }
 
-#if 0
-const struct file_operations rMetProcFops = {
-	.write = kalMetWriteProcfs
-};
-#endif
 #if KERNEL_VERSION(5, 6, 0) <= LINUX_VERSION_CODE
 const struct proc_ops rMetProcCtrlFops = { .proc_write = kalMetCtrlWriteProcfs };
 

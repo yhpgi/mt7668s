@@ -133,16 +133,11 @@ VOID aisInitializeConnectionSettings(IN P_ADAPTER_T prAdapter, IN P_REG_INFO_T p
 	/* Features */
 	prConnSettings->fgIsEnableRoaming = FALSE;
 #if CFG_SUPPORT_ROAMING
-#if 0
-	if (prRegInfo)
-		prConnSettings->fgIsEnableRoaming = ((prRegInfo->fgDisRoaming > 0) ? (FALSE) : (TRUE));
-#else
 	if (prAdapter->rWifiVar.fgDisRoaming)
 		prConnSettings->fgIsEnableRoaming = FALSE;
 	else
 		prConnSettings->fgIsEnableRoaming = TRUE;
 #endif
-#endif /* CFG_SUPPORT_ROAMING */
 
 	prConnSettings->fgIsAdHocQoSEnable = FALSE;
 
@@ -290,11 +285,7 @@ VOID aisFsmInit(IN P_ADAPTER_T prAdapter)
 		prAisBssInfo->ucBMCWlanIndexSUsed[i] = FALSE;
 		prAisBssInfo->wepkeyUsed[i]			 = FALSE;
 	}
-#if 0
-	prAisBssInfo->rPmProfSetupInfo.ucBmpDeliveryAC = PM_UAPSD_ALL;
-	prAisBssInfo->rPmProfSetupInfo.ucBmpTriggerAC = PM_UAPSD_ALL;
-	prAisBssInfo->rPmProfSetupInfo.ucUapsdSp = WMM_MAX_SP_LENGTH_2;
-#else
+
 	if (prAdapter->u4UapsdAcBmp == 0) {
 		prAdapter->u4UapsdAcBmp = CFG_INIT_UAPSD_AC_BMP;
 		/* ASSERT(prAdapter->u4UapsdAcBmp); */
@@ -302,7 +293,6 @@ VOID aisFsmInit(IN P_ADAPTER_T prAdapter)
 	prAisBssInfo->rPmProfSetupInfo.ucBmpDeliveryAC = (UINT_8)prAdapter->u4UapsdAcBmp;
 	prAisBssInfo->rPmProfSetupInfo.ucBmpTriggerAC  = (UINT_8)prAdapter->u4UapsdAcBmp;
 	prAisBssInfo->rPmProfSetupInfo.ucUapsdSp	   = (UINT_8)prAdapter->u4MaxSpLen;
-#endif
 
 	/* request list initialization */
 	LINK_INITIALIZE(&prAisFsmInfo->rPendingReqList);
@@ -430,30 +420,30 @@ VOID aisFsmStateInit_JOIN(IN P_ADAPTER_T prAdapter, P_BSS_DESC_T prBssDesc)
 		prAisFsmInfo->ucAvailableAuthTypes = (UINT_8)prAdapter->prGlueInfo->rWpaInfo.u4AuthAlg;
 		DBGLOG(AIS, INFO, "JOIN INIT: Auth Algorithm :%d\n", prAisFsmInfo->ucAvailableAuthTypes);
 #else
-		  switch (prConnSettings->eAuthMode) {
-		  case AUTH_MODE_OPEN: /* Note: Omit break here. */
-		  case AUTH_MODE_WPA:
-		  case AUTH_MODE_WPA_PSK:
-		  case AUTH_MODE_WPA2:
-		  case AUTH_MODE_WPA2_PSK:
-			  prAisFsmInfo->ucAvailableAuthTypes = (UINT_8)AUTH_TYPE_OPEN_SYSTEM;
-			  break;
+		switch (prConnSettings->eAuthMode) {
+		case AUTH_MODE_OPEN: /* Note: Omit break here. */
+		case AUTH_MODE_WPA:
+		case AUTH_MODE_WPA_PSK:
+		case AUTH_MODE_WPA2:
+		case AUTH_MODE_WPA2_PSK:
+			prAisFsmInfo->ucAvailableAuthTypes = (UINT_8)AUTH_TYPE_OPEN_SYSTEM;
+			break;
 
-		  case AUTH_MODE_SHARED:
-			  prAisFsmInfo->ucAvailableAuthTypes = (UINT_8)AUTH_TYPE_SHARED_KEY;
-			  break;
+		case AUTH_MODE_SHARED:
+			prAisFsmInfo->ucAvailableAuthTypes = (UINT_8)AUTH_TYPE_SHARED_KEY;
+			break;
 
-		  case AUTH_MODE_AUTO_SWITCH:
-			  DBGLOG(AIS, LOUD, "JOIN INIT: eAuthMode == AUTH_MODE_AUTO_SWITCH\n");
-			  prAisFsmInfo->ucAvailableAuthTypes = (UINT_8)(AUTH_TYPE_OPEN_SYSTEM | AUTH_TYPE_SHARED_KEY);
-			  break;
+		case AUTH_MODE_AUTO_SWITCH:
+			DBGLOG(AIS, LOUD, "JOIN INIT: eAuthMode == AUTH_MODE_AUTO_SWITCH\n");
+			prAisFsmInfo->ucAvailableAuthTypes = (UINT_8)(AUTH_TYPE_OPEN_SYSTEM | AUTH_TYPE_SHARED_KEY);
+			break;
 
-		  default:
-			  ASSERT(!(prConnSettings->eAuthMode == AUTH_MODE_WPA_NONE));
-			  DBGLOG(AIS, ERROR, "JOIN INIT: Auth Algorithm : %d was not supported by JOIN\n", prConnSettings->eAuthMode);
-			  /* TODO(Kevin): error handling ? */
-			  return;
-		  }
+		default:
+			ASSERT(!(prConnSettings->eAuthMode == AUTH_MODE_WPA_NONE));
+			DBGLOG(AIS, ERROR, "JOIN INIT: Auth Algorithm : %d was not supported by JOIN\n", prConnSettings->eAuthMode);
+			/* TODO(Kevin): error handling ? */
+			return;
+		}
 #endif
 		/* TODO(tyhsu): Assume that Roaming Auth Type is equal to ConnSettings eAuthMode */
 		prAisSpecificBssInfo->ucRoamingAuthTypes = prAisFsmInfo->ucAvailableAuthTypes;
@@ -474,8 +464,8 @@ VOID aisFsmStateInit_JOIN(IN P_ADAPTER_T prAdapter, P_BSS_DESC_T prBssDesc)
 #if CFG_SUPPORT_CFG80211_AUTH
 		prAisFsmInfo->ucAvailableAuthTypes = (UINT_8)prAdapter->prGlueInfo->rWpaInfo.u4AuthAlg;
 #else
-		  /* TODO(Kevin): We may call a sub function to acquire the Roaming Auth Type */
-		  prAisFsmInfo->ucAvailableAuthTypes = prAisSpecificBssInfo->ucRoamingAuthTypes;
+		/* TODO(Kevin): We may call a sub function to acquire the Roaming Auth Type */
+		prAisFsmInfo->ucAvailableAuthTypes = prAisSpecificBssInfo->ucRoamingAuthTypes;
 #endif
 		DBGLOG(AIS, INFO, "JOIN INIT: Auth Algorithm for Roaming:%d\n", prAisFsmInfo->ucAvailableAuthTypes);
 
@@ -611,9 +601,7 @@ VOID aisFsmStateInit_IBSS_ALONE(IN P_ADAPTER_T prAdapter)
 	/* 4 <1> Check if IBSS was created before ? */
 	if (prAisBssInfo->fgIsBeaconActivated) {
 		/* 4 <2> Start IBSS Alone Timer for periodic SCAN and then SEARCH */
-#if !CFG_SLT_SUPPORT
 		cnmTimerStartTimer(prAdapter, &prAisFsmInfo->rIbssAloneTimer, SEC_TO_MSEC(AIS_IBSS_ALONE_TIMEOUT_SEC));
-#endif
 	}
 
 	aisFsmCreateIBSS(prAdapter);
@@ -944,11 +932,7 @@ VOID aisFsmSteps(IN P_ADAPTER_T prAdapter, ENUM_AIS_STATE_T eNextState)
 
 		case AIS_STATE_SEARCH:
 			/* 4 <1> Search for a matched candidate and save it to prTargetBssDesc. */
-#if CFG_SLT_SUPPORT
-			prBssDesc = prAdapter->rWifiVar.rSltInfo.prPseudoBssDesc;
-#else
-			  prBssDesc = scanSearchBssDescByPolicy(prAdapter, prAdapter->prAisBssInfo->ucBssIndex);
-#endif
+			prBssDesc = scanSearchBssDescByPolicy(prAdapter, prAdapter->prAisBssInfo->ucBssIndex);
 
 			/* we are under Roaming Condition. */
 			if (prAisBssInfo->eConnectionState == PARAM_MEDIA_STATE_CONNECTED) {
@@ -1210,7 +1194,7 @@ VOID aisFsmSteps(IN P_ADAPTER_T prAdapter, ENUM_AIS_STATE_T eNextState)
 #if CFG_SUPPORT_WPS2
 				u2ScanIELen = prAdapter->prGlueInfo->u2WSCIELen;
 #else
-				  u2ScanIELen = 0;
+				u2ScanIELen = 0;
 #endif
 			}
 
@@ -1228,42 +1212,42 @@ VOID aisFsmSteps(IN P_ADAPTER_T prAdapter, ENUM_AIS_STATE_T eNextState)
 #if CFG_SUPPORT_RDD_TEST_MODE
 			prScanReqMsg->eScanType = SCAN_TYPE_PASSIVE_SCAN;
 #else
-			  if (prAisFsmInfo->eCurrentState == AIS_STATE_SCAN || prAisFsmInfo->eCurrentState == AIS_STATE_ONLINE_SCAN) {
-					  if (prAisFsmInfo->ucScanSSIDNum == 0) {
+			if (prAisFsmInfo->eCurrentState == AIS_STATE_SCAN || prAisFsmInfo->eCurrentState == AIS_STATE_ONLINE_SCAN) {
+				if (prAisFsmInfo->ucScanSSIDNum == 0) {
 #if CFG_SUPPORT_AIS_PASSIVE_SCAN
-						  prScanReqMsg->eScanType = SCAN_TYPE_PASSIVE_SCAN;
+					prScanReqMsg->eScanType = SCAN_TYPE_PASSIVE_SCAN;
 
-						  prScanReqMsg->ucSSIDType = 0;
-						  prScanReqMsg->ucSSIDNum  = 0;
+					prScanReqMsg->ucSSIDType = 0;
+					prScanReqMsg->ucSSIDNum	 = 0;
 #else
 					prScanReqMsg->eScanType = SCAN_TYPE_ACTIVE_SCAN;
 
 					prScanReqMsg->ucSSIDType = SCAN_REQ_SSID_WILDCARD;
 					prScanReqMsg->ucSSIDNum	 = 0;
 #endif
-				  } else if (prAisFsmInfo->ucScanSSIDNum == 1 && prAisFsmInfo->arScanSSID[0].u4SsidLen == 0) {
-						  prScanReqMsg->eScanType = SCAN_TYPE_ACTIVE_SCAN;
+				} else if (prAisFsmInfo->ucScanSSIDNum == 1 && prAisFsmInfo->arScanSSID[0].u4SsidLen == 0) {
+					prScanReqMsg->eScanType = SCAN_TYPE_ACTIVE_SCAN;
 
-						  prScanReqMsg->ucSSIDType = SCAN_REQ_SSID_WILDCARD;
-						  prScanReqMsg->ucSSIDNum  = 0;
-				  } else {
-						  prScanReqMsg->eScanType = SCAN_TYPE_ACTIVE_SCAN;
+					prScanReqMsg->ucSSIDType = SCAN_REQ_SSID_WILDCARD;
+					prScanReqMsg->ucSSIDNum	 = 0;
+				} else {
+					prScanReqMsg->eScanType = SCAN_TYPE_ACTIVE_SCAN;
 
-						  prScanReqMsg->ucSSIDType = SCAN_REQ_SSID_SPECIFIED;
-						  prScanReqMsg->ucSSIDNum  = prAisFsmInfo->ucScanSSIDNum;
-						  prScanReqMsg->prSsid	   = prAisFsmInfo->arScanSSID;
-				  }
-			  } else {
-					  prScanReqMsg->eScanType = SCAN_TYPE_ACTIVE_SCAN;
+					prScanReqMsg->ucSSIDType = SCAN_REQ_SSID_SPECIFIED;
+					prScanReqMsg->ucSSIDNum	 = prAisFsmInfo->ucScanSSIDNum;
+					prScanReqMsg->prSsid	 = prAisFsmInfo->arScanSSID;
+				}
+			} else {
+				prScanReqMsg->eScanType = SCAN_TYPE_ACTIVE_SCAN;
 
-					  COPY_SSID(prAisFsmInfo->rRoamingSSID.aucSsid, prAisFsmInfo->rRoamingSSID.u4SsidLen,
-							  prConnSettings->aucSSID, prConnSettings->ucSSIDLen);
+				COPY_SSID(prAisFsmInfo->rRoamingSSID.aucSsid, prAisFsmInfo->rRoamingSSID.u4SsidLen,
+						prConnSettings->aucSSID, prConnSettings->ucSSIDLen);
 
-					  /* Scan for determined SSID */
-					  prScanReqMsg->ucSSIDType = SCAN_REQ_SSID_SPECIFIED;
-					  prScanReqMsg->ucSSIDNum  = 1;
-					  prScanReqMsg->prSsid	   = &(prAisFsmInfo->rRoamingSSID);
-			  }
+				/* Scan for determined SSID */
+				prScanReqMsg->ucSSIDType = SCAN_REQ_SSID_SPECIFIED;
+				prScanReqMsg->ucSSIDNum	 = 1;
+				prScanReqMsg->prSsid	 = &(prAisFsmInfo->rRoamingSSID);
+			}
 #endif
 
 			/* using default channel dwell time/timeout value */
@@ -1333,7 +1317,7 @@ VOID aisFsmSteps(IN P_ADAPTER_T prAdapter, ENUM_AIS_STATE_T eNextState)
 #ifdef CFG_SUPPORT_ADJUST_JOIN_CH_REQ_INTERVAL
 			prMsgChReq->u4MaxInterval = prAdapter->rWifiVar.u4AisJoinChReqIntervel;
 #else
-				  prMsgChReq->u4MaxInterval = AIS_JOIN_CH_REQUEST_INTERVAL;
+				prMsgChReq->u4MaxInterval = AIS_JOIN_CH_REQUEST_INTERVAL;
 #endif
 			DBGLOG(AIS, INFO, "Request join interval: %u\n", prMsgChReq->u4MaxInterval);
 			prMsgChReq->ucPrimaryChannel = prAisFsmInfo->prTargetBssDesc->ucChannelNum;
@@ -1485,12 +1469,7 @@ enum _ENUM_AIS_STATE_T aisFsmStateSearchAction(IN struct _ADAPTER_T *prAdapter, 
 	prAisFsmInfo   = &(prAdapter->rWifiVar.rAisFsmInfo);
 	prAisBssInfo   = prAdapter->prAisBssInfo;
 	prConnSettings = &(prAdapter->rWifiVar.rConnSettings);
-
-#if CFG_SLT_SUPPORT
-	prBssDesc = prAdapter->rWifiVar.rSltInfo.prPseudoBssDesc;
-#else
-		  prBssDesc = scanSearchBssDescByPolicy(prAdapter, prAdapter->prAisBssInfo->ucBssIndex);
-#endif
+	prBssDesc	   = scanSearchBssDescByPolicy(prAdapter, prAdapter->prAisBssInfo->ucBssIndex);
 
 	if (ucPhase == AIS_FSM_STATE_SEARCH_ACTION_PHASE_0) {
 		if (prConnSettings->eOPMode == NET_TYPE_INFRA) {
@@ -1618,7 +1597,7 @@ VOID aisFsmRunEventScanDone(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMsgHdr)
 #if CFG_SUPPORT_ROAMING
 			eNextState = aisFsmRoamingScanResultsUpdate(prAdapter);
 #else
-				  eNextState = AIS_STATE_NORMAL_TR;
+				eNextState				  = AIS_STATE_NORMAL_TR;
 #endif /* CFG_SUPPORT_ROAMING */
 #if CFG_SUPPORT_AGPS_ASSIST
 			scanReportScanResultToAgps(prAdapter);
@@ -1633,7 +1612,7 @@ VOID aisFsmRunEventScanDone(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMsgHdr)
 #if CFG_SUPPORT_ROAMING
 				eNextState = aisFsmRoamingScanResultsUpdate(prAdapter);
 #else
-					  eNextState = AIS_STATE_SEARCH;
+					   eNextState = AIS_STATE_SEARCH;
 #endif /* CFG_SUPPORT_ROAMING */
 			}
 			break;
@@ -2146,10 +2125,10 @@ enum _ENUM_AIS_STATE_T aisFsmJoinCompleteAction(IN struct _ADAPTER_T *prAdapter,
 				}
 				DBGLOG(AIS, WARN, "Join fail, disconnect\n");
 #else
-					  /* 4.b send reconnect request */
-					  aisFsmInsertRequest(prAdapter, AIS_REQUEST_RECONNECT);
+					   /* 4.b send reconnect request */
+					   aisFsmInsertRequest(prAdapter, AIS_REQUEST_RECONNECT);
 
-					  eNextState = AIS_STATE_IDLE;
+					   eNextState = AIS_STATE_IDLE;
 #endif
 			}
 		}
@@ -2249,9 +2228,6 @@ VOID aisFsmMergeIBSS(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec)
 			/* 4 <1.10> Release channel privilege */
 			aisFsmReleaseCh(prAdapter);
 
-#if CFG_SLT_SUPPORT
-			prAdapter->rWifiVar.rSltInfo.prPseudoStaRec = prStaRec;
-#endif
 		} break;
 
 		default:
@@ -2311,20 +2287,6 @@ VOID aisFsmRunEventFoundIBSSPeer(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMsgH
 			/* 4 <1.2> Add Peers' STA_RECORD_T to Client List */
 			bssAddClient(prAdapter, prAisBssInfo, prStaRec);
 
-#if CFG_SLT_SUPPORT
-			/* 4 <1.3> Mark connection flag of BSS_DESC_T. */
-			prBssDesc = scanSearchBssDescByTA(prAdapter, prStaRec->aucMacAddr);
-
-			if (prBssDesc != NULL) {
-				prBssDesc->fgIsConnecting = FALSE;
-				prBssDesc->fgIsConnected  = TRUE;
-			} else {
-				ASSERT(0); /* Should be able to find a BSS_DESC_T here. */
-			}
-
-			/* 4 <1.4> Activate current Peer's STA_RECORD_T in Driver. */
-			prStaRec->fgIsQoS = TRUE; /* TODO(Kevin): TBD */
-#else
 			/* 4 <1.3> Mark connection flag of BSS_DESC_T. */
 			prBssDesc = scanSearchBssDescByBssid(prAdapter, prAisBssInfo->aucBSSID);
 
@@ -2337,8 +2299,6 @@ VOID aisFsmRunEventFoundIBSSPeer(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMsgH
 
 			/* 4 <1.4> Activate current Peer's STA_RECORD_T in Driver. */
 			prStaRec->fgIsQoS = FALSE; /* TODO(Kevin): TBD */
-
-#endif
 
 			cnmStaRecChangeState(prAdapter, prStaRec, STA_STATE_3);
 			prStaRec->fgIsMerging = FALSE;
@@ -2376,13 +2336,8 @@ VOID aisFsmRunEventFoundIBSSPeer(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMsgH
 			/* 4 <3.1> Add Peers' STA_RECORD_T to Client List */
 			bssAddClient(prAdapter, prAisBssInfo, prStaRec);
 
-#if CFG_SLT_SUPPORT
-			/* 4 <3.2> Activate current Peer's STA_RECORD_T in Driver. */
-			prStaRec->fgIsQoS = TRUE; /* TODO(Kevin): TBD */
-#else
 			/* 4 <3.2> Activate current Peer's STA_RECORD_T in Driver. */
 			prStaRec->fgIsQoS = FALSE; /* TODO(Kevin): TBD */
-#endif
 
 			cnmStaRecChangeState(prAdapter, prStaRec, STA_STATE_3);
 			prStaRec->fgIsMerging = FALSE;
@@ -2659,7 +2614,7 @@ VOID aisUpdateBssInfoForJOIN(IN P_ADAPTER_T prAdapter, P_STA_RECORD_T prStaRec, 
 		prBssDesc = scanSearchBssDescByBssidAndChanNum(
 				prAdapter, prConnSettings->aucBSSID, TRUE, prConnSettings->ucChannelNum);
 #else
-			  prBssDesc	 = scanSearchBssDescByBssid(prAdapter, prAssocRspFrame->aucBSSID);
+			prBssDesc  = scanSearchBssDescByBssid(prAdapter, prAssocRspFrame->aucBSSID);
 #endif
 	}
 
@@ -3022,11 +2977,6 @@ VOID aisFsmDisconnect(IN P_ADAPTER_T prAdapter, IN BOOLEAN fgDelayIndication)
 		{
 			if (prAdapter->rWifiVar.ucTpTestMode != ENUM_TP_TEST_MODE_NORMAL)
 				nicEnterTPTestMode(prAdapter, TEST_MODE_NONE);
-
-#if 0
-			if (prAdapter->rWifiVar.ucSigmaTestMode)
-				nicEnterTPTestMode(prAdapter, TEST_MODE_NONE);
-#endif
 		}
 
 		if (prAisBssInfo->ucReasonOfDisconnect == DISCONNECT_REASON_CODE_RADIO_LOST) {
@@ -3126,7 +3076,7 @@ static VOID aisFsmRunEventScanDoneTimeOut(IN P_ADAPTER_T prAdapter, ULONG ulPara
 #if CFG_SUPPORT_ROAMING
 		eNextState = aisFsmRoamingScanResultsUpdate(prAdapter);
 #else
-			  eNextState = AIS_STATE_NORMAL_TR;
+			eNextState = AIS_STATE_NORMAL_TR;
 #endif /* CFG_SUPPORT_ROAMING */
 		break;
 	default:

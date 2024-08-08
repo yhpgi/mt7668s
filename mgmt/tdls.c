@@ -84,9 +84,6 @@ UINT_32 TdlsexLinkMgt(P_ADAPTER_T prAdapter, PVOID pvSetBuffer, UINT_32 u4SetBuf
 	prCmd	  = (TDLS_CMD_LINK_MGT_T *)pvSetBuffer;
 	prBssInfo = prAdapter->prAisBssInfo;
 
-	/* printk("\n\n\n  TdlsexLinkMgt\n\n\n"); */
-
-#if 1
 	/* AIS only */
 	if (prBssInfo->eCurrentOPMode == OP_MODE_INFRASTRUCTURE) {
 		prStaRec = prBssInfo->prStaRecOfAP;
@@ -95,7 +92,6 @@ UINT_32 TdlsexLinkMgt(P_ADAPTER_T prAdapter, PVOID pvSetBuffer, UINT_32 u4SetBuf
 	} else {
 		return -EINVAL;
 	}
-#endif
 
 	switch (prCmd->ucActionCode) {
 	case TDLS_FRM_ACTION_DISCOVERY_REQ:
@@ -1190,29 +1186,6 @@ TdlsDataFrameSend_DISCOVERY_REQ(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec, UI
 		}
 	}
 
-	/* 6. Frame Formation - 20/40 BSS Coexistence */
-	/*
-	 *  Follow WiFi test plan, add 20/40 element to request/response/confirm.
-	 */
-#if 0
-	if (prGlueInfo->fgTdlsIs2040Supported == TRUE) {
-		/*
-		 *  bit0 = 1: The Information Request field is used to indicate that a
-		 *  transmitting STA is requesting the recipient to transmit a 20/40 BSS
-		 *  Coexistence Management frame with the transmitting STA as the
-		 *  recipient.
-		 *  bit1 = 0: The Forty MHz Intolerant field is set to 1 to prohibit an AP
-		 *  that receives this information or reports of this information from
-		 *  operating a 20/40 MHz BSS.
-		 *  bit2 = 0: The 20 MHz BSS Width Request field is set to 1 to prohibit
-		 *  a receiving AP from operating its BSS as a 20/40 MHz BSS.
-		 */
-		BSS_20_40_COEXIST_IE(pPkt)->ucId = ELEM_ID_20_40_BSS_COEXISTENCE;
-		BSS_20_40_COEXIST_IE(pPkt)->ucLength = 1;
-		BSS_20_40_COEXIST_IE(pPkt)->ucData = 0x01;
-		LR_TDLS_FME_FIELD_FILL(3);
-	}
-#endif
 	/* 6. Frame Formation - HT Operation element */
 	/* u4IeLen = rlmFillHtOpIeBody(prBssInfo, pPkt); */
 	/* LR_TDLS_FME_FIELD_FILL(u4IeLen); */
@@ -1399,29 +1372,6 @@ TdlsDataFrameSend_DISCOVERY_RSP(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec, UI
 	u4IeLen = IE_SIZE(pPkt);
 	LR_TDLS_FME_FIELD_FILL(u4IeLen);
 
-	/* 6. Frame Formation - 20/40 BSS Coexistence */
-	/*
-	 * Follow WiFi test plan, add 20/40 element to request/response/confirm.
-	 */
-#if 0
-	if (prGlueInfo->fgTdlsIs2040Supported == TRUE) {
-		/*
-		 *  bit0 = 1: The Information Request field is used to indicate that a
-		 *  transmitting STA is requesting the recipient to transmit a 20/40 BSS
-		 *  Coexistence Management frame with the transmitting STA as the
-		 *  recipient.
-		 *  bit1 = 0: The Forty MHz Intolerant field is set to 1 to prohibit an AP
-		 *  that receives this information or reports of this information from
-		 *  operating a 20/40 MHz BSS.
-		 *  bit2 = 0: The 20 MHz BSS Width Request field is set to 1 to prohibit
-		 *  a receiving AP from operating its BSS as a 20/40 MHz BSS.
-		 */
-		BSS_20_40_COEXIST_IE(pPkt)->ucId = ELEM_ID_20_40_BSS_COEXISTENCE;
-		BSS_20_40_COEXIST_IE(pPkt)->ucLength = 1;
-		BSS_20_40_COEXIST_IE(pPkt)->ucData = 0x01;
-		LR_TDLS_FME_FIELD_FILL(3);
-	}
-#endif
 	/* 6. Frame Formation - HT Operation element */
 	/* u4IeLen = rlmFillHtOpIeBody(prBssInfo, pPkt); */
 	/* LR_TDLS_FME_FIELD_FILL(u4IeLen); */
@@ -1633,116 +1583,6 @@ VOID TdlsEventTearDown(GLUE_INFO_T *prGlueInfo, UINT_8 *prInBuf, UINT_32 u4InBuf
 
 	/* 16 Nov 21:49 2012 http://permalink.gmane.org/gmane.linux.kernel.wireless.general/99712 */
 }
-
-#if 0
-
-/*----------------------------------------------------------------------------*/
-/*! \brief  This routine is called to send a TDLS event to supplicant.
-*
-* \param[in] prGlueInfo Pointer to the Adapter structure
-* \param[in] prInBuf A pointer to the command string buffer
-* \param[in] u4InBufLen The length of the buffer
-* \param[out] None
-*
-* \retval None
-*
-*/
-/*----------------------------------------------------------------------------*/
-VOID tdls_oper_request(struct net_device *dev, const u8 *peer, u16 oper, u16 reason_code, gfp_t gfp)
-{
-	GLUE_INFO_T *prGlueInfo;
-	ADAPTER_T *prAdapter;
-	struct sk_buff *prMsduInfo;
-	UINT_8 *pPkt;
-	UINT_32 u4PktLen;
-
-	/* sanity check */
-	if ((dev == NULL) || (peer == NULL))
-		return;		/* shall not be here */
-
-	/* init */
-	prGlueInfo = *((P_GLUE_INFO_T *) netdev_priv(dev));
-	prAdapter = prGlueInfo->prAdapter;
-	u4PktLen = 0;
-
-	/* allocate/init packet */
-	prMsduInfo = kalPacketAlloc(prGlueInfo, 1600, &pPkt);
-	if (prMsduInfo == NULL)
-		return;
-	prMsduInfo->dev = dev;
-
-	/* make up frame content */
-	/* 1. 802.3 header */
-	kalMemCopy(pPkt, prAdapter->rMyMacAddr, TDLS_FME_MAC_ADDR_LEN);
-	LR_TDLS_FME_FIELD_FILL(TDLS_FME_MAC_ADDR_LEN);
-	kalMemCopy(pPkt, peer, TDLS_FME_MAC_ADDR_LEN);
-	LR_TDLS_FME_FIELD_FILL(TDLS_FME_MAC_ADDR_LEN);
-	*(UINT_16 *) pPkt = htons(TDLS_FRM_PROT_TYPE);
-	LR_TDLS_FME_FIELD_FILL(2);
-
-	/* 2. payload type */
-	*pPkt = TDLS_FRM_PAYLOAD_TYPE;
-	LR_TDLS_FME_FIELD_FILL(1);
-
-	/* 3. Frame Formation - (1) Category */
-	*pPkt = TDLS_FRM_CATEGORY;
-	LR_TDLS_FME_FIELD_FILL(1);
-
-	/* 3. Frame Formation - (2) Action */
-	*pPkt = TDLS_FRM_ACTION_EVENT_TEAR_DOWN_TO_SUPPLICANT;
-	LR_TDLS_FME_FIELD_FILL(1);
-
-	/* 3. Frame Formation - (3) Operation */
-	*pPkt = oper;
-	LR_TDLS_FME_FIELD_FILL(1);
-
-	/* 3. Frame Formation - (4) Reason Code */
-	*pPkt = reason_code;
-	*(pPkt + 1) = 0x00;
-	LR_TDLS_FME_FIELD_FILL(2);
-
-	/* 3. Frame Formation - (5) Peer MAC */
-	kalMemCopy(pPkt, peer, 6);
-	LR_TDLS_FME_FIELD_FILL(6);
-
-	/* 4. Update packet length */
-	prMsduInfo->len = u4PktLen;
-
-	/* pass to OS */
-	TdlsCmdTestRxIndicatePkts(prGlueInfo, prMsduInfo);
-}
-
-/*----------------------------------------------------------------------------*/
-/*!
-* \brief This routine is called to indicate packets to upper layer.
-*
-* \param[in] prGlueInfo		Pointer to the Adapter structure
-* \param[in] prSkb			A pointer to the received packet
-*
-* \retval None
-*
-*/
-/*----------------------------------------------------------------------------*/
-VOID TdlsCmdTestRxIndicatePkts(GLUE_INFO_T *prGlueInfo, struct sk_buff *prSkb)
-{
-	struct net_device *prNetDev;
-
-	/* init */
-	prNetDev = prGlueInfo->prDevHandler;
-	prGlueInfo->rNetDevStats.rx_bytes += prSkb->len;
-	prGlueInfo->rNetDevStats.rx_packets++;
-
-	/* pass to upper layer */
-	prNetDev->last_rx = jiffies;
-	prSkb->protocol = eth_type_trans(prSkb, prNetDev);
-	prSkb->dev = prNetDev;
-
-	if (!in_interrupt())
-		netif_rx_ni(prSkb);	/* only in non-interrupt context */
-	else
-		netif_rx(prSkb);
-}
-#endif
 
 VOID TdlsBssExtCapParse(P_STA_RECORD_T prStaRec, P_UINT_8 pucIE)
 {

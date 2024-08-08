@@ -95,13 +95,7 @@ INT_32 mtk_Netdev_To_RoleIdx(P_GLUE_INFO_T prGlueInfo, struct net_device *ndev, 
 
 UINT_8 kalP2PGetRole(IN P_GLUE_INFO_T prGlueInfo, IN UINT_8 ucRoleIdx);
 
-#if 1
 VOID kalP2PSetRole(IN P_GLUE_INFO_T prGlueInfo, IN UINT_8 ucRole, IN UINT_8 ucRoleIdx);
-
-#else
-VOID kalP2PSetRole(
-		IN P_GLUE_INFO_T prGlueInfo, IN UINT_8 ucResult, IN PUINT_8 pucSSID, IN UINT_8 ucSSIDLen, IN UINT_8 ucRole);
-#endif
 
 VOID kalP2PSetCipher(IN P_GLUE_INFO_T prGlueInfo, IN UINT_32 u4Cipher, IN UINT_8 ucRoleIdx);
 

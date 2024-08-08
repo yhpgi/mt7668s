@@ -52,11 +52,6 @@
 #endif
 #endif
 
-#if 0
-#define RUNNING_P2P_MODE 0
-#define RUNNING_AP_MODE 1
-#define RUNNING_DUAL_AP_MODE 2
-#endif
 #ifdef CFG_SUPPORT_MULTICAST_ENHANCEMENT_LOOKBACK
 #define MAX_LOOK_BACK_NUN (3)
 #endif
@@ -157,94 +152,8 @@ static const struct ieee80211_txrx_stypes
 #endif
 
 static const struct iw_priv_args rP2PIwPrivTable[] = {
-#if 0
-	{
-	.cmd = IOC_P2P_CFG_DEVICE,
-	.set_args = IW_PRIV_TYPE_BYTE | (__u16) sizeof(IW_P2P_CFG_DEVICE_TYPE),
-	.get_args = IW_PRIV_TYPE_NONE,
-	.name = "P2P_CFG_DEVICE"}
-	,
-	{
-	.cmd = IOC_P2P_START_STOP_DISCOVERY,
-	.set_args = IW_PRIV_TYPE_BYTE | (__u16) sizeof(IW_P2P_REQ_DEVICE_TYPE),
-	.get_args = IW_PRIV_TYPE_NONE,
-	.name = "P2P_DISCOVERY"}
-	,
-	{
-	.cmd = IOC_P2P_DISCOVERY_RESULTS,
-	.set_args = IW_PRIV_TYPE_NONE,
-	.get_args = IW_PRIV_TYPE_NONE,
-	.name = "P2P_RESULT"}
-	,
-	{
-	.cmd = IOC_P2P_WSC_BEACON_PROBE_RSP_IE,
-	.set_args = IW_PRIV_TYPE_BYTE | (__u16) sizeof(IW_P2P_HOSTAPD_PARAM),
-	.get_args = IW_PRIV_TYPE_NONE,
-	.name = "P2P_WSC_IE"}
-	,
-	{
-	.cmd = IOC_P2P_CONNECT_DISCONNECT,
-	.set_args = IW_PRIV_TYPE_BYTE | (__u16) sizeof(IW_P2P_CONNECT_DEVICE),
-	.get_args = IW_PRIV_TYPE_NONE,
-	.name = "P2P_CONNECT"}
-	,
-	{
-	.cmd = IOC_P2P_PASSWORD_READY,
-	.set_args = IW_PRIV_TYPE_BYTE | (__u16) sizeof(IW_P2P_PASSWORD_READY),
-	.get_args = IW_PRIV_TYPE_NONE,
-	.name = "P2P_PASSWD_RDY"}
-	,
-	{
-	.cmd = IOC_P2P_GET_STRUCT,
-	.set_args = IW_PRIV_TYPE_NONE,
-	.get_args = 256,
-	.name = "P2P_GET_STRUCT"}
-	,
-	{
-	.cmd = IOC_P2P_SET_STRUCT,
-	.set_args = 256,
-	.get_args = IW_PRIV_TYPE_NONE,
-	.name = "P2P_SET_STRUCT"}
-	,
-	{
-	.cmd = IOC_P2P_GET_REQ_DEVICE_INFO,
-	.set_args = IW_PRIV_TYPE_NONE,
-	.get_args = IW_PRIV_TYPE_BYTE | (__u16) sizeof(IW_P2P_DEVICE_REQ),
-	.name = "P2P_GET_REQDEV"}
-	,
-	{
-	 /* SET STRUCT sub-ioctls commands */
-	.cmd = PRIV_CMD_OID,
-	.set_args = 256,
-	.get_args = IW_PRIV_TYPE_NONE,
-	.name = "set_oid"}
-	,
-	{
-	 /* GET STRUCT sub-ioctls commands */
-	.cmd = PRIV_CMD_OID,
-	.set_args = IW_PRIV_TYPE_NONE,
-	.get_args = 256,
-	.name = "get_oid"}
-	,
-#endif
 	{ IOCTL_GET_DRIVER, IW_PRIV_TYPE_CHAR | 2000, IW_PRIV_TYPE_CHAR | 2000, "driver" },
 };
-
-#if 0
-const struct iw_handler_def mtk_p2p_wext_handler_def = {
-	.num_standard = (__u16) sizeof(rP2PIwStandardHandler) / sizeof(iw_handler),
-/* .num_private        = (__u16)sizeof(rP2PIwPrivHandler)/sizeof(iw_handler), */
-	.num_private_args = (__u16) sizeof(rP2PIwPrivTable) / sizeof(struct iw_priv_args),
-	.standard = rP2PIwStandardHandler,
-/* .private            = rP2PIwPrivHandler, */
-	.private_args = rP2PIwPrivTable,
-#if CFG_SUPPORT_P2P_RSSI_QUERY
-	.get_wireless_stats = mtk_p2p_wext_get_wireless_stats,
-#else
-	.get_wireless_stats = NULL,
-#endif
-};
-#endif
 
 #ifdef CONFIG_PM
 static const struct wiphy_wowlan_support mtk_p2p_wowlan_support = {
@@ -450,14 +359,6 @@ BOOLEAN p2PAllocInfo(IN P_GLUE_INFO_T prGlueInfo, IN UINT_8 ucIdex)
 			}
 			prWifiVar->prP2PConnSettings[ucIdex]	= kalMemAlloc(sizeof(P2P_CONNECTION_SETTINGS_T), VIR_MEM_TYPE);
 			prWifiVar->prP2pSpecificBssInfo[ucIdex] = kalMemAlloc(sizeof(P2P_SPECIFIC_BSS_INFO_T), VIR_MEM_TYPE);
-
-			/* TODO: It can be moved to the interface been created. */
-#if 0
-				for (u4Idx = 0; u4Idx < BSS_P2P_NUM; u4Idx++) {
-				prWifiVar->aprP2pRoleFsmInfo[u4Idx] =
-				kalMemAlloc(sizeof(P2P_ROLE_FSM_INFO_T), VIR_MEM_TYPE);
-				}
-#endif
 		} else {
 			ASSERT(prAdapter->prP2pInfo != NULL);
 			ASSERT(prWifiVar->prP2PConnSettings[ucIdex] != NULL);
@@ -946,19 +847,6 @@ BOOLEAN glRegisterP2P(P_GLUE_INFO_T prGlueInfo, const char *prDevName, const cha
 
 		kalResetStats(prGlueInfo->prP2PInfo[i]->prDevHandler);
 
-#if 0
-		/* 7. net device initialize */
-		netif_carrier_off(prGlueInfo->prP2PInfo->prDevHandler);
-		netif_tx_stop_all_queues(prGlueInfo->prP2PInfo->prDevHandler);
-
-		/* 8. register for net device */
-		if (register_netdev(prGlueInfo->prP2PInfo->prDevHandler) < 0) {
-			DBGLOG(INIT, WARN, "unable to register netdevice for p2p\n");
-
-			goto err_reg_netdev;
-		}
-#endif
-
 		/* 8. set p2p net device register state */
 		prGlueInfo->prAdapter->rP2PNetRegState = ENUM_NET_REG_STATE_UNREGISTERED;
 
@@ -1001,10 +889,7 @@ BOOLEAN glRegisterP2P(P_GLUE_INFO_T prGlueInfo, const char *prDevName, const cha
 		prGlueInfo->prAdapter->prP2pInfo->u4DeviceNum = 1;
 
 	return TRUE;
-#if 0
-err_reg_netdev:
-	free_netdev(prGlueInfo->prP2PInfo->prDevHandler);
-#endif
+
 err_alloc_netdev:
 	return FALSE;
 } /* end of glRegisterP2P() */
@@ -1147,16 +1032,6 @@ free_wdev:
 
 void glP2pDestroyWirelessDevice(void)
 {
-#if 0
-#if CFG_ENABLE_WIFI_DIRECT_CFG_80211
-	set_wiphy_dev(gprP2pWdev->wiphy, NULL);
-
-	wiphy_unregister(gprP2pWdev->wiphy);
-	wiphy_free(gprP2pWdev->wiphy);
-	kfree(gprP2pWdev);
-	gprP2pWdev = NULL;
-#endif
-#else
 	int i = 0;
 
 	set_wiphy_dev(gprP2pWdev->wiphy, NULL);
@@ -1181,7 +1056,6 @@ void glP2pDestroyWirelessDevice(void)
 	}
 
 	gprP2pWdev = NULL;
-#endif
 }
 
 /*----------------------------------------------------------------------------*/
@@ -1247,62 +1121,6 @@ BOOLEAN glUnregisterP2P(P_GLUE_INFO_T prGlueInfo)
 
 	return TRUE;
 
-#if 0
-	p2pFsmUninit(prGlueInfo->prAdapter);
-
-	nicDeactivateNetwork(prGlueInfo->prAdapter, NETWORK_TYPE_P2P_INDEX);
-
-#if 0
-	/* Release command, mgmt and security frame belong to P2P network in
-	 *   prGlueInfo->prCmdQue
-	 *   prAdapter->rPendingCmdQueue
-	 *   prAdapter->rTxCtrl.rTxMgmtTxingQueue
-	 *  To ensure there is no pending CmdDone/TxDone handler to be executed after p2p module is removed.
-	 */
-
-	/* Clear CmdQue */
-	kalClearMgmtFramesByBssIdx(prGlueInfo, NETWORK_TYPE_P2P_INDEX);
-	kalClearSecurityFramesByBssIdx(prGlueInfo, NETWORK_TYPE_P2P_INDEX);
-	/* Clear PendingCmdQue */
-	wlanReleasePendingCMDbyBssIdx(prGlueInfo->prAdapter, NETWORK_TYPE_P2P_INDEX);
-	/* Clear PendingTxMsdu */
-	nicFreePendingTxMsduInfoByBssIdx(prGlueInfo->prAdapter, NETWORK_TYPE_P2P_INDEX);
-#endif
-
-#if 0
-	/* prepare for removal */
-	if (netif_carrier_ok(prGlueInfo->prP2PInfo[0]->prDevHandler))
-		netif_carrier_off(prGlueInfo->prP2PInfo[0]->prDevHandler);
-
-	netif_tx_stop_all_queues(prGlueInfo->prP2PInfo[0]->prDevHandler);
-
-	/* netdevice unregistration & free */
-	unregister_netdev(prGlueInfo->prP2PInfo[0]->prDevHandler);
-#endif
-	free_netdev(prGlueInfo->prP2PInfo[0]->prDevHandler);
-	prGlueInfo->prP2PInfo[0]->prDevHandler = NULL;
-
-#if CFG_ENABLE_WIFI_DIRECT_CFG_80211
-#if 0
-	wiphy_unregister(prGlueInfo->prP2PInfo[0]->wdev.wiphy);
-#endif
-	wiphy_free(prGlueInfo->prP2PInfo[0]->wdev.wiphy);
-	prGlueInfo->prP2PInfo[0]->wdev.wiphy = NULL;
-#endif
-
-	/* Free p2p memory */
-#if 1
-	if (!p2PFreeInfo(prGlueInfo)) {
-		DBGLOG(INIT, WARN, "Free memory for p2p FAILED\n");
-		ASSERT(0);
-		return FALSE;
-	}
-#endif
-	return TRUE;
-
-#else
-	return 0;
-#endif
 } /* end of glUnregisterP2P() */
 
 /* Net Device Hooks */
@@ -1318,36 +1136,7 @@ BOOLEAN glUnregisterP2P(P_GLUE_INFO_T prGlueInfo)
 /*----------------------------------------------------------------------------*/
 static int p2pOpen(IN struct net_device *prDev)
 {
-	/* P_GLUE_INFO_T prGlueInfo = NULL; */
-	/* P_ADAPTER_T prAdapter = NULL; */
-	/* P_MSG_P2P_FUNCTION_SWITCH_T prFuncSwitch; */
-
 	ASSERT(prDev);
-
-#if 0 /* Move after device name set. (mtk_p2p_set_local_dev_info) */
-	prGlueInfo = *((P_GLUE_INFO_T *) netdev_priv(prDev));
-	ASSERT(prGlueInfo);
-
-	prAdapter = prGlueInfo->prAdapter;
-	ASSERT(prAdapter);
-
-	/* 1. switch P2P-FSM on */
-	/* 1.1 allocate for message */
-	prFuncSwitch = (P_MSG_P2P_FUNCTION_SWITCH_T) cnmMemAlloc(prAdapter,
-								RAM_TYPE_MSG, sizeof(MSG_P2P_FUNCTION_SWITCH_T));
-
-	if (!prFuncSwitch) {
-		ASSERT(0);	/* Can't trigger P2P FSM */
-		return -ENOMEM;
-	}
-
-	/* 1.2 fill message */
-	prFuncSwitch->rMsgHdr.eMsgId = MID_MNY_P2P_FUN_SWITCH;
-	prFuncSwitch->fgIsFuncOn = TRUE;
-
-	/* 1.3 send message */
-	mboxSendMsg(prAdapter, MBOX_ID_0, (P_MSG_HDR_T) prFuncSwitch, MSG_SEND_METHOD_BUF);
-#endif
 
 	/* 2. carrier on & start TX queue */
 	/*DFS todo 20161220_DFS*/
@@ -1420,24 +1209,7 @@ static int p2pStop(IN struct net_device *prDev)
 
 	/* 1. stop TX queue */
 	netif_tx_stop_all_queues(prDev);
-#if 0
-	/* 2. switch P2P-FSM off */
-	/* 2.1 allocate for message */
-	prFuncSwitch = (P_MSG_P2P_FUNCTION_SWITCH_T) cnmMemAlloc(prAdapter,
-								RAM_TYPE_MSG, sizeof(MSG_P2P_FUNCTION_SWITCH_T));
 
-	if (!prFuncSwitch) {
-		ASSERT(0);	/* Can't trigger P2P FSM */
-		return -ENOMEM;
-	}
-
-	/* 2.2 fill message */
-	prFuncSwitch->rMsgHdr.eMsgId = MID_MNY_P2P_FUN_SWITCH;
-	prFuncSwitch->fgIsFuncOn = FALSE;
-
-	/* 2.3 send message */
-	mboxSendMsg(prAdapter, MBOX_ID_0, (P_MSG_HDR_T) prFuncSwitch, MSG_SEND_METHOD_BUF);
-#endif
 	/* 3. stop queue and turn off carrier */
 	/*prGlueInfo->prP2PInfo[0]->eState = PARAM_MEDIA_STATE_DISCONNECTED;*/ /* TH3 multiple P2P */
 
@@ -1846,105 +1618,6 @@ int p2pDoIOCTL(struct net_device *prDev, struct ifreq *prIfReq, int i4Cmd)
 		DBGLOG(INIT, INFO, "Unexpected ioctl command: 0x%04x\n", i4Cmd);
 		ret = -1;
 	}
-
-#if 0
-	/* fill rIwReqInfo */
-	rIwReqInfo.cmd = (__u16) i4Cmd;
-	rIwReqInfo.flags = 0;
-
-	switch (i4Cmd) {
-	case SIOCSIWENCODEEXT:
-		/* Set Encryption Material after 4-way handshaking is done */
-		if (prIwReq->u.encoding.pointer) {
-			u4ExtraSize = prIwReq->u.encoding.length;
-			prExtraBuf = kalMemAlloc(u4ExtraSize, VIR_MEM_TYPE);
-
-			if (!prExtraBuf) {
-				ret = -ENOMEM;
-				break;
-			}
-
-			if (copy_from_user(prExtraBuf, prIwReq->u.encoding.pointer, prIwReq->u.encoding.length))
-				ret = -EFAULT;
-		} else if (prIwReq->u.encoding.length != 0) {
-			ret = -EINVAL;
-			break;
-		}
-
-		if (ret == 0)
-			ret = mtk_p2p_wext_set_key(prDev, &rIwReqInfo, &(prIwReq->u), prExtraBuf);
-
-		kalMemFree(prExtraBuf, VIR_MEM_TYPE, u4ExtraSize);
-		prExtraBuf = NULL;
-		break;
-
-	case SIOCSIWMLME:
-		/* IW_MLME_DISASSOC used for disconnection */
-		if (prIwReq->u.data.length != sizeof(struct iw_mlme)) {
-			DBGLOG(INIT, INFO, "MLME buffer strange:%d\n", prIwReq->u.data.length);
-			ret = -EINVAL;
-			break;
-		}
-
-		if (!prIwReq->u.data.pointer) {
-			ret = -EINVAL;
-			break;
-		}
-
-		prExtraBuf = kalMemAlloc(sizeof(struct iw_mlme), VIR_MEM_TYPE);
-		if (!prExtraBuf) {
-			ret = -ENOMEM;
-			break;
-		}
-
-		if (copy_from_user(prExtraBuf, prIwReq->u.data.pointer, sizeof(struct iw_mlme)))
-			ret = -EFAULT;
-		else
-			ret = mtk_p2p_wext_mlme_handler(prDev, &rIwReqInfo, &(prIwReq->u), prExtraBuf);
-
-		kalMemFree(prExtraBuf, VIR_MEM_TYPE, sizeof(struct iw_mlme));
-		prExtraBuf = NULL;
-		break;
-
-	case SIOCGIWPRIV:
-		/* This ioctl is used to list all IW privilege ioctls */
-		ret = mtk_p2p_wext_get_priv(prDev, &rIwReqInfo, &(prIwReq->u), NULL);
-		break;
-
-	case SIOCGIWSCAN:
-		ret = mtk_p2p_wext_discovery_results(prDev, &rIwReqInfo, &(prIwReq->u), NULL);
-		break;
-
-	case SIOCSIWAUTH:
-		ret = mtk_p2p_wext_set_auth(prDev, &rIwReqInfo, &(prIwReq->u), NULL);
-		break;
-
-	case IOC_P2P_CFG_DEVICE:
-	case IOC_P2P_PROVISION_COMPLETE:
-	case IOC_P2P_START_STOP_DISCOVERY:
-	case IOC_P2P_DISCOVERY_RESULTS:
-	case IOC_P2P_WSC_BEACON_PROBE_RSP_IE:
-	case IOC_P2P_CONNECT_DISCONNECT:
-	case IOC_P2P_PASSWORD_READY:
-	case IOC_P2P_GET_STRUCT:
-	case IOC_P2P_SET_STRUCT:
-	case IOC_P2P_GET_REQ_DEVICE_INFO:
-#if 0
-		ret = rP2PIwPrivHandler[i4Cmd - SIOCIWFIRSTPRIV](prDev,
-									&rIwReqInfo,
-									&(prIwReq->u),
-									(char *)&(prIwReq->u));
-#endif
-		break;
-#if CFG_SUPPORT_P2P_RSSI_QUERY
-	case SIOCGIWSTATS:
-		ret = mtk_p2p_wext_get_rssi(prDev, &rIwReqInfo, &(prIwReq->u), NULL);
-		break;
-#endif
-	default:
-		ret = -ENOTTY;
-	}
-#endif /* 0 */
 
 	return ret;
 } /* end of p2pDoIOCTL() */

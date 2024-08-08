@@ -349,35 +349,6 @@ typedef enum _ENUM_CHNL_SPAN_T {
 /* Define BSS operating bandwidth */
 typedef enum _ENUM_CHNL_BW_T { CHNL_BW_20, CHNL_BW_20_40, CHNL_BW_10, CHNL_BW_5 } ENUM_CHNL_BW_T, *P_ENUM_CHNL_BW_T;
 
-#if 0
-/* If channel width is CHNL_BW_20_40, the first channel will be SCA and
- * the second channel is SCB, then iteratively.
- * Note the final channel will not be SCA.
- */
-typedef struct _DOMAIN_SUBBAND_INFO {
-	UINT_8 ucRegClass;
-	ENUM_BAND_T eBand;
-	ENUM_CHNL_SPAN_T eChannelSpan;
-	UINT_8 ucFirstChannelNum;
-	UINT_8 ucNumChannels;
-	ENUM_CHNL_BW_T eChannelBw;
-	BOOLEAN fgDfsNeeded;
-	BOOLEAN fgIbssProhibited;
-} DOMAIN_SUBBAND_INFO, *P_DOMAIN_SUBBAND_INFO;
-
-/* Use it as all available channel list for STA */
-typedef struct _DOMAIN_INFO_ENTRY {
-	UINT_16 u2CountryCode;
-	UINT_16 u2MibRegDomainValue;
-
-	/* If different attributes, put them into different rSubBands.
-	 * For example, DFS shall be used or not.
-	 */
-	DOMAIN_SUBBAND_INFO rSubBand[MAX_SUBBAND_NUM];
-} DOMAIN_INFO_ENTRY, *P_DOMAIN_INFO_ENTRY;
-
-#else /* New definition 20110830 */
-
 /* In all bands, the first channel will be SCA and the second channel is SCB,
  * then iteratively.
  * Note the final channel will not be SCA.
@@ -407,7 +378,6 @@ typedef struct _DOMAIN_INFO_ENTRY {
 	 */
 	DOMAIN_SUBBAND_INFO rSubBand[MAX_SUBBAND_NUM];
 } DOMAIN_INFO_ENTRY, *P_DOMAIN_INFO_ENTRY;
-#endif
 
 #if CFG_SUPPORT_PWR_LIMIT_COUNTRY
 

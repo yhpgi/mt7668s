@@ -333,7 +333,6 @@ BOOLEAN halSetDriverOwn(IN P_ADAPTER_T prAdapter)
 			break;
 		}
 
-#if 1
 		if (i == 0) {
 			/* Software get LP ownership - only one time.
 			 * Suppose one CLR_LP_OWN will trigger firmware to return the hif_own.
@@ -341,12 +340,7 @@ BOOLEAN halSetDriverOwn(IN P_ADAPTER_T prAdapter)
 			 */
 			HAL_LP_OWN_CLR(prAdapter, &fgResult);
 		}
-#else
-		if ((i & (LP_OWN_BACK_CLR_OWN_ITERATION - 1)) == 0) {
-			/* Software get LP ownership - per 256 iterations */
-			HAL_LP_OWN_CLR(prAdapter, &fgResult);
-		}
-#endif
+
 		/* Delay for LP engine to complete its operation. */
 		kalMsleep(LP_OWN_BACK_LOOP_DELAY_MS);
 		i++;
@@ -355,7 +349,7 @@ BOOLEAN halSetDriverOwn(IN P_ADAPTER_T prAdapter)
 	/* For Low power Test */
 	/* 1. Driver need to polling until CR4 ready, then could do normal Tx/Rx */
 	/* 2. Send a dummy command to change data path to store-forward mode */
-#if 1
+
 	if (prAdapter->fgIsFwDownloaded) {
 		u4CurrTick = kalGetTimeTick();
 		while (1) {
@@ -399,7 +393,6 @@ BOOLEAN halSetDriverOwn(IN P_ADAPTER_T prAdapter)
 			prAdapter->prGlueInfo->rHifInfo.au4PendingTxDoneCount[TC4_INDEX]--;
 		}
 	}
-#endif
 
 	return fgStatus;
 }
@@ -698,17 +691,6 @@ BOOLEAN halTxReleaseResource(IN P_ADAPTER_T prAdapter, IN PUINT_16 au2TxRlsCnt)
 	prTcqStatus = &prAdapter->rTxCtrl.rTc;
 	prStatCnt	= &prAdapter->prGlueInfo->rHifInfo.rStatCounter;
 
-#if 0 /*Dump Tx Done Counters Info.*/
-{
-	for (i = 0; i < 4; i++) {
-		DBGLOG(TX, LOUD, "Tx Done INT result, AC%d-%d [%u:%u:%u:%u]\n",
-			i*4+0, i*4+3,
-			au2TxRlsCnt[i*4+0], au2TxRlsCnt[i*4+1],
-			au2TxRlsCnt[i*4+2], au2TxRlsCnt[i*4+3]);
-	}
-}
-#endif
-
 	/* Update Free Tc resource counter */
 	for (i = HIF_TX_AC0_INDEX; i <= HIF_TX_AC23_INDEX; i++) {
 #if (HIF_TX_RSRC_WMM_ENHANCE == 1)
@@ -722,17 +704,6 @@ BOOLEAN halTxReleaseResource(IN P_ADAPTER_T prAdapter, IN PUINT_16 au2TxRlsCnt)
 #if (HIF_TX_RSRC_WMM_ENHANCE == 1)
 	/*wmm_3: P2P_DEV*/
 	au2TxDoneCnt[HIF_TX_AC3X_INDEX] = au2TxRlsCnt[HIF_TX_AC3X_INDEX];
-#endif
-
-#if 0 /*Dump Tx Done Counters Info.*/
-{
-	for (i = 0; i < 4; i++) {
-		DBGLOG(TX, LOUD, "Tx Done Count, AC%d-%d [%u:%u:%u:%u]\n",
-			i*4+0, i*4+3,
-			au2TxDoneCnt[i*4+0], au2TxDoneCnt[i*4+1],
-			au2TxDoneCnt[i*4+2], au2TxDoneCnt[i*4+3]);
-	}
-}
 #endif
 
 	/* Return free Tc page count */

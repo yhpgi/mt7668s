@@ -22,7 +22,6 @@ mt7668s-objs := \
     mgmt/cnm_mem.o \
     mgmt/cnm_timer.o \
     mgmt/hem_mbox.o \
-    mgmt/hs20.o \
     mgmt/mib.o \
     mgmt/p2p_assoc.o \
     mgmt/p2p_dev_fsm.o \
@@ -49,7 +48,6 @@ mt7668s-objs := \
     mgmt/swcr.o \
     mgmt/tdls.o \
     mgmt/tkip_mic.o \
-    mgmt/wapi.o \
     mgmt/wnm.o \
     nic/cmd_buf.o \
     nic/nic.o \

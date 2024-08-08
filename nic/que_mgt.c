@@ -460,13 +460,6 @@ VOID qmActivateStaRec(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec)
 
 	qmUpdateStaRec(prAdapter, prStaRec);
 
-	/* Done in qmInit() or qmDeactivateStaRec() */
-#if 0
-	/* At the beginning, no RX BA agreements have been established */
-	for (i = 0; i < CFG_RX_MAX_BA_TID_NUM; i++)
-		(prStaRec->aprRxReorderParamRefTbl)[i] = NULL;
-#endif
-
 	DBGLOG(QM, STATE, "QM: +STA[%ld]\n", (UINT_32)prStaRec->ucIndex);
 }
 
@@ -727,12 +720,6 @@ P_SW_RFB_T qmFlushStaRxQueue(IN P_ADAPTER_T prAdapter, IN UINT_32 u4StaRecIdx, I
 
 	prStaRec = &prAdapter->arStaRec[u4StaRecIdx];
 	ASSERT(prStaRec);
-
-	/* No matter whether this is an activated STA_REC, do flush */
-#if 0
-	if (!prStaRec->fgIsValid)
-		return NULL;
-#endif
 
 	/* Obtain the RX BA Entry pointer */
 	if (u4Tid < CFG_RX_MAX_BA_TID_NUM) {
@@ -2177,18 +2164,7 @@ VOID qmUpdateAverageTxQueLen(IN P_ADAPTER_T prAdapter)
 			prQM->au4AverageQueLen[u4Tc] += (u4CurrQueLen);
 		}
 	}
-#if 0
-	/* Update the queue length for TC5 (BMCAST) */
-	u4CurrQueLen = prQM->arTxQueue[TX_QUEUE_INDEX_BMCAST].u4NumElem;
 
-	if (prQM->au4AverageQueLen[TC5_INDEX] == 0) {
-		prQM->au4AverageQueLen[TC5_INDEX] = (u4CurrQueLen << QM_QUE_LEN_MOVING_AVE_FACTOR);
-	} else {
-		prQM->au4AverageQueLen[TC5_INDEX] -=
-			(prQM->au4AverageQueLen[TC5_INDEX] >> QM_QUE_LEN_MOVING_AVE_FACTOR);
-		prQM->au4AverageQueLen[TC5_INDEX] += (u4CurrQueLen);
-	}
-#endif
 #endif
 }
 
@@ -2700,16 +2676,6 @@ P_SW_RFB_T qmHandleRxPackets(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfbList
 						/* If src mac is invalid, the packet will be freed in fw */
 					}
 				}
-#if CFG_SUPPORT_PASSPOINT
-				else if (hs20IsFrameFilterEnabled(prAdapter, prBssInfo) &&
-						 hs20IsUnsecuredFrame(prAdapter, prBssInfo, prCurrSwRfb)) {
-					DBGLOG(QM, WARN, "Mark NULL the Packet for Dropped Packet %u\n", ucBssIndex);
-					RX_INC_CNT(&prAdapter->rRxCtrl, RX_HS20_DROP_COUNT);
-					prCurrSwRfb->eDst = RX_PKT_DESTINATION_NULL;
-					QUEUE_INSERT_TAIL(prReturnedQue, (P_QUE_ENTRY_T)prCurrSwRfb);
-					continue;
-				}
-#endif /* CFG_SUPPORT_PASSPOINT */
 
 			} else {
 				/* Dont not occupy other SW RFB */
@@ -2762,25 +2728,6 @@ P_SW_RFB_T qmHandleRxPackets(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfbList
 #endif
 					}
 				}
-			}
-		}
-#endif
-
-#if CFG_SUPPORT_WAPI
-		if (prCurrSwRfb->u2PacketLen > ETHER_HEADER_LEN) {
-			PUINT_8 pc		= (PUINT_8)prCurrSwRfb->pvHeader;
-			UINT_16 u2Etype = 0;
-
-			u2Etype = (pc[ETHER_TYPE_LEN_OFFSET] << 8) | (pc[ETHER_TYPE_LEN_OFFSET + 1]);
-			/* for wapi integrity test. WPI_1x packet should be always in non-encrypted mode.
-			 * if we received any WPI(0x88b4) packet that is encrypted, drop here.
-			 */
-			if (u2Etype == ETH_WPI_1X && HAL_RX_STATUS_GET_SEC_MODE(prRxStatus) != 0 &&
-					HAL_RX_STATUS_IS_CIPHER_MISMATCH(prRxStatus) == 0) {
-				DBGLOG(QM, INFO, "drop wpi packet with sec mode\n");
-				prCurrSwRfb->eDst = RX_PKT_DESTINATION_NULL;
-				QUEUE_INSERT_TAIL(prReturnedQue, (P_QUE_ENTRY_T)prCurrSwRfb);
-				continue;
 			}
 		}
 #endif
@@ -3237,17 +3184,6 @@ VOID qmProcessPktWithReordering(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb,
 	prRxStatus = prSwRfb->prRxStatus;
 	/* prSwRfb->eDst = RX_PKT_DESTINATION_HOST; */
 
-#if 0
-	if (!(prStaRec->fgIsValid)) {
-		/* TODO: (Tehuang) Handle the Host-FW sync issue. */
-		prSwRfb->eDst = RX_PKT_DESTINATION_NULL;
-		QUEUE_INSERT_TAIL(prReturnedQue, (P_QUE_ENTRY_T) prSwRfb);
-		DBGLOG(QM, WARN, "Reordering for an invalid STA_REC\n");
-		/* ASSERT(0); */
-		return;
-	}
-#endif
-
 	RX_INC_CNT(&prAdapter->rRxCtrl, RX_DATA_REORDER_TOTAL_COUINT);
 
 	/* Check whether the BA agreement exists */
@@ -3384,14 +3320,7 @@ VOID qmProcessBarFrame(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb, OUT P_QU
 		/* ASSERT(prStaRec); */
 		return;
 	}
-#if 0
-	if (!(prStaRec->fgIsValid)) {
-		/* TODO: (Tehuang) Handle the Host-FW sync issue. */
-		DbgPrint("QM: (Warning) BAR for an invalid STA_REC\n");
-		/* ASSERT(0); */
-		return;
-	}
-#endif
+
 	/* Check index out of bound */
 	if (prSwRfb->ucTid >= CFG_RX_MAX_BA_TID_NUM) {
 		DBGLOG(QM, WARN, "QM: (Warning) index out of bound: ucTid = %d\n", prSwRfb->ucTid);
@@ -3671,23 +3600,9 @@ VOID qmPopOutReorderPkt(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb, OUT P_Q
 {
 	UINT_32 u4PktCnt = 0;
 	/* RX reorder for one MSDU in AMSDU issue */
-#if 0
-	P_SW_RFB_T prAmsduSwRfb;
-#endif
 
 	u4PktCnt++;
 	QUEUE_INSERT_TAIL(prReturnedQue, (P_QUE_ENTRY_T)prSwRfb);
-
-#if 0
-	u4PktCnt += prSwRfb->rAmsduQue.u4NumElem;
-	QUEUE_REMOVE_HEAD(&prSwRfb->rAmsduQue, prAmsduSwRfb, P_SW_RFB_T);
-	while (prAmsduSwRfb) {
-		/* Update MSDU destination of AMSDU */
-		prAmsduSwRfb->eDst = prSwRfb->eDst;
-		QUEUE_INSERT_TAIL(prReturnedQue, (P_QUE_ENTRY_T)prAmsduSwRfb);
-		QUEUE_REMOVE_HEAD(&prSwRfb->rAmsduQue, prAmsduSwRfb, P_SW_RFB_T);
-	}
-#endif
 
 	RX_ADD_CNT(&prAdapter->rRxCtrl, eRxCounter, u4PktCnt);
 }
@@ -4136,14 +4051,6 @@ VOID qmHandleEventRxAddBa(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent, I
 		DBGLOG(QM, INFO, "QM: (Warning) RX ADDBA Event for a NULL STA_REC\n");
 		return;
 	}
-#if 0
-	if (!(prStaRec->fgIsValid)) {
-		/* TODO: (Tehuang) Handle the Host-FW synchronization issue */
-		DBGLOG(QM, WARN, "QM: (Warning) RX ADDBA Event for an invalid STA_REC\n");
-		/* ASSERT(0); */
-		/* return; */
-	}
-#endif
 
 	u4Tid = (((prEventRxAddBa->u2BAParameterSet) & BA_PARAM_SET_TID_MASK) >> BA_PARAM_SET_TID_MASK_OFFSET);
 
@@ -4173,7 +4080,6 @@ VOID qmHandleEventRxDelBa(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent, I
 	P_EVENT_RX_DELBA_T prEventRxDelBa;
 	P_STA_RECORD_T	   prStaRec;
 
-	/* DbgPrint("QM:Event -RxBa\n"); */
 	if (u4EventBufLen < sizeof(EVENT_RX_DELBA_T)) {
 		DBGLOG(QM, ERROR, "%s: Invalid event length: %d < %d\n", __func__, u4EventBufLen, sizeof(EVENT_RX_DELBA_T));
 		return;
@@ -4182,15 +4088,7 @@ VOID qmHandleEventRxDelBa(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent, I
 	prStaRec	   = QM_GET_STA_REC_PTR_FROM_INDEX(prAdapter, prEventRxDelBa->ucStaRecIdx);
 
 	if (!prStaRec)
-		/* Invalid STA_REC index, discard the event packet */
-		/* ASSERT(0); */
 		return;
-#if 0
-	if (!(prStaRec->fgIsValid))
-		/* TODO: (Tehuang) Handle the Host-FW synchronization issue */
-		/* ASSERT(0); */
-		return;
-#endif
 
 	qmDelRxBaEntry(prAdapter, prStaRec->ucIndex, prEventRxDelBa->ucTid, TRUE);
 }
@@ -4301,13 +4199,6 @@ VOID qmDelRxBaEntry(IN P_ADAPTER_T prAdapter, IN UINT_8 ucStaRecIdx, IN UINT_8 u
 	prStaRec = &prAdapter->arStaRec[ucStaRecIdx];
 	ASSERT(prStaRec);
 
-#if 0
-	if (!(prStaRec->fgIsValid)) {
-		DbgPrint("QM: (WARNING) Invalid STA when deleting an RX BA\n");
-		return;
-	}
-#endif
-
 	if (ucTid >= CFG_RX_MAX_BA_TID_NUM) {
 		DBGLOG(QM, WARN, "QM: ucTid invalid: %d in %s)\n", ucTid, __func__);
 		return;
@@ -4348,11 +4239,6 @@ VOID qmDelRxBaEntry(IN P_ADAPTER_T prAdapter, IN UINT_8 ucStaRecIdx, IN UINT_8 u
 		/* Update RX BA entry state. Note that RX queue flush is not done here */
 		prRxBaEntry->fgIsValid = FALSE;
 		prQM->ucRxBaCount--;
-
-		/* Debug */
-#if 0
-		DbgPrint("QM: ucRxBaCount=%d\n", prQM->ucRxBaCount);
-#endif
 
 		/* Update STA RX BA table */
 		prStaRec->aprRxReorderParamRefTbl[ucTid] = NULL;
@@ -5536,12 +5422,6 @@ VOID qmHandleEventStaUpdateFreeQuota(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T
 			else
 				kalSetEvent(prAdapter->prGlueInfo);
 		}
-#if 0
-		DBGLOG(QM, TRACE,
-				"qmHandleEventStaUpdateFreeQuota (ucStaRecIdx=%d, ucUpdateMode=%d, ucFreeQuota=%d)\n",
-				prEventStaUpdateFreeQuota->ucStaRecIdx,
-				prEventStaUpdateFreeQuota->ucUpdateMode, prEventStaUpdateFreeQuota->ucFreeQuota);
-#endif
 
 		DBGLOG(QM, TRACE, "UFQ=%d,%d,%d\n", prEventStaUpdateFreeQuota->ucStaRecIdx,
 				prEventStaUpdateFreeQuota->ucUpdateMode, prEventStaUpdateFreeQuota->ucFreeQuota);
@@ -5658,10 +5538,6 @@ UINT_32 qmGetRxReorderQueuedBufferCount(IN P_ADAPTER_T prAdapter)
 	/* XXX The summation may impact the performance */
 	for (i = 0; i < CFG_NUM_OF_RX_BA_AGREEMENTS; i++) {
 		u4Total += prQM->arRxBaTable[i].rReOrderQue.u4NumElem;
-#if DBG && 0
-		if (QUEUE_IS_EMPTY(&(prQM->arRxBaTable[i].rReOrderQue)))
-			ASSERT(prQM->arRxBaTable[i].rReOrderQue == 0);
-#endif
 	}
 	ASSERT(u4Total <= (CFG_NUM_OF_QM_RX_PKT_NUM * 2));
 	return u4Total;
@@ -5781,732 +5657,6 @@ UINT_32 qmDumpQueueStatus(IN P_ADAPTER_T prAdapter, IN PUINT_8 pucBuf, IN UINT_3
 
 	return u4Len;
 }
-
-#if CFG_M0VE_BA_TO_DRIVER
-/*----------------------------------------------------------------------------*/
-/*!
- * @brief Send DELBA Action frame
- *
- * @param fgIsInitiator DELBA_ROLE_INITIATOR or DELBA_ROLE_RECIPIENT
- * @param prStaRec Pointer to the STA_REC of the receiving peer
- * @param u4Tid TID of the BA entry
- * @param u4ReasonCode The reason code carried in the Action frame
- *
- * @return (none)
- */
-/*----------------------------------------------------------------------------*/
-VOID mqmSendDelBaFrame(IN P_ADAPTER_T prAdapter, IN BOOLEAN fgIsInitiator, IN P_STA_RECORD_T prStaRec, IN UINT_32 u4Tid,
-		IN UINT_32 u4ReasonCode)
-{
-	P_MSDU_INFO_T		   prTxMsduInfo;
-	P_ACTION_DELBA_FRAME_T prDelBaFrame;
-	P_BSS_INFO_T		   prBssInfo;
-
-	DBGLOG(QM, WARN, "[Puff]: Enter mqmSendDelBaFrame()\n");
-
-	ASSERT(prStaRec);
-
-	/* 3 <1> Block the message in case of invalid STA */
-	if (!prStaRec->fgIsInUse) {
-		DBGLOG(QM, WARN, "[Puff][%s]: (Warning) sta_rec is not inuse\n", __func__);
-		return;
-	}
-	/* Check HT-capabale STA */
-	if (!(prStaRec->ucDesiredPhyTypeSet & PHY_TYPE_BIT_HT)) {
-		DBGLOG(QM, WARN, "[Puff][%s]: (Warning) sta is NOT HT-capable(0x%08X)\n", __func__,
-				prStaRec->ucDesiredPhyTypeSet);
-		return;
-	}
-	/* 4 <2> Construct the DELBA frame */
-	prTxMsduInfo = (P_MSDU_INFO_T)cnmMgtPktAlloc(prAdapter, ACTION_DELBA_FRAME_LEN);
-
-	if (!prTxMsduInfo) {
-		DBGLOG(QM, WARN, "[Puff][%s]: (Warning) DELBA for TID=%ld was not sent (MSDU_INFO alloc failure)\n", __func__,
-				u4Tid);
-		return;
-	}
-
-	prBssInfo = GET_BSS_INFO_BY_INDEX(prAdapter, prStaRec->ucBssIndex);
-
-	/* Fill the Action frame */
-	prDelBaFrame			  = (P_ACTION_DELBA_FRAME_T)((UINT_32)(prTxMsduInfo->prPacket) + MAC_TX_RESERVED_FIELD);
-	prDelBaFrame->u2FrameCtrl = MAC_FRAME_ACTION;
-#if CFG_SUPPORT_802_11W
-	if (rsnCheckBipKeyInstalled(prAdapter, prStaRec)) {
-		DBGLOG(QM, WARN, "[Puff][%s]: (Warning) DELBA is 80211w enabled\n", __func__);
-		prDelBaFrame->u2FrameCtrl |= MASK_FC_PROTECTED_FRAME;
-	}
-#endif
-
-	prDelBaFrame->u2DurationID = 0;
-	prDelBaFrame->ucCategory   = CATEGORY_BLOCK_ACK_ACTION;
-	prDelBaFrame->ucAction	   = ACTION_DELBA;
-
-	prDelBaFrame->u2DelBaParameterSet = 0;
-	prDelBaFrame->u2DelBaParameterSet |= ((fgIsInitiator ? ACTION_DELBA_INITIATOR_MASK : 0));
-	prDelBaFrame->u2DelBaParameterSet |= ((u4Tid << ACTION_DELBA_TID_OFFSET) & ACTION_DELBA_TID_MASK);
-	prDelBaFrame->u2ReasonCode = u4ReasonCode;
-
-	COPY_MAC_ADDR(prDelBaFrame->aucDestAddr, prStaRec->aucMacAddr);
-	COPY_MAC_ADDR(prDelBaFrame->aucSrcAddr, prBssInfo->aucOwnMacAddr);
-	COPY_MAC_ADDR(prDelBaFrame->aucBSSID, prBssInfo->aucBSSID);
-
-	/* 4 <3> Configure the MSDU_INFO and forward it to TXM */
-	TX_SET_MMPDU(prAdapter, prTxMsduInfo, prStaRec->ucBssIndex,
-			(prStaRec != NULL) ? (prStaRec->ucIndex) : (STA_REC_INDEX_NOT_FOUND), WLAN_MAC_HEADER_LEN,
-			ACTION_DELBA_FRAME_LEN, NULL, MSDU_RATE_MODE_AUTO);
-
-#if CFG_SUPPORT_802_11W
-	if (rsnCheckBipKeyInstalled(prAdapter, prStaRec)) {
-		DBGLOG(RSN, INFO, "Set MSDU_OPT_PROTECTED_FRAME\n");
-		nicTxConfigPktOption(prTxMsduInfo, MSDU_OPT_PROTECTED_FRAME, TRUE);
-	}
-#endif
-
-	/* TID and fgIsInitiator are needed when processing TX Done of the DELBA frame */
-	prTxMsduInfo->ucTID			= (UINT_8)u4Tid;
-	prTxMsduInfo->ucControlFlag = (fgIsInitiator ? 1 : 0);
-
-	nicTxEnqueueMsdu(prAdapter, prTxMsduInfo);
-
-	DBGLOG(QM, WARN, "[Puff][%s]: Send DELBA for TID=%ld Initiator=%d\n", __func__, u4Tid, fgIsInitiator);
-}
-
-/*----------------------------------------------------------------------------*/
-/*!
- * @brief Callback function for the TX Done event for an ADDBA_RSP
- *
- * @param prMsduInfo The TX packet
- * @param rWlanStatus WLAN_STATUS_SUCCESS if TX is successful
- *
- * @return WLAN_STATUS_BUFFER_RETAINED is returned if the buffer shall not be freed by TXM
- */
-/*----------------------------------------------------------------------------*/
-WLAN_STATUS
-mqmCallbackAddBaRspSent(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo, IN ENUM_TX_RESULT_CODE_T rTxDoneStatus)
-{
-	P_RX_BA_ENTRY_T prRxBaEntry;
-	P_STA_RECORD_T	prStaRec;
-	P_QUE_MGT_T		prQM;
-
-	UINT_32 u4Tid = 0;
-
-	/* ASSERT(prMsduInfo); */
-	prStaRec = cnmGetStaRecByIndex(prAdapter, prMsduInfo->ucStaRecIndex);
-	ASSERT(prStaRec);
-
-	prQM = &prAdapter->rQM;
-
-	DBGLOG(QM, WARN, "[Puff]: Enter mqmCallbackAddBaRspSent()\n");
-
-	/* 4 <0> Check STA_REC status */
-	/* Check STA_REC is inuse */
-	if (!prStaRec->fgIsInUse) {
-		DBGLOG(QM, WARN, "[Puff][%s]: (Warning) sta_rec is not inuse\n", __func__);
-		return WLAN_STATUS_SUCCESS;
-	}
-	/* Check HT-capabale STA */
-	if (!(prStaRec->ucDesiredPhyTypeSet & PHY_TYPE_BIT_HT)) {
-		DBGLOG(QM, WARN, "[Puff][%s]: (Warning) sta is NOT HT-capable(0x%08X)\n", __func__,
-				prStaRec->ucDesiredPhyTypeSet);
-		return WLAN_STATUS_SUCCESS; /* To free the received ADDBA_REQ directly */
-	}
-	/* 4 <1> Find the corresponding BA entry */
-	u4Tid		= prMsduInfo->ucTID; /* TID is stored in MSDU_INFO when composing the ADDBA_RSP frame */
-	prRxBaEntry = &prQM->arRxBaTable[u4Tid];
-
-	/* Note: Due to some reason, for example, receiving a DELBA, the BA entry may not be in state NEGO */
-	/* 4 <2> INVALID state */
-	if (!prRxBaEntry) {
-		DBGLOG(QM, WARN, "[Puff][%s]: (RX_BA) ADDBA_RSP ---> peer (STA=%d TID=%d)(TX successful)(invalid BA)\n",
-				__func__, prStaRec->ucIndex, u4Tid);
-	}
-	/* 4 <3> NEGO, ACTIVE, or DELETING state */
-	else {
-		switch (rTxDoneStatus) {
-			/* 4 <Case 1> TX Success */
-		case TX_RESULT_SUCCESS:
-
-			DBGLOG(QM, WARN, "[Puff][%s]: (RX_BA) ADDBA_RSP ---> peer (STA=%d TID=%d)(TX successful)\n", __func__,
-					prStaRec->ucIndex, u4Tid);
-
-			/* 4 <Case 1.1> NEGO or ACTIVE state */
-			if (prRxBaEntry->ucStatus != BA_ENTRY_STATUS_DELETING)
-				mqmRxModifyBaEntryStatus(prAdapter, prRxBaEntry, BA_ENTRY_STATUS_ACTIVE);
-			/* 4 <Case 1.2> DELETING state */
-			/* else */
-			/* Deleting is on-going, so do nothing and wait for TX done of the DELBA frame */
-
-			break;
-
-			/* 4 <Case 2> TX Failure */
-		default:
-
-			DBGLOG(QM, WARN, "[Puff][%s]: (RX_BA) ADDBA_RSP ---> peer (STA=%d TID=%ld Entry_Status=%d)(TX failed)\n",
-					__func__, prStaRec->ucIndex, u4Tid, prRxBaEntry->ucStatus);
-
-			/* 4 <Case 2.1> NEGO or ACTIVE state */
-			/* Notify the host to delete the agreement */
-			if (prRxBaEntry->ucStatus != BA_ENTRY_STATUS_DELETING) {
-				mqmRxModifyBaEntryStatus(prAdapter, prRxBaEntry, BA_ENTRY_STATUS_DELETING);
-
-				/* Send DELBA to the peer to ensure the BA state is synchronized */
-				mqmSendDelBaFrame(prAdapter, DELBA_ROLE_RECIPIENT, prStaRec, u4Tid, STATUS_CODE_UNSPECIFIED_FAILURE);
-			}
-			/* 4 <Case 2.2> DELETING state */
-			/* else */
-			/* Deleting is on-going, so do nothing and wait for the TX done of the DELBA frame */
-
-			break;
-		}
-	}
-
-	return WLAN_STATUS_SUCCESS; /* TXM shall release the packet */
-}
-
-/*----------------------------------------------------------------------------*/
-/*!
- * @brief Check if there is any idle RX BA
- *
- * @param u4Param (not used)
- *
- * @return (none)
- */
-/*----------------------------------------------------------------------------*/
-VOID mqmTimeoutCheckIdleRxBa(IN P_ADAPTER_T prAdapter, IN ULONG ulParamPtr)
-{
-	INT_8			i;
-	P_RX_BA_ENTRY_T prRxBa;
-	UINT_32			u4IdleCountThreshold = 0;
-	P_STA_RECORD_T	prStaRec;
-	P_QUE_MGT_T		prQM;
-
-	DBGLOG(QM, WARN, "[Puff]: Enter mqmTimeoutIdleRxBaDetection()\n");
-
-	prQM = &prAdapter->rQM;
-
-	/* 4 <1> Restart the timer */
-	cnmTimerStopTimer(prAdapter, &prAdapter->rMqmIdleRxBaDetectionTimer);
-	cnmTimerStartTimer(prAdapter, &prAdapter->rMqmIdleRxBaDetectionTimer, MQM_IDLE_RX_BA_CHECK_INTERVAL);
-
-	/* 4 <2> Increment the idle count for each idle BA */
-	for (i = 0; i < CFG_NUM_OF_RX_BA_AGREEMENTS; i++) {
-		prRxBa = &prQM->arRxBaTable[i];
-
-		if (prRxBa->ucStatus == BA_ENTRY_STATUS_ACTIVE) {
-			prStaRec = cnmGetStaRecByIndex(prAdapter, prRxBa->ucStaRecIdx);
-
-			if (!prStaRec->fgIsInUse) {
-				DBGLOG(QM, WARN, "[Puff][%s]: (Warning) sta_rec is not inuse\n", __func__);
-				ASSERT(0);
-			}
-			/* Check HT-capabale STA */
-			if (!(prStaRec->ucDesiredPhyTypeSet & PHY_TYPE_BIT_HT)) {
-				DBGLOG(QM, WARN, "[Puff][%s]: (Warning) sta is NOT HT-capable(0x%08X)\n", __func__,
-						prStaRec->ucDesiredPhyTypeSet);
-				ASSERT(0);
-			}
-			/* 4 <2.1>  Idle detected, increment idle count and see if a DELBA should be sent */
-			if (prRxBa->u2SnapShotSN == prStaRec->au2CachedSeqCtrl[prRxBa->ucTid]) {
-				prRxBa->ucIdleCount++;
-
-				ASSERT(prRxBa->ucTid < 8);
-				switch (aucTid2ACI[prRxBa->ucTid]) {
-				case 0: /* BK */
-					u4IdleCountThreshold = MQM_DEL_IDLE_RXBA_THRESHOLD_BK;
-					break;
-				case 1: /* BE */
-					u4IdleCountThreshold = MQM_DEL_IDLE_RXBA_THRESHOLD_BE;
-					break;
-				case 2: /* VI */
-					u4IdleCountThreshold = MQM_DEL_IDLE_RXBA_THRESHOLD_VI;
-					break;
-				case 3: /* VO */
-					u4IdleCountThreshold = MQM_DEL_IDLE_RXBA_THRESHOLD_VO;
-					break;
-				}
-
-				if (prRxBa->ucIdleCount >= u4IdleCountThreshold) {
-					mqmRxModifyBaEntryStatus(prAdapter, prRxBa, BA_ENTRY_STATUS_INVALID);
-					mqmSendDelBaFrame(prAdapter, DELBA_ROLE_RECIPIENT, prStaRec, (UINT_32)prRxBa->ucTid,
-							REASON_CODE_PEER_TIME_OUT);
-					qmDelRxBaEntry(prAdapter, prStaRec->ucIndex, prRxBa->ucTid, TRUE);
-				}
-			}
-			/* 4 <2.2> Activity detected */
-			else {
-				prRxBa->u2SnapShotSN = prStaRec->au2CachedSeqCtrl[prRxBa->ucTid];
-				prRxBa->ucIdleCount	 = 0;
-				continue; /* check the next BA entry */
-			}
-		}
-	}
-}
-
-/*----------------------------------------------------------------------------*/
-/*!
- * @brief Do RX BA entry state transition
- *
- * @param prRxBaEntry The BA entry pointer
- * @param eStatus The state to transition to
- *
- * @return (none)
- */
-/*----------------------------------------------------------------------------*/
-VOID mqmRxModifyBaEntryStatus(
-		IN P_ADAPTER_T prAdapter, IN P_RX_BA_ENTRY_T prRxBaEntry, IN ENUM_BA_ENTRY_STATUS_T eStatus)
-{
-	P_STA_RECORD_T prStaRec;
-	P_QUE_MGT_T	   prQM;
-
-	BOOLEAN fgResetScoreBoard = FALSE;
-
-	ASSERT(prRxBaEntry);
-
-	prStaRec = cnmGetStaRecByIndex(prAdapter, prRxBaEntry->ucStaRecIdx);
-	ASSERT(prStaRec);
-	prQM = &prAdapter->rQM;
-
-	if (prRxBaEntry->ucStatus == (UINT_8)eStatus) {
-		DBGLOG(QM, WARN, "[Puff][%s]: eStatus are identical...\n", __func__, prRxBaEntry->ucStatus);
-		return;
-	}
-	/* 4 <1> State transition from state X */
-	switch (prRxBaEntry->ucStatus) {
-		/* 4 <1.1> From (X = INVALID) to (ACTIVE or NEGO or DELETING) */
-	case BA_ENTRY_STATUS_INVALID:
-
-		/* Associate the BA entry with the STA_REC when leaving INVALID state */
-		kalMemCopy(&prQM->arRxBaTable[prRxBaEntry->ucTid], prRxBaEntry, sizeof(RX_BA_ENTRY_T));
-
-		/* Increment the RX BA counter */
-		prQM->ucRxBaCount++;
-		ASSERT(prQM->ucRxBaCount <= CFG_NUM_OF_RX_BA_AGREEMENTS);
-
-		/* Since AMPDU may be received during INVALID state */
-		fgResetScoreBoard = TRUE;
-
-		/* Reset Idle Count since this BA entry is being activated now.
-		 *  Note: If there is no ACTIVE entry, the idle detection timer will not be started.
-		 */
-		prRxBaEntry->ucIdleCount = 0;
-		break;
-
-		/* 4 <1.2> Other cases */
-	default:
-		break;
-	}
-
-	/* 4 <2> State trasition to state Y */
-	switch (eStatus) {
-		/* 4 <2.1> From  (NEGO, ACTIVE, DELETING) to (Y=INVALID) */
-	case BA_ENTRY_STATUS_INVALID:
-
-		/* Disassociate the BA entry with the STA_REC */
-		kalMemZero(&prQM->arRxBaTable[prRxBaEntry->ucTid], sizeof(RX_BA_ENTRY_T));
-
-		/* Decrement the RX BA counter */
-		prQM->ucRxBaCount--;
-		ASSERT(prQM->ucRxBaCount < CFG_NUM_OF_RX_BA_AGREEMENTS);
-
-		/* (TBC) */
-		fgResetScoreBoard = TRUE;
-
-		/* If there is not any BA agreement, stop doing idle detection  */
-		if (prQM->ucRxBaCount == 0) {
-			if (MQM_CHECK_FLAG(prAdapter->u4FlagBitmap, MQM_FLAG_IDLE_RX_BA_TIMER_STARTED)) {
-				cnmTimerStopTimer(prAdapter, &prAdapter->rMqmIdleRxBaDetectionTimer);
-				MQM_CLEAR_FLAG(prAdapter->u4FlagBitmap, MQM_FLAG_IDLE_RX_BA_TIMER_STARTED);
-			}
-		}
-
-		break;
-
-		/* 4 <2.2> From  (any) to (Y=ACTIVE) */
-	case BA_ENTRY_STATUS_ACTIVE:
-
-		/* If there is at least one BA going into ACTIVE, start idle detection */
-		if (!MQM_CHECK_FLAG(prAdapter->u4FlagBitmap, MQM_FLAG_IDLE_RX_BA_TIMER_STARTED)) {
-			cnmTimerInitTimer(prAdapter, &prAdapter->rMqmIdleRxBaDetectionTimer,
-					(PFN_MGMT_TIMEOUT_FUNC)mqmTimeoutCheckIdleRxBa, (ULONG)NULL);
-			/* No parameter */
-
-			cnmTimerStopTimer(prAdapter, &prAdapter->rMqmIdleRxBaDetectionTimer);
-
-#if MQM_IDLE_RX_BA_DETECTION
-			cnmTimerStartTimer(prAdapter, &prAdapter->rMqmIdleRxBaDetectionTimer, MQM_IDLE_RX_BA_CHECK_INTERVAL);
-			MQM_SET_FLAG(prAdapter->u4FlagBitmap, MQM_FLAG_IDLE_RX_BA_TIMER_STARTED);
-#endif
-		}
-
-		break;
-
-	case BA_ENTRY_STATUS_NEGO:
-	default:
-		break;
-	}
-
-	if (fgResetScoreBoard) {
-		P_CMD_RESET_BA_SCOREBOARD_T prCmdBody;
-
-		prCmdBody =
-				(P_CMD_RESET_BA_SCOREBOARD_T)cnmMemAlloc(prAdapter, RAM_TYPE_BUF, sizeof(CMD_RESET_BA_SCOREBOARD_T));
-		ASSERT(prCmdBody);
-
-		prCmdBody->ucflag = MAC_ADDR_TID_MATCH;
-		prCmdBody->ucTID  = prRxBaEntry->ucTid;
-		kalMemCopy(prCmdBody->aucMacAddr, prStaRec->aucMacAddr, PARAM_MAC_ADDR_LEN);
-
-		wlanoidResetBAScoreboard(prAdapter, prCmdBody, sizeof(CMD_RESET_BA_SCOREBOARD_T));
-	}
-
-	DBGLOG(QM, WARN, "[Puff]QM: (RX_BA) [STA=%d TID=%d] status from %d to %d\n", prRxBaEntry->ucStaRecIdx,
-			prRxBaEntry->ucTid, prRxBaEntry->ucStatus, eStatus);
-
-	prRxBaEntry->ucStatus = (UINT_8)eStatus;
-}
-
-/*----------------------------------------------------------------------------*/
-/*!
- * \brief
- *
- * \param[in]
- *
- * \return none
- */
-/*----------------------------------------------------------------------------*/
-VOID mqmHandleAddBaReq(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb)
-{
-	P_STA_RECORD_T			   prStaRec;
-	P_BSS_INFO_T			   prBssInfo;
-	P_ACTION_ADDBA_REQ_FRAME_T prAddBaReq;
-	ACTION_ADDBA_REQ_BODY_T	   rAddBaReqBody;
-	P_ACTION_ADDBA_RSP_FRAME_T prAddBaRsp;
-	ACTION_ADDBA_RSP_BODY_T	   rAddBaRspBody;
-	P_RX_BA_ENTRY_T			   prRxBaEntry;
-	P_MSDU_INFO_T			   prTxMsduInfo;
-	P_QUE_MGT_T				   prQM;
-
-	BOOLEAN fgIsReqAccepted	  = TRUE;  /* Reject or accept the ADDBA_REQ */
-	BOOLEAN fgIsNewEntryAdded = FALSE; /* Indicator: Whether a new RX BA entry will be added */
-
-	UINT_32 u4Tid;
-	UINT_32 u4StaRecIdx;
-	UINT_16 u2WinStart;
-	UINT_16 u2WinSize;
-	UINT_32 u4BuffSize;
-
-#if CFG_SUPPORT_BCM
-	UINT_32 u4BuffSizeBT;
-#endif
-
-	ASSERT(prSwRfb);
-
-	prStaRec = prSwRfb->prStaRec;
-	prQM	 = &prAdapter->rQM;
-
-	do {
-		/* 4 <0> Check if this is an active HT-capable STA */
-		/* Check STA_REC is inuse */
-		if (!prStaRec->fgIsInUse) {
-			DBGLOG(QM, WARN, "[Puff][%s]: (Warning) sta_rec is not inuse\n", __func__);
-			break;
-		}
-		/* Check HT-capabale STA */
-		if (!(prStaRec->ucDesiredPhyTypeSet & PHY_TYPE_BIT_HT)) {
-			DBGLOG(QM, WARN, "[Puff][%s]: (Warning) sta is NOT HT-capable(0x%08X)\n", __func__,
-					prStaRec->ucDesiredPhyTypeSet);
-			break; /* To free the received ADDBA_REQ directly */
-		}
-		/* 4 <1> Check user configurations and HW capabilities */
-		/* Check configurations (QoS support, AMPDU RX support) */
-		if ((!prAdapter->rWifiVar.fgSupportQoS) || (!prAdapter->rWifiVar.fgSupportAmpduRx) ||
-				(!prStaRec->fgRxAmpduEn)) {
-			DBGLOG(QM, WARN, "[Puff][%s]: (Warning) BA ACK Policy not supported fgSupportQoS(%d)", __func__,
-					prAdapter->rWifiVar.fgSupportQoS);
-			DBGLOG(QM, WARN, "fgSupportAmpduRx(%d), fgRxAmpduEn(%d)\n", prAdapter->rWifiVar.fgSupportAmpduRx,
-					prStaRec->fgRxAmpduEn);
-			fgIsReqAccepted = FALSE; /* Will send an ADDBA_RSP with DECLINED */
-		}
-		/* Check capability */
-		prAddBaReq = ((P_ACTION_ADDBA_REQ_FRAME_T)(prSwRfb->pvHeader));
-		kalMemCopy((PUINT_8)(&rAddBaReqBody), (PUINT_8)(&(prAddBaReq->aucBAParameterSet[0])), 6);
-		if ((((rAddBaReqBody.u2BAParameterSet) & BA_PARAM_SET_ACK_POLICY_MASK) >>
-					BA_PARAM_SET_ACK_POLICY_MASK_OFFSET) != BA_PARAM_SET_ACK_POLICY_IMMEDIATE_BA) { /* Only Immediate_BA
-																										is supported */
-			DBGLOG(QM, WARN, "[Puff][%s]: (Warning) BA ACK Policy not supported (0x%08X)\n", __func__,
-					rAddBaReqBody.u2BAParameterSet);
-			fgIsReqAccepted = FALSE; /* Will send an ADDBA_RSP with DECLINED */
-		}
-
-		/* 4 <2> Determine the RX BA entry (existing or to be added) */
-		/* Note: BA entry index = (TID, STA_REC index) */
-		u4Tid		= (((rAddBaReqBody.u2BAParameterSet) & BA_PARAM_SET_TID_MASK) >> BA_PARAM_SET_TID_MASK_OFFSET);
-		u4StaRecIdx = prStaRec->ucIndex;
-		DBGLOG(QM, WARN, "[Puff][%s]: BA entry index = [TID(%d), STA_REC index(%d)]\n", __func__, u4Tid, u4StaRecIdx);
-
-		u2WinStart = ((rAddBaReqBody.u2BAStartSeqCtrl) >> OFFSET_BAR_SSC_SN);
-		u2WinSize  = (((rAddBaReqBody.u2BAParameterSet) & BA_PARAM_SET_BUFFER_SIZE_MASK) >>
-					  BA_PARAM_SET_BUFFER_SIZE_MASK_OFFSET);
-		DBGLOG(QM, WARN, "[Puff][%s]: BA entry info = [WinStart(%d), WinSize(%d)]\n", __func__, u2WinStart, u2WinSize);
-
-		if (fgIsReqAccepted) {
-			prRxBaEntry = &prQM->arRxBaTable[u4Tid];
-
-			if (!prRxBaEntry) {
-				/* 4 <Case 2.1> INVALID state && BA entry available --> Add a new entry and accept */
-				if (prQM->ucRxBaCount < CFG_NUM_OF_RX_BA_AGREEMENTS) {
-					fgIsNewEntryAdded =
-							qmAddRxBaEntry(prAdapter, (UINT_8)u4StaRecIdx, (UINT_8)u4Tid, u2WinStart, u2WinSize);
-
-					if (!fgIsNewEntryAdded) {
-						DBGLOG(QM, ERROR, "[Puff][%s]: (Error) Free RX BA entry alloc failure\n");
-						fgIsReqAccepted = FALSE;
-					} else {
-						DBGLOG(QM, WARN, "[Puff][%s]: Create a new BA Entry\n");
-					}
-				}
-				/* 4 <Case 2.2> INVALID state && BA entry unavailable --> Reject the ADDBA_REQ */
-				else {
-					DBGLOG(QM, WARN, "[Puff][%s]: (Warning) Free RX BA entry unavailable(req: %d)\n", __func__,
-							prQM->ucRxBaCount);
-					fgIsReqAccepted = FALSE; /* Will send an ADDBA_RSP with DECLINED */
-				}
-			} else {
-				/* 4 <Case 2.3> NEGO or DELETING  state --> Ignore the ADDBA_REQ */
-				/* For NEGO: do nothing. Wait for TX Done of ADDBA_RSP */
-				/* For DELETING: do nothing. Wait for TX Done of DELBA */
-				if (prRxBaEntry->ucStatus != BA_ENTRY_STATUS_ACTIVE) {
-					DBGLOG(QM, WARN, "[Puff][%s]:(Warning)ADDBA_REQ for TID=%ld is received, status:%d)\n", __func__,
-							u4Tid, prRxBaEntry->ucStatus);
-					break; /* Ignore the ADDBA_REQ since the current state is NEGO */
-				}
-				/* 4 <Case 2.4> ACTIVE state --> Accept */
-				/* Send an ADDBA_RSP to accept the request again */
-				/* else */
-			}
-		}
-		/* 4 <3> Construct the ADDBA_RSP frame */
-		prTxMsduInfo = (P_MSDU_INFO_T)cnmMgtPktAlloc(prAdapter, ACTION_ADDBA_RSP_FRAME_LEN);
-		prBssInfo	 = GET_BSS_INFO_BY_INDEX(prAdapter, prStaRec->ucBssIndex);
-
-		if (!prTxMsduInfo) {
-			/* The peer may send an ADDBA_REQ message later.
-			 *  Do nothing to the BA entry. No DELBA will be sent (because cnmMgtPktAlloc() may fail again).
-			 *  No BA deletion event will be sent to the host (because cnmMgtPktAlloc() may fail again).
-			 */
-			DBGLOG(QM, WARN, "[Puff][%s]: (Warning) ADDBA_RSP alloc failure\n", __func__);
-
-			if (fgIsNewEntryAdded) {
-				/* If a new entry has been created due to this ADDBA_REQ, delete it */
-				ASSERT(prRxBaEntry);
-				mqmRxModifyBaEntryStatus(prAdapter, prRxBaEntry, BA_ENTRY_STATUS_INVALID);
-			}
-
-			break; /* Exit directly to free the ADDBA_REQ */
-		}
-
-		/* Fill the ADDBA_RSP message */
-		prAddBaRsp = (P_ACTION_ADDBA_RSP_FRAME_T)((UINT_32)(prTxMsduInfo->prPacket) + MAC_TX_RESERVED_FIELD);
-		prAddBaRsp->u2FrameCtrl = MAC_FRAME_ACTION;
-
-#if CFG_SUPPORT_802_11W
-		if (rsnCheckBipKeyInstalled(prAdapter, prStaRec)) {
-			DBGLOG(QM, WARN, "[Puff][%s]: (Warning) ADDBA_RSP is 80211w enabled\n", __func__);
-			prAddBaReq->u2FrameCtrl |= MASK_FC_PROTECTED_FRAME;
-		}
-#endif
-		prAddBaRsp->u2DurationID  = 0;
-		prAddBaRsp->ucCategory	  = CATEGORY_BLOCK_ACK_ACTION;
-		prAddBaRsp->ucAction	  = ACTION_ADDBA_RSP;
-		prAddBaRsp->ucDialogToken = prAddBaReq->ucDialogToken;
-
-		DBGLOG(QM, WARN, "[Puff][%s]: (Warning) ADDBA_RSP DurationID(%d) Category(%d) Action(%d) DialogToken(%d)\n",
-				__func__, prAddBaRsp->u2DurationID, prAddBaRsp->ucCategory, prAddBaRsp->ucAction,
-				prAddBaRsp->ucDialogToken);
-
-		if (fgIsReqAccepted)
-			rAddBaRspBody.u2StatusCode = STATUS_CODE_SUCCESSFUL;
-		else
-			rAddBaRspBody.u2StatusCode = STATUS_CODE_REQ_DECLINED;
-
-		/* WinSize = min(WinSize in ADDBA_REQ, CFG_RX_BA_MAX_WINSIZE) */
-		u4BuffSize = (((rAddBaReqBody.u2BAParameterSet) & BA_PARAM_SET_BUFFER_SIZE_MASK) >>
-					  BA_PARAM_SET_BUFFER_SIZE_MASK_OFFSET);
-
-		/*If ADDBA req WinSize<=0 => use default WinSize(16) */
-		if ((u4BuffSize > CFG_RX_BA_MAX_WINSIZE) || (u4BuffSize <= 0))
-			u4BuffSize = CFG_RX_BA_MAX_WINSIZE;
-#if CFG_SUPPORT_BCM
-		/* TODO: Call BT coexistence function to limit the winsize */
-		u4BuffSizeBT = bcmRequestBaWinSize();
-		DBGLOG(QM, WARN, "[Puff][%s]: (Warning) bcmRequestBaWinSize(%d)\n", __func__, u4BuffSizeBT);
-
-		if (u4BuffSize > u4BuffSizeBT)
-			u4BuffSize = u4BuffSizeBT;
-#endif /* CFG_SUPPORT_BCM */
-
-		rAddBaRspBody.u2BAParameterSet = (BA_POLICY_IMMEDIATE | (u4Tid << BA_PARAM_SET_TID_MASK_OFFSET) |
-										  (u4BuffSize << BA_PARAM_SET_BUFFER_SIZE_MASK_OFFSET));
-
-		/* TODO: Determine the BA timeout value according to the default preference */
-		rAddBaRspBody.u2BATimeoutValue = rAddBaReqBody.u2BATimeoutValue;
-
-		DBGLOG(QM, WARN, "[Puff][%s]: (Warning) ADDBA_RSP u4BuffSize(%d) StatusCode(%d)", __func__, u4BuffSize,
-				rAddBaRspBody.u2StatusCode);
-		DBGLOG(QM, WARN, "BAParameterSet(0x%08X) BATimeoutValue(%d)\n", rAddBaRspBody.u2BAParameterSet,
-				rAddBaRspBody.u2BATimeoutValue);
-		kalMemCopy((PUINT_8)(&(prAddBaRsp->aucStatusCode[0])), (PUINT_8)(&rAddBaRspBody), 6);
-
-		COPY_MAC_ADDR(prAddBaRsp->aucDestAddr, prStaRec->aucMacAddr);
-		COPY_MAC_ADDR(prAddBaRsp->aucSrcAddr, prBssInfo->aucOwnMacAddr);
-		/* COPY_MAC_ADDR(prAddBaRsp->aucBSSID,g_aprBssInfo[prStaRec->ucNetTypeIndex]->aucBSSID); */
-		COPY_MAC_ADDR(prAddBaRsp->aucBSSID, prAddBaReq->aucBSSID);
-
-		/* 4 <4> Forward the ADDBA_RSP to TXM */
-		TX_SET_MMPDU(prAdapter, prTxMsduInfo, prStaRec->ucBssIndex,
-				(prStaRec != NULL) ? (prStaRec->ucIndex) : (STA_REC_INDEX_NOT_FOUND), WLAN_MAC_HEADER_LEN,
-				ACTION_ADDBA_RSP_FRAME_LEN, mqmCallbackAddBaRspSent, MSDU_RATE_MODE_AUTO);
-
-#if CFG_SUPPORT_802_11W
-		if (rsnCheckBipKeyInstalled(prAdapter, prStaRec)) {
-			DBGLOG(RSN, INFO, "Set MSDU_OPT_PROTECTED_FRAME\n");
-			nicTxConfigPktOption(prTxMsduInfo, MSDU_OPT_PROTECTED_FRAME, TRUE);
-		}
-#endif
-
-		/* Note: prTxMsduInfo->ucTID is not used for transmitting the ADDBA_RSP.
-		 *  However, when processing TX Done of this ADDBA_RSP, the TID value is needed, so
-		 *  store the TID value in advance to prevent parsing the ADDBA_RSP frame
-		 */
-		prTxMsduInfo->ucTID = (UINT_8)u4Tid;
-
-		nicTxEnqueueMsdu(prAdapter, prTxMsduInfo);
-
-		DBGLOG(QM, WARN, "[Puff][%s]: (RX_BA) ADDBA_RSP ---> peer (STA=%d TID=%ld)\n", __func__, prStaRec->ucIndex,
-				u4Tid);
-
-#if 0
-		/* 4 <5> Notify the host to start buffer reordering */
-		if (fgIsNewEntryAdded) {	/* Only when a new BA entry is indeed added will the host be notified */
-			ASSERT(fgIsReqAccepted);
-
-			prSwRfbEventToHost = (P_SW_RFB_T) cnmMgtPktAlloc(EVENT_RX_ADDBA_PACKET_LEN);
-
-			if (!prSwRfbEventToHost) {
-
-				/* Note: DELBA will not be sent since cnmMgtPktAlloc() may fail again. However,
-				 * it does not matter because upon receipt of AMPDUs without a RX BA agreement,
-				 * MQM will send DELBA frames
-				 */
-
-				DBGLOG(MQM, WARN, "MQM: (Warning) EVENT packet alloc failed\n");
-
-				/* Ensure that host and FW are synchronized */
-				mqmRxModifyBaEntryStatus(prRxBaEntry, BA_ENTRY_STATUS_INVALID);
-
-				break;	/* Free the received ADDBA_REQ */
-			}
-				prEventRxAddBa = (P_EVENT_RX_ADDBA_T) prSwRfbEventToHost->pucBuffer;
-				prEventRxAddBa->ucStaRecIdx = (UINT_8) u4StaRecIdx;
-				prEventRxAddBa->u2Length = EVENT_RX_ADDBA_PACKET_LEN;
-				prEventRxAddBa->ucEID = EVENT_ID_RX_ADDBA;
-				prEventRxAddBa->ucSeqNum = 0;	/* Unsolicited event packet */
-				prEventRxAddBa->u2BAParameterSet = rAddBaRspBody.u2BAParameterSet;
-				prEventRxAddBa->u2BAStartSeqCtrl = rAddBaReqBody.u2BAStartSeqCtrl;
-				prEventRxAddBa->u2BATimeoutValue = rAddBaReqBody.u2BATimeoutValue;
-				prEventRxAddBa->ucDialogToken = prAddBaReq->ucDialogToken;
-
-				DBGLOG(MQM, INFO,
-						"MQM: (RX_BA) Event ADDBA ---> driver (STA=%ld TID=%ld WinStart=%d)\n",
-						u4StaRecIdx, u4Tid, (prEventRxAddBa->u2BAStartSeqCtrl >> 4));
-
-				/* Configure the SW_RFB for the Event packet */
-				RXM_SET_EVENT_PACKET(
-							    /* P_SW_RFB_T */ (P_SW_RFB_T)
-								prSwRfbEventToHost,
-							    /* HIF RX Packet pointer */
-								(PUINT_8) prEventRxAddBa,
-							    /* HIF RX port number */ HIF_RX0_INDEX
-					);
-
-				rxmSendEventToHost(prSwRfbEventToHost);
-
-
-		}
-#endif
-
-	} while (FALSE);
-}
-
-/*----------------------------------------------------------------------------*/
-/*!
- * \brief
- *
- * \param[in]
- *
- * \return none
- */
-/*----------------------------------------------------------------------------*/
-VOID mqmHandleAddBaRsp(IN P_SW_RFB_T prSwRfb)
-{
-}
-
-/*----------------------------------------------------------------------------*/
-/*!
- * \brief
- *
- * \param[in]
- *
- * \return none
- */
-/*----------------------------------------------------------------------------*/
-VOID mqmHandleDelBa(IN P_SW_RFB_T prSwRfb)
-{
-}
-
-/*----------------------------------------------------------------------------*/
-/*!
- * \brief
- *
- * \param[in]
- *
- * \return none
- */
-/*----------------------------------------------------------------------------*/
-VOID mqmHandleBaActionFrame(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb)
-{
-	P_WLAN_ACTION_FRAME prRxFrame;
-
-	ASSERT(prAdapter);
-	ASSERT(prSwRfb);
-
-	prRxFrame = (P_WLAN_ACTION_FRAME)prSwRfb->pvHeader;
-	DBGLOG(RLM, WARN, "[Puff][%s] Action(%d)\n", __func__, prRxFrame->ucAction);
-
-	switch (prRxFrame->ucAction) {
-	case ACTION_ADDBA_REQ:
-		DBGLOG(RLM, WARN, "[Puff][%s] (RX_BA) ADDBA_REQ <--- peer\n", __func__);
-		mqmHandleAddBaReq(prAdapter, prSwRfb);
-		break;
-
-	case ACTION_ADDBA_RSP:
-		DBGLOG(RLM, WARN, "[Puff][%s] (RX_BA) ADDBA_RSP <--- peer\n", __func__);
-		mqmHandleAddBaRsp(prSwRfb);
-		break;
-
-	case ACTION_DELBA:
-		DBGLOG(RLM, WARN, "[Puff][%s] (RX_BA) DELBA <--- peer\n", __func__);
-		mqmHandleDelBa(prSwRfb);
-		break;
-
-	default:
-		DBGLOG(RLM, WARN, "[Puff][%s] Unknown BA Action Frame\n", __func__);
-		break;
-	}
-}
-
-#endif
 
 #if QM_ADAPTIVE_TC_RESOURCE_CTRL
 VOID qmResetTcControlResource(IN P_ADAPTER_T prAdapter)
@@ -6640,12 +5790,6 @@ BOOLEAN qmHandleRxReplay(P_ADAPTER_T prAdapter, P_SW_RFB_T prSwRfb)
 	if (ucSecMode != CIPHER_SUITE_CCMP && ucSecMode != CIPHER_SUITE_TKIP) {
 		DBGLOG(QM, TRACE, "SecMode: %d and CipherGroup: %d, no need check replay\n", ucSecMode,
 				prWpaInfo->u4CipherGroup);
-#if 0
-		if (!(prSwRfb->ucGroupVLD & BIT(RX_GROUP_VLD_1))) {
-			DBGLOG(QM, ERROR, "Group 1 invalid\n");
-			return TRUE;
-		}
-#endif
 		return FALSE;
 	}
 
@@ -6656,16 +5800,6 @@ BOOLEAN qmHandleRxReplay(P_ADAPTER_T prAdapter, P_SW_RFB_T prSwRfb)
 	}
 
 	prDetRplyInfo = &prBssInfo->rDetRplyInfo;
-
-#if 0
-	if (prDetRplyInfo->arReplayPNInfo[ucKeyID].fgFirstPkt) {
-		prDetRplyInfo->arReplayPNInfo[ucKeyID].fgFirstPkt = FALSE;
-		HAL_RX_STATUS_GET_PN(prSwRfb->prRxStatusGroup1, prDetRplyInfo->arReplayPNInfo[ucKeyID].auPN);
-		DBGLOG(QM, INFO,
-			"First check packet. Key ID:0x%x\n", ucKeyID);
-		return FALSE;
-	}
-#endif
 
 	pucPN = prSwRfb->prRxStatusGroup1->aucPN;
 	DBGLOG(QM, TRACE, "BC packet 0x%x:0x%x:0x%x:0x%x:0x%x:0x%x--0x%x:0x%x:0x%x:0x%x:0x%x:0x%x\n", pucPN[0], pucPN[1],

@@ -431,14 +431,6 @@ BOOLEAN tkipMicDecapsulateInRxHdrTransMode(IN P_SW_RFB_T prSwRfb, IN PUINT_8 puc
 	PUCHAR			pucFrameBody;
 	UINT_16			u2FrameBodyLen;
 	struct sk_buff *prSkb = NULL;
-#if 0
-	P_WLAN_MAC_HEADER_T prMacHeader;
-	PUCHAR pucSa, pucDa;
-	UCHAR ucPriority;
-	UCHAR aucDA[6];
-	UCHAR aucSA[6];
-	UCHAR aucType[2];
-#endif
 
 	DEBUGFUNC("tkipMicDecapsulateInRxHdrTransMode");
 
@@ -491,29 +483,6 @@ BOOLEAN tkipMicDecapsulateInRxHdrTransMode(IN P_SW_RFB_T prSwRfb, IN PUINT_8 puc
 		fgStatus = FALSE;
 		DBGLOG(RX, ERROR, "MIC SW DEC2\n");
 	}
-
-#if 0
-	/* perform header transfer for tkip defragment frame, if receiving 802.11 pkt */
-	if (fgStatus == TRUE) {
-		/* reassign payload address */
-		prSwRfb->pucPayload += (ETH_LLC_LEN + ETH_SNAP_LEN);
-
-		/* reassign payload length */
-		u2FrameBodyLen -= (ETH_LLC_LEN + ETH_SNAP_LEN);
-
-		prSwRfb->pvHeader = prSwRfb->pucPayload - (ETHERNET_HEADER_SZ);
-
-		kalMemCopy(&aucDA[0], pucDa, MAC_ADDR_LEN);
-		kalMemCopy(&aucSA[0], pucSa, MAC_ADDR_LEN);
-		kalMemCopy(&aucType[0], prSwRfb->pucPayload - 2, 2);
-
-		kalMemCopy(prSwRfb->pvHeader, &aucDA[0], MAC_ADDR_LEN);
-		kalMemCopy(prSwRfb->pvHeader + MAC_ADDR_LEN, &aucSA[0], MAC_ADDR_LEN);
-		kalMemCopy(prSwRfb->pvHeader + MAC_ADDR_LEN + 2, &aucType[0], 2);
-
-		prSwRfb->u2HeaderLen = ETHERNET_HEADER_SZ;
-	}
-#endif
 
 	/* DBGLOG(RSN, LOUD, ("TKIP MIC:\n")); */
 	/* DBGLOG_MEM8(RSN, LOUD, pucMic1, 8); */

@@ -90,26 +90,5 @@ typedef enum _ENUM_SCAN_PROFILE_T {
  *                              F U N C T I O N S
  ********************************************************************************
  */
-#if 0
-VOID cnmScanInit(VOID);
-
-VOID cnmScanRunEventScanRequest(IN P_MSG_HDR_T prMsgHdr);
-
-BOOLEAN cnmScanRunEventScanAbort(IN P_MSG_HDR_T prMsgHdr);
-
-VOID cnmScanProfileSelection(VOID);
-
-VOID cnmScanProcessStart(VOID);
-
-VOID cnmScanProcessStop(VOID);
-
-VOID cnmScanRunEventReqAISAbsDone(IN P_MSG_HDR_T prMsgHdr);
-
-VOID cnmScanRunEventCancelAISAbsDone(IN P_MSG_HDR_T prMsgHdr);
-
-VOID cnmScanPartialScanTimeout(UINT_32 u4Param);
-
-VOID cnmScanRunEventScnFsmComplete(IN P_MSG_HDR_T prMsgHdr);
-#endif
 
 #endif /* _CNM_SCAN_H */

@@ -71,7 +71,7 @@
  *                              F U N C T I O N S
  ********************************************************************************
  */
-#if 1
+
 static int netdev_event(struct notifier_block *nb, unsigned long notification, void *ptr)
 {
 	struct in_ifaddr	 *ifa		  = (struct in_ifaddr *)ptr;
@@ -87,12 +87,7 @@ static int netdev_event(struct notifier_block *nb, unsigned long notification, v
 		/* DBGLOG(REQ, INFO, ("netdev_event: xxx\n")); */
 		return NOTIFY_DONE;
 	}
-#if 0  /* CFG_SUPPORT_PASSPOINT */
-	{
-		/* printk(KERN_INFO "[netdev_event] IPV4_DAD is unlock now!!\n"); */
-		prGlueInfo->fgIsDad = FALSE;
-	}
-#endif /* CFG_SUPPORT_PASSPOINT */
+
 	if ((prDev != gPrDev) && (prDev != gPrP2pDev[0]) && (prDev != gPrP2pDev[1])) {
 		/* DBGLOG(REQ, INFO, ("netdev_event: device is not mine.\n")); */
 		return NOTIFY_DONE;
@@ -120,76 +115,22 @@ static int netdev_event(struct notifier_block *nb, unsigned long notification, v
 
 	return NOTIFY_DONE;
 }
-#endif
-#if 0  /* CFG_SUPPORT_PASSPOINT */
-static int net6dev_event(struct notifier_block *nb, unsigned long notification, void *ptr)
-{
-	struct inet6_ifaddr *ifa = (struct inet6_ifaddr *)ptr;
-	struct net_device *prDev = ifa->idev->dev;
-	P_GLUE_INFO_T prGlueInfo = NULL;
 
-	if (prDev == NULL) {
-		DBGLOG(REQ, INFO, "net6dev_event: device is empty.\n");
-		return NOTIFY_DONE;
-	}
-
-	if ((strncmp(prDev->name, "p2p", 3) != 0) && (strncmp(prDev->name, "wlan", 4) != 0)) {
-		DBGLOG(REQ, INFO, "net6dev_event: xxx\n");
-		return NOTIFY_DONE;
-	}
-
-	if (strncmp(prDev->name, "p2p", 3) == 0) {
-		/* because we store the address of prGlueInfo in p2p's private date of net device */
-		/* *((P_GLUE_INFO_T *) netdev_priv(prGlueInfo->prP2PInfo[0]->prDevHandler)) = prGlueInfo; */
-		prGlueInfo = *((P_GLUE_INFO_T *) netdev_priv(prDev));
-	} else {		/* wlan0 */
-		prGlueInfo = (P_GLUE_INFO_T) netdev_priv(prDev);
-	}
-
-	if (prGlueInfo == NULL) {
-		DBGLOG(REQ, INFO, "netdev_event: prGlueInfo is empty.\n");
-		return NOTIFY_DONE;
-	}
-	/* printk(KERN_INFO "[net6dev_event] IPV6_DAD is unlock now!!\n"); */
-	prGlueInfo->fgIs6Dad = FALSE;
-
-	return NOTIFY_DONE;
-}
-#endif /* CFG_SUPPORT_PASSPOINT */
-
-#if 1 /* unused  */
 static struct notifier_block inetaddr_notifier = {
 	.notifier_call = netdev_event,
 };
-#endif
-
-#if 0  /* CFG_SUPPORT_PASSPOINT */
-static struct notifier_block inet6addr_notifier = {
-	.notifier_call = net6dev_event,
-};
-#endif /* CFG_SUPPORT_PASSPOINT */
 
 void wlanRegisterNotifier(void)
 {
 #if CFG_ENABLE_NET_DEV_NOTIFY
-
 	register_inetaddr_notifier(&inetaddr_notifier);
-#if 0  /* CFG_SUPPORT_PASSPOINT */
-	register_inet6addr_notifier(&inet6addr_notifier);
-#endif /* CFG_SUPPORT_PASSPOINT */
-
 #endif
 }
 
 void wlanUnregisterNotifier(void)
 {
 #if CFG_ENABLE_NET_DEV_NOTIFY
-
 	unregister_inetaddr_notifier(&inetaddr_notifier);
-#if 0  /* CFG_SUPPORT_PASSPOINT */
-	unregister_inetaddr_notifier(&inet6addr_notifier);
-#endif /* CFG_SUPPORT_PASSPOINT */
-
 #endif
 }
 

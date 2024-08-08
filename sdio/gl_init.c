@@ -325,10 +325,7 @@ static struct cfg80211_ops mtk_wlan_ops = {
 #ifdef CONFIG_NL80211_TESTMODE
 	.testmode_cmd = mtk_cfg80211_testmode_cmd,
 #endif
-#if 0 /* Remove schedule_scan because we need more verification for NLO */
-	.sched_scan_start = mtk_cfg80211_sched_scan_start,
-	.sched_scan_stop = mtk_cfg80211_sched_scan_stop,
-#endif
+
 #if CFG_SUPPORT_TDLS
 	.tdls_oper = mtk_cfg80211_tdls_oper,
 	.tdls_mgmt = mtk_cfg80211_tdls_mgmt,
@@ -422,38 +419,6 @@ struct notifier_block pm_resume_notifier_func = {
  *                              F U N C T I O N S
  ********************************************************************************
  */
-
-#if 0
-/*----------------------------------------------------------------------------*/
-/*!
-* \brief Override the implementation of select queue
-*
-* \param[in] dev Pointer to struct net_device
-* \param[in] skb Pointer to struct skb_buff
-*
-* \return (none)
-*/
-/*----------------------------------------------------------------------------*/
-unsigned int _cfg80211_classify8021d(struct sk_buff *skb)
-{
-	unsigned int dscp = 0;
-
-	/* skb->priority values from 256->263 are magic values
-	 * directly indicate a specific 802.1d priority.  This is
-	 * to allow 802.1d priority to be passed directly in from
-	 * tags
-	 */
-
-	if (skb->priority >= 256 && skb->priority <= 263)
-		return skb->priority - 256;
-	switch (skb->protocol) {
-	case htons(ETH_P_IP):
-		dscp = ip_hdr(skb)->tos & 0xfc;
-		break;
-	}
-	return dscp >> 5;
-}
-#endif
 
 #if KERNEL_VERSION(5, 2, 0) <= LINUX_VERSION_CODE
 u16 wlanSelectQueue(struct net_device *dev, struct sk_buff *skb, struct net_device *sb_dev)
@@ -583,14 +548,14 @@ static void glLoadNvram(IN P_GLUE_INFO_T prGlueInfo, OUT P_REG_INFO_T prRegInfo)
 			kalCfgDataRead16(prGlueInfo, OFFSET_OF(WIFI_CFG_PARAM_STRUCT, rRssiPathCompensation) + i,
 					(PUINT_16)(((PUINT_8) & (prRegInfo->rRssiPathCompasation)) + i));
 		}
-#if 1
+
 		/* load full NVRAM */
 		for (i = 0; i < sizeof(WIFI_CFG_PARAM_STRUCT); i += sizeof(UINT_16)) {
 			kalCfgDataRead16(prGlueInfo, OFFSET_OF(WIFI_CFG_PARAM_STRUCT, u2Part1OwnVersion) + i,
 					(PUINT_16)(((PUINT_8) & (prRegInfo->aucNvram)) + i));
 		}
 		prRegInfo->prNvramSettings = (P_WIFI_CFG_PARAM_STRUCT)&prRegInfo->aucNvram;
-#endif
+
 	} else {
 		DBGLOG(INIT, INFO, "glLoadNvram fail\n");
 		prGlueInfo->fgNvramAvailable = FALSE;
@@ -1037,19 +1002,6 @@ int wlanHardStartXmit(struct sk_buff *prSkb, struct net_device *prDev)
 	prNetDevPrivate = (P_NETDEV_PRIVATE_GLUE_INFO)netdev_priv(prDev);
 	ASSERT(prNetDevPrivate->prGlueInfo == prGlueInfo);
 	ucBssIndex = prNetDevPrivate->ucBssIdx;
-
-#if CFG_SUPPORT_PASSPOINT
-	if (prGlueInfo->fgIsDad) {
-		/* kalPrint("[Passpoint R2] Due to ipv4_dad...TX is forbidden\n"); */
-		dev_kfree_skb(prSkb);
-		return NETDEV_TX_OK;
-	}
-	if (prGlueInfo->fgIs6Dad) {
-		/* kalPrint("[Passpoint R2] Due to ipv6_dad...TX is forbidden\n"); */
-		dev_kfree_skb(prSkb);
-		return NETDEV_TX_OK;
-	}
-#endif /* CFG_SUPPORT_PASSPOINT */
 
 	kalResetPacket(prGlueInfo, (P_NATIVE_PACKET)prSkb);
 
@@ -1514,17 +1466,12 @@ static INT_32 wlanNetRegister(struct wireless_dev *prWdev)
 			wlanClearDevIdx(prWdev->netdev);
 			i4DevIdx = -1;
 		}
-#if 1
 		prNetDevPrivate = (P_NETDEV_PRIVATE_GLUE_INFO)netdev_priv(prGlueInfo->prDevHandler);
 		ASSERT(prNetDevPrivate->prGlueInfo == prGlueInfo);
 		prNetDevPrivate->ucBssIdx = prGlueInfo->prAdapter->prAisBssInfo->ucBssIndex;
 		wlanBindBssIdxToNetInterface(
 				prGlueInfo, prGlueInfo->prAdapter->prAisBssInfo->ucBssIndex, (PVOID)prWdev->netdev);
-#else
-		wlanBindBssIdxToNetInterface(
-				prGlueInfo, prGlueInfo->prAdapter->prAisBssInfo->ucBssIndex, (PVOID)prWdev->netdev);
-		/* wlanBindNetInterface(prGlueInfo, NET_DEV_WLAN_IDX, (PVOID)prWdev->netdev); */
-#endif
+
 		if (i4DevIdx != -1)
 			prGlueInfo->fgIsRegistered = TRUE;
 	} while (FALSE);
@@ -1783,12 +1730,10 @@ static struct wireless_dev  *wlanNetCreate(PVOID pvData, PVOID pvDriverData)
 	DBGLOG(INIT, INFO, "net_device prDev(0x%p) allocated\n", prGlueInfo->prDevHandler);
 
 	/* 4 <3.1.1> Initialize net device varaiables */
-#if 1
+
 	prNetDevPrivate				= (P_NETDEV_PRIVATE_GLUE_INFO)netdev_priv(prGlueInfo->prDevHandler);
 	prNetDevPrivate->prGlueInfo = prGlueInfo;
-#else
-	*((P_GLUE_INFO_T *)netdev_priv(prGlueInfo->prDevHandler)) = prGlueInfo;
-#endif
+
 	prGlueInfo->prDevHandler->needed_headroom += NIC_TX_HEAD_ROOM;
 	prGlueInfo->prDevHandler->netdev_ops = &wlan_netdev_ops;
 #ifdef CONFIG_WIRELESS_EXT
@@ -1819,14 +1764,6 @@ static struct wireless_dev  *wlanNetCreate(PVOID pvData, PVOID pvDriverData)
 	prGlueInfo->fgIsRegistered			  = FALSE;
 	prGlueInfo->prScanRequest			  = NULL;
 	prGlueInfo->prSchedScanRequest		  = NULL;
-
-#if CFG_SUPPORT_PASSPOINT
-	/* Init DAD */
-	prGlueInfo->fgIsDad	 = FALSE;
-	prGlueInfo->fgIs6Dad = FALSE;
-	kalMemZero(prGlueInfo->aucDADipv4, 4);
-	kalMemZero(prGlueInfo->aucDADipv6, 16);
-#endif /* CFG_SUPPORT_PASSPOINT */
 
 	init_completion(&prGlueInfo->rScanComp);
 	init_completion(&prGlueInfo->rHaltComp);
@@ -2276,10 +2213,7 @@ WLAN_STATUS wlanDownloadBufferBin(P_ADAPTER_T prAdapter)
 	UINT_32							  chip_id;
 	WLAN_STATUS						  retWlanStat  = WLAN_STATUS_FAILURE;
 	INT_32							  i4OidTimeout = -1;
-#if 0
-	UINT_8 aucBinMacAddr[MAC_ADDR_LEN];
-	UINT_8 aucZeroMacAddr[] = NULL_MAC_ADDR;
-#endif
+
 #if CFG_EFUSE_AUTO_MODE_SUPPORT
 	UINT_32						u4Efuse_addr = 0;
 	UINT_8						u4Index		 = 0;
@@ -2392,20 +2326,6 @@ INT_32 wlanProbe(PVOID pvData, PVOID pvDriverData)
 	UINT_8 ucRpyDetectOffload;
 #endif
 
-#if 0
-	PUINT_8 pucConfigBuf = NULL, pucCfgBuf = NULL;
-	UINT_32 u4ConfigReadLen = 0;
-#endif
-#if 0
-	struct sdio_func *func = (struct sdio_func *)pvData;
-
-	dev_warn("wlanProbe()\n");
-	dev_warn("pvData=0x%x\n", pvData);
-	dev_warn("pvDriverData=0x%x\n", pvDriverData);
-	dev_warn("func->vendor=0x%x\n", func->vendor);
-	dev_warn("func->device=0x%x\n", func->device);
-#endif
-
 	do {
 		/* 4 <1> Initialize the IO port of the interface */
 		/* GeorgeKuo: pData has different meaning for _HIF_XXX:
@@ -2486,9 +2406,7 @@ INT_32 wlanProbe(PVOID pvData, PVOID pvDriverData)
 		/* kalMemCopy(&prGlueInfo->rRegInfo, prRegInfo, sizeof(REG_INFO_T)); */
 
 		prRegInfo->u4PowerMode = CFG_INIT_POWER_SAVE_PROF;
-#if 0
-		prRegInfo->fgEnArpFilter = TRUE;
-#endif
+
 		/* The Init value of u4WpaVersion/u4AuthAlg shall be DISABLE/OPEN, not zero! */
 		/* The Init value of u4CipherGroup/u4CipherPairwise shall be NONE, not zero! */
 		prGlueInfo->rWpaInfo.u4WpaVersion	  = IW_AUTH_WPA_VERSION_DISABLED;
@@ -2683,14 +2601,6 @@ INT_32 wlanProbe(PVOID pvData, PVOID pvDriverData)
 #endif
 
 #if CFG_SUPPORT_EASY_DEBUG
-
-#if 0
-	wlanGetParseConfig(prGlueInfo->prAdapter);
-	/*wlanGetParseConfig would reparsing the config file,
-	*and then, sent to firmware
-	*use wlanFeatureToFw to take it(won't be reparsing)
-	*/
-#endif
 
 		/* move before reading file
 		 *wlanLoadDefaultCustomerSetting(prAdapter);

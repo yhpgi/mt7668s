@@ -60,25 +60,6 @@ struct ieee80211_channel *kalP2pFuncGetChannelEntry(IN P_GL_P2P_INFO_T prP2pInfo
 
 /*----------------------------------------------------------------------------*/
 /*!
- * \brief to retrieve Wi-Fi Direct state from glue layer
- *
- * \param[in]
- *           prGlueInfo
- *           rPeerAddr
- * \return
- *           ENUM_BOW_DEVICE_STATE
- */
-/*----------------------------------------------------------------------------*/
-#if 0
-ENUM_PARAM_MEDIA_STATE_T kalP2PGetState(IN P_GLUE_INFO_T prGlueInfo)
-{
-	ASSERT(prGlueInfo);
-
-	return prGlueInfo->prP2PInfo[0]->eState;
-}				/* end of kalP2PGetState() */
-#endif
-/*----------------------------------------------------------------------------*/
-/*!
  * \brief to update the assoc req to p2p
  *
  * \param[in]
@@ -166,71 +147,6 @@ VOID kalP2PUpdateAssocInfo(IN P_GLUE_INFO_T prGlueInfo, IN PUINT_8 pucFrameBody,
 
 /*----------------------------------------------------------------------------*/
 /*!
- * \brief to set Wi-Fi Direct state in glue layer
- *
- * \param[in]
- *           prGlueInfo
- *           eBowState
- *           rPeerAddr
- * \return
- *           none
- */
-/*----------------------------------------------------------------------------*/
-#if 0
-VOID
-kalP2PSetState(IN P_GLUE_INFO_T prGlueInfo,
-			IN ENUM_PARAM_MEDIA_STATE_T eState, IN PARAM_MAC_ADDRESS rPeerAddr, IN UINT_8 ucRole)
-{
-	union iwreq_data evt;
-	UINT_8 aucBuffer[IW_CUSTOM_MAX];
-
-	ASSERT(prGlueInfo);
-
-	memset(&evt, 0, sizeof(evt));
-
-	if (eState == PARAM_MEDIA_STATE_CONNECTED) {
-		prGlueInfo->prP2PInfo[0]->eState = PARAM_MEDIA_STATE_CONNECTED;
-
-		snprintf(aucBuffer, IW_CUSTOM_MAX - 1, "P2P_STA_CONNECT=" MACSTR, MAC2STR(rPeerAddr));
-		evt.data.length = strlen(aucBuffer);
-
-		/* indicate in IWECUSTOM event */
-		wireless_send_event(prGlueInfo->prP2PInfo[0]->prDevHandler, IWEVCUSTOM, &evt, aucBuffer);
-
-	} else if (eState == PARAM_MEDIA_STATE_DISCONNECTED) {
-		snprintf(aucBuffer, IW_CUSTOM_MAX - 1, "P2P_STA_DISCONNECT=" MACSTR, MAC2STR(rPeerAddr));
-		evt.data.length = strlen(aucBuffer);
-
-		/* indicate in IWECUSTOM event */
-		wireless_send_event(prGlueInfo->prP2PInfo[0]->prDevHandler, IWEVCUSTOM, &evt, aucBuffer);
-	} else {
-		ASSERT(0);
-	}
-
-}				/* end of kalP2PSetState() */
-#endif
-/*----------------------------------------------------------------------------*/
-/*!
- * \brief to retrieve Wi-Fi Direct operating frequency
- *
- * \param[in]
- *           prGlueInfo
- *
- * \return
- *           in unit of KHz
- */
-/*----------------------------------------------------------------------------*/
-#if 0
-UINT_32 kalP2PGetFreqInKHz(IN P_GLUE_INFO_T prGlueInfo)
-{
-	ASSERT(prGlueInfo);
-
-	return prGlueInfo->prP2PInfo[0]->u4FreqInKHz;
-}				/* end of kalP2PGetFreqInKHz() */
-#endif
-
-/*----------------------------------------------------------------------------*/
-/*!
  * \brief to retrieve Bluetooth-over-Wi-Fi role
  *
  * \param[in]
@@ -267,49 +183,15 @@ UINT_8 kalP2PGetRole(IN P_GLUE_INFO_T prGlueInfo, IN UINT_8 ucRoleIdx)
  *           none
  */
 /*----------------------------------------------------------------------------*/
-#if 1
 VOID kalP2PSetRole(IN P_GLUE_INFO_T prGlueInfo, IN UINT_8 ucRole, IN UINT_8 ucRoleIdx)
 {
 	ASSERT(prGlueInfo);
 	ASSERT(ucRole <= 2);
 
 	prGlueInfo->prP2PInfo[ucRoleIdx]->ucRole = ucRole;
-	/* Remove non-used code */
-} /* end of kalP2PSetRole() */
-
-#else
-VOID kalP2PSetRole(
-		IN P_GLUE_INFO_T prGlueInfo, IN UINT_8 ucResult, IN PUINT_8 pucSSID, IN UINT_8 ucSSIDLen, IN UINT_8 ucRole)
-{
-	union iwreq_data evt;
-	UINT_8			 aucBuffer[IW_CUSTOM_MAX];
-
-	ASSERT(prGlueInfo);
-	ASSERT(ucRole <= 2);
-
-	memset(&evt, 0, sizeof(evt));
-
-	if (ucResult == 0)
-		prGlueInfo->prP2PInfo[0]->ucRole = ucRole;
-
-	if (pucSSID)
-		snprintf(aucBuffer, IW_CUSTOM_MAX - 1, "P2P_FORMATION_RST=%d%d%d%c%c", ucResult, ucRole,
-				1 /* persistence or not */, pucSSID[7], pucSSID[8]);
-	else
-		snprintf(aucBuffer, IW_CUSTOM_MAX - 1, "P2P_FORMATION_RST=%d%d%d%c%c", ucResult, ucRole,
-				1 /* persistence or not */, '0', '0');
-
-	evt.data.length = strlen(aucBuffer);
-
-	/* if (pucSSID) */
-	/* printk("P2P GO SSID DIRECT-%c%c\n", pucSSID[7], pucSSID[8]); */
-
-	/* indicate in IWECUSTOM event */
-	wireless_send_event(prGlueInfo->prP2PInfo[0]->prDevHandler, IWEVCUSTOM, &evt, aucBuffer);
 
 } /* end of kalP2PSetRole() */
 
-#endif
 /*----------------------------------------------------------------------------*/
 /*!
  * \brief to set the cipher for p2p
@@ -523,186 +405,6 @@ VOID kalP2PUpdateWSC_IE(IN P_GLUE_INFO_T prGlueInfo, IN UINT_8 ucType, IN PUINT_
 
 } /* kalP2PUpdateWSC_IE */
 
-#if 0
-/*----------------------------------------------------------------------------*/
-/*!
-* \brief indicate an event to supplicant for device connection request
-*
-* \param[in] prGlueInfo Pointer of GLUE_INFO_T
-*
-* \retval none
-*/
-/*----------------------------------------------------------------------------*/
-VOID kalP2PIndicateConnReq(IN P_GLUE_INFO_T prGlueInfo, IN PUINT_8 pucDevName, IN INT_32 u4NameLength,
-							IN PARAM_MAC_ADDRESS rPeerAddr,
-							IN UINT_8 ucDevType,/* 0: P2P Device / 1: GC / 2: GO */
-							IN INT_32 i4ConfigMethod, IN INT_32 i4ActiveConfigMethod
-)
-{
-	union iwreq_data evt;
-	UINT_8 aucBuffer[IW_CUSTOM_MAX];
-
-	ASSERT(prGlueInfo);
-
-	/* buffer peer information for later IOC_P2P_GET_REQ_DEVICE_INFO access */
-	prGlueInfo->prP2PInfo[0]->u4ConnReqNameLength = u4NameLength > 32 ? 32 : u4NameLength;
-	kalMemCopy(prGlueInfo->prP2PInfo[0]->aucConnReqDevName,
-		pucDevName,
-		prGlueInfo->prP2PInfo[0]->u4ConnReqNameLength);
-	COPY_MAC_ADDR(prGlueInfo->prP2PInfo[0]->rConnReqPeerAddr, rPeerAddr);
-	prGlueInfo->prP2PInfo[0]->ucConnReqDevType = ucDevType;
-	prGlueInfo->prP2PInfo[0]->i4ConnReqConfigMethod = i4ConfigMethod;
-	prGlueInfo->prP2PInfo[0]->i4ConnReqActiveConfigMethod = i4ActiveConfigMethod;
-
-	/* prepare event structure */
-	memset(&evt, 0, sizeof(evt));
-
-	snprintf(aucBuffer, IW_CUSTOM_MAX - 1, "P2P_DVC_REQ");
-	evt.data.length = strlen(aucBuffer);
-
-	/* indicate in IWEVCUSTOM event */
-	wireless_send_event(prGlueInfo->prP2PInfo[0]->prDevHandler, IWEVCUSTOM, &evt, aucBuffer);
-
-}				/* end of kalP2PIndicateConnReq() */
-
-/*----------------------------------------------------------------------------*/
-/*!
-* \brief Indicate an event to supplicant for device connection request from other device.
-*
-* \param[in] prGlueInfo Pointer of GLUE_INFO_T
-* \param[in] pucGroupBssid  Only valid when invitation Type equals to 0.
-*
-* \retval none
-*/
-/*----------------------------------------------------------------------------*/
-VOID
-kalP2PInvitationIndication(IN P_GLUE_INFO_T prGlueInfo,
-				IN P_P2P_DEVICE_DESC_T prP2pDevDesc,
-				IN PUINT_8 pucSsid,
-				IN UINT_8 ucSsidLen,
-				IN UINT_8 ucOperatingChnl, IN UINT_8 ucInvitationType, IN PUINT_8 pucGroupBssid)
-{
-#if 1
-	union iwreq_data evt;
-	UINT_8 aucBuffer[IW_CUSTOM_MAX];
-
-	ASSERT(prGlueInfo);
-
-	/* buffer peer information for later IOC_P2P_GET_STRUCT access */
-	prGlueInfo->prP2PInfo[0]->u4ConnReqNameLength =
-		(UINT_32) ((prP2pDevDesc->u2NameLength > 32) ? 32 : prP2pDevDesc->u2NameLength);
-	kalMemCopy(prGlueInfo->prP2PInfo[0]->aucConnReqDevName, prP2pDevDesc->aucName,
-			prGlueInfo->prP2PInfo[0]->u4ConnReqNameLength);
-	COPY_MAC_ADDR(prGlueInfo->prP2PInfo[0]->rConnReqPeerAddr, prP2pDevDesc->aucDeviceAddr);
-	COPY_MAC_ADDR(prGlueInfo->prP2PInfo[0]->rConnReqGroupAddr, pucGroupBssid);
-	prGlueInfo->prP2PInfo[0]->i4ConnReqConfigMethod = (INT_32) (prP2pDevDesc->u2ConfigMethod);
-	prGlueInfo->prP2PInfo[0]->ucOperatingChnl = ucOperatingChnl;
-	prGlueInfo->prP2PInfo[0]->ucInvitationType = ucInvitationType;
-
-	/* prepare event structure */
-	memset(&evt, 0, sizeof(evt));
-
-	snprintf(aucBuffer, IW_CUSTOM_MAX - 1, "P2P_INV_INDICATE");
-	evt.data.length = strlen(aucBuffer);
-
-	/* indicate in IWEVCUSTOM event */
-	wireless_send_event(prGlueInfo->prP2PInfo[0]->prDevHandler, IWEVCUSTOM, &evt, aucBuffer);
-
-#else
-	P_MSG_P2P_CONNECTION_REQUEST_T prP2pConnReq = (P_MSG_P2P_CONNECTION_REQUEST_T) NULL;
-	P_P2P_SPECIFIC_BSS_INFO_T prP2pSpecificBssInfo = (P_P2P_SPECIFIC_BSS_INFO_T) NULL;
-	P_P2P_CONNECTION_SETTINGS_T prP2pConnSettings = (P_P2P_CONNECTION_SETTINGS_T) NULL;
-
-	do {
-		ASSERT_BREAK((prGlueInfo != NULL) && (prP2pDevDesc != NULL));
-
-		/* Not a real solution */
-
-		prP2pSpecificBssInfo = prGlueInfo->prAdapter->rWifiVar.prP2pSpecificBssInfo;
-		prP2pConnSettings = prGlueInfo->prAdapter->rWifiVar.prP2PConnSettings;
-
-		prP2pConnReq = (P_MSG_P2P_CONNECTION_REQUEST_T) cnmMemAlloc(prGlueInfo->prAdapter,
-										RAM_TYPE_MSG,
-										sizeof(MSG_P2P_CONNECTION_REQUEST_T));
-
-		if (prP2pConnReq == NULL)
-			break;
-
-		kalMemZero(prP2pConnReq, sizeof(MSG_P2P_CONNECTION_REQUEST_T));
-
-		prP2pConnReq->rMsgHdr.eMsgId = MID_MNY_P2P_CONNECTION_REQ;
-
-		prP2pConnReq->eFormationPolicy = ENUM_P2P_FORMATION_POLICY_AUTO;
-
-		COPY_MAC_ADDR(prP2pConnReq->aucDeviceID, prP2pDevDesc->aucDeviceAddr);
-
-		prP2pConnReq->u2ConfigMethod = prP2pDevDesc->u2ConfigMethod;
-
-		if (ucInvitationType == P2P_INVITATION_TYPE_INVITATION) {
-			prP2pConnReq->fgIsPersistentGroup = FALSE;
-			prP2pConnReq->fgIsTobeGO = FALSE;
-
-		}
-
-		else if (ucInvitationType == P2P_INVITATION_TYPE_REINVOKE) {
-			DBGLOG(P2P, TRACE, "Re-invoke Persistent Group\n");
-			prP2pConnReq->fgIsPersistentGroup = TRUE;
-			prP2pConnReq->fgIsTobeGO = (prGlueInfo->prP2PInfo[0]->ucRole == 2) ? TRUE : FALSE;
-
-		}
-
-		p2pFsmRunEventDeviceDiscoveryAbort(prGlueInfo->prAdapter, NULL);
-
-		if (ucOperatingChnl != 0)
-			prP2pSpecificBssInfo->ucPreferredChannel = ucOperatingChnl;
-
-		if ((ucSsidLen < 32) && (pucSsid != NULL))
-			COPY_SSID(prP2pConnSettings->aucSSID, prP2pConnSettings->ucSSIDLen, pucSsid, ucSsidLen);
-
-		mboxSendMsg(prGlueInfo->prAdapter, MBOX_ID_0, (P_MSG_HDR_T) prP2pConnReq, MSG_SEND_METHOD_BUF);
-
-	} while (FALSE);
-
-	/* frog add. */
-	/* TODO: Invitation Indication */
-
-#endif
-
-}				/* kalP2PInvitationIndication */
-#endif
-
-#if 0
-/*----------------------------------------------------------------------------*/
-/*!
-* \brief Indicate an status to supplicant for device invitation status.
-*
-* \param[in] prGlueInfo Pointer of GLUE_INFO_T
-*
-* \retval none
-*/
-/*----------------------------------------------------------------------------*/
-VOID kalP2PInvitationStatus(IN P_GLUE_INFO_T prGlueInfo, IN UINT_32 u4InvStatus)
-{
-	union iwreq_data evt;
-	UINT_8 aucBuffer[IW_CUSTOM_MAX];
-
-	ASSERT(prGlueInfo);
-
-	/* buffer peer information for later IOC_P2P_GET_STRUCT access */
-	prGlueInfo->prP2PInfo[0]->u4InvStatus = u4InvStatus;
-
-	/* prepare event structure */
-	memset(&evt, 0, sizeof(evt));
-
-	snprintf(aucBuffer, IW_CUSTOM_MAX - 1, "P2P_INV_STATUS");
-	evt.data.length = strlen(aucBuffer);
-
-	/* indicate in IWEVCUSTOM event */
-	wireless_send_event(prGlueInfo->prP2PInfo[0]->prDevHandler, IWEVCUSTOM, &evt, aucBuffer);
-
-}				/* kalP2PInvitationStatus */
-#endif
-
 /*----------------------------------------------------------------------------*/
 /*!
  * \brief Indicate an event to supplicant for Service Discovery request from other device.
@@ -791,39 +493,6 @@ struct net_device *kalP2PGetDevHdlr(P_GLUE_INFO_T prGlueInfo)
 	ASSERT(prGlueInfo->prP2PInfo[0]);
 	return prGlueInfo->prP2PInfo[0]->prDevHandler;
 }
-
-#if CFG_SUPPORT_ANTI_PIRACY
-#if 0
-/*----------------------------------------------------------------------------*/
-/*!
-* \brief
-*
-* \param[in] prAdapter  Pointer of ADAPTER_T
-*
-* \return none
-*/
-/*----------------------------------------------------------------------------*/
-VOID kalP2PIndicateSecCheckRsp(IN P_GLUE_INFO_T prGlueInfo, IN PUINT_8 pucRsp, IN UINT_16 u2RspLen)
-{
-	union iwreq_data evt;
-	UINT_8 aucBuffer[IW_CUSTOM_MAX];
-
-	ASSERT(prGlueInfo);
-
-	memset(&evt, 0, sizeof(evt));
-	snprintf(aucBuffer, IW_CUSTOM_MAX - 1, "P2P_SEC_CHECK_RSP=");
-
-	kalMemCopy(prGlueInfo->prP2PInfo[0]->aucSecCheckRsp, pucRsp, u2RspLen);
-	evt.data.length = strlen(aucBuffer);
-
-#if DBG
-	DBGLOG_MEM8(SEC, LOUD, prGlueInfo->prP2PInfo[0]->aucSecCheckRsp, u2RspLen);
-#endif
-	/* indicate in IWECUSTOM event */
-	wireless_send_event(prGlueInfo->prP2PInfo[0]->prDevHandler, IWEVCUSTOM, &evt, aucBuffer);
-}				/* p2pFsmRunEventRxDisassociation */
-#endif
-#endif
 
 /*----------------------------------------------------------------------------*/
 /*!

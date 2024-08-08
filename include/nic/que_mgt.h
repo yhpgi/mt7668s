@@ -210,42 +210,6 @@ extern const PUINT_8 apucACI2Str[4];
 #define QM_RX_BA_ENTRY_MISS_TIMEOUT_MS (200)
 #endif
 
-#if CFG_M0VE_BA_TO_DRIVER
-/* MQM internal control bitmap per-bit usage (for operations on g_prMqm->u4FlagBitmap) */
-#define MQM_FLAG_TSPEC_NEGO_ADD_IN_PROGRESS 0
-#define MQM_FLAG_IDLE_TX_BA_TIMER_STARTED 1
-#define MQM_FLAG_IDLE_RX_BA_TIMER_STARTED 2
-
-#define MQM_IDLE_RX_BA_DETECTION 0
-#define MQM_IDLE_RX_BA_CHECK_INTERVAL 5000 /* in msec */
-#define MQM_DEL_IDLE_RXBA_THRESHOLD_BK 6
-#define MQM_DEL_IDLE_RXBA_THRESHOLD_BE 12
-#define MQM_DEL_IDLE_RXBA_THRESHOLD_VI 6
-#define MQM_DEL_IDLE_RXBA_THRESHOLD_VO 6
-
-/* For indicating whether the role when generating a DELBA message */
-#define DELBA_ROLE_INITIATOR TRUE
-#define DELBA_ROLE_RECIPIENT FALSE
-
-#define MQM_SET_FLAG(_Bitmap, _flag) \
-	{ \
-		(_Bitmap) |= (BIT((_flag))); \
-	}
-#define MQM_CLEAR_FLAG(_Bitmap, _flag) \
-	{ \
-		(_Bitmap) &= (~BIT((_flag))); \
-	}
-#define MQM_CHECK_FLAG(_Bitmap, _flag) ((_Bitmap) & (BIT((_flag))))
-
-typedef enum _ENUM_BA_RESET_SEL_T {
-	MAC_ADDR_TID_MATCH = 0,
-	MAC_ADDR_MATCH,
-	ALWAYS_MATCH,
-	MATCH_NUM
-} ENUM_BA_RESET_SEL_T;
-
-#endif
-
 #define QM_DEQUE_PERCENT_VHT80_NSS1 75 /* BW80 NSS1 rate: MCS9 433 Mbps */
 #define QM_DEQUE_PERCENT_VHT40_NSS1 35 /* BW40 NSS1 Max rate: 200 Mbps */
 #define QM_DEQUE_PERCENT_VHT20_NSS1 15 /* BW20 NSS1 Max rate: 86.7Mbps */
@@ -325,11 +289,6 @@ typedef struct _RX_BA_ENTRY_T {
 	UINT_16 u2FirstBubbleSn;
 	BOOLEAN fgHasBubble;
 
-#if CFG_M0VE_BA_TO_DRIVER
-	UINT_8	ucStatus;
-	UINT_8	ucIdleCount;
-	UINT_16 u2SnapShotSN;
-#endif
 	/* UINT_8                  ucTxBufferSize; */
 	/* BOOL                    fgIsAcConstrain; */
 	/* BOOL                    fgIsBaEnabled; */
@@ -361,13 +320,6 @@ typedef struct _TC_RESOURCE_CTRL_T {
 typedef struct _QUE_MGT_T { /* Queue Management Control Info */
 	/* Per-Type Queues: [0] BMCAST or UNKNOWN-STA packets */
 	QUE_T arTxQueue[NUM_OF_PER_TYPE_TX_QUEUES];
-
-#if 0
-	/* For TX Scheduling */
-	UINT_8 arRemainingTxOppt[NUM_OF_PER_STA_TX_QUEUES];
-	UINT_8 arCurrentTxStaIndex[NUM_OF_PER_STA_TX_QUEUES];
-
-#endif
 
 	/* Reordering Queue Parameters */
 	RX_BA_ENTRY_T arRxBaTable[CFG_NUM_OF_RX_BA_AGREEMENTS];
@@ -528,25 +480,8 @@ typedef struct _IE_WMM_PARAM_T {
 	UINT_8 ucReserved;
 
 	/* AC Parameters */
-#if 1
 	WMM_AC_PARAM_T arAcParam[4];
-#else
-	UINT_8 ucAciAifsn_BE;
-	UINT_8 ucEcw_BE;
-	UINT_8 aucTxopLimit_BE[2];
 
-	UINT_8 ucAciAifsn_BG;
-	UINT_8 ucEcw_BG;
-	UINT_8 aucTxopLimit_BG[2];
-
-	UINT_8 ucAciAifsn_VI;
-	UINT_8 ucEcw_VI;
-	UINT_8 aucTxopLimit_VI[2];
-
-	UINT_8 ucAciAifsn_VO;
-	UINT_8 ucEcw_VO;
-	UINT_8 aucTxopLimit_VO[2];
-#endif
 } IE_WMM_PARAM_T, *P_IE_WMM_PARAM_T;
 
 typedef struct _IE_WMM_TSPEC_T {
@@ -630,17 +565,6 @@ typedef struct _CMD_ADDBA_REJECT {
 	UINT_8	aucReserved[3];
 } CMD_ADDBA_REJECT_T, *P_CMD_ADDBA_REJECT_T;
 
-#if CFG_M0VE_BA_TO_DRIVER
-/* The status of an TX/RX BA entry in FW (NEGO means the negotiation process is in progress) */
-typedef enum _ENUM_BA_ENTRY_STATUS_T {
-	BA_ENTRY_STATUS_INVALID = 0,
-	BA_ENTRY_STATUS_NEGO,
-	BA_ENTRY_STATUS_ACTIVE,
-	BA_ENTRY_STATUS_DELETING
-} ENUM_BA_ENTRY_STATUS_T,
-		*P_ENUM_BA_ENTRY_STATUS_T;
-#endif
-
 /*******************************************************************************
  *                            P U B L I C   D A T A
  ********************************************************************************
@@ -669,32 +593,8 @@ typedef enum _ENUM_BA_ENTRY_STATUS_T {
 
 #define QM_RX_GET_NEXT_SW_RFB(_prSwRfb) ((P_SW_RFB_T)(((_prSwRfb)->rQueEntry).prNext))
 
-#if 0
-#define QM_GET_STA_REC_PTR_FROM_INDEX(_prAdapter, _ucIndex) \
-	((((_ucIndex) != STA_REC_INDEX_BMCAST) && ((_ucIndex) != STA_REC_INDEX_NOT_FOUND)) ? \
-					&(_prAdapter->arStaRec[_ucIndex]) : \
-					NULL)
-#endif
-
 #define QM_GET_STA_REC_PTR_FROM_INDEX(_prAdapter, _ucIndex) cnmGetStaRecByIndex(_prAdapter, _ucIndex)
 
-#if 0
-#define QM_TX_SET_MSDU_INFO_FOR_DATA_PACKET(_prMsduInfo, _ucTC, _ucPacketType, _ucFormatID, _fgIs802_1x, _fgIs802_11, \
-		_u2PalLLH, _u2AclSN, _ucPsForwardingType, _ucPsSessionID) \
-	{ \
-		ASSERT(_prMsduInfo); \
-		(_prMsduInfo)->ucTC				  = (_ucTC); \
-		(_prMsduInfo)->ucPacketType		  = (_ucPacketType); \
-		(_prMsduInfo)->ucFormatID		  = (_ucFormatID); \
-		(_prMsduInfo)->fgIs802_1x		  = (_fgIs802_1x); \
-		(_prMsduInfo)->fgIs802_11		  = (_fgIs802_11); \
-		(_prMsduInfo)->u2PalLLH			  = (_u2PalLLH); \
-		(_prMsduInfo)->u2AclSN			  = (_u2AclSN); \
-		(_prMsduInfo)->ucPsForwardingType = (_ucPsForwardingType); \
-		(_prMsduInfo)->ucPsSessionID	  = (_ucPsSessionID); \
-		(_prMsduInfo)->fgIsBurstEnd		  = (FALSE); \
-	}
-#else
 #define QM_TX_SET_MSDU_INFO_FOR_DATA_PACKET( \
 		_prMsduInfo, _ucTC, _ucPacketType, _ucFormatID, _fgIs802_1x, _fgIs802_11, _ucPsForwardingType) \
 	{ \
@@ -706,7 +606,6 @@ typedef enum _ENUM_BA_ENTRY_STATUS_T {
 		(_prMsduInfo)->fgIs802_11		  = (_fgIs802_11); \
 		(_prMsduInfo)->ucPsForwardingType = (_ucPsForwardingType); \
 	}
-#endif
 
 #define QM_INIT_STA_REC(_prStaRec, _fgIsValid, _fgIsQoS, _pucMacAddr) \
 	{ \
@@ -911,23 +810,6 @@ VOID qmFreeAllByBssIdx(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex);
 UINT_32 qmGetRxReorderQueuedBufferCount(IN P_ADAPTER_T prAdapter);
 
 UINT_32 qmDumpQueueStatus(IN P_ADAPTER_T prAdapter, IN PUINT_8 pucBuf, IN UINT_32 u4MaxLen);
-
-#if CFG_M0VE_BA_TO_DRIVER
-VOID mqmSendDelBaFrame(IN P_ADAPTER_T prAdapter, IN BOOLEAN fgIsInitiator, IN P_STA_RECORD_T prStaRec, IN UINT_32 u4Tid,
-		IN UINT_32 u4ReasonCode);
-
-WLAN_STATUS
-mqmCallbackAddBaRspSent(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo, IN ENUM_TX_RESULT_CODE_T rTxDoneStatus);
-
-VOID mqmTimeoutCheckIdleRxBa(IN P_ADAPTER_T prAdapter, IN ULONG ulParamPtr);
-
-VOID mqmRxModifyBaEntryStatus(
-		IN P_ADAPTER_T prAdapter, IN P_RX_BA_ENTRY_T prRxBaEntry, IN ENUM_BA_ENTRY_STATUS_T eStatus);
-
-VOID mqmHandleAddBaReq(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb);
-
-VOID mqmHandleBaActionFrame(P_ADAPTER_T prAdapter, P_SW_RFB_T prSwRfb);
-#endif
 
 VOID qmResetTcControlResource(IN P_ADAPTER_T prAdapter);
 

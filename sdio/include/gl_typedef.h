@@ -193,7 +193,6 @@ typedef VOID (*remove_card)(VOID);
 #define DWORD_TO_BYTE(_value) ((_value) << 2)
 #endif /* DWORD_TO_BYTE */
 
-#if 1 /* Little-Endian */
 #define CONST_NTOHS(_x) ntohs(_x)
 
 #define CONST_HTONS(_x) htons(_x)
@@ -205,18 +204,6 @@ typedef VOID (*remove_card)(VOID);
 #define NTOHL(_x) ntohl(_x)
 
 #define HTONL(_x) htonl(_x)
-
-#else /* Big-Endian */
-
-#define CONST_NTOHS(_x)
-
-#define CONST_HTONS(_x)
-
-#define NTOHS(_x)
-
-#define HTONS(_x)
-
-#endif
 
 /*******************************************************************************
  *                  F U N C T I O N   D E C L A R A T I O N S

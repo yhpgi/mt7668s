@@ -1087,23 +1087,6 @@ BOOLEAN rlmDomainCheckChannelEntryValid(P_ADAPTER_T prAdapter, UINT_8 ucCentralC
 			ucTemp = (ucCentralCh - g_rRlmSubBand[i].ucStartCh) % g_rRlmSubBand[i].ucInterval;
 	}
 
-#if 0
-	/*2.4G, ex 1, 2, 3 */
-	if (ucCentralCh >= BAND_2G4_LOWER_BOUND && ucCentralCh <= BAND_2G4_UPPER_BOUND)
-		ucTemp = 0;
-	/*FCC- Spec : Band UNII-1, ex 36, 38, 40.... */
-	else if (ucCentralCh >= UNII1_LOWER_BOUND && ucCentralCh <= UNII1_UPPER_BOUND)
-		ucTemp = (ucCentralCh - UNII1_LOWER_BOUND) % 2;
-	/*FCC- Spec : Band UNII-2A, ex 52, 54, 56.... */
-	else if (ucCentralCh >= UNII2A_LOWER_BOUND && ucCentralCh <= UNII2A_UPPER_BOUND)
-		ucTemp = (ucCentralCh - UNII2A_LOWER_BOUND) % 2;
-	/*FCC- Spec : Band UNII-2C, ex 100, 102, 104.... */
-	else if (ucCentralCh >= UNII2C_LOWER_BOUND && ucCentralCh <= UNII2C_UPPER_BOUND)
-		ucTemp = (ucCentralCh - UNII2C_LOWER_BOUND) % 2;
-	/*FCC- Spec : Band UNII-3, ex 149, 151, 153... */
-	else if (ucCentralCh >= UNII3_LOWER_BOUND && ucCentralCh <= UNII3_UPPER_BOUND)
-		ucTemp = (ucCentralCh - UNII3_LOWER_BOUND) % 2;
-#endif
 	if (ucTemp == 0)
 		fgValid = TRUE;
 	return fgValid;
@@ -1990,78 +1973,6 @@ VOID rlmDomainBuildCmdByDefaultTable(P_CMD_SET_COUNTRY_CHANNEL_POWER_LIMIT_T prC
 			}
 		}
 	}
-
-#if 0
-	if (prPwrLimitSubBand->aucPwrLimitSubBand[POWER_LIMIT_2G4] < MAX_TX_POWER) {
-		for (i = BAND_2G4_LOWER_BOUND; i <= BAND_2G4_UPPER_BOUND; i++) {
-			prCmdPwrLimit->ucCentralCh = i;
-			kalMemSet(&prCmdPwrLimit->cPwrLimitCCK, prPwrLimitSubBand->aucPwrLimitSubBand[POWER_LIMIT_2G4],
-				PWR_LIMIT_NUM);
-			prCmdPwrLimit++;
-			prCmd->ucNum++;
-		}
-	}
-
-	if (prPwrLimitSubBand->aucPwrLimitSubBand[POWER_LIMIT_UNII1] < MAX_TX_POWER) {
-		if (prCmd->u2CountryCode != COUNTRY_CODE_KR) {
-			for (i = UNII1_LOWER_BOUND; i <= UNII1_UPPER_BOUND; i += 2) {
-				prCmdPwrLimit->ucCentralCh = i;
-				kalMemSet(&prCmdPwrLimit->cPwrLimitCCK,
-					prPwrLimitSubBand->aucPwrLimitSubBand[POWER_LIMIT_UNII1], PWR_LIMIT_NUM);
-				prCmdPwrLimit++;
-				prCmd->ucNum++;
-			}
-		} else {
-			for (i = UNII1_LOWER_BOUND; i <= UNII1_UPPER_BOUND; i += 2) {
-				/* ex:    40MHz power limit(mW\MHz) = 20MHz power limit(mW\MHz) * 2
-				 * ---> 40MHz power limit(dBm) = 20MHz power limit(dBm) + 6;
-				 */
-				prCmdPwrLimit->ucCentralCh = i;
-				prCmdPwrLimit->cPwrLimitCCK =
-					g_rRlmPowerLimitDefault[u2DefaultTableIndex].cPwrLimitUnii1;
-				prCmdPwrLimit->cPwrLimit20 =
-					g_rRlmPowerLimitDefault[u2DefaultTableIndex].cPwrLimitUnii1;
-				prCmdPwrLimit->cPwrLimit40 =
-					g_rRlmPowerLimitDefault[u2DefaultTableIndex].cPwrLimitUnii1 + 6;
-				prCmdPwrLimit->cPwrLimit80 =
-					g_rRlmPowerLimitDefault[u2DefaultTableIndex].cPwrLimitUnii1 + 12;
-				prCmdPwrLimit->cPwrLimit160 =
-					g_rRlmPowerLimitDefault[u2DefaultTableIndex].cPwrLimitUnii1 + 18;
-				prCmdPwrLimit++;
-				prCmd->ucNum++;
-			}
-		}
-	}
-
-	if (prPwrLimitSubBand->aucPwrLimitSubBand[POWER_LIMIT_UNII2A] < MAX_TX_POWER) {
-		for (i = UNII2A_LOWER_BOUND; i <= UNII2A_UPPER_BOUND; i += 2) {
-			prCmdPwrLimit->ucCentralCh = i;
-			kalMemSet(&prCmdPwrLimit->cPwrLimitCCK,
-				prPwrLimitSubBand->aucPwrLimitSubBand[POWER_LIMIT_UNII2A], PWR_LIMIT_NUM);
-			prCmdPwrLimit++;
-			prCmd->ucNum++;
-		}
-	}
-
-	if (prPwrLimitSubBand->aucPwrLimitSubBand[POWER_LIMIT_UNII2C] < MAX_TX_POWER) {
-		for (i = UNII2C_LOWER_BOUND; i <= UNII2C_UPPER_BOUND; i += 2) {
-			prCmdPwrLimit->ucCentralCh = i;
-			kalMemSet(&prCmdPwrLimit->cPwrLimitCCK,
-				prPwrLimitSubBand->aucPwrLimitSubBand[POWER_LIMIT_UNII2C], PWR_LIMIT_NUM);
-			prCmdPwrLimit++;
-			prCmd->ucNum++;
-		}
-	}
-	if (prPwrLimitSubBand->aucPwrLimitSubBand[POWER_LIMIT_UNII3] < MAX_TX_POWER) {
-		for (i = UNII3_LOWER_BOUND; i <= UNII3_UPPER_BOUND; i += 2) {
-			prCmdPwrLimit->ucCentralCh = i;
-			kalMemSet(&prCmdPwrLimit->cPwrLimitCCK,
-				prPwrLimitSubBand->aucPwrLimitSubBand[POWER_LIMIT_UNII3], PWR_LIMIT_NUM);
-			prCmdPwrLimit++;
-			prCmd->ucNum++;
-		}
-	}
-#endif
 }
 
 /*----------------------------------------------------------------------------*/
@@ -2339,62 +2250,6 @@ VOID rlmDomainSendPwrLimitCmd(P_ADAPTER_T prAdapter)
 			rlmDomainBuildCmdByConfigTable(prAdapter, prCmd);
 		}
 	}
-#if 0
-	u4SetCmdTableMaxSize =
-		sizeof(CMD_SET_COUNTRY_CHANNEL_POWER_LIMIT_T) +
-		MAX_CMD_SUPPORT_CHANNEL_NUM * sizeof(CMD_CHANNEL_POWER_LIMIT);
-
-	prCmd = cnmMemAlloc(prAdapter, RAM_TYPE_BUF, u4SetCmdTableMaxSize);
-	ASSERT(prCmd);
-
-	/* To do: exception handle */
-	if (!prCmd) {
-		DBGLOG(RLM, ERROR, "Domain: no buf to send cmd\n");
-		return;
-	}
-	kalMemZero(prCmd, u4SetCmdTableMaxSize);	/* TODO memzero */
-
-	if (u2TableIndex != POWER_LIMIT_TABLE_NULL && u2TableIndex < MAX_DEFAULT_TABLE_COUNTRY_NUM) {
-
-		prCmd->u2CountryCode = (((UINT_16) g_rRlmCountryPowerLimitTable[u2TableIndex].aucCountryCode[0]) << 8) |
-			(((UINT_16) g_rRlmCountryPowerLimitTable[u2TableIndex].aucCountryCode[1]) & BITS(0, 7));
-		prChPwrLimit = &g_rRlmCountryPowerLimitTable[u2TableIndex].rChannelPowerLimit[0];
-		prCmdPwrLimit = &prCmd->rChannelPowerLimit[0];
-		prCmd->ucNum = 0;
-		for (i = 0; i < MAX_CMD_SUPPORT_CHANNEL_NUM; i++) {
-
-			if (prChPwrLimit->ucCentralCh != ENDCH) {
-
-				/*Check Power limit table channel efficient or not */
-				fgChannelValid = rlmDomainCheckChannelEntryValid(prAdapter, prChPwrLimit->ucCentralCh);
-
-				/*Cmd set up */
-				if (fgChannelValid) {
-					kalMemCopy(prCmdPwrLimit, prChPwrLimit, sizeof(CMD_CHANNEL_POWER_LIMIT));
-					DBGLOG(RLM, INFO,
-							"Domain: ValidCh=%d,Limit=%d,%d,%d,%d,%d,Fg=%d\n",
-							prCmdPwrLimit->ucCentralCh, prCmdPwrLimit->cPwrLimitCCK,
-							prCmdPwrLimit->cPwrLimit20, prCmdPwrLimit->cPwrLimit40,
-							prCmdPwrLimit->cPwrLimit80, prCmdPwrLimit->cPwrLimit160,
-							prCmdPwrLimit->ucFlag);
-					prCmd->ucNum++;
-					prCmdPwrLimit++;
-				} else {
-					DBGLOG(RLM, INFO,
-							"Domain: Non-Ch=%d,Limit=%d,%d,%d,%d,%d,Fg=%d\n",
-							prChPwrLimit->ucCentralCh, prChPwrLimit->cPwrLimitCCK,
-							prChPwrLimit->cPwrLimit20, prChPwrLimit->cPwrLimit40,
-							prChPwrLimit->cPwrLimit80, prChPwrLimit->cPwrLimit160,
-							prChPwrLimit->ucFlag);
-				}
-				prChPwrLimit++;
-			} else {
-				/*End of the chanel entry */
-				break;
-			}
-		};
-	}
-#endif
 
 	if (prCmd->u2CountryCode != 0) {
 		DBGLOG(RLM, INFO, "Domain: ValidCC =%c%c, ChNum=%d\n", ((prCmd->u2CountryCode & 0xff00) >> 8),

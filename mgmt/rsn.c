@@ -1383,13 +1383,6 @@ VOID rsnGenerateRSNIE(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo)
 
 		if (GET_BSS_INFO_BY_INDEX(prAdapter, ucBssIndex)->eNetworkType == NETWORK_TYPE_AIS &&
 				rsnSearchPmkidEntry(prAdapter, prStaRec->aucMacAddr, &u4Entry)) {
-#if 0
-			DBGLOG(RSN, TRACE, ("Add Pmk at assoc req\n"));
-			DBGLOG(RSN, TRACE, ("addr " MACSTR" PMKID "MACSTR"\n",
-			MAC2STR(prAdapter->rWifiVar.rAisSpecificBssInfo.arPmkidCache[u4Entry].rBssidInfo.arBSSID),
-						MAC2STR(prAdapter->
-						rWifiVar.rAisSpecificBssInfo.arPmkidCache[u4Entry].rBssidInfo.arPMKID)));
-#endif
 			if (prAdapter->rWifiVar.rAisSpecificBssInfo.arPmkidCache[u4Entry].fgPmkidExist) {
 				RSN_IE(pucBuffer)->ucLength = 38;
 				WLAN_SET_FIELD_16(cp, 1); /* PMKID count */
@@ -1620,50 +1613,15 @@ VOID rsnGenMicErrorEvent(IN P_ADAPTER_T prAdapter, IN BOOLEAN fgFlags)
 /*----------------------------------------------------------------------------*/
 VOID rsnTkipHandleMICFailure(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prSta, IN BOOLEAN fgErrorKeyType)
 {
-	/* UINT_32               u4RsnaCurrentMICFailTime; */
-	/* P_AIS_SPECIFIC_BSS_INFO_T prAisSpecBssInfo; */
-
 	DEBUGFUNC("rsnTkipHandleMICFailure");
 
 	ASSERT(prAdapter);
-#if 1
+
 	rsnGenMicErrorEvent(prAdapter, /* prSta, */ fgErrorKeyType);
 
 	/* Generate authentication request event. */
 	DBGLOG(RSN, INFO, "Generate TKIP MIC error event (type: 0%d)\n", fgErrorKeyType);
-#else
-	ASSERT(prSta);
 
-	prAisSpecBssInfo = &prAdapter->rWifiVar.rAisSpecificBssInfo;
-
-	/* Record the MIC error occur time. */
-	GET_CURRENT_SYSTIME(&u4RsnaCurrentMICFailTime);
-
-	/* Generate authentication request event. */
-	DBGLOG(RSN, INFO, "Generate TKIP MIC error event (type: 0%d)\n", fgErrorKeyType);
-
-	/* If less than 60 seconds have passed since a previous TKIP MIC failure,
-	 *  disassociate from the AP and wait for 60 seconds before (re)associating
-	 *  with the same AP.
-	 */
-	if (prAisSpecBssInfo->u4RsnaLastMICFailTime != 0 &&
-			!CHECK_FOR_TIMEOUT(u4RsnaCurrentMICFailTime, prAisSpecBssInfo->u4RsnaLastMICFailTime,
-					SEC_TO_SYSTIME(TKIP_COUNTERMEASURE_SEC))) {
-		/* If less than 60 seconds expired since last MIC error, we have to
-		 *  block traffic.
-		 */
-
-		DBGLOG(RSN, INFO, "Start blocking traffic!\n");
-		rsnGenMicErrorEvent(prAdapter, /* prSta, */ fgErrorKeyType);
-
-		secFsmEventStartCounterMeasure(prAdapter, prSta);
-	} else {
-		rsnGenMicErrorEvent(prAdapter, /* prSta, */ fgErrorKeyType);
-		DBGLOG(RSN, INFO, "First TKIP MIC error!\n");
-	}
-
-	COPY_SYSTIME(prAisSpecBssInfo->u4RsnaLastMICFailTime, u4RsnaCurrentMICFailTime);
-#endif
 } /* rsnTkipHandleMICFailure */
 
 /*----------------------------------------------------------------------------*/
@@ -1698,20 +1656,6 @@ VOID rsnSelectPmkidCandidateList(IN P_ADAPTER_T prAdapter, IN P_BSS_DESC_T prBss
 		DBGLOG(RSN, TRACE, "-- SSID not matched\n");
 		return;
 	}
-#if 0
-	if ((prBssDesc->u2BSSBasicRateSet &
-		~(rPhyAttributes[prAisBssInfo->ePhyType].u2SupportedRateSet)) || prBssDesc->fgIsUnknownBssBasicRate) {
-		DBGLOG(RSN, TRACE, "-- Rate set not matched\n");
-		return;
-	}
-
-	if (/* prBssDesc->u4RsnSelectedPairwiseCipher != prAisBssInfo->u4RsnSelectedPairwiseCipher || */
-			prBssDesc->u4RsnSelectedGroupCipher != prAisBssInfo->u4RsnSelectedGroupCipher
-		/* || prBssDesc->u4RsnSelectedAKMSuite != prAisBssInfo->u4RsnSelectedAKMSuite */) {
-		DBGLOG(RSN, TRACE, "-- Encrypt status not matched for PMKID\n");
-		return;
-	}
-#endif
 
 	rsnUpdatePmkidCandidateList(prAdapter, prBssDesc);
 
@@ -2098,7 +2042,7 @@ UINT_8 rsnCheckSaQueryTimeout(IN P_ADAPTER_T prAdapter)
 		prBssSpecInfo->pucSaQueryTransId = NULL;
 		prBssSpecInfo->u4SaQueryCount	 = 0;
 		cnmTimerStopTimer(prAdapter, &prBssSpecInfo->rSaQueryTimer);
-#if 1
+
 		if (prAdapter->prAisBssInfo->eConnectionState ==
 				PARAM_MEDIA_STATE_CONNECTED /* STA_STATE_3 == prStaRec->ucStaState */) {
 			P_MSG_AIS_ABORT_T prAisAbortMsg;
@@ -2112,10 +2056,7 @@ UINT_8 rsnCheckSaQueryTimeout(IN P_ADAPTER_T prAdapter)
 
 			mboxSendMsg(prAdapter, MBOX_ID_0, (P_MSG_HDR_T)prAisAbortMsg, MSG_SEND_METHOD_BUF);
 		}
-#else
-		/* Re-connect */
-		kalIndicateStatusAndComplete(prAdapter->prGlueInfo, WLAN_STATUS_MEDIA_DISCONNECT, NULL, 0);
-#endif
+
 		return 1;
 	}
 
@@ -2359,19 +2300,7 @@ void rsnSaQueryRequest(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb)
 		DBGLOG(RSN, INFO, "Set MSDU_OPT_PROTECTED_FRAME\n");
 		nicTxConfigPktOption(prMsduInfo, MSDU_OPT_PROTECTED_FRAME, TRUE);
 	}
-#if 0
-	/* 4 Update information of MSDU_INFO_T */
-	prMsduInfo->ucPacketType = HIF_TX_PACKET_TYPE_MGMT;	/* Management frame */
-	prMsduInfo->ucStaRecIndex = prBssInfo->prStaRecOfAP->ucIndex;
-	prMsduInfo->ucNetworkType = prBssInfo->ucNetTypeIndex;
-	prMsduInfo->ucMacHeaderLength = WLAN_MAC_MGMT_HEADER_LEN;
-	prMsduInfo->fgIs802_1x = FALSE;
-	prMsduInfo->fgIs802_11 = TRUE;
-	prMsduInfo->u2FrameLength = WLAN_MAC_MGMT_HEADER_LEN + u2PayloadLen;
-	prMsduInfo->ucPID = nicAssignPID(prAdapter);
-	prMsduInfo->pfTxDoneHandler = NULL;
-	prMsduInfo->fgIsBasicRate = FALSE;
-#endif
+
 	/* 4 Enqueue the frame to send this action frame. */
 	nicTxEnqueueMsdu(prAdapter, prMsduInfo);
 }

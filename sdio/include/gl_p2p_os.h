@@ -130,19 +130,6 @@ struct _GL_P2P_INFO_T {
 /* UINT_16                     u2VenderIELen; */
 #endif
 
-	/*UINT_8 ucOperatingChnl;*/	 /* TH3 multiple P2P */
-	/*UINT_8 ucInvitationType;*/ /* TH3 multiple P2P */
-
-	/*UINT_32 u4InvStatus;*/ /* TH3 multiple P2P */
-
-	/* For SET_STRUCT/GET_STRUCT */
-	/*UINT_8 aucOidBuf[4096];*/ /* TH3 multiple P2P */
-
-#if 1								/* CFG_SUPPORT_ANTI_PIRACY */
-	/*UINT_8 aucSecCheck[256];*/	/* TH3 multiple P2P */
-	/*UINT_8 aucSecCheckRsp[256];*/ /* TH3 multiple P2P */
-#endif
-
 #if (CFG_SUPPORT_DFS_MASTER == 1)
 	struct cfg80211_chan_def *chandef;
 	UINT_32					  cac_time_ms;

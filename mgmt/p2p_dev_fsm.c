@@ -84,76 +84,6 @@ UINT_8 p2pDevFsmInit(IN P_ADAPTER_T prAdapter)
 	else
 		return P2P_DEV_BSS_INDEX + 1;
 
-#if 0
-	do {
-		ASSERT_BREAK(prAdapter != NULL);
-
-		prP2pFsmInfo = prAdapter->rWifiVar.prP2pFsmInfo;
-		prP2pBssInfo = &(prAdapter->rWifiVar.arBssInfo[NETWORK_TYPE_P2P_INDEX]);
-
-		ASSERT_BREAK(prP2pFsmInfo != NULL);
-
-		LINK_INITIALIZE(&(prP2pFsmInfo->rMsgEventQueue));
-
-		prP2pFsmInfo->eCurrentState = prP2pFsmInfo->ePreviousState = P2P_STATE_IDLE;
-		prP2pFsmInfo->prTargetBss = NULL;
-
-		cnmTimerInitTimer(prAdapter,
-				&(prP2pFsmInfo->rP2pFsmTimeoutTimer),
-				(PFN_MGMT_TIMEOUT_FUNC) p2pFsmRunEventFsmTimeout, (ULONG) prP2pFsmInfo);
-
-		/* 4 <2> Initiate BSS_INFO_T - common part */
-		BSS_INFO_INIT(prAdapter, NETWORK_TYPE_P2P_INDEX);
-
-		/* 4 <2.1> Initiate BSS_INFO_T - Setup HW ID */
-		prP2pBssInfo->ucConfigAdHocAPMode = AP_MODE_11G_P2P;
-		prP2pBssInfo->ucHwDefaultFixedRateCode = RATE_OFDM_6M;
-
-		prP2pBssInfo->ucNonHTBasicPhyType = (UINT_8)
-			rNonHTApModeAttributes[prP2pBssInfo->ucConfigAdHocAPMode].ePhyTypeIndex;
-		prP2pBssInfo->u2BSSBasicRateSet =
-			rNonHTApModeAttributes[prP2pBssInfo->ucConfigAdHocAPMode].u2BSSBasicRateSet;
-
-		prP2pBssInfo->u2OperationalRateSet =
-			rNonHTPhyAttributes[prP2pBssInfo->ucNonHTBasicPhyType].u2SupportedRateSet;
-
-		rateGetDataRatesFromRateSet(prP2pBssInfo->u2OperationalRateSet,
-						prP2pBssInfo->u2BSSBasicRateSet,
-						prP2pBssInfo->aucAllSupportedRates, &prP2pBssInfo->ucAllSupportedRatesLen);
-
-		prP2pBssInfo->prBeacon = cnmMgtPktAlloc(prAdapter,
-							OFFSET_OF(WLAN_BEACON_FRAME_T, aucInfoElem[0]) + MAX_IE_LENGTH);
-
-		if (prP2pBssInfo->prBeacon) {
-			prP2pBssInfo->prBeacon->eSrc = TX_PACKET_MGMT;
-			prP2pBssInfo->prBeacon->ucStaRecIndex = 0xFF;	/* NULL STA_REC */
-			prP2pBssInfo->prBeacon->ucNetworkType = NETWORK_TYPE_P2P_INDEX;
-		} else {
-			/* Out of memory. */
-			ASSERT(FALSE);
-		}
-
-		prP2pBssInfo->eCurrentOPMode = OP_MODE_NUM;
-
-		prP2pBssInfo->rPmProfSetupInfo.ucBmpDeliveryAC = PM_UAPSD_ALL;
-		prP2pBssInfo->rPmProfSetupInfo.ucBmpTriggerAC = PM_UAPSD_ALL;
-		prP2pBssInfo->rPmProfSetupInfo.ucUapsdSp = WMM_MAX_SP_LENGTH_2;
-		prP2pBssInfo->ucPrimaryChannel = P2P_DEFAULT_LISTEN_CHANNEL;
-		prP2pBssInfo->eBand = BAND_2G4;
-		prP2pBssInfo->eBssSCO = CHNL_EXT_SCN;
-
-		if (IS_FEATURE_ENABLED(prAdapter->rWifiVar.ucQoS))
-			prP2pBssInfo->fgIsQBSS = TRUE;
-		else
-			prP2pBssInfo->fgIsQBSS = FALSE;
-
-		SET_NET_PWR_STATE_IDLE(prAdapter, NETWORK_TYPE_P2P_INDEX);
-
-		p2pFsmStateTransition(prAdapter, prP2pFsmInfo, P2P_STATE_IDLE);
-	} while (FALSE);
-
-	return;
-#endif
 } /* p2pDevFsmInit */
 
 VOID p2pDevFsmUninit(IN P_ADAPTER_T prAdapter)
@@ -194,53 +124,6 @@ VOID p2pDevFsmUninit(IN P_ADAPTER_T prAdapter)
 		cnmFreeBssInfo(prAdapter, prP2pBssInfo);
 	} while (FALSE);
 
-#if 0
-	P_P2P_FSM_INFO_T prP2pFsmInfo = (P_P2P_FSM_INFO_T) NULL;
-	P_BSS_INFO_T prP2pBssInfo = (P_BSS_INFO_T) NULL;
-
-	do {
-		ASSERT_BREAK(prAdapter != NULL);
-
-		DEBUGFUNC("p2pFsmUninit()");
-		DBGLOG(P2P, INFO, "->p2pFsmUninit()\n");
-
-		prP2pFsmInfo = prAdapter->rWifiVar.prP2pFsmInfo;
-		prP2pBssInfo = &(prAdapter->rWifiVar.arBssInfo[NETWORK_TYPE_P2P_INDEX]);
-
-		p2pFuncSwitchOPMode(prAdapter, prP2pBssInfo, OP_MODE_P2P_DEVICE, TRUE);
-
-		p2pFsmRunEventAbort(prAdapter, prP2pFsmInfo);
-
-		p2pStateAbort_IDLE(prAdapter, prP2pFsmInfo, P2P_STATE_NUM);
-
-		UNSET_NET_ACTIVE(prAdapter, NETWORK_TYPE_P2P_INDEX);
-
-		wlanAcquirePowerControl(prAdapter);
-
-		/* Release all pending CMD queue. */
-		DBGLOG(P2P, TRACE,
-				"p2pFsmUninit: wlanProcessCommandQueue, num of element:%d\n",
-				prAdapter->prGlueInfo->rCmdQueue.u4NumElem);
-		wlanProcessCommandQueue(prAdapter, &prAdapter->prGlueInfo->rCmdQueue);
-
-		wlanReleasePowerControl(prAdapter);
-
-		/* Release pending mgmt frame,
-		 * mgmt frame may be pending by CMD without resource.
-		 */
-		kalClearMgmtFramesByBssIdx(prAdapter->prGlueInfo, NETWORK_TYPE_P2P_INDEX);
-
-		/* Clear PendingCmdQue */
-		wlanReleasePendingCMDbyBssIdx(prAdapter, NETWORK_TYPE_P2P_INDEX);
-
-		if (prP2pBssInfo->prBeacon) {
-			cnmMgtPktFree(prAdapter, prP2pBssInfo->prBeacon);
-			prP2pBssInfo->prBeacon = NULL;
-		}
-	} while (FALSE);
-
-	return;
-#endif
 } /* p2pDevFsmUninit */
 
 VOID p2pDevFsmStateTransition(

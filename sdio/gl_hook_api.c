@@ -1224,7 +1224,6 @@ INT_32 MT_ATESetMACAddress(struct net_device *prNetDev, UINT_32 u4Type, PUINT_8 
 	DBGLOG(RFTEST, ERROR, "MT6632 : QA_ATE_HOOK SetMACAddress Type = %d, Addr = %02x:%02x:%02x:%02x:%02x:%02x\n",
 			u4Type, ucAddr[0], ucAddr[1], ucAddr[2], ucAddr[3], ucAddr[4], ucAddr[5]);
 
-#if 1
 	rRfATInfo.u4FuncIndex = u4Type;
 	memcpy(&rRfATInfo.u4FuncData, ucAddr, 4);
 
@@ -1238,7 +1237,7 @@ INT_32 MT_ATESetMACAddress(struct net_device *prNetDev, UINT_32 u4Type, PUINT_8 
 			&u4BufLen);				  /* pu4QryInfoLen */
 	if (i4Status != WLAN_STATUS_SUCCESS)
 		return -EFAULT;
-#endif
+
 	rRfATInfo.u4FuncIndex = u4Type | BIT(18);
 	memset(&rRfATInfo.u4FuncData, 0, sizeof(rRfATInfo.u4FuncData));
 	memcpy(&rRfATInfo.u4FuncData, ucAddr + 4, 2);
@@ -3417,32 +3416,6 @@ INT_32 TxBfManualAssoc(struct net_device *prNetDev, UINT_8 aucMac[MAC_ADDR_LEN],
 	rManualAssoc.ucMarate = ucMarate;
 	rManualAssoc.ucSpeIdx = ucSpeIdx;
 	rManualAssoc.ucaid	  = ucRca2;
-
-#if 0
-	switch (ucMode) {
-	case 0:		/* abggnanac */
-		prStaRec->ucDesiredPhyTypeSet = aucPhyCfg2PhyTypeSet[PHY_TYPE_SET_802_11ABGNAC];
-		break;
-	case 1:		/* bggnan */
-		prStaRec->ucDesiredPhyTypeSet = aucPhyCfg2PhyTypeSet[PHY_TYPE_SET_802_11ABGN];
-		break;
-	case 2:		/* aanac */
-		prStaRec->ucDesiredPhyTypeSet = aucPhyCfg2PhyTypeSet[PHY_TYPE_SET_802_11ANAC];
-		break;
-	default:
-		prStaRec->ucDesiredPhyTypeSet = aucPhyCfg2PhyTypeSet[PHY_TYPE_SET_802_11ABGNAC];
-		break;
-	}
-
-	prStaRec->rTxBfPfmuStaInfo.u2PfmuId = ucPfmuId;
-
-	memcpy(prStaRec->aucMacAddr, aucMac, MAC_ADDR_LEN);
-
-	i4Status = kalIoctl(prGlueInfo,
-				wlanoidStaRecUpdate,
-				&rStaRecUpdateInfo,
-				sizeof(PARAM_CUSTOM_STA_REC_UPD_STRUCT_T), FALSE, FALSE, TRUE, &u4BufLen);
-#endif
 
 	i4Status = kalIoctl(prGlueInfo, wlanoidManualAssoc, &rManualAssoc, sizeof(CMD_MANUAL_ASSOC_STRUCT_T), FALSE, FALSE,
 			TRUE, &u4BufLen);

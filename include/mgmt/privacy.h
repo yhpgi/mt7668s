@@ -105,14 +105,6 @@ typedef struct _PMKID_CANDICATE_T {
 	UINT_32 u4PreAuthFlags;
 } PMKID_CANDICATE_T, *P_PMKID_CANDICATE_T;
 
-#if 0
-/* WPA2 PMKID cache structure */
-typedef struct _PMKID_ENTRY_T {
-	PARAM_BSSID_INFO_T rBssidInfo;
-	BOOLEAN fgPmkidExist;
-} PMKID_ENTRY_T, *P_PMKID_ENTRY_T;
-#endif
-
 /*******************************************************************************
  *                            P U B L I C   D A T A
  ********************************************************************************

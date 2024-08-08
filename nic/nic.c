@@ -306,62 +306,6 @@ VOID nicEnableInterrupt(IN P_ADAPTER_T prAdapter)
 
 } /* end of nicEnableInterrupt() */
 
-#if 0 /* CFG_SDIO_INTR_ENHANCE */
-/*----------------------------------------------------------------------------*/
-/*!
-* @brief Read interrupt status from hardware
-*
-* @param prAdapter pointer to the Adapter handler
-* @param the interrupts
-*
-* @return N/A
-*
-*/
-/*----------------------------------------------------------------------------*/
-VOID nicSDIOReadIntStatus(IN P_ADAPTER_T prAdapter, OUT PUINT_32 pu4IntStatus)
-{
-	P_SDIO_CTRL_T prSDIOCtrl;
-
-	DEBUGFUNC("nicSDIOReadIntStatus");
-
-	ASSERT(prAdapter);
-	ASSERT(pu4IntStatus);
-
-	prSDIOCtrl = prAdapter->prSDIOCtrl;
-	ASSERT(prSDIOCtrl);
-
-	HAL_PORT_RD(prAdapter,
-			MCR_WHISR,
-			sizeof(ENHANCE_MODE_DATA_STRUCT_T), (PUINT_8) prSDIOCtrl, sizeof(ENHANCE_MODE_DATA_STRUCT_T));
-
-	if (kalIsCardRemoved(prAdapter->prGlueInfo) == TRUE || fgIsBusAccessFailed == TRUE) {
-		*pu4IntStatus = 0;
-		return;
-	}
-
-	/* workaround */
-	if ((prSDIOCtrl->u4WHISR & WHISR_TX_DONE_INT) == 0 && (prSDIOCtrl->rTxInfo.au4WTSR[0]
-									| prSDIOCtrl->rTxInfo.au4WTSR[1]
-									| prSDIOCtrl->rTxInfo.au4WTSR[2]
-									| prSDIOCtrl->rTxInfo.au4WTSR[3]
-									| prSDIOCtrl->rTxInfo.au4WTSR[4]
-									| prSDIOCtrl->rTxInfo.au4WTSR[5]
-									| prSDIOCtrl->rTxInfo.au4WTSR[6]
-									| prSDIOCtrl->rTxInfo.au4WTSR[7])) {
-		prSDIOCtrl->u4WHISR |= WHISR_TX_DONE_INT;
-	}
-
-	if ((prSDIOCtrl->u4WHISR & BIT(31)) == 0 &&
-		HAL_GET_MAILBOX_READ_CLEAR(prAdapter) == TRUE &&
-		(prSDIOCtrl->u4RcvMailbox0 != 0 || prSDIOCtrl->u4RcvMailbox1 != 0)) {
-		prSDIOCtrl->u4WHISR |= BIT(31);
-	}
-
-	*pu4IntStatus = prSDIOCtrl->u4WHISR;
-
-}				/* end of nicSDIOReadIntStatus() */
-#endif
-
 /*----------------------------------------------------------------------------*/
 /*!
  * @brief The function used to read interrupt status and then invoking
@@ -488,12 +432,6 @@ VOID nicMCRInit(IN P_ADAPTER_T prAdapter)
 VOID nicHifInit(IN P_ADAPTER_T prAdapter)
 {
 	ASSERT(prAdapter);
-#if 0
-	/* reset event */
-	nicPutMailbox(prAdapter, 0, 0x52455345);	/* RESE */
-	nicPutMailbox(prAdapter, 1, 0x545F5746);	/* T_WF */
-	nicSetSwIntr(prAdapter, BIT(16));
-#endif
 }
 
 /*----------------------------------------------------------------------------*/
@@ -1180,12 +1118,10 @@ WLAN_STATUS nicActivateNetwork(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex)
 
 	kalMemZero(&rCmdActivateCtrl.ucReserved, sizeof(rCmdActivateCtrl.ucReserved));
 
-#if 1 /* DBG */
 	DBGLOG(RSN, INFO, "[wlan index][Network]=%d activate=%d\n", ucBssIndex, 1);
 	DBGLOG(RSN, INFO, "[wlan index][Network] OwnMac=" MACSTR " BSSID=" MACSTR " BMCIndex = %d NetType=%d\n",
 			MAC2STR(prBssInfo->aucOwnMacAddr), MAC2STR(prBssInfo->aucBSSID), prBssInfo->ucBMCWlanIndex,
 			prBssInfo->eNetworkType);
-#endif
 
 	return wlanSendSetQueryCmd(prAdapter, CMD_ID_BSS_ACTIVATE_CTRL, TRUE, FALSE, FALSE, NULL, NULL,
 			sizeof(CMD_BSS_ACTIVATE_CTRL), (PUINT_8)&rCmdActivateCtrl, NULL, 0);
@@ -1217,11 +1153,10 @@ WLAN_STATUS nicDeactivateNetwork(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex)
 	rCmdActivateCtrl.ucBssIndex = ucBssIndex;
 	rCmdActivateCtrl.ucActive	= 0;
 
-#if 1 /* DBG */
 	DBGLOG(RSN, INFO, "[wlan index][Network]=%d activate=%d\n", ucBssIndex, 0);
 	DBGLOG(RSN, INFO, "[wlan index][Network] OwnMac=" MACSTR " BSSID=" MACSTR " BMCIndex = %d\n",
 			MAC2STR(prBssInfo->aucOwnMacAddr), MAC2STR(prBssInfo->aucBSSID), prBssInfo->ucBMCWlanIndex);
-#endif
+
 	rCmdActivateCtrl.ucOwnMacAddrIndex = prBssInfo->ucOwnMacIndex;
 	/* 20170628, if deactive bssid, do not reset NetworkType, otherwise we cannot free bcn */
 	rCmdActivateCtrl.ucNetworkType = (UINT_8)prBssInfo->eNetworkType;
@@ -1400,10 +1335,7 @@ WLAN_STATUS nicUpdateBss(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex)
 		else
 			qmFreeAllByBssIdx(prAdapter, ucBssIndex);
 		kalClearSecurityFramesByBssIdx(prAdapter->prGlueInfo, ucBssIndex);
-#if CFG_ENABLE_GTK_FRAME_FILTER
-		if (prBssInfo->prIpV4NetAddrList)
-			FREE_IPV4_NETWORK_ADDR_LIST(prBssInfo->prIpV4NetAddrList);
-#endif
+
 #if CFG_SUPPORT_DBDC
 		cnmDbdcDisableDecision(prAdapter, ucBssIndex);
 #endif
@@ -1960,19 +1892,7 @@ WLAN_STATUS nicSetAutoTxPowerControl(IN P_ADAPTER_T prAdapter, IN P_CMD_TX_PWR_T
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS nicUpdate5GOffset(IN P_ADAPTER_T prAdapter, IN P_CMD_5G_PWR_OFFSET_T pr5GPwrOffset)
 {
-#if 0 /* It is not needed anymore */
-	DEBUGFUNC("nicUpdate5GOffset");
-
-	ASSERT(prAdapter);
-
-	return wlanSendSetQueryCmd(prAdapter,
-					CMD_ID_SET_5G_PWR_OFFSET,
-					TRUE,
-					FALSE,
-					FALSE, NULL, NULL, sizeof(CMD_5G_PWR_OFFSET_T), (PUINT_8) pr5GPwrOffset, NULL, 0);
-#else
 	return 0;
-#endif
 }
 
 /*----------------------------------------------------------------------------*/
@@ -2956,13 +2876,6 @@ nicRlmArUpdateParms(IN P_ADAPTER_T prAdapter, IN UINT_32 u4ArSysParam0, IN UINT_
 	u2HtClrMask		= (UINT_16)((u4ArSysParam0 & BITS(8, 15)) >> 8);
 	u2LegacyClrMask = (UINT_16)((u4ArSysParam0 & BITS(16, 31)) >> 16);
 
-#if 0
-	ucArCheckWindow = (UINT_8) (u4ArSysParam1 & BITS(0, 7));
-/*	ucArPerForceRateDownPer = (UINT_8) ((u4ArSysParam1 & BITS(8, 15) >> 8)); */
-	ucArPerH = (UINT_8) ((u4ArSysParam1 & BITS(16, 23)) >> 16);
-	ucArPerL = (UINT_8) ((u4ArSysParam1 & BITS(24, 31)) >> 24);
-#endif
-
 	ucArCheckWindow			= (UINT_8)(u4ArSysParam1 & BITS(0, 7));
 	ucArPerForceRateDownPer = (UINT_8)(((u4ArSysParam1 >> 8) & BITS(0, 7)));
 	ucArPerH				= (UINT_8)(((u4ArSysParam1 >> 16) & BITS(0, 7)));
@@ -3007,29 +2920,6 @@ nicRlmArUpdateParms(IN P_ADAPTER_T prAdapter, IN UINT_32 u4ArSysParam0, IN UINT_
 	/* Candidate rate legacy mask */
 	nicWriteMcr(prAdapter, SWCR_DATA_ADDR(1 /*MOD*/, SWCR_DATA1), u2LegacyClrMask);
 	nicWriteMcr(prAdapter, SWCR_DATA_ADDR(1 /*MOD*/, SWCR_DATA0), SWCR_DATA_CMD(0, SWCR_WRITE, 0x1d, 0, 0));
-
-#if 0
-	if (ucArCheckWindow != 0) {
-		/* TX DONE MCS INDEX CHECK STA RATE DOWN TH */
-		nicWriteMcr(prAdapter, SWCR_DATA_ADDR(1 /*MOD*/, SWCR_DATA1), ucArCheckWindow);
-		nicWriteMcr(prAdapter, SWCR_DATA_ADDR(1 /*MOD*/, SWCR_DATA0), SWCR_DATA_CMD(0, SWCR_WRITE, 0x14, 0, 0));
-		nicWriteMcr(prAdapter, SWCR_DATA_ADDR(1 /*MOD*/, SWCR_DATA1), ucArCheckWindow);
-		nicWriteMcr(prAdapter, SWCR_DATA_ADDR(1 /*MOD*/, SWCR_DATA0), SWCR_DATA_CMD(0, SWCR_WRITE, 0xc, 0, 0));
-	}
-
-	if (ucArPerForceRateDownPer != 0) {
-		nicWriteMcr(prAdapter, SWCR_DATA_ADDR(1 /*MOD*/, SWCR_DATA1), ucArPerForceRateDownPer);
-		nicWriteMcr(prAdapter, SWCR_DATA_ADDR(1 /*MOD*/, SWCR_DATA0), SWCR_DATA_CMD(0, SWCR_WRITE, 0x18, 0, 0));
-	}
-	if (ucArPerH != 0) {
-		nicWriteMcr(prAdapter, SWCR_DATA_ADDR(1 /*MOD*/, SWCR_DATA1), ucArPerH);
-		nicWriteMcr(prAdapter, SWCR_DATA_ADDR(1 /*MOD*/, SWCR_DATA0), SWCR_DATA_CMD(0, SWCR_WRITE, 0x1, 0, 0));
-	}
-	if (ucArPerL != 0) {
-		nicWriteMcr(prAdapter, SWCR_DATA_ADDR(1 /*MOD*/, SWCR_DATA1), ucArPerL);
-		nicWriteMcr(prAdapter, SWCR_DATA_ADDR(1 /*MOD*/, SWCR_DATA0), SWCR_DATA_CMD(0, SWCR_WRITE, 0x2, 0, 0));
-	}
-#endif
 
 	return WLAN_STATUS_SUCCESS;
 }
@@ -3101,17 +2991,6 @@ VOID nicUpdateLinkQuality(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex, IN P_E
 			}
 		}
 		break;
-
-#if 0 /* #if CFG_ENABLE_WIFI_DIRECT && CFG_SUPPORT_P2P_RSSI_QUERY */
-	case NETWORK_TYPE_P2P:
-		if (prAdapter->fgIsP2pLinkQualityValid == FALSE
-			|| (kalGetTimeTick() - prAdapter->rP2pLinkQualityUpdateTime) > CFG_LINK_QUALITY_VALID_PERIOD) {
-			P_EVENT_LINK_QUALITY_EX prEventLQEx = (P_EVENT_LINK_QUALITY_EX) prEventLinkQuality;
-
-			nicUpdateRSSI(prAdapter, ucBssIndex, prEventLQEx->cRssiP2P, prEventLQEx->cLinkQualityP2P);
-		}
-		break;
-#endif
 	default:
 		break;
 	}
@@ -3262,7 +3141,6 @@ WLAN_STATUS nicApplyNetworkAddress(IN P_ADAPTER_T prAdapter)
 	return WLAN_STATUS_SUCCESS;
 }
 
-#if 1
 UINT_8 nicGetChipHwVer(VOID)
 {
 	return g_eco_info.ucHwVer;
@@ -3296,23 +3174,6 @@ UINT_8 nicSetChipFactoryVer(UINT_8 value)
 	return 0;
 }
 
-#else
-UINT_8 nicGetChipHwVer(VOID)
-{
-	return mtk_wcn_wmt_ic_info_get(WMTCHIN_HWVER) & BITS(0, 7);
-}
-
-UINT_8 nicGetChipSwVer(VOID)
-{
-	return mtk_wcn_wmt_ic_info_get(WMTCHIN_FWVER) & BITS(0, 7);
-}
-
-UINT_8 nicGetChipFactoryVer(VOID)
-{
-	return (mtk_wcn_wmt_ic_info_get(WMTCHIN_FWVER) & BITS(8, 11)) >> 8;
-}
-#endif
-
 UINT_8 nicGetChipEcoVer(IN P_ADAPTER_T prAdapter)
 {
 	P_ECO_INFO_T prEcoInfo;
@@ -3341,12 +3202,6 @@ UINT_8 nicGetChipEcoVer(IN P_ADAPTER_T prAdapter)
 
 		ucEcoVer++;
 	}
-
-#if 0
-	DBGLOG(INIT, INFO,
-			"Cannot get ECO version for SwVer[0x%02x]HwVer[0x%02x]FactoryVer[0x%1x],recognize as latest version[E%u]\n",
-			ucCurSwVer, ucCurHwVer, ucCurFactoryVer, prAdapter->chip_info->eco_info[ucEcoVer].ucEcoVer);
-#endif
 	return prAdapter->chip_info->eco_info[ucEcoVer].ucEcoVer;
 }
 

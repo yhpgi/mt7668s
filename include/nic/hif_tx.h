@@ -23,15 +23,6 @@
 /* Maximum buffer size for individual HIF TCQ Buffer */
 #define HIF_TX_BUFF_MAX_SIZE 1552 /* Reserved field was not included */
 
-/* Maximum buffer count for individual HIF TCQ */
-#if 0
-#define HIF_TX_BUFF_COUNT_TC0 3
-#define HIF_TX_BUFF_COUNT_TC1 3
-#define HIF_TX_BUFF_COUNT_TC2 3
-#define HIF_TX_BUFF_COUNT_TC3 3
-#define HIF_TX_BUFF_COUNT_TC4 2
-#endif
-
 #define TX_HDR_SIZE sizeof(HIF_TX_HEADER_T)
 
 #define CMD_HDR_SIZE sizeof(WIFI_CMD_T)

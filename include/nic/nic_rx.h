@@ -256,11 +256,6 @@
 #define RX_VT_SMOOTH BIT(20)
 #define RX_VT_NO_SOUNDING BIT(21)
 #define RX_VT_SOUNDING BIT(21)
-#if 0
-#define RX_VT_SHORT_GI_NSYM BIT(22)	   /* VHT_SIG_A2[B1], not defined in MT6632 */
-#define RX_VT_CODING_MASK BITS(23, 24) /* VHT_SIG_A2[B2:B3], not defined in MT6632 */
-#define RX_VT_CODING_OFFSET 23
-#endif
 #define RX_VT_NUM_RX_MASK BITS(22, 23)
 #define RX_VT_NUM_RX_OFFSET 22
 #define RX_VT_LDPC_EXTRA_OFDM_SYM BIT(24)	   /* VHT_SIG_A2[B3] */
@@ -670,10 +665,6 @@ struct _SW_RFB_T {
 	ENUM_CSUM_RESULT_T		   aeCSUM[CSUM_TYPE_NUM];
 	ENUM_RX_PKT_DESTINATION_T  eDst;
 	ENUM_TRAFFIC_CLASS_INDEX_T eTC; /* only valid when eDst == FORWARD */
-#if 0
-	/* RX reorder for one MSDU in AMSDU issue */
-	/*QUE_T rAmsduQue;*/
-#endif
 };
 
 /*! RX configuration type structure */

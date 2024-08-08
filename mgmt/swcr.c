@@ -232,15 +232,6 @@ void dumpSTA(P_ADAPTER_T prAdapter, P_STA_RECORD_T prStaRec)
 	DBGLOG(SW4, INFO, "ucFreeQuotaForDelivery %u\n", prStaRec->ucFreeQuotaForDelivery);
 	DBGLOG(SW4, INFO, "ucFreeQuotaForNonDelivery %u\n", prStaRec->ucFreeQuotaForNonDelivery);
 
-#if 0
-	DBGLOG(SW4, INFO, "IsQmmSup  %u\n", prStaRec->fgIsWmmSupported);
-	DBGLOG(SW4, INFO, "IsUapsdSup  %u\n", prStaRec->fgIsUapsdSupported);
-	DBGLOG(SW4, INFO, "AvailabaleDeliverPkts  %u\n", prStaRec->ucAvailableDeliverPkts);
-	DBGLOG(SW4, INFO, "BmpDeliverPktsAC  %u\n", prStaRec->u4BmpDeliverPktsAC);
-	DBGLOG(SW4, INFO, "BmpBufferAC  %u\n", prStaRec->u4BmpBufferAC);
-	DBGLOG(SW4, INFO, "BmpNonDeliverPktsAC  %u\n", prStaRec->u4BmpNonDeliverPktsAC);
-#endif
-
 	for (i = 0; i < CFG_RX_MAX_BA_TID_NUM; i++) {
 		if (prStaRec->aprRxReorderParamRefTbl[i]) {
 			DBGLOG(SW4, INFO, "RxReorder fgIsValid: %u\n", prStaRec->aprRxReorderParamRefTbl[i]->fgIsValid);
@@ -344,11 +335,6 @@ VOID swCtrlCmdCategory0(P_ADAPTER_T prAdapter, UINT_8 ucCate, UINT_8 ucAction, U
 
 			if (ucOpt0 == SWCR_RX_FILTER_CMD_STOP) {
 				g_u4RXFilter &= ~(RX_FILTER_START);
-/* changed by jeffrey to align Android behavior */
-#if 0
-					if (prAdapter->fgAllMulicastFilter == FALSE)
-						prAdapter->u4OsPacketFilter &= ~PARAM_PACKET_FILTER_ALL_MULTICAST;
-#endif
 				prAdapter->u4OsPacketFilter &= ~PARAM_PACKET_FILTER_MULTICAST;
 				u4rxfilter = prAdapter->u4OsPacketFilter;
 				fgUpdate   = TRUE;
@@ -356,9 +342,6 @@ VOID swCtrlCmdCategory0(P_ADAPTER_T prAdapter, UINT_8 ucCate, UINT_8 ucAction, U
 				g_u4RXFilter |= (RX_FILTER_START);
 
 				if ((g_u4RXFilter & RX_FILTER_IPV4) || (g_u4RXFilter & RX_FILTER_IPV6)) {
-#if 0
-						prAdapter->u4OsPacketFilter |= PARAM_PACKET_FILTER_ALL_MULTICAST;
-#endif
 					prAdapter->u4OsPacketFilter |= PARAM_PACKET_FILTER_MULTICAST;
 				}
 				u4rxfilter = prAdapter->u4OsPacketFilter;
@@ -443,26 +426,6 @@ VOID swCtrlCmdCategory0(P_ADAPTER_T prAdapter, UINT_8 ucCate, UINT_8 ucAction, U
 														   sizeof(PARAM_NETWORK_ADDRESS_IP));
 				u4Len += OFFSET_OF(PARAM_NETWORK_ADDRESS, aucAddress) + sizeof(PARAM_NETWORK_ADDRESS_IP);
 			}
-
-#if 0
-#ifdef CONFIG_IPV6
-				if (!wlanGetIPV6Address(prAdapter->prGlueInfo, pucIp, &u4NumIPv6)
-					|| (u4NumIPv6 + u4NumIPv4) > 3) {
-					goto bailout;
-				}
-
-				pucIpv6 = kalMemAlloc(u4NumIPv6 * 16, VIR_MEM_TYPE);
-
-				for (i = 0; i < u4NumIPv6; i++) {
-					prParamNetAddr->u2AddressLength = 6;
-					prParamNetAddr->u2AddressType = PARAM_PROTOCOL_ID_TCP_IP;
-					kalMemCopy(prParamNetAddr->aucAddress, pucIpv6 + (i * 16), 16);
-					prParamNetAddr =
-						(P_PARAM_NETWORK_ADDRESS) ((UINT_32) prParamNetAddr + sizeof(ip6));
-					u4Len += OFFSET_OF(PARAM_NETWORK_ADDRESS, aucAddress) + sizeof(ip6);
-				}
-#endif
-#endif
 
 			ASSERT(u4Len <= bufSize);
 
@@ -748,33 +711,9 @@ VOID testPsSetupBss(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex)
 		DBGLOG(SW4, INFO, "prBeacon allocation fail\n");
 	}
 
-#if 0
-	prBssInfo->rPmProfSetupInfo.ucBmpDeliveryAC = PM_UAPSD_ALL;
-	prBssInfo->rPmProfSetupInfo.ucBmpTriggerAC = PM_UAPSD_ALL;
-	prBssInfo->rPmProfSetupInfo.ucUapsdSp = WMM_MAX_SP_LENGTH_2;
-#else
 	prBssInfo->rPmProfSetupInfo.ucBmpDeliveryAC = (UINT_8)prAdapter->u4UapsdAcBmp;
-	prBssInfo->rPmProfSetupInfo.ucBmpTriggerAC = (UINT_8)prAdapter->u4UapsdAcBmp;
-	prBssInfo->rPmProfSetupInfo.ucUapsdSp = (UINT_8)prAdapter->u4MaxSpLen;
-#endif
-
-#if 0
-	for (eAci = 0; eAci < WMM_AC_INDEX_NUM; eAci++) {
-
-		prBssInfo->arACQueParms[eAci].ucIsACMSet = FALSE;
-		prBssInfo->arACQueParms[eAci].u2Aifsn = (UINT_16) eAci;
-		prBssInfo->arACQueParms[eAci].u2CWmin = 7;
-		prBssInfo->arACQueParms[eAci].u2CWmax = 31;
-		prBssInfo->arACQueParms[eAci].u2TxopLimit = eAci + 1;
-		DBGLOG(SW4, INFO,
-				"MQM: eAci = %d, ACM = %d, Aifsn = %d, CWmin = %d, CWmax = %d, TxopLimit = %d\n",
-				eAci, prBssInfo->arACQueParms[eAci].ucIsACMSet,
-				prBssInfo->arACQueParms[eAci].u2Aifsn,
-				prBssInfo->arACQueParms[eAci].u2CWmin,
-				prBssInfo->arACQueParms[eAci].u2CWmax, prBssInfo->arACQueParms[eAci].u2TxopLimit);
-
-	}
-#endif
+	prBssInfo->rPmProfSetupInfo.ucBmpTriggerAC	= (UINT_8)prAdapter->u4UapsdAcBmp;
+	prBssInfo->rPmProfSetupInfo.ucUapsdSp		= (UINT_8)prAdapter->u4MaxSpLen;
 
 	DBGLOG(SW4, INFO, "[2] ucBmpDeliveryAC:0x%x, ucBmpTriggerAC:0x%x, ucUapsdSp:0x%x",
 			prBssInfo->rPmProfSetupInfo.ucBmpDeliveryAC, prBssInfo->rPmProfSetupInfo.ucBmpTriggerAC,
@@ -1033,7 +972,7 @@ VOID swCrDebugCheck(P_ADAPTER_T prAdapter, P_CMD_SW_DBG_CTRL_T prCmdSwCtrl)
 					prCmdSwCtrl->u4DebugCnt[SWCR_DBG_ALL_TX_PS_OVERFLOW_CNT],
 					prCmdSwCtrl->u4DebugCnt[SWCR_DBG_ALL_TX_MGNT_DROP_CNT],
 					prCmdSwCtrl->u4DebugCnt[SWCR_DBG_ALL_TX_ERROR_CNT]);
-#if 1
+
 			/* TX Counter from drv */
 			DBGLOG(SW4, INFO,
 					"TX1\n"
@@ -1042,7 +981,6 @@ VOID swCrDebugCheck(P_ADAPTER_T prAdapter, P_CMD_SW_DBG_CTRL_T prCmdSwCtrl)
 					(UINT_32)TX_GET_CNT(prTxCtrl, TX_INACTIVE_STA_DROP),
 					(UINT_32)TX_GET_CNT(prTxCtrl, TX_FORWARD_OVERFLOW_DROP),
 					(UINT_32)TX_GET_CNT(prTxCtrl, TX_AP_BORADCAST_DROP));
-#endif
 
 			/* RX Counter */
 			DBGLOG(SW4, INFO,

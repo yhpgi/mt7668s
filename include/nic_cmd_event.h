@@ -885,7 +885,7 @@ typedef struct _PSE_CMD_HDR_T {
 typedef struct _WIFI_CMD_T {
 	UINT_16 u2TxByteCount; /* Max value is over 2048 */
 	UINT_16 u2PQ_ID;	   /* Must be 0x8000 (Port1, Queue 0) */
-#if 1
+
 	UINT_8	ucWlanIdx;
 	UINT_8	ucHeaderFormat;
 	UINT_8	ucHeaderPadding;
@@ -895,12 +895,12 @@ typedef struct _WIFI_CMD_T {
 
 	UINT_16 u2Length;
 	UINT_16 u2PqId;
-#endif
+
 	UINT_8 ucCID;
 	UINT_8 ucPktTypeID; /* Must be 0x20 (CMD Packet) */
 	UINT_8 ucSetQuery;
 	UINT_8 ucSeqNum;
-#if 1
+
 	UINT_8 ucD2B0Rev;	   /* padding fields, hw may auto modify this field */
 	UINT_8 ucExtenCID;	   /* Extend CID */
 	UINT_8 ucS2DIndex;	   /* Index for Src to Dst in CMD usage */
@@ -909,16 +909,15 @@ typedef struct _WIFI_CMD_T {
 	UINT_8	ucCmdVersion;
 	UINT_8	ucReserved2[3];
 	UINT_32 au4Reserved3[4]; /* padding fields */
-#endif
+
 	UINT_8 aucBuffer[0];
 } WIFI_CMD_T, *P_WIFI_CMD_T;
 
 /* for Command Packet (via HIF-TX) */
 /* following CM's documentation v0.7 */
 typedef struct _WIFI_EVENT_T {
-#if 1
 	UINT_32 au4HwMacRxDesc[4];
-#endif
+
 	UINT_16 u2PacketLength;
 	UINT_16 u2PacketType; /* Must be filled with 0xE000 (EVENT Packet) */
 	UINT_8	ucEID;
@@ -1085,14 +1084,6 @@ typedef struct _CMD_CUSTOM_UAPSD_PARAM_STRUCT_T {
 	UINT_8 ucMaxSpLen;
 	UINT_8 aucResv[2];
 } CMD_CUSTOM_UAPSD_PARAM_STRUCT_T, *P_CMD_CUSTOM_UAPSD_PARAM_STRUCT_T;
-
-#if CFG_M0VE_BA_TO_DRIVER
-typedef struct _CMD_RESET_BA_SCOREBOARD_T {
-	UINT_8 ucflag;
-	UINT_8 ucTID;
-	UINT_8 aucMacAddr[PARAM_MAC_ADDR_LEN];
-} CMD_RESET_BA_SCOREBOARD_T, *P_CMD_RESET_BA_SCOREBOARD_T;
-#endif
 
 /* EVENT_CONNECTION_STATUS */
 typedef struct _EVENT_CONNECTION_STATUS {
@@ -1494,7 +1485,7 @@ typedef struct _CMD_FW_LOG_2_HOST_CTRL_T {
 	UINT_8 ucFwLogLevel;
 	UINT_8 ucReserve;
 #else
-	UINT_8				  ucReserve[2];
+	UINT_8 ucReserve[2];
 #endif
 	UINT_32 u4HostTimeSec;
 	UINT_32 u4HostTimeMSec;
@@ -1547,12 +1538,12 @@ typedef struct _CMD_PS_PROFILE_T {
 	UINT_8 ucPspCAMInt;
 	UINT_8 ucPspPSInt;
 #else
-	UINT_8				  aucReserved[2];
+	UINT_8 aucReserved[2];
 #endif
 } CMD_PS_PROFILE_T, *P_CMD_PS_PROFILE_T;
 
 /* EVENT_LINK_QUALITY */
-#if 1
+
 typedef struct _LINK_QUALITY_ {
 	INT_8	cRssi; /* AIS Network. */
 	INT_8	cLinkQuality;
@@ -1571,7 +1562,6 @@ typedef struct _EVENT_LINK_QUALITY {
 	UINT_16 u2LinkSpeed;
 	UINT_8	ucMediumBusyPercentage;
 } EVENT_LINK_QUALITY, *P_EVENT_LINK_QUALITY;
-#endif
 
 #if CFG_SUPPORT_P2P_RSSI_QUERY
 /* EVENT_LINK_QUALITY */
@@ -2268,21 +2258,8 @@ typedef struct _CMD_TX_PWR_T {
 } CMD_TX_PWR_T, *P_CMD_TX_PWR_T;
 
 typedef struct _CMD_TX_AC_PWR_T {
-	INT_8 ucBand;
-#if 0
-	INT_8 c11AcTxPwr_BPSK;
-	INT_8 c11AcTxPwr_QPSK;
-	INT_8 c11AcTxPwr_16QAM;
-	INT_8 c11AcTxPwr_MCS5_MCS6;
-	INT_8 c11AcTxPwr_MCS7;
-	INT_8 c11AcTxPwr_MCS8;
-	INT_8 c11AcTxPwr_MCS9;
-	INT_8 c11AcTxPwrVht40_OFFSET;
-	INT_8 c11AcTxPwrVht80_OFFSET;
-	INT_8 c11AcTxPwrVht160_OFFSET;
-#else
+	INT_8				  ucBand;
 	AC_PWR_SETTING_STRUCT rAcPwr;
-#endif
 } CMD_TX_AC_PWR_T, *P_CMD_TX_AC_PWR_T;
 
 typedef struct _CMD_RSSI_PATH_COMPASATION_T {

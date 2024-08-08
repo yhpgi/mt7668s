@@ -144,15 +144,8 @@
 
 #define MAX_CMD_BUFFER_LENGTH (CMD_FORMAT_V1_LENGTH * MAX_CMD_ITEM_MAX)
 
-#if 1
 #define ED_STRING_SITE 0
 #define ED_VALUE_SITE 1
-
-#else
-#define ED_ITEMTYPE_SITE 0
-#define ED_STRING_SITE 1
-#define ED_VALUE_SITE 2
-#endif
 
 #if CFG_AUTO_CHANNEL_SEL_SUPPORT
 #define ACS_AP_RSSI_LEVEL_HIGH -50
@@ -178,16 +171,6 @@ typedef enum _CMD_VER_T {
 } CMD_VER_T,
 		*P_CMD_VER_T;
 
-#if 0
-typedef enum _ENUM_AIS_REQUEST_TYPE_T {
-	AIS_REQUEST_SCAN,
-	AIS_REQUEST_RECONNECT,
-	AIS_REQUEST_ROAMING_SEARCH,
-	AIS_REQUEST_ROAMING_CONNECT,
-	AIS_REQUEST_REMAIN_ON_CHANNEL,
-	AIS_REQUEST_NUM
-} ENUM_AIS_REQUEST_TYPE_T;
-#endif
 typedef enum _CMD_TYPE_T { CMD_TYPE_QUERY, CMD_TYPE_SET } CMD_TYPE_T, *P_CMD_TYPE_T;
 
 #define ITEM_TYPE_DEC 1
@@ -504,10 +487,9 @@ typedef struct _REG_INFO_T {
 	UINT_32 fgDisRoaming; /* 0:enable roaming 1:disable */
 
 	/* NVRAM - MP Data -START- */
-#if 1
 	UINT_16 u2Part1OwnVersion;
 	UINT_16 u2Part1PeerVersion;
-#endif
+
 	UINT_8					aucMacAddr[6];
 	UINT_16					au2CountryCode[4]; /* Country code (in ISO 3166-1 expression, ex: "US", "TW")  */
 	TX_PWR_PARAM_T			rTxPwr;
@@ -542,12 +524,6 @@ typedef struct _REG_INFO_T {
 
 /* for divided firmware loading */
 typedef struct _FWDL_SECTION_INFO_T {
-#if 0
-	UINT_32 u4Offset;
-	UINT_32 u4Reserved;
-	UINT_32 u4Length;
-	UINT_32 u4DestAddr;
-#endif
 	UINT_32 u4DestAddr;
 	UINT_8	ucChipInfo;
 	UINT_8	ucFeatureSet;
@@ -558,13 +534,6 @@ typedef struct _FWDL_SECTION_INFO_T {
 } FWDL_SECTION_INFO_T, *P_FWDL_SECTION_INFO_T;
 
 typedef struct _FIRMWARE_DIVIDED_DOWNLOAD_T {
-#if 0
-	UINT_32 u4Signature;
-	UINT_32 u4CRC;		/* CRC calculated without first 8 bytes included */
-	UINT_32 u4NumOfEntries;
-	UINT_32 u4Reserved;
-	FWDL_SECTION_INFO_T arSection[];
-#endif
 	FWDL_SECTION_INFO_T arSection[2];
 } FIRMWARE_DIVIDED_DOWNLOAD_T, *P_FIRMWARE_DIVIDED_DOWNLOAD_T;
 
@@ -620,23 +589,6 @@ typedef struct _PATCH_FORMAT_T {
 	UINT_16 u2CRC; /* CRC calculated for image only */
 	UINT_8	ucPatchImage[0];
 } PATCH_FORMAT_T, *P_PATCH_FORMAT_T;
-
-#if 0
-#define DATA_MODE_BIT_SHFT_ENCRYPT_MODE (0)									  /* bit0 */
-#define DATA_MODE_MASK_ENCRYPT_MODE (0x01 << DATA_MODE_BIT_SHFT_ENCRYPT_MODE) /* bit0 */
-
-#define DATA_MODE_BIT_SHFT_KEY_INDEX (1)								/* bit[2:1] */
-#define DATA_MODE_MASK_KEY_INDEX (0x03 << DATA_MODE_BIT_SHFT_KEY_INDEX) /* bit[2:1] */
-
-#define DATA_MODE_BIT_SHFT_RESET_IV (3) /* bit3 */
-#define DATA_MODE_MASK_RESET_IV (0x1 << DATA_MODE_BIT_SHFT_RESET_IV)
-
-#define DATA_MODE_BIT_SHFT_WORKING_PDA_OPTION (4) /* bit4 */
-#define DATA_MODE_MASK_WORKING_PDA_OPTION (0x1 << DATA_MODE_BIT_SHFT_WORKING_PDA_OPTION)
-
-#define DATA_MODE_BIT_SHFT_NEED_ACK (31)							  /* bit31 */
-#define DATA_MODE_MASK_NEED_ACK (0x01 << DATA_MODE_BIT_SHFT_NEED_ACK) /* bit31 */
-#endif
 
 /* PDA - Patch Decryption Accelerator */
 #define PDA_N9 0
@@ -877,15 +829,6 @@ typedef struct _TX_PACKET_INFO {
 	UINT_32 u4PacketLen;
 	UINT_8	aucEthDestAddr[MAC_ADDR_LEN];
 	UINT_16 u2Flag;
-
-#if 0
-	BOOLEAN fgIs1X;
-	BOOLEAN fgIsPAL;
-	BOOLEAN fgIs802_3;
-	BOOLEAN fgIsVlanExists;
-	BOOLEAN fgIsDhcp;
-	BOOLEAN fgIsArp;
-#endif
 } TX_PACKET_INFO, *P_TX_PACKET_INFO;
 
 typedef enum _ENUM_TX_PROFILING_TAG_T {
@@ -1000,10 +943,6 @@ WLAN_STATUS wlanAdapterStart(IN P_ADAPTER_T prAdapter, IN P_REG_INFO_T prRegInfo
 WLAN_STATUS wlanAdapterStop(IN P_ADAPTER_T prAdapter);
 
 WLAN_STATUS wlanCheckWifiFunc(IN P_ADAPTER_T prAdapter, IN BOOLEAN fgRdyChk);
-
-#if CFG_SUPPORT_WAPI
-BOOLEAN wlanQueryWapiMode(IN P_ADAPTER_T prAdapter);
-#endif
 
 VOID wlanReturnRxPacket(IN PVOID pvAdapter, IN PVOID pvPacket);
 

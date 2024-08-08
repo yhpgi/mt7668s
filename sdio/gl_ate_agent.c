@@ -44,10 +44,6 @@ typedef struct _ATE_PRIV_CMD {
 } ATE_PRIV_CMD, *P_ATE_PRIV_CMD;
 
 ATE_PRIV_CMD rAtePrivCmdTable[] = { { "ResetCounter", Set_ResetStatCounter_Proc }, { "ATE", SetATE },
-#if 0
-	{"ADCDump", SetADCDump},
-	{"ATEBSSID", SetATEBssid},
-#endif
 	{ "ATEDA", SetATEDa }, { "ATESA", SetATESa }, { "ATECHANNEL", SetATEChannel }, { "ATETXPOW0", SetATETxPower0 },
 	{ "ATETXGI", SetATETxGi }, { "ATETXBW", SetATETxBw }, { "ATETXLEN", SetATETxLength }, { "ATETXCNT", SetATETxCount },
 	{ "ATETXMCS", SetATETxMcs }, { "ATETXMODE", SetATETxMode }, { "ATEIPG", SetATEIpg },

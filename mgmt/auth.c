@@ -1090,15 +1090,6 @@ WLAN_STATUS authProcessRxDeauthFrame(IN P_SW_RFB_T prSwRfb, IN UINT_8 aucBSSID[]
 	/* 4 <1> locate the Deauthentication Frame. */
 	prDeauthFrame = (P_WLAN_DEAUTH_FRAME_T)prSwRfb->pvHeader;
 
-	/* 4 <2> Parse the Header of Deauthentication Frame. */
-#if 0 /* Kevin: Seems redundant */
-	WLAN_GET_FIELD_16(&prDeauthFrame->u2FrameCtrl, &u2RxFrameCtrl)
-		u2RxFrameCtrl &= MASK_FRAME_TYPE;
-	if (u2RxFrameCtrl != MAC_FRAME_DEAUTH)
-		return WLAN_STATUS_FAILURE;
-
-#endif
-
 	if ((prSwRfb->u2PacketLen - prSwRfb->u2HeaderLen) < REASON_CODE_FIELD_LEN) {
 		DBGLOG(SAA, WARN, "Invalid Deauth packet length. u2PacketLen(%u), u2HeaderLen(%u)\n", prSwRfb->u2PacketLen,
 				prSwRfb->u2HeaderLen);

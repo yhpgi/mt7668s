@@ -364,16 +364,6 @@ typedef struct _PARAM_WIFI_GSCAN_RESULT {
 								 /* other fields */
 } PARAM_WIFI_GSCAN_RESULT, *P_PARAM_WIFI_GSCAN_RESULT;
 
-/* Significant wifi change */
-#if 0
-	typedef struct _PARAM_WIFI_CHANGE_RESULT {
-		mac_addr bssid;	/* BSSID */
-		wifi_channel channel;	/* channel frequency in MHz */
-		UINT_32 num_rssi;	/* number of rssi samples */
-		wifi_rssi rssi[8];	/* RSSI history in db */
-	} PARAM_WIFI_CHANGE_RESULT, *P_PARAM_WIFI_CHANGE_RESULT;
-#endif
-
 typedef struct _PARAM_WIFI_CHANGE_RESULT {
 	UINT_16	 flags;
 	UINT_16	 channel;

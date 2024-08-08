@@ -566,11 +566,6 @@ BOOLEAN cnmAisInfraChannelFixed(P_ADAPTER_T prAdapter, P_ENUM_BAND_T prBand, PUI
 	for (i = 0; i < BSS_INFO_NUM; i++) {
 		prBssInfo = prAdapter->aprBssInfo[i];
 
-#if 0
-		DBGLOG(INIT, INFO, "%s BSS[%u] active[%u] netType[%u]\n",
-				__func__, i, prBssInfo->fgIsNetActive, prBssInfo->eNetworkType);
-#endif
-
 		if (!IS_NET_ACTIVE(prAdapter, i))
 			continue;
 
@@ -795,18 +790,6 @@ BOOLEAN cnmBss40mBwPermitted(P_ADAPTER_T prAdapter, UINT_8 ucBssIndex)
 	/*check AP or GO capbility for Station or GC */
 	if (cnmGetAPBwPermitted(prAdapter, ucBssIndex) < MAX_BW_40MHZ)
 		return FALSE;
-#if 0
-	/* Decide max by other BSS */
-	for (i = 0; i < BSS_INFO_NUM; i++) {
-		if (i != ucBssIndex) {
-			prBssInfo = prAdapter->aprBssInfo[i];
-
-			if (prBssInfo && IS_BSS_ACTIVE(prBssInfo) &&
-				(prBssInfo->fg40mBwAllowed || prBssInfo->fgAssoc40mBwAllowed))
-				return FALSE;
-		}
-	}
-#endif
 
 	return TRUE;
 }
@@ -1413,20 +1396,6 @@ VOID cnmDbdcDisableDecision(IN P_ADAPTER_T prAdapter, IN UINT_8 ucChangedBssInde
 
 	if (!prAdapter->rWifiVar.fgDbDcModeEn) {
 		DBGLOG(CNM, STATE, "[DBDC] Keep DBDC status [%s]\n", prAdapter->rWifiVar.fgDbDcModeEn ? "Enable" : "Disable");
-
-#if CFG_SUPPORT_DBDC_TC6
-#if 0
-		if (timerPendingTimer(&prAdapter->rWifiVar.rDBDCSwitchGuardTimer)) {
-			/* update timer for connection retry */
-			DBGLOG(CNM, INFO, "DBDC guard time extend\n");
-			cnmTimerStopTimer(prAdapter,
-								&prAdapter->rWifiVar.rDBDCSwitchGuardTimer);
-			cnmTimerStartTimer(prAdapter,
-								&prAdapter->rWifiVar.rDBDCSwitchGuardTimer,
-								DBDC_SWITCH_GUARD_TIME);
-		}
-#endif
-#endif
 		return;
 	}
 

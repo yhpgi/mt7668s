@@ -22,9 +22,6 @@
  *                    E X T E R N A L   R E F E R E N C E S
  ********************************************************************************
  */
-#if CFG_SUPPORT_PASSPOINT
-#include "hs20.h"
-#endif /* CFG_SUPPORT_PASSPOINT */
 
 /*******************************************************************************
  *                              C O N S T A N T S
@@ -159,12 +156,10 @@ typedef struct _CONNECTION_SETTINGS_T {
 	BOOLEAN fgMultiDomainCapabilityEnabled;
 #endif /* CFG_SUPPORT_802_11D */
 
-#if 1 /* CFG_SUPPORT_WAPI */
 	BOOL	fgWapiMode;
 	UINT_32 u4WapiSelectedGroupCipher;
 	UINT_32 u4WapiSelectedPairwiseCipher;
 	UINT_32 u4WapiSelectedAKMSuite;
-#endif
 
 	/* CR1486, CR1640 */
 	/* for WPS, disable the privacy check for AP selection policy */
@@ -369,7 +364,7 @@ struct _BSS_INFO_T {
 	/* is true. They have the same definition with fields of                  */
 	/* information element (EASON)                                               */
 	/*------------------------------------------------------------------------*/
-#if 1 /* CFG_SUPPORT_802_11AC */
+
 	UINT_8	ucVhtChannelWidth;
 	UINT_8	ucVhtChannelFrequencyS1;
 	UINT_8	ucVhtChannelFrequencyS2;
@@ -379,7 +374,7 @@ struct _BSS_INFO_T {
 	UINT_8 ucVhtPeerChannelWidth;
 	UINT_8 ucVhtPeerChannelFrequencyS1;
 	UINT_8 ucVhtPeerChannelFrequencyS2;
-#endif
+
 	/*------------------------------------------------------------------------*/
 	/* Required protection modes (CM)                                         */
 	/*------------------------------------------------------------------------*/
@@ -435,9 +430,6 @@ struct _BSS_INFO_T {
 
 	UINT_8 ucBssFreeQuota; /* The value is updated from FW  */
 
-#if CFG_ENABLE_GTK_FRAME_FILTER
-	P_IPV4_NETWORK_ADDRESS_LIST prIpV4NetAddrList;
-#endif
 	UINT_16 u2DeauthReason;
 
 #if CFG_SUPPORT_TDLS
@@ -520,14 +512,6 @@ struct _AIS_SPECIFIC_BSS_INFO_T {
 	/* BOOLEAN                 fgKeyMaterialExist[4]; */
 	/* UINT_8                  aucKeyMaterial[32][4]; */
 
-#if 0
-	BOOLEAN fgWepWapiBcKeyExist;	/* WEP WAPI BC key exist flag */
-	UINT_8 ucWepWapiBcWlanIndex;	/* WEP WAPI BC wlan index */
-
-	BOOLEAN fgRsnBcKeyExist[4];	/* RSN BC key exist flag, map to key id 0, 1, 2, 3 */
-	UINT_8 ucRsnBcWlanIndex[4];	/* RSN BC wlan index, map to key id 0, 1, 2, 3 */
-#endif
-
 	/* While Do CounterMeasure procedure, check the EAPoL Error report have send out */
 	BOOLEAN fgCheckEAPoLTxDone;
 
@@ -579,19 +563,6 @@ struct _AIS_SPECIFIC_BSS_INFO_T {
 struct _BOW_SPECIFIC_BSS_INFO_T {
 	UINT_16 u2Reserved; /* Reserved for Data Type Check */
 };
-
-#if CFG_SLT_SUPPORT
-typedef struct _SLT_INFO_T {
-	P_BSS_DESC_T prPseudoBssDesc;
-	UINT_16		 u2SiteID;
-	UINT_8		 ucChannel2G4;
-	UINT_8		 ucChannel5G;
-	BOOLEAN		 fgIsDUT;
-	UINT_32		 u4BeaconReceiveCnt;
-	/* ///////Deprecated///////// */
-	P_STA_RECORD_T prPseudoStaRec;
-} SLT_INFO_T, *P_SLT_INFO_T;
-#endif
 
 typedef struct _WLAN_TABLE_T {
 	UINT_8 ucUsed;
@@ -673,13 +644,6 @@ typedef struct _WIFI_VAR_T {
 	WFD_CFG_SETTINGS_T rWfdConfigureSettings;
 #endif
 
-#if CFG_SLT_SUPPORT
-	SLT_INFO_T rSltInfo;
-#endif
-
-#if CFG_SUPPORT_PASSPOINT
-	HS20_INFO_T rHS20Info;
-#endif /* CFG_SUPPORT_PASSPOINT */
 	UINT_8	aucMediatekOuiIE[64];
 	UINT_16 u2MediatekOuiIELen;
 
@@ -1148,9 +1112,7 @@ struct _ADAPTER_T {
 	UINT_8 ucTxSeqNum;
 	UINT_8 aucPidPool[WTBL_SIZE];
 
-#if 1 /* CFG_SUPPORT_WAPI */
 	BOOLEAN fgUseWapi;
-#endif
 
 	/* RF Test flags */
 	BOOLEAN fgTestMode;
@@ -1296,10 +1258,6 @@ struct _ADAPTER_T {
 	WLAN_CFG_REC_T	 rWlanCfgRec;
 #endif
 
-#if CFG_M0VE_BA_TO_DRIVER
-	TIMER_T rMqmIdleRxBaDetectionTimer;
-	UINT_32 u4FlagBitmap;
-#endif
 #if CFG_ASSERT_DUMP
 	TIMER_T rN9CorDumpTimer;
 	TIMER_T rCr4CorDumpTimer;

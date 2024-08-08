@@ -198,13 +198,6 @@ int mtk_cfg80211_testmode_cmd(struct wiphy *wiphy, void *data, int len);
 
 int mtk_cfg80211_testmode_sw_cmd(IN struct wiphy *wiphy, IN void *data, IN int len);
 
-#if CFG_SUPPORT_PASSPOINT
-int mtk_cfg80211_testmode_hs20_cmd(IN struct wiphy *wiphy, IN void *data, IN int len);
-#endif /* CFG_SUPPORT_PASSPOINT */
-
-#if CFG_SUPPORT_WAPI
-int mtk_cfg80211_testmode_set_key_ext(IN struct wiphy *wiphy, IN void *data, IN int len);
-#endif
 #if CFG_SUPPORT_NFC_BEAM_PLUS
 int mtk_cfg80211_testmode_get_scan_done(IN struct wiphy *wiphy, IN void *data, IN int len, IN P_GLUE_INFO_T prGlueInfo);
 #endif

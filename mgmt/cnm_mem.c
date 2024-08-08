@@ -777,7 +777,6 @@ VOID cnmStaRecChangeState(P_ADAPTER_T prAdapter, P_STA_RECORD_T prStaRec, UINT_8
 
 	cnmStaSendUpdateCmd(prAdapter, prStaRec, NULL, fgNeedResp);
 
-#if 1 /* Marked for MT6630 */
 #if CFG_ENABLE_WIFI_DIRECT
 	/* To do: Confirm if it is invoked here or other location, but it should
 	 *        be invoked after state sync of STA_REC
@@ -791,7 +790,6 @@ VOID cnmStaRecChangeState(P_ADAPTER_T prAdapter, P_STA_RECORD_T prStaRec, UINT_8
 		if (prBssInfo->eCurrentOPMode == OP_MODE_ACCESS_POINT)
 			rlmUpdateParamsForAP(prAdapter, prBssInfo, FALSE);
 	}
-#endif
 #endif
 }
 
@@ -895,14 +893,12 @@ VOID cnmStaSendUpdateCmd(
 	prCmdContent->u2HtCapInfo = prStaRec->u2HtCapInfo;
 	prCmdContent->ucNeedResp  = (UINT_8)fgNeedResp;
 
-#if !CFG_SLT_SUPPORT
 	if (prAdapter->rWifiVar.eRateSetting != FIXED_RATE_NONE) {
 		/* override rate configuration */
 		nicUpdateRateParams(prAdapter, prAdapter->rWifiVar.eRateSetting, &(prCmdContent->ucDesiredPhyTypeSet),
 				&(prCmdContent->u2DesiredNonHTRateSet), &(prCmdContent->u2BSSBasicRateSet), &(prCmdContent->ucMcsSet),
 				&(prCmdContent->ucSupMcs32), &(prCmdContent->u2HtCapInfo));
 	}
-#endif
 
 	prCmdContent->ucIsQoS			 = prStaRec->fgIsQoS;
 	prCmdContent->ucIsUapsdSupported = prStaRec->fgIsUapsdSupported;
@@ -1386,12 +1382,7 @@ cnmPeerUpdate(P_ADAPTER_T prAdapter, PVOID pvSetBuffer, UINT_32 u4SetBufferLen, 
 			if (!((prAdapter->rWifiVar.rConnSettings.eEncStatus == ENUM_ENCRYPTION3_ENABLED) ||
 						(prAdapter->rWifiVar.rConnSettings.eEncStatus == ENUM_ENCRYPTION3_KEY_ABSENT) ||
 						(prAdapter->rWifiVar.rConnSettings.eEncStatus == ENUM_ENCRYPTION_DISABLED) ||
-						(prAdapter->prGlueInfo->u2WSCAssocInfoIELen)
-#if CFG_SUPPORT_WAPI
-						|| (prAdapter->prGlueInfo->u2WapiAssocInfoIESz)
-#endif
-								)) {
-
+						(prAdapter->prGlueInfo->u2WSCAssocInfoIELen))) {
 				prStaRec->ucPhyTypeSet &= ~PHY_TYPE_BIT_HT;
 			}
 		}

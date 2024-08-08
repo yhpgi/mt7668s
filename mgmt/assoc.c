@@ -46,14 +46,6 @@ APPEND_VAR_IE_ENTRY_T txAssocReqIETable[] = {
 #if CFG_SUPPORT_WPS2
 	{ (ELEM_HDR_LEN + ELEM_MAX_LEN_WSC), NULL, rsnGenerateWSCIE }, /* 221 */
 #endif
-#if CFG_SUPPORT_WAPI
-	{ (ELEM_HDR_LEN + ELEM_MAX_LEN_WAPI), NULL, wapiGenerateWAPIIE }, /* 68 */
-#endif
-#if CFG_SUPPORT_PASSPOINT
-	{ (ELEM_HDR_LEN + ELEM_MAX_LEN_INTERWORKING), NULL, hs20GenerateInterworkingIE },			 /* 107 */
-	{ (ELEM_HDR_LEN + ELEM_MAX_LEN_ROAMING_CONSORTIUM), NULL, hs20GenerateRoamingConsortiumIE }, /* 111 */
-	{ (ELEM_HDR_LEN + ELEM_MAX_LEN_HS20_INDICATION), NULL, hs20GenerateHS20IE },				 /* 221 */
-#endif																		 /* CFG_SUPPORT_PASSPOINT */
 	{ (ELEM_HDR_LEN + ELEM_MAX_LEN_EXT_CAP), NULL, rlmReqGenerateExtCapIE }, /* 127 */
 	{ (ELEM_HDR_LEN + ELEM_MAX_LEN_WMM_INFO), NULL, mqmGenerateWmmInfoIE },	 /* 221 */
 	{ (ELEM_HDR_LEN + ELEM_MAX_LEN_RSN), NULL, rsnGenerateRSNIE },			 /* 48 */
@@ -709,15 +701,8 @@ assocCheckRxReAssocRspFrameStatus(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRf
 	 * of our SCAN result didn't consist with AP's Association Resp.
 	 */
 	if (u2RxStatusCode == STATUS_CODE_SUCCESSFUL) {
-#if CFG_SUPPORT_WAPI
-		if (prAdapter->rWifiVar.rConnSettings.fgWapiMode) {
-			/* WAPI AP allow the customer use WZC to join mode, the privacy bit is 0 */
-			/* even at WAI & WAPI_PSK mode, but the assoc respose set the privacy bit set 1 */
-			DBGLOG(SEC, TRACE, "Workaround the WAPI AP allow the customer to use WZC to join\n");
-		} else
-#endif
 #if CFG_ENABLE_WIFI_DIRECT
-				if (prAdapter->fgIsP2PRegistered && 1) {
+		if (prAdapter->fgIsP2PRegistered && 1) {
 			/* Todo:: Fixed this */
 		} else
 #endif
@@ -1141,10 +1126,6 @@ WLAN_STATUS assocProcessRxAssocReqFrame(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T 
 	UINT_8					  ucFixedFieldLength;
 	BOOLEAN					  fgIsHT = FALSE, fgIsTKIP = FALSE;
 	UINT_32					  i;
-#if 0
-	BOOLEAN					fgIsUnknownBssBasicRate;
-	UINT_16					u2BSSBasicRateSet;
-#endif
 
 	if (!prAdapter || !prSwRfb || !pu2StatusCode) {
 		DBGLOG(SAA, WARN, "Invalid parameters, ignore this pkt!\n");
@@ -1196,16 +1177,6 @@ WLAN_STATUS assocProcessRxAssocReqFrame(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T 
 
 	/* 4 <3> Parse the Fixed Fields of Assoc Req Frame Body. */
 	prStaRec->u2CapInfo = prAssocReqFrame->u2CapInfo;
-
-#if 0 /* CFG_ENABLE_WIFI_DIRECT && CFG_ENABLE_HOTSPOT_PRIVACY_CHECK */
-	if (prAdapter->fgIsP2PRegistered && IS_STA_P2P_TYPE(prStaRec)) {
-		if (((prStaRec->u2CapInfo & CAP_INFO_PRIVACY) && !kalP2PGetCipher(prAdapter->prGlueInfo))) {
-			u2StatusCode = STATUS_CODE_CAP_NOT_SUPPORTED;
-			DBGLOG(RSN, TRACE, "STA Assoc req privacy bit check fail\n");
-			return WLAN_STATUS_SUCCESS;
-		}
-	}
-#endif
 
 	prStaRec->u2ListenInterval = prAssocReqFrame->u2ListenInterval;
 	prStaRec->ucPhyTypeSet	   = 0;
@@ -1385,7 +1356,6 @@ WLAN_STATUS assocProcessRxAssocReqFrame(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T 
 
 #if CFG_ENABLE_WIFI_DIRECT
 	if (prAdapter->fgIsP2PRegistered && IS_STA_IN_P2P(prStaRec)) {
-#if 1 /* ICS */
 		{
 			PUINT_8 cp = (PUINT_8)&prAssocReqFrame->u2CapInfo;
 
@@ -1407,7 +1377,7 @@ WLAN_STATUS assocProcessRxAssocReqFrame(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T 
 					DBGLOG(SAA, LOUD, "allocate memory for prStaRec->pucAssocReqIe failed!\n");
 			}
 		}
-#endif
+
 		kalP2PUpdateAssocInfo(prAdapter->prGlueInfo, (PUINT_8)&prAssocReqFrame->u2CapInfo,
 				u2IELength + (prStaRec->fgIsReAssoc ? 10 : 4), prStaRec->fgIsReAssoc, prStaRec->ucBssIndex);
 	}

@@ -230,15 +230,11 @@ enum {
 	IEEE80211_FILTER_TYPE_ALL		 = 0xFF /* used to check the valid filter bits */
 };
 
-#if CFG_SUPPORT_WAPI
-#define IW_AUTH_WAPI_ENABLED 0x20
-#define IW_ENCODE_ALG_SMS4 0x20
-#endif
+// #define IW_AUTH_WAPI_ENABLED 0x20
+// #define IW_ENCODE_ALG_SMS4 0x20
 
-#if CFG_SUPPORT_WAPI /* Android+ */
-#define IW_AUTH_KEY_MGMT_WAPI_PSK 3
-#define IW_AUTH_KEY_MGMT_WAPI_CERT 4
-#endif
+// #define IW_AUTH_KEY_MGMT_WAPI_PSK 3
+// #define IW_AUTH_KEY_MGMT_WAPI_CERT 4
 #define IW_AUTH_KEY_MGMT_WPS 5
 
 #if CFG_SUPPORT_802_11W
@@ -286,16 +282,6 @@ BOOLEAN
 wextSrchDesiredWPSIE(
 		IN PUINT_8 pucIEStart, IN INT_32 i4TotalIeLen, IN UINT_8 ucDesiredElemId, OUT PUINT_8 *ppucDesiredIE);
 #endif
-
-#if CFG_SUPPORT_PASSPOINT
-BOOLEAN wextSrchDesiredHS20IE(IN PUINT_8 pucIEStart, IN INT_32 i4TotalIeLen, OUT PUINT_8 *ppucDesiredIE);
-
-BOOLEAN wextSrchDesiredInterworkingIE(IN PUINT_8 pucIEStart, IN INT_32 i4TotalIeLen, OUT PUINT_8 *ppucDesiredIE);
-
-BOOLEAN wextSrchDesiredAdvProtocolIE(IN PUINT_8 pucIEStart, IN INT_32 i4TotalIeLen, OUT PUINT_8 *ppucDesiredIE);
-
-BOOLEAN wextSrchDesiredRoamingConsortiumIE(IN PUINT_8 pucIEStart, IN INT_32 i4TotalIeLen, OUT PUINT_8 *ppucDesiredIE);
-#endif /* CFG_SUPPORT_PASSPOINT */
 
 BOOLEAN wextSrchDesiredWAPIIE(IN PUINT_8 pucIEStart, IN INT_32 i4TotalIeLen, OUT PUINT_8 *ppucDesiredIE);
 

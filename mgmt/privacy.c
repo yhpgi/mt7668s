@@ -147,16 +147,6 @@ VOID secInit(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex)
 	prAdapter->prAisBssInfo->ucBcDefaultKeyIdx	 = 0xff;
 	prAdapter->prAisBssInfo->fgBcDefaultKeyExist = FALSE;
 
-#if 0
-	for (i = 0; i < WTBL_SIZE; i++) {
-		g_prWifiVar->arWtbl[i].ucUsed = FALSE;
-		g_prWifiVar->arWtbl[i].prSta = NULL;
-		g_prWifiVar->arWtbl[i].ucNetTypeIdx = NETWORK_TYPE_INDEX_NUM;
-
-	}
-	nicPrivacyInitialize((UINT_8) NETWORK_TYPE_INDEX_NUM);
-#endif
-
 } /* secInit */
 
 /*----------------------------------------------------------------------------*/
@@ -179,7 +169,6 @@ BOOL secCheckClassError(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb, IN P_ST
 
 	prRxStatus = prSwRfb->prRxStatus;
 
-#if 1
 	if (!prStaRec || (prRxStatus->u2StatusFlag & RXS_DW2_RX_CLASSERR_BITMAP) == RXS_DW2_RX_CLASSERR_VALUE) {
 		DBGLOG(RSN, ERROR, "prStaRec=%x RX Status = %x RX_CLASSERR check!\n", prStaRec, prRxStatus->u2StatusFlag);
 
@@ -188,33 +177,7 @@ BOOL secCheckClassError(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb, IN P_ST
 		return FALSE;
 		/* } */
 	}
-#else
-	if ((prStaRec) && 1 /* RXM_IS_DATA_FRAME(prSwRfb) */) {
-		UINT_8 ucBssIndex = prStaRec->ucBssIndex;
 
-		if (IS_NET_ACTIVE(prAdapter, ucBssIndex)) {
-			/* P_BSS_INFO_T prBssInfo; */
-			/* prBssInfo = GET_BSS_INFO_BY_INDEX(prAdapter, ucBssIndex); */
-
-			if ((prRxStatus->u2StatusFlag & RXS_DW2_RX_CLASSERR_BITMAP) == RXS_DW2_RX_CLASSERR_VALUE) {
-				/*if ((STA_STATE_3 != prStaRec->ucStaState) &&
-				 * IS_BSS_ACTIVE(prBssInfo) &&
-				 * prBssInfo->fgIsNetAbsent == FALSE) {
-				 * (IS_AP_STA(prStaRec) || IS_CLIENT_STA(prStaRec))) {
-				 */
-				if (authSendDeauthFrame(prAdapter, prStaRec, NULL, REASON_CODE_CLASS_3_ERR,
-							(PFN_TX_DONE_HANDLER)NULL) == WLAN_STATUS_SUCCESS) {
-					DBGLOG(RSN, TRACE,
-							("Send Deauth to MAC:[" MACSTR "] for Rx Class 3 Error.\n", MAC2STR(prStaRec->aucMacAddr)));
-				}
-
-				return FALSE;
-			}
-
-			return secRxPortControlCheck(prAdapter, prSwRfb);
-		}
-	}
-#endif
 	return TRUE;
 
 } /* end of secCheckClassError() */
@@ -233,85 +196,7 @@ BOOL secCheckClassError(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb, IN P_ST
 /*----------------------------------------------------------------------------*/
 VOID secSetPortBlocked(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prSta, IN BOOLEAN fgPortBlock)
 {
-#if 0 /* Marked for MT6630 */
-	if (prSta == NULL)
-		return;
-
-	prSta->fgPortBlock = fgPortBlock;
-
-	DBGLOG(RSN, TRACE,
-			"The STA " MACSTR " port %s\n", MAC2STR(prSta->aucMacAddr), fgPortBlock == TRUE ? "BLOCK" : " OPEN");
-#endif
 }
-
-#if 0 /* Marked for MT6630 */
-
-/*----------------------------------------------------------------------------*/
-/*!
-* \brief This routine is used to report the sta port status.
-*
-* \param[in]  prAdapter Pointer to the Adapter structure
-* \param[in]  prSta Pointer to the sta
-* \param[out]  fgPortBlock The port status
-*
-* \return TRUE sta exist, FALSE sta not exist
-*
-*/
-/*----------------------------------------------------------------------------*/
-BOOLEAN secGetPortStatus(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prSta, OUT PBOOLEAN pfgPortStatus)
-{
-	if (prSta == NULL)
-		return FALSE;
-
-	*pfgPortStatus = prSta->fgPortBlock;
-
-	return TRUE;
-}
-
-/*----------------------------------------------------------------------------*/
-/*!
-* \brief This routine is called to handle Peer device Tx Security process MSDU.
-*
-* \param[in] prMsduInfo pointer to the packet info pointer
-*
-* \retval TRUE Accept the packet
-* \retval FALSE Refuse the MSDU packet due port blocked
-*
-*/
-/*----------------------------------------------------------------------------*/
-BOOL				/* ENUM_PORT_CONTROL_RESULT */
-secTxPortControlCheck(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo, IN P_STA_RECORD_T prStaRec)
-{
-	ASSERT(prAdapter);
-	ASSERT(prMsduInfo);
-	ASSERT(prStaRec);
-
-	if (prStaRec) {
-
-		/* Todo:: */
-		if (prMsduInfo->fgIs802_1x)
-			return TRUE;
-
-		if (prStaRec->fgPortBlock == TRUE) {
-			DBGLOG(INIT, TRACE, "Drop Tx packet due Port Control!\n");
-			return FALSE;
-		}
-#if CFG_SUPPORT_WAPI
-		if (prAdapter->rWifiVar.rConnSettings.fgWapiMode)
-			return TRUE;
-#endif
-		if (IS_STA_IN_AIS(prStaRec)) {
-			if (!prAdapter->rWifiVar.rAisSpecificBssInfo.fgTransmitKeyExist &&
-				(prAdapter->rWifiVar.rConnSettings.eEncStatus == ENUM_ENCRYPTION1_ENABLED)) {
-				DBGLOG(INIT, TRACE, "Drop Tx packet due the key is removed!!!\n");
-				return FALSE;
-			}
-		}
-	}
-
-	return TRUE;
-}
-#endif /* Marked for MT6630 */
 
 /*----------------------------------------------------------------------------*/
 /*!
@@ -327,24 +212,6 @@ secTxPortControlCheck(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo, IN 
 BOOLEAN secRxPortControlCheck(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSWRfb)
 {
 	ASSERT(prSWRfb);
-
-#if 0
-	/* whsu:Todo: Process MGMT and DATA */
-	if (prSWRfb->prStaRec) {
-		if (prSWRfb->prStaRec->fgPortBlock == TRUE) {
-			if (1 /* prSWRfb->fgIsDataFrame and not 1x */  &&
-				(g_prWifiVar->rConnSettings.eAuthMode >= AUTH_MODE_WPA)) {
-				/* DBGLOG(SEC, WARN, ("Drop Rx data due port control !\r\n")); */
-				return TRUE;	/* Todo: whsu FALSE; */
-			}
-			/* if (!RX_STATUS_IS_PROTECT(prSWRfb->prRxStatus)) { */
-			/* DBGLOG(RSN, WARN, ("Drop rcv non-encrypted data frame!\n")); */
-			/* return FALSE; */
-			/* } */
-		}
-	} else {
-	}
-#endif
 	return TRUE;
 }
 
@@ -509,10 +376,6 @@ BOOLEAN secIsProtected1xFrame(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaR
 	if (prStaRec) {
 		prBssInfo = GET_BSS_INFO_BY_INDEX(prAdapter, prStaRec->ucBssIndex);
 		if (prBssInfo && prBssInfo->eNetworkType == NETWORK_TYPE_AIS) {
-#if CFG_SUPPORT_WAPI
-			if (wlanQueryWapiMode(prAdapter))
-				return FALSE;
-#endif
 		}
 
 		return prStaRec->fgTransmitKeyExist;
@@ -533,35 +396,11 @@ BOOLEAN secIsProtected1xFrame(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaR
 /*----------------------------------------------------------------------------*/
 BOOLEAN secIsProtectedFrame(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsdu, IN P_STA_RECORD_T prStaRec)
 {
-	/* P_BSS_INFO_T prBssInfo; */
-
 	ASSERT(prAdapter);
 	ASSERT(prMsdu);
-	/* ASSERT(prStaRec); */
 
-#if CFG_SUPPORT_802_11W
-	if (prMsdu->ucPacketType == TX_PACKET_TYPE_MGMT) {
-#if 0 /* Decide by Compose module */
-		BOOL fgRobustActionWithProtect = FALSE;
-		P_BSS_INFO_T prBssInfo;
-
-		if (prStaRec) {
-			prBssInfo = GET_BSS_INFO_BY_INDEX(prAdapter, prStaRec->ucBssIndex);
-			ASSERT(prBssInfo);
-			if ((prBssInfo->eNetworkType == NETWORK_TYPE_AIS) &&
-				prAdapter->rWifiVar.rAisSpecificBssInfo.fgMgmtProtection /* Use MFP */) {
-
-				fgRobustActionWithProtect = TRUE;
-				return TRUE; /* AIS & Robust action frame */
-			}
-		}
-#endif
-		return FALSE;
-	}
-#else
 	if (prMsdu->ucPacketType == TX_PACKET_TYPE_MGMT)
 		return FALSE;
-#endif
 
 	return secIsProtectedBss(prAdapter, GET_BSS_INFO_BY_INDEX(prAdapter, prMsdu->ucBssIndex));
 }
@@ -571,10 +410,6 @@ BOOLEAN secIsProtectedBss(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prBssInfo)
 	ASSERT(prBssInfo);
 
 	if (prBssInfo->eNetworkType == NETWORK_TYPE_AIS) {
-#if CFG_SUPPORT_WAPI
-		if (wlanQueryWapiMode(prAdapter))
-			return TRUE;
-#endif
 		return secEnabledInAis(prAdapter);
 	}
 #if CFG_ENABLE_WIFI_DIRECT
@@ -672,9 +507,9 @@ BOOL secPrivacySeekForEntry(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prSta)
 		DBGLOG(RSN, INFO, "[Wlan index] BSS#%d keyid#%d P=%d use WlanIndex#%d STAIdx=%d " MACSTR " staType=%x\n",
 				prSta->ucBssIndex, 0, prWtbl[ucEntry].ucPairwise, ucEntry, prSta->ucIndex, MAC2STR(prSta->aucMacAddr),
 				prSta->eStaType);
-#if 1 /* DBG */
+
 		secCheckWTBLAssign(prAdapter);
-#endif
+
 		return TRUE;
 	}
 #if DBG
@@ -741,9 +576,8 @@ VOID secPrivacyFreeSta(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec)
 		/* Consider GTK case !! */
 		if (prWtbl[entry].ucUsed && EQUAL_MAC_ADDR(prStaRec->aucMacAddr, prWtbl[entry].aucMacAddr) &&
 				prWtbl[entry].ucPairwise) {
-#if 1 /* DBG */
 			DBGLOG(RSN, INFO, "Free STA entry (%lu)!\n", entry);
-#endif
+
 			secPrivacyFreeForEntry(prAdapter, entry);
 			prStaRec->ucWlanIndex = WTBL_RESERVED_ENTRY;
 			/* prStaRec->ucBMCWlanIndex = WTBL_RESERVED_ENTRY; */
@@ -830,14 +664,6 @@ VOID secRemoveBssBcEntry(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prBssInfo, IN
 	} else {
 		prBssInfo->ucBMCWlanIndex = WTBL_RESERVED_ENTRY;
 		secPrivacyFreeForEntry(prAdapter, prBssInfo->ucBMCWlanIndex);
-
-		/* Not to remove BMC WTBL entries to sync with FW's behavior. */
-#if 0
-		for (i = 0; i < MAX_KEY_NUM; i++) {
-			if (prBssInfo->ucBMCWlanIndexSUsed[i])
-				secPrivacyFreeForEntry(prAdapter, prBssInfo->ucBMCWlanIndexS[i]);
-		}
-#endif
 
 		for (i = 0; i < MAX_KEY_NUM; i++) {
 			if (prBssInfo->wepkeyUsed[i] == FALSE)

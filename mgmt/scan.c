@@ -1258,7 +1258,7 @@ P_BSS_DESC_T scanAddToBssDesc(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb)
 			prBssDesc->fgIsConnecting = fgIsConnecting;
 		}
 	}
-#if 1
+
 	/* 2021/04/18 frog: Only update IE when in scan state. */
 	/* Driver would still RX BCN/Probe RSP under other state. */
 	/* It would cause driver cache some scan result till next scan done. */
@@ -1276,7 +1276,6 @@ P_BSS_DESC_T scanAddToBssDesc(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb)
 	} else {
 		prBssDesc->u2RawLength = 0;
 	}
-#endif
 
 	/* NOTE: Keep consistency of Scan Record during JOIN process */
 	if (fgIsNewBssDesc == FALSE && prBssDesc->fgIsConnecting)
@@ -1387,12 +1386,6 @@ P_BSS_DESC_T scanAddToBssDesc(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb)
 				prBssDesc->u2ATIMWindow = IBSS_PARAM_IE(pucIE)->u2ATIMWindow;
 			break;
 
-#if 0 /* CFG_SUPPORT_802_11D */
-		case ELEM_ID_COUNTRY_INFO:
-			prBssDesc->prIECountry = (P_IE_COUNTRY_T) pucIE;
-			break;
-#endif
-
 		case ELEM_ID_ERP_INFO:
 			if (IE_LEN(pucIE) == ELEM_MAX_LEN_ERP)
 				prBssDesc->fgIsERPPresent = TRUE;
@@ -1448,12 +1441,6 @@ P_BSS_DESC_T scanAddToBssDesc(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb)
 					&prBssDesc->ucCenterFreqS1, &prBssDesc->ucCenterFreqS2, (PUINT_8)&prBssDesc->eChannelWidth);
 
 			break;
-#if CFG_SUPPORT_WAPI
-		case ELEM_ID_WAPI:
-			if (wapiParseWapiIE(WAPI_IE(pucIE), &prBssDesc->rIEWAPI))
-				prBssDesc->fgIEWAPI = TRUE;
-			break;
-#endif
 
 		case ELEM_ID_VENDOR: /* ELEM_ID_P2P, ELEM_ID_WMM */
 		{
@@ -1749,9 +1736,6 @@ WLAN_STATUS scanProcessBeaconAndProbeResp(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_
 	WLAN_STATUS				rStatus	  = WLAN_STATUS_SUCCESS;
 	P_BSS_INFO_T			prAisBssInfo;
 	P_WLAN_BEACON_FRAME_T	prWlanBeaconFrame = (P_WLAN_BEACON_FRAME_T)NULL;
-#if CFG_SLT_SUPPORT
-	P_SLT_INFO_T prSltInfo = (P_SLT_INFO_T)NULL;
-#endif
 
 	ASSERT(prAdapter);
 	ASSERT(prSwRfb);
@@ -1766,17 +1750,6 @@ WLAN_STATUS scanProcessBeaconAndProbeResp(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_
 #endif /* _lint */
 		return rStatus;
 	}
-#if CFG_SLT_SUPPORT
-	prSltInfo = &prAdapter->rWifiVar.rSltInfo;
-
-	if (prSltInfo->fgIsDUT) {
-		DBGLOG(P2P, INFO, "\n\rBCN: RX\n");
-		prSltInfo->u4BeaconReceiveCnt++;
-		return WLAN_STATUS_SUCCESS;
-	} else {
-		return WLAN_STATUS_SUCCESS;
-	}
-#endif
 
 	prConnSettings	  = &(prAdapter->rWifiVar.rConnSettings);
 	prAisBssInfo	  = prAdapter->prAisBssInfo;
@@ -1940,21 +1913,17 @@ P_BSS_DESC_T scanSearchBssDescByPolicy(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBss
 		prConnSettings->aucSSID[prConnSettings->ucSSIDLen] = '\0';
 #endif
 
-#if 1
 	DBGLOG(SCN, INFO,
 			"SEARCH: Num Of BSS_DESC_T = %d, Look for SSID: %s prConnSettings->fgIsConnByBssidIssued %x prConnSettings->eConnectionPolicy %x\n",
 			prBSSDescList->u4NumElem, prConnSettings->aucSSID, prConnSettings->fgIsConnByBssidIssued,
 			prConnSettings->eConnectionPolicy);
-#endif
 
 	/* 4 <1> The outer loop to search for a candidate. */
 	LINK_FOR_EACH_ENTRY(prBssDesc, prBSSDescList, rLinkEntry, BSS_DESC_T)
 	{
 		/* TODO(Kevin): Update Minimum Channel Load Information here */
 
-#if 1
 		DBGLOG(SCN, INFO, "SEARCH: [" MACSTR "], SSID:%s\n", MAC2STR(prBssDesc->aucBSSID), prBssDesc->aucSSID);
-#endif
 
 		/* 4 <2> Check PHY Type and attributes */
 		/* 4 <2.1> Check Unsupported BSS PHY Type */
@@ -2006,13 +1975,7 @@ P_BSS_DESC_T scanSearchBssDescByPolicy(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBss
 			 * we use this Code for "Reject"
 			 * a SCAN result to become our candidate(Like a blacklist).
 			 */
-#if 0 /* TODO(Kevin): */
-			if (prStaRec->u2ReasonCode != REASON_CODE_RESERVED) {
-				DBGLOG(SCN, INFO,
-						"SEARCH: Ignore BSS with previous Reason Code = %d\n", prStaRec->u2ReasonCode);
-				continue;
-			} else
-#endif
+
 			if (prStaRec->u2StatusCode != STATUS_CODE_SUCCESSFUL) {
 				/* NOTE(Kevin): greedy association - after timeout, we'll still
 				 * try to associate to the AP whose STATUS of conection attempt
@@ -2097,108 +2060,6 @@ P_BSS_DESC_T scanSearchBssDescByPolicy(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBss
 			}
 #endif /* CFG_SUPPORT_ADHOC */
 		}
-#if 0 /* TODO(Kevin): For IBSS */
-		/* 4 <2.c> Check if this SCAN record has been updated recently for IBSS. */
-		/* NOTE(Kevin): Because some STA may change its BSSID frequently after it
-		 * create the IBSS, so we need to make sure we get the new one.
-		 * For BSS, if the old record was matched, however it won't be able to pass
-		 * the Join Process later.
-		 */
-		if (prBssDesc->eBSSType == BSS_TYPE_IBSS) {
-			OS_SYSTIME rCurrentTime;
-
-			GET_CURRENT_SYSTIME(&rCurrentTime);
-			if (CHECK_FOR_TIMEOUT(rCurrentTime, prBssDesc->rUpdateTime,
-							SEC_TO_SYSTIME(BSS_DESC_TIMEOUT_SEC))) {
-				DBGLOG(SCAN, TRACE,
-						"Skip old record of BSS Descriptor - BSSID:[" MACSTR
-						"]\n\n", MAC2STR(prBssDesc->aucBSSID));
-				continue;
-			}
-		}
-
-		if ((prBssDesc->eBSSType == BSS_TYPE_INFRASTRUCTURE) &&
-			(prAdapter->eConnectionState == MEDIA_STATE_CONNECTED)) {
-			OS_SYSTIME rCurrentTime;
-
-			GET_CURRENT_SYSTIME(&rCurrentTime);
-			if (CHECK_FOR_TIMEOUT(rCurrentTime, prBssDesc->rUpdateTime,
-							SEC_TO_SYSTIME(BSS_DESC_TIMEOUT_SEC))) {
-				DBGLOG(SCAN, TRACE,
-						"Skip old record of BSS Descriptor - BSSID:[" MACSTR
-						"]\n\n", MAC2STR(prBssDesc->aucBSSID));
-				continue;
-			}
-		}
-
-		/* 4 <4B> Check for IBSS AdHoc Mode. */
-		/* Skip if one or more BSS Basic Rate are not supported by current AdHocMode */
-		if (prPrimaryBssDesc->eBSSType == BSS_TYPE_IBSS) {
-			/* 4 <4B.1> Check if match the Capability of current IBSS AdHoc Mode. */
-			if (ibssCheckCapabilityForAdHocMode(prAdapter, prPrimaryBssDesc) == WLAN_STATUS_FAILURE) {
-
-				DBGLOG(SCAN, TRACE,
-						"Ignore BSS DESC MAC: " MACSTR
-						", Capability is not supported for current AdHoc Mode.\n",
-						MAC2STR(prPrimaryBssDesc->aucBSSID));
-
-				continue;
-			}
-
-			/* 4 <4B.2> IBSS Merge Decision Flow for SEARCH STATE. */
-			if (prAdapter->fgIsIBSSActive &&
-				UNEQUAL_MAC_ADDR(prBssInfo->aucBSSID, prPrimaryBssDesc->aucBSSID)) {
-
-				if (!fgIsLocalTSFRead) {
-					NIC_GET_CURRENT_TSF(prAdapter, &rCurrentTsf);
-
-					DBGLOG(SCAN, TRACE,
-							"\n\nCurrent TSF : %08lx-%08lx\n\n",
-							rCurrentTsf.u.HighPart, rCurrentTsf.u.LowPart);
-				}
-
-				if (rCurrentTsf.QuadPart > prPrimaryBssDesc->u8TimeStamp.QuadPart) {
-					DBGLOG(SCAN, TRACE,
-							"Ignore BSS DESC MAC: [" MACSTR
-							"], Current BSSID: [" MACSTR "].\n",
-							MAC2STR(prPrimaryBssDesc->aucBSSID), MAC2STR(prBssInfo->aucBSSID));
-
-					DBGLOG(SCAN, TRACE,
-							"\n\nBSS's TSF : %08lx-%08lx\n\n",
-							prPrimaryBssDesc->u8TimeStamp.u.HighPart,
-							prPrimaryBssDesc->u8TimeStamp.u.LowPart);
-
-					prPrimaryBssDesc->fgIsLargerTSF = FALSE;
-					continue;
-				} else {
-					prPrimaryBssDesc->fgIsLargerTSF = TRUE;
-				}
-
-			}
-		}
-		/* 4 <5> Check the Encryption Status. */
-		if (rsnPerformPolicySelection(prPrimaryBssDesc)) {
-
-			if (prPrimaryBssDesc->ucEncLevel > 0) {
-				fgIsFindBestEncryptionLevel = TRUE;
-
-				fgIsFindFirst = FALSE;
-			}
-		} else {
-			/* Can't pass the Encryption Status Check, get next one */
-			continue;
-		}
-
-		/* For RSN Pre-authentication, update the PMKID canidate list for
-		 *  same SSID and encrypt status
-		 */
-		/* Update PMKID candicate list. */
-		if (prAdapter->rWifiVar.rConnSettings.eAuthMode == AUTH_MODE_WPA2) {
-			rsnUpdatePmkidCandidateList(prPrimaryBssDesc);
-			if (prAdapter->rWifiVar.rAisBssInfo.u4PmkidCandicateCount)
-				prAdapter->rWifiVar.rAisBssInfo.fgIndicatePMKID = rsnCheckPmkidCandicate();
-		}
-#endif
 
 		prPrimaryBssDesc = (P_BSS_DESC_T)NULL;
 
@@ -2270,18 +2131,7 @@ P_BSS_DESC_T scanSearchBssDescByPolicy(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBss
 		/* 4 <7> Check the Encryption Status. */
 		if (prPrimaryBssDesc->eBSSType == BSS_TYPE_INFRASTRUCTURE) {
 #if !CFG_SUPPORT_CFG80211_AUTH
-#if CFG_SUPPORT_WAPI
-			if (prAdapter->rWifiVar.rConnSettings.fgWapiMode) {
-				if (wapiPerformPolicySelection(prAdapter, prPrimaryBssDesc)) {
-					fgIsFindFirst = TRUE;
-				} else {
-					/* Can't pass the Encryption Status Check, get next one */
-					DBGLOG(RSN, INFO, "Ignore BSS can't pass WAPI policy selection\n");
-					continue;
-				}
-			} else
-#endif
-					if (rsnPerformPolicySelection(prAdapter, prPrimaryBssDesc)) {
+			if (rsnPerformPolicySelection(prAdapter, prPrimaryBssDesc)) {
 				if (prAisSpecBssInfo->fgCounterMeasure) {
 					DBGLOG(RSN, INFO, "Skip while at counter measure period!!!\n");
 					continue;
@@ -2376,16 +2226,6 @@ P_BSS_DESC_T scanSearchBssDescByPolicy(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBss
 					continue;
 				}
 			}
-#if 0
-			/* If reach here, that means they have the same Encryption Score, and
-			 * both RSSI value are close too.
-			 */
-			/* 4 <6F> Seek the minimum Channel Load for less interference. */
-			if (fgIsFindMinChannelLoad) {
-				/* ToDo:: Nothing */
-				/* TODO(Kevin): Check which one has minimum channel load in its channel */
-			}
-#endif
 		}
 	}
 
@@ -2514,51 +2354,6 @@ VOID scanReportBss2Cfg80211(IN P_ADAPTER_T prAdapter, IN ENUM_BSS_TYPE_T eBSSTyp
 #endif
 	}
 }
-
-#if CFG_SUPPORT_PASSPOINT
-/*----------------------------------------------------------------------------*/
-/*!
- * @brief Find the corresponding BSS Descriptor according to given BSSID
- *
- * @param[in] prAdapter          Pointer to the Adapter structure.
- * @param[in] aucBSSID           Given BSSID.
- * @param[in] fgCheckSsid        Need to check SSID or not. (for multiple SSID with single BSSID cases)
- * @param[in] prSsid             Specified SSID
- *
- * @return   Pointer to BSS Descriptor, if found. NULL, if not found
- */
-/*----------------------------------------------------------------------------*/
-P_BSS_DESC_T scanSearchBssDescByBssidAndLatestUpdateTime(IN P_ADAPTER_T prAdapter, IN UINT_8 aucBSSID[])
-{
-	P_SCAN_INFO_T prScanInfo;
-	P_LINK_T	  prBSSDescList;
-	P_BSS_DESC_T  prBssDesc;
-	P_BSS_DESC_T  prDstBssDesc		= (P_BSS_DESC_T)NULL;
-	OS_SYSTIME	  rLatestUpdateTime = 0;
-
-	ASSERT(prAdapter);
-	ASSERT(aucBSSID);
-
-	prScanInfo = &(prAdapter->rWifiVar.rScanInfo);
-
-	prBSSDescList = &prScanInfo->rBSSDescList;
-
-	/* Search BSS Desc from current SCAN result list. */
-	LINK_FOR_EACH_ENTRY(prBssDesc, prBSSDescList, rLinkEntry, BSS_DESC_T)
-	{
-		if (EQUAL_MAC_ADDR(prBssDesc->aucBSSID, aucBSSID)) {
-			if (!rLatestUpdateTime || CHECK_FOR_EXPIRATION(prBssDesc->rUpdateTime, rLatestUpdateTime)) {
-				prDstBssDesc = prBssDesc;
-				COPY_SYSTIME(rLatestUpdateTime, prBssDesc->rUpdateTime);
-			}
-		}
-	}
-
-	return prDstBssDesc;
-
-} /* end of scanSearchBssDescByBssid() */
-
-#endif /* CFG_SUPPORT_PASSPOINT */
 
 #if CFG_SUPPORT_AGPS_ASSIST
 VOID scanReportScanResultToAgps(P_ADAPTER_T prAdapter)

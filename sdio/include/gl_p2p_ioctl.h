@@ -197,9 +197,9 @@ typedef enum _ENUM_P2P_CMD_ID_T {
 	P2P_CMD_ID_SEND_SD_REQUEST,		 /* 0x02 (Set) */
 	P2P_CMD_ID_GET_SD_RESPONSE,		 /* 0x03 (Get) */
 	P2P_CMD_ID_TERMINATE_SD_PHASE,	 /* 0x04 (Set) */
-#if 1								 /* CFG_SUPPORT_ANTI_PIRACY */
-	P2P_CMD_ID_SEC_CHECK,			 /* 0x05(Set) */
-#endif
+
+	P2P_CMD_ID_SEC_CHECK, /* 0x05(Set) */
+
 	P2P_CMD_ID_INVITATION,			/* 0x06 (Set) */
 	P2P_CMD_ID_INVITATION_INDICATE, /* 0x07 (Get) */
 	P2P_CMD_ID_INVITATION_STATUS,	/* 0x08 (Get) */

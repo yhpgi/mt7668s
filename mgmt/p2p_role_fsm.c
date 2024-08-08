@@ -218,54 +218,7 @@ VOID p2pRoleFsmUninit(IN P_ADAPTER_T prAdapter, IN UINT_8 ucRoleIdx)
 	} while (FALSE);
 
 	return;
-#if 0
-	P_P2P_FSM_INFO_T prP2pFsmInfo = (P_P2P_FSM_INFO_T) NULL;
-	P_BSS_INFO_T prP2pBssInfo = (P_BSS_INFO_T) NULL;
 
-	do {
-		ASSERT_BREAK(prAdapter != NULL);
-
-		DEBUGFUNC("p2pFsmUninit()");
-		DBGLOG(P2P, INFO, "->p2pFsmUninit()\n");
-
-		prP2pFsmInfo = prAdapter->rWifiVar.prP2pFsmInfo;
-		prP2pBssInfo = &(prAdapter->rWifiVar.arBssInfo[NETWORK_TYPE_P2P_INDEX]);
-
-		p2pFuncSwitchOPMode(prAdapter, prP2pBssInfo, OP_MODE_P2P_DEVICE, TRUE);
-
-		p2pFsmRunEventAbort(prAdapter, prP2pFsmInfo);
-
-		p2pStateAbort_IDLE(prAdapter, prP2pFsmInfo, P2P_STATE_NUM);
-
-		UNSET_NET_ACTIVE(prAdapter, NETWORK_TYPE_P2P_INDEX);
-
-		wlanAcquirePowerControl(prAdapter);
-
-		/* Release all pending CMD queue. */
-		DBGLOG(P2P, TRACE,
-				"p2pFsmUninit: wlanProcessCommandQueue, num of element:%d\n",
-				prAdapter->prGlueInfo->rCmdQueue.u4NumElem);
-		wlanProcessCommandQueue(prAdapter, &prAdapter->prGlueInfo->rCmdQueue);
-
-		wlanReleasePowerControl(prAdapter);
-
-		/* Release pending mgmt frame,
-		 * mgmt frame may be pending by CMD without resource.
-		 */
-		kalClearMgmtFramesByBssIdx(prAdapter->prGlueInfo, NETWORK_TYPE_P2P_INDEX);
-
-		/* Clear PendingCmdQue */
-		wlanReleasePendingCMDbyBssIdx(prAdapter, NETWORK_TYPE_P2P_INDEX);
-
-		if (prP2pBssInfo->prBeacon) {
-			cnmMgtPktFree(prAdapter, prP2pBssInfo->prBeacon);
-			prP2pBssInfo->prBeacon = NULL;
-		}
-
-	} while (FALSE);
-
-	return;
-#endif
 } /* p2pRoleFsmUninit */
 
 VOID p2pRoleFsmStateTransition(
@@ -959,15 +912,7 @@ VOID p2pRoleFsmRunEventStartAP(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMsgHdr
 
 		/* Leave IDLE state. */
 		SET_NET_PWR_STATE_ACTIVE(prAdapter, prP2pBssInfo->ucBssIndex);
-
 		prP2pBssInfo->eIntendOPMode = OP_MODE_ACCESS_POINT;
-
-#if 0
-					prP2pRoleFsmInfo->rConnReqInfo.rChannelInfo.ucChannelNum = 8;
-					prP2pRoleFsmInfo->rConnReqInfo.rChannelInfo.eBand = BAND_2G4;
-					/*prP2pRoleFsmInfo->rConnReqInfo.rChannelInfo.ucBandwidth = 0;*/
-					/*prP2pRoleFsmInfo->rConnReqInfo.rChannelInfo.eSCO= CHNL_EXT_SCN;*/
-#endif
 
 		if (prP2pRoleFsmInfo->rConnReqInfo.rChannelInfo.ucChannelNum != 0) {
 			DBGLOG(P2P, INFO, "Role(%d) StartAP at CH(%d)\n", prP2pStartAPMsg->ucRoleIdx,
@@ -1658,38 +1603,6 @@ VOID p2pRoleFsmRunEventConnectionAbort(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T 
 			prP2pBssInfo->encryptedDeauthIsInProcess = FALSE;
 #endif
 		}
-#if 0
-			LINK_FOR_EACH(prLinkEntry, prStaRecOfClientList) {
-				prCurrStaRec = LINK_ENTRY(prLinkEntry, STA_RECORD_T, rLinkEntry);
-
-				ASSERT(prCurrStaRec);
-
-				if (EQUAL_MAC_ADDR(prCurrStaRec->aucMacAddr, prDisconnMsg->aucTargetID)) {
-
-					DBGLOG(P2P, TRACE,
-							"Disconnecting: " MACSTR "\n",
-							MAC2STR(prCurrStaRec->aucMacAddr));
-
-					/* Remove STA from client list. */
-					LINK_REMOVE_KNOWN_ENTRY(prStaRecOfClientList,
-								&prCurrStaRec->rLinkEntry);
-
-					/* Glue layer indication. */
-					/* kalP2PGOStationUpdate(prAdapter->prGlueInfo, prCurrStaRec, FALSE); */
-
-					/* Send deauth & do indication. */
-					p2pFuncDisconnect(prAdapter, prP2pBssInfo,
-							prCurrStaRec,
-							prDisconnMsg->fgSendDeauth,
-							prDisconnMsg->u2ReasonCode);
-
-					/* prTargetStaRec = prCurrStaRec; */
-
-					break;
-				}
-			}
-#endif
-
 	} break;
 	case OP_MODE_P2P_DEVICE:
 	default:

@@ -131,21 +131,6 @@ typedef struct _TSPEC_ENTRY_T {
 	/* Add other retained QoS parameters below */
 } TSPEC_ENTRY_T, *P_TSPEC_ENTRY_T, TSPEC_TABLE_ENTRY_T, *P_TSPEC_TABLE_ENTRY_T;
 
-#if 0
-typedef struct _SEC_INFO_T {
-
-	ENUM_SEC_STATE_T ePreviousState;
-	ENUM_SEC_STATE_T eCurrentState;
-
-	BOOL fg2nd1xSend;
-	BOOL fgKeyStored;
-
-	UINT_8 aucStoredKey[64];
-
-	BOOL fgAllowOnly1x;
-} SEC_INFO_T, *P_SEC_INFO_T;
-#endif
-
 #define MAX_NUM_CONCURRENT_FRAGMENTED_MSDUS 3
 
 #define UPDATE_BSS_RSSI_INTERVAL_SEC 3 /* Seconds */
@@ -269,7 +254,7 @@ struct _STA_RECORD_T {
 	UINT_16 u2HtExtendedCap;	/* HT extended cap field by HT cap IE */
 	UINT_32 u4TxBeamformingCap; /* TX beamforming cap field by HT cap IE */
 	UINT_8	ucAselCap;			/* ASEL cap field by HT cap IE */
-#if 1							/* CFG_SUPPORT_802_11AC */
+	/* CFG_SUPPORT_802_11AC */
 	/*------------------------------------------------------------------------------------------*/
 	/* 802.11ac  VHT capabilities when (prStaRec->ucPhyTypeSet & PHY_TYPE_BIT_VHT) is true          */
 	/* They have the same definition with fields of information element                         */
@@ -280,7 +265,7 @@ struct _STA_RECORD_T {
 	UINT_16 u2VhtTxMcsMap;
 	UINT_16 u2VhtTxHighestSupportedDataRate;
 	UINT_8	ucVhtOpMode;
-#endif
+
 	UINT_8 ucRCPI; /* RCPI of peer */
 
 	UINT_8 ucDTIMPeriod;  /* Target BSS's DTIM Period, we use this
@@ -363,14 +348,6 @@ struct _STA_RECORD_T {
 	UINT_8	afgIsAmsduInvalid[TID_NUM + 1];
 #endif /* CFG_SUPPORT_AMSDU_ATTACK_DETECTION */
 
-#if 0
-	/* RXM */
-	P_RX_BA_ENTRY_T aprRxBaTable[TID_NUM];
-
-	/* TXM */
-	P_TX_BA_ENTRY_T aprTxBaTable[TID_NUM];
-#endif
-
 	FRAG_INFO_T rFragInfo[MAX_NUM_CONCURRENT_FRAGMENTED_MSDUS];
 
 	/* SEC_INFO_T              rSecInfo; */ /* The security state machine */
@@ -445,7 +422,6 @@ struct _STA_RECORD_T {
 	UINT_32 u4ThresholdCounter;
 #endif
 
-#if 1
 	/*------------------------------------------------------------------------------------------*/
 	/* To be removed, this is to make que_mgt compilation success only                          */
 	/*------------------------------------------------------------------------------------------*/
@@ -470,7 +446,6 @@ struct _STA_RECORD_T {
 
 	/* Reorder Parameter reference table */
 	P_RX_BA_ENTRY_T aprRxReorderParamRefTbl[CFG_RX_MAX_BA_TID_NUM];
-#endif
 
 #if CFG_SUPPORT_802_11V_TIMING_MEASUREMENT
 	TIMINGMSMT_PARAM_T rWNMTimingMsmt;
@@ -518,135 +493,6 @@ struct _STA_RECORD_T {
 	UINT_8 fgSupportBTM; /* Indicates whether to support BTM */
 #endif
 };
-
-#if 0
-/* use nic_tx.h instead */
-/* MSDU_INFO and SW_RFB structure */
-typedef struct _MSDU_INFO_T {
-
-	/* 4 ----------------MSDU_INFO and SW_RFB Common Fields------------------ */
-
-	LINK_ENTRY_T rLinkEntry;
-	PUINT_8 pucBuffer;	/* Pointer to the associated buffer */
-
-	UINT_8 ucBufferSource;	/* HIF TX0, HIF TX1, MAC RX, or MNG Pool */
-	UINT_8 ucNetworkTypeIndex;	/* Network type index that this TX packet is assocaited with */
-	UINT_8 ucTC;		/* 0 to 5 (used by HIF TX to increment the corresponding TC counter) */
-	UINT_8 ucTID;		/* Traffic Identification */
-
-	BOOLEAN fgIs802_11Frame;	/* Set to TRUE for 802.11 frame */
-	UINT_8 ucMacHeaderLength;
-	UINT_16 u2PayloadLength;
-	PUINT_8 pucMacHeader;	/* 802.11 header  */
-	PUINT_8 pucPayload;	/* 802.11 payload */
-
-	OS_SYSTIME rArrivalTime;	/* System Timestamp (4) */
-	P_STA_RECORD_T prStaRec;
-
-#if CFG_PROFILE_BUFFER_TRACING
-	ENUM_BUFFER_ACTIVITY_TYPE_T eActivity[2];
-	UINT_32 rActivityTime[2];
-#endif
-#if DBG && CFG_BUFFER_FREE_CHK
-	BOOLEAN fgBufferInSource;
-#endif
-
-	UINT_8 ucControlFlag;	/* For specify some Control Flags, e.g. Basic Rate */
-
-	/* 4 -----------------------Non-Common ------------------------- */
-	/* TODO: move flags to ucControlFlag */
-
-	BOOLEAN fgIs1xFrame;	/* Set to TRUE for 802.1x frame */
-
-	/* TXM: For TX Done handling, callback function & parameter (5) */
-	BOOLEAN fgIsTxFailed;	/* Set to TRUE if transmission failure */
-
-	PFN_TX_DONE_HANDLER pfTxDoneHandler;
-
-	UINT_64 u8TimeStamp;	/* record the TX timestamp */
-
-	/* TXM: For PS forwarding control (per-STA flow control) */
-	UINT_8 ucPsForwardingType;	/* Delivery-enabled, non-delivery-enabled, non-PS */
-	UINT_8 ucPsSessionID;	/* The Power Save session id for PS forwarding control */
-
-	/* TXM: For MAC TX DMA operations */
-	UINT_8 ucMacTxQueIdx;	/*  MAC TX queue: AC0-AC6, BCM, or BCN */
-	BOOLEAN fgNoAck;	/* Set to true if Ack is not required for this packet */
-	BOOLEAN fgBIP;		/* Set to true if BIP is used for this packet */
-	UINT_8 ucFragTotalCount;
-	UINT_8 ucFragFinishedCount;
-	UINT_16 u2FragThreshold;	/* Fragmentation threshold without WLAN Header & FCS */
-	BOOLEAN fgFixedRate;	/* If a fixed rate is used, set to TRUE. */
-	UINT_8 ucFixedRateCode;	/* The rate code copied to MAC TX Desc */
-	UINT_8 ucFixedRateRetryLimit;	/* The retry limit when a fixed rate is used */
-	BOOLEAN fgIsBmcQueueEnd;	/* Set to true if this packet is the end of BMC */
-
-	/* TXM: For flushing ACL frames */
-	UINT_16 u2PalLLH;	/* 802.11 PAL LLH */
-	/* UINT_16     u2LLH; */
-	UINT_16 u2ACLSeq;	/* u2LLH+u2ACLSeq for AM HCI flush ACL frame */
-
-	/* TXM for retransmitting a flushed packet */
-	BOOLEAN fgIsSnAssigned;
-	UINT_16 u2SequenceNumber;	/* To remember the Sequence Control field of this MPDU */
-
-} MSDU_INFO_T, *P_MSDU_INFO_T;
-#endif
-
-#if 0
-/* nic_rx.h */
-typedef struct _SW_RFB_T {
-
-	/* 4 ----------------MSDU_INFO and SW_RFB Common Fields------------------ */
-
-	LINK_ENTRY_T rLinkEntry;
-	PUINT_8 pucBuffer;	/* Pointer to the associated buffer */
-
-	UINT_8 ucBufferSource;	/* HIF TX0, HIF TX1, MAC RX, or MNG Pool */
-	UINT_8 ucNetworkTypeIndex;	/* Network type index that this TX packet is assocaited with */
-	UINT_8 ucTC;		/* 0 to 5 (used by HIF TX to increment the corresponding TC counter) */
-	UINT_8 ucTID;		/* Traffic Identification */
-
-	BOOLEAN fgIs802_11Frame;	/* Set to TRUE for 802.11 frame */
-	UINT_8 ucMacHeaderLength;
-	UINT_16 u2PayloadLength;
-	PUINT_8 pucMacHeader;	/* 802.11 header  */
-	PUINT_8 pucPayload;	/* 802.11 payload */
-
-	OS_SYSTIME rArrivalTime;	/* System Timestamp (4) */
-	P_STA_RECORD_T prStaRec;
-
-#if CFG_PROFILE_BUFFER_TRACING
-	ENUM_BUFFER_ACTIVITY_TYPE_T eActivity[2];
-	UINT_32 rActivityTime[2];
-#endif
-#if DBG && CFG_BUFFER_FREE_CHK
-	BOOLEAN fgBufferInSource;
-#endif
-
-	UINT_8 ucControlFlag;	/* For specify some Control Flags, e.g. Basic Rate */
-
-	/* 4 -----------------------Non-Common ------------------------- */
-
-	/* For composing the HIF RX Header (TODO: move flags to ucControlFlag) */
-	PUINT_8 pucHifRxPacket;	/* Pointer to the Response packet to HIF RX0 or RX1 */
-	UINT_16 u2HifRxPacketLength;
-	UINT_8 ucHeaderOffset;
-	UINT_8 ucHifRxPortIndex;
-
-	UINT_16 u2SequenceControl;
-	BOOLEAN fgIsA4Frame;	/* (For MAC RX packet parsing) set to TRUE if 4 addresses are present */
-	BOOLEAN fgIsBAR;
-	BOOLEAN fgIsQoSData;
-	BOOLEAN fgIsAmsduSubframe;	/* Set to TRUE for A-MSDU Subframe */
-
-	/* For HIF RX DMA Desc */
-	BOOLEAN fgTUChecksumCheckRequired;
-	BOOLEAN fgIPChecksumCheckRequired;
-	UINT_8 ucEtherTypeOffset;
-
-} SW_RFB_T, *P_SW_RFB_T;
-#endif
 
 typedef enum _ENUM_STA_REC_CMD_ACTION_T {
 	STA_REC_CMD_ACTION_STA			   = 0,
@@ -722,36 +568,6 @@ typedef struct _CMD_PEER_UPDATE_T {
 	BOOLEAN			fgIsSupHt;
 	BOOLEAN			fgIsSupVht;
 	ENUM_STA_TYPE_T eStaType;
-
-	/* TODO */
-	/* So far, TDLS only a few of the parameters, the rest will be added in the future requiements */
-	/* kernel 3.10 station paramenters */
-#if 0
-	struct station_parameters {
-		const u8 *supported_rates;
-		struct net_device *vlan;
-		u32 sta_flags_mask, sta_flags_set;
-		u32 sta_modify_mask;
-		int listen_interval;
-		u16 aid;
-		u8 supported_rates_len;
-		u8 plink_action;
-		u8 plink_state;
-		const struct ieee80211_ht_cap *ht_capa;
-		const struct ieee80211_vht_cap *vht_capa;
-		u8 uapsd_queues;
-		u8 max_sp;
-		enum nl80211_mesh_power_mode local_pm;
-		u16 capability;
-		const u8 *ext_capab;
-		u8 ext_capab_len;
-		const u8 *supported_channels;
-		u8 supported_channels_len;
-		const u8 *supported_oper_classes;
-		u8 supported_oper_classes_len;
-		};
-#endif
-
 } CMD_PEER_UPDATE_T;
 
 #endif
@@ -843,55 +659,6 @@ VOID cnmStaSendUpdateCmd(
  */
 static __KAL_INLINE__ VOID cnmMemDataTypeCheck(VOID)
 {
-#if 0
-	DATA_STRUCT_INSPECTING_ASSERT(OFFSET_OF(MSDU_INFO_T, rLinkEntry) == 0);
-
-	DATA_STRUCT_INSPECTING_ASSERT(OFFSET_OF(MSDU_INFO_T, rLinkEntry) == OFFSET_OF(SW_RFB_T, rLinkEntry));
-
-	DATA_STRUCT_INSPECTING_ASSERT(OFFSET_OF(MSDU_INFO_T, pucBuffer) == OFFSET_OF(SW_RFB_T, pucBuffer));
-
-	DATA_STRUCT_INSPECTING_ASSERT(OFFSET_OF(MSDU_INFO_T, ucBufferSource) == OFFSET_OF(SW_RFB_T, ucBufferSource));
-
-	DATA_STRUCT_INSPECTING_ASSERT(OFFSET_OF(MSDU_INFO_T, pucMacHeader) == OFFSET_OF(SW_RFB_T, pucMacHeader));
-
-	DATA_STRUCT_INSPECTING_ASSERT(OFFSET_OF(MSDU_INFO_T, ucMacHeaderLength) ==
-						OFFSET_OF(SW_RFB_T, ucMacHeaderLength));
-
-	DATA_STRUCT_INSPECTING_ASSERT(OFFSET_OF(MSDU_INFO_T, pucPayload) == OFFSET_OF(SW_RFB_T, pucPayload));
-
-	DATA_STRUCT_INSPECTING_ASSERT(OFFSET_OF(MSDU_INFO_T, u2PayloadLength) == OFFSET_OF(SW_RFB_T, u2PayloadLength));
-
-	DATA_STRUCT_INSPECTING_ASSERT(OFFSET_OF(MSDU_INFO_T, prStaRec) == OFFSET_OF(SW_RFB_T, prStaRec));
-
-	DATA_STRUCT_INSPECTING_ASSERT(OFFSET_OF(MSDU_INFO_T, ucNetworkTypeIndex) ==
-						OFFSET_OF(SW_RFB_T, ucNetworkTypeIndex));
-
-	DATA_STRUCT_INSPECTING_ASSERT(OFFSET_OF(MSDU_INFO_T, ucTID) == OFFSET_OF(SW_RFB_T, ucTID));
-
-	DATA_STRUCT_INSPECTING_ASSERT(OFFSET_OF(MSDU_INFO_T, fgIs802_11Frame) == OFFSET_OF(SW_RFB_T, fgIs802_11Frame));
-
-	DATA_STRUCT_INSPECTING_ASSERT(OFFSET_OF(MSDU_INFO_T, ucControlFlag) == OFFSET_OF(SW_RFB_T, ucControlFlag));
-
-	DATA_STRUCT_INSPECTING_ASSERT(OFFSET_OF(MSDU_INFO_T, rArrivalTime) == OFFSET_OF(SW_RFB_T, rArrivalTime));
-
-	DATA_STRUCT_INSPECTING_ASSERT(OFFSET_OF(MSDU_INFO_T, ucTC) == OFFSET_OF(SW_RFB_T, ucTC));
-
-#if CFG_PROFILE_BUFFER_TRACING
-	DATA_STRUCT_INSPECTING_ASSERT(OFFSET_OF(MSDU_INFO_T, eActivity[0]) == OFFSET_OF(SW_RFB_T, eActivity[0]));
-
-	DATA_STRUCT_INSPECTING_ASSERT(OFFSET_OF(MSDU_INFO_T, rActivityTime[0]) ==
-						OFFSET_OF(SW_RFB_T, rActivityTime[0]));
-#endif
-
-#if DBG && CFG_BUFFER_FREE_CHK
-	DATA_STRUCT_INSPECTING_ASSERT(OFFSET_OF(MSDU_INFO_T, fgBufferInSource) ==
-						OFFSET_OF(SW_RFB_T, fgBufferInSource));
-#endif
-
-	DATA_STRUCT_INSPECTING_ASSERT(OFFSET_OF(STA_RECORD_T, rLinkEntry) == 0);
-
-	return;
-#endif
 }
 #endif /* _lint */
 

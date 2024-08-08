@@ -55,16 +55,8 @@
 #define REMOVE_TIMEOUT_TWO_DAY (60 * 60 * 24 * 2)
 #endif
 
-#if 1
 #define SCN_BSS_DESC_REMOVE_TIMEOUT_SEC 30
 #define SCN_BSS_DESC_STALE_SEC 20 /* Scan Request Timeout */
-#else
-#define SCN_BSS_DESC_REMOVE_TIMEOUT_SEC 5 /* Second. */
-/* This is used by POLICY TIMEOUT,
- * If exceed this value, remove timeout BSS_DESC_T.
- */
-
-#endif
 
 #define SCN_PROBE_DELAY_MSEC 0
 
@@ -233,10 +225,10 @@ struct _BSS_DESC_T {
 
 	RSN_INFO_T rRSNInfo;
 	RSN_INFO_T rWPAInfo;
-#if 1 /* CFG_SUPPORT_WAPI */
+
 	WAPI_INFO_T rIEWAPI;
 	BOOL		fgIEWAPI;
-#endif
+
 	BOOL fgIERSN;
 	BOOL fgIEWPA;
 
@@ -671,10 +663,6 @@ scnFsmSchedScanRequest(IN P_ADAPTER_T prAdapter, IN UINT_8 ucSsidNum, IN P_PARAM
 		IN PUINT_8 pucIe, IN UINT_16 u2Interval);
 
 BOOLEAN scnFsmSchedScanStopRequest(IN P_ADAPTER_T prAdapter);
-
-#if CFG_SUPPORT_PASSPOINT
-P_BSS_DESC_T scanSearchBssDescByBssidAndLatestUpdateTime(IN P_ADAPTER_T prAdapter, IN UINT_8 aucBSSID[]);
-#endif /* CFG_SUPPORT_PASSPOINT */
 
 #if CFG_SUPPORT_AGPS_ASSIST
 VOID scanReportScanResultToAgps(P_ADAPTER_T prAdapter);

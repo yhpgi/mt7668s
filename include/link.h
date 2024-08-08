@@ -70,14 +70,6 @@ typedef struct _LINK_MGMT_T {
  *                                 M A C R O S
  ********************************************************************************
  */
-#if 0 /* No one use it, temporarily mark it for [Lint - Info 773] */
-#define LINK_ADDR(rLink) \
-	{ \
-		(P_LINK_ENTRY_T)(&(rLink)), (P_LINK_ENTRY_T)(&(rLink)), 0 \
-	}
-
-#define LINK_DECLARATION(rLink) struct _LINK_T rLink = LINK_ADDR(rLink)
-#endif
 
 #define LINK_INITIALIZE(prLink) \
 	do { \
