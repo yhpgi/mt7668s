@@ -29,11 +29,11 @@ const struct ieee80211_regdomain regdom_us01 = { .n_reg_rules = 6,
 			   /* channels 36..48 */
 			   REG_RULE_LIGHT(5180 - 10, 5240 + 10, 40, 0),
 			   /* channels 56..64 */
-			   REG_RULE_LIGHT(5260 - 10, 5320 + 10, 40, KAL_RRF_DFS),
+			   REG_RULE_LIGHT(5260 - 10, 5320 + 10, 40, NL80211_RRF_DFS),
 			   /* channels 100..118 */
-			   REG_RULE_LIGHT(5500 - 10, 5590 + 10, 40, KAL_RRF_DFS),
+			   REG_RULE_LIGHT(5500 - 10, 5590 + 10, 40, NL80211_RRF_DFS),
 			   /* channels 132..140 */
-			   REG_RULE_LIGHT(5660 - 10, 5700 + 10, 40, KAL_RRF_DFS),
+			   REG_RULE_LIGHT(5660 - 10, 5700 + 10, 40, NL80211_RRF_DFS),
 			   /* channels 149..165 */
 			   REG_RULE_LIGHT(5745 - 10, 5825 + 10, 40, 0) } };
 
@@ -42,11 +42,11 @@ const struct ieee80211_regdomain regdom_us = { .n_reg_rules = 5,
 	.reg_rules												= { /* channels 1..11 */
 			 REG_RULE_LIGHT(2412 - 10, 2462 + 10, 40, 0),
 			 /* channels 36..48 */
-			 REG_RULE_LIGHT(5180 - 10, 5240 + 10, 80, KAL_RRF_AUTO_BW),
+			 REG_RULE_LIGHT(5180 - 10, 5240 + 10, 80, 0),
 			 /* channels 52..64 */
-			 REG_RULE_LIGHT(5260 - 10, 5320 + 10, 80, KAL_RRF_DFS | KAL_RRF_AUTO_BW),
+			 REG_RULE_LIGHT(5260 - 10, 5320 + 10, 80, NL80211_RRF_DFS | 0),
 			 /* channels 100..140 */
-			 REG_RULE_LIGHT(5500 - 10, 5720 + 10, 160, KAL_RRF_DFS),
+			 REG_RULE_LIGHT(5500 - 10, 5720 + 10, 160, NL80211_RRF_DFS),
 			 /* channels 149..165 */
 			 REG_RULE_LIGHT(5745 - 10, 5825 + 10, 80, 0) } };
 
@@ -55,9 +55,9 @@ const struct ieee80211_regdomain regdom_cn = { .n_reg_rules = 4,
 	.reg_rules												= { /* channels 1..13 */
 			 REG_RULE_LIGHT(2412 - 10, 2472 + 10, 40, 0),
 			 /* channels 36..48 */
-			 REG_RULE_LIGHT(5180 - 10, 5240 + 10, 80, KAL_RRF_AUTO_BW),
+			 REG_RULE_LIGHT(5180 - 10, 5240 + 10, 80, 0),
 			 /* channels 52..64 */
-			 REG_RULE_LIGHT(5260 - 10, 5320 + 10, 80, KAL_RRF_DFS | KAL_RRF_AUTO_BW),
+			 REG_RULE_LIGHT(5260 - 10, 5320 + 10, 80, NL80211_RRF_DFS | 0),
 			 /* channels 149..165 */
 			 REG_RULE_LIGHT(5745 - 10, 5825 + 10, 80, 0) } };
 
@@ -69,37 +69,37 @@ const struct ieee80211_regdomain regdom_cz_nl = { .n_reg_rules = 5,
 			/* channels 36..48 */
 			REG_RULE_LIGHT(5180 - 10, 5240 + 10, 80, 0),
 			/* channels 52..64 */
-			REG_RULE_LIGHT(5260 - 10, 5320 + 10, 80, KAL_RRF_DFS),
+			REG_RULE_LIGHT(5260 - 10, 5320 + 10, 80, NL80211_RRF_DFS),
 			/* channels 100..140 */
-			REG_RULE_LIGHT(5500 - 10, 5700 + 10, 160, KAL_RRF_DFS) } };
+			REG_RULE_LIGHT(5500 - 10, 5700 + 10, 160, NL80211_RRF_DFS) } };
 
 const struct ieee80211_regdomain regdom_jp = { .n_reg_rules = 7,
 	.dfs_region												= NL80211_DFS_JP,
 	.reg_rules												= { /* channels 1..13 */
 			 REG_RULE_LIGHT(2412 - 10, 2472 + 10, 40, 0),
 			 /* channels 14 */
-			 REG_RULE_LIGHT(2484 - 10, 2484 + 10, 20, KAL_RRF_NO_OFDM),
+			 REG_RULE_LIGHT(2484 - 10, 2484 + 10, 20, NL80211_RRF_NO_OFDM),
 			 /* channels 184..196 */
 			 REG_RULE_LIGHT(4920 - 10, 4980 + 10, 40, 0),
 			 /* channels 8..16 */
 			 REG_RULE_LIGHT(5040 - 10, 5080 + 10, 40, 0),
 			 /* channels 36..48 */
-			 REG_RULE_LIGHT(5180 - 10, 5240 + 10, 80, KAL_RRF_AUTO_BW),
+			 REG_RULE_LIGHT(5180 - 10, 5240 + 10, 80, 0),
 			 /* channels 52..64 */
-			 REG_RULE_LIGHT(5260 - 10, 5320 + 10, 80, KAL_RRF_DFS | KAL_RRF_AUTO_BW),
+			 REG_RULE_LIGHT(5260 - 10, 5320 + 10, 80, NL80211_RRF_DFS | 0),
 			 /* channels 100..140 */
-			 REG_RULE_LIGHT(5500 - 10, 5700 + 10, 160, KAL_RRF_DFS) } };
+			 REG_RULE_LIGHT(5500 - 10, 5700 + 10, 160, NL80211_RRF_DFS) } };
 
 const struct ieee80211_regdomain regdom_tr = { .n_reg_rules = 4,
 	.dfs_region												= NL80211_DFS_ETSI,
 	.reg_rules												= { /* channels 1..13 */
 			 REG_RULE_LIGHT(2412 - 10, 2472 + 10, 40, 0),
 			 /* channels 36..48 */
-			 REG_RULE_LIGHT(5180 - 10, 5240 + 10, 80, KAL_RRF_AUTO_BW),
+			 REG_RULE_LIGHT(5180 - 10, 5240 + 10, 80, 0),
 			 /* channels 52..64 */
-			 REG_RULE_LIGHT(5260 - 10, 5320 + 10, 80, KAL_RRF_DFS | KAL_RRF_AUTO_BW),
+			 REG_RULE_LIGHT(5260 - 10, 5320 + 10, 80, NL80211_RRF_DFS | 0),
 			 /* channels 100..140 */
-			 REG_RULE_LIGHT(5500 - 10, 5700 + 10, 160, KAL_RRF_DFS) } };
+			 REG_RULE_LIGHT(5500 - 10, 5700 + 10, 160, NL80211_RRF_DFS) } };
 
 /*
  * Step2. Decclare struct mtk_regdomain

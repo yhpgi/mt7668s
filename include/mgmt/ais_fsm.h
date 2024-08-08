@@ -52,12 +52,8 @@
 #define AIS_BMC_MIN_TIMEOUT_VALID TRUE
 
 #define AIS_JOIN_CH_GRANT_THRESHOLD 10
-#if CFG_SUPPORT_CFG80211_AUTH
-/* expand 4000 to 6000 to improve SAE connection success probability */
 #define AIS_JOIN_CH_REQUEST_INTERVAL 6000
-#else
-#define AIS_JOIN_CH_REQUEST_INTERVAL 4000
-#endif
+
 #ifdef CFG_SUPPORT_ADJUST_JOIN_CH_REQ_INTERVAL
 #define AIS_JOIN_CH_REQUEST_MAX_INTERVAL 4000
 #endif
@@ -151,9 +147,7 @@ typedef struct _AIS_FSM_INFO_T {
 
 	UINT_32 u4SleepInterval;
 
-#if CFG_SUPPORT_CFG80211_AUTH
 	TIMER_T rBeaconLostTimer;
-#endif
 
 	TIMER_T rBGScanTimer;
 
@@ -362,9 +356,7 @@ VOID aisUpdateBssInfoForRoamingAP(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T pr
 /*----------------------------------------------------------------------------*/
 VOID aisFsmRunEventBGSleepTimeOut(IN P_ADAPTER_T prAdapter, ULONG ulParamPtr);
 
-#if CFG_SUPPORT_CFG80211_AUTH
 VOID aisFsmBeaconLostTimeOut(IN P_ADAPTER_T prAdapter, ULONG ulParamPtr);
-#endif
 
 VOID aisFsmRunEventIbssAloneTimeOut(IN P_ADAPTER_T prAdapter, ULONG ulParamPtr);
 

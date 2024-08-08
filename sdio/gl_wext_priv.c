@@ -7260,13 +7260,13 @@ int priv_driver_get_channels(IN struct net_device *prNetDev, IN char *pcCommand,
 	 **/
 	if (i4Argc >= 2 && (apcArgv[1][0] == '2') && (apcArgv[1][1] == 'g')) {
 		start_idx = 0;
-		end_idx	  = rlmDomainGetActiveChannelCount(KAL_BAND_2GHZ);
+		end_idx	  = rlmDomainGetActiveChannelCount(NL80211_BAND_2GHZ);
 	} else if (i4Argc >= 2 && (apcArgv[1][0] == '5') && (apcArgv[1][1] == 'g')) {
-		start_idx = rlmDomainGetActiveChannelCount(KAL_BAND_2GHZ);
-		end_idx	  = rlmDomainGetActiveChannelCount(KAL_BAND_2GHZ) + rlmDomainGetActiveChannelCount(KAL_BAND_5GHZ);
+		start_idx = rlmDomainGetActiveChannelCount(NL80211_BAND_2GHZ);
+		end_idx = rlmDomainGetActiveChannelCount(NL80211_BAND_2GHZ) + rlmDomainGetActiveChannelCount(NL80211_BAND_5GHZ);
 	} else {
 		start_idx = 0;
-		end_idx	  = rlmDomainGetActiveChannelCount(KAL_BAND_2GHZ) + rlmDomainGetActiveChannelCount(KAL_BAND_5GHZ);
+		end_idx = rlmDomainGetActiveChannelCount(NL80211_BAND_2GHZ) + rlmDomainGetActiveChannelCount(NL80211_BAND_5GHZ);
 		if (i4Argc >= 2) {
 			/* Dump only specified channel */
 			u4Ret = kalkStrtou32(apcArgv[1], 0, &ch_num);
@@ -7289,8 +7289,8 @@ int priv_driver_get_channels(IN struct net_device *prNetDev, IN char *pcCommand,
 			/* Channel number */
 			LOGBUF(pcCommand, i4TotalLen, i4BytesWritten, "CH-%d:", pCh->chNum);
 			/* Active/Passive */
-			if (pCh->flags & IEEE80211_CHAN_PASSIVE_FLAG)
-				LOGBUF(pcCommand, i4TotalLen, i4BytesWritten, " " IEEE80211_CHAN_PASSIVE_STR);
+			if (pCh->flags & IEEE80211_CHAN_NO_IR)
+				LOGBUF(pcCommand, i4TotalLen, i4BytesWritten, "NO_IR ");
 			else
 				LOGBUF(pcCommand, i4TotalLen, i4BytesWritten, " ACTIVE");
 			/* Max BW */
@@ -7349,13 +7349,13 @@ int priv_driver_get_ap_channels(IN struct net_device *prNetDev, IN char *pcComma
 	 **/
 	if (i4Argc >= 2 && (apcArgv[1][0] == '2') && (apcArgv[1][1] == 'g')) {
 		start_idx = 0;
-		end_idx	  = rlmDomainGetActiveChannelCount(KAL_BAND_2GHZ);
+		end_idx	  = rlmDomainGetActiveChannelCount(NL80211_BAND_2GHZ);
 	} else if (i4Argc >= 2 && (apcArgv[1][0] == '5') && (apcArgv[1][1] == 'g')) {
-		start_idx = rlmDomainGetActiveChannelCount(KAL_BAND_2GHZ);
-		end_idx	  = rlmDomainGetActiveChannelCount(KAL_BAND_2GHZ) + rlmDomainGetActiveChannelCount(KAL_BAND_5GHZ);
+		start_idx = rlmDomainGetActiveChannelCount(NL80211_BAND_2GHZ);
+		end_idx = rlmDomainGetActiveChannelCount(NL80211_BAND_2GHZ) + rlmDomainGetActiveChannelCount(NL80211_BAND_5GHZ);
 	} else {
 		start_idx = 0;
-		end_idx	  = rlmDomainGetActiveChannelCount(KAL_BAND_2GHZ) + rlmDomainGetActiveChannelCount(KAL_BAND_5GHZ);
+		end_idx = rlmDomainGetActiveChannelCount(NL80211_BAND_2GHZ) + rlmDomainGetActiveChannelCount(NL80211_BAND_5GHZ);
 		if (i4Argc >= 2) {
 			/* Dump only specified channel */
 			u4Ret = kalkStrtou32(apcArgv[1], 0, &ch_num);
@@ -7380,8 +7380,8 @@ int priv_driver_get_ap_channels(IN struct net_device *prNetDev, IN char *pcComma
 			/* Channel number */
 			LOGBUF(pcCommand, i4TotalLen, i4BytesWritten, "CH-%d:", pCh->chNum);
 			/* Active/Passive */
-			if (pCh->flags & IEEE80211_CHAN_PASSIVE_FLAG)
-				LOGBUF(pcCommand, i4TotalLen, i4BytesWritten, " " IEEE80211_CHAN_PASSIVE_STR);
+			if (pCh->flags & IEEE80211_CHAN_NO_IR)
+				LOGBUF(pcCommand, i4TotalLen, i4BytesWritten, " NO_IR");
 			else
 				LOGBUF(pcCommand, i4TotalLen, i4BytesWritten, " ACTIVE");
 			/* Max BW */

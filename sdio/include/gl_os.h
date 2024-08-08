@@ -133,9 +133,7 @@
 #include <net/if_inet6.h>
 #endif
 
-#if KERNEL_VERSION(3, 8, 0) <= CFG80211_VERSION_CODE
 #include <uapi/linux/nl80211.h>
-#endif
 
 #include "gl_typedef.h"
 #include "typedef.h"
@@ -186,7 +184,6 @@ extern const INT_32								 mtk_iface_combinations_sta_num;
 #define GLUE_FLAG_FRAME_FILTER_BIT (8)
 #define GLUE_FLAG_FRAME_FILTER_AIS_BIT (9)
 
-#if CFG_SUPPORT_MULTITHREAD
 #define GLUE_FLAG_RX BIT(10)
 #define GLUE_FLAG_TX_CMD_DONE BIT(11)
 #define GLUE_FLAG_HIF_TX BIT(12)
@@ -202,13 +199,11 @@ extern const INT_32								 mtk_iface_combinations_sta_num;
 #define GLUE_FLAG_RX_TO_OS_BIT (14)
 #define GLUE_FLAG_HIF_FW_OWN_BIT (15)
 #define GLUE_FLAG_HIF_PRT_HIF_DBG_INFO_BIT (16)
-#endif
 #define GLUE_FLAG_ADAPT_RDY BIT(17)
 
 #define GLUE_FLAG_ADAPT_RDY_BIT (17)
 
 #define GLUE_BOW_KFIFO_DEPTH (1024)
-/* #define GLUE_BOW_DEVICE_NAME        "MT6620 802.11 AMP" */
 #define GLUE_BOW_DEVICE_NAME "ampc0"
 
 #define WAKE_LOCK_RX_TIMEOUT 300		   /* ms */
@@ -220,24 +215,9 @@ extern const INT_32								 mtk_iface_combinations_sta_num;
 #define LOAD_AUTO 2
 #define EFUSE_AUTO_CHEK 0x76
 
-#if CFG_SUPPORT_CFG80211_AUTH
-#if KERNEL_VERSION(4, 0, 0) > CFG80211_VERSION_CODE
-#define WLAN_CIPHER_SUITE_GCMP_256 0x000FAC09
-#define WLAN_CIPHER_SUITE_CCMP_256 0x000FAC0A
-#define WLAN_CIPHER_SUITE_BIP_GMAC_128 0x000FAC0B
-#define WLAN_CIPHER_SUITE_BIP_GMAC_256 0x000FAC0C
-#define WLAN_CIPHER_SUITE_BIP_CMAC_256 0x000FAC0D
-#endif
-
 #if KERNEL_VERSION(4, 12, 0) > CFG80211_VERSION_CODE
 #define WLAN_AKM_SUITE_8021X_SUITE_B 0x000FAC0B
 #define WLAN_AKM_SUITE_8021X_SUITE_B_192 0x000FAC0C
-#endif
-
-#if KERNEL_VERSION(4, 2, 0) > CFG80211_VERSION_CODE
-#if CFG_SUPPORT_SAE
-#define WLAN_AKM_SUITE_SAE 0x000FAC08
-#endif
 #endif
 
 #if CFG_SUPPORT_OWE
@@ -245,7 +225,6 @@ extern const INT_32								 mtk_iface_combinations_sta_num;
 #endif
 
 #define IW_AUTH_CIPHER_GCMP256 0x00000080
-#endif
 
 /*******************************************************************************
  *                             D A T A   T Y P E S
@@ -439,41 +418,31 @@ struct _GLUE_INFO_T {
 	/* Device power state D0~D3 */
 	PARAM_DEVICE_POWER_STATE ePowerState;
 
-	struct completion rScanComp; /* indicate scan complete */
-	struct completion rHaltComp; /* indicate main thread halt complete */
-	struct completion rPendComp; /* indicate main thread halt complete */
-#if CFG_SUPPORT_MULTITHREAD
+	struct completion rScanComp;	/* indicate scan complete */
+	struct completion rHaltComp;	/* indicate main thread halt complete */
+	struct completion rPendComp;	/* indicate main thread halt complete */
 	struct completion rHifHaltComp; /* indicate hif_thread halt complete */
 	struct completion rRxHaltComp;	/* indicate hif_thread halt complete */
 
-	UINT_32 u4TxThreadPid;
-	UINT_32 u4RxThreadPid;
-	UINT_32 u4HifThreadPid;
-#endif
+	UINT_32		u4TxThreadPid;
+	UINT_32		u4RxThreadPid;
+	UINT_32		u4HifThreadPid;
 	WLAN_STATUS rPendStatus;
 
 	QUE_T rTxQueue;
 
 	/* OID related */
 	QUE_T rCmdQueue;
-	/* PVOID                   pvInformationBuffer; */
-	/* UINT_32                 u4InformationBufferLength; */
-	/* PVOID                   pvOidEntry; */
-	/* PUINT_8                 pucIOReqBuff; */
-	/* QUE_T                   rIOReqQueue; */
-	/* QUE_T                   rFreeIOReqQueue; */
 
 	wait_queue_head_t	waitq;
 	struct task_struct *main_thread;
 
-#if CFG_SUPPORT_MULTITHREAD
 	wait_queue_head_t	waitq_hif;
 	struct task_struct *hif_thread;
 
 	wait_queue_head_t	waitq_rx;
 	struct task_struct *rx_thread;
 
-#endif
 	struct tasklet_struct rRxTask;
 	struct tasklet_struct rTxCompleteTask;
 
@@ -770,11 +739,8 @@ static inline u16 mtk_wlan_ndev_select_queue(struct sk_buff *skb)
 	static u16 ieee8021d_to_queue[8] = { 1, 0, 0, 1, 2, 2, 3, 3 };
 
 	/* cfg80211_classify8021d returns 0~7 */
-#if KERNEL_VERSION(3, 14, 0) > CFG80211_VERSION_CODE
-	skb->priority = cfg80211_classify8021d(skb);
-#else
 	skb->priority = cfg80211_classify8021d(skb, NULL);
-#endif
+
 	return ieee8021d_to_queue[skb->priority];
 }
 
@@ -821,12 +787,8 @@ u16 wlanSelectQueue(struct net_device *dev, struct sk_buff *skb, struct net_devi
 #elif KERNEL_VERSION(4, 19, 0) <= LINUX_VERSION_CODE
 u16 wlanSelectQueue(
 		struct net_device *dev, struct sk_buff *skb, struct net_device *sb_dev, select_queue_fallback_t fallback);
-#elif KERNEL_VERSION(3, 14, 0) <= LINUX_VERSION_CODE
-u16 wlanSelectQueue(struct net_device *dev, struct sk_buff *skb, void *accel_priv, select_queue_fallback_t fallback);
-#elif KERNEL_VERSION(3, 13, 0) <= LINUX_VERSION_CODE
-u16 wlanSelectQueue(struct net_device *dev, struct sk_buff *skb, void *accel_priv);
 #else
-u16 wlanSelectQueue(struct net_device *dev, struct sk_buff *skb);
+u16 wlanSelectQueue(struct net_device *dev, struct sk_buff *skb, void *accel_priv, select_queue_fallback_t fallback);
 #endif
 
 VOID wlanDebugInit(VOID);

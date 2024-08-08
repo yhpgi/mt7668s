@@ -741,18 +741,11 @@ struct _MSDU_INFO_T {
 #endif
 
 	/* To be removed  */
-	UINT_8 ucFormatID;			/* 0: MAUI, Linux, Windows NDIS 5.1 */
-	/* UINT_16 u2PalLLH; */		/* PAL Logical Link Header (for BOW network) */
-	/* UINT_16 u2AclSN; */		/* ACL Sequence Number (for BOW network) */
-	UINT_8 ucPsForwardingType;	/* See ENUM_PS_FORWARDING_TYPE_T */
-	/* UINT_8 ucPsSessionID; */ /* PS Session ID specified by the FW for the STA */
-								/* TRUE means this is the last packet of the burst for (STA, TID) */
-								/* BOOLEAN fgIsBurstEnd; */
+	UINT_8 ucFormatID;		   /* 0: MAUI, Linux, Windows NDIS 5.1 */
+	UINT_8 ucPsForwardingType; /* See ENUM_PS_FORWARDING_TYPE_T */
 
-#if CFG_SUPPORT_MULTITHREAD
 	/* Compose TxDesc in main_thread and place here */
 	UINT_8 aucTxDescBuffer[NIC_TX_DESC_AND_PADDING_LENGTH];
-#endif
 
 	/* sanity drop flag */
 	UINT_8 fgDrop;
@@ -1323,8 +1316,7 @@ extern PFN_TX_DATA_DONE_CB g_pfTxDataDoneCb;
  */
 VOID nicTxInitialize(IN P_ADAPTER_T prAdapter);
 
-WLAN_STATUS nicTxAcquireResource(
-		IN P_ADAPTER_T prAdapter, IN UINT_8 ucTC, IN UINT_32 u4PageCount, IN BOOLEAN fgReqLock);
+WLAN_STATUS nicTxAcquireResource(IN P_ADAPTER_T prAdapter, IN UINT_8 ucTC, IN BOOLEAN fgReqLock);
 
 WLAN_STATUS nicTxPollingResource(IN P_ADAPTER_T prAdapter, IN UINT_8 ucTC);
 
@@ -1358,13 +1350,11 @@ WLAN_STATUS nicTxMsduInfoList(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduI
 
 UINT_8 nicTxGetTxQByTc(IN P_ADAPTER_T prAdapter, IN UINT_8 ucTc);
 
-#if CFG_SUPPORT_MULTITHREAD
 WLAN_STATUS nicTxMsduInfoListMthread(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfoListHead);
 
 UINT_32 nicTxMsduQueueMthread(IN P_ADAPTER_T prAdapter);
 
 UINT_32 nicTxGetMsduPendingCnt(IN P_ADAPTER_T prAdapter);
-#endif
 
 WLAN_STATUS nicTxMsduQueue(IN P_ADAPTER_T prAdapter, UINT_8 ucPortIdx, P_QUE_T prQue);
 
@@ -1397,10 +1387,6 @@ UINT_8 nicTxGetWlanIdx(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIdx, IN UINT_8 u
 BOOLEAN nicTxIsMgmtResourceEnough(IN P_ADAPTER_T prAdapter);
 
 UINT_32 nicTxGetFreeCmdCount(IN P_ADAPTER_T prAdapter);
-
-UINT_32 nicTxGetPageCount(IN UINT_32 u4FrameLength, IN BOOLEAN fgIncludeDesc);
-
-UINT_32 nicTxGetCmdPageCount(IN P_CMD_INFO_T prCmdInfo);
 
 WLAN_STATUS nicTxGenerateDescTemplate(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec);
 
@@ -1462,8 +1448,6 @@ VOID nicTxPrintMetRTP(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo, IN 
 VOID nicTxProcessTxDoneEvent(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent, IN UINT_32 u4EventBufLen);
 
 void nicTxMsduDoneCb(IN P_GLUE_INFO_T prGlueInfo, IN P_QUE_T prQue);
-
-VOID nicTxCancelSendingCmd(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo);
 
 /* TX Direct functions : BEGIN */
 VOID nicTxDirectStartCheckQTimer(IN P_ADAPTER_T prAdapter);

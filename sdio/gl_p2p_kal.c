@@ -755,19 +755,9 @@ VOID kalP2PIndicateRxMgmtFrame(
 		else
 			prNetdevice = prGlueP2pInfo->aprRoleHandler;
 
-#if (KERNEL_VERSION(3, 18, 0) <= CFG80211_VERSION_CODE)
 		cfg80211_rx_mgmt(prNetdevice->ieee80211_ptr, /* struct net_device * dev, */
 				i4Freq, RCPI_TO_dBm(nicRxGetRcpiValueFromRxv(RCPI_MODE_WF0, prSwRfb)), prSwRfb->pvHeader,
 				prSwRfb->u2PacketLen, NL80211_RXMGMT_FLAG_ANSWERED);
-#elif (KERNEL_VERSION(3, 12, 0) <= CFG80211_VERSION_CODE)
-		cfg80211_rx_mgmt(prNetdevice->ieee80211_ptr, /* struct net_device * dev, */
-				i4Freq, RCPI_TO_dBm(nicRxGetRcpiValueFromRxv(RCPI_MODE_WF0, prSwRfb)), prSwRfb->pvHeader,
-				prSwRfb->u2PacketLen, NL80211_RXMGMT_FLAG_ANSWERED, GFP_ATOMIC);
-#else
-		cfg80211_rx_mgmt(prNetdevice->ieee80211_ptr, /* struct net_device * dev, */
-				i4Freq, RCPI_TO_dBm(nicRxGetRcpiValueFromRxv(RCPI_MODE_WF0, prSwRfb)), prSwRfb->pvHeader,
-				prSwRfb->u2PacketLen, GFP_ATOMIC);
-#endif
 
 	} while (FALSE);
 
@@ -834,11 +824,7 @@ VOID kalP2PGOStationUpdate(
 
 			kalMemZero(&rStationInfo, sizeof(rStationInfo));
 
-#if KERNEL_VERSION(4, 0, 0) > CFG80211_VERSION_CODE
-			rStationInfo.filled = STATION_INFO_ASSOC_REQ_IES;
-#endif
-			rStationInfo.generation = ++prP2pGlueInfo->i4Generation;
-
+			rStationInfo.generation		   = ++prP2pGlueInfo->i4Generation;
 			rStationInfo.assoc_req_ies	   = prCliStaRec->pucAssocReqIe;
 			rStationInfo.assoc_req_ies_len = prCliStaRec->u2AssocReqIeLen;
 
@@ -923,12 +909,10 @@ VOID kalP2PCacFinishedUpdate(IN P_GLUE_INFO_T prGlueInfo, IN UINT_8 ucRoleIndex)
 	 * P2P GO case: p2p0=>prDevHandler, p2p-xxx-x=> aprRoleHandler
 	 */
 	DBGLOG(INIT, INFO, "kalP2PCacFinishedUpdate: Update to OS\n");
-#if KERNEL_VERSION(3, 14, 0) <= CFG80211_VERSION_CODE
+
 	cfg80211_cac_event(prGlueInfo->prP2PInfo[ucRoleIndex]->prDevHandler, prGlueInfo->prP2PInfo[ucRoleIndex]->chandef,
 			NL80211_RADAR_CAC_FINISHED, GFP_KERNEL);
-#else
-	cfg80211_cac_event(prGlueInfo->prP2PInfo[ucRoleIndex]->prDevHandler, NL80211_RADAR_CAC_FINISHED, GFP_KERNEL);
-#endif
+
 	DBGLOG(INIT, INFO, "kalP2PCacFinishedUpdate: Update to OS Done\n");
 
 } /* kalP2PRddDetectUpdate */
@@ -977,12 +961,12 @@ struct ieee80211_channel *kalP2pFuncGetChannelEntry(IN P_GL_P2P_INFO_T prP2pInfo
 	do {
 		switch (prChannelInfo->eBand) {
 		case BAND_2G4:
-			prTargetChannelEntry = wiphy->bands[KAL_BAND_2GHZ]->channels;
-			u4TblSize			 = wiphy->bands[KAL_BAND_2GHZ]->n_channels;
+			prTargetChannelEntry = wiphy->bands[NL80211_BAND_2GHZ]->channels;
+			u4TblSize			 = wiphy->bands[NL80211_BAND_2GHZ]->n_channels;
 			break;
 		case BAND_5G:
-			prTargetChannelEntry = wiphy->bands[KAL_BAND_5GHZ]->channels;
-			u4TblSize			 = wiphy->bands[KAL_BAND_5GHZ]->n_channels;
+			prTargetChannelEntry = wiphy->bands[NL80211_BAND_5GHZ]->channels;
+			u4TblSize			 = wiphy->bands[NL80211_BAND_5GHZ]->n_channels;
 			break;
 		default:
 			break;

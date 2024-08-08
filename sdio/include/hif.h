@@ -238,13 +238,9 @@ VOID glClearHifInfo(P_GLUE_INFO_T prGlueInfo);
 
 BOOL glBusInit(PVOID pvData);
 
-VOID glBusRelease(PVOID pData);
-
 INT_32 glBusSetIrq(PVOID pvData, PVOID pfnIsr, PVOID pvCookie);
 
 VOID glBusFreeIrq(PVOID pvData, PVOID pvCookie);
-
-VOID glSetPowerState(IN P_GLUE_INFO_T prGlueInfo, IN UINT_32 ePowerMode);
 
 void glGetDev(PVOID ctx, struct device **dev);
 

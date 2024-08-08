@@ -1759,14 +1759,6 @@ VOID bssInitForAP(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prBssInfo, IN BOOLEA
 
 #endif /* CFG_SUPPORT_AAA */
 
-VOID bssCreateStaRecFromAuth(IN P_ADAPTER_T prAdapter)
-{
-}
-
-VOID bssUpdateStaRecFromAssocReq(IN P_ADAPTER_T prAdapter)
-{
-}
-
 VOID bssDumpBssInfo(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex)
 {
 	P_BSS_INFO_T prBssInfo;

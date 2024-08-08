@@ -256,9 +256,7 @@
 #define AUTH_TYPE_OPEN_SYSTEM BIT(AUTH_ALGORITHM_NUM_OPEN_SYSTEM)
 #define AUTH_TYPE_SHARED_KEY BIT(AUTH_ALGORITHM_NUM_SHARED_KEY)
 #define AUTH_TYPE_FAST_BSS_TRANSITION BIT(AUTH_ALGORITHM_NUM_FAST_BSS_TRANSITION)
-#if CFG_SUPPORT_CFG80211_AUTH
 #define AUTH_TYPE_SAE BIT(AUTH_ALGORITHM_NUM_SAE)
-#endif
 
 /* Authentication Retry Limit */
 #define TX_AUTH_ASSOCI_RETRY_LIMIT 2
@@ -763,30 +761,13 @@ typedef enum _ENUM_ANTENNA_NUM {
 /*----------------------------------------------------------------------------*/
 /* RSN structures                                                             */
 /*----------------------------------------------------------------------------*/
-/* #if defined(WINDOWS_DDK) || defined(WINDOWS_CE) */
-/* #pragma pack(1) */
-/* #endif */
 
-#if CFG_SUPPORT_CFG80211_AUTH
 /* max number of supported cipher suites */
 #define MAX_NUM_SUPPORTED_CIPHER_SUITES 10
-#if CFG_SUPPORT_802_11W
+
 /* max number of supported AKM suites */
 #define MAX_NUM_SUPPORTED_AKM_SUITES 15
-#else
-/* max number of supported AKM suites */
-#define MAX_NUM_SUPPORTED_AKM_SUITES 13
-#endif
-#else
-#define MAX_NUM_SUPPORTED_CIPHER_SUITES 8
-#if CFG_SUPPORT_802_11W
-/* max number of supported AKM suites */
-#define MAX_NUM_SUPPORTED_AKM_SUITES 8
-#else
-/* max number of supported AKM suites */
-#define MAX_NUM_SUPPORTED_AKM_SUITES 6
-#endif
-#endif
+
 /* max number of supported PMKID */
 #define MAX_NUM_SUPPORTED_PMKID 10
 

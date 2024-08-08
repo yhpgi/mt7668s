@@ -1534,18 +1534,7 @@ VOID p2pFuncDissolve(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prP2pBssInfo, IN 
 		}
 
 		/* Make the deauth frame send to FW ASAP. */
-#if !CFG_SUPPORT_MULTITHREAD
-		wlanAcquirePowerControl(prAdapter);
-#endif
 		wlanProcessCommandQueue(prAdapter, &prAdapter->prGlueInfo->rCmdQueue);
-#if !CFG_SUPPORT_MULTITHREAD
-		wlanReleasePowerControl(prAdapter);
-#endif
-
-		/*kalMdelay(100);*/
-
-		/* Change Connection Status. */ /* 20161025, can not set DISCONNECTED if clientcount > 0 */
-		/*p2pChangeMediaState(prAdapter, prP2pBssInfo, PARAM_MEDIA_STATE_DISCONNECTED);*/
 
 	} while (FALSE);
 } /* p2pFuncDissolve */
@@ -1599,15 +1588,7 @@ VOID p2pFuncDisconnect(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prP2pBssInfo, I
 			/* Send deauth. */
 			authSendDeauthFrame(prAdapter, prP2pBssInfo, prStaRec, (P_SW_RFB_T)NULL, u2ReasonCode,
 					(PFN_TX_DONE_HANDLER)p2pRoleFsmRunEventDeauthTxDone);
-
-			/* Make the deauth frame send to FW ASAP. */
-#if !CFG_SUPPORT_MULTITHREAD
-			wlanAcquirePowerControl(prAdapter);
-#endif
 			wlanProcessCommandQueue(prAdapter, &prAdapter->prGlueInfo->rCmdQueue);
-#if !CFG_SUPPORT_MULTITHREAD
-			wlanReleasePowerControl(prAdapter);
-#endif
 		} else {
 			/* Change station state. */
 			cnmStaRecChangeState(prAdapter, prStaRec, STA_STATE_1);
@@ -3607,7 +3588,7 @@ VOID p2pFuncModifyChandef(IN P_ADAPTER_T prAdapter, IN P_GL_P2P_INFO_T prGlueP2p
 			return;
 		}
 		/* Fill chan def */
-		prGlueP2pInfo->chandef->chan->band		  = (prBssInfo->eBand == BAND_5G) ? KAL_BAND_5GHZ : KAL_BAND_2GHZ;
+		prGlueP2pInfo->chandef->chan->band = (prBssInfo->eBand == BAND_5G) ? NL80211_BAND_5GHZ : NL80211_BAND_2GHZ;
 		prGlueP2pInfo->chandef->chan->center_freq = nicChannelNum2Freq(prBssInfo->ucPrimaryChannel) / 1000;
 
 		if (rlmDomainIsLegalDfsChannel(prAdapter, prBssInfo->eBand, prBssInfo->ucPrimaryChannel))

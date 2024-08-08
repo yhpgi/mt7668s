@@ -128,9 +128,7 @@ typedef enum _ENUM_PARAM_AUTH_MODE_T {
 	AUTH_MODE_WPA_NONE, /*!< For Ad hoc */
 	AUTH_MODE_WPA2,
 	AUTH_MODE_WPA2_PSK,
-#if CFG_SUPPORT_CFG80211_AUTH
 	AUTH_MODE_WPA2_SAE,
-#endif
 	AUTH_MODE_NUM /*!< Upper bound, not real case */
 } ENUM_PARAM_AUTH_MODE_T,
 		*P_ENUM_PARAM_AUTH_MODE_T;
@@ -200,8 +198,6 @@ typedef enum _ENUM_PARAM_OP_MODE_T {
 } ENUM_PARAM_OP_MODE_T,
 		*P_ENUM_PARAM_OP_MODE_T;
 
-#if CFG_SUPPORT_CFG80211_AUTH
-#if CFG_WDEV_LOCK_THREAD_SUPPORT
 enum ENUM_CFG80211_WDEV_LOCK_FUNC {
 	CFG80211_RX_ASSOC_RESP = 0,
 	CFG80211_RX_MLME_MGMT,
@@ -209,8 +205,6 @@ enum ENUM_CFG80211_WDEV_LOCK_FUNC {
 	CFG80211_ABANDON_ASSOC,
 	CFG80211_ASSOC_TIMEOUT
 };
-#endif
-#endif
 
 typedef struct _PARAM_SSID_T {
 	UINT_32 u4SsidLen; /*!< SSID length in bytes. Zero length is broadcast(any) SSID */
@@ -1927,8 +1921,6 @@ typedef struct _CNM_CH_LIST_T {
 	UINT_8 ucChNum[4];
 } CNM_CH_LIST_T, *P_CNM_CH_LIST_T;
 
-#if CFG_SUPPORT_CFG80211_AUTH
-#if CFG_WDEV_LOCK_THREAD_SUPPORT
 typedef struct _PARAM_WDEV_LOCK_THREAD_T {
 	QUE_ENTRY_T						  rQueEntry;
 	struct net_device				  *pDev;
@@ -1941,8 +1933,6 @@ typedef struct _PARAM_WDEV_LOCK_THREAD_T {
 	const u8						 *req_ies;
 	size_t							  req_ies_len;
 } PARAM_WDEV_LOCK_THREAD_T, *P_PARAM_WDEV_LOCK_THREAD_T;
-#endif
-#endif
 
 /*******************************************************************************
  *                            P U B L I C   D A T A

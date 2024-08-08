@@ -17,14 +17,16 @@
  *                    E X T E R N A L   R E F E R E N C E S
  ********************************************************************************
  */
+
+#include <linux/can/netlink.h>
+#include <net/netlink.h>
+#include <net/cfg80211.h>
+
 #include "gl_os.h"
 #include "debug.h"
 #include "wlan_lib.h"
 #include "gl_wext.h"
 #include "precomp.h"
-#include <linux/can/netlink.h>
-#include <net/netlink.h>
-#include <net/cfg80211.h>
 #include "gl_cfg80211.h"
 #include "gl_vendor.h"
 #include "wlan_oid.h"
@@ -69,7 +71,6 @@ extern struct wireless_dev *gprWdev;
  *                              F U N C T I O N S
  ********************************************************************************
  */
-#if KERNEL_VERSION(3, 17, 0) <= CFG80211_VERSION_CODE
 
 int mtk_cfg80211_NLA_PUT(struct sk_buff *skb, int attrtype, int attrlen, const void *data)
 {
@@ -342,5 +343,3 @@ nla_put_failure:
 	kfree_skb(skb);
 	return -EFAULT;
 }
-
-#endif

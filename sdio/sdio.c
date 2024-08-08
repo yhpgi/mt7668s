@@ -528,19 +528,6 @@ BOOL glBusInit(PVOID pvData)
 
 /*----------------------------------------------------------------------------*/
 /*!
- * \brief Stop bus operation and release resources.
- *
- * \param[in] pvData A pointer to struct net_device.
- *
- * \return (none)
- */
-/*----------------------------------------------------------------------------*/
-VOID glBusRelease(PVOID pvData)
-{
-} /* end of glBusRelease() */
-
-/*----------------------------------------------------------------------------*/
-/*!
  * \brief Setup bus interrupt operation and interrupt handler for os.
  *
  * \param[in] pvData     A pointer to struct net_device.
@@ -1094,10 +1081,6 @@ BOOL kalDevWriteWithSdioCmd52(IN P_GLUE_INFO_T prGlueInfo, IN UINT_32 u4Addr, IN
 	return (ret) ? FALSE : TRUE;
 
 } /* end of kalDevWriteWithSdioCmd52() */
-
-VOID glSetPowerState(IN P_GLUE_INFO_T prGlueInfo, IN UINT_32 ePowerMode)
-{
-}
 
 /*----------------------------------------------------------------------------*/
 /*!

@@ -533,13 +533,15 @@ VOID rlmDomainGetChnlList_V2(P_ADAPTER_T prAdapter, ENUM_BAND_T eSpecificBand, B
 
 	if (eSpecificBand == BAND_2G4) {
 		i		  = 0;
-		max_count = rlmDomainGetActiveChannelCount(KAL_BAND_2GHZ);
+		max_count = rlmDomainGetActiveChannelCount(NL80211_BAND_2GHZ);
 	} else if (eSpecificBand == BAND_5G) {
-		i		  = rlmDomainGetActiveChannelCount(KAL_BAND_2GHZ);
-		max_count = rlmDomainGetActiveChannelCount(KAL_BAND_5GHZ) + rlmDomainGetActiveChannelCount(KAL_BAND_2GHZ);
+		i = rlmDomainGetActiveChannelCount(NL80211_BAND_2GHZ);
+		max_count =
+				rlmDomainGetActiveChannelCount(NL80211_BAND_5GHZ) + rlmDomainGetActiveChannelCount(NL80211_BAND_2GHZ);
 	} else {
-		i		  = 0;
-		max_count = rlmDomainGetActiveChannelCount(KAL_BAND_5GHZ) + rlmDomainGetActiveChannelCount(KAL_BAND_2GHZ);
+		i = 0;
+		max_count =
+				rlmDomainGetActiveChannelCount(NL80211_BAND_5GHZ) + rlmDomainGetActiveChannelCount(NL80211_BAND_2GHZ);
 	}
 
 	ucNum = 0;
@@ -548,7 +550,7 @@ VOID rlmDomainGetChnlList_V2(P_ADAPTER_T prAdapter, ENUM_BAND_T eSpecificBand, B
 		if (fgNoDfs && (prCh->flags & IEEE80211_CHAN_RADAR))
 			continue; /*not match*/
 
-		if (i < rlmDomainGetActiveChannelCount(KAL_BAND_2GHZ))
+		if (i < rlmDomainGetActiveChannelCount(NL80211_BAND_2GHZ))
 			band = BAND_2G4;
 		else
 			band = BAND_5G;
@@ -726,10 +728,10 @@ VOID rlmDomainSendDomainInfoCmd_V2(P_ADAPTER_T prAdapter, BOOLEAN fgIsOid)
 	struct wiphy				 *pWiphy;
 
 	pWiphy = priv_to_wiphy(prAdapter->prGlueInfo);
-	if (pWiphy->bands[KAL_BAND_2GHZ] != NULL)
-		max_channel_count += pWiphy->bands[KAL_BAND_2GHZ]->n_channels;
-	if (pWiphy->bands[KAL_BAND_5GHZ] != NULL)
-		max_channel_count += pWiphy->bands[KAL_BAND_5GHZ]->n_channels;
+	if (pWiphy->bands[NL80211_BAND_2GHZ] != NULL)
+		max_channel_count += pWiphy->bands[NL80211_BAND_2GHZ]->n_channels;
+	if (pWiphy->bands[NL80211_BAND_5GHZ] != NULL)
+		max_channel_count += pWiphy->bands[NL80211_BAND_5GHZ]->n_channels;
 
 	if (max_channel_count == 0) {
 		DBGLOG(RLM, ERROR, "%s, invalid channel count.\n", __func__);
@@ -944,10 +946,10 @@ BOOLEAN rlmDomainIsLegalChannel_V2(P_ADAPTER_T prAdapter, ENUM_BAND_T eBand, UIN
 
 	if (eBand == BAND_2G4) {
 		start_idx = 0;
-		end_idx	  = rlmDomainGetActiveChannelCount(KAL_BAND_2GHZ);
+		end_idx	  = rlmDomainGetActiveChannelCount(NL80211_BAND_2GHZ);
 	} else {
-		start_idx = rlmDomainGetActiveChannelCount(KAL_BAND_2GHZ);
-		end_idx	  = rlmDomainGetActiveChannelCount(KAL_BAND_2GHZ) + rlmDomainGetActiveChannelCount(KAL_BAND_5GHZ);
+		start_idx = rlmDomainGetActiveChannelCount(NL80211_BAND_2GHZ);
+		end_idx = rlmDomainGetActiveChannelCount(NL80211_BAND_2GHZ) + rlmDomainGetActiveChannelCount(NL80211_BAND_5GHZ);
 	}
 
 	for (idx = start_idx; idx < end_idx; idx++) {
@@ -2084,20 +2086,20 @@ VOID rlmDomainSendPwrLimitCmd_V2(P_ADAPTER_T prAdapter)
 	UINT_32									   ch_cnt;
 	struct wiphy							  *wiphy;
 	u8										   band_idx, ch_idx;
-	P_CMD_SET_COUNTRY_CHANNEL_POWER_LIMIT_V2_T prCmd[KAL_NUM_BANDS]				   = { NULL };
-	UINT_32									   u4SetCmdTableMaxSize[KAL_NUM_BANDS] = { 0 };
-	const INT_8							   *prChannelList					   = NULL;
+	P_CMD_SET_COUNTRY_CHANNEL_POWER_LIMIT_V2_T prCmd[NUM_NL80211_BANDS]				   = { NULL };
+	UINT_32									   u4SetCmdTableMaxSize[NUM_NL80211_BANDS] = { 0 };
+	const INT_8							   *prChannelList						   = NULL;
 
 	DBGLOG(RLM, INFO, "rlmDomainSendPwrLimitCmd()\n");
 
 	wiphy = priv_to_wiphy(prAdapter->prGlueInfo);
-	for (band_idx = 0; band_idx < KAL_NUM_BANDS; band_idx++) {
-		if (band_idx != KAL_BAND_2GHZ && band_idx != KAL_BAND_5GHZ)
+	for (band_idx = 0; band_idx < NUM_NL80211_BANDS; band_idx++) {
+		if (band_idx != NL80211_BAND_2GHZ && band_idx != NL80211_BAND_5GHZ)
 			continue;
 
-		prChannelList = (band_idx == KAL_BAND_2GHZ) ? gTx_Pwr_Limit_2g_Ch : gTx_Pwr_Limit_5g_Ch;
+		prChannelList = (band_idx == NL80211_BAND_2GHZ) ? gTx_Pwr_Limit_2g_Ch : gTx_Pwr_Limit_5g_Ch;
 
-		ch_cnt = (band_idx == KAL_BAND_2GHZ) ? TX_PWR_LIMIT_2G_CH_NUM : TX_PWR_LIMIT_5G_CH_NUM;
+		ch_cnt = (band_idx == NL80211_BAND_2GHZ) ? TX_PWR_LIMIT_2G_CH_NUM : TX_PWR_LIMIT_5G_CH_NUM;
 
 		if (!ch_cnt)
 			continue;
@@ -2128,7 +2130,7 @@ VOID rlmDomainSendPwrLimitCmd_V2(P_ADAPTER_T prAdapter)
 		kalMemSet(prCmd[band_idx], MAX_TX_POWER, u4SetCmdTableMaxSize[band_idx]);
 
 		prCmd[band_idx]->ucNum		 = ch_cnt;
-		prCmd[band_idx]->eband		 = (band_idx == KAL_BAND_2GHZ) ? BAND_2G4 : BAND_5G;
+		prCmd[band_idx]->eband		 = (band_idx == NL80211_BAND_2GHZ) ? BAND_2G4 : BAND_5G;
 		prCmd[band_idx]->countryCode = rlmDomainGetCountryCode();
 
 		DBGLOG(RLM, INFO, "%s, active n_channels=%d, band=%d\n", __func__, ch_cnt, prCmd[band_idx]->eband);
@@ -2142,13 +2144,13 @@ VOID rlmDomainSendPwrLimitCmd_V2(P_ADAPTER_T prAdapter)
 	 * Get Max Tx Power from MT_TxPwrLimit.dat
 	 */
 	rlmDomainGetTxPwrLimit(
-			rlmDomainGetCountryCode(), prAdapter->prGlueInfo, prCmd[KAL_BAND_2GHZ], prCmd[KAL_BAND_5GHZ]);
+			rlmDomainGetCountryCode(), prAdapter->prGlueInfo, prCmd[NL80211_BAND_2GHZ], prCmd[NL80211_BAND_5GHZ]);
 
-	for (band_idx = 0; band_idx < KAL_NUM_BANDS; band_idx++) {
+	for (band_idx = 0; band_idx < NUM_NL80211_BANDS; band_idx++) {
 		UINT_8									   ucRemainChNum, i, ucTempChNum, prCmdBatchNum;
 		UINT_32									   u4BufSize = 0;
 		P_CMD_SET_COUNTRY_CHANNEL_POWER_LIMIT_V2_T prTempCmd = NULL;
-		ENUM_BAND_T								   eBand	 = (band_idx == KAL_BAND_2GHZ) ? BAND_2G4 : BAND_5G;
+		ENUM_BAND_T								   eBand	 = (band_idx == NL80211_BAND_2GHZ) ? BAND_2G4 : BAND_5G;
 
 		if (!prCmd[band_idx])
 			continue;
@@ -2203,7 +2205,7 @@ VOID rlmDomainSendPwrLimitCmd_V2(P_ADAPTER_T prAdapter)
 	}
 
 error:
-	for (band_idx = 0; band_idx < KAL_NUM_BANDS; band_idx++) {
+	for (band_idx = 0; band_idx < NUM_NL80211_BANDS; band_idx++) {
 		if (prCmd[band_idx])
 			cnmMemFree(prAdapter, prCmd[band_idx]);
 	}
@@ -2321,17 +2323,17 @@ void rlmDomainResetActiveChannel(void)
 void rlmDomainAddActiveChannel(u8 band)
 
 {
-	if (band == KAL_BAND_2GHZ)
+	if (band == NL80211_BAND_2GHZ)
 		g_mtk_regd_control.n_channel_active_2g += 1;
-	else if (band == KAL_BAND_5GHZ)
+	else if (band == NL80211_BAND_5GHZ)
 		g_mtk_regd_control.n_channel_active_5g += 1;
 }
 
 u8 rlmDomainGetActiveChannelCount(u8 band)
 {
-	if (band == KAL_BAND_2GHZ)
+	if (band == NL80211_BAND_2GHZ)
 		return g_mtk_regd_control.n_channel_active_2g;
-	else if (band == KAL_BAND_5GHZ)
+	else if (band == NL80211_BAND_5GHZ)
 		return g_mtk_regd_control.n_channel_active_5g;
 	else
 		return 0;
@@ -2497,8 +2499,8 @@ void rlmDomainChannelFlagString(u32 flags, char *buf, size_t buf_size)
 		/* If DISABLED, don't need to check other flags */
 		return;
 	}
-	if (flags & IEEE80211_CHAN_PASSIVE_FLAG)
-		LOGBUF(buf, ((INT_32)buf_size), buf_written, IEEE80211_CHAN_PASSIVE_STR " ");
+	if (flags & IEEE80211_CHAN_NO_IR)
+		LOGBUF(buf, ((INT_32)buf_size), buf_written, "NO_IR ");
 	if (flags & IEEE80211_CHAN_RADAR)
 		LOGBUF(buf, ((INT_32)buf_size), buf_written, "RADAR ");
 	if (flags & IEEE80211_CHAN_NO_HT40PLUS)
@@ -2545,7 +2547,7 @@ void rlmDomainParsingChannel(IN struct wiphy *pWiphy)
 	rlmDomainResetActiveChannel();
 
 	ch_count = 0;
-	for (band_idx = 0; band_idx < KAL_NUM_BANDS; band_idx++) {
+	for (band_idx = 0; band_idx < NUM_NL80211_BANDS; band_idx++) {
 		sband = pWiphy->bands[band_idx];
 		if (!sband)
 			continue;
@@ -2599,8 +2601,8 @@ void rlmExtractChannelInfo(u32 max_ch_count, struct acctive_channel_list *prBuff
 	u32				ch_count, idx;
 	struct channel *pCh;
 
-	prBuff->n_channels_2g = rlmDomainGetActiveChannelCount(KAL_BAND_2GHZ);
-	prBuff->n_channels_5g = rlmDomainGetActiveChannelCount(KAL_BAND_5GHZ);
+	prBuff->n_channels_2g = rlmDomainGetActiveChannelCount(NL80211_BAND_2GHZ);
+	prBuff->n_channels_5g = rlmDomainGetActiveChannelCount(NL80211_BAND_5GHZ);
 	ch_count			  = prBuff->n_channels_2g + prBuff->n_channels_5g;
 
 	if (ch_count > max_ch_count) {
@@ -2683,7 +2685,7 @@ UINT_8 rlmDomainGetChannelBw(UINT_8 channelNum)
 	UINT_32			channelBw = MAX_BW_80_80_MHZ;
 	struct channel *pCh;
 
-	end_idx = rlmDomainGetActiveChannelCount(KAL_BAND_2GHZ) + rlmDomainGetActiveChannelCount(KAL_BAND_5GHZ);
+	end_idx = rlmDomainGetActiveChannelCount(NL80211_BAND_2GHZ) + rlmDomainGetActiveChannelCount(NL80211_BAND_5GHZ);
 
 	for (ch_idx = start_idx; ch_idx < end_idx; ch_idx++) {
 		pCh = (rlmDomainGetActiveChannels() + ch_idx);
@@ -2701,7 +2703,7 @@ UINT_8 rlmDomainGetChannelBw(UINT_8 channelNum)
 			break;
 		}
 
-		if (pCh->chNum > rlmDomainGetActiveChannelCount(KAL_BAND_2GHZ)) {
+		if (pCh->chNum > rlmDomainGetActiveChannelCount(NL80211_BAND_2GHZ)) {
 			UINT_16 u2Bw40 = (pCh->chNum >> 2) & 0x1; /* 1, 0 */
 			UINT_16 u2Bw80 = (pCh->chNum >> 2) & 0x3; /* 1, 2, 3, 0 */
 

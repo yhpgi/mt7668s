@@ -47,9 +47,7 @@
 #define MAX_SCAN_IE_LEN (512)
 
 #if (CFG_SUPPORT_DFS_MASTER == 1)
-#if KERNEL_VERSION(3, 16, 0) <= CFG80211_VERSION_CODE
 #define MAX_CSA_COUNTER 10
-#endif
 #endif
 
 #ifdef CFG_SUPPORT_MULTICAST_ENHANCEMENT_LOOKBACK
@@ -77,8 +75,6 @@ struct net_device	  *gPrP2pDev[KAL_P2P_NUM];
 
 #if CFG_ENABLE_WIFI_DIRECT_CFG_80211
 static struct cfg80211_ops mtk_p2p_ops = {
-#if (CFG_ENABLE_WIFI_DIRECT_CFG_80211 != 0)
-	/* Froyo */
 	.add_virtual_intf		  = mtk_p2p_cfg80211_add_iface,
 	.change_virtual_intf	  = mtk_p2p_cfg80211_change_iface, /* 1 st */
 	.del_virtual_intf		  = mtk_p2p_cfg80211_del_iface,
@@ -110,18 +106,12 @@ static struct cfg80211_ops mtk_p2p_ops = {
 	.set_tx_power			  = mtk_p2p_cfg80211_set_txpower,
 	.get_tx_power			  = mtk_p2p_cfg80211_get_txpower,
 	.set_power_mgmt			  = mtk_p2p_cfg80211_set_power_mgmt,
-#if (CFG_SUPPORT_DFS_MASTER == 1)
-	.start_radar_detection = mtk_p2p_cfg80211_start_radar_detection,
-#if KERNEL_VERSION(3, 13, 0) <= CFG80211_VERSION_CODE
-	.channel_switch = mtk_p2p_cfg80211_channel_switch,
-#endif
-#endif
+	.start_radar_detection	  = mtk_p2p_cfg80211_start_radar_detection,
+	.channel_switch			  = mtk_p2p_cfg80211_channel_switch,
 #ifdef CONFIG_NL80211_TESTMODE
 	.testmode_cmd = mtk_p2p_cfg80211_testmode_cmd,
 #endif
-#endif
 };
-#if KERNEL_VERSION(3, 18, 0) <= CFG80211_VERSION_CODE
 
 static const struct wiphy_vendor_command mtk_p2p_vendor_ops[] = {
 	{ { .vendor_id = GOOGLE_OUI, .subcmd = WIFI_SUBCMD_GET_CHANNEL_LIST },
@@ -131,8 +121,6 @@ static const struct wiphy_vendor_command mtk_p2p_vendor_ops[] = {
 			.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
 			.doit  = mtk_cfg80211_vendor_set_country_code, VENDOR_OPS_SET_POLICY(VENDOR_CMD_RAW_DATA) },
 };
-
-#endif
 
 /* There isn't a lot of sense in it, but you can transmit anything you like */
 static const struct ieee80211_txrx_stypes
@@ -173,26 +161,16 @@ static const struct ieee80211_iface_limit mtk_p2p_sta_go_limits[] = {
 	},
 };
 
-#if ((CFG_SUPPORT_DFS_MASTER == 1) && (KERNEL_VERSION(3, 17, 0) > CFG80211_VERSION_CODE))
-static const struct ieee80211_iface_limit mtk_ap_limits[] = {
-	{
-			.max   = 1,
-			.types = BIT(NL80211_IFTYPE_AP),
-	},
-};
-#endif
-
 static const struct ieee80211_iface_combination mtk_iface_combinations_sta[] = {
 	{
 #ifdef CFG_NUM_DIFFERENT_CHANNELS_STA
 			.num_different_channels = CFG_NUM_DIFFERENT_CHANNELS_STA,
 #else
 			.num_different_channels = 2,
-#endif /* CFG_NUM_DIFFERENT_CHANNELS_STA */
+#endif
 			.max_interfaces = 3,
-			/*.beacon_int_infra_match = true,*/
-			.limits	  = mtk_p2p_sta_go_limits,
-			.n_limits = 1, /* include p2p */
+			.limits			= mtk_p2p_sta_go_limits,
+			.n_limits		= 1, /* include p2p */
 	},
 };
 
@@ -202,24 +180,11 @@ static const struct ieee80211_iface_combination mtk_iface_combinations_p2p[] = {
 			.num_different_channels = CFG_NUM_DIFFERENT_CHANNELS_P2P,
 #else
 			.num_different_channels = 2,
-#endif /* CFG_NUM_DIFFERENT_CHANNELS_P2P */
-			.max_interfaces = 3,
-			/*.beacon_int_infra_match = true,*/
-			.limits	  = mtk_p2p_sta_go_limits,
-			.n_limits = ARRAY_SIZE(mtk_p2p_sta_go_limits), /* include p2p */
-	},
-#if ((CFG_SUPPORT_DFS_MASTER == 1) && (KERNEL_VERSION(3, 17, 0) > CFG80211_VERSION_CODE))
-	/* ONLY for passing checks in cfg80211_can_use_iftype_chan before linux-3.17.0 */
-	{
-			.num_different_channels = 1,
-			.max_interfaces			= 1,
-			.limits					= mtk_ap_limits,
-			.n_limits				= ARRAY_SIZE(mtk_ap_limits),
-			.radar_detect_widths	= BIT(NL80211_CHAN_WIDTH_20_NOHT) | BIT(NL80211_CHAN_WIDTH_20) |
-								   BIT(NL80211_CHAN_WIDTH_40) | BIT(NL80211_CHAN_WIDTH_80) |
-								   BIT(NL80211_CHAN_WIDTH_80P80),
-	},
 #endif
+			.max_interfaces = 3,
+			.limits			= mtk_p2p_sta_go_limits,
+			.n_limits		= ARRAY_SIZE(mtk_p2p_sta_go_limits), /* include p2p */
+	},
 };
 
 const struct ieee80211_iface_combination *p_mtk_iface_combinations_sta	 = mtk_iface_combinations_sta;
@@ -285,19 +250,6 @@ static int p2pInit(struct net_device *prDev)
 	return 0; /* success */
 } /* end of p2pInit() */
 
-/*----------------------------------------------------------------------------*/
-/*!
- * \brief A function for prDev->uninit
- *
- * \param[in] prDev      Pointer to struct net_device.
- *
- * \return (none)
- */
-/*----------------------------------------------------------------------------*/
-static void p2pUninit(IN struct net_device *prDev)
-{
-} /* end of p2pUninit() */
-
 const struct net_device_ops p2p_netdev_ops = {
 	.ndo_open			 = p2pOpen,
 	.ndo_stop			 = p2pStop,
@@ -306,10 +258,8 @@ const struct net_device_ops p2p_netdev_ops = {
 	.ndo_get_stats		 = p2pGetStats,
 	.ndo_do_ioctl		 = p2pDoIOCTL,
 	.ndo_start_xmit		 = p2pHardStartXmit,
-	/* .ndo_select_queue       = p2pSelectQueue, */
-	.ndo_select_queue = wlanSelectQueue,
-	.ndo_init		  = p2pInit,
-	.ndo_uninit		  = p2pUninit,
+	.ndo_select_queue	 = wlanSelectQueue,
+	.ndo_init			 = p2pInit,
 };
 
 /*******************************************************************************
@@ -474,18 +424,13 @@ BOOLEAN p2PFreeInfo(P_GLUE_INFO_T prGlueInfo)
 		}
 
 		if (prAdapter->prP2pInfo->u4DeviceNum == i) {
-			/* all prP2PInfo are freed, and free the general part now */
-
 			p2pFreeMemSafe(prGlueInfo, (VOID **)&prAdapter->prP2pInfo, sizeof(P2P_INFO_T));
 
-			if (prGlueInfo->prP2PDevInfo) {
+			if (prGlueInfo->prP2PDevInfo)
 				p2pFreeMemSafe(prGlueInfo, (VOID **)&prGlueInfo->prP2PDevInfo, sizeof(GL_P2P_DEV_INFO_T));
-			}
-			if (prAdapter->rWifiVar.prP2pDevFsmInfo) {
+			if (prAdapter->rWifiVar.prP2pDevFsmInfo)
 				p2pFreeMemSafe(prGlueInfo, (VOID **)&prWifiVar->prP2pDevFsmInfo, sizeof(P2P_DEV_FSM_INFO_T));
-			}
 
-			/* Reomve p2p bss scan list */
 			scanRemoveAllP2pBssDesc(prAdapter);
 		}
 	}
@@ -794,16 +739,12 @@ BOOLEAN glRegisterP2P(P_GLUE_INFO_T prGlueInfo, const char *prDevName, const cha
 		else
 			prP2pWdev->iftype = NL80211_IFTYPE_P2P_CLIENT;
 
-#endif /* CFG_ENABLE_WIFI_DIRECT_CFG_80211 */
+#endif
 
-			/* 3. allocate netdev */
-#if KERNEL_VERSION(3, 17, 0) <= CFG80211_VERSION_CODE
+		/* 3. allocate netdev */
 		prGlueInfo->prP2PInfo[i]->prDevHandler = alloc_netdev_mq(
 				sizeof(NETDEV_PRIVATE_GLUE_INFO), prSetDevName, NET_NAME_PREDICTABLE, ether_setup, CFG_MAX_TXQ_NUM);
-#else
-		prGlueInfo->prP2PInfo[i]->prDevHandler =
-				alloc_netdev_mq(sizeof(NETDEV_PRIVATE_GLUE_INFO), prSetDevName, ether_setup, CFG_MAX_TXQ_NUM);
-#endif
+
 		if (!prGlueInfo->prP2PInfo[i]->prDevHandler) {
 			DBGLOG(INIT, WARN, "unable to allocate netdevice for p2p\n");
 
@@ -924,8 +865,8 @@ BOOLEAN glP2pCreateWirelessDevice(P_GLUE_INFO_T prGlueInfo)
 	prWiphy->iface_combinations	  = p_mtk_iface_combinations_p2p;
 	prWiphy->n_iface_combinations = mtk_iface_combinations_p2p_num;
 
-	prWiphy->bands[KAL_BAND_2GHZ] = &mtk_band_2ghz;
-	prWiphy->bands[KAL_BAND_5GHZ] = &mtk_band_5ghz;
+	prWiphy->bands[NL80211_BAND_2GHZ] = &mtk_band_2ghz;
+	prWiphy->bands[NL80211_BAND_5GHZ] = &mtk_band_5ghz;
 
 	/*
 	 * Clear flags in ieee80211_channel before p2p registers to resolve
@@ -944,7 +885,7 @@ BOOLEAN glP2pCreateWirelessDevice(P_GLUE_INFO_T prGlueInfo)
 	 *                  (Unexpected! It includes WW flags)
 	 */
 
-	for (band_idx = 0; band_idx < KAL_NUM_BANDS; band_idx++) {
+	for (band_idx = 0; band_idx < NUM_NL80211_BANDS; band_idx++) {
 		sband = prWiphy->bands[band_idx];
 		if (!sband)
 			continue;
@@ -958,43 +899,18 @@ BOOLEAN glP2pCreateWirelessDevice(P_GLUE_INFO_T prGlueInfo)
 	prWiphy->max_remain_on_channel_duration = 5000;
 	prWiphy->n_cipher_suites				= 5;
 	prWiphy->cipher_suites					= mtk_cipher_suites;
-#if KERNEL_VERSION(3, 14, 0) > CFG80211_VERSION_CODE
-	prWiphy->flags = WIPHY_FLAG_CUSTOM_REGULATORY | WIPHY_FLAG_HAS_REMAIN_ON_CHANNEL | WIPHY_FLAG_HAVE_AP_SME;
-#else
-#if (CFG_SUPPORT_DFS_MASTER == 1)
 	prWiphy->flags = WIPHY_FLAG_HAS_REMAIN_ON_CHANNEL | WIPHY_FLAG_HAVE_AP_SME | WIPHY_FLAG_HAS_CHANNEL_SWITCH;
-#if KERNEL_VERSION(3, 16, 0) <= CFG80211_VERSION_CODE
 	prWiphy->max_num_csa_counters = MAX_CSA_COUNTER;
-#endif
-#else
-	prWiphy->flags = WIPHY_FLAG_HAS_REMAIN_ON_CHANNEL | WIPHY_FLAG_HAVE_AP_SME;
-#endif
 	prWiphy->regulatory_flags	  = REGULATORY_CUSTOM_REG;
-#endif
-	prWiphy->ap_sme_capa = 1;
-
-	prWiphy->max_scan_ssids	 = MAX_SCAN_LIST_NUM;
-	prWiphy->max_scan_ie_len = MAX_SCAN_IE_LEN;
-	prWiphy->signal_type	 = CFG80211_SIGNAL_TYPE_MBM;
-#if KERNEL_VERSION(3, 18, 0) <= CFG80211_VERSION_CODE
-	prWiphy->vendor_commands   = mtk_p2p_vendor_ops;
-	prWiphy->n_vendor_commands = sizeof(mtk_p2p_vendor_ops) / sizeof(struct wiphy_vendor_command);
-#endif
-
-#ifdef CONFIG_PM
-#if KERNEL_VERSION(3, 9, 0) > CFG80211_VERSION_CODE
-	prWiphy->wowlan = &mtk_p2p_wowlan_support;
-#endif
-#endif
-
-#ifdef STA_P2P_MCC
+	prWiphy->ap_sme_capa		  = 1;
+	prWiphy->max_scan_ssids		  = MAX_SCAN_LIST_NUM;
+	prWiphy->max_scan_ie_len	  = MAX_SCAN_IE_LEN;
+	prWiphy->signal_type		  = CFG80211_SIGNAL_TYPE_MBM;
+	prWiphy->vendor_commands	  = mtk_p2p_vendor_ops;
+	prWiphy->n_vendor_commands	  = sizeof(mtk_p2p_vendor_ops) / sizeof(struct wiphy_vendor_command);
 	prWiphy->iface_combinations	  = p2p_iface_comb_mcc;
 	prWiphy->n_iface_combinations = ARRAY_SIZE(p2p_iface_comb_mcc);
-#endif
-
-#if KERNEL_VERSION(3, 16, 0) <= CFG80211_VERSION_CODE
 	prWiphy->max_num_csa_counters = 2;
-#endif
 
 	cfg80211_regd_set_wiphy(prWiphy);
 

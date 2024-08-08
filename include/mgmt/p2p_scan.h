@@ -59,8 +59,6 @@ VOID scanP2pProcessBeaconAndProbeResp(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T pr
 
 VOID scanRemoveAllP2pBssDesc(P_ADAPTER_T prAdapter);
 
-VOID scanRemoveP2pBssDesc(P_ADAPTER_T prAdapter, P_BSS_DESC_T prBssDesc);
-
 P_BSS_DESC_T scanP2pSearchDesc(IN P_ADAPTER_T prAdapter, IN P_P2P_CONNECTION_REQ_INFO_T prConnReqInfo);
 
 #endif

@@ -90,19 +90,6 @@ VOID cnmInit(P_ADAPTER_T prAdapter)
 
 /*----------------------------------------------------------------------------*/
 /*!
- * @brief This function is used to initialize variables in CNM_INFO_T.
- *
- * @param (none)
- *
- * @return (none)
- */
-/*----------------------------------------------------------------------------*/
-VOID cnmUninit(P_ADAPTER_T prAdapter)
-{
-} /* end of cnmUninit()*/
-
-/*----------------------------------------------------------------------------*/
-/*!
  * @brief Before handle the message from other module, it need to obtain
  *        the Channel privilege from Channel Manager
  *
@@ -607,19 +594,6 @@ BOOLEAN cnmAisDetectP2PChannel(P_ADAPTER_T prAdapter, P_ENUM_BAND_T prBand, PUIN
 	return FALSE;
 }
 #endif
-
-/*----------------------------------------------------------------------------*/
-/*!
- * @brief
- *
- * @param (none)
- *
- * @return (none)
- */
-/*----------------------------------------------------------------------------*/
-VOID cnmAisInfraConnectNotify(P_ADAPTER_T prAdapter)
-{
-}
 
 /*----------------------------------------------------------------------------*/
 /*!
@@ -1152,7 +1126,7 @@ VOID cnmUpdateDbdcSetting(IN P_ADAPTER_T prAdapter, IN BOOLEAN fgDbdcEn)
 
 	for (ucBssIndex = 0; ucBssIndex <= HW_BSSID_NUM; ucBssIndex++) {
 		prBssInfo = prAdapter->aprBssInfo[ucBssIndex];
-#if CFG_SUPPORT_DBDC_TC6
+
 		/* TC6 DBDC Case: Switch DBDC mode, change Nss and reconnect to AP */
 		if (IS_BSS_AIS(prBssInfo) && (ucBssIndex == prAdapter->prAisBssInfo->ucBssIndex)) {
 			/* Update AIS NSS */
@@ -1166,54 +1140,16 @@ VOID cnmUpdateDbdcSetting(IN P_ADAPTER_T prAdapter, IN BOOLEAN fgDbdcEn)
 						prAdapter, &prAdapter->rWifiVar.rDBDCReconnectCountDown, DBDC_AIS_REASSOC_COUNTDOWN_TIME);
 				prBssInfo->fgReConnBypassScan = 1;
 				prBssInfo->u2DeauthReason	  = BEACON_TIMEOUT_REASON_DUE_2_DBDC_RECONNECT;
-#if CFG_SUPPORT_CFG80211_AUTH
+
 				if (!timerPendingTimer(&prAdapter->rWifiVar.rAisFsmInfo.rBeaconLostTimer))
 					cnmTimerStartTimer(prAdapter, &prAdapter->rWifiVar.rAisFsmInfo.rBeaconLostTimer,
 							prAdapter->rWifiVar.ucWaitConnect * MSEC_PER_SEC);
 
 				kalIndicateStatusAndComplete(prAdapter->prGlueInfo, WLAN_STATUS_BEACON_TIMEOUT, NULL, 0);
-#else
-				aisBssBeaconTimeout(prAdapter, BEACON_TIMEOUT_REASON_DUE_2_DBDC_RECONNECT);
-#endif
 			}
 			DBGLOG(CNM, STATE, "[DBDC %s] station mode is on and NSS:%d, AIS BssIndex:%d\n",
 					fgDbdcEn ? "Enable" : "Disable", prBssInfo->ucNss, prAdapter->prAisBssInfo->ucBssIndex);
 		}
-#else
-		if (prBssInfo->fgIsInUse && prBssInfo->fgIsNetActive &&
-				(prBssInfo->eConnectionState == PARAM_MEDIA_STATE_CONNECTED ||
-						prBssInfo->eCurrentOPMode == OP_MODE_ACCESS_POINT)) {
-			switch (prBssInfo->ucVhtChannelWidth) {
-			case VHT_OP_CHANNEL_WIDTH_80P80:
-				ucMaxBw = MAX_BW_160MHZ;
-				break;
-
-			case VHT_OP_CHANNEL_WIDTH_160:
-				ucMaxBw = MAX_BW_160MHZ;
-				break;
-
-			case VHT_OP_CHANNEL_WIDTH_80:
-				ucMaxBw = MAX_BW_80MHZ;
-				break;
-
-			case VHT_OP_CHANNEL_WIDTH_20_40:
-			default: {
-				ucMaxBw = MAX_BW_20MHZ;
-
-				if (prBssInfo->eBssSCO != CHNL_EXT_SCN)
-					ucMaxBw = MAX_BW_40MHZ;
-			} break;
-			}
-
-			if (fgDbdcEn) {
-				DBGLOG(CNM, INFO, "BSS index[%u] to 1SS\n", ucBssIndex);
-				rlmChangeOperationMode(prAdapter, ucBssIndex, ucMaxBw, 1);
-			} else {
-				DBGLOG(CNM, INFO, "BSS index[%u] to %uSS\n", ucBssIndex, wlanGetSupportNss(prAdapter, ucBssIndex));
-				rlmChangeOperationMode(prAdapter, ucBssIndex, ucMaxBw, wlanGetSupportNss(prAdapter, ucBssIndex));
-			}
-		}
-#endif
 	}
 
 	if (fgDbdcEn) {

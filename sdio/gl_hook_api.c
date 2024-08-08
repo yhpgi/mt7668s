@@ -21,9 +21,9 @@
 #include "gl_cfg80211.h"
 #include "gl_ate_agent.h"
 #include "gl_qa_agent.h"
-#if KERNEL_VERSION(3, 8, 0) <= CFG80211_VERSION_CODE
+
 #include <uapi/linux/nl80211.h>
-#endif
+
 /*******************************************************************************
  *						C O N S T A N T S
  ********************************************************************************

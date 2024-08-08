@@ -38,11 +38,9 @@
 /* Wait for a response to a transmitted association-request MMPDU. */
 #define DOT11_ASSOCIATION_RESPONSE_TIMEOUT_TU 512 /* TU. */
 
-#if CFG_SUPPORT_CFG80211_AUTH
 /* Wait for a response to a transmitted SAE authentication MMPDU. */
 /* Default value on 802.11-REVmd-D0.5 */
 #define DOT11_RSNA_SAE_RETRANS_PERIOD_TU 2000
-#endif
 
 /* The maximum time to wait for JOIN process complete. */
 #define JOIN_FAILURE_TIMEOUT_BEACON_INTERVAL 20 /* Beacon Interval, 20 * 100TU = 2 sec. */
@@ -50,13 +48,8 @@
 /* Retry interval for next JOIN request. */
 #define JOIN_RETRY_INTERVAL_SEC 10 /* Seconds */
 
-#if CFG_SUPPORT_CFG80211_AUTH
 /* Maximum Retry Count for accept a JOIN request. */
 #define JOIN_MAX_RETRY_FAILURE_COUNT 1 /* Times */
-#else
-/* Maximum Retry Count for accept a JOIN request. */
-#define JOIN_MAX_RETRY_FAILURE_COUNT 2 /* Times */
-#endif
 
 #define TX_AUTHENTICATION_RESPONSE_TIMEOUT_TU 512 /* TU. */
 
@@ -81,7 +74,6 @@ typedef enum _ENUM_AA_STATE_T {
 	AA_STATE_NUM
 } ENUM_AA_STATE_T;
 
-#if CFG_SUPPORT_CFG80211_AUTH
 enum ENUM_AA_SENT_T {
 	AA_SENT_NONE = 0,
 	AA_SENT_AUTH1, /* = auth transaction SN */
@@ -93,7 +85,6 @@ enum ENUM_AA_SENT_T {
 	AA_SENT_RESOURCE, /* A state for debug the case of out of msg buffer */
 	AA_SENT_NUM
 };
-#endif
 
 typedef enum _ENUM_AA_FRM_TYPE_T { FRM_DISASSOC = 0, FRM_DEAUTH } ENUM_AA_FRM_TYPE_T;
 
@@ -153,9 +144,7 @@ VOID saaChkDisassocfrmParamHandler(IN P_ADAPTER_T prAdapter, IN P_WLAN_DISASSOC_
 VOID saaSendDisconnectMsgHandler(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec, IN P_BSS_INFO_T prAisBssInfo,
 		IN ENUM_AA_FRM_TYPE_T eFrmType);
 
-#if CFG_SUPPORT_CFG80211_AUTH
 VOID saaSendAuthAssoc(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec);
-#endif
 
 /*----------------------------------------------------------------------------*/
 /* Routines in aaa_fsm.c                                                      */

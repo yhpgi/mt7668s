@@ -114,7 +114,6 @@ static RX_EVENT_HANDLER_T arEventTable[] = {
 #if CFG_ASSERT_DUMP
 	{ EVENT_ID_ASSERT_DUMP, nicEventAssertDump },
 #endif
-	{ EVENT_ID_HIF_CTRL, nicEventHifCtrl },
 	{ EVENT_ID_RDD_SEND_PULSE, nicEventRddSendPulse },
 #if (CFG_SUPPORT_DFS_MASTER == 1)
 	{ EVENT_ID_UPDATE_COEX_PHYRATE, nicEventUpdateCoexPhyrate },
@@ -887,7 +886,6 @@ VOID nicRxProcessPktWithoutReorder(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwR
 		return;
 	}
 
-#if CFG_SUPPORT_MULTITHREAD
 	if (HAL_IS_RX_DIRECT(prAdapter)) {
 		kalRxIndicateOnePkt(prAdapter->prGlueInfo, prSwRfb->pvPacket);
 		RX_ADD_CNT(prRxCtrl, RX_DATA_INDICATION_COUNT, 1);
@@ -901,10 +899,7 @@ VOID nicRxProcessPktWithoutReorder(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwR
 		prRxCtrl->ucNumIndPacket++;
 		kalSetTxEvent2Rx(prAdapter->prGlueInfo);
 	}
-#else
-	prRxCtrl->apvIndPacket[prRxCtrl->ucNumIndPacket] = prSwRfb->pvPacket;
-	prRxCtrl->ucNumIndPacket++;
-#endif
+
 	prSwRfb->pvPacket = NULL;
 
 	/* Return RFB */
@@ -1191,9 +1186,7 @@ VOID nicRxProcessMonitorPacket(IN P_ADAPTER_T prAdapter, IN OUT P_SW_RFB_T prSwR
 	UINT_8					  ucShortGI;
 	UINT_32					  u4PhyRate;
 
-#if CFG_SUPPORT_MULTITHREAD
 	KAL_SPIN_LOCK_DECLARATION();
-#endif
 
 	DEBUGFUNC("nicRxProcessMonitorPacket");
 
@@ -1326,17 +1319,12 @@ VOID nicRxProcessMonitorPacket(IN P_ADAPTER_T prAdapter, IN OUT P_SW_RFB_T prSwR
 	skb_trim(prSkb, 0);
 	skb_put(prSkb, (u4RadiotapLen + prSwRfb->u2PacketLen));
 
-#if CFG_SUPPORT_MULTITHREAD
 	KAL_ACQUIRE_SPIN_LOCK(prAdapter, SPIN_LOCK_RX_TO_OS_QUE);
 	QUEUE_INSERT_TAIL(&(prAdapter->rRxQueue), (P_QUE_ENTRY_T)GLUE_GET_PKT_QUEUE_ENTRY(prSwRfb->pvPacket));
 	KAL_RELEASE_SPIN_LOCK(prAdapter, SPIN_LOCK_RX_TO_OS_QUE);
 
 	prRxCtrl->ucNumIndPacket++;
 	kalSetTxEvent2Rx(prAdapter->prGlueInfo);
-#else
-	prRxCtrl->apvIndPacket[prRxCtrl->ucNumIndPacket] = prSwRfb->pvPacket;
-	prRxCtrl->ucNumIndPacket++;
-#endif
 
 	prSwRfb->pvPacket = NULL;
 	/* Return RFB */
@@ -1520,11 +1508,7 @@ VOID nicRxProcessDataPacket(IN P_ADAPTER_T prAdapter, IN OUT P_SW_RFB_T prSwRfb)
 						RX_GET_CNT(&prAdapter->rRxCtrl, RX_BMC_KEY_ERROR_COUNT));
 
 				prBssInfo->u2DeauthReason = BEACON_TIMEOUT_REASON_DUE_2_BMC_ERR;
-#if CFG_SUPPORT_CFG80211_AUTH
 				kalIndicateStatusAndComplete(prAdapter->prGlueInfo, WLAN_STATUS_BEACON_TIMEOUT, NULL, 0);
-#else
-				aisBssBeaconTimeout(prAdapter, prBssInfo->u2DeauthReason);
-#endif
 			}
 		}
 	}
@@ -1769,8 +1753,6 @@ VOID nicRxProcessMgmtPacket(IN P_ADAPTER_T prAdapter, IN OUT P_SW_RFB_T prSwRfb)
 
 VOID nicRxProcessMsduReport(IN P_ADAPTER_T prAdapter, IN OUT P_SW_RFB_T prSwRfb)
 {
-	halRxProcessMsduReport(prAdapter, prSwRfb);
-
 	nicRxReturnRFB(prAdapter, prSwRfb);
 }
 
@@ -1874,16 +1856,6 @@ VOID nicRxProcessRFBs(IN P_ADAPTER_T prAdapter)
 			if (prRxCtrl->ucNumIndPacket > 0) {
 				RX_ADD_CNT(prRxCtrl, RX_DATA_INDICATION_COUNT, prRxCtrl->ucNumIndPacket);
 				RX_ADD_CNT(prRxCtrl, RX_DATA_RETAINED_COUNT, prRxCtrl->ucNumRetainedPacket);
-#if !CFG_SUPPORT_MULTITHREAD
-				/* DBGLOG(RX, INFO, ("%d packets indicated, Retained cnt = %d\n", */
-				/* prRxCtrl->ucNumIndPacket, prRxCtrl->ucNumRetainedPacket)); */
-#if CFG_NATIVE_802_11
-				kalRxIndicatePkts(prAdapter->prGlueInfo, (UINT_32)prRxCtrl->ucNumIndPacket,
-						(UINT_32)prRxCtrl->ucNumRetainedPacket);
-#else
-				kalRxIndicatePkts(prAdapter->prGlueInfo, prRxCtrl->apvIndPacket, (UINT_32)prRxCtrl->ucNumIndPacket);
-#endif
-#endif
 			}
 		}
 	}
@@ -1990,20 +1962,14 @@ VOID nicProcessRxInterrupt(IN P_ADAPTER_T prAdapter)
 {
 	ASSERT(prAdapter);
 
-	/* SER break point */
 	if (nicSerIsRxStop(prAdapter)) {
-		/* Skip following Rx handling */
 		return;
 	}
 
 	halProcessRxInterrupt(prAdapter);
 
-#if CFG_SUPPORT_MULTITHREAD
 	set_bit(GLUE_FLAG_RX_BIT, &(prAdapter->prGlueInfo->ulFlag));
 	wake_up_interruptible(&(prAdapter->prGlueInfo->waitq));
-#else
-	nicRxProcessRFBs(prAdapter);
-#endif
 
 	return;
 

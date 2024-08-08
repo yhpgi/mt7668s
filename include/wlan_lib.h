@@ -899,7 +899,6 @@ WLAN_STATUS wlanProcessCommandQueue(IN P_ADAPTER_T prAdapter, IN P_QUE_T prCmdQu
 
 WLAN_STATUS wlanSendCommand(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo);
 
-#if CFG_SUPPORT_MULTITHREAD
 WLAN_STATUS wlanSendCommandMthread(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo);
 
 WLAN_STATUS wlanTxCmdMthread(IN P_ADAPTER_T prAdapter);
@@ -913,7 +912,6 @@ VOID wlanClearTxCommandDoneQueue(IN P_ADAPTER_T prAdapter);
 VOID wlanClearDataQueue(IN P_ADAPTER_T prAdapter);
 
 VOID wlanClearRxToOsQueue(IN P_ADAPTER_T prAdapter);
-#endif
 
 VOID wlanClearPendingCommandQueue(IN P_ADAPTER_T prAdapter);
 
@@ -923,8 +921,6 @@ VOID wlanReleaseCommandEx(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo, I
 		IN UINT_8 fgIsNeedHandler);
 
 VOID wlanReleasePendingOid(IN P_ADAPTER_T prAdapter, IN ULONG ulParamPtr);
-
-VOID wlanReleasePendingCMDbyBssIdx(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex);
 
 VOID wlanReturnPacketDelaySetupTimeout(IN P_ADAPTER_T prAdapter, IN ULONG ulParamPtr);
 

@@ -282,23 +282,6 @@ extern const UINT_32 mtk_cipher_suites[5];
  *                                 M A C R O S
  ********************************************************************************
  */
-/* Macros used for cfg80211 */
-#define RATETAB_ENT(_rate, _rateid, _flags) \
-	{ \
-		.bitrate = (_rate), .hw_value = (_rateid), .flags = (_flags), \
-	}
-
-#define CHAN2G(_channel, _freq, _flags) \
-	{ \
-		.band = KAL_BAND_2GHZ, .center_freq = (_freq), .hw_value = (_channel), .flags = (_flags), \
-		.max_antenna_gain = 0, .max_power = 30, \
-	}
-
-#define CHAN5G(_channel, _flags) \
-	{ \
-		.band = KAL_BAND_5GHZ, .center_freq = 5000 + (5 * (_channel)), .hw_value = (_channel), .flags = (_flags), \
-		.max_antenna_gain = 0, .max_power = 30, \
-	}
 
 /*******************************************************************************
  *                  F U N C T I O N   D E C L A R A T I O N S
@@ -310,12 +293,9 @@ extern const UINT_32 mtk_cipher_suites[5];
 #if KERNEL_VERSION(4, 12, 0) <= CFG80211_VERSION_CODE
 struct wireless_dev *mtk_p2p_cfg80211_add_iface(struct wiphy *wiphy, const char *name, unsigned char name_assign_type,
 		enum nl80211_iftype type, struct vif_params *params);
-#elif KERNEL_VERSION(4, 1, 0) <= CFG80211_VERSION_CODE
+#else
 struct wireless_dev *mtk_p2p_cfg80211_add_iface(struct wiphy *wiphy, const char *name, unsigned char name_assign_type,
 		enum nl80211_iftype type, u32 *flags, struct vif_params *params);
-#else
-struct wireless_dev *mtk_p2p_cfg80211_add_iface(
-		struct wiphy *wiphy, const char *name, enum nl80211_iftype type, u32 *flags, struct vif_params *params);
 #endif
 
 #if KERNEL_VERSION(4, 12, 0) <= CFG80211_VERSION_CODE
@@ -342,12 +322,9 @@ int mtk_p2p_cfg80211_set_default_key(
 
 int mtk_p2p_cfg80211_set_mgmt_key(struct wiphy *wiphy, struct net_device *dev, u8 key_index);
 
-#if KERNEL_VERSION(3, 16, 0) <= CFG80211_VERSION_CODE
 int mtk_p2p_cfg80211_get_station(
 		struct wiphy *wiphy, struct net_device *ndev, const u8 *mac, struct station_info *sinfo);
-#else
-int mtk_p2p_cfg80211_get_station(struct wiphy *wiphy, struct net_device *ndev, u8 *mac, struct station_info *sinfo);
-#endif
+
 int mtk_p2p_cfg80211_scan(struct wiphy *wiphy, struct cfg80211_scan_request *request);
 
 int mtk_p2p_cfg80211_set_wiphy_params(struct wiphy *wiphy, u32 changed);
@@ -372,20 +349,10 @@ int mtk_p2p_cfg80211_cancel_remain_on_channel(struct wiphy *wiphy, struct wirele
 
 int mtk_p2p_cfg80211_set_power_mgmt(struct wiphy *wiphy, struct net_device *dev, bool enabled, int timeout);
 
-#if (CFG_SUPPORT_DFS_MASTER == 1)
-
-#if KERNEL_VERSION(3, 15, 0) <= CFG80211_VERSION_CODE
 int mtk_p2p_cfg80211_start_radar_detection(
 		struct wiphy *wiphy, struct net_device *dev, struct cfg80211_chan_def *chandef, unsigned int cac_time_ms);
-#else
-int mtk_p2p_cfg80211_start_radar_detection(
-		struct wiphy *wiphy, struct net_device *dev, struct cfg80211_chan_def *chandef);
-#endif
 
-#if KERNEL_VERSION(3, 13, 0) <= CFG80211_VERSION_CODE
 int mtk_p2p_cfg80211_channel_switch(struct wiphy *wiphy, struct net_device *dev, struct cfg80211_csa_settings *params);
-#endif
-#endif
 
 int mtk_p2p_cfg80211_change_bss(struct wiphy *wiphy, struct net_device *dev, struct bss_parameters *params);
 
@@ -396,21 +363,11 @@ int mtk_p2p_cfg80211_disassoc(struct wiphy *wiphy, struct net_device *dev, struc
 int mtk_p2p_cfg80211_start_ap(struct wiphy *wiphy, struct net_device *dev, struct cfg80211_ap_settings *settings);
 
 int mtk_p2p_cfg80211_change_beacon(struct wiphy *wiphy, struct net_device *dev, struct cfg80211_beacon_data *info);
-#if KERNEL_VERSION(3, 14, 0) <= CFG80211_VERSION_CODE
+
 int mtk_p2p_cfg80211_mgmt_tx(
 		struct wiphy *wiphy, struct wireless_dev *wdev, struct cfg80211_mgmt_tx_params *params, u64 *cookie);
-#else
-int mtk_p2p_cfg80211_mgmt_tx(struct wiphy *wiphy, struct wireless_dev *wdev, struct ieee80211_channel *chan,
-		bool offchan, unsigned int wait, const u8 *buf, size_t len, bool no_cck, bool dont_wait_for_ack, u64 *cookie);
-#endif
 
-#if KERNEL_VERSION(3, 19, 0) <= CFG80211_VERSION_CODE
 int mtk_p2p_cfg80211_del_station(struct wiphy *wiphy, struct net_device *dev, struct station_del_parameters *params);
-#elif KERNEL_VERSION(3, 16, 0) <= CFG80211_VERSION_CODE
-int mtk_p2p_cfg80211_del_station(struct wiphy *wiphy, struct net_device *dev, const u8 *mac);
-#else
-int mtk_p2p_cfg80211_del_station(struct wiphy *wiphy, struct net_device *dev, u8 *mac);
-#endif
 
 int mtk_p2p_cfg80211_mgmt_tx_cancel_wait(struct wiphy *wiphy, struct wireless_dev *wdev, u64 cookie);
 
@@ -425,11 +382,8 @@ int mtk_p2p_cfg80211_set_bitrate_mask(IN struct wiphy *wiphy, IN struct net_devi
 		IN const struct cfg80211_bitrate_mask *mask);
 
 #ifdef CONFIG_NL80211_TESTMODE
-#if KERNEL_VERSION(3, 12, 0) <= CFG80211_VERSION_CODE
 int mtk_p2p_cfg80211_testmode_cmd(struct wiphy *wiphy, struct wireless_dev *wdev, void *data, int len);
-#else
-int mtk_p2p_cfg80211_testmode_cmd(struct wiphy *wiphy, void *data, int len);
-#endif
+
 int mtk_p2p_cfg80211_testmode_p2p_sigma_pre_cmd(IN struct wiphy *wiphy, IN void *data, IN int len);
 
 int mtk_p2p_cfg80211_testmode_p2p_sigma_cmd(IN struct wiphy *wiphy, IN void *data, IN int len);
@@ -444,9 +398,6 @@ int mtk_p2p_cfg80211_testmode_hotspot_block_list_cmd(IN struct wiphy *wiphy, IN 
 int mtk_p2p_cfg80211_testmode_get_best_channel(IN struct wiphy *wiphy, IN void *data, IN int len);
 #endif
 
-#else
-/* IGNORE KERNEL DEPENCY ERRORS*/
-/*#error "Please ENABLE kernel config (CONFIG_NL80211_TESTMODE) to support Wi-Fi Direct"*/
 #endif
 
 #endif

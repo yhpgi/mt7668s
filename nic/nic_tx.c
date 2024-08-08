@@ -260,7 +260,7 @@ BOOLEAN nicTxSanityCheckResource(IN P_ADAPTER_T prAdapter)
  * \retval WLAN_STATUS_RESOURCES Resource is not available.
  */
 /*----------------------------------------------------------------------------*/
-WLAN_STATUS nicTxAcquireResource(IN P_ADAPTER_T prAdapter, IN UINT_8 ucTC, IN UINT_32 u4PageCount, IN BOOLEAN fgReqLock)
+WLAN_STATUS nicTxAcquireResource(IN P_ADAPTER_T prAdapter, IN UINT_8 ucTC, IN BOOLEAN fgReqLock)
 {
 	P_TX_CTRL_T		  prTxCtrl;
 	P_TX_TCQ_STATUS_T prTc;
@@ -279,11 +279,11 @@ WLAN_STATUS nicTxAcquireResource(IN P_ADAPTER_T prAdapter, IN UINT_8 ucTC, IN UI
 	if (fgReqLock)
 		KAL_ACQUIRE_SPIN_LOCK(prAdapter, SPIN_LOCK_TX_RESOURCE);
 
-	if (prTc->au4FreePageCount[ucTC] >= u4PageCount) {
-		prTc->au4FreePageCount[ucTC] -= u4PageCount;
+	if (prTc->au4FreePageCount[ucTC] >= 1) {
+		prTc->au4FreePageCount[ucTC] -= 1;
 		prTc->au4FreeBufferCount[ucTC] = (prTc->au4FreePageCount[ucTC] / NIC_TX_MAX_PAGE_PER_FRAME);
 
-		DBGLOG(TX, LOUD, "Acquire: TC%d AcquirePageCnt[%u] FreeBufferCnt[%u] FreePageCnt[%u]\n", ucTC, u4PageCount,
+		DBGLOG(TX, LOUD, "Acquire: TC%d AcquirePageCnt[%u] FreeBufferCnt[%u] FreePageCnt[%u]\n", ucTC, 1,
 				prTc->au4FreeBufferCount[ucTC], prTc->au4FreePageCount[ucTC]);
 
 		u4Status = WLAN_STATUS_SUCCESS;
@@ -405,7 +405,7 @@ VOID nicTxReleaseMsduResource(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduI
 	while (prMsduInfo) {
 		prNextMsduInfo = (P_MSDU_INFO_T)QUEUE_GET_NEXT_ENTRY((P_QUE_ENTRY_T)prMsduInfo);
 
-		nicTxReleaseResource(prAdapter, prMsduInfo->ucTC, nicTxGetPageCount(prMsduInfo->u2FrameLength, FALSE), FALSE);
+		nicTxReleaseResource(prAdapter, prMsduInfo->ucTC, 1, FALSE);
 
 		prMsduInfo = prNextMsduInfo;
 	};
@@ -646,8 +646,7 @@ WLAN_STATUS nicTxMsduInfoList(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduI
 		case TC5_INDEX: /* Broadcast/multicast data packets */
 			QUEUE_GET_NEXT_ENTRY((P_QUE_ENTRY_T)prMsduInfo) = NULL;
 			QUEUE_INSERT_TAIL(prDataPort0, (P_QUE_ENTRY_T)prMsduInfo);
-			status = nicTxAcquireResource(
-					prAdapter, prMsduInfo->ucTC, nicTxGetPageCount(prMsduInfo->u2FrameLength, FALSE), TRUE);
+			status = nicTxAcquireResource(prAdapter, prMsduInfo->ucTC, TRUE);
 			ASSERT(status == WLAN_STATUS_SUCCESS);
 
 			break;
@@ -656,8 +655,7 @@ WLAN_STATUS nicTxMsduInfoList(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduI
 			QUEUE_GET_NEXT_ENTRY((P_QUE_ENTRY_T)prMsduInfo) = NULL;
 			QUEUE_INSERT_TAIL(prDataPort1, (P_QUE_ENTRY_T)prMsduInfo);
 
-			status = nicTxAcquireResource(
-					prAdapter, prMsduInfo->ucTC, nicTxGetPageCount(prMsduInfo->u2FrameLength, FALSE), TRUE);
+			status = nicTxAcquireResource(prAdapter, prMsduInfo->ucTC, TRUE);
 			ASSERT(status == WLAN_STATUS_SUCCESS);
 
 			break;
@@ -707,12 +705,11 @@ VOID nicTxDropInvalidMsduInfo(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduI
 	QM_TX_SET_NEXT_MSDU_INFO(prMsduInfo, NULL);
 
 	/* Release Tx resource */
-	nicTxReleaseResource(prAdapter, prMsduInfo->ucTC, nicTxGetPageCount(prMsduInfo->u2FrameLength, TRUE), TRUE);
+	nicTxReleaseResource(prAdapter, prMsduInfo->ucTC, 1, TRUE);
 	nicTxFreePacket(prAdapter, prMsduInfo, TRUE);
 	nicTxReturnMsduInfo(prAdapter, prMsduInfo);
 }
 
-#if CFG_SUPPORT_MULTITHREAD
 /*----------------------------------------------------------------------------*/
 /*!
  * @brief In this function, we'll aggregate frame(PACKET_INFO_T)
@@ -962,8 +959,6 @@ UINT_32 nicTxGetMsduPendingCnt(IN P_ADAPTER_T prAdapter)
 	return retValue;
 #endif
 }
-
-#endif
 
 VOID nicTxComposeDescAppend(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo, OUT PUINT_8 prTxDescBuffer)
 {
@@ -1779,21 +1774,6 @@ WLAN_STATUS nicTxMsduQueue(IN P_ADAPTER_T prAdapter, UINT_8 ucPortIdx, P_QUE_T p
 	while (QUEUE_IS_NOT_EMPTY(prQue)) {
 		QUEUE_REMOVE_HEAD(prQue, prMsduInfo, P_MSDU_INFO_T);
 
-		if (!halTxIsDataBufEnough(prAdapter, prMsduInfo)) {
-			QUEUE_INSERT_HEAD(prQue, (P_QUE_ENTRY_T)prMsduInfo);
-			break;
-		}
-
-#if !CFG_SUPPORT_MULTITHREAD
-		nicTxFillDataDesc(prAdapter, prMsduInfo);
-
-		/* Drop invalid MsduInfo */
-		if (unlikely(prMsduInfo->fgDrop)) {
-			nicTxDropInvalidMsduInfo(prAdapter, prMsduInfo);
-			continue;
-		}
-#endif
-
 		if (prMsduInfo->pfTxDoneHandler) {
 			KAL_SPIN_LOCK_DECLARATION();
 
@@ -1804,10 +1784,8 @@ WLAN_STATUS nicTxMsduQueue(IN P_ADAPTER_T prAdapter, UINT_8 ucPortIdx, P_QUE_T p
 			QUEUE_INSERT_TAIL(&(prTxCtrl->rTxMgmtTxingQueue), (P_QUE_ENTRY_T)prMsduInfo);
 			KAL_RELEASE_SPIN_LOCK(prAdapter, SPIN_LOCK_TXING_MGMT_LIST);
 		}
-
 		HAL_WRITE_TX_DATA(prAdapter, prMsduInfo);
 	}
-
 	HAL_KICK_TX_DATA(prAdapter);
 
 	return WLAN_STATUS_SUCCESS;
@@ -2176,7 +2154,7 @@ BOOLEAN nicTxFillMsduInfo(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo,
 	prMsduInfo->ucUserPriority	  = GLUE_GET_PKT_TID(prPacket);
 	prMsduInfo->ucMacHeaderLength = GLUE_GET_PKT_HEADER_LEN(prPacket);
 	prMsduInfo->u2FrameLength	  = (UINT_16)GLUE_GET_PKT_FRAME_LEN(prPacket);
-	prMsduInfo->u4PageCount		  = nicTxGetPageCount(prMsduInfo->u2FrameLength, FALSE);
+	prMsduInfo->u4PageCount		  = 1;
 
 #ifdef CFG_SUPPORT_MULTICAST_ENHANCEMENT
 	if (IS_BMCAST_MAC_ADDR(prMsduInfo->aucEthDestAddr) && prAdapter->fgIsMcastBurstMode) {
@@ -2228,7 +2206,6 @@ BOOLEAN nicTxFillMsduInfo(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo,
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS nicTxAdjustTcq(IN P_ADAPTER_T prAdapter)
 {
-#if CFG_SUPPORT_MULTITHREAD
 	TX_TCQ_ADJUST_T rTcqAdjust;
 	P_TX_CTRL_T		prTxCtrl;
 
@@ -2239,48 +2216,6 @@ WLAN_STATUS nicTxAdjustTcq(IN P_ADAPTER_T prAdapter)
 
 	qmAdjustTcQuotasMthread(prAdapter, &rTcqAdjust, &prTxCtrl->rTc);
 
-#else
-
-	UINT_32 u4Num;
-	TX_TCQ_ADJUST_T rTcqAdjust;
-	P_TX_CTRL_T prTxCtrl;
-	P_TX_TCQ_STATUS_T prTcqStatus;
-
-	KAL_SPIN_LOCK_DECLARATION();
-
-	ASSERT(prAdapter);
-
-	prTxCtrl = &prAdapter->rTxCtrl;
-	prTcqStatus = &prAdapter->rTxCtrl.rTc;
-	ASSERT(prTxCtrl);
-
-	if (qmAdjustTcQuotas(prAdapter, &rTcqAdjust, &prTxCtrl->rTc)) {
-		KAL_ACQUIRE_SPIN_LOCK(prAdapter, SPIN_LOCK_TX_RESOURCE);
-
-		for (u4Num = 0; u4Num < TC_NUM; u4Num++) {
-			/* Page count */
-			prTxCtrl->rTc.au4FreePageCount[u4Num] += (rTcqAdjust.ai4Variation[u4Num] * NIC_TX_MAX_PAGE_PER_FRAME);
-			prTxCtrl->rTc.au4MaxNumOfPage[u4Num] += (rTcqAdjust.ai4Variation[u4Num] * NIC_TX_MAX_PAGE_PER_FRAME);
-
-			/* Buffer count */
-			prTxCtrl->rTc.au4FreeBufferCount[u4Num] += rTcqAdjust.ai4Variation[u4Num];
-			prTxCtrl->rTc.au4MaxNumOfBuffer[u4Num] += rTcqAdjust.ai4Variation[u4Num];
-
-			ASSERT(prTxCtrl->rTc.au4FreeBufferCount[u4Num] >= 0);
-			ASSERT(prTxCtrl->rTc.au4MaxNumOfBuffer[u4Num] >= 0);
-		}
-
-		KAL_RELEASE_SPIN_LOCK(prAdapter, SPIN_LOCK_TX_RESOURCE);
-
-		DBGLOG(TX, LOUD, "TCQ Status Max Page:Buf[%03u:%02u, %03u:%02u, %03u:%02u, %03u:%02u, %03u:%02u, %03u:%02u]\n",
-				prTcqStatus->au4MaxNumOfPage[TC0_INDEX], prTcqStatus->au4MaxNumOfBuffer[TC0_INDEX],
-				prTcqStatus->au4MaxNumOfPage[TC1_INDEX], prTcqStatus->au4MaxNumOfBuffer[TC1_INDEX],
-				prTcqStatus->au4MaxNumOfPage[TC2_INDEX], prTcqStatus->au4MaxNumOfBuffer[TC2_INDEX],
-				prTcqStatus->au4MaxNumOfPage[TC3_INDEX], prTcqStatus->au4MaxNumOfBuffer[TC3_INDEX],
-				prTcqStatus->au4MaxNumOfPage[TC4_INDEX], prTcqStatus->au4MaxNumOfBuffer[TC4_INDEX],
-				prTcqStatus->au4MaxNumOfPage[TC5_INDEX], prTcqStatus->au4MaxNumOfBuffer[TC5_INDEX]);
-	}
-#endif
 	return WLAN_STATUS_SUCCESS;
 }
 
@@ -2446,10 +2381,7 @@ BOOLEAN nicTxProcessMngPacket(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduI
 	if (prMsduInfo->ucRateMode == MSDU_RATE_MODE_AUTO)
 		nicTxSetPktLowestFixedRate(prAdapter, prMsduInfo);
 
-#if CFG_SUPPORT_MULTITHREAD
 	nicTxFillDesc(prAdapter, prMsduInfo, prMsduInfo->aucTxDescBuffer, NULL);
-#endif
-
 	return TRUE;
 }
 
@@ -2751,45 +2683,6 @@ UINT_32 nicTxGetFreeCmdCount(IN P_ADAPTER_T prAdapter)
 	ASSERT(prAdapter);
 
 	return prAdapter->rFreeCmdList.u4NumElem;
-}
-
-/*----------------------------------------------------------------------------*/
-/*!
- * \brief this function returns page count of frame
- *
- * @param u4FrameLength      frame length
- *
- * @retval page count of this frame
- */
-/*----------------------------------------------------------------------------*/
-UINT_32 nicTxGetPageCount(IN UINT_32 u4FrameLength, IN BOOLEAN fgIncludeDesc)
-{
-	return halTxGetPageCount(u4FrameLength, fgIncludeDesc);
-}
-
-UINT_32 nicTxGetCmdPageCount(IN P_CMD_INFO_T prCmdInfo)
-{
-	UINT_32 u4PageCount;
-
-	switch (prCmdInfo->eCmdType) {
-	case COMMAND_TYPE_NETWORK_IOCTL:
-	case COMMAND_TYPE_GENERAL_IOCTL:
-		u4PageCount = nicTxGetPageCount(prCmdInfo->u2InfoBufLen, TRUE);
-		break;
-
-	case COMMAND_TYPE_SECURITY_FRAME:
-	case COMMAND_TYPE_MANAGEMENT_FRAME:
-		/* No TxD append field for management packet */
-		u4PageCount = nicTxGetPageCount(prCmdInfo->u2InfoBufLen + NIC_TX_DESC_LONG_FORMAT_LENGTH, TRUE);
-		break;
-
-	default:
-		DBGLOG(INIT, WARN, "Undefined CMD Type(%u)\n", prCmdInfo->eCmdType);
-		u4PageCount = nicTxGetPageCount(prCmdInfo->u2InfoBufLen, FALSE);
-		break;
-	}
-
-	return u4PageCount;
 }
 
 VOID nicTxSetMngPacket(P_ADAPTER_T prAdapter, P_MSDU_INFO_T prMsduInfo, UINT_8 ucBssIndex, UINT_8 ucStaRecIndex,
@@ -3259,11 +3152,6 @@ VOID nicTxUpdateStaRecDefaultRate(P_STA_RECORD_T prStaRec)
 		else if (prStaRec->ucDesiredPhyTypeSet & PHY_TYPE_SET_802_11N)
 			prStaRec->u2HwDefaultFixedRateCode = RATE_MM_MCS_0;
 	}
-}
-
-VOID nicTxCancelSendingCmd(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo)
-{
-	halTxCancelSendingCmd(prAdapter, prCmdInfo);
 }
 
 /* TX Direct functions : BEGIN */
@@ -3757,13 +3645,6 @@ static WLAN_STATUS nicTxDirectStartXmitMain(struct sk_buff *prSkb, P_MSDU_INFO_T
 	}
 
 	while (1) {
-		if (!halTxIsDataBufEnough(prAdapter, prMsduInfo)) {
-			QUEUE_INSERT_HEAD(&prAdapter->rTxDirectHifQueue[ucHifTc], (P_QUE_ENTRY_T)prMsduInfo);
-			mod_timer(&prAdapter->rTxDirectHifTimer, jiffies + TX_DIRECT_CHECK_INTERVAL);
-
-			return WLAN_STATUS_SUCCESS;
-		}
-
 		if (prMsduInfo->pfTxDoneHandler) {
 			KAL_SPIN_LOCK_DECLARATION();
 

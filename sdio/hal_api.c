@@ -504,15 +504,6 @@ VOID halDevInit(IN P_ADAPTER_T prAdapter)
 	HAL_CFG_MAX_HIF_RX_LEN_NUM(prAdapter, HIF_RX_MAX_AGG_NUM);
 }
 
-VOID halTxCancelSendingCmd(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo)
-{
-}
-
-BOOLEAN halTxIsDataBufEnough(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo)
-{
-	return TRUE;
-}
-
 /*----------------------------------------------------------------------------*/
 /*!
  * \brief Driver maintain a variable that is synchronous with the usage of individual
@@ -1351,19 +1342,6 @@ VOID halProcessRxInterrupt(IN P_ADAPTER_T prAdapter)
 #endif
 }
 
-VOID halHifSwInfoInit(IN P_ADAPTER_T prAdapter)
-{
-}
-
-VOID halRxProcessMsduReport(IN P_ADAPTER_T prAdapter, IN OUT P_SW_RFB_T prSwRfb)
-{
-}
-
-UINT_32 halTxGetPageCount(IN UINT_32 u4FrameLength, IN BOOLEAN fgIncludeDesc)
-{
-	return 1;
-}
-
 UINT_32 halDumpHifStatus(IN P_ADAPTER_T prAdapter, IN PUINT_8 pucBuf, IN UINT_32 u4Max)
 {
 	P_GLUE_INFO_T		  prGlueInfo = prAdapter->prGlueInfo;
@@ -2025,14 +2003,6 @@ VOID halDeAggRxPkt(P_ADAPTER_T prAdapter, P_SDIO_RX_COALESCING_BUF_T prRxBuf)
 
 	halDeAggRxPktProc(prAdapter, prRxBuf);
 #endif
-}
-
-VOID halRxTasklet(unsigned long data)
-{
-}
-
-VOID halTxCompleteTasklet(unsigned long data)
-{
 }
 
 /* Hif power off wifi */

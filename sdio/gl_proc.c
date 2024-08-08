@@ -1029,12 +1029,7 @@ INT_32 procInitFs(VOID)
 
 INT_32 procUninitProcFs(VOID)
 {
-#if KERNEL_VERSION(3, 9, 0) <= LINUX_VERSION_CODE
 	remove_proc_subtree(PROC_ROOT_NAME, init_net.proc_net);
-#else
-	remove_proc_entry(PROC_ROOT_NAME, init_net.proc_net);
-#endif
-
 	return 0;
 }
 

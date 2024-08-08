@@ -96,11 +96,9 @@ VOID secInit(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex)
 	prAdapter->rMib.dot11RSNAConfigPairwiseCiphersTable[5].dot11RSNAConfigPairwiseCipher = RSN_CIPHER_SUITE_TKIP;
 	prAdapter->rMib.dot11RSNAConfigPairwiseCiphersTable[6].dot11RSNAConfigPairwiseCipher = RSN_CIPHER_SUITE_CCMP;
 	prAdapter->rMib.dot11RSNAConfigPairwiseCiphersTable[7].dot11RSNAConfigPairwiseCipher = RSN_CIPHER_SUITE_WEP104;
-#if CFG_SUPPORT_CFG80211_AUTH
 	prAdapter->rMib.dot11RSNAConfigPairwiseCiphersTable[8].dot11RSNAConfigPairwiseCipher =
 			RSN_CIPHER_SUITE_GROUP_NOT_USED;
 	prAdapter->rMib.dot11RSNAConfigPairwiseCiphersTable[9].dot11RSNAConfigPairwiseCipher = RSN_CIPHER_SUITE_GCMP_256;
-#endif
 
 	for (i = 0; i < MAX_NUM_SUPPORTED_CIPHER_SUITES; i++)
 		prAdapter->rMib.dot11RSNAConfigPairwiseCiphersTable[i].dot11RSNAConfigPairwiseCipherEnabled = FALSE;
@@ -114,20 +112,16 @@ VOID secInit(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex)
 			RSN_AKM_SUITE_802_1X;
 	prAdapter->rMib.dot11RSNAConfigAuthenticationSuitesTable[5].dot11RSNAConfigAuthenticationSuite = RSN_AKM_SUITE_PSK;
 
-#if CFG_SUPPORT_802_11W
 	prAdapter->rMib.dot11RSNAConfigAuthenticationSuitesTable[6].dot11RSNAConfigAuthenticationSuite =
 			RSN_AKM_SUITE_802_1X_SHA256;
 	prAdapter->rMib.dot11RSNAConfigAuthenticationSuitesTable[7].dot11RSNAConfigAuthenticationSuite =
 			RSN_AKM_SUITE_PSK_SHA256;
-#endif
-#if CFG_SUPPORT_CFG80211_AUTH
 	prAdapter->rMib.dot11RSNAConfigAuthenticationSuitesTable[8].dot11RSNAConfigAuthenticationSuite =
 			RSN_AKM_SUITE_8021X_SUITE_B;
 	prAdapter->rMib.dot11RSNAConfigAuthenticationSuitesTable[9].dot11RSNAConfigAuthenticationSuite =
 			RSN_AKM_SUITE_8021X_SUITE_B_192;
 	prAdapter->rMib.dot11RSNAConfigAuthenticationSuitesTable[10].dot11RSNAConfigAuthenticationSuite = RSN_AKM_SUITE_SAE;
 	prAdapter->rMib.dot11RSNAConfigAuthenticationSuitesTable[11].dot11RSNAConfigAuthenticationSuite = RSN_AKM_SUITE_OWE;
-#endif
 
 	for (i = 0; i < MAX_NUM_SUPPORTED_AKM_SUITES; i++) {
 		prAdapter->rMib.dot11RSNAConfigAuthenticationSuitesTable[i].dot11RSNAConfigAuthenticationSuiteEnabled = FALSE;
@@ -138,10 +132,8 @@ VOID secInit(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex)
 	cnmTimerInitTimer(prAdapter, &prAisSpecBssInfo->rPreauthenticationTimer,
 			(PFN_MGMT_TIMEOUT_FUNC)rsnIndicatePmkidCand, (ULONG)NULL);
 
-#if CFG_SUPPORT_802_11W
 	cnmTimerInitTimer(
 			prAdapter, &prAisSpecBssInfo->rSaQueryTimer, (PFN_MGMT_TIMEOUT_FUNC)rsnStartSaQueryTimer, (ULONG)NULL);
-#endif
 
 	prAisSpecBssInfo->fgCounterMeasure			 = FALSE;
 	prAdapter->prAisBssInfo->ucBcDefaultKeyIdx	 = 0xff;
@@ -181,22 +173,6 @@ BOOL secCheckClassError(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb, IN P_ST
 	return TRUE;
 
 } /* end of secCheckClassError() */
-
-/*----------------------------------------------------------------------------*/
-/*!
- * \brief This routine is used to setting the sta port status.
- *
- * \param[in]  prAdapter Pointer to the Adapter structure
- * \param[in]  prSta Pointer to the sta
- * \param[in]  fgPortBlock The port status
- *
- * \retval none
- *
- */
-/*----------------------------------------------------------------------------*/
-VOID secSetPortBlocked(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prSta, IN BOOLEAN fgPortBlock)
-{
-}
 
 /*----------------------------------------------------------------------------*/
 /*!

@@ -79,9 +79,7 @@
 #define SCN_SSID_MAX_NUM CFG_SCAN_SSID_MAX_NUM
 #define SCN_SSID_MATCH_MAX_NUM CFG_SCAN_SSID_MATCH_MAX_NUM
 
-#if CFG_SUPPORT_AGPS_ASSIST
 #define SCN_AGPS_AP_LIST_MAX_NUM 32
-#endif
 
 #define SCN_BSS_JOIN_FAIL_THRESOLD 5
 #define SCN_BSS_JOIN_FAIL_CNT_RESET_SEC 15
@@ -479,7 +477,6 @@ typedef struct _MSG_SCN_SCAN_DONE_T {
 	ENUM_SCAN_STATUS eScanStatus;
 } MSG_SCN_SCAN_DONE, *P_MSG_SCN_SCAN_DONE;
 
-#if CFG_SUPPORT_AGPS_ASSIST
 typedef enum {
 	AGPS_PHY_A,
 	AGPS_PHY_B,
@@ -497,7 +494,6 @@ typedef struct _AGPS_AP_LIST_T {
 	UINT_8		   ucNum;
 	AGPS_AP_INFO_T arApInfo[SCN_AGPS_AP_LIST_MAX_NUM];
 } AGPS_AP_LIST_T, *P_AGPS_AP_LIST_T;
-#endif
 
 typedef enum _ENUM_NLO_STATUS_T {
 	NLO_STATUS_FOUND = 0,
@@ -548,11 +544,10 @@ P_BSS_DESC_T
 scanSearchBssDescByBssidAndSsid(
 		IN P_ADAPTER_T prAdapter, IN UINT_8 aucBSSID[], IN BOOLEAN fgCheckSsid, IN P_PARAM_SSID_T prSsid);
 
-#if CFG_SUPPORT_CFG80211_AUTH
 P_BSS_DESC_T
 scanSearchBssDescByBssidAndChanNum(
 		IN P_ADAPTER_T prAdapter, IN UINT_8 aucBSSID[], IN BOOLEAN fgCheckChanNum, IN UINT_8 ucChannelNum);
-#endif
+
 P_BSS_DESC_T scanSearchBssDescByTA(IN P_ADAPTER_T prAdapter, IN UINT_8 aucSrcAddr[]);
 
 P_BSS_DESC_T
@@ -664,9 +659,7 @@ scnFsmSchedScanRequest(IN P_ADAPTER_T prAdapter, IN UINT_8 ucSsidNum, IN P_PARAM
 
 BOOLEAN scnFsmSchedScanStopRequest(IN P_ADAPTER_T prAdapter);
 
-#if CFG_SUPPORT_AGPS_ASSIST
 VOID scanReportScanResultToAgps(P_ADAPTER_T prAdapter);
-#endif
 
 #if CFG_SCAN_CHANNEL_SPECIFIED
 static inline bool is_valid_scan_chnl_cnt(UINT_8 num)

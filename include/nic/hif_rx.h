@@ -86,19 +86,10 @@
  *                  F U N C T I O N   D E C L A R A T I O N S
  ********************************************************************************
  */
-static __KAL_INLINE__ VOID hifDataTypeCheck(VOID);
 
 /*******************************************************************************
  *                              F U N C T I O N S
  ********************************************************************************
  */
-
-/* Kevin: we don't have to call following function to inspect the data structure.
- * It will check automatically while at compile time.
- * We'll need this for porting driver to different RTOS.
- */
-static __KAL_INLINE__ VOID hifDataTypeCheck(VOID)
-{
-}
 
 #endif

@@ -1921,10 +1921,6 @@ VOID nicCmdEventBatchScanResult(
 }
 #endif
 
-VOID nicEventHifCtrl(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent, IN UINT_32 u4EventBufLen)
-{
-}
-
 #if CFG_SUPPORT_BUILD_DATE_CODE
 /*----------------------------------------------------------------------------*/
 /*!
@@ -2660,20 +2656,11 @@ VOID nicEventSleepyNotify(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent, I
 		DBGLOG(NIC, ERROR, "%s: Invalid event length: %d < %d\n", __func__, u4EventBufLen, sizeof(EVENT_SLEEPY_INFO_T));
 		return;
 	}
-	prEventSleepyNotify = (P_EVENT_SLEEPY_INFO_T)(prEvent->aucBuffer);
-
-	/* DBGLOG(RX, INFO, ("ucSleepyState = %d\n", prEventSleepyNotify->ucSleepyState)); */
-
+	prEventSleepyNotify			   = (P_EVENT_SLEEPY_INFO_T)(prEvent->aucBuffer);
 	prAdapter->fgWiFiInSleepyState = (BOOLEAN)(prEventSleepyNotify->ucSleepyState);
 
-#if CFG_SUPPORT_MULTITHREAD
 	if (prEventSleepyNotify->ucSleepyState)
 		kalSetFwOwnEvent2Hif(prAdapter->prGlueInfo);
-#endif
-}
-
-VOID nicEventBtOverWifi(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent, IN UINT_32 u4EventBufLen)
-{
 }
 
 VOID nicEventStatistics(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent, IN UINT_32 u4EventBufLen)
@@ -2799,32 +2786,11 @@ VOID nicEventBeaconTimeout(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent, 
 		prBssInfo->u2DeauthReason = prEventBssBeaconTimeout->ucReasonCode;
 
 		if (prEventBssBeaconTimeout->ucBssIndex == prAdapter->prAisBssInfo->ucBssIndex) {
-#if CFG_SUPPORT_CFG80211_AUTH
-#ifdef CFG_STR_DEAUTH_DELAY
-#ifdef CONFIG_PM_SLEEP
-			if (prEventBssBeaconTimeout->ucReasonCode == BEACON_TIMEOUT_EVENT_DUE_2_RX_DEAUTH_IN_STR) {
-				int iCount = 0;
-				DBGLOG(AIS, STATE, "[STR]: Deauth From STR (%d) \r\n", kalPmResumeState());
-				netif_carrier_off(prAdapter->prGlueInfo->prDevHandler);
-
-				while ((kalPmResumeState() != 1) && (iCount < 400)) {
-					kalMsleep(20);
-					iCount++;
-				}
-
-				DBGLOG(AIS, STATE, "[STR]: PM Resume State (%d, %d)\r\n", kalPmResumeState(), iCount);
-			}
-#endif
-#endif
-
 			if (!timerPendingTimer(&prAdapter->rWifiVar.rAisFsmInfo.rBeaconLostTimer))
 				cnmTimerStartTimer(prAdapter, &prAdapter->rWifiVar.rAisFsmInfo.rBeaconLostTimer,
 						prAdapter->rWifiVar.ucWaitConnect * MSEC_PER_SEC);
 
 			kalIndicateStatusAndComplete(prAdapter->prGlueInfo, WLAN_STATUS_BEACON_TIMEOUT, NULL, 0);
-#else
-			aisBssBeaconTimeout(prAdapter, prEventBssBeaconTimeout->ucReasonCode);
-#endif
 		}
 
 #if CFG_ENABLE_WIFI_DIRECT

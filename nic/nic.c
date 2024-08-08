@@ -503,19 +503,6 @@ VOID nicProcessAbnormalInterrupt(IN P_ADAPTER_T prAdapter)
  * @return (none)
  */
 /*----------------------------------------------------------------------------*/
-VOID nicProcessFwOwnBackInterrupt(IN P_ADAPTER_T prAdapter)
-{
-} /* end of nicProcessFwOwnBackInterrupt() */
-
-/*----------------------------------------------------------------------------*/
-/*!
- * @brief .
- *
- * @param prAdapter  Pointer to the Adapter structure.
- *
- * @return (none)
- */
-/*----------------------------------------------------------------------------*/
 VOID nicProcessSoftwareInterrupt(IN P_ADAPTER_T prAdapter)
 {
 	halProcessSoftwareInterrupt(prAdapter);
@@ -1300,8 +1287,6 @@ WLAN_STATUS nicUpdateBss(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex)
 	if (ucBssIndex == prAdapter->prAisBssInfo->ucBssIndex && prBssInfo->eCurrentOPMode == OP_MODE_INFRASTRUCTURE &&
 			prBssInfo->prStaRecOfAP != NULL) {
 		rCmdSetBssInfo.ucStaRecIdxOfAP = prBssInfo->prStaRecOfAP->ucIndex;
-
-		cnmAisInfraConnectNotify(prAdapter);
 	}
 #if CFG_ENABLE_WIFI_DIRECT
 	else if ((prAdapter->fgIsP2PRegistered) && (prBssInfo->eNetworkType == NETWORK_TYPE_P2P) &&
@@ -2043,9 +2028,6 @@ VOID nicUninitMGMT(IN P_ADAPTER_T prAdapter)
 
 	/* RLM Module - uninitialization */
 	rlmFsmEventUninit(prAdapter);
-
-	/* CNM Module - uninitialization */
-	cnmUninit(prAdapter);
 }
 
 /*----------------------------------------------------------------------------*/

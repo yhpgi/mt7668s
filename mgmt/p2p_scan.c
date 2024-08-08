@@ -164,13 +164,8 @@ VOID scanRemoveAllP2pBssDesc(IN P_ADAPTER_T prAdapter)
 	/* Search BSS Desc from current SCAN result list. */
 	LINK_FOR_EACH_ENTRY_SAFE(prBssDesc, prBSSDescNext, prBSSDescList, rLinkEntry, BSS_DESC_T)
 	{
-		scanRemoveP2pBssDesc(prAdapter, prBssDesc);
 	}
 } /* scanRemoveAllP2pBssDesc */
-
-VOID scanRemoveP2pBssDesc(IN P_ADAPTER_T prAdapter, IN P_BSS_DESC_T prBssDesc)
-{
-} /* scanRemoveP2pBssDesc */
 
 P_BSS_DESC_T scanP2pSearchDesc(IN P_ADAPTER_T prAdapter, IN P_P2P_CONNECTION_REQ_INFO_T prConnReqInfo)
 {

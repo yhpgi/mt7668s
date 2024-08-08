@@ -111,8 +111,7 @@ VOID p2pDevFsmUninit(IN P_ADAPTER_T prAdapter)
 		/* Clear CmdQue */
 		kalClearMgmtFramesByBssIdx(prAdapter->prGlueInfo, prP2pBssInfo->ucBssIndex);
 		kalClearSecurityFramesByBssIdx(prAdapter->prGlueInfo, prP2pBssInfo->ucBssIndex);
-		/* Clear PendingCmdQue */
-		wlanReleasePendingCMDbyBssIdx(prAdapter, prP2pBssInfo->ucBssIndex);
+
 		/* Clear PendingTxMsdu */
 		nicFreePendingTxMsduInfoByBssIdx(prAdapter, prP2pBssInfo->ucBssIndex);
 

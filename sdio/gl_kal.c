@@ -19,18 +19,13 @@
  *                    E X T E R N A L   R E F E R E N C E S
  ********************************************************************************
  */
+#include <linux/ctype.h>
+#include <net/netlink.h>
+
 #include "gl_os.h"
 #include "gl_kal.h"
 #include "gl_wext.h"
 #include "precomp.h"
-#if CFG_SUPPORT_AGPS_ASSIST
-#include <net/netlink.h>
-#endif
-#include <linux/ctype.h>
-
-#ifdef CONFIG_PM_SLEEP
-#include <linux/suspend.h>
-#endif
 
 /*******************************************************************************
  *                              C O N S T A N T S
@@ -60,10 +55,6 @@ static PVOID   pvIoBuffer;
 static UINT_32 pvIoBufferSize;
 static UINT_32 pvIoBufferUsage;
 
-#ifdef CONFIG_PM_SLEEP
-static int pm_resume_done = 0;
-#endif
-
 /*******************************************************************************
  *                                 M A C R O S
  ********************************************************************************
@@ -80,13 +71,8 @@ static int pm_resume_done = 0;
  */
 #if CFG_ENABLE_FW_DOWNLOAD
 
-#if (defined(CONFIG_UIDGID_STRICT_TYPE_CHECKS) || (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 14, 0)))
 #define KUIDT_VALUE(v) (v.val)
 #define KGIDT_VALUE(v) (v.val)
-#else
-#define KUIDT_VALUE(v) v
-#define KGIDT_VALUE(v) v
-#endif
 
 const struct firmware *fw_entry;
 
@@ -515,8 +501,6 @@ VOID kalReleaseMutex(IN P_GLUE_INFO_T prGlueInfo, IN ENUM_MUTEX_CATEGORY_E rMute
 
 } /* end of kalReleaseMutex() */
 
-#if CFG_SUPPORT_CFG80211_AUTH
-#if CFG_WDEV_LOCK_THREAD_SUPPORT
 /*----------------------------------------------------------------------------*/
 /*!
  * \brief This function is provided by GLUE Layer for internal driver stack to
@@ -561,8 +545,6 @@ void kalReleaseWDevMutex(IN struct net_device *pDev)
 	mutex_unlock(&(pDev->ieee80211_ptr)->mtx);
 	DBGLOG(INIT, TEMP, "WDEV_UNLOCK\n");
 } /* end of kalReleaseWDevMutex() */
-#endif
-#endif
 
 /*----------------------------------------------------------------------------*/
 /*!
@@ -928,10 +910,9 @@ VOID kalIndicateStatusAndComplete(
 
 		/* switch netif on */
 		netif_carrier_on(prGlueInfo->prDevHandler);
-#if CFG_SUPPORT_CFG80211_AUTH /* Report RX association response frame */
 		DBGLOG(INIT, INFO, "Skip report CONNECTED when using supplicant SME\n");
 		return;
-#endif
+
 		do {
 			/* print message on console */
 			wlanQueryInformation(prGlueInfo->prAdapter, wlanoidQuerySsid, &ssid, sizeof(ssid), &bufLen);
@@ -947,18 +928,14 @@ VOID kalIndicateStatusAndComplete(
 					prGlueInfo->prAdapter, prGlueInfo->prAdapter->prAisBssInfo->ucBssIndex);
 			if (ucChannelNum <= 14) {
 				prChannel = ieee80211_get_channel(
-						priv_to_wiphy(prGlueInfo), ieee80211_channel_to_frequency(ucChannelNum, KAL_BAND_2GHZ));
+						priv_to_wiphy(prGlueInfo), ieee80211_channel_to_frequency(ucChannelNum, NL80211_BAND_2GHZ));
 			} else {
 				prChannel = ieee80211_get_channel(
-						priv_to_wiphy(prGlueInfo), ieee80211_channel_to_frequency(ucChannelNum, KAL_BAND_5GHZ));
+						priv_to_wiphy(prGlueInfo), ieee80211_channel_to_frequency(ucChannelNum, NL80211_BAND_5GHZ));
 			}
-#if KERNEL_VERSION(4, 1, 0) <= CFG80211_VERSION_CODE
+
 			bss = cfg80211_get_bss(priv_to_wiphy(prGlueInfo), prChannel, arBssid, ssid.aucSsid, ssid.u4SsidLen,
 					IEEE80211_BSS_TYPE_ESS, IEEE80211_PRIVACY_ANY);
-#else
-			bss = cfg80211_get_bss(priv_to_wiphy(prGlueInfo), prChannel, arBssid, ssid.aucSsid, ssid.u4SsidLen,
-					WLAN_CAPABILITY_ESS, WLAN_CAPABILITY_ESS);
-#endif
 			if (bss == NULL) {
 #if (BUILD_DBG_MSG == 1)
 				DBGLOG(INIT, EVENT, "Cannot get BSS from cfg80211 [ssid:%s]\n", ssid.aucSsid);
@@ -967,7 +944,6 @@ VOID kalIndicateStatusAndComplete(
 				prBssDesc = ((P_AIS_FSM_INFO_T)(&(prGlueInfo->prAdapter->rWifiVar.rAisFsmInfo)))->prTargetBssDesc;
 
 				if (prChannel && prBssDesc != NULL) {
-#if KERNEL_VERSION(3, 18, 0) <= CFG80211_VERSION_CODE
 					bss = cfg80211_inform_bss(priv_to_wiphy(prGlueInfo), prChannel, CFG80211_BSS_FTYPE_PRESP, arBssid,
 							0,												   /* TSF */
 							prBssDesc->u2CapInfo, prBssDesc->u2BeaconInterval, /* beacon interval */
@@ -975,14 +951,6 @@ VOID kalIndicateStatusAndComplete(
 							prBssDesc->u2IELength,							   /* IE Length */
 							RCPI_TO_dBm(prBssDesc->ucRCPI) * 100,			   /* MBM */
 							GFP_KERNEL);
-#else
-					bss = cfg80211_inform_bss(priv_to_wiphy(prGlueInfo), prChannel, arBssid, 0, /* TSF */
-							prBssDesc->u2CapInfo, prBssDesc->u2BeaconInterval,					/* beacon interval */
-							prBssDesc->aucIEBuf,												/* IE */
-							prBssDesc->u2IELength,												/* IE Length */
-							RCPI_TO_dBm(prBssDesc->ucRCPI) * 100,								/* MBM */
-							GFP_KERNEL);
-#endif
 				}
 #if (BUILD_DBG_MSG == 1)
 				if (bss == NULL)
@@ -997,13 +965,12 @@ VOID kalIndicateStatusAndComplete(
 #if KERNEL_VERSION(4, 12, 0) <= CFG80211_VERSION_CODE
 				struct cfg80211_roam_info rRoamInfo = {};
 #endif
-
 				if (ucChannelNum <= 14) {
 					prChannel = ieee80211_get_channel(
-							priv_to_wiphy(prGlueInfo), ieee80211_channel_to_frequency(ucChannelNum, KAL_BAND_2GHZ));
+							priv_to_wiphy(prGlueInfo), ieee80211_channel_to_frequency(ucChannelNum, NL80211_BAND_2GHZ));
 				} else {
 					prChannel = ieee80211_get_channel(
-							priv_to_wiphy(prGlueInfo), ieee80211_channel_to_frequency(ucChannelNum, KAL_BAND_5GHZ));
+							priv_to_wiphy(prGlueInfo), ieee80211_channel_to_frequency(ucChannelNum, NL80211_BAND_5GHZ));
 				}
 
 #if KERNEL_VERSION(4, 12, 0) <= CFG80211_VERSION_CODE
@@ -1050,30 +1017,11 @@ VOID kalIndicateStatusAndComplete(
 			flags = GFP_ATOMIC;
 
 		netif_carrier_off(prGlueInfo->prDevHandler);
-#if CFG_SUPPORT_CFG80211_AUTH
+
 		/* Report T/RX deauth/disassociation frame */
 		DBGLOG(INIT, INFO, "Skip report DISCONNECTED when using supplicant SME\n");
-#else
-		if (prGlueInfo->fgIsRegistered == TRUE
-#if CFG_SUPPORT_DBDC_TC6
-				&& !prGlueInfo->prAdapter->rWifiVar.fgDelayInidicateDISCON
-#endif
-		) {
-			P_BSS_INFO_T prBssInfo = prGlueInfo->prAdapter->prAisBssInfo;
-			UINT_16 u2DeauthReason = 0;
-
-			if (prBssInfo)
-				u2DeauthReason = prBssInfo->u2DeauthReason;
-			/* CFG80211 Indication */
-			DBGLOG(INIT, INFO, "[wifi]Indicate disconnection: Locally[%d]\n",
-					(eStatus == WLAN_STATUS_MEDIA_DISCONNECT_LOCALLY));
-			cfg80211_disconnected(prGlueInfo->prDevHandler, u2DeauthReason, NULL, 0,
-					eStatus == WLAN_STATUS_MEDIA_DISCONNECT_LOCALLY, flags);
-		}
-#endif
 
 		prGlueInfo->eParamMediaStateIndicated = PARAM_MEDIA_STATE_DISCONNECTED;
-
 		break;
 
 	case WLAN_STATUS_SCAN_COMPLETE:
@@ -1163,34 +1111,18 @@ VOID kalIndicateStatusAndComplete(
 #endif
 	case WLAN_STATUS_JOIN_TIMEOUT:
 	case WLAN_STATUS_JOIN_ABORT: {
-		P_BSS_DESC_T prBssDesc = prGlueInfo->prAdapter->rWifiVar.rAisFsmInfo.prTargetBssDesc;
-#if CFG_SUPPORT_CFG80211_AUTH /* Report assoc fail or abort. */
+		P_BSS_DESC_T			prBssDesc	   = prGlueInfo->prAdapter->rWifiVar.rAisFsmInfo.prTargetBssDesc;
 		P_CONNECTION_SETTINGS_T prConnSettings = &prGlueInfo->prAdapter->rWifiVar.rConnSettings;
 		DBGLOG(INIT, INFO, "Skip report CONNECTED when using supplicant SME\n");
 		if (prConnSettings->bss) {
-#if CFG_WDEV_LOCK_THREAD_SUPPORT
 			kalWDevLockThread(prGlueInfo, prGlueInfo->prDevHandler,
 					(eStatus == WLAN_STATUS_JOIN_TIMEOUT) ? (CFG80211_ASSOC_TIMEOUT) : (CFG80211_ABANDON_ASSOC), NULL,
 					0, prConnSettings->bss, 0, NULL, 0, FALSE);
-#else
-#if (KERNEL_VERSION(4, 4, 41) <= CFG80211_VERSION_CODE)
-			if (eStatus == WLAN_STATUS_JOIN_ABORT) {
-				cfg80211_abandon_assoc(prGlueInfo->prDevHandler, prConnSettings->bss);
-			} else
-#endif
-			{
-#if (KERNEL_VERSION(3, 11, 0) <= CFG80211_VERSION_CODE)
-				cfg80211_assoc_timeout(prGlueInfo->prDevHandler, prConnSettings->bss);
-#else
-				cfg80211_send_assoc_timeout(prGlueInfo->prDevHandler, prConnSettings->bss->bssid);
-#endif
-			}
-#endif
+
 			cfg80211_put_bss(priv_to_wiphy(prGlueInfo), prConnSettings->bss);
 			prConnSettings->bss = NULL;
 		}
 		return;
-#endif
 
 		if (prBssDesc)
 			COPY_MAC_ADDR(arBssid, prBssDesc->aucBSSID);
@@ -1202,13 +1134,11 @@ VOID kalIndicateStatusAndComplete(
 		cfg80211_cqm_beacon_loss_notify(prGlueInfo->prDevHandler, GFP_KERNEL);
 		break;
 	case WLAN_STATUS_ASSOC_RESP: {
-#if CFG_SUPPORT_CFG80211_AUTH /* Report RX association response frame */
 		P_CONNECTION_SETTINGS_T prConnSettings = &prGlueInfo->prAdapter->rWifiVar.rConnSettings;
 
 		DBGLOG(INIT, INFO, "Report ASSOC response frame when using supplicant SME\n");
 
 		if (prConnSettings->bss) {
-#if CFG_WDEV_LOCK_THREAD_SUPPORT
 			PUINT_8 prFrameBuf			 = NULL;
 			BOOLEAN fgIsInterruptContext = FALSE;
 
@@ -1229,28 +1159,15 @@ VOID kalIndicateStatusAndComplete(
 
 			kalWDevLockThread(prGlueInfo, prGlueInfo->prDevHandler, CFG80211_RX_ASSOC_RESP, prFrameBuf, u4BufLen,
 					prConnSettings->bss, 0, NULL, 0, fgIsInterruptContext);
-#else
-#if (KERNEL_VERSION(3, 18, 0) <= CFG80211_VERSION_CODE)
-			cfg80211_rx_assoc_resp(
-					prGlueInfo->prDevHandler, prConnSettings->bss, (const u8 *)pvBuf, (size_t)u4BufLen, 0);
-#elif (KERNEL_VERSION(3, 11, 0) <= CFG80211_VERSION_CODE)
-			cfg80211_rx_assoc_resp(prGlueInfo->prDevHandler, prConnSettings->bss, (const u8 *)pvBuf, (size_t)u4BufLen);
-#else
-			cfg80211_send_rx_assoc(prGlueInfo->prDevHandler, prConnSettings->bss, (const u8 *)pvBuf, (size_t)u4BufLen);
-#endif
-#endif
+
 			cfg80211_put_bss(priv_to_wiphy(prGlueInfo), prConnSettings->bss);
 
 			prConnSettings->bss = NULL;
 		} else
 			DBGLOG(SAA, WARN, "Rx Assoc Resp without specific BSS\n");
-#endif
 		break;
 	}
 	default:
-		/*
-		 *  printk(KERN_WARNING "unknown indication:%lx\n", eStatus);
-		 */
 		break;
 	}
 } /* kalIndicateStatusAndComplete */
@@ -1969,10 +1886,6 @@ VOID kalOidComplete(
 	/* else let it timeout on kalIoctl entry */
 }
 
-VOID kalOidClearance(IN P_GLUE_INFO_T prGlueInfo)
-{
-}
-
 /*----------------------------------------------------------------------------*/
 /*!
  * @brief This function is used to transfer linux ioctl to OID, and  we
@@ -2461,12 +2374,9 @@ VOID kalProcessTxReq(P_GLUE_INFO_T prGlueInfo, PBOOLEAN pfgNeedHwAccess)
 	QUE_T		  rTempReturnQue;
 	P_QUE_T		  prTempReturnQue = &rTempReturnQue;
 	P_QUE_ENTRY_T prQueueEntry	  = NULL;
-	/* struct sk_buff      *prSkb = NULL; */
-	UINT_32 u4Status;
-#if CFG_SUPPORT_MULTITHREAD
-	UINT_32 u4CmdCount = 0;
-#endif
-	UINT_32 u4TxLoopCount;
+	UINT_32		  u4Status;
+	UINT_32		  u4CmdCount = 0;
+	UINT_32		  u4TxLoopCount;
 
 	/* for spin lock acquire and release */
 	GLUE_SPIN_LOCK_DECLARATION();
@@ -2483,23 +2393,11 @@ VOID kalProcessTxReq(P_GLUE_INFO_T prGlueInfo, PBOOLEAN pfgNeedHwAccess)
 	wlanProcessMboxMessage(prGlueInfo->prAdapter);
 
 	/* Process CMD request */
-#if CFG_SUPPORT_MULTITHREAD
 	GLUE_ACQUIRE_SPIN_LOCK(prGlueInfo, SPIN_LOCK_CMD_QUE);
 	u4CmdCount = prCmdQue->u4NumElem;
 	GLUE_RELEASE_SPIN_LOCK(prGlueInfo, SPIN_LOCK_CMD_QUE);
 	if (u4CmdCount > 0)
 		wlanProcessCommandQueue(prGlueInfo->prAdapter, prCmdQue);
-
-#else
-	if (prCmdQue->u4NumElem > 0) {
-		if (*pfgNeedHwAccess == FALSE) {
-			*pfgNeedHwAccess = TRUE;
-
-			wlanAcquirePowerControl(prGlueInfo->prAdapter);
-		}
-		wlanProcessCommandQueue(prGlueInfo->prAdapter, prCmdQue);
-	}
-#endif
 
 	while (u4TxLoopCount--) {
 		while (QUEUE_IS_NOT_EMPTY(prTxQueue)) {
@@ -2547,7 +2445,6 @@ VOID kalProcessTxReq(P_GLUE_INFO_T prGlueInfo, PBOOLEAN pfgNeedHwAccess)
 	}
 }
 
-#if CFG_SUPPORT_MULTITHREAD
 /*----------------------------------------------------------------------------*/
 /*!
  * @brief
@@ -2697,7 +2594,6 @@ int rx_thread(void *data)
 
 	return 0;
 }
-#endif
 
 /*----------------------------------------------------------------------------*/
 /*!
@@ -2720,9 +2616,7 @@ int main_thread(void *data)
 	int				   ret			  = 0;
 	BOOLEAN			   fgNeedHwAccess = FALSE;
 
-#if CFG_SUPPORT_MULTITHREAD
 	prGlueInfo->u4TxThreadPid = KAL_GET_CURRENT_THREAD_ID();
-#endif
 
 	current->flags |= PF_NOFREEZE;
 	ASSERT(prGlueInfo);
@@ -2732,11 +2626,9 @@ int main_thread(void *data)
 	DBGLOG(INIT, INFO, "%s:%u starts running...\n", KAL_GET_CURRENT_THREAD_NAME(), KAL_GET_CURRENT_THREAD_ID());
 
 	while (TRUE) {
-#if CFG_ENABLE_WIFI_DIRECT
 		/*run p2p multicast list work. */
 		if (test_and_clear_bit(GLUE_FLAG_SUB_MOD_MULTICAST_BIT, &prGlueInfo->ulFlag))
 			p2pSetMulticastListWorkQueueWrapper(prGlueInfo);
-#endif
 
 		if (prGlueInfo->ulFlag & GLUE_FLAG_HALT) {
 			DBGLOG(INIT, INFO, "%s should stop now...\n", KAL_GET_CURRENT_THREAD_NAME());
@@ -2824,32 +2716,8 @@ int main_thread(void *data)
 			}
 		}
 #endif
-#if CFG_SUPPORT_MULTITHREAD
-#else
-		/* Handle Interrupt */
-		if (test_and_clear_bit(GLUE_FLAG_INT_BIT, &prGlueInfo->ulFlag)) {
-			if (fgNeedHwAccess == FALSE) {
-				fgNeedHwAccess = TRUE;
 
-				wlanAcquirePowerControl(prGlueInfo->prAdapter);
-			}
-
-			/* the Wi-Fi interrupt is already disabled in mmc thread,
-			 *  so we set the flag only to enable the interrupt later
-			 */
-			prGlueInfo->prAdapter->fgIsIntEnable = FALSE;
-			/* wlanISR(prGlueInfo->prAdapter, TRUE); */
-
-			if (prGlueInfo->ulFlag & GLUE_FLAG_HALT) {
-				/* Should stop now... skip pending interrupt */
-				DBGLOG(INIT, INFO, "ignore pending interrupt\n");
-			} else {
-				wlanIST(prGlueInfo->prAdapter);
-			}
-		}
-#endif
 		/* transfer ioctl to OID request */
-
 		do {
 			if (test_and_clear_bit(GLUE_FLAG_OID_BIT, &prGlueInfo->ulFlag)) {
 				/* get current prIoReq */
@@ -2884,24 +2752,11 @@ int main_thread(void *data)
 
 		if (test_and_clear_bit(GLUE_FLAG_TXREQ_BIT, &prGlueInfo->ulFlag))
 			kalProcessTxReq(prGlueInfo, &fgNeedHwAccess);
-#if CFG_SUPPORT_MULTITHREAD
 		/* Process RX */
 		if (test_and_clear_bit(GLUE_FLAG_RX_BIT, &prGlueInfo->ulFlag))
 			nicRxProcessRFBs(prGlueInfo->prAdapter);
 		if (test_and_clear_bit(GLUE_FLAG_TX_CMD_DONE_BIT, &prGlueInfo->ulFlag))
 			wlanTxCmdDoneMthread(prGlueInfo->prAdapter);
-#endif
-
-			/* Process RX, In linux, we don't need to free sk_buff by ourself */
-
-			/* In linux, we don't need to free sk_buff by ourself */
-
-			/* In linux, we don't do reset */
-#if CFG_SUPPORT_MULTITHREAD
-#else
-		if (fgNeedHwAccess == TRUE)
-			wlanReleasePowerControl(prGlueInfo->prAdapter);
-#endif
 		/* handle cnmTimer time out */
 		if (test_and_clear_bit(GLUE_FLAG_TIMEOUT_BIT, &prGlueInfo->ulFlag))
 			wlanTimerTimeoutCheck(prGlueInfo->prAdapter);
@@ -3485,14 +3340,9 @@ VOID kalSetIntEvent(P_GLUE_INFO_T pr)
 	set_bit(GLUE_FLAG_INT_BIT, &pr->ulFlag);
 
 	/* when we got interrupt, we wake up servie thread */
-#if CFG_SUPPORT_MULTITHREAD
 	wake_up_interruptible(&pr->waitq_hif);
-#else
-	wake_up_interruptible(&pr->waitq);
-#endif
 }
 
-#if CFG_SUPPORT_MULTITHREAD
 VOID kalSetTxEvent2Hif(P_GLUE_INFO_T pr)
 {
 	if (!pr->hif_thread)
@@ -3528,7 +3378,7 @@ VOID kalSetTxCmdEvent2Hif(P_GLUE_INFO_T pr)
 	set_bit(GLUE_FLAG_HIF_TX_CMD_BIT, &pr->ulFlag);
 	wake_up_interruptible(&pr->waitq_hif);
 }
-#endif
+
 /*----------------------------------------------------------------------------*/
 /*!
  * \brief to check if configuration file (NVRAM/Registry) exists
@@ -4069,9 +3919,9 @@ VOID kalIndicateBssInfo(IN P_GLUE_INFO_T prGlueInfo, IN PUINT_8 pucBeaconProbeRe
 
 	/* search through channel entries */
 	if (ucChannelNum <= 14) {
-		prChannel = ieee80211_get_channel(wiphy, ieee80211_channel_to_frequency(ucChannelNum, KAL_BAND_2GHZ));
+		prChannel = ieee80211_get_channel(wiphy, ieee80211_channel_to_frequency(ucChannelNum, NL80211_BAND_2GHZ));
 	} else {
-		prChannel = ieee80211_get_channel(wiphy, ieee80211_channel_to_frequency(ucChannelNum, KAL_BAND_5GHZ));
+		prChannel = ieee80211_get_channel(wiphy, ieee80211_channel_to_frequency(ucChannelNum, NL80211_BAND_5GHZ));
 	}
 
 	if (prChannel != NULL && prGlueInfo->fgIsRegistered == TRUE) {
@@ -4115,10 +3965,10 @@ VOID kalReadyOnChannel(IN P_GLUE_INFO_T prGlueInfo, IN UINT_64 u8Cookie, IN ENUM
 	if (prGlueInfo->fgIsRegistered == TRUE) {
 		if (ucChannelNum <= 14) {
 			prChannel = ieee80211_get_channel(
-					priv_to_wiphy(prGlueInfo), ieee80211_channel_to_frequency(ucChannelNum, KAL_BAND_2GHZ));
+					priv_to_wiphy(prGlueInfo), ieee80211_channel_to_frequency(ucChannelNum, NL80211_BAND_2GHZ));
 		} else {
 			prChannel = ieee80211_get_channel(
-					priv_to_wiphy(prGlueInfo), ieee80211_channel_to_frequency(ucChannelNum, KAL_BAND_5GHZ));
+					priv_to_wiphy(prGlueInfo), ieee80211_channel_to_frequency(ucChannelNum, NL80211_BAND_5GHZ));
 		}
 
 		if (!prChannel) {
@@ -4173,10 +4023,10 @@ VOID kalRemainOnChannelExpired(IN P_GLUE_INFO_T prGlueInfo, IN UINT_64 u8Cookie,
 	if (prGlueInfo->fgIsRegistered == TRUE) {
 		if (ucChannelNum <= 14) {
 			prChannel = ieee80211_get_channel(
-					priv_to_wiphy(prGlueInfo), ieee80211_channel_to_frequency(ucChannelNum, KAL_BAND_2GHZ));
+					priv_to_wiphy(prGlueInfo), ieee80211_channel_to_frequency(ucChannelNum, NL80211_BAND_2GHZ));
 		} else {
 			prChannel = ieee80211_get_channel(
-					priv_to_wiphy(prGlueInfo), ieee80211_channel_to_frequency(ucChannelNum, KAL_BAND_5GHZ));
+					priv_to_wiphy(prGlueInfo), ieee80211_channel_to_frequency(ucChannelNum, NL80211_BAND_5GHZ));
 		}
 
 		if (!prChannel) {
@@ -4247,23 +4097,11 @@ VOID kalIndicateRxMgmtFrame(IN P_GLUE_INFO_T prGlueInfo, IN P_SW_RFB_T prSwRfb)
 		}
 
 		ucChnlNum = (UINT_8)HAL_RX_STATUS_GET_CHNL_NUM(prSwRfb->prRxStatus);
+		i4Freq	  = nicChannelNum2Freq(ucChnlNum) / 1000;
 
-		i4Freq = nicChannelNum2Freq(ucChnlNum) / 1000;
-
-#if (KERNEL_VERSION(3, 18, 0) <= CFG80211_VERSION_CODE)
 		cfg80211_rx_mgmt(prGlueInfo->prDevHandler->ieee80211_ptr, i4Freq, /* in MHz */
 				RCPI_TO_dBm((UINT_8)nicRxGetRcpiValueFromRxv(RCPI_MODE_WF0, prSwRfb)), prSwRfb->pvHeader,
 				prSwRfb->u2PacketLen, NL80211_RXMGMT_FLAG_ANSWERED);
-
-#elif (KERNEL_VERSION(3, 12, 0) <= CFG80211_VERSION_CODE)
-		cfg80211_rx_mgmt(prGlueInfo->prDevHandler->ieee80211_ptr, i4Freq, /* in MHz */
-				RCPI_TO_dBm((UINT_8)nicRxGetRcpiValueFromRxv(RCPI_MODE_WF0, prSwRfb)), prSwRfb->pvHeader,
-				prSwRfb->u2PacketLen, NL80211_RXMGMT_FLAG_ANSWERED, GFP_ATOMIC);
-#else
-		cfg80211_rx_mgmt(prGlueInfo->prDevHandler->ieee80211_ptr, i4Freq, /* in MHz */
-				RCPI_TO_dBm((UINT_8)nicRxGetRcpiValueFromRxv(RCPI_MODE_WF0, prSwRfb)), prSwRfb->pvHeader,
-				prSwRfb->u2PacketLen, GFP_ATOMIC);
-#endif
 
 	} while (FALSE);
 
@@ -4380,8 +4218,6 @@ VOID kalSchedScanStopped(IN P_GLUE_INFO_T prGlueInfo)
 	DBGLOG(SCN, INFO, "main_thread return from kalSchedScanStoppped\n");
 }
 
-#if CFG_SUPPORT_CFG80211_AUTH
-#if CFG_WDEV_LOCK_THREAD_SUPPORT
 VOID kalWDevLockThread(IN P_GLUE_INFO_T prGlueInfo, IN struct net_device *pDev, IN enum ENUM_CFG80211_WDEV_LOCK_FUNC fn,
 		IN PUINT_8 pFrameBuf, IN size_t frameLen, IN struct cfg80211_bss *pBss, IN INT_32 uapsd_queues,
 		const u8 *req_ies, size_t req_ies_len, IN BOOLEAN fgIsInterruptContext)
@@ -4427,8 +4263,6 @@ VOID kalWDevLockThread(IN P_GLUE_INFO_T prGlueInfo, IN struct net_device *pDev, 
 	if (!schedule_delayed_work(&wdev_lock_workq, 0))
 		DBGLOG(REQ, INFO, "work is already in wdev_lock_workq\n");
 }
-#endif
-#endif
 
 BOOLEAN
 kalGetIPv4Address(
@@ -4833,9 +4667,8 @@ int kalMetRemoveProcfs(IN P_GLUE_INFO_T prGlueInfo)
 
 	return 0;
 }
-
 #endif
-#if CFG_SUPPORT_AGPS_ASSIST
+
 BOOLEAN kalIndicateAgpsNotify(P_ADAPTER_T prAdapter, UINT_8 cmd, PUINT_8 data, UINT_16 dataLen)
 {
 #ifdef CONFIG_NL80211_TESTMODE
@@ -4863,7 +4696,6 @@ nla_put_failure:
 	return FALSE;
 #endif
 }
-#endif
 
 UINT_64 kalGetBootTime(void)
 {
@@ -5112,10 +4944,10 @@ VOID kalIndicateChannelSwitch(IN P_GLUE_INFO_T prGlueInfo, IN ENUM_CHNL_EXT_T eS
 
 	if (ucChannelNum <= 14) {
 		prChannel = ieee80211_get_channel(
-				priv_to_wiphy(prGlueInfo), ieee80211_channel_to_frequency(ucChannelNum, KAL_BAND_2GHZ));
+				priv_to_wiphy(prGlueInfo), ieee80211_channel_to_frequency(ucChannelNum, NL80211_BAND_2GHZ));
 	} else {
 		prChannel = ieee80211_get_channel(
-				priv_to_wiphy(prGlueInfo), ieee80211_channel_to_frequency(ucChannelNum, KAL_BAND_5GHZ));
+				priv_to_wiphy(prGlueInfo), ieee80211_channel_to_frequency(ucChannelNum, NL80211_BAND_5GHZ));
 	}
 
 	if (!prChannel) {
@@ -5149,36 +4981,12 @@ VOID kalIndicateChannelSwitch(IN P_GLUE_INFO_T prGlueInfo, IN ENUM_CHNL_EXT_T eS
 }
 #endif
 
-#ifdef CONFIG_PM_SLEEP
-INT_32 kalPmResumeState(VOID)
+int kal_sched_set(struct task_struct *p, int policy, const struct sched_param *param, int nice)
 {
-	return pm_resume_done;
-}
+	if (p == NULL || &(p->static_prio) < (int *)p)
+		return -1;
 
-INT_32 kalPmResumeHandler(struct notifier_block *notifier, unsigned long pm_event, void *unused)
-{
-	switch (pm_event) {
-	case PM_SUSPEND_PREPARE:
-		pm_resume_done = 0;
-		break;
-	case PM_POST_SUSPEND:
-		pm_resume_done = 1;
-		break;
-	}
-
-	DBGLOG(INIT, TRACE, "[PM]: pm_resume_done = %d\r\n", pm_resume_done);
-
-	return NOTIFY_DONE;
-}
-#endif
-
-void kal_sched_set(struct task_struct *p, int policy, const struct sched_param *param, int nice)
-{
 #if KERNEL_VERSION(5, 9, 0) <= LINUX_VERSION_CODE
-	/* apply auto-detection based on function description
-	 * TODO:
-	 * kernel prefer modify "current" only, add sanity here?
-	 */
 	struct sched_attr attr = {
 		.sched_policy	= policy,
 		.sched_priority = param->sched_priority,
@@ -5196,6 +5004,7 @@ void kal_sched_set(struct task_struct *p, int policy, const struct sched_param *
 #else
 	sched_setscheduler(p, policy, param);
 #endif
+	return 0;
 }
 
 WLAN_STATUS kalUpdateBssChannel(IN P_GLUE_INFO_T prGlueInfo, IN UINT_8 aucSSID[], IN UINT_8 ucSsidLength,
@@ -5207,23 +5016,16 @@ WLAN_STATUS kalUpdateBssChannel(IN P_GLUE_INFO_T prGlueInfo, IN UINT_8 aucSSID[]
 
 	if (ucChannelNum <= 14) {
 		prChannel = ieee80211_get_channel(
-				priv_to_wiphy(prGlueInfo), ieee80211_channel_to_frequency(ucChannelNum, KAL_BAND_2GHZ));
+				priv_to_wiphy(prGlueInfo), ieee80211_channel_to_frequency(ucChannelNum, NL80211_BAND_2GHZ));
 	} else {
 		prChannel = ieee80211_get_channel(
-				priv_to_wiphy(prGlueInfo), ieee80211_channel_to_frequency(ucChannelNum, KAL_BAND_5GHZ));
+				priv_to_wiphy(prGlueInfo), ieee80211_channel_to_frequency(ucChannelNum, NL80211_BAND_5GHZ));
 	}
 
-#if (KERNEL_VERSION(4, 1, 0) <= CFG80211_VERSION_CODE)
 	bss = cfg80211_get_bss(priv_to_wiphy(prGlueInfo), NULL, /* channel */
 			aucBSSID, aucSSID,								/* ssid */
 			(UINT_32)ucSsidLength,							/* ssid length */
 			IEEE80211_BSS_TYPE_ESS, IEEE80211_PRIVACY_ANY);
-#else
-	bss = cfg80211_get_bss(priv_to_wiphy(prGlueInfo), NULL, /* channel */
-			aucBSSID, aucSSID,								/* ssid */
-			(UINT_32)ucSsidLength,							/* ssid length */
-			WLAN_CAPABILITY_ESS, WLAN_CAPABILITY_ESS);
-#endif
 
 	if (bss) {
 		if (prChannel) {

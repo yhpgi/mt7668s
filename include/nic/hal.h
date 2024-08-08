@@ -529,9 +529,7 @@ VOID	halSetFWOwn(IN P_ADAPTER_T prAdapter, IN BOOLEAN fgEnableGlobalInt);
 VOID		halDevInit(IN P_ADAPTER_T prAdapter);
 VOID		halEnableFWDownload(IN P_ADAPTER_T prAdapter, IN BOOL fgEnable);
 VOID		halWakeUpWiFi(IN P_ADAPTER_T prAdapter);
-VOID		halTxCancelSendingCmd(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo);
 VOID		halTxCancelAllSending(IN P_ADAPTER_T prAdapter);
-BOOLEAN		halTxIsDataBufEnough(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo);
 VOID		halProcessTxInterrupt(IN P_ADAPTER_T prAdapter);
 WLAN_STATUS halTxPollingResource(IN P_ADAPTER_T prAdapter, IN UINT_8 ucTC);
 VOID		halSerHifReset(IN P_ADAPTER_T prAdapter);
@@ -540,18 +538,12 @@ VOID halProcessRxInterrupt(IN P_ADAPTER_T prAdapter);
 VOID halProcessSoftwareInterrupt(IN P_ADAPTER_T prAdapter);
 /* Hif power off wifi */
 WLAN_STATUS halHifPowerOffWifi(IN P_ADAPTER_T prAdapter);
-
-VOID		halHifSwInfoInit(IN P_ADAPTER_T prAdapter);
-VOID		halRxProcessMsduReport(IN P_ADAPTER_T prAdapter, IN OUT P_SW_RFB_T prSwRfb);
-UINT_32		halTxGetPageCount(IN UINT_32 u4FrameLength, IN BOOLEAN fgIncludeDesc);
 UINT_32		halDumpHifStatus(IN P_ADAPTER_T prAdapter, IN PUINT_8 pucBuf, IN UINT_32 u4Max);
 BOOLEAN		halIsPendingRx(IN P_ADAPTER_T prAdapter);
 UINT_32		halGetValidCoalescingBufSize(IN P_ADAPTER_T prAdapter);
 WLAN_STATUS halAllocateIOBuffer(IN P_ADAPTER_T prAdapter);
 WLAN_STATUS halReleaseIOBuffer(IN P_ADAPTER_T prAdapter);
 VOID		halDeAggRxPktWorker(struct work_struct *work);
-VOID		halRxTasklet(unsigned long data);
-VOID		halTxCompleteTasklet(unsigned long data);
 VOID		halPrintHifDbgInfo(IN P_ADAPTER_T prAdapter);
 BOOLEAN		halIsTxResourceControlEn(IN P_ADAPTER_T prAdapter);
 VOID		halTxResourceResetHwTQCounter(IN P_ADAPTER_T prAdapter);

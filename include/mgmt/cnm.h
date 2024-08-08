@@ -189,8 +189,6 @@ typedef enum _ENUM_CNM_DBDC_DECISION_TIMER_T {
  */
 VOID cnmInit(P_ADAPTER_T prAdapter);
 
-VOID cnmUninit(P_ADAPTER_T prAdapter);
-
 VOID cnmChMngrRequestPrivilege(P_ADAPTER_T prAdapter, P_MSG_HDR_T prMsgHdr);
 
 VOID cnmChMngrAbortPrivilege(P_ADAPTER_T prAdapter, P_MSG_HDR_T prMsgHdr);
@@ -207,8 +205,6 @@ BOOLEAN
 cnmPreferredChannel(P_ADAPTER_T prAdapter, P_ENUM_BAND_T prBand, PUINT_8 pucPrimaryChannel, P_ENUM_CHNL_EXT_T prBssSCO);
 
 BOOLEAN cnmAisInfraChannelFixed(P_ADAPTER_T prAdapter, P_ENUM_BAND_T prBand, PUINT_8 pucPrimaryChannel);
-
-VOID cnmAisInfraConnectNotify(P_ADAPTER_T prAdapter);
 
 BOOLEAN cnmAisIbssIsPermitted(P_ADAPTER_T prAdapter);
 

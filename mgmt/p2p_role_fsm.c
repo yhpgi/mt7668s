@@ -183,8 +183,6 @@ VOID p2pRoleFsmUninit(IN P_ADAPTER_T prAdapter, IN UINT_8 ucRoleIdx)
 		/* Clear CmdQue */
 		kalClearMgmtFramesByBssIdx(prAdapter->prGlueInfo, prP2pBssInfo->ucBssIndex);
 		kalClearSecurityFramesByBssIdx(prAdapter->prGlueInfo, prP2pBssInfo->ucBssIndex);
-		/* Clear PendingCmdQue */
-		wlanReleasePendingCMDbyBssIdx(prAdapter, prP2pBssInfo->ucBssIndex);
 		/* Clear PendingTxMsdu */
 		nicFreePendingTxMsduInfoByBssIdx(prAdapter, prP2pBssInfo->ucBssIndex);
 
@@ -745,22 +743,13 @@ VOID p2pRoleFsmRunEventBeaconTimeout(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T p
 					REASON_CODE_DISASSOC_LEAVING_BSS, WLAN_STATUS_MEDIA_DISCONNECT_LOCALLY);
 
 			if (prP2pBssInfo->prStaRecOfAP != NULL) {
-				P_STA_RECORD_T prStaRec = prP2pBssInfo->prStaRecOfAP;
-
+				P_STA_RECORD_T prStaRec	   = prP2pBssInfo->prStaRecOfAP;
 				prP2pBssInfo->prStaRecOfAP = NULL;
 
-#if CFG_SUPPORT_CFG80211_AUTH
 				p2pFuncDisconnect(prAdapter, prP2pBssInfo, prStaRec, TRUE, REASON_CODE_DISASSOC_LEAVING_BSS, TRUE);
-
 				p2pRoleFsmDeauthComplete(prAdapter, prStaRec);
-#else
-
-				p2pFuncDisconnect(prAdapter, prP2pBssInfo, prStaRec, FALSE, REASON_CODE_DISASSOC_LEAVING_BSS, TRUE);
-#endif
 
 				SET_NET_PWR_STATE_IDLE(prAdapter, prP2pBssInfo->ucBssIndex);
-				/* 20120830 moved into p2pFuncDisconnect() */
-				/* cnmStaRecFree(prAdapter, prP2pBssInfo->prStaRecOfAP); */
 				p2pRoleFsmStateTransition(prAdapter, prP2pRoleFsmInfo, P2P_ROLE_STATE_IDLE);
 			}
 		}
@@ -981,8 +970,6 @@ VOID p2pRoleFsmRunEventDelIface(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMsgHd
 		/* Clear CmdQue */
 		kalClearMgmtFramesByBssIdx(prAdapter->prGlueInfo, prP2pBssInfo->ucBssIndex);
 		kalClearSecurityFramesByBssIdx(prAdapter->prGlueInfo, prP2pBssInfo->ucBssIndex);
-		/* Clear PendingCmdQue */
-		wlanReleasePendingCMDbyBssIdx(prAdapter, prP2pBssInfo->ucBssIndex);
 		/* Clear PendingTxMsdu */
 		nicFreePendingTxMsduInfoByBssIdx(prAdapter, prP2pBssInfo->ucBssIndex);
 

@@ -268,14 +268,9 @@ WLAN_STATUS wlanAdapterStart(IN P_ADAPTER_T prAdapter, IN P_REG_INFO_T prRegInfo
 	prAdapter->u4OwnFailedLogCount = 0;
 
 	QUEUE_INITIALIZE(&(prAdapter->rPendingCmdQueue));
-#if CFG_SUPPORT_MULTITHREAD
 	QUEUE_INITIALIZE(&prAdapter->rTxCmdQueue);
 	QUEUE_INITIALIZE(&prAdapter->rTxCmdDoneQueue);
-#if CFG_SUPPORT_CFG80211_AUTH
-#if CFG_WDEV_LOCK_THREAD_SUPPORT
 	QUEUE_INITIALIZE(&prAdapter->rWDevLockQueue);
-#endif
-#endif
 #if CFG_FIX_2_TX_PORT
 	QUEUE_INITIALIZE(&prAdapter->rTxP0Queue);
 	QUEUE_INITIALIZE(&prAdapter->rTxP1Queue);
@@ -285,7 +280,6 @@ WLAN_STATUS wlanAdapterStart(IN P_ADAPTER_T prAdapter, IN P_REG_INFO_T prRegInfo
 #endif
 	QUEUE_INITIALIZE(&prAdapter->rRxQueue);
 	QUEUE_INITIALIZE(&prAdapter->rTxDataDoneQueue);
-#endif
 
 	/* Initialize rWlanInfo */
 	kalMemSet(&(prAdapter->rWlanInfo), 0, sizeof(WLAN_INFO_T));
@@ -353,9 +347,6 @@ WLAN_STATUS wlanAdapterStart(IN P_ADAPTER_T prAdapter, IN P_REG_INFO_T prRegInfo
 
 		/* 4 <4> Initialize Rx */
 		nicRxInitialize(prAdapter);
-
-		/* 4 <5> HIF SW info initialize */
-		halHifSwInfoInit(prAdapter);
 
 		/* 4 <6> Enable HIF cut-through to N9 mode, not visiting CR4 */
 		HAL_ENABLE_FWDL(prAdapter, TRUE);
@@ -441,7 +432,8 @@ WLAN_STATUS wlanAdapterStart(IN P_ADAPTER_T prAdapter, IN P_REG_INFO_T prRegInfo
 
 			/* 9. indicate disconnection as default status */
 			kalIndicateStatusAndComplete(prAdapter->prGlueInfo, WLAN_STATUS_MEDIA_DISCONNECT, NULL, 0);
-		}
+		} else
+			return WLAN_STATUS_FAILURE;
 
 		RECLAIM_POWER_CONTROL_TO_PM(prAdapter, FALSE);
 
@@ -597,8 +589,6 @@ WLAN_STATUS wlanAdapterStop(IN P_ADAPTER_T prAdapter)
 	/* Release all CMD in pending command queue */
 	wlanClearPendingCommandQueue(prAdapter);
 
-#if CFG_SUPPORT_MULTITHREAD
-
 	/* Flush all items in queues for multi-thread */
 	wlanClearTxCommandQueue(prAdapter);
 
@@ -608,7 +598,6 @@ WLAN_STATUS wlanAdapterStop(IN P_ADAPTER_T prAdapter)
 
 	wlanClearRxToOsQueue(prAdapter);
 
-#endif
 	/* Hif power off wifi */
 	wlanPowerOffWifi(prAdapter);
 
@@ -825,7 +814,6 @@ WLAN_STATUS wlanProcessCommandQueue(IN P_ADAPTER_T prAdapter, IN P_QUE_T prCmdQu
 			QUEUE_INSERT_TAIL(prMergeCmdQue, prQueueEntry);
 		} else if (eFrameAction == FRAME_ACTION_TX_PKT) {
 			/* 4 <4> Send the command */
-#if CFG_SUPPORT_MULTITHREAD
 			rStatus = wlanSendCommandMthread(prAdapter, prCmdInfo);
 
 			if (rStatus == WLAN_STATUS_RESOURCES) {
@@ -851,40 +839,6 @@ WLAN_STATUS wlanProcessCommandQueue(IN P_ADAPTER_T prAdapter, IN P_QUE_T prCmdQu
 				}
 				cmdBufFreeCmdInfo(prAdapter, prCmdInfo);
 			}
-
-#else
-			rStatus = wlanSendCommand(prAdapter, prCmdInfo);
-
-			if (rStatus == WLAN_STATUS_RESOURCES) {
-				/* no more TC4 resource for further transmission */
-
-				DBGLOG(INIT, WARN, "NO Resource for CMD TYPE[%u] ID[0x%02X] SEQ[%u]\n", prCmdInfo->eCmdType,
-						prCmdInfo->ucCID, prCmdInfo->ucCmdSeqNum);
-
-				QUEUE_INSERT_TAIL(prMergeCmdQue, prQueueEntry);
-				break;
-			} else if (rStatus == WLAN_STATUS_PENDING) {
-				/* command packet which needs further handling upon response */
-				KAL_ACQUIRE_SPIN_LOCK(prAdapter, SPIN_LOCK_CMD_PENDING);
-				QUEUE_INSERT_TAIL(&(prAdapter->rPendingCmdQueue), prQueueEntry);
-				KAL_RELEASE_SPIN_LOCK(prAdapter, SPIN_LOCK_CMD_PENDING);
-			} else {
-				P_CMD_INFO_T prCmdInfo = (P_CMD_INFO_T)prQueueEntry;
-
-				if (rStatus == WLAN_STATUS_SUCCESS) {
-					if (prCmdInfo->pfCmdDoneHandler) {
-						prCmdInfo->pfCmdDoneHandler(
-								prAdapter, prCmdInfo, prCmdInfo->pucInfoBuffer, prCmdInfo->u2InfoBufLen);
-					}
-				} else {
-					if (prCmdInfo->fgIsOid) {
-						kalOidComplete(prAdapter->prGlueInfo, prCmdInfo->fgSetQuery, prCmdInfo->u4SetInfoLen, rStatus);
-					}
-				}
-
-				cmdBufFreeCmdInfo(prAdapter, prCmdInfo);
-			}
-#endif
 		} else {
 			ASSERT(0);
 		}
@@ -907,9 +861,7 @@ WLAN_STATUS wlanProcessCommandQueue(IN P_ADAPTER_T prAdapter, IN P_QUE_T prCmdQu
 	QUEUE_MOVE_ALL(prCmdQue, prMergeCmdQue);
 	KAL_RELEASE_SPIN_LOCK(prAdapter, SPIN_LOCK_CMD_QUE);
 
-#if CFG_SUPPORT_MULTITHREAD
 	kalSetTxCmdEvent2Hif(prAdapter->prGlueInfo);
-#endif
 
 	return WLAN_STATUS_SUCCESS;
 } /* end of wlanProcessCommandQueue() */
@@ -949,7 +901,7 @@ WLAN_STATUS wlanSendCommand(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo)
 		ucTC = nicTxGetCmdResourceType(prCmdInfo);
 
 		/* <1.2> Check if pending packet or resource was exhausted */
-		rStatus = nicTxAcquireResource(prAdapter, ucTC, nicTxGetCmdPageCount(prCmdInfo), TRUE);
+		rStatus = nicTxAcquireResource(prAdapter, ucTC, TRUE);
 		if (rStatus == WLAN_STATUS_RESOURCES) {
 			DBGLOG(INIT, INFO, "NO Resource:%d\n", ucTC);
 			break;
@@ -967,8 +919,6 @@ WLAN_STATUS wlanSendCommand(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo)
 
 	return rStatus;
 } /* end of wlanSendCommand() */
-
-#if CFG_SUPPORT_MULTITHREAD
 
 /*----------------------------------------------------------------------------*/
 /*!
@@ -1013,7 +963,7 @@ WLAN_STATUS wlanSendCommandMthread(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prC
 		ucTC = nicTxGetCmdResourceType(prCmdInfo);
 
 		/* <1.2> Check if pending packet or resource was exhausted */
-		rStatus = nicTxAcquireResource(prAdapter, ucTC, nicTxGetCmdPageCount(prCmdInfo), TRUE);
+		rStatus = nicTxAcquireResource(prAdapter, ucTC, TRUE);
 		if (rStatus == WLAN_STATUS_RESOURCES) {
 			break;
 		}
@@ -1251,7 +1201,7 @@ VOID wlanClearTxCommandQueue(IN P_ADAPTER_T prAdapter)
 			wlanReleaseCommand(prAdapter, prCmdInfo, TX_RESULT_QUEUE_CLEARANCE);
 
 		/* Release Tx resource for CMD which resource is allocated but not used */
-		nicTxReleaseResource(prAdapter, nicTxGetCmdResourceType(prCmdInfo), nicTxGetCmdPageCount(prCmdInfo), TRUE);
+		nicTxReleaseResource(prAdapter, nicTxGetCmdResourceType(prCmdInfo), 1, TRUE);
 
 		cmdBufFreeCmdInfo(prAdapter, prCmdInfo);
 
@@ -1293,7 +1243,7 @@ VOID wlanClearTxOidCommand(IN P_ADAPTER_T prAdapter)
 				wlanReleaseCommand(prAdapter, prCmdInfo, TX_RESULT_QUEUE_CLEARANCE);
 
 			/* Release Tx resource for CMD which resource is allocated but not used */
-			nicTxReleaseResource(prAdapter, nicTxGetCmdResourceType(prCmdInfo), nicTxGetCmdPageCount(prCmdInfo), TRUE);
+			nicTxReleaseResource(prAdapter, nicTxGetCmdResourceType(prCmdInfo), 1, TRUE);
 
 			cmdBufFreeCmdInfo(prAdapter, prCmdInfo);
 
@@ -1461,7 +1411,6 @@ VOID wlanClearRxToOsQueue(IN P_ADAPTER_T prAdapter)
 		QUEUE_REMOVE_HEAD(prTempRxQue, prQueueEntry, P_QUE_ENTRY_T);
 	}
 }
-#endif
 
 /*----------------------------------------------------------------------------*/
 /*!
@@ -1499,7 +1448,6 @@ void wlanClearPendingCommandQueue(IN P_ADAPTER_T prAdapter)
 		else
 			wlanReleaseCommand(prAdapter, prCmdInfo, TX_RESULT_QUEUE_CLEARANCE);
 
-		nicTxCancelSendingCmd(prAdapter, prCmdInfo);
 		cmdBufFreeCmdInfo(prAdapter, prCmdInfo);
 		QUEUE_REMOVE_HEAD(prTempCmdQue, prQueueEntry, P_QUE_ENTRY_T);
 	}
@@ -1621,9 +1569,7 @@ VOID wlanReleasePendingOid(IN P_ADAPTER_T prAdapter, IN ULONG ulParamPtr)
 	}
 
 	do {
-#if CFG_SUPPORT_MULTITHREAD
 		KAL_ACQUIRE_MUTEX(prAdapter, MUTEX_TX_CMD_CLEAR);
-#endif
 
 		/* 1: Clear Pending OID in prAdapter->rPendingCmdQueue */
 		KAL_ACQUIRE_SPIN_LOCK(prAdapter, SPIN_LOCK_CMD_PENDING);
@@ -1646,7 +1592,6 @@ VOID wlanReleasePendingOid(IN P_ADAPTER_T prAdapter, IN ULONG ulParamPtr)
 				}
 
 				KAL_RELEASE_SPIN_LOCK(prAdapter, SPIN_LOCK_CMD_PENDING);
-				nicTxCancelSendingCmd(prAdapter, prCmdInfo);
 				KAL_ACQUIRE_SPIN_LOCK(prAdapter, SPIN_LOCK_CMD_PENDING);
 
 				cmdBufFreeCmdInfo(prAdapter, prCmdInfo);
@@ -1659,38 +1604,17 @@ VOID wlanReleasePendingOid(IN P_ADAPTER_T prAdapter, IN ULONG ulParamPtr)
 
 		KAL_RELEASE_SPIN_LOCK(prAdapter, SPIN_LOCK_CMD_PENDING);
 
-#if CFG_SUPPORT_MULTITHREAD
 		/* Clear pending OID in main_thread to hif_thread command queue */
 		wlanClearTxOidCommand(prAdapter);
-#endif
 
 		/* 2: Clear pending OID in glue layer command queue */
 		kalOidCmdClearance(prAdapter->prGlueInfo);
 
-		/* 3: Clear pending OID queued in pvOidEntry with REQ_FLAG_OID set */
-		kalOidClearance(prAdapter->prGlueInfo);
-
-#if CFG_SUPPORT_MULTITHREAD
 		KAL_RELEASE_MUTEX(prAdapter, MUTEX_TX_CMD_CLEAR);
-#endif
 	} while (FALSE);
 
 	DBGLOG(OID, INFO, "End of Release pending OID\n");
 }
-
-/*----------------------------------------------------------------------------*/
-/*!
- * \brief This function will search the CMD Queue to look for the pending CMD/OID for specific
- *        NETWORK TYPE and compelete it immediately when system request a reset.
- *
- * \param prAdapter  ointer of Adapter Data Structure
- *
- * \return (none)
- */
-/*----------------------------------------------------------------------------*/
-VOID wlanReleasePendingCMDbyBssIdx(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex)
-{
-} /* wlanReleasePendingCMDbyBssIdx */
 
 /*----------------------------------------------------------------------------*/
 /*!
@@ -2036,7 +1960,7 @@ WLAN_STATUS wlanSendNicPowerCtrlCmd(IN P_ADAPTER_T prAdapter, IN UINT_8 ucPowerM
 			break;
 		}
 		/* 3.1 Acquire TX Resource */
-		if (nicTxAcquireResource(prAdapter, ucTC, nicTxGetCmdPageCount(prCmdInfo), TRUE) == WLAN_STATUS_RESOURCES) {
+		if (nicTxAcquireResource(prAdapter, ucTC, TRUE) == WLAN_STATUS_RESOURCES) {
 			if (nicTxPollingResource(prAdapter, ucTC) != WLAN_STATUS_SUCCESS) {
 				DBGLOG(INIT, ERROR, "Fail to get TX resource return within timeout\n");
 				status					 = WLAN_STATUS_FAILURE;
@@ -2412,14 +2336,14 @@ WLAN_STATUS wlanImageSectionDownloadStage(IN P_ADAPTER_T prAdapter, IN PVOID pvF
 WLAN_STATUS wlanImageSectionDownloadStage(IN P_ADAPTER_T prAdapter, IN PVOID pvFwImageMapFile,
 		IN UINT_32 u4FwImageFileLength, IN UINT_8 ucSectionNumber, IN ENUM_IMG_DL_IDX_T eDlIdx)
 {
-	UINT_32 u4ImgSecSize;
-	UINT_32 j, i;
-	UINT_32 u4FileOffset = 0;
-	UINT_32 u4StartOffset = 0;
-	UINT_32 u4DataMode = 0;
-	UINT_32 u4Addr, u4Len;
+	UINT_32		u4ImgSecSize;
+	UINT_32		j, i;
+	UINT_32		u4FileOffset  = 0;
+	UINT_32		u4StartOffset = 0;
+	UINT_32		u4DataMode	  = 0;
+	UINT_32		u4Addr, u4Len;
 	WLAN_STATUS u4Status = WLAN_STATUS_SUCCESS;
-	PUINT_8 pucSecBuf, pucStartPtr;
+	PUINT_8		pucSecBuf, pucStartPtr;
 
 	/* 3a. parse file header for decision of divided firmware download or not */
 	for (i = 0; i < ucSectionNumber; ++i) {
@@ -2658,8 +2582,7 @@ WLAN_STATUS wlanPatchSendComplete(IN P_ADAPTER_T prAdapter)
 	/* 5. Seend WIFI start command */
 	while (1) {
 		/* 5.1 Acquire TX Resource */
-		if (nicTxAcquireResource(prAdapter, ucTC, nicTxGetPageCount(prCmdInfo->u2InfoBufLen, TRUE), TRUE) ==
-				WLAN_STATUS_RESOURCES) {
+		if (nicTxAcquireResource(prAdapter, ucTC, TRUE) == WLAN_STATUS_RESOURCES) {
 			if (nicTxPollingResource(prAdapter, ucTC) != WLAN_STATUS_SUCCESS) {
 				u4Status = WLAN_STATUS_FAILURE;
 				DBGLOG(INIT, ERROR, "Fail to get TX resource return within timeout\n");
@@ -2771,8 +2694,7 @@ WLAN_STATUS wlanImageSectionConfig(IN P_ADAPTER_T prAdapter, IN UINT_32 u4DestAd
 	/* 6. Send FW_Download command */
 	while (1) {
 		/* 6.1 Acquire TX Resource */
-		if (nicTxAcquireResource(prAdapter, ucTC, nicTxGetPageCount(prCmdInfo->u2InfoBufLen, TRUE), TRUE) ==
-				WLAN_STATUS_RESOURCES) {
+		if (nicTxAcquireResource(prAdapter, ucTC, TRUE) == WLAN_STATUS_RESOURCES) {
 			if (nicTxPollingResource(prAdapter, ucTC) != WLAN_STATUS_SUCCESS) {
 				u4Status = WLAN_STATUS_FAILURE;
 				DBGLOG(INIT, ERROR, "Fail to get TX resource return within timeout\n");
@@ -2922,8 +2844,7 @@ WLAN_STATUS wlanImageQueryStatus(IN P_ADAPTER_T prAdapter)
 	/* 5. Send command */
 	while (1) {
 		/* 5.1 Acquire TX Resource */
-		if (nicTxAcquireResource(prAdapter, ucTC, nicTxGetPageCount(prCmdInfo->u2InfoBufLen, TRUE), TRUE) ==
-				WLAN_STATUS_RESOURCES) {
+		if (nicTxAcquireResource(prAdapter, ucTC, TRUE) == WLAN_STATUS_RESOURCES) {
 			if (nicTxPollingResource(prAdapter, ucTC) != WLAN_STATUS_SUCCESS) {
 				u4Status = WLAN_STATUS_FAILURE;
 				DBGLOG(INIT, ERROR, "Fail to get TX resource return within timeout\n");
@@ -3098,8 +3019,7 @@ WLAN_STATUS wlanConfigWifiFunc(
 	/* 5. Seend WIFI start command */
 	while (1) {
 		/* 5.1 Acquire TX Resource */
-		if (nicTxAcquireResource(prAdapter, ucTC, nicTxGetPageCount(prCmdInfo->u2InfoBufLen, TRUE), TRUE) ==
-				WLAN_STATUS_RESOURCES) {
+		if (nicTxAcquireResource(prAdapter, ucTC, TRUE) == WLAN_STATUS_RESOURCES) {
 			if (nicTxPollingResource(prAdapter, ucTC) != WLAN_STATUS_SUCCESS) {
 				u4Status = WLAN_STATUS_FAILURE;
 				DBGLOG(INIT, ERROR, "Fail to get TX resource return within timeout\n");
@@ -3203,8 +3123,7 @@ wlanCompressedFWConfigWifiFunc(IN P_ADAPTER_T prAdapter, IN BOOLEAN fgEnable, IN
 
 	while (1) {
 		/* 5.1 Acquire TX Resource */
-		if (nicTxAcquireResource(prAdapter, ucTC, nicTxGetPageCount(prCmdInfo->u2InfoBufLen, TRUE), TRUE) ==
-				WLAN_STATUS_RESOURCES) {
+		if (nicTxAcquireResource(prAdapter, ucTC, TRUE) == WLAN_STATUS_RESOURCES) {
 			if (nicTxPollingResource(prAdapter, ucTC) != WLAN_STATUS_SUCCESS) {
 				u4Status = WLAN_STATUS_FAILURE;
 				DBGLOG(INIT, ERROR, "Fail to get TX resource return within timeout\n");
@@ -3292,7 +3211,7 @@ WLAN_STATUS wlanDownloadFW(IN P_ADAPTER_T prAdapter)
 			rCfgStatus = wlanConfigWifiFunc(prAdapter, FALSE, 0, PDA_N9);
 
 #else
-		rDlStatus = wlanImageSectionDownloadStage(prAdapter, prFwBuffer, u4FwSize, 2, IMG_DL_IDX_N9_FW);
+		rDlStatus  = wlanImageSectionDownloadStage(prAdapter, prFwBuffer, u4FwSize, 2, IMG_DL_IDX_N9_FW);
 		rCfgStatus = wlanConfigWifiFunc(prAdapter, FALSE, 0, PDA_N9);
 #endif
 		kalFirmwareImageUnmapping(prAdapter->prGlueInfo, NULL, prFwBuffer);
@@ -3321,7 +3240,7 @@ WLAN_STATUS wlanDownloadFW(IN P_ADAPTER_T prAdapter)
 		rDlStatus =
 				wlanImageSectionDownloadStage(prAdapter, prFwBuffer, u4FwSize, CR4_FWDL_SECTION_NUM, IMG_DL_IDX_CR4_FW);
 		prAdapter->fgIsCr4FwDownloaded = TRUE;
-		rCfgStatus = wlanConfigWifiFunc(prAdapter, FALSE, 0, PDA_CR4);
+		rCfgStatus					   = wlanConfigWifiFunc(prAdapter, FALSE, 0, PDA_CR4);
 #endif
 		kalFirmwareImageUnmapping(prAdapter->prGlueInfo, NULL, prFwBuffer);
 
@@ -3505,7 +3424,7 @@ WLAN_STATUS wlanAccessRegister(
 	 * Only TC0 is allowed because SDIO HW always reports
 	 * MCU's TXQ_CNT at TXQ0_CNT in CR4 architecutre)
 	 */
-	ucTC = TC0_INDEX;
+	ucTC	 = TC0_INDEX;
 #endif
 
 	/* 3. increase command sequence number */
@@ -3532,8 +3451,7 @@ WLAN_STATUS wlanAccessRegister(
 	/* 6. Send CMD_ACCESS_REG command */
 	while (1) {
 		/* 6.1 Acquire TX Resource */
-		if (nicTxAcquireResource(prAdapter, ucTC, nicTxGetPageCount(prCmdInfo->u2InfoBufLen, TRUE), TRUE) ==
-				WLAN_STATUS_RESOURCES) {
+		if (nicTxAcquireResource(prAdapter, ucTC, TRUE) == WLAN_STATUS_RESOURCES) {
 			if (nicTxPollingResource(prAdapter, ucTC) != WLAN_STATUS_SUCCESS) {
 				u4Status = WLAN_STATUS_FAILURE;
 				DBGLOG(INIT, ERROR, "Fail to get TX resource return within timeout\n");
@@ -4069,12 +3987,9 @@ BOOLEAN wlanProcessSecurityFrame(IN P_ADAPTER_T prAdapter, IN P_NATIVE_PACKET pr
 
 		if (GLUE_TEST_PKT_FLAG(prPacket, ENUM_PKT_PROTECTED_1X))
 			nicTxConfigPktOption(prMsduInfo, MSDU_OPT_PROTECTED_FRAME, TRUE);
-#if CFG_SUPPORT_MULTITHREAD
+
 		nicTxComposeSecurityFrameDesc(prAdapter, prCmdInfo, prMsduInfo->aucTxDescBuffer, NULL);
-#endif
-
 		kalEnqueueCommand(prAdapter->prGlueInfo, (P_QUE_ENTRY_T)prCmdInfo);
-
 		GLUE_SET_EVENT(prAdapter->prGlueInfo);
 
 		return TRUE;
@@ -4266,9 +4181,6 @@ VOID wlanClearBssInScanningResult(IN P_ADAPTER_T prAdapter, IN PUINT_8 arBSSID)
 }
 
 #if CFG_TEST_WIFI_DIRECT_GO
-VOID wlanEnableP2pFunction(IN P_ADAPTER_T prAdapter)
-{
-}
 
 VOID wlanEnableATGO(IN P_ADAPTER_T prAdapter)
 {
@@ -5046,46 +4958,24 @@ WLAN_STATUS wlanTxPendingPackets(IN P_ADAPTER_T prAdapter, IN OUT PBOOLEAN pfgHw
 	P_MSDU_INFO_T prMsduInfo;
 
 	KAL_SPIN_LOCK_DECLARATION();
-
 	ASSERT(prAdapter);
 	prTxCtrl = &prAdapter->rTxCtrl;
 
-#if !CFG_SUPPORT_MULTITHREAD
-	ASSERT(pfgHwAccess);
-#endif
-
-	/* <1> dequeue packet by txDequeuTxPackets() */
-#if CFG_SUPPORT_MULTITHREAD
 	KAL_ACQUIRE_SPIN_LOCK(prAdapter, SPIN_LOCK_QM_TX_QUEUE);
 	prMsduInfo = qmDequeueTxPacketsMthread(prAdapter, &prTxCtrl->rTc);
+
 	KAL_RELEASE_SPIN_LOCK(prAdapter, SPIN_LOCK_QM_TX_QUEUE);
-#else
-	KAL_ACQUIRE_SPIN_LOCK(prAdapter, SPIN_LOCK_QM_TX_QUEUE);
-	prMsduInfo = qmDequeueTxPackets(prAdapter, &prTxCtrl->rTc);
-	KAL_RELEASE_SPIN_LOCK(prAdapter, SPIN_LOCK_QM_TX_QUEUE);
-#endif
+
 	if (prMsduInfo != NULL) {
 		if (kalIsCardRemoved(prAdapter->prGlueInfo) == FALSE) {
-#if !CFG_SUPPORT_MULTITHREAD
-			/* <2> Acquire LP-OWN if necessary */
-			if (*pfgHwAccess == FALSE) {
-				*pfgHwAccess = TRUE;
-
-				wlanAcquirePowerControl(prAdapter);
-			}
-#endif
 			/* <3> send packets */
-#if CFG_SUPPORT_MULTITHREAD
 			nicTxMsduInfoListMthread(prAdapter, prMsduInfo);
-#else
-			nicTxMsduInfoList(prAdapter, prMsduInfo);
-#endif
+
 			/* <4> update TC by txAdjustTcQuotas() */
 			nicTxAdjustTcq(prAdapter);
 		} else
 			wlanProcessQueuedMsduInfo(prAdapter, prMsduInfo);
 	}
-
 	return WLAN_STATUS_SUCCESS;
 }
 
@@ -6351,11 +6241,7 @@ VOID wlanInitFeatureOption(IN P_ADAPTER_T prAdapter)
 	prWifiVar->ucPspPSInt		= (uint8_t)wlanCfgGetUint32(prAdapter, "WowPspPSInt", PSP_PS_INT_DEFAULT);
 	prWifiVar->ucAwakePspPSInt	= (uint8_t)wlanCfgGetUint32(prAdapter, "AwakePspPSInt", AWAKE_PSP_PS_INT_DEFAULT);
 #endif
-
-#if CFG_SUPPORT_CFG80211_AUTH
 	prWifiVar->ucWaitConnect = (uint8_t)wlanCfgGetUint32(prAdapter, "WaitConnect", WAIT_CONNECT_DEFAULT);
-#endif
-
 	prWifiVar->ucListenDtimInterval =
 			(UINT_8)wlanCfgGetUint32(prAdapter, "ListenDtimInt", DEFAULT_LISTEN_INTERVAL_BY_DTIM_PERIOD);
 	/* prWifiVar->ucEapolOffload = (UINT_8) wlanCfgGetUint32(prAdapter, "EapolOffload", FEATURE_ENABLED); */
@@ -6368,7 +6254,7 @@ VOID wlanInitFeatureOption(IN P_ADAPTER_T prAdapter)
 	prWifiVar->ucEnforce5G = (UINT_8)wlanCfgGetUint32(prAdapter, "Enforce5G", Param_PowerModeMax);
 #else
 	prWifiVar->ucEnforcePSMode = (UINT_8)wlanCfgGetUint32(prAdapter, "EnforcePSMode", Param_PowerModeMax);
-	prWifiVar->ucEnforceCAM2G = (UINT_8)wlanCfgGetUint32(prAdapter, "EnforceCAM2G", 0);
+	prWifiVar->ucEnforceCAM2G  = (UINT_8)wlanCfgGetUint32(prAdapter, "EnforceCAM2G", 0);
 #endif
 
 #if CFG_SUPPORT_REPLAY_DETECTION
@@ -7702,9 +7588,9 @@ WLAN_STATUS wlanFeatureToFwOnlyOneCfg(IN P_ADAPTER_T prAdapter, const PCHAR pucK
 WLAN_STATUS wlanCfgParse(IN P_ADAPTER_T prAdapter, PUINT_8 pucConfigBuf, UINT_32 u4ConfigBufLen)
 {
 	struct WLAN_CFG_PARSE_STATE_S state;
-	PCHAR apcArgv[WLAN_CFG_ARGV_MAX];
-	CHAR **args;
-	INT_32 nargs;
+	PCHAR						  apcArgv[WLAN_CFG_ARGV_MAX];
+	CHAR						**args;
+	INT_32						  nargs;
 
 	if (pucConfigBuf == NULL) {
 		ASSERT(0);
@@ -7716,11 +7602,11 @@ WLAN_STATUS wlanCfgParse(IN P_ADAPTER_T prAdapter, PUINT_8 pucConfigBuf, UINT_32
 	}
 	if (u4ConfigBufLen == 0)
 		return WLAN_STATUS_FAILURE;
-	args = apcArgv;
-	nargs = 0;
-	state.ptr = pucConfigBuf;
+	args			= apcArgv;
+	nargs			= 0;
+	state.ptr		= pucConfigBuf;
 	state.nexttoken = 0;
-	state.maxSize = u4ConfigBufLen;
+	state.maxSize	= u4ConfigBufLen;
 
 	for (;;) {
 		switch (wlanCfgFindNextToken(&state)) {

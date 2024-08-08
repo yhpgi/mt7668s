@@ -1356,11 +1356,9 @@ wlanoidQueryAuthMode(
 		DBGLOG(REQ, INFO, "Current auth mode: WPA2 PSK\n");
 		break;
 
-#if CFG_SUPPORT_CFG80211_AUTH
 	case AUTH_MODE_WPA2_SAE:
 		DBGLOG(RSN, INFO, "Current auth mode: SAE\n");
 		break;
-#endif
 
 	default:
 		DBGLOG(REQ, INFO, "Current auth mode: %d\n", *(P_ENUM_PARAM_AUTH_MODE_T)pvQueryBuffer);
@@ -4958,36 +4956,24 @@ wlanoidSetMcrWrite(
 	else
 #endif
 		/* -- Puff Stress Test End */
-
-		/* Check if access F/W Domain MCR */
 		if (prMcrWrInfo->u4McrOffset & 0xFFFF0000) {
-			/* 0x9000 - 0x9EFF reserved for FW */
 #if CFG_SUPPORT_SWCR
 			if ((prMcrWrInfo->u4McrOffset >> 16) == 0x9F00) {
 				swCrReadWriteCmd(prAdapter, SWCR_WRITE, (UINT_16)(prMcrWrInfo->u4McrOffset & BITS(0, 15)),
 						&prMcrWrInfo->u4McrData);
 				return WLAN_STATUS_SUCCESS;
 			}
-#endif /* CFG_SUPPORT_SWCR */
-
-			/* low power test special command */
+#endif
 			if (prMcrWrInfo->u4McrOffset == 0x11111110) {
-				WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
-				/* DbgPrint("Enter test mode\n"); */
+				WLAN_STATUS rStatus	  = WLAN_STATUS_SUCCESS;
 				prAdapter->fgTestMode = TRUE;
 				return rStatus;
 			}
 			if (prMcrWrInfo->u4McrOffset == 0x11111111) {
-				/* DbgPrint("nicpmSetAcpiPowerD3\n"); */
-
 				nicpmSetAcpiPowerD3(prAdapter);
-				kalDevSetPowerState(prAdapter->prGlueInfo, (UINT_32)ParamDeviceStateD3);
 				return WLAN_STATUS_SUCCESS;
 			}
 			if (prMcrWrInfo->u4McrOffset == 0x11111112) {
-				/* DbgPrint("LP enter sleep\n"); */
-
-				/* fill command */
 				rCmdAccessReg.u4Address = prMcrWrInfo->u4McrOffset;
 				rCmdAccessReg.u4Data	= prMcrWrInfo->u4McrData;
 
@@ -4998,21 +4984,15 @@ wlanoidSetMcrWrite(
 
 			/* low power test special command */
 			if (prMcrWrInfo->u4McrOffset == 0x11111110) {
-				WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
-				/* DbgPrint("Enter test mode\n"); */
+				WLAN_STATUS rStatus	  = WLAN_STATUS_SUCCESS;
 				prAdapter->fgTestMode = TRUE;
 				return rStatus;
 			}
 			if (prMcrWrInfo->u4McrOffset == 0x11111111) {
-				/* DbgPrint("nicpmSetAcpiPowerD3\n"); */
-
 				nicpmSetAcpiPowerD3(prAdapter);
-				kalDevSetPowerState(prAdapter->prGlueInfo, (UINT_32)ParamDeviceStateD3);
 				return WLAN_STATUS_SUCCESS;
 			}
 			if (prMcrWrInfo->u4McrOffset == 0x11111112) {
-				/* DbgPrint("LP enter sleep\n"); */
-
 				/* fill command */
 				rCmdAccessReg.u4Address = prMcrWrInfo->u4McrOffset;
 				rCmdAccessReg.u4Data	= prMcrWrInfo->u4McrData;
@@ -5024,23 +5004,17 @@ wlanoidSetMcrWrite(
 
 #if CFG_SUPPORT_SDIO_READ_WRITE_PATTERN
 			if (prMcrWrInfo->u4McrOffset == 0x22220000) {
-				/* read test mode */
 				kalSetSdioTestPattern(prAdapter->prGlueInfo, TRUE, TRUE);
-
 				return WLAN_STATUS_SUCCESS;
 			}
 
 			if (prMcrWrInfo->u4McrOffset == 0x22220001) {
-				/* write test mode */
 				kalSetSdioTestPattern(prAdapter->prGlueInfo, TRUE, FALSE);
-
 				return WLAN_STATUS_SUCCESS;
 			}
 
 			if (prMcrWrInfo->u4McrOffset == 0x22220002) {
-				/* leave from test mode */
 				kalSetSdioTestPattern(prAdapter->prGlueInfo, FALSE, FALSE);
-
 				return WLAN_STATUS_SUCCESS;
 			}
 #endif
@@ -6518,7 +6492,6 @@ wlanoidSetAcpiDevicePowerState(
 	switch (*prPowerState) {
 	case ParamDeviceStateD0:
 		DBGLOG(REQ, INFO, "Set Power State: D0\n");
-		kalDevSetPowerState(prAdapter->prGlueInfo, (UINT_32)ParamDeviceStateD0);
 		fgRetValue = nicpmSetAcpiPowerD0(prAdapter);
 		break;
 	case ParamDeviceStateD1:
@@ -6532,7 +6505,6 @@ wlanoidSetAcpiDevicePowerState(
 	case ParamDeviceStateD3:
 		DBGLOG(REQ, INFO, "Set Power State: D3\n");
 		fgRetValue = nicpmSetAcpiPowerD3(prAdapter);
-		kalDevSetPowerState(prAdapter->prGlueInfo, (UINT_32)ParamDeviceStateD3);
 		break;
 	default:
 		break;

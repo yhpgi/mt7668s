@@ -42,12 +42,7 @@ extern struct semaphore g_halt_sem;
 extern int				g_u4HaltFlag;
 
 extern struct delayed_work sched_workq;
-
-#if CFG_SUPPORT_CFG80211_AUTH
-#if CFG_WDEV_LOCK_THREAD_SUPPORT
 extern struct delayed_work wdev_lock_workq;
-#endif
-#endif
 
 /*******************************************************************************
  *                              C O N S T A N T S
@@ -64,7 +59,6 @@ extern struct delayed_work wdev_lock_workq;
 #define KAL_P2P_NUM 1
 #endif
 
-#if CFG_SUPPORT_MULTITHREAD
 #define GLUE_FLAG_MAIN_PROCESS \
 	(GLUE_FLAG_HALT | GLUE_FLAG_SUB_MOD_MULTICAST | GLUE_FLAG_TX_CMD_DONE | GLUE_FLAG_TXREQ | GLUE_FLAG_TIMEOUT | \
 			GLUE_FLAG_FRAME_FILTER | GLUE_FLAG_OID | GLUE_FLAG_RX)
@@ -73,10 +67,6 @@ extern struct delayed_work wdev_lock_workq;
 	(GLUE_FLAG_HALT | GLUE_FLAG_INT | GLUE_FLAG_HIF_TX | GLUE_FLAG_HIF_TX_CMD | GLUE_FLAG_HIF_FW_OWN)
 
 #define GLUE_FLAG_RX_PROCESS (GLUE_FLAG_HALT | GLUE_FLAG_RX_TO_OS)
-#else
-/* All flags for single thread driver */
-#define GLUE_FLAG_TX_PROCESS 0xFFFFFFFF
-#endif
 
 #if CFG_SUPPORT_SNIFFER
 #define RADIOTAP_FIELD_TSFT BIT(0)
@@ -115,19 +105,12 @@ extern struct delayed_work wdev_lock_workq;
  */
 typedef enum _ENUM_SPIN_LOCK_CATEGORY_E {
 	SPIN_LOCK_FSM = 0,
-
-#if CFG_SUPPORT_MULTITHREAD
 	SPIN_LOCK_TX_PORT_QUE,
 	SPIN_LOCK_TX_CMD_QUE,
 	SPIN_LOCK_TX_CMD_DONE_QUE,
 	SPIN_LOCK_TC_RESOURCE,
 	SPIN_LOCK_RX_TO_OS_QUE,
-#if CFG_SUPPORT_CFG80211_AUTH
-#if CFG_WDEV_LOCK_THREAD_SUPPORT
 	SPIN_LOCK_WDEV_LOCK,
-#endif
-#endif
-#endif
 
 	/* FIX ME */
 	SPIN_LOCK_RX_QUE,
@@ -204,7 +187,6 @@ typedef enum _ENUM_KAL_MEM_ALLOCATION_TYPE_E {
 	MEM_TYPE_NUM
 } ENUM_KAL_MEM_ALLOCATION_TYPE;
 
-#if CFG_SUPPORT_AGPS_ASSIST
 typedef enum _ENUM_MTK_AGPS_ATTR {
 	MTK_ATTR_AGPS_INVALID,
 	MTK_ATTR_AGPS_CMD,
@@ -220,7 +202,6 @@ typedef enum _ENUM_AGPS_EVENT {
 	AGPS_EVENT_WLAN_AP_LIST,
 } ENUM_CCX_EVENT;
 BOOLEAN kalIndicateAgpsNotify(P_ADAPTER_T prAdapter, UINT_8 cmd, PUINT_8 data, UINT_16 dataLen);
-#endif /* CFG_SUPPORT_AGPS_ASSIST */
 
 #if CFG_SUPPORT_SNIFFER
 /* Vendor Namespace
@@ -373,47 +354,6 @@ typedef struct _MONITOR_RADIOTAP_T {
 /*----------------------------------------------------------------------------*/
 /* Macros for kernel related defines                      */
 /*----------------------------------------------------------------------------*/
-#if KERNEL_VERSION(3, 14, 0) > CFG80211_VERSION_CODE
-#define IEEE80211_CHAN_PASSIVE_FLAG IEEE80211_CHAN_PASSIVE_SCAN
-#define IEEE80211_CHAN_PASSIVE_STR "PASSIVE"
-#else
-#define IEEE80211_CHAN_PASSIVE_FLAG IEEE80211_CHAN_NO_IR
-#define IEEE80211_CHAN_PASSIVE_STR "NO_IR"
-#endif
-
-#if KERNEL_VERSION(4, 7, 0) <= CFG80211_VERSION_CODE
-/**
- * enum nl80211_band - Frequency band
- * @NL80211_BAND_2GHZ: 2.4 GHz ISM band
- * @NL80211_BAND_5GHZ: around 5 GHz band (4.9 - 5.7 GHz)
- * @NL80211_BAND_60GHZ: around 60 GHz band (58.32 - 64.80 GHz)
- * @NUM_NL80211_BANDS: number of bands, avoid using this in userspace
- *	 since newer kernel versions may support more bands
- */
-#define KAL_BAND_2GHZ NL80211_BAND_2GHZ
-#define KAL_BAND_5GHZ NL80211_BAND_5GHZ
-#define KAL_NUM_BANDS NUM_NL80211_BANDS
-#else
-#define KAL_BAND_2GHZ IEEE80211_BAND_2GHZ
-#define KAL_BAND_5GHZ IEEE80211_BAND_5GHZ
-#define KAL_NUM_BANDS IEEE80211_NUM_BANDS
-#endif
-
-/**
- * enum nl80211_reg_rule_flags - regulatory rule flags
- * @NL80211_RRF_NO_OFDM: OFDM modulation not allowed
- * @NL80211_RRF_AUTO_BW: maximum available bandwidth should be calculated
- *  base on contiguous rules and wider channels will be allowed to cross
- *  multiple contiguous/overlapping frequency ranges.
- * @NL80211_RRF_DFS: DFS support is required to be used
- */
-#define KAL_RRF_NO_OFDM NL80211_RRF_NO_OFDM
-#define KAL_RRF_DFS NL80211_RRF_DFS
-#if KERNEL_VERSION(3, 15, 0) > CFG80211_VERSION_CODE
-#define KAL_RRF_AUTO_BW 0
-#else
-#define KAL_RRF_AUTO_BW NL80211_RRF_AUTO_BW
-#endif
 
 /**
  * kalCfg80211ToMtkBand - Band translation helper
@@ -424,7 +364,7 @@ typedef struct _MONITOR_RADIOTAP_T {
  */
 #if CFG_SCAN_CHANNEL_SPECIFIED
 #define kalCfg80211ToMtkBand(cfg80211_band) \
-	(cfg80211_band == KAL_BAND_2GHZ ? BAND_2G4 : cfg80211_band == KAL_BAND_5GHZ ? BAND_5G : BAND_NULL)
+	(cfg80211_band == NL80211_BAND_2GHZ ? BAND_2G4 : cfg80211_band == NL80211_BAND_5GHZ ? BAND_5G : BAND_NULL)
 #endif
 
 /**
@@ -441,7 +381,6 @@ typedef struct _MONITOR_RADIOTAP_T {
 static inline void kalCfg80211ScanDone(struct cfg80211_scan_request *request, bool aborted)
 {
 	struct cfg80211_scan_info info = { .aborted = aborted };
-
 	cfg80211_scan_done(request, &info);
 }
 #else
@@ -580,9 +519,7 @@ static inline void kalCfg80211ScanDone(struct cfg80211_scan_request *request, bo
 /* Move memory block with specific size */
 #define kalMemMove(pvDst, pvSrc, u4Size) memmove(pvDst, pvSrc, u4Size)
 
-#if KERNEL_VERSION(4, 0, 0) <= LINUX_VERSION_CODE
 #define strnicmp(s1, s2, n) strncasecmp(s1, s2, n)
-#endif
 
 /* string operation */
 #define kalStrCpy(dest, src) strcpy(dest, src)
@@ -594,9 +531,7 @@ static inline void kalCfg80211ScanDone(struct cfg80211_scan_request *request, bo
 #define kalStrnChr(s, n, c) strnchr(s, n, c)
 #define kalStrLen(s) strlen(s)
 #define kalStrnLen(s, b) strnlen(s, b)
-/* #define kalStrniCmp(s, n)                        strnicmp(s, n)	*/
-/* #define kalStrtoul(cp, endp, base)               simple_strtoul(cp, endp, base) */
-/* #define kalStrtol(cp, endp, base)                simple_strtol(cp, endp, base) */
+
 #define kalkStrtou8(cp, base, resp) kstrtou8(cp, base, resp)
 #define kalkStrtou16(cp, base, resp) kstrtou16(cp, base, resp)
 #define kalkStrtou32(cp, base, resp) kstrtou32(cp, base, resp)
@@ -604,16 +539,13 @@ static inline void kalCfg80211ScanDone(struct cfg80211_scan_request *request, bo
 #define kalSnprintf(buf, size, fmt, ...) snprintf(buf, size, fmt, ##__VA_ARGS__)
 #define kalScnprintf(buf, size, fmt, ...) scnprintf(buf, size, fmt, ##__VA_ARGS__)
 #define kalSprintf(buf, fmt, ...) sprintf(buf, fmt, __VA_ARGS__)
-/* remove for AOSP */
-/* #define kalSScanf(buf, fmt, ...)                    sscanf(buf, fmt, __VA_ARGS__) */
+
 #define kalStrStr(ct, cs) strstr(ct, cs)
 #define kalStrSep(s, ct) strsep(s, ct)
 #define kalStrCat(dest, src) strcat(dest, src)
 #define kalIsXdigit(c) isxdigit(c)
 
 /* defined for wince sdio driver only */
-
-#define kalDevSetPowerState(prGlueInfo, ePowerMode) glSetPowerState(prGlueInfo, ePowerMode)
 
 /*----------------------------------------------------------------------------*/
 /*!
@@ -729,13 +661,8 @@ VOID kalAcquireMutex(IN P_GLUE_INFO_T prGlueInfo, IN ENUM_MUTEX_CATEGORY_E rMute
 
 VOID kalReleaseMutex(IN P_GLUE_INFO_T prGlueInfo, IN ENUM_MUTEX_CATEGORY_E rMutexCategory);
 
-#if CFG_SUPPORT_CFG80211_AUTH
-#if CFG_WDEV_LOCK_THREAD_SUPPORT
 VOID kalAcquireWDevMutex(IN struct net_device *pDev);
-
 VOID kalReleaseWDevMutex(IN struct net_device *pDev);
-#endif
-#endif
 
 VOID kalPacketFree(IN P_GLUE_INFO_T prGlueInfo, IN PVOID pvPacket);
 
@@ -876,8 +803,6 @@ VOID kalSetMediaStateIndicated(IN P_GLUE_INFO_T prGlueInfo, IN ENUM_PARAM_MEDIA_
 /*----------------------------------------------------------------------------*/
 VOID kalOidCmdClearance(IN P_GLUE_INFO_T prGlueInfo);
 
-VOID kalOidClearance(IN P_GLUE_INFO_T prGlueInfo);
-
 VOID kalEnqueueCommand(IN P_GLUE_INFO_T prGlueInfo, IN P_QUE_ENTRY_T prQueueEntry);
 
 /*----------------------------------------------------------------------------*/
@@ -920,13 +845,12 @@ VOID kalSetEvent(P_GLUE_INFO_T pr);
 
 VOID kalSetIntEvent(P_GLUE_INFO_T pr);
 
-#if CFG_SUPPORT_MULTITHREAD
 VOID kalSetTxEvent2Hif(P_GLUE_INFO_T pr);
 
 VOID kalSetTxEvent2Rx(P_GLUE_INFO_T pr);
 
 VOID kalSetTxCmdEvent2Hif(P_GLUE_INFO_T pr);
-#endif
+
 /*----------------------------------------------------------------------------*/
 /* NVRAM/Registry Service                                                     */
 /*----------------------------------------------------------------------------*/
@@ -1053,13 +977,9 @@ VOID kalSchedScanResults(IN P_GLUE_INFO_T prGlueInfo);
 
 VOID kalSchedScanStopped(IN P_GLUE_INFO_T prGlueInfo);
 
-#if CFG_SUPPORT_CFG80211_AUTH
-#if CFG_WDEV_LOCK_THREAD_SUPPORT
 VOID kalWDevLockThread(IN P_GLUE_INFO_T prGlueInfo, IN struct net_device *pDev, IN enum ENUM_CFG80211_WDEV_LOCK_FUNC fn,
 		IN PUINT_8 pFrameBuf, IN size_t frameLen, IN struct cfg80211_bss *pBss, IN INT_32 uapsd_queues,
 		const u8 *req_ies, size_t req_ies_len, IN BOOLEAN fgIsInterruptContext);
-#endif
-#endif
 
 #if CFG_MULTI_ECOVER_SUPPORT
 
@@ -1094,11 +1014,9 @@ VOID kalWowProcess(IN P_GLUE_INFO_T prGlueInfo, UINT_8 enable);
 #endif
 
 int main_thread(void *data);
-
-#if CFG_SUPPORT_MULTITHREAD
 int hif_thread(void *data);
 int rx_thread(void *data);
-#endif
+
 UINT_64 kalGetBootTime(VOID);
 
 int kalMetInitProcfs(IN P_GLUE_INFO_T prGlueInfo);
@@ -1107,25 +1025,12 @@ int kalMetRemoveProcfs(IN P_GLUE_INFO_T prGlueInfo);
 VOID kalFreeTxMsduWorker(struct work_struct *work);
 VOID kalFreeTxMsdu(P_ADAPTER_T prAdapter, P_MSDU_INFO_T prMsduInfo);
 
-#if KERNEL_VERSION(3, 0, 0) <= LINUX_VERSION_CODE
-/* since: 0b5c9db1b11d3175bb42b80663a9f072f801edf5 */
 static inline void kal_skb_reset_mac_len(struct sk_buff *skb)
 {
 	skb_reset_mac_len(skb);
 }
-#else
-static inline void kal_skb_reset_mac_len(struct sk_buff *skb)
-{
-	skb->mac_len = skb->network_header - skb->mac_header;
-}
-#endif
 
-#ifdef CONFIG_PM_SLEEP
-INT_32 kalPmResumeState(VOID);
-INT_32 kalPmResumeHandler(struct notifier_block *notifier, unsigned long pm_event, void *unused);
-#endif
-
-void kal_sched_set(struct task_struct *p, int policy, const struct sched_param *param, int nice);
+int kal_sched_set(struct task_struct *p, int policy, const struct sched_param *param, int nice);
 
 WLAN_STATUS kalUpdateBssChannel(IN P_GLUE_INFO_T prGlueInfo, IN UINT_8 aucSSID[], IN UINT_8 ucSsidLength,
 		IN UINT_8 aucBSSID[], IN UINT_8 ucChannelNum);

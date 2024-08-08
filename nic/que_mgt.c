@@ -1790,7 +1790,6 @@ P_MSDU_INFO_T qmDequeueTxPackets(IN P_ADAPTER_T prAdapter, IN P_TX_TCQ_STATUS_T 
 	return prReturnedPacketListHead;
 }
 
-#if CFG_SUPPORT_MULTITHREAD
 /*----------------------------------------------------------------------------*/
 /*!
  * \brief Dequeue TX packets to send to HIF TX
@@ -1818,7 +1817,7 @@ P_MSDU_INFO_T qmDequeueTxPacketsMthread(IN P_ADAPTER_T prAdapter, IN P_TX_TCQ_ST
 	prMsduInfo = prReturnedPacketListHead;
 	while (prMsduInfo) {
 		prNextMsduInfo = (P_MSDU_INFO_T)QUEUE_GET_NEXT_ENTRY((P_QUE_ENTRY_T)prMsduInfo);
-		nicTxAcquireResource(prAdapter, prMsduInfo->ucTC, nicTxGetPageCount(prMsduInfo->u2FrameLength, FALSE), FALSE);
+		nicTxAcquireResource(prAdapter, prMsduInfo->ucTC, FALSE);
 		prMsduInfo = prNextMsduInfo;
 	}
 
@@ -1965,7 +1964,6 @@ qmAdjustTcQuotasMthread(IN P_ADAPTER_T prAdapter, OUT P_TX_TCQ_ADJUST_T prTcqAdj
 	return FALSE;
 #endif
 }
-#endif
 
 /*----------------------------------------------------------------------------*/
 /*!
@@ -2721,11 +2719,8 @@ P_SW_RFB_T qmHandleRxPackets(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfbList
 								RX_GET_CNT(&prAdapter->rRxCtrl, RX_BMC_NO_KEY_COUNT));
 
 						prAisBssInfo->u2DeauthReason = BEACON_TIMEOUT_REASON_DUE_2_BMC_ERR;
-#if CFG_SUPPORT_CFG80211_AUTH
+
 						kalIndicateStatusAndComplete(prAdapter->prGlueInfo, WLAN_STATUS_BEACON_TIMEOUT, NULL, 0);
-#else
-						aisBssBeaconTimeout(prAdapter, prAisBssInfo->u2DeauthReason);
-#endif
 					}
 				}
 			}
@@ -5235,8 +5230,7 @@ qmGetFrameAction(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex, IN UINT_8 ucSta
 			}
 			/* 4 <4.2> Sta in PS */
 			if (prStaRec->fgIsInPS) {
-				ucReqResource = nicTxGetPageCount(u2FrameLength, FALSE) + prWifiVar->ucCmdRsvResource +
-								QM_MGMT_QUEUED_THRESHOLD;
+				ucReqResource = 1 + prWifiVar->ucCmdRsvResource + QM_MGMT_QUEUED_THRESHOLD;
 
 				/* 4 <4.2.1> Tx, if resource is enough */
 				if (u2FreeResource > ucReqResource) {
@@ -5257,12 +5251,12 @@ qmGetFrameAction(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex, IN UINT_8 ucSta
 	/* <5> Resource CHECK! */
 	/* <5.1> Reserve resource for CMD & 1X */
 	if (eFrameType == FRAME_TYPE_MMPDU) {
-		ucReqResource = nicTxGetPageCount(u2FrameLength, FALSE) + prWifiVar->ucCmdRsvResource;
+		ucReqResource = 1 + prWifiVar->ucCmdRsvResource;
 
 		if (u2FreeResource < ucReqResource) {
 			eFrameAction = FRAME_ACTION_QUEUE_PKT;
-			DBGLOG(QM, INFO, "Queue MGMT (MSDU[0x%p] Req/Rsv/Free[%u/%u/%u])\n", prMsduInfo,
-					nicTxGetPageCount(u2FrameLength, FALSE), prWifiVar->ucCmdRsvResource, u2FreeResource);
+			DBGLOG(QM, INFO, "Queue MGMT (MSDU[0x%p] Req/Rsv/Free[%u/%u/%u])\n", prMsduInfo, 1,
+					prWifiVar->ucCmdRsvResource, u2FreeResource);
 		}
 
 		/* <6> Timeout check! */

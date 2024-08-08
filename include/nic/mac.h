@@ -26,9 +26,9 @@
  *                              C O N S T A N T S
  ********************************************************************************
  */
-#if CFG_SUPPORT_CFG80211_AUTH
+
 #define AUTH_DATA_MAX_LEN 1024 /* temp defined */
-#endif
+
 /* 3 --------------- Constants for Ethernet/802.11 MAC --------------- */
 /* MAC Address */
 #define MAC_ADDR_LEN 6
@@ -506,9 +506,7 @@
 #define AUTH_ALGORITHM_NUM_OPEN_SYSTEM 0		 /* Open System */
 #define AUTH_ALGORITHM_NUM_SHARED_KEY 1			 /* Shared Key */
 #define AUTH_ALGORITHM_NUM_FAST_BSS_TRANSITION 2 /* Fast BSS Transition */
-#if CFG_SUPPORT_CFG80211_AUTH
-#define AUTH_ALGORITHM_NUM_SAE 3 /* SAE */
-#endif
+#define AUTH_ALGORITHM_NUM_SAE 3				 /* SAE */
 
 /* 7.3.1.2 Authentication Transaction Sequence Number field */
 #define AUTH_TRANSACTION_SEQENCE_NUM_FIELD_LEN 2
@@ -1653,13 +1651,8 @@ typedef struct _WLAN_AUTH_FRAME_T {
 	UINT_16 u2SeqCtrl;				   /* Sequence Control */
 	/* Authentication frame body */
 	UINT_16 u2AuthAlgNum; /* Authentication algorithm number */
-#if CFG_SUPPORT_CFG80211_AUTH
 	BOOLEAN aucAuthData[AUTH_DATA_MAX_LEN];
-#else
-	UINT_16 u2AuthTransSeqNo; /* Authentication transaction sequence number */
-	UINT_16 u2StatusCode;	  /* Status code */
-#endif
-	UINT_8 aucInfoElem[1]; /* Various IEs for Fast BSS Transition */
+	UINT_8	aucInfoElem[1]; /* Various IEs for Fast BSS Transition */
 } __KAL_ATTRIB_PACKED__ WLAN_AUTH_FRAME_T, *P_WLAN_AUTH_FRAME_T;
 
 /* 7.2.3.11 WLAN Management Frame - Deauthentication Frame */

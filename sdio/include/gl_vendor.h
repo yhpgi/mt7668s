@@ -243,24 +243,9 @@ typedef UINT_32 wifi_channel; /* indicates channel frequency in MHz */
 typedef INT_32	wifi_rssi;
 
 /*******************************************************************************
- *                           MACROS
- ********************************************************************************
- */
+ *                          		 M A C R O S
+ *******************************************************************************/
 
-#if KERNEL_VERSION(3, 5, 0) <= LINUX_VERSION_CODE
-/*
- * #define NLA_PUT(skb, attrtype, attrlen, data) \
- *	do { \
- *		if (unlikely(nla_put(skb, attrtype, attrlen, data) < 0)) \
- *			goto nla_put_failure; \
- *	} while (0)
- *
- *#define NLA_PUT_TYPE(skb, type, attrtype, value) \
- *	do { \
- *		type __tmp = value; \
- *		NLA_PUT(skb, attrtype, sizeof(type), &__tmp); \
- *	} while (0)
- */
 #define NLA_PUT(skb, attrtype, attrlen, data) mtk_cfg80211_NLA_PUT(skb, attrtype, attrlen, data)
 
 #define NLA_PUT_TYPE(skb, type, attrtype, value) mtk_cfg80211_nla_put_type(skb, type, attrtype, value)
@@ -273,8 +258,6 @@ typedef INT_32	wifi_rssi;
 
 #define NLA_PUT_U64(skb, attrtype, value) NLA_PUT_TYPE(skb, NLA_PUT_DATE_U64, attrtype, value)
 
-#endif
-
 #if KERNEL_VERSION(5, 3, 0) <= CFG80211_VERSION_CODE
 #define VENDOR_OPS_SET_POLICY(_val) .policy = (_val),
 #else
@@ -282,8 +265,7 @@ typedef INT_32	wifi_rssi;
 #endif
 
 /********************************************************************************
- *				P R I V A T E   D A T A
- *
+ *							P R I V A T E   D A T A
  ********************************************************************************/
 
 typedef struct _PARAM_WIFI_GSCAN_GET_RESULT_PARAMS {

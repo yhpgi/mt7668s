@@ -273,7 +273,6 @@ scanSearchBssDescByBssidAndSsid(
 
 } /* end of scanSearchBssDescByBssid() */
 
-#if CFG_SUPPORT_CFG80211_AUTH
 /*----------------------------------------------------------------------------*/
 /*!
  * @brief Find the corresponding BSS Descriptor
@@ -315,7 +314,6 @@ P_BSS_DESC_T scanSearchBssDescByBssidAndChanNum(
 
 	return prBssDesc;
 }
-#endif
 
 /*----------------------------------------------------------------------------*/
 /*!
@@ -1849,44 +1847,24 @@ P_BSS_DESC_T scanSearchBssDescByPolicy(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBss
 	P_BSS_INFO_T			  prBssInfo;
 	P_AIS_SPECIFIC_BSS_INFO_T prAisSpecBssInfo;
 	P_SCAN_INFO_T			  prScanInfo;
-
-	P_LINK_T prBSSDescList;
-
-	P_BSS_DESC_T prBssDesc			= (P_BSS_DESC_T)NULL;
-	P_BSS_DESC_T prPrimaryBssDesc	= (P_BSS_DESC_T)NULL;
-	P_BSS_DESC_T prCandidateBssDesc = (P_BSS_DESC_T)NULL;
-
-	P_STA_RECORD_T prStaRec = (P_STA_RECORD_T)NULL;
-	P_STA_RECORD_T prPrimaryStaRec;
-	P_STA_RECORD_T prCandidateStaRec = (P_STA_RECORD_T)NULL;
-
-	OS_SYSTIME rCurrentTime;
-
-	/* The first one reach the check point will be our candidate */
-	BOOLEAN fgIsFindFirst = (BOOLEAN)FALSE;
-
-	BOOLEAN fgIsFindBestRSSI = (BOOLEAN)FALSE;
-#if !CFG_SUPPORT_CFG80211_AUTH
-	BOOLEAN fgIsFindBestEncryptionLevel = (BOOLEAN)FALSE;
-#endif
-	/* BOOLEAN fgIsFindMinChannelLoad = (BOOLEAN)FALSE; */
-
-	/* TODO(Kevin): Support Min Channel Load */
-	/* UINT_8 aucChannelLoad[CHANNEL_NUM] = {0}; */
-
-	BOOLEAN		fgIsFixedChannel;
-	ENUM_BAND_T eBand;
-	UINT_8		ucChannel;
-
-#if CFG_SUPPORT_DBDC_TC6
-	P_BSS_INFO_T prAisBssInfo;
-#endif
+	P_LINK_T				  prBSSDescList;
+	P_BSS_DESC_T			  prBssDesc			 = (P_BSS_DESC_T)NULL;
+	P_BSS_DESC_T			  prPrimaryBssDesc	 = (P_BSS_DESC_T)NULL;
+	P_BSS_DESC_T			  prCandidateBssDesc = (P_BSS_DESC_T)NULL;
+	P_STA_RECORD_T			  prStaRec			 = (P_STA_RECORD_T)NULL;
+	P_STA_RECORD_T			  prPrimaryStaRec;
+	P_STA_RECORD_T			  prCandidateStaRec = (P_STA_RECORD_T)NULL;
+	OS_SYSTIME				  rCurrentTime;
+	BOOLEAN					  fgIsFindFirst	   = (BOOLEAN)FALSE;
+	BOOLEAN					  fgIsFindBestRSSI = (BOOLEAN)FALSE;
+	BOOLEAN					  fgIsFixedChannel;
+	ENUM_BAND_T				  eBand;
+	UINT_8					  ucChannel;
+	P_BSS_INFO_T			  prAisBssInfo;
 
 	ASSERT(prAdapter);
 
-#if CFG_SUPPORT_DBDC_TC6
 	prAisBssInfo = prAdapter->prAisBssInfo;
-#endif
 
 	prConnSettings = &(prAdapter->rWifiVar.rConnSettings);
 	prBssInfo	   = GET_BSS_INFO_BY_INDEX(prAdapter, ucBssIndex);
@@ -1949,14 +1927,11 @@ P_BSS_DESC_T scanSearchBssDescByPolicy(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBss
 		}
 		/* 4 <2.5> Check if this BSS_DESC_T is stale */
 		if (CHECK_FOR_TIMEOUT(rCurrentTime, prBssDesc->rUpdateTime, SEC_TO_SYSTIME(SCN_BSS_DESC_STALE_SEC))) {
-#if CFG_SUPPORT_DBDC_TC6
 			if (prAisBssInfo->fgReConnBypassScan && EQUAL_MAC_ADDR(prConnSettings->aucBSSID, prBssDesc->aucBSSID) &&
 					prAisBssInfo->eConnectionState == PARAM_MEDIA_STATE_DISCONNECTED) {
 				prAisBssInfo->fgReConnBypassScan = 0;
 				DBGLOG(SCN, LOUD, "SEARCH: Found target Bss but skip stale state for DBDC reconnect\n");
-			} else
-#endif
-			{
+			} else {
 				DBGLOG(SCN, LOUD, "SEARCH: Ignore stale Bss, CurrTime[%ld] BssUpdateTime[%ld]\n", rCurrentTime,
 						prBssDesc->rUpdateTime);
 				continue;
@@ -2019,7 +1994,7 @@ P_BSS_DESC_T scanSearchBssDescByPolicy(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBss
 					continue;
 				}
 			}
-#if CFG_SUPPORT_ADHOC
+
 			/* 4 <4.3> Check for AdHoc Mode */
 			if (prBssDesc->eBSSType == BSS_TYPE_IBSS) {
 				OS_SYSTIME rCurrentTime;
@@ -2058,7 +2033,6 @@ P_BSS_DESC_T scanSearchBssDescByPolicy(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBss
 					}
 				}
 			}
-#endif /* CFG_SUPPORT_ADHOC */
 		}
 
 		prPrimaryBssDesc = (P_BSS_DESC_T)NULL;
@@ -2110,14 +2084,11 @@ P_BSS_DESC_T scanSearchBssDescByPolicy(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBss
 							EQUAL_SSID(prBssDesc->aucSSID, prBssDesc->ucSSIDLen, prConnSettings->aucSSID,
 									prConnSettings->ucSSIDLen)) ||
 						prConnSettings->ucSSIDLen == 0)
-#if CFG_SUPPORT_CFG80211_AUTH
+
 					if (prBssDesc->ucChannelNum == prConnSettings->ucChannelNum) {
 						prPrimaryBssDesc = prBssDesc;
 						fgIsFindFirst	 = TRUE;
 					}
-#else
-					prPrimaryBssDesc = prBssDesc;
-#endif
 			}
 			break;
 
@@ -2128,29 +2099,6 @@ P_BSS_DESC_T scanSearchBssDescByPolicy(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBss
 		/* Primary Candidate was not found */
 		if (prPrimaryBssDesc == NULL)
 			continue;
-		/* 4 <7> Check the Encryption Status. */
-		if (prPrimaryBssDesc->eBSSType == BSS_TYPE_INFRASTRUCTURE) {
-#if !CFG_SUPPORT_CFG80211_AUTH
-			if (rsnPerformPolicySelection(prAdapter, prPrimaryBssDesc)) {
-				if (prAisSpecBssInfo->fgCounterMeasure) {
-					DBGLOG(RSN, INFO, "Skip while at counter measure period!!!\n");
-					continue;
-				}
-
-				if (prPrimaryBssDesc->ucEncLevel > 0) {
-					fgIsFindBestEncryptionLevel = TRUE;
-
-					fgIsFindFirst = FALSE;
-				}
-			} else {
-				/* Can't pass the Encryption Status Check, get next one */
-				DBGLOG(RSN, INFO, "Ignore BSS can't pass Encryption Status Check\n");
-				continue;
-			}
-#endif
-		} else {
-			/* Todo:: P2P and BOW Policy Selection */
-		}
 
 		prPrimaryStaRec = prStaRec;
 
@@ -2269,9 +2217,7 @@ VOID scanReportBss2Cfg80211(IN P_ADAPTER_T prAdapter, IN ENUM_BSS_TYPE_T eBSSTyp
 						SpecificprBssDesc->u2RawLength, &rChannelInfo, RCPI_TO_dBm(SpecificprBssDesc->ucRCPI));
 			}
 
-#if CFG_ENABLE_WIFI_DIRECT
 			SpecificprBssDesc->fgIsP2PReport = FALSE;
-#endif
 		}
 	} else {
 #if CFG_AUTO_CHANNEL_SEL_SUPPORT
@@ -2297,13 +2243,9 @@ VOID scanReportBss2Cfg80211(IN P_ADAPTER_T prAdapter, IN ENUM_BSS_TYPE_T eBSSTyp
 				continue;
 			}
 
-			if ((prBssDesc->eBSSType == eBSSType)
-#if CFG_ENABLE_WIFI_DIRECT
-					|| ((eBSSType == BSS_TYPE_P2P_DEVICE) &&
-							   (prBssDesc->fgIsP2PReport == TRUE && prAdapter->p2p_scan_report_all_bss))
-#endif
-			) {
-
+			if ((prBssDesc->eBSSType == eBSSType) ||
+					((eBSSType == BSS_TYPE_P2P_DEVICE) &&
+							(prBssDesc->fgIsP2PReport == TRUE && prAdapter->p2p_scan_report_all_bss))) {
 				DBGLOG(SCN, TRACE, "Report ALL SSID[%s %d]\n", prBssDesc->aucSSID, prBssDesc->ucChannelNum);
 
 				if (eBSSType == BSS_TYPE_INFRASTRUCTURE) {
@@ -2311,17 +2253,12 @@ VOID scanReportBss2Cfg80211(IN P_ADAPTER_T prAdapter, IN ENUM_BSS_TYPE_T eBSSTyp
 						kalIndicateBssInfo(prAdapter->prGlueInfo, (PUINT_8)prBssDesc->aucRawBuf, prBssDesc->u2RawLength,
 								prBssDesc->ucChannelNum, RCPI_TO_dBm(prBssDesc->ucRCPI));
 						kalMemZero(prBssDesc->aucRawBuf, CFG_RAW_BUFFER_SIZE);
-						prBssDesc->u2RawLength = 0;
-
-#if CFG_ENABLE_WIFI_DIRECT
+						prBssDesc->u2RawLength	 = 0;
 						prBssDesc->fgIsP2PReport = FALSE;
-#endif
 					}
 				} else {
-#if CFG_ENABLE_WIFI_DIRECT
 					if ((prBssDesc->fgIsP2PReport == TRUE && prAdapter->p2p_scan_report_all_bss) &&
 							prBssDesc->u2RawLength != 0) {
-#endif
 						rChannelInfo.ucChannelNum = prBssDesc->ucChannelNum;
 						rChannelInfo.eBand		  = prBssDesc->eBand;
 
@@ -2337,10 +2274,8 @@ VOID scanReportBss2Cfg80211(IN P_ADAPTER_T prAdapter, IN ENUM_BSS_TYPE_T eBSSTyp
 						 *  pass it. We use u2RawLength for the purpose.
 						 */
 						/* prBssDesc->u2RawLength=0; */
-#if CFG_ENABLE_WIFI_DIRECT
 						prBssDesc->fgIsP2PReport = FALSE;
 					}
-#endif
 				}
 			} else {
 				prBssDesc->u2RawLength = 0;
@@ -2355,7 +2290,6 @@ VOID scanReportBss2Cfg80211(IN P_ADAPTER_T prAdapter, IN ENUM_BSS_TYPE_T eBSSTyp
 	}
 }
 
-#if CFG_SUPPORT_AGPS_ASSIST
 VOID scanReportScanResultToAgps(P_ADAPTER_T prAdapter)
 {
 	P_LINK_T		 prBSSDescList = &prAdapter->rWifiVar.rScanInfo.rBSSDescList;
@@ -2384,4 +2318,3 @@ VOID scanReportScanResultToAgps(P_ADAPTER_T prAdapter)
 	kalIndicateAgpsNotify(prAdapter, AGPS_EVENT_WLAN_AP_LIST, (PUINT_8)prAgpsApList, sizeof(AGPS_AP_LIST_T));
 	kalMemFree(prAgpsApList, VIR_MEM_TYPE, sizeof(AGPS_AP_LIST_T));
 }
-#endif /* CFG_SUPPORT_AGPS_ASSIST */

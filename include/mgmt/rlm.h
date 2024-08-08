@@ -355,10 +355,4 @@ VOID rrmTxQuietTimeout(P_ADAPTER_T prAdapter, ULONG ulParamPtr);
  ********************************************************************************
  */
 
-#ifndef _lint
-static __KAL_INLINE__ VOID rlmDataTypeCheck(VOID)
-{
-}
-#endif /* _lint */
-
 #endif /* _RLM_H */
