@@ -23,11 +23,8 @@
  ********************************************************************************
  */
 #include "gl_os.h" /* Include "config.h" */
-
 #include "gl_p2p_os.h"
-
 #include "debug.h"
-
 #include "link.h"
 #include "queue.h"
 
@@ -36,12 +33,10 @@
  *------------------------------------------------------------------------------
  */
 #include "wlan_typedef.h"
-
 #include "mac.h"
 
 /* Dependency:  mac.h (MAC_ADDR_LEN) */
 #include "wlan_def.h"
-
 #include "roaming_fsm.h"
 
 /*------------------------------------------------------------------------------
@@ -56,28 +51,21 @@
 
 /* Dependency:  nic_cmd_event.h (P_EVENT_CONNECTION_STATUS) */
 #include "nic.h"
-
 #include "nic_init_cmd_event.h"
-
 #include "hif_rx.h"
 #include "hif_tx.h"
-
 #include "nic_tx.h"
 
 /* Dependency:  hif_rx.h (P_HIF_RX_HEADER_T) */
 #include "nic_rx.h"
-
 #include "que_mgt.h"
-
 #include "nic_rate.h"
 
-#if CFG_ENABLE_WIFI_DIRECT
 #include "p2p_typedef.h"
 #include "p2p_cmd_buf.h"
 #include "p2p_nic_cmd_event.h"
 #include "p2p_mac.h"
 #include "p2p_nic.h"
-#endif
 
 /*------------------------------------------------------------------------------
  * .\include\mgmt
@@ -92,33 +80,26 @@
 #include "wlan_lib.h"
 #include "wlan_oid.h"
 #include "wlan_bow.h"
-
 #include "wlan_p2p.h"
-
 #include "hal.h"
-
-#include "mt66xx_reg.h"
-
+#include "reg.h"
 #include "rlm.h"
 #include "rlm_domain.h"
 #include "rlm_protection.h"
 #include "rlm_obss.h"
 #include "rate.h"
-
 #include "aa_fsm.h"
-
 #include "cnm_timer.h"
-
 #include "pwr_mgt.h"
-
 #include "cnm.h"
+
 /* Dependency:  aa_fsm.h (ENUM_AA_STATE_T), p2p_fsm.h (WPS_ATTRI_MAX_LEN_DEVICE_NAME) */
 #include "cnm_mem.h"
 #include "cnm_scan.h"
-
 #include "p2p_rlm_obss.h"
 #include "p2p_bss.h"
 #include "p2p.h"
+
 /* Dependency:  cnm_timer.h (TIMER_T) */
 #include "p2p_fsm.h"
 #include "p2p_scan.h"
@@ -126,29 +107,22 @@
 #include "p2p_rlm.h"
 #include "p2p_assoc.h"
 #include "p2p_ie.h"
-
 #include "privacy.h"
-
 #include "mib.h"
-
 #include "auth.h"
 #include "assoc.h"
-
 #include "ais_fsm.h"
-
 #include "adapter.h"
-
 #include "que_mgt.h"
 #include "rftest.h"
-
 #include "rsn.h"
 
 /*------------------------------------------------------------------------------
  * NVRAM structure
  *------------------------------------------------------------------------------
  */
-#include "CFG_Wifi_File.h"
 
+#include "CFG_Wifi_File.h"
 #include "gl_p2p_kal.h"
 
 /*******************************************************************************

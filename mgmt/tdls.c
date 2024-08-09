@@ -18,7 +18,6 @@
  */
 #include "precomp.h"
 
-#if CFG_SUPPORT_TDLS
 #include "tdls.h"
 #include "gl_cfg80211.h"
 #include "queue.h"
@@ -75,8 +74,6 @@ UINT_8 g_arTdlsLink[MAXNUM_TDLS_PEER] = { 0, 0, 0, 0 };
 /*----------------------------------------------------------------------------*/
 UINT_32 TdlsexLinkMgt(P_ADAPTER_T prAdapter, PVOID pvSetBuffer, UINT_32 u4SetBufferLen, PUINT_32 pu4SetInfoLen)
 {
-	/* from supplicant -- wpa_supplicant_tdls_peer_addset() */
-
 	STA_RECORD_T		 *prStaRec;
 	P_BSS_INFO_T		 prBssInfo;
 	TDLS_CMD_LINK_MGT_T *prCmd;
@@ -95,7 +92,6 @@ UINT_32 TdlsexLinkMgt(P_ADAPTER_T prAdapter, PVOID pvSetBuffer, UINT_32 u4SetBuf
 
 	switch (prCmd->ucActionCode) {
 	case TDLS_FRM_ACTION_DISCOVERY_REQ:
-		/* printk("\n\n\n  TDLS_FRM_ACTION_DISCOVERY_REQ\n\n\n"); */
 		if (TdlsDataFrameSend_DISCOVERY_REQ(prAdapter, prStaRec, prCmd->aucPeer, prCmd->ucActionCode,
 					prCmd->ucDialogToken, prCmd->u2StatusCode, (UINT_8 *)(prCmd->aucSecBuf),
 					prCmd->u4SecBufLen) != TDLS_STATUS_SUCCESS) {
@@ -105,7 +101,6 @@ UINT_32 TdlsexLinkMgt(P_ADAPTER_T prAdapter, PVOID pvSetBuffer, UINT_32 u4SetBuf
 		break;
 
 	case TDLS_FRM_ACTION_SETUP_REQ:
-		/* printk("\n\n\n  TDLS_FRM_ACTION_SETUP_REQ\n\n\n"); */
 		prStaRec = cnmGetTdlsPeerByAddress(prAdapter, prAdapter->prAisBssInfo->ucBssIndex, prCmd->aucPeer);
 		g_arTdlsLink[prStaRec->ucTdlsIndex] = 0;
 		if (TdlsDataFrameSend_SETUP_REQ(prAdapter, prStaRec, prCmd->aucPeer, prCmd->ucActionCode, prCmd->ucDialogToken,
@@ -120,11 +115,9 @@ UINT_32 TdlsexLinkMgt(P_ADAPTER_T prAdapter, PVOID pvSetBuffer, UINT_32 u4SetBuf
 		/* fix sigma bug 5.2.4.2, 5.2.4.7, we sent Status code decline,
 		 * but the sigma recogniezis it as scucess, and it will fail
 		 */
-		/* if(prCmd->u2StatusCode != 0) */
 		if (prBssInfo->fgTdlsIsProhibited)
 			return 0;
 
-		/* printk("\n\n\n  TDLS_FRM_ACTION_SETUP_RSP\n\n\n"); */
 		if (TdlsDataFrameSend_SETUP_RSP(prAdapter, prStaRec, prCmd->aucPeer, prCmd->ucActionCode, prCmd->ucDialogToken,
 					prCmd->u2StatusCode, (UINT_8 *)(prCmd->aucSecBuf), prCmd->u4SecBufLen) != TDLS_STATUS_SUCCESS) {
 			return -1;
@@ -133,7 +126,6 @@ UINT_32 TdlsexLinkMgt(P_ADAPTER_T prAdapter, PVOID pvSetBuffer, UINT_32 u4SetBuf
 		break;
 
 	case TDLS_FRM_ACTION_DISCOVERY_RSP:
-		/* printk("\n\n\n  TDLS_FRM_ACTION_DISCOVERY_RSP\n\n\n"); */
 		if (TdlsDataFrameSend_DISCOVERY_RSP(prAdapter, prStaRec, prCmd->aucPeer, prCmd->ucActionCode,
 					prCmd->ucDialogToken, prCmd->u2StatusCode, (UINT_8 *)(prCmd->aucSecBuf),
 					prCmd->u4SecBufLen) != TDLS_STATUS_SUCCESS) {
@@ -143,7 +135,6 @@ UINT_32 TdlsexLinkMgt(P_ADAPTER_T prAdapter, PVOID pvSetBuffer, UINT_32 u4SetBuf
 		break;
 
 	case TDLS_FRM_ACTION_CONFIRM:
-		/* printk("\n\n\n  TDLS_FRM_ACTION_CONFIRM\n\n\n"); */
 		if (TdlsDataFrameSend_CONFIRM(prAdapter, prStaRec, prCmd->aucPeer, prCmd->ucActionCode, prCmd->ucDialogToken,
 					prCmd->u2StatusCode, (UINT_8 *)(prCmd->aucSecBuf), prCmd->u4SecBufLen) != TDLS_STATUS_SUCCESS) {
 			return -1;
@@ -154,19 +145,16 @@ UINT_32 TdlsexLinkMgt(P_ADAPTER_T prAdapter, PVOID pvSetBuffer, UINT_32 u4SetBuf
 
 		prStaRec = cnmGetTdlsPeerByAddress(prAdapter, prAdapter->prAisBssInfo->ucBssIndex, prCmd->aucPeer);
 		if (prCmd->u2StatusCode == TDLS_REASON_CODE_UNREACHABLE) {
-			/* printk("\n\n\n  u2StatusCode == TDLS_REASON_CODE_UNREACHABLE\n\n\n"); */
 			g_arTdlsLink[prStaRec->ucTdlsIndex] = 0;
 		}
-		/* printk("\n\n\n  TDLS_FRM_ACTION_TEARDOWN\n\n\n"); */
+
 		if (TdlsDataFrameSend_TearDown(prAdapter, prStaRec, prCmd->aucPeer, prCmd->ucActionCode, prCmd->ucDialogToken,
 					prCmd->u2StatusCode, (UINT_8 *)(prCmd->aucSecBuf), prCmd->u4SecBufLen) != TDLS_STATUS_SUCCESS) {
-			/* printk("\n teardown frrame  send failure\n"); */
 			return -1;
 		}
 		break;
 
 	default:
-		/* printk("\n\n\n  default\n\n\n"); */
 		return -EINVAL;
 	}
 
@@ -188,9 +176,6 @@ UINT_32 TdlsexLinkMgt(P_ADAPTER_T prAdapter, PVOID pvSetBuffer, UINT_32 u4SetBuf
 /*----------------------------------------------------------------------------*/
 UINT_32 TdlsexLinkOper(P_ADAPTER_T prAdapter, PVOID pvSetBuffer, UINT_32 u4SetBufferLen, PUINT_32 pu4SetInfoLen)
 {
-	/* printk("TdlsexLinkOper\n"); */
-
-	/* from supplicant -- wpa_supplicant_tdls_peer_addset() */
 	UINT_16		  i;
 	STA_RECORD_T *prStaRec;
 
@@ -210,13 +195,11 @@ UINT_32 TdlsexLinkOper(P_ADAPTER_T prAdapter, PVOID pvSetBuffer, UINT_32 u4SetBu
 			}
 		}
 
-		/* printk("TDLS_ENABLE_LINK %d\n", i); */
 		break;
 	case TDLS_DISABLE_LINK:
 
 		prStaRec = cnmGetTdlsPeerByAddress(prAdapter, prAdapter->prAisBssInfo->ucBssIndex, prCmd->aucPeerMac);
 
-		/* printk("TDLS_ENABLE_LINK %d\n", prStaRec->ucTdlsIndex); */
 		g_arTdlsLink[prStaRec->ucTdlsIndex] = 0;
 		if (IS_DLS_STA(prStaRec))
 			cnmStaRecFree(prAdapter, prStaRec);
@@ -393,8 +376,6 @@ TdlsDataFrameSend_TearDown(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec, UINT_8 
 
 	ReasonCode = u2StatusCode;
 
-	/* printk("\n\n ReasonCode = %u\n\n",ReasonCode ); */
-
 	kalMemCopy(pPkt, &ReasonCode, 2);
 	pPkt	 = pPkt + 2;
 	u4PktLen = u4PktLen + 2;
@@ -428,12 +409,6 @@ TdlsDataFrameSend_TearDown(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec, UINT_8 
 
 	/* 5. Update packet length */
 	prMsduInfo->len = u4PktLen;
-
-	/* if(u2StatusCode == UNREACH_ABLE ){ */
-	/* g_arTdlsLink[prStaRec->ucTdlsIndex] = FALSE; */
-	/* } */
-
-	/* printk(" TdlsDataFrameSend_TearDown !!\n"); */
 
 	/* 5. send the data frame */
 	wlanHardStartXmit(prMsduInfo, prMsduInfo->dev);
@@ -565,9 +540,7 @@ TdlsDataFrameSend_SETUP_REQ(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec, UINT_8
 		u4IeLen = rlmFillHtCapIEByAdapter(prAdapter, prBssInfo, pPkt);
 		pPkt += u4IeLen;
 		u4PktLen += u4IeLen;
-		/* 0320 !! check newest driver !!! */
 	}
-	/* check */
 
 	/* 3. Frame Formation - (12) Timeout interval element (TPK Key Lifetime) */
 	TIMEOUT_INTERVAL_IE(pPkt)->ucId		= ELEM_ID_TIMEOUT_INTERVAL;
@@ -637,14 +610,13 @@ TdlsDataFrameSend_SETUP_REQ(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec, UINT_8
 
 		LR_TDLS_FME_FIELD_FILL(u4IeLen);
 	}
-#if CFG_SUPPORT_802_11AC
+
 	if (prAdapter->rWifiVar.ucAvailablePhyTypeSet & PHY_TYPE_SET_802_11AC) {
 		/* Add VHT IE */ /* try to reuse p2p path */
 		u4IeLen = rlmFillVhtCapIEByAdapter(prAdapter, prBssInfo, pPkt);
 		pPkt += u4IeLen;
 		u4PktLen += u4IeLen;
 	}
-#endif
 
 	/* 5. Update packet length */
 	prMsduInfo->len = u4PktLen;
@@ -844,14 +816,13 @@ TdlsDataFrameSend_SETUP_RSP(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec, UINT_8
 
 		LR_TDLS_FME_FIELD_FILL(u4IeLen);
 	}
-#if CFG_SUPPORT_802_11AC
+
 	if (prAdapter->rWifiVar.ucAvailablePhyTypeSet & PHY_TYPE_SET_802_11AC) {
 		/* Add VHT IE */ /* try to reuse p2p path */
 		u4IeLen = rlmFillVhtCapIEByAdapter(prAdapter, prBssInfo, pPkt);
 		pPkt += u4IeLen;
 		u4PktLen += u4IeLen;
 	}
-#endif
 
 	/* 5. Update packet length */
 	prMsduInfo->len = u4PktLen;
@@ -1452,14 +1423,13 @@ TdlsDataFrameSend_DISCOVERY_RSP(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec, UI
 
 		LR_TDLS_FME_FIELD_FILL(u4IeLen);
 	}
-#if CFG_SUPPORT_802_11AC
+
 	if (prAdapter->rWifiVar.ucAvailablePhyTypeSet & PHY_TYPE_SET_802_11AC) {
 		/* Add VHT IE */ /* try to reuse p2p path */
 		u4IeLen = rlmFillVhtCapIEByAdapter(prAdapter, prBssInfo, pPkt);
 		pPkt += u4IeLen;
 		u4PktLen += u4IeLen;
 	}
-#endif
 
 	/* 8. Append security IEs */
 	if (pAppendIe != NULL) {
@@ -1665,6 +1635,5 @@ TdlsTxCtrl(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo, BOOLEAN fgEnable)
 
 	return TDLS_STATUS_SUCCESS;
 }
-#endif /* CFG_SUPPORT_TDLS */
 
 /* End of tdls.c */

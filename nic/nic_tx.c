@@ -167,11 +167,6 @@ VOID nicTxInitialize(IN P_ADAPTER_T prAdapter)
 	QUEUE_INITIALIZE(&prTxCtrl->rTxMgmtTxingQueue);
 	prTxCtrl->i4TxMgmtPendingNum = 0;
 
-#if CFG_HIF_STATISTICS
-	prTxCtrl->u4TotalTxAccessNum = 0;
-	prTxCtrl->u4TotalTxPacketNum = 0;
-#endif
-
 	prTxCtrl->i4PendingFwdFrameCount = 0;
 
 	/* Assign init value */
@@ -1055,7 +1050,6 @@ VOID nicTxComposeDesc(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo, IN 
 
 		/* Must set No ACK to mask retry bit in FC */
 		HAL_MAC_TX_DESC_SET_NO_ACK(prTxDesc);
-#ifdef CFG_SUPPORT_MULTICAST_ENHANCEMENT
 		if (prAdapter->fgIsFixedMRate) {
 			/* Fixed M rate for choosing first unicast sta */
 			DBGLOG(TX, LOUD, "Force Mcast index to used Sta index\n");
@@ -1067,7 +1061,6 @@ VOID nicTxComposeDesc(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo, IN 
 			HAL_MAC_TX_DESC_SET_FIXED_RATE_MODE_TO_DESC(prTxDesc);
 			HAL_MAC_TX_DESC_SET_FIXED_RATE_ENABLE(prTxDesc);
 		}
-#endif
 	}
 
 	/* WLAN index */
@@ -1345,9 +1338,7 @@ VOID nicTxFillDesc(
 	P_HW_MAC_TX_DESC_T prTxDescTemplate = NULL;
 	P_STA_RECORD_T	   prStaRec			= cnmGetStaRecByIndex(prAdapter, prMsduInfo->ucStaRecIndex);
 	UINT_32			   u4TxDescLength, u4TxDescAppendLength;
-#if CFG_TCP_IP_CHKSUM_OFFLOAD
-	UINT_8 ucChksumFlag = 0;
-#endif
+	UINT_8			   ucChksumFlag = 0;
 
 	/* This is to lock the process to preventing */
 	/* nicTxFreeDescTemplate while Filling it */
@@ -1376,7 +1367,6 @@ VOID nicTxFillDesc(
 
 		/* Overwrite fields for EOSP or More data */
 		nicTxFillDescByPktOption(prMsduInfo, prTxDesc);
-#ifdef CFG_SUPPORT_MULTICAST_ENHANCEMENT
 		/* Set no ack here and no enable BMC in Burst mode*/
 		if (IS_BMCAST_MAC_ADDR(prMsduInfo->aucEthDestAddr)) {
 			/* Force mcast rate here   */
@@ -1390,7 +1380,6 @@ VOID nicTxFillDesc(
 				HAL_MAC_TX_DESC_SET_FIXED_RATE_ENABLE(prTxDesc);
 			}
 		}
-#endif
 	}
 	/* Compose TXD by Msdu info */
 	else {
@@ -1411,7 +1400,6 @@ VOID nicTxFillDesc(
 	HAL_MAC_TX_DESC_SET_TX_BYTE_COUNT(prTxDesc, u4TxDescLength + u4TxDescAppendLength + prMsduInfo->u2FrameLength);
 
 	/* Checksum offload */
-#if CFG_TCP_IP_CHKSUM_OFFLOAD
 	if (prAdapter->fgIsSupportCsumOffload && prMsduInfo->eSrc == TX_PACKET_OS) {
 		if (prAdapter->u4CSUMFlags & (CSUM_OFFLOAD_EN_TX_TCP | CSUM_OFFLOAD_EN_TX_UDP | CSUM_OFFLOAD_EN_TX_IP)) {
 			ASSERT(prMsduInfo->prPacket);
@@ -1422,7 +1410,6 @@ VOID nicTxFillDesc(
 				HAL_MAC_TX_DESC_SET_TCP_UDP_CHKSUM(prTxDesc);
 		}
 	}
-#endif /* CFG_TCP_IP_CHKSUM_OFFLOAD */
 
 	/* Set EtherType & VLAN for non 802.11 frame */
 	if (!prMsduInfo->fgIs802_11) {
@@ -1765,11 +1752,6 @@ WLAN_STATUS nicTxMsduQueue(IN P_ADAPTER_T prAdapter, UINT_8 ucPortIdx, P_QUE_T p
 	ASSERT(prQue);
 
 	prTxCtrl = &prAdapter->rTxCtrl;
-
-#if CFG_HIF_STATISTICS
-	prTxCtrl->u4TotalTxAccessNum++;
-	prTxCtrl->u4TotalTxPacketNum += prQue->u4NumElem;
-#endif
 
 	while (QUEUE_IS_NOT_EMPTY(prQue)) {
 		QUEUE_REMOVE_HEAD(prQue, prMsduInfo, P_MSDU_INFO_T);
@@ -2156,12 +2138,10 @@ BOOLEAN nicTxFillMsduInfo(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo,
 	prMsduInfo->u2FrameLength	  = (UINT_16)GLUE_GET_PKT_FRAME_LEN(prPacket);
 	prMsduInfo->u4PageCount		  = 1;
 
-#ifdef CFG_SUPPORT_MULTICAST_ENHANCEMENT
 	if (IS_BMCAST_MAC_ADDR(prMsduInfo->aucEthDestAddr) && prAdapter->fgIsMcastBurstMode) {
 		/* Force Multicast Burst mode set VI queue */
 		prMsduInfo->ucUserPriority = NIC_TX_AC_VI_TID; // VI
 	}
-#endif
 	if (GLUE_IS_PKT_FLAG_SET(prPacket)) {
 		prMsduInfo->fgIs802_1x				= GLUE_TEST_PKT_FLAG(prPacket, ENUM_PKT_1X) ? TRUE : FALSE;
 		prMsduInfo->fgIs802_1x_NonProtected = GLUE_TEST_PKT_FLAG(prPacket, ENUM_PKT_NON_PROTECTED_1X) ? TRUE : FALSE;
@@ -2254,7 +2234,6 @@ WLAN_STATUS nicTxFlush(IN P_ADAPTER_T prAdapter)
 	return WLAN_STATUS_SUCCESS;
 }
 
-#if CFG_ENABLE_FW_DOWNLOAD
 /*----------------------------------------------------------------------------*/
 /*!
  * \brief In this function, we'll write Command(CMD_INFO_T) into HIF.
@@ -2349,8 +2328,6 @@ WLAN_STATUS nicTxInitResetResource(IN P_ADAPTER_T prAdapter)
 	return WLAN_STATUS_SUCCESS;
 }
 
-#endif
-
 BOOLEAN nicTxProcessMngPacket(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo)
 {
 	P_BSS_INFO_T   prBssInfo;
@@ -2436,14 +2413,6 @@ VOID nicTxProcessTxDoneEvent(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent
 
 	/* call related TX Done Handler */
 	prMsduInfo = nicGetPendingTxMsduInfo(prAdapter, prTxDone->ucWlanIndex, prTxDone->ucPacketSeq);
-
-#if CFG_SUPPORT_802_11V_TIMING_MEASUREMENT
-	DBGLOG(NIC, TRACE, "EVENT_ID_TX_DONE u4TimeStamp = %x u2AirDelay = %x\n", prTxDone->au4Reserved1,
-			prTxDone->au4Reserved2);
-
-	wnmReportTimingMeas(prAdapter, prMsduInfo->ucStaRecIndex, prTxDone->au4Reserved1,
-			prTxDone->au4Reserved1 + prTxDone->au4Reserved2);
-#endif
 
 	if (prMsduInfo) {
 		prMsduInfo->pfTxDoneHandler(prAdapter, prMsduInfo, (ENUM_TX_RESULT_CODE_T)(prTxDone->ucStatus));
@@ -2568,10 +2537,8 @@ WLAN_STATUS nicTxEnqueueMsdu(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduIn
 
 					kalMemZero(prCmdInfo, sizeof(CMD_INFO_T));
 
-#if CFG_ENABLE_PKT_LIFETIME_PROFILE
 					/* Tag MGMT enqueue time */
 					GET_CURRENT_SYSTIME(&prMsduInfoHead->rPktProfile.rEnqueueTimestamp);
-#endif
 					prCmdInfo->eCmdType			   = COMMAND_TYPE_MANAGEMENT_FRAME;
 					prCmdInfo->u2InfoBufLen		   = prMsduInfoHead->u2FrameLength;
 					prCmdInfo->pucInfoBuffer	   = NULL;

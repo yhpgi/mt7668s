@@ -20,8 +20,6 @@
 #include "precomp.h"
 #include "swcr.h"
 
-#if CFG_SUPPORT_SWCR
-
 /*******************************************************************************
  *                             D A T A   T Y P E S
  ********************************************************************************
@@ -51,12 +49,6 @@ static const PFN_CMD_RW_T g_arSwCtrlCmd[] = { swCtrlCmdCategory0, swCtrlCmdCateg
 	,
 	testPsCmdCategory0, testPsCmdCategory1
 #endif
-#if CFG_SUPPORT_802_11V
-#if (CFG_SUPPORT_802_11V_TIMING_MEASUREMENT == 1) && (WNM_UNIT_TEST == 1)
-	,
-	testWNMCmdCategory0
-#endif
-#endif
 };
 
 const PFN_SWCR_RW_T g_arSwCrModHandle[] = { swCtrlSwCr, NULL };
@@ -84,9 +76,6 @@ enum {
 	SWCTRL_QM_DBG_CNT,
 	SWCTRL_RX_PKTS_DUMP,
 	SWCTRL_RX_FILTER,
-#if CFG_INIT_ENABLE_PATTERN_FILTER_ARP
-	SWCTRL_RX_ARP_OFFLOAD,
-#endif
 	SWCTRL_PS_DTIM_SKIP,
 	SWCTRL_ROAMING,
 	SWCTRL_CATA0_INDEX_NUM
@@ -128,10 +117,8 @@ enum {
 };
 #endif
 
-#if CFG_SUPPORT_802_11V
 #if WNM_UNIT_TEST
 enum { TEST_WNM_TIMING_MEAS, TEST_WNM_CATA0_INDEX_NUM };
-#endif
 #endif
 
 #define _SWCTRL_MAGIC 0x66201642
@@ -322,12 +309,6 @@ VOID swCtrlCmdCategory0(P_ADAPTER_T prAdapter, UINT_8 ucCate, UINT_8 ucAction, U
 			prAdapter->rQM.au4QmDebugCounters[ucOpt0] = g_au4SwCr[1];
 			break;
 #endif
-#if CFG_RX_PKTS_DUMP
-		case SWCTRL_RX_PKTS_DUMP:
-			/* DBGLOG(SW4, INFO,("SWCTRL_RX_PKTS_DUMP: mask %x\n", g_au4SwCr[1])); */
-			prAdapter->rRxCtrl.u4RxPktsDumpTypeMask = g_au4SwCr[1];
-			break;
-#endif
 		case SWCTRL_RX_FILTER: {
 			UINT_32		u4rxfilter;
 			BOOLEAN		fgUpdate = FALSE;
@@ -376,71 +357,6 @@ VOID swCtrlCmdCategory0(P_ADAPTER_T prAdapter, UINT_8 ucCate, UINT_8 ucAction, U
 			 */
 			/* g_u4RXFilter, ucOpt0, ucOpt1, fgUpdate, u4rxfilter, rStatus)); */
 		} break;
-
-#if CFG_INIT_ENABLE_PATTERN_FILTER_ARP
-		case SWCTRL_RX_ARP_OFFLOAD: {
-			WLAN_STATUS					 rStatus	  = WLAN_STATUS_FAILURE;
-			UINT_32						 u4SetInfoLen = 0;
-			UINT_32						 u4Len		  = OFFSET_OF(PARAM_NETWORK_ADDRESS_LIST, arAddress);
-			UINT_32						 u4NumIPv4 = 0, u4NumIPv6 = 0;
-			UINT_32						 i					= 0;
-			PUINT_8						 pucBufIpAddr		= NULL;
-			P_PARAM_NETWORK_ADDRESS_LIST prParamNetAddrList = NULL;
-			P_PARAM_NETWORK_ADDRESS_IP	 prParamIpAddr		= NULL;
-			PUINT_8						 pucIp				= NULL;
-			/* PUINT_8                         pucIpv6 = NULL; */
-			UINT_32 bufSize =
-					u4Len + (OFFSET_OF(PARAM_NETWORK_ADDRESS, aucAddress) + sizeof(PARAM_NETWORK_ADDRESS_IP)) * 3;
-			P_PARAM_NETWORK_ADDRESS prParamNetAddr = NULL;
-
-			/* <1> allocate IP address buffer */
-			pucBufIpAddr = kalMemAlloc(bufSize, VIR_MEM_TYPE);
-			pucIp		 = kalMemAlloc(3 * 4, VIR_MEM_TYPE); /* TODO: replace 3 to macro */
-
-			prParamNetAddrList = (P_PARAM_NETWORK_ADDRESS_LIST)pucBufIpAddr;
-			prParamNetAddr	   = prParamNetAddrList->arAddress;
-			/* <2> clear IP address buffer */
-			kalMemZero(pucBufIpAddr, bufSize);
-			kalMemZero(pucIp, 3 * 4);
-
-			/* <3> setup the number of IP address */
-			if (ucOpt1 == 1) {
-				if (wlanGetIPV4Address(prAdapter->prGlueInfo, pucIp, &u4NumIPv4) && u4NumIPv4 > 3) /* TODO: repleace 3
-																									to macro */
-					u4NumIPv4 = 3;
-			} else if (ucOpt1 == 0) {
-				u4NumIPv4 = u4NumIPv6 = 0;
-			}
-			DBGLOG(INIT, INFO, "u4Len:%d bufSize:%d u4NumIPv4:%d\n", u4Len, bufSize, u4NumIPv4);
-
-			prParamNetAddrList->u4AddressCount = u4NumIPv6 + u4NumIPv4;
-			prParamNetAddrList->u2AddressType  = PARAM_PROTOCOL_ID_TCP_IP;
-
-			for (i = 0; i < u4NumIPv4; i++) {
-				prParamNetAddr->u2AddressLength = sizeof(PARAM_NETWORK_ADDRESS_IP);
-				prParamNetAddr->u2AddressType	= PARAM_PROTOCOL_ID_TCP_IP;
-				prParamIpAddr					= (P_PARAM_NETWORK_ADDRESS_IP)prParamNetAddr->aucAddress;
-				kalMemCopy(&prParamIpAddr->in_addr, pucIp + (i * 4), 4);
-				prParamNetAddr = (P_PARAM_NETWORK_ADDRESS)((UINT_32)prParamNetAddr +
-														   OFFSET_OF(PARAM_NETWORK_ADDRESS, aucAddress) +
-														   sizeof(PARAM_NETWORK_ADDRESS_IP));
-				u4Len += OFFSET_OF(PARAM_NETWORK_ADDRESS, aucAddress) + sizeof(PARAM_NETWORK_ADDRESS_IP);
-			}
-
-			ASSERT(u4Len <= bufSize);
-
-			rStatus = wlanoidSetNetworkAddress(prAdapter, (PVOID)prParamNetAddrList, u4Len, &u4SetInfoLen);
-
-			if (rStatus != WLAN_STATUS_SUCCESS)
-				DBGLOG(INIT, INFO, "set HW packet filter fail 0x%1x\n", rStatus);
-
-			if (pucIp)
-				kalMemFree(pucIp, VIR_MEM_TYPE, 3 * 4); /* TODO: replace 3 to marco */
-			if (pucBufIpAddr)
-				kalMemFree(pucBufIpAddr, VIR_MEM_TYPE, bufSize);
-
-		} break;
-#endif
 		case SWCTRL_PS_DTIM_SKIP:
 			break;
 		case SWCTRL_ROAMING:
@@ -821,35 +737,6 @@ VOID testPsCmdCategory1(P_ADAPTER_T prAdapter, UINT_8 ucCate, UINT_8 ucAction, U
 
 #endif /* TEST_PS */
 
-#if CFG_SUPPORT_802_11V
-#if (CFG_SUPPORT_802_11V_TIMING_MEASUREMENT == 1) && (WNM_UNIT_TEST == 1)
-VOID testWNMCmdCategory0(P_ADAPTER_T prAdapter, UINT_8 ucCate, UINT_8 ucAction, UINT_8 ucOpt0, UINT_8 ucOpt1)
-{
-	UINT_8		   ucIndex, ucRead;
-	P_STA_RECORD_T prStaRec;
-
-	DEBUGFUNC("testWNMCmdCategory0");
-	SWCR_GET_RW_INDEX(ucAction, ucRead, ucIndex);
-
-	DBGLOG(SW4, INFO, "Read %u Index %u\n", ucRead, ucIndex);
-
-	if (ucIndex >= TEST_WNM_CATA0_INDEX_NUM)
-		return;
-
-	if (ucRead == SWCR_WRITE) {
-		switch (ucIndex) {
-		case TEST_WNM_TIMING_MEAS:
-			wnmTimingMeasUnitTest1(prAdapter, ucOpt0);
-			break;
-
-		default:
-			break;
-		}
-	}
-}
-#endif /* TEST_WNM */
-#endif /* CFG_SUPPORT_802_11V */
-
 VOID swCtrlSwCr(P_ADAPTER_T prAdapter, UINT_8 ucRead, UINT_16 u2Addr, UINT_32 *pu4Data)
 {
 	/* According other register STAIDX */
@@ -906,9 +793,6 @@ VOID swCrReadWriteCmd(P_ADAPTER_T prAdapter, UINT_8 ucRead, UINT_16 u2Addr, UINT
 VOID swCrFrameCheckEnable(P_ADAPTER_T prAdapter, UINT_32 u4DumpType)
 {
 	g_u4SwcrDebugFrameDumpType = u4DumpType;
-#if CFG_RX_PKTS_DUMP
-	prAdapter->rRxCtrl.u4RxPktsDumpTypeMask = u4DumpType;
-#endif
 }
 
 VOID swCrDebugInit(P_ADAPTER_T prAdapter)
@@ -1102,5 +986,3 @@ VOID swCrDebugQueryTimeout(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo)
 
 	swCrDebugCheck(prAdapter, NULL);
 }
-
-#endif /* CFG_SUPPORT_SWCR */

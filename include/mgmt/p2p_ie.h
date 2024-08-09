@@ -5,8 +5,6 @@
 #ifndef _P2P_IE_H
 #define _P2P_IE_H
 
-#if CFG_SUPPORT_WFD
-
 #define ELEM_MAX_LEN_WFD 62 /* TODO: Move to appropriate place */
 
 /*---------------- WFD Data Element Definitions ----------------*/
@@ -44,7 +42,6 @@ typedef struct _WFD_DEVICE_INFORMATION_IE_T {
 	UINT_16 u2WfdDevMaxSpeed;
 } __KAL_ATTRIB_PACKED__ WFD_DEVICE_INFORMATION_IE_T, *P_WFD_DEVICE_INFORMATION_IE_T;
 
-#endif
 
 UINT_32 p2pCalculate_IEForAssocReq(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex, IN P_STA_RECORD_T prStaRec);
 

@@ -29,114 +29,100 @@
  *                              C O N S T A N T S
  ********************************************************************************
  */
-/* These values must sync from Wifi HAL
- * /hardware/libhardware_legacy/include/hardware_legacy/wifi_hal.h
- */
-/* Basic infrastructure mode */
-//#define WIFI_FEATURE_INFRA              (0x0001)
-/* Support for 5 GHz Band */
-#define WIFI_FEATURE_INFRA_5G (0x0002)
-/* Support for GAS/ANQP */
-//#define WIFI_FEATURE_HOTSPOT            (0x0004)
-/* Wifi-Direct */
-#define WIFI_FEATURE_P2P (0x0008)
-/* Soft AP */
-#define WIFI_FEATURE_SOFT_AP (0x0010)
-/* Tunnel directed link setup */
-#define WIFI_FEATURE_TDLS (0x1000)
+
+#define WIFI_FEATURE_INFRA_5G 	(0x0002)
+#define WIFI_FEATURE_P2P 		(0x0008)
+#define WIFI_FEATURE_SOFT_AP 	(0x0010)
+#define WIFI_FEATURE_TDLS 		(0x1000)
 
 /* note: WIFI_FEATURE_GSCAN be enabled  just for ACTS test item: scanner  */
-#define WIFI_HAL_FEATURE_SET ((WIFI_FEATURE_P2P) | (WIFI_FEATURE_SOFT_AP))
+#define WIFI_HAL_FEATURE_SET 	((WIFI_FEATURE_P2P) | (WIFI_FEATURE_SOFT_AP))
 
-#define MAX_NUM_GROUP_ADDR 32 /* max number of group addresses */
-#define AUTO_RATE_NUM 8
-#define AR_RATE_TABLE_ENTRY_MAX 25
-#define AR_RATE_ENTRY_INDEX_NULL 0x80
+#define MAX_NUM_GROUP_ADDR 			32 /* max number of group addresses */
+#define AUTO_RATE_NUM 				8
+#define AR_RATE_TABLE_ENTRY_MAX 	25
+#define AR_RATE_ENTRY_INDEX_NULL 	0x80
 
-#define TX_CS_TCP_UDP_GEN BIT(1)
-#define TX_CS_IP_GEN BIT(0)
+#define TX_CS_TCP_UDP_GEN 	BIT(1)
+#define TX_CS_IP_GEN 		BIT(0)
 
-#define CSUM_OFFLOAD_EN_TX_TCP BIT(0)
-#define CSUM_OFFLOAD_EN_TX_UDP BIT(1)
-#define CSUM_OFFLOAD_EN_TX_IP BIT(2)
-#define CSUM_OFFLOAD_EN_RX_TCP BIT(3)
-#define CSUM_OFFLOAD_EN_RX_UDP BIT(4)
-#define CSUM_OFFLOAD_EN_RX_IPv4 BIT(5)
-#define CSUM_OFFLOAD_EN_RX_IPv6 BIT(6)
-#define CSUM_OFFLOAD_EN_TX_MASK BITS(0, 2)
-#define CSUM_OFFLOAD_EN_ALL BITS(0, 6)
+#define CSUM_OFFLOAD_EN_TX_TCP 		BIT(0)
+#define CSUM_OFFLOAD_EN_TX_UDP 		BIT(1)
+#define CSUM_OFFLOAD_EN_TX_IP 		BIT(2)
+#define CSUM_OFFLOAD_EN_RX_TCP 		BIT(3)
+#define CSUM_OFFLOAD_EN_RX_UDP 		BIT(4)
+#define CSUM_OFFLOAD_EN_RX_IPv4 	BIT(5)
+#define CSUM_OFFLOAD_EN_RX_IPv6 	BIT(6)
+#define CSUM_OFFLOAD_EN_TX_MASK 	BITS(0, 2)
+#define CSUM_OFFLOAD_EN_ALL 		BITS(0, 6)
 
 /* TCP, UDP, IP Checksum */
-#define RX_CS_TYPE_UDP BIT(7)
-#define RX_CS_TYPE_TCP BIT(6)
-#define RX_CS_TYPE_IPv6 BIT(5)
-#define RX_CS_TYPE_IPv4 BIT(4)
+#define RX_CS_TYPE_UDP 		BIT(7)
+#define RX_CS_TYPE_TCP 		BIT(6)
+#define RX_CS_TYPE_IPv6 	BIT(5)
+#define RX_CS_TYPE_IPv4 	BIT(4)
 
-#define RX_CS_STATUS_UDP BIT(3)
-#define RX_CS_STATUS_TCP BIT(2)
-#define RX_CS_STATUS_IP BIT(0)
+#define RX_CS_STATUS_UDP 	BIT(3)
+#define RX_CS_STATUS_TCP 	BIT(2)
+#define RX_CS_STATUS_IP 	BIT(0)
 
-#define CSUM_NOT_SUPPORTED 0x0
+#define CSUM_NOT_SUPPORTED 	0x0
 
-#define TXPWR_USE_PDSLOPE 0
+#define TXPWR_USE_PDSLOPE 	0
 
 /* NVRAM error code definitions */
-#define NVRAM_ERROR_VERSION_MISMATCH BIT(1)
-#define NVRAM_ERROR_INVALID_TXPWR BIT(2)
-#define NVRAM_ERROR_INVALID_DPD BIT(3)
-#define NVRAM_ERROR_INVALID_MAC_ADDR BIT(4)
-#if CFG_SUPPORT_PWR_LIMIT_COUNTRY
+#define NVRAM_ERROR_VERSION_MISMATCH 	BIT(1)
+#define NVRAM_ERROR_INVALID_TXPWR 		BIT(2)
+#define NVRAM_ERROR_INVALID_DPD 		BIT(3)
+#define NVRAM_ERROR_INVALID_MAC_ADDR	BIT(4)
 #define NVRAM_POWER_LIMIT_TABLE_INVALID BIT(5)
-#endif
 
-#define NUM_TC_RESOURCE_TO_STATISTICS 4
+#define NUM_TC_RESOURCE_TO_STATISTICS 	4
 
-#define WLAN_CFG_ARGV_MAX 23
-#define WLAN_CFG_ARGV_MAX_LONG 22  /* for WOW, 2+20 */
-#define WLAN_CFG_ENTRY_NUM_MAX 200 /* 128 */
-#define WLAN_CFG_KEY_LEN_MAX 32	   /* include \x00  EOL */
-#define WLAN_CFG_VALUE_LEN_MAX 32  /* include \x00 EOL */
-#define WLAN_CFG_FLAG_SKIP_CB BIT(0)
-#define WLAN_CFG_FILE_BUF_SIZE 2048
+#define WLAN_CFG_ARGV_MAX 			23
+#define WLAN_CFG_ARGV_MAX_LONG 		22  /* for WOW, 2+20 */
+#define WLAN_CFG_ENTRY_NUM_MAX 		200 /* 128 */
+#define WLAN_CFG_KEY_LEN_MAX 		32	/* include \x00  EOL */
+#define WLAN_CFG_VALUE_LEN_MAX 		32  /* include \x00 EOL */
+#define WLAN_CFG_FLAG_SKIP_CB 		BIT(0)
+#define WLAN_CFG_FILE_BUF_SIZE 		2048
 
-#define WLAN_CFG_REC_ENTRY_NUM_MAX 200
-#define WLAN_CFG_REC_FLAG_BIT BIT(0)
+#define WLAN_CFG_REC_ENTRY_NUM_MAX	200
+#define WLAN_CFG_REC_FLAG_BIT 		BIT(0)
 
-#define WLAN_CFG_SET_CHIP_LEN_MAX 10
-#define WLAN_CFG_SET_DEBUG_LEVEL_LEN_MAX 10
-#define WLAN_CFG_SET_SW_CTRL_LEN_MAX 10
+#define WLAN_CFG_SET_CHIP_LEN_MAX 			10
+#define WLAN_CFG_SET_DEBUG_LEVEL_LEN_MAX 	10
+#define WLAN_CFG_SET_SW_CTRL_LEN_MAX 		10
 
-#define WLAN_OID_TIMEOUT_THRESHOLD 2000				/* OID timeout (in ms) */
-#define WLAN_OID_TIMEOUT_THRESHOLD_MAX 10000		/* OID max timeout (in ms) */
-#define WLAN_OID_TIMEOUT_THRESHOLD_IN_RESETTING 300 /* OID timeout during chip-resetting  (in ms) */
+#define WLAN_OID_TIMEOUT_THRESHOLD				2000	/* OID timeout (in ms) */
+#define WLAN_OID_TIMEOUT_THRESHOLD_MAX 			10000	/* OID max timeout (in ms) */
+#define WLAN_OID_TIMEOUT_THRESHOLD_IN_RESETTING 300		/* OID timeout during chip-resetting  (in ms) */
 
-#define WLAN_OID_NO_ACK_THRESHOLD 3
+#define WLAN_OID_NO_ACK_THRESHOLD 	3
 
-#define WLAN_THREAD_TASK_PRIORITY 0 /* If not setting the priority, 0 is the default */
-#define WLAN_THREAD_TASK_NICE (-10) /* If not setting the nice, -10 is the default */
+#define WLAN_THREAD_TASK_PRIORITY 	0	  /* If not setting the priority, 0 is the default */
+#define WLAN_THREAD_TASK_NICE 		(-10) /* If not setting the nice, -10 is the default */
 
-#define WLAN_TX_STATS_LOG_TIMEOUT 30000
-#define WLAN_TX_STATS_LOG_DURATION 1500
+#define WLAN_TX_STATS_LOG_TIMEOUT 	30000
+#define WLAN_TX_STATS_LOG_DURATION 	1500
 
 /* Define for wifi path usage */
-#define WLAN_FLAG_2G4_WF0 BIT(0)		   /*1: support, 0: NOT support */
-#define WLAN_FLAG_5G_WF0 BIT(1)			   /*1: support, 0: NOT support */
-#define WLAN_FLAG_2G4_WF1 BIT(2)		   /*1: support, 0: NOT support */
-#define WLAN_FLAG_5G_WF1 BIT(3)			   /*1: support, 0: NOT support */
+#define WLAN_FLAG_2G4_WF0 			BIT(0) /*1: support, 0: NOT support */
+#define WLAN_FLAG_5G_WF0 			BIT(1) /*1: support, 0: NOT support */
+#define WLAN_FLAG_2G4_WF1 			BIT(2) /*1: support, 0: NOT support */
+#define WLAN_FLAG_5G_WF1 			BIT(3) /*1: support, 0: NOT support */
 #define WLAN_FLAG_2G4_COANT_SUPPORT BIT(4) /*1: support, 0: NOT support */
-#define WLAN_FLAG_2G4_COANT_PATH BIT(5)	   /*1: WF1, 0:WF0 */
-#define WLAN_FLAG_5G_COANT_SUPPORT BIT(6)  /*1: support, 0: NOT support */
-#define WLAN_FLAG_5G_COANT_PATH BIT(7)	   /*1: WF1, 0:WF0 */
+#define WLAN_FLAG_2G4_COANT_PATH 	BIT(5) /*1: WF1, 0:WF0 */
+#define WLAN_FLAG_5G_COANT_SUPPORT 	BIT(6) /*1: support, 0: NOT support */
+#define WLAN_FLAG_5G_COANT_PATH 	BIT(7) /*1: WF1, 0:WF0 */
 
-#if CFG_SUPPORT_EASY_DEBUG
-
-#define MAX_CMD_ITEM_MAX 4			/* Max item per cmd. */
-#define MAX_CMD_NAME_MAX_LENGTH 32	/* Max name string length */
-#define MAX_CMD_VALUE_MAX_LENGTH 32 /* Max value string length */
-#define MAX_CMD_TYPE_LENGTH 1
-#define MAX_CMD_STRING_LENGTH 1
-#define MAX_CMD_VALUE_LENGTH 1
-#define MAX_CMD_RESERVE_LENGTH 1
+#define MAX_CMD_ITEM_MAX 			4 /* Max item per cmd. */
+#define MAX_CMD_NAME_MAX_LENGTH 	32 /* Max name string length */
+#define MAX_CMD_VALUE_MAX_LENGTH 	32 /* Max value string length */
+#define MAX_CMD_TYPE_LENGTH 		1
+#define MAX_CMD_STRING_LENGTH 		1
+#define MAX_CMD_VALUE_LENGTH 		1
+#define MAX_CMD_RESERVE_LENGTH 		1
 
 #define CMD_FORMAT_V1_LENGTH \
 	(MAX_CMD_NAME_MAX_LENGTH + MAX_CMD_VALUE_MAX_LENGTH + MAX_CMD_TYPE_LENGTH + MAX_CMD_STRING_LENGTH + \
@@ -144,26 +130,20 @@
 
 #define MAX_CMD_BUFFER_LENGTH (CMD_FORMAT_V1_LENGTH * MAX_CMD_ITEM_MAX)
 
-#define ED_STRING_SITE 0
-#define ED_VALUE_SITE 1
+#define ED_STRING_SITE 	0
+#define ED_VALUE_SITE 	1
 
-#if CFG_AUTO_CHANNEL_SEL_SUPPORT
-#define ACS_AP_RSSI_LEVEL_HIGH -50
-#define ACS_AP_RSSI_LEVEL_LOW -80
-#define ACS_DIRTINESS_LEVEL_HIGH 52
-#define ACS_DIRTINESS_LEVEL_MID 40
-#define ACS_DIRTINESS_LEVEL_LOW 32
-#endif
+#define ACS_AP_RSSI_LEVEL_HIGH 		-50
+#define ACS_AP_RSSI_LEVEL_LOW 		-80
+#define ACS_DIRTINESS_LEVEL_HIGH 	52
+#define ACS_DIRTINESS_LEVEL_MID 	40
+#define ACS_DIRTINESS_LEVEL_LOW 	32
 
-#if CFG_WOW_SUPPORT
-#define INVALID_WOW_WAKE_UP_REASON 255
-#endif
+#define INVALID_WOW_WAKE_UP_REASON 	255
 
-#if CFG_SUPPORT_ADVANCE_CONTROL
-#define KEEP_FULL_PWR_TRAFFIC_REPORT_BIT BIT(0)
-#define KEEP_FULL_PWR_NOISE_HISTOGRAM_BIT BIT(1)
-#define BLOCK_KEEP_FULL_PWR BIT(31)
-#endif
+#define KEEP_FULL_PWR_TRAFFIC_REPORT_BIT 	BIT(0)
+#define KEEP_FULL_PWR_NOISE_HISTOGRAM_BIT 	BIT(1)
+#define BLOCK_KEEP_FULL_PWR 				BIT(31)
 
 typedef enum _CMD_VER_T {
 	CMD_VER_1, /* Type[2]+String[32]+Value[32] */
@@ -243,8 +223,6 @@ typedef struct _CFG_SETTING_T {
 	UINT_8	TestStr[80];
 
 } CFG_SETTING_T, *P_CFG_SETTING_T;
-
-#endif
 
 /*******************************************************************************
  *                             D A T A   T Y P E S
@@ -410,8 +388,6 @@ typedef struct _SET_TXPWR_CTRL_T {
 	INT_8 acReserved2[2];	  /* Must be zero */
 } SET_TXPWR_CTRL_T, *P_SET_TXPWR_CTRL_T;
 
-#if CFG_WOW_SUPPORT
-
 typedef struct _WOW_WAKE_HIF_T {
 	UINT_8	ucWakeupHif;	/* use in-band signal to wakeup system, ENUM_HIF_TYPE */
 	UINT_8	ucGpioPin;		/* GPIO Pin */
@@ -441,7 +417,6 @@ typedef struct _WOW_CTRL_T {
 	UINT_8		   ucReason;
 } WOW_CTRL_T, *P_WOW_CTRL_T;
 
-#endif
 
 typedef enum _ENUM_NVRAM_MTK_FEATURE_T {
 	MTK_FEATURE_2G_256QAM_DISABLED = 0,
@@ -548,39 +523,13 @@ typedef struct _tailer_format_tag {
 	UINT_8	ram_version[10];
 	UINT_8	ram_built_date[15];
 	UINT_32 len;
-
 } tailer_format_t;
 
 typedef struct _fw_image_tailer_tag {
 	tailer_format_t ilm_info;
 	tailer_format_t dlm_info;
 } fw_image_tailer_t;
-#if CFG_SUPPORT_COMPRESSION_FW_OPTION
-typedef struct _tailer_format_tag_2 {
-	UINT_32 crc;
-	UINT_32 addr;
-	UINT_32 block_size;
-	UINT_32 real_size;
-	UINT_8	chip_info;
-	UINT_8	feature_set;
-	UINT_8	eco_code;
-	UINT_8	ram_version[10];
-	UINT_8	ram_built_date[15];
-	UINT_32 len;
-} tailer_format_t_2;
-typedef struct _fw_image_tailer_tag_2 {
-	tailer_format_t_2 ilm_info;
-	tailer_format_t_2 dlm_info;
-} fw_image_tailer_t_2;
-typedef struct _fw_image_tailer_check {
-	UINT_8	chip_info;
-	UINT_8	feature_set;
-	UINT_8	eco_code;
-	UINT_8	ram_version[10];
-	UINT_8	ram_built_date[15];
-	UINT_32 len;
-} fw_image_tailer_check;
-#endif
+
 typedef struct _PATCH_FORMAT_T {
 	UINT_8	aucBuildDate[16];
 	UINT_8	aucPlatform[4];
@@ -947,17 +896,10 @@ VOID wlanRxSetBroadcast(IN P_ADAPTER_T prAdapter, IN BOOLEAN fgEnableBroadcast);
 BOOLEAN wlanIsHandlerNeedHwAccess(IN PFN_OID_HANDLER_FUNC pfnOidHandler, IN BOOLEAN fgSetInfo);
 
 VOID wlanSetPromiscuousMode(IN P_ADAPTER_T prAdapter, IN BOOLEAN fgEnablePromiscuousMode);
-#if CFG_SUPPORT_COMPRESSION_FW_OPTION
-WLAN_STATUS wlanImageSectionDownloadStage(IN P_ADAPTER_T prAdapter, IN PVOID pvFwImageMapFile,
-		IN UINT_32 u4FwImageFileLength, UINT_8 ucSectionNumber, IN ENUM_IMG_DL_IDX_T eDlIdx, OUT PUINT_8 ucIsCompressed,
-		OUT P_INIT_CMD_WIFI_DECOMPRESSION_START prFwImageInFo);
-#else
+
 WLAN_STATUS wlanImageSectionDownloadStage(IN P_ADAPTER_T prAdapter, IN PVOID pvFwImageMapFile,
 		IN UINT_32 u4FwImageFileLength, UINT_8 ucSectionNumber, IN ENUM_IMG_DL_IDX_T eDlIdx);
 
-#endif
-
-#if CFG_ENABLE_FW_DOWNLOAD
 WLAN_STATUS wlanImageSectionConfig(IN P_ADAPTER_T prAdapter, IN UINT_32 u4DestAddr, IN UINT_32 u4ImgSecSize,
 		IN UINT_32 u4DataMode, IN ENUM_IMG_DL_IDX_T eDlIdx);
 
@@ -972,7 +914,6 @@ WLAN_STATUS wlanConfigWifiFunc(
 		IN P_ADAPTER_T prAdapter, IN BOOLEAN fgEnable, IN UINT_32 u4StartAddress, IN UINT_8 ucPDA);
 
 UINT_32 wlanCRC32(PUINT_8 buf, UINT_32 len);
-#endif
 
 WLAN_STATUS wlanSendDummyCmd(IN P_ADAPTER_T prAdapter, IN BOOLEAN fgIsReqTxRsrc);
 
@@ -1012,12 +953,6 @@ VOID wlanSecurityFrameTxTimeout(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdI
 VOID wlanClearScanningResult(IN P_ADAPTER_T prAdapter);
 
 VOID wlanClearBssInScanningResult(IN P_ADAPTER_T prAdapter, IN PUINT_8 arBSSID);
-
-#if CFG_TEST_WIFI_DIRECT_GO
-VOID wlanEnableP2pFunction(IN P_ADAPTER_T prAdapter);
-
-VOID wlanEnableATGO(IN P_ADAPTER_T prAdapter);
-#endif
 
 /*----------------------------------------------------------------------------*/
 /* NIC Capability Retrieve by Polling                                         */
@@ -1172,14 +1107,9 @@ WLAN_STATUS wlanCfgSet(IN P_ADAPTER_T prAdapter, const PCHAR pucKey, PCHAR pucVa
 WLAN_STATUS
 wlanCfgSetCb(IN P_ADAPTER_T prAdapter, const PCHAR pucKey, WLAN_CFG_SET_CB pfSetCb, void *pPrivate, UINT_32 u4Flags);
 
-#if CFG_SUPPORT_EASY_DEBUG
-
 WLAN_STATUS wlanCfgParse(IN P_ADAPTER_T prAdapter, PUINT_8 pucConfigBuf, UINT_32 u4ConfigBufLen, BOOLEAN isFwConfig);
 VOID		wlanFeatureToFw(IN P_ADAPTER_T prAdapter);
-#if CFG_SUPPORT_SEND_ONLY_ONE_CFG
 WLAN_STATUS wlanFeatureToFwOnlyOneCfg(IN P_ADAPTER_T prAdapter, const PCHAR pucKey, PCHAR pucValue);
-#endif
-#endif
 
 VOID wlanLoadDefaultCustomerSetting(IN P_ADAPTER_T prAdapter);
 
@@ -1187,9 +1117,7 @@ WLAN_STATUS wlanCfgInit(IN P_ADAPTER_T prAdapter, PUINT_8 pucConfigBuf, UINT_32 
 
 WLAN_STATUS wlanCfgParseArgument(CHAR *cmdLine, INT_32 *argc, CHAR *argv[]);
 
-#if CFG_WOW_SUPPORT
 WLAN_STATUS wlanCfgParseArgumentLong(CHAR *cmdLine, INT_32 *argc, CHAR *argv[]);
-#endif
 
 INT_32 wlanHexToNum(CHAR c);
 INT_32 wlanHexToByte(PCHAR hex);
@@ -1207,13 +1135,12 @@ VOID wlanChipRstPreAct(IN P_ADAPTER_T prAdapter);
 VOID wlanTxProfilingTagPacket(IN P_ADAPTER_T prAdapter, IN P_NATIVE_PACKET prPacket, IN ENUM_TX_PROFILING_TAG_T eTag);
 
 VOID wlanTxProfilingTagMsdu(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo, IN ENUM_TX_PROFILING_TAG_T eTag);
-#if CFG_ASSERT_DUMP
+
 VOID wlanCorDumpTimerReset(IN P_ADAPTER_T prAdapter, BOOLEAN fgIsResetN9);
 
 VOID wlanN9CorDumpTimeOut(IN P_ADAPTER_T prAdapter, IN ULONG ulParamPtr);
 
 VOID wlanCr4CorDumpTimeOut(IN P_ADAPTER_T prAdapter, IN ULONG ulParamPtr);
-#endif
 #endif /* _WLAN_LIB_H */
 
 BOOL wlanGetWlanIdxByAddress(IN P_ADAPTER_T prAdapter, IN PUINT_8 pucAddr, OUT PUINT_8 pucIndex);
@@ -1258,10 +1185,6 @@ WLAN_STATUS wlanAccessRegisterStatus(
 
 WLAN_STATUS wlanSetChipEcoInfo(IN P_ADAPTER_T prAdapter);
 
-#if CFG_STR_DHCP_RENEW_OFFLOAD
-VOID wlanSetDhcpOffloadInfo(P_GLUE_INFO_T prGlueInfo, struct net_device *prDev, BOOLEAN fgSuspend);
-#endif
-
 VOID wlanNotifyFwSuspend(P_GLUE_INFO_T prGlueInfo, struct net_device *prDev, BOOLEAN fgSuspend);
 
 VOID wlanClearPendingInterrupt(IN P_ADAPTER_T prAdapter);
@@ -1275,13 +1198,9 @@ UINT_8 wlanGetSupportNss(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex);
 INT_32 wlanGetFileContent(P_ADAPTER_T prAdapter, const PUINT_8 pcFileName, PUINT_8 pucBuf, UINT_32 u4MaxFileLen,
 		PUINT_32 pu4ReadFileLen, BOOL bReqFw);
 
-#if CFG_SUPPORT_ANT_SELECT
 WLAN_STATUS wlanUpdateExtInfo(IN P_ADAPTER_T prAdapter);
-#endif
 
-#if CFG_SUPPORT_RSSI_COMP
 WLAN_STATUS wlanUpdateRssiComp(IN P_ADAPTER_T prAdapter);
-#endif
 
 WLAN_STATUS wlanSetEd(IN P_ADAPTER_T prAdapter, INT_32 u4EdVal2G, INT_32 u4EdVal5G, UINT_32 u4Sel);
 int			wlanSuspendRekeyOffload(P_GLUE_INFO_T prGlueInfo, IN UINT_8 ucRekeyMode);

@@ -107,9 +107,7 @@ BOOLEAN kalP2PGetTkipCipher(IN P_GLUE_INFO_T prGlueInfo, IN UINT_8 ucRoleIdx);
 
 BOOLEAN kalP2PGetCcmpCipher(IN P_GLUE_INFO_T prGlueInfo, IN UINT_8 ucRoleIdx);
 
-#if CFG_SUPPORT_SUITB
 BOOLEAN kalP2PGetGcmp256Cipher(IN P_GLUE_INFO_T prGlueInfo, IN UINT_8 ucRoleIdx);
-#endif
 
 VOID kalP2PSetWscMode(IN P_GLUE_INFO_T prGlueInfo, IN UINT_8 ucWscMode);
 
@@ -138,9 +136,7 @@ struct net_device *kalP2PGetDevHdlr(P_GLUE_INFO_T prGlueInfo);
 VOID kalGetChnlList(IN P_GLUE_INFO_T prGlueInfo, IN ENUM_BAND_T eSpecificBand, IN UINT_8 ucMaxChannelNum,
 		IN PUINT_8 pucNumOfChannel, IN P_RF_CHANNEL_INFO_T paucChannelList);
 
-#if CFG_SUPPORT_ANTI_PIRACY
 VOID kalP2PIndicateSecCheckRsp(IN P_GLUE_INFO_T prGlueInfo, IN PUINT_8 pucRsp, IN UINT_16 u2RspLen);
-#endif
 
 /*******************************************************************************
  *                              F U N C T I O N S
@@ -170,13 +166,9 @@ VOID kalP2PGCIndicateConnectionStatus(IN P_GLUE_INFO_T prGlueInfo, IN UINT_8 ucR
 VOID kalP2PGOStationUpdate(
 		IN P_GLUE_INFO_T prGlueInfo, IN UINT_8 ucRoleIndex, IN P_STA_RECORD_T prCliStaRec, IN BOOLEAN fgIsNew);
 
-#if (CFG_SUPPORT_DFS_MASTER == 1)
 VOID kalP2PRddDetectUpdate(IN P_GLUE_INFO_T prGlueInfo, IN UINT_8 ucRoleIndex);
 
 VOID kalP2PCacFinishedUpdate(IN P_GLUE_INFO_T prGlueInfo, IN UINT_8 ucRoleIndex);
-#endif
-
-#if CFG_SUPPORT_HOTSPOT_WPS_MANAGER
 
 BOOLEAN kalP2PSetBlackList(
 		IN P_GLUE_INFO_T prGlueInfo, IN PARAM_MAC_ADDRESS rbssid, IN BOOLEAN fgIsblock, IN UINT_8 ucRoleIndex);
@@ -186,7 +178,5 @@ BOOLEAN kalP2PCmpBlackList(IN P_GLUE_INFO_T prGlueInfo, IN PARAM_MAC_ADDRESS rbs
 VOID kalP2PSetMaxClients(IN P_GLUE_INFO_T prGlueInfo, IN UINT_32 u4MaxClient, IN UINT_8 ucRoleIndex);
 
 BOOLEAN kalP2PMaxClients(IN P_GLUE_INFO_T prGlueInfo, IN UINT_32 u4NumClient, IN UINT_8 ucRoleIndex);
-
-#endif
 
 #endif /* _GL_P2P_KAL_H */

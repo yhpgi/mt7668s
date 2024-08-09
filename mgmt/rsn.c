@@ -682,12 +682,8 @@ BOOLEAN rsnSearchAKMSuite(IN P_ADAPTER_T prAdapter, IN UINT_32 u4AkmSuite, OUT P
 /*----------------------------------------------------------------------------*/
 BOOLEAN rsnPerformPolicySelection(IN P_ADAPTER_T prAdapter, IN P_BSS_DESC_T prBss)
 {
-#if CFG_SUPPORT_802_11W
-	INT_32	i;
-	UINT_32 j;
-#else
-	UINT_32 i, j;
-#endif
+	INT_32		 i;
+	UINT_32		 j;
 	BOOLEAN		 fgSuiteSupported;
 	UINT_32		 u4PairwiseCipher = 0;
 	UINT_32		 u4GroupCipher	  = 0;
@@ -711,7 +707,6 @@ BOOLEAN rsnPerformPolicySelection(IN P_ADAPTER_T prAdapter, IN P_BSS_DESC_T prBs
 
 	prAdapter->rWifiVar.rAisSpecificBssInfo.fgMgmtProtection = FALSE;
 
-#if CFG_SUPPORT_WPS
 	fgIsWpsActive = kalWSCGetActiveState(prAdapter->prGlueInfo);
 
 	/* CR1640, disable the AP select privacy check */
@@ -720,7 +715,6 @@ BOOLEAN rsnPerformPolicySelection(IN P_ADAPTER_T prAdapter, IN P_BSS_DESC_T prBs
 		DBGLOG(RSN, INFO, "-- Skip the Protected BSS check\n");
 		return TRUE;
 	}
-#endif
 
 	/* Protection is not required in this BSS. */
 	if ((prBss->u2CapInfo & CAP_INFO_PRIVACY) == 0) {
@@ -750,12 +744,8 @@ BOOLEAN rsnPerformPolicySelection(IN P_ADAPTER_T prAdapter, IN P_BSS_DESC_T prBs
 			return FALSE;
 		}
 	} else if (prAdapter->rWifiVar.rConnSettings.eAuthMode == AUTH_MODE_WPA2 ||
-			   prAdapter->rWifiVar.rConnSettings.eAuthMode == AUTH_MODE_WPA2_PSK
-#if CFG_SUPPORT_SAE
-			   || prAdapter->rWifiVar.rConnSettings.eAuthMode == AUTH_MODE_WPA2_SAE
-#endif
-	) {
-
+			   prAdapter->rWifiVar.rConnSettings.eAuthMode == AUTH_MODE_WPA2_PSK ||
+			   prAdapter->rWifiVar.rConnSettings.eAuthMode == AUTH_MODE_WPA2_SAE) {
 		if (prBss->fgIERSN) {
 			prBssRsnInfo = &prBss->rRSNInfo;
 		} else {
@@ -786,12 +776,10 @@ BOOLEAN rsnPerformPolicySelection(IN P_ADAPTER_T prAdapter, IN P_BSS_DESC_T prBs
 		fgSuiteSupported = FALSE;
 
 		switch (prBssRsnInfo->u4GroupKeyCipherSuite) {
-#if CFG_SUPPORT_SUITB
 		case RSN_CIPHER_SUITE_GCMP_256:
 			if (prAdapter->rWifiVar.rConnSettings.eEncStatus == ENUM_ENCRYPTION4_ENABLED)
 				fgSuiteSupported = TRUE;
 			break;
-#endif
 		case WPA_CIPHER_SUITE_CCMP:
 		case RSN_CIPHER_SUITE_CCMP:
 			if (prAdapter->rWifiVar.rConnSettings.eEncStatus == ENUM_ENCRYPTION3_ENABLED)
@@ -828,7 +816,6 @@ BOOLEAN rsnPerformPolicySelection(IN P_ADAPTER_T prAdapter, IN P_BSS_DESC_T prBs
 				prBssRsnInfo->u4PairwiseKeyCipherSuiteCount, prBssRsnInfo->au4PairwiseKeyCipherSuite[0]);
 		/* Select pairwise/group ciphers */
 		switch (prAdapter->rWifiVar.rConnSettings.eEncStatus) {
-#if CFG_SUPPORT_SUITB
 		case ENUM_ENCRYPTION4_ENABLED:
 			for (i = 0; i < prBssRsnInfo->u4PairwiseKeyCipherSuiteCount; i++) {
 				/* TODO: WTBL cipher filed cannot 1-1 mapping
@@ -839,7 +826,6 @@ BOOLEAN rsnPerformPolicySelection(IN P_ADAPTER_T prAdapter, IN P_BSS_DESC_T prBs
 			}
 			u4GroupCipher = prBssRsnInfo->u4GroupKeyCipherSuite;
 			break;
-#endif
 		case ENUM_ENCRYPTION3_ENABLED:
 			for (i = 0; i < prBssRsnInfo->u4PairwiseKeyCipherSuiteCount; i++) {
 				if (GET_SELECTOR_TYPE(prBssRsnInfo->au4PairwiseKeyCipherSuite[i]) == CIPHER_SUITE_CCMP) {
@@ -889,7 +875,7 @@ BOOLEAN rsnPerformPolicySelection(IN P_ADAPTER_T prAdapter, IN P_BSS_DESC_T prBs
 				u4GroupCipher);
 		return FALSE;
 	}
-#if CFG_ENABLE_WIFI_DIRECT
+
 	if ((prAdapter->fgIsP2PRegistered) &&
 			(GET_BSS_INFO_BY_INDEX(prAdapter, ucBssIndex)->eNetworkType == NETWORK_TYPE_P2P)) {
 		if (u4PairwiseCipher != RSN_CIPHER_SUITE_CCMP || u4GroupCipher != RSN_CIPHER_SUITE_CCMP ||
@@ -899,7 +885,6 @@ BOOLEAN rsnPerformPolicySelection(IN P_ADAPTER_T prAdapter, IN P_BSS_DESC_T prBs
 			return FALSE;
 		}
 	}
-#endif
 
 	/* Verify if selected pairwisse cipher is supported */
 	fgSuiteSupported = rsnSearchSupportedCipher(prAdapter, u4PairwiseCipher, &i);
@@ -919,12 +904,8 @@ BOOLEAN rsnPerformPolicySelection(IN P_ADAPTER_T prAdapter, IN P_BSS_DESC_T prBs
 	 *  the given BSS, we fail to perform RSNA policy selection.
 	 */
 	/* Attempt to find any overlapping supported AKM suite. */
-#if CFG_SUPPORT_802_11W
 	if (i != 0)
 		for (i = (prBssRsnInfo->u4AuthKeyMgtSuiteCount - 1); i >= 0; i--) {
-#else
-	for (i = 0; i < prBssRsnInfo->u4AuthKeyMgtSuiteCount; i++) {
-#endif
 			if (rsnSearchAKMSuite(prAdapter, prBssRsnInfo->au4AuthKeyMgtSuite[i], &j)) {
 				u4AkmSuite = prBssRsnInfo->au4AuthKeyMgtSuite[i];
 				break;
@@ -946,7 +927,6 @@ BOOLEAN rsnPerformPolicySelection(IN P_ADAPTER_T prAdapter, IN P_BSS_DESC_T prBs
 			(UINT_8)((u4AkmSuite >> 8) & 0x000000FF), (UINT_8)((u4AkmSuite >> 16) & 0x000000FF),
 			(UINT_8)((u4AkmSuite >> 24) & 0x000000FF));
 
-#if CFG_SUPPORT_802_11W
 	DBGLOG(RSN, TRACE, "[MFP] MFP setting = %lu\n ", kalGetMfpSetting(prAdapter->prGlueInfo));
 
 	if (kalGetMfpSetting(prAdapter->prGlueInfo) == RSN_AUTH_MFP_REQUIRED) {
@@ -973,14 +953,10 @@ BOOLEAN rsnPerformPolicySelection(IN P_ADAPTER_T prAdapter, IN P_BSS_DESC_T prBs
 	prAdapter->rWifiVar.rAisSpecificBssInfo.fgAPApplyPmfReq = FALSE;
 	if (prBssRsnInfo->fgRsnCapPresent && (prBssRsnInfo->u2RsnCap & ELEM_WPA_CAP_MFPR))
 		prAdapter->rWifiVar.rAisSpecificBssInfo.fgAPApplyPmfReq = TRUE;
-#endif
-
 	if (GET_SELECTOR_TYPE(u4GroupCipher) == CIPHER_SUITE_CCMP) {
 		prBss->ucEncLevel = 3;
-#if CFG_SUPPORT_SUITB
 	} else if (u4GroupCipher == RSN_CIPHER_SUITE_GCMP_256) {
 		prBss->ucEncLevel = 4;
-#endif
 	} else if (GET_SELECTOR_TYPE(u4GroupCipher) == CIPHER_SUITE_TKIP) {
 		prBss->ucEncLevel = 2;
 	} else if (GET_SELECTOR_TYPE(u4GroupCipher) == CIPHER_SUITE_WEP40 ||
@@ -1146,21 +1122,12 @@ VOID rsnGenerateWPAIE(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo)
 	prBssInfo			 = prAdapter->aprBssInfo[ucBssIndex];
 	prP2pSpecificBssInfo = prAdapter->rWifiVar.prP2pSpecificBssInfo[prBssInfo->u4PrivateData];
 
-	/* if (eNetworkId != NETWORK_TYPE_AIS_INDEX) */
-	/* return; */
-
-#if CFG_ENABLE_WIFI_DIRECT
 	if ((prAdapter->fgIsP2PRegistered &&
 				GET_BSS_INFO_BY_INDEX(prAdapter, ucBssIndex)->eNetworkType == NETWORK_TYPE_P2P &&
 				kalP2PGetTkipCipher(prAdapter->prGlueInfo, (UINT_8)prBssInfo->u4PrivateData)) ||
 			(GET_BSS_INFO_BY_INDEX(prAdapter, ucBssIndex)->eNetworkType == NETWORK_TYPE_AIS &&
 					(prAdapter->rWifiVar.rConnSettings.eAuthMode == AUTH_MODE_WPA ||
 							prAdapter->rWifiVar.rConnSettings.eAuthMode == AUTH_MODE_WPA_PSK))) {
-#else
-	if (GET_BSS_INFO_BY_INDEX(prAdapter, ucBssIndex)->eNetworkType == NETWORK_TYPE_AIS &&
-			(prAdapter->rWifiVar.rConnSettings.eAuthMode == AUTH_MODE_WPA ||
-					prAdapter->rWifiVar.rConnSettings.eAuthMode == AUTH_MODE_WPA_PSK)) {
-#endif
 		if (prAdapter->fgIsP2PRegistered && prP2pSpecificBssInfo && (prP2pSpecificBssInfo->u2WpaIeLen != 0)) {
 			kalMemCopy(pucBuffer, prP2pSpecificBssInfo->aucWpaIeBuffer, prP2pSpecificBssInfo->u2WpaIeLen);
 			prMsduInfo->u2FrameLength += prP2pSpecificBssInfo->u2WpaIeLen;
@@ -1175,35 +1142,34 @@ VOID rsnGenerateWPAIE(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo)
 		WPA_IE(pucBuffer)->ucOuiType = VENDOR_OUI_TYPE_WPA;
 		WLAN_SET_FIELD_16(&WPA_IE(pucBuffer)->u2Version, 1);
 
-#if CFG_ENABLE_WIFI_DIRECT
 		if (prAdapter->fgIsP2PRegistered &&
 				GET_BSS_INFO_BY_INDEX(prAdapter, ucBssIndex)->eNetworkType == NETWORK_TYPE_P2P) {
 			WLAN_SET_FIELD_32(&WPA_IE(pucBuffer)->u4GroupKeyCipherSuite, WPA_CIPHER_SUITE_TKIP);
 		} else
-#endif
+
 			WLAN_SET_FIELD_32(
 					&WPA_IE(pucBuffer)->u4GroupKeyCipherSuite, prAdapter->prAisBssInfo->u4RsnSelectedGroupCipher);
 
 		cp = (PUCHAR)&WPA_IE(pucBuffer)->aucPairwiseKeyCipherSuite1[0];
 
 		WLAN_SET_FIELD_16(&WPA_IE(pucBuffer)->u2PairwiseKeyCipherSuiteCount, 1);
-#if CFG_ENABLE_WIFI_DIRECT
+
 		if (prAdapter->fgIsP2PRegistered &&
 				GET_BSS_INFO_BY_INDEX(prAdapter, ucBssIndex)->eNetworkType == NETWORK_TYPE_P2P) {
 			WLAN_SET_FIELD_32(cp, WPA_CIPHER_SUITE_TKIP);
 		} else
-#endif
+
 			WLAN_SET_FIELD_32(cp, prAdapter->prAisBssInfo->u4RsnSelectedPairwiseCipher);
 		cp += 4;
 
 		WLAN_SET_FIELD_16(cp, 1);
 		cp += 2;
-#if CFG_ENABLE_WIFI_DIRECT
+
 		if (prAdapter->fgIsP2PRegistered &&
 				GET_BSS_INFO_BY_INDEX(prAdapter, ucBssIndex)->eNetworkType == NETWORK_TYPE_P2P) {
 			WLAN_SET_FIELD_32(cp, WPA_AKM_SUITE_PSK);
 		} else
-#endif
+
 			WLAN_SET_FIELD_32(cp, prAdapter->prAisBssInfo->u4RsnSelectedAKMSuite);
 		cp += 4;
 
@@ -1395,7 +1361,6 @@ rsnParseCheckForWFAInfoElem(
 
 } /* end of rsnParseCheckForWFAInfoElem() */
 
-#if CFG_SUPPORT_AAA
 /*----------------------------------------------------------------------------*/
 /*!
 * \brief Parse the given IE buffer and check if it is RSN IE with CCMP PSK
@@ -1441,7 +1406,6 @@ void rsnParserCheckForRSNCCMPPSK(
 		DBGLOG(RSN, TRACE, "RSN with CCMP-PSK\n");
 		*pu2StatusCode = WLAN_STATUS_SUCCESS;
 
-#if CFG_SUPPORT_802_11W
 		/* AP PMF */
 		/* 1st check: if already PMF connection, reject assoc req: error 30 ASSOC_REJECTED_TEMPORARILY */
 		if (rsnCheckBipKeyInstalled(prAdapter, prStaRec)) {
@@ -1476,10 +1440,8 @@ void rsnParserCheckForRSNCCMPPSK(
 		/* if PMF validation fail, return success as legacy association */
 		statusCode	   = rsnPmfCapableValidation(prAdapter, prBssInfo, prStaRec);
 		*pu2StatusCode = statusCode;
-#endif
 	}
 }
-#endif
 
 /*----------------------------------------------------------------------------*/
 /*!
@@ -1866,7 +1828,6 @@ VOID rsnGeneratePmkidIndication(IN P_ADAPTER_T prAdapter)
 
 } /* rsnGeneratePmkidIndication */
 
-#if CFG_SUPPORT_WPS2
 /*----------------------------------------------------------------------------*/
 /*!
  *
@@ -1899,9 +1860,6 @@ VOID rsnGenerateWSCIE(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo)
 		prMsduInfo->u2FrameLength += prAdapter->prGlueInfo->u2WSCAssocInfoIELen;
 	}
 }
-#endif
-
-#if CFG_SUPPORT_802_11W
 
 /*----------------------------------------------------------------------------*/
 /*!
@@ -2284,9 +2242,7 @@ void rsnSaQueryAction(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb)
 
 	rsnStopSaQuery(prAdapter);
 }
-#endif
 
-#if CFG_SUPPORT_AAA
 #define WPS_DEV_OUI_WFA 0x0050f204
 #define ATTR_RESPONSE_TYPE 0x103b
 
@@ -2321,10 +2277,6 @@ VOID rsnGenerateWSCIEForAssocRsp(P_ADAPTER_T prAdapter, P_MSDU_INFO_T prMsduInfo
 			(UINT_16)kalP2PCalWSC_IELen(prAdapter->prGlueInfo, 3, (UINT_8)prP2pBssInfo->u4PrivateData);
 }
 
-#endif
-
-#if CFG_SUPPORT_802_11W
-/* AP PMF */
 /*----------------------------------------------------------------------------*/
 /*!
  * \brief This routine is called to validate setting if PMF connection capable or not
@@ -2725,9 +2677,6 @@ void rsnApSaQueryAction(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb)
 	}
 }
 
-#endif /* CFG_SUPPORT_802_11W */
-
-#if CFG_SUPPORT_H2E
 /*----------------------------------------------------------------------------*/
 /*!
  *
@@ -2801,4 +2750,3 @@ uint32_t rsnCalRSNXELen(IN P_ADAPTER_T prAdapter, IN uint8_t ucBssIndex, P_STA_R
 
 	return 0;
 }
-#endif

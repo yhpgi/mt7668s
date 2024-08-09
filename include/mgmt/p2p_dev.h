@@ -47,7 +47,7 @@ typedef struct _MSG_P2P_MGMT_TX_REQUEST_T {
 	BOOLEAN			  fgIsWaitRsp;
 } MSG_P2P_MGMT_TX_REQUEST_T, *P_MSG_P2P_MGMT_TX_REQUEST_T;
 
-#if CFG_SUPPORT_WFD
+
 
 #define WFD_FLAGS_DEV_INFO_VALID BIT(0)		  /* 1. WFD_DEV_INFO, 2. WFD_CTRL_PORT, 3. WFD_MAT_TP. */
 #define WFD_FLAGS_SINK_INFO_VALID BIT(1)	  /* 1. WFD_SINK_STATUS, 2. WFD_SINK_MAC. */
@@ -91,7 +91,6 @@ struct _WFD_CFG_SETTINGS_T {
 	UINT_8 aucReverved4[64];
 };
 
-#endif
 
 typedef struct _MSG_P2P_ACTIVE_DEV_BSS_T {
 	MSG_HDR_T rMsgHdr;
@@ -141,12 +140,10 @@ typedef struct _MSG_P2P_NETDEV_REGISTER_T {
 	UINT_8	  ucMode;
 } MSG_P2P_NETDEV_REGISTER_T, *P_MSG_P2P_NETDEV_REGISTER_T;
 
-#if CFG_SUPPORT_WFD
 typedef struct _MSG_WFD_CONFIG_SETTINGS_CHANGED_T {
 	MSG_HDR_T			 rMsgHdr; /* Must be the first member */
 	P_WFD_CFG_SETTINGS_T prWfdCfgSettings;
 } MSG_WFD_CONFIG_SETTINGS_CHANGED_T, *P_MSG_WFD_CONFIG_SETTINGS_CHANGED_T;
-#endif
 
 /*========================= Initial ============================*/
 

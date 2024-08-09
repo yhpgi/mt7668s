@@ -56,11 +56,9 @@
 #define SC_CACHE_INDEX_NUM 5 /* Number of SC caches in each STA_REC: AC0~AC4 */
 
 /* P2P related definitions */
-#ifdef CFG_ENABLE_WIFI_DIRECT
 /* Moved from p2p_fsm.h */
 #define WPS_ATTRI_MAX_LEN_DEVICE_NAME 32	   /* 0x1011 */
 #define P2P_GC_MAX_CACHED_SEC_DEV_TYPE_COUNT 8 /* NOTE(Kevin): Shall <= 16 */
-#endif
 
 /* Define the argument of cnmStaFreeAllStaByNetwork when all station records
  * will be free. No one will be free
@@ -84,13 +82,9 @@ typedef UINT_8 BUF_BITMAP;
 /* Control variable of TX management memory pool */
 typedef struct _BUF_INFO_T {
 	PUINT_8 pucBuf;
-
-#if CFG_DBG_MGT_BUF
 	UINT_32 u4AllocCount;
 	UINT_32 u4FreeCount;
 	UINT_32 u4AllocNullCount;
-#endif /* CFG_DBG_MGT_BUF */
-
 	BUF_BITMAP rFreeBlocksBitmap;
 	UINT_8	   aucAllocatedBlockNum[MAX_NUM_OF_BUF_BLOCKS];
 } BUF_INFO_T, *P_BUF_INFO_T;
@@ -139,16 +133,13 @@ typedef struct _TSPEC_ENTRY_T {
 typedef struct _FRAG_INFO_T {
 	UINT_16 u2SeqNo;
 	UINT_8	ucNextFragNo;
-#if CFG_SUPPORT_FRAG_ATTACK_DETECTION
 	UINT_8	ucSecMode;
 	UINT_64 u8NextPN;
-#endif /* CFG_SUPPORT_FRAG_ATTACK_DETECTION */
 	PUINT_8	   pucNextFragStart;
 	P_SW_RFB_T pr1stFrag;
 	OS_SYSTIME rReceiveLifetimeLimit; /* The receive time of 1st fragment */
 } FRAG_INFO_T, *P_FRAG_INFO_T;
 
-#if CFG_SUPPORT_802_11W
 /* AP PMF */
 struct AP_PMF_CFG {
 	BOOLEAN fgMfpc;
@@ -173,7 +164,6 @@ struct STA_PMF_CFG {
 	TIMER_T rSAQueryTimer;
 	UINT_16 u2TransactionID;
 };
-#endif
 
 /* Define STA record structure */
 struct _STA_RECORD_T {
@@ -254,7 +244,6 @@ struct _STA_RECORD_T {
 	UINT_16 u2HtExtendedCap;	/* HT extended cap field by HT cap IE */
 	UINT_32 u4TxBeamformingCap; /* TX beamforming cap field by HT cap IE */
 	UINT_8	ucAselCap;			/* ASEL cap field by HT cap IE */
-	/* CFG_SUPPORT_802_11AC */
 	/*------------------------------------------------------------------------------------------*/
 	/* 802.11ac  VHT capabilities when (prStaRec->ucPhyTypeSet & PHY_TYPE_BIT_VHT) is true          */
 	/* They have the same definition with fields of information element                         */
@@ -343,21 +332,16 @@ struct _STA_RECORD_T {
 
 	BOOLEAN afgIsIgnoreAmsduDuplicate[TID_NUM + 1];
 
-#if CFG_SUPPORT_AMSDU_ATTACK_DETECTION
 	UINT_16 au2AmsduInvalidSN[TID_NUM + 1];
 	UINT_8	afgIsAmsduInvalid[TID_NUM + 1];
-#endif /* CFG_SUPPORT_AMSDU_ATTACK_DETECTION */
 
 	FRAG_INFO_T rFragInfo[MAX_NUM_CONCURRENT_FRAGMENTED_MSDUS];
 
-	/* SEC_INFO_T              rSecInfo; */ /* The security state machine */
 
-#if CFG_SUPPORT_ADHOC
 	BOOLEAN fgAdhocRsnBcKeyExist[2]; /* Ad-hoc RSN Rx BC key exist flag,
 									  * only reserved two entry for each peer
 									  */
 	UINT_8 ucAdhocRsnBcWlanIndex[2]; /* Ad-hoc RSN Rx BC wlan index */
-#endif
 
 	BOOLEAN fgPortBlock; /* The 802.1x Port Control flag */
 
@@ -381,7 +365,6 @@ struct _STA_RECORD_T {
 	/*------------------------------------------------------------------------------------------*/
 	/* P2P related fields                                                                       */
 	/*------------------------------------------------------------------------------------------*/
-#if CFG_ENABLE_WIFI_DIRECT
 	UINT_8 u2DevNameLen;
 	UINT_8 aucDevName[WPS_ATTRI_MAX_LEN_DEVICE_NAME];
 
@@ -396,7 +379,6 @@ struct _STA_RECORD_T {
 	DEVICE_TYPE_T rPrimaryDevTypeBE;
 
 	DEVICE_TYPE_T arSecondaryDevTypeBE[P2P_GC_MAX_CACHED_SEC_DEV_TYPE_COUNT];
-#endif /* CFG_SUPPORT_P2P */
 
 	/*------------------------------------------------------------------------------------------*/
 	/* QM related fields                                                                       */
@@ -414,13 +396,11 @@ struct _STA_RECORD_T {
 	/*------------------------------------------------------------------------------------------*/
 	PVOID aprTxDescTemplate[TX_DESC_TID_NUM];
 
-#if CFG_ENABLE_PKT_LIFETIME_PROFILE && CFG_ENABLE_PER_STA_STATISTICS
 	UINT_32 u4TotalTxPktsNumber;
 	UINT_32 u4TotalTxPktsTime;
 	UINT_32 u4TotalRxPktsNumber;
 	UINT_32 u4MaxTxPktsTime;
 	UINT_32 u4ThresholdCounter;
-#endif
 
 	/*------------------------------------------------------------------------------------------*/
 	/* To be removed, this is to make que_mgt compilation success only                          */
@@ -447,9 +427,6 @@ struct _STA_RECORD_T {
 	/* Reorder Parameter reference table */
 	P_RX_BA_ENTRY_T aprRxReorderParamRefTbl[CFG_RX_MAX_BA_TID_NUM];
 
-#if CFG_SUPPORT_802_11V_TIMING_MEASUREMENT
-	TIMINGMSMT_PARAM_T rWNMTimingMsmt;
-#endif
 	UINT_8	ucTrafficDataType; /* 0: auto 1: data 2: video 3: voice */
 	UINT_8	ucTxGfMode;		   /* 0: auto 1:Force enable 2: Force disable 3: enable by peer */
 	UINT_8	ucTxSgiMode;	   /* 0: auto 1:Force enable 2: Force disable 3: enable by peer */
@@ -459,7 +436,6 @@ struct _STA_RECORD_T {
 	UINT_16 u2MinLinkSpeed;
 	UINT_32 u4Flags; /* reserved for MTK Synergies */
 
-#if CFG_SUPPORT_TDLS
 	BOOLEAN fgTdlsIsProhibited;		/* TRUE: AP prohibits TDLS links */
 	BOOLEAN fgTdlsIsChSwProhibited; /* TRUE: AP prohibits TDLS chan switch */
 
@@ -467,31 +443,20 @@ struct _STA_RECORD_T {
 	IE_HT_CAP_T rTdlsHtCap;			/* temp to queue HT capability element */
 	PARAM_KEY_T rTdlsKeyTemp;		/* temp to queue the key information */
 	UINT_8		ucTdlsIndex;
-#endif /* CFG_SUPPORT_TDLS */
-#if CFG_SUPPORT_TX_BF
 	TXBF_PFMU_STA_INFO rTxBfPfmuStaInfo;
-#endif
-#if CFG_SUPPORT_MSP
 	UINT_32 u4RxVector0;
 	UINT_32 u4RxVector1;
 	UINT_32 u4RxVector2;
 	UINT_32 u4RxVector3;
 	UINT_32 u4RxVector4;
-#endif
-#if CFG_SUPPORT_LAST_SEC_MCS_INFO
 	UINT_32 au4RxVect0Que[MCS_INFO_SAMPLE_CNT];
 	UINT_32 au4RxVect1Que[MCS_INFO_SAMPLE_CNT];
-#endif
 	UINT_8 ucSmDialogToken;		/* Spectrum Mngt Dialog Token */
 	UINT_8 ucSmMsmtRequestMode; /* Measurement Request Mode */
 	UINT_8 ucSmMsmtToken;		/* Measurement Request Token */
-#if CFG_SUPPORT_802_11W
 	/* AP PMF */
 	struct STA_PMF_CFG rPmfCfg;
-#endif
-#if CFG_SUPPORT_802_11V_BSS_TRANSITION_MGT
 	UINT_8 fgSupportBTM; /* Indicates whether to support BTM */
-#endif
 };
 
 typedef enum _ENUM_STA_REC_CMD_ACTION_T {
@@ -500,8 +465,6 @@ typedef enum _ENUM_STA_REC_CMD_ACTION_T {
 	STA_REC_CMD_ACTION_BSS_EXCLUDE_STA = 2
 } ENUM_STA_REC_CMD_ACTION_T,
 		*P_ENUM_STA_REC_CMD_ACTION_T;
-
-#if CFG_SUPPORT_TDLS
 
 /* TDLS FSM */
 typedef struct _CMD_PEER_ADD_T {
@@ -570,7 +533,7 @@ typedef struct _CMD_PEER_UPDATE_T {
 	ENUM_STA_TYPE_T eStaType;
 } CMD_PEER_UPDATE_T;
 
-#endif
+
 /*******************************************************************************
  *                            P U B L I C   D A T A
  ********************************************************************************
@@ -586,14 +549,8 @@ typedef struct _CMD_PEER_UPDATE_T {
  ********************************************************************************
  */
 
-#if CFG_DBG_MGT_BUF
 #define cnmMgtPktAlloc(_prAdapter, _u4Length) cnmPktAllocWrapper((_prAdapter), (_u4Length), (PUINT_8) __func__)
-
 #define cnmMgtPktFree(_prAdapter, _prMsduInfo) cnmPktFreeWrapper((_prAdapter), (_prMsduInfo), (PUINT_8) __func__)
-#else
-#define cnmMgtPktAlloc cnmPktAlloc
-#define cnmMgtPktFree cnmPktFree
-#endif
 
 /*******************************************************************************
  *                   F U N C T I O N   D E C L A R A T I O N S
@@ -635,7 +592,6 @@ VOID cnmDumpStaRec(IN P_ADAPTER_T prAdapter, IN UINT_8 ucStaRecIdx);
 
 UINT_32 cnmDumpMemoryStatus(IN P_ADAPTER_T prAdapter, IN PUINT_8 pucBuf, IN UINT_32 u4Max);
 
-#if CFG_SUPPORT_TDLS
 WLAN_STATUS /* TDLS_STATUS */
 cnmPeerAdd(P_ADAPTER_T prAdapter, PVOID pvSetBuffer, UINT_32 u4SetBufferLen, PUINT_32 pu4SetInfoLen);
 
@@ -643,7 +599,6 @@ WLAN_STATUS /* TDLS_STATUS */
 cnmPeerUpdate(P_ADAPTER_T prAdapter, PVOID pvSetBuffer, UINT_32 u4SetBufferLen, PUINT_32 pu4SetInfoLen);
 
 P_STA_RECORD_T cnmGetTdlsPeerByAddress(P_ADAPTER_T prAdapter, UINT_8 ucBssIndex, UINT_8 aucPeerMACAddress[]);
-#endif
 
 VOID cnmStaSendUpdateCmd(
 		P_ADAPTER_T prAdapter, P_STA_RECORD_T prStaRec, P_TXBF_PFMU_STA_INFO prTxBfPfmuStaInfo, BOOLEAN fgNeedResp);

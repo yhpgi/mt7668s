@@ -256,7 +256,6 @@ BOOLEAN kalP2PGetWepCipher(IN P_GLUE_INFO_T prGlueInfo, IN UINT_8 ucRoleIdx)
 	return FALSE;
 }
 
-#if CFG_SUPPORT_SUITB
 BOOLEAN kalP2PGetGcmp256Cipher(IN P_GLUE_INFO_T prGlueInfo, IN UINT_8 ucRoleIdx)
 {
 	ASSERT(prGlueInfo);
@@ -267,7 +266,6 @@ BOOLEAN kalP2PGetGcmp256Cipher(IN P_GLUE_INFO_T prGlueInfo, IN UINT_8 ucRoleIdx)
 
 	return FALSE;
 }
-#endif
 
 BOOLEAN kalP2PGetCcmpCipher(IN P_GLUE_INFO_T prGlueInfo, IN UINT_8 ucRoleIdx)
 {
@@ -848,7 +846,6 @@ VOID kalP2PGOStationUpdate(
 
 } /* kalP2PGOStationUpdate */
 
-#if (CFG_SUPPORT_DFS_MASTER == 1)
 VOID kalP2PRddDetectUpdate(IN P_GLUE_INFO_T prGlueInfo, IN UINT_8 ucRoleIndex)
 {
 	DBGLOG(INIT, INFO, "Radar Detection event\n");
@@ -916,7 +913,6 @@ VOID kalP2PCacFinishedUpdate(IN P_GLUE_INFO_T prGlueInfo, IN UINT_8 ucRoleIndex)
 	DBGLOG(INIT, INFO, "kalP2PCacFinishedUpdate: Update to OS Done\n");
 
 } /* kalP2PRddDetectUpdate */
-#endif
 
 BOOLEAN kalP2pFuncGetChannelType(IN ENUM_CHNL_EXT_T rChnlSco, OUT enum nl80211_channel_type *channel_type)
 {
@@ -989,8 +985,6 @@ struct ieee80211_channel *kalP2pFuncGetChannelEntry(IN P_GL_P2P_INFO_T prP2pInfo
 
 	return prTargetChannelEntry;
 } /* kalP2pFuncGetChannelEntry */
-
-#if CFG_SUPPORT_HOTSPOT_WPS_MANAGER
 
 /*----------------------------------------------------------------------------*/
 /*!
@@ -1117,5 +1111,3 @@ BOOLEAN kalP2PMaxClients(IN P_GLUE_INFO_T prGlueInfo, IN UINT_32 u4NumClient, IN
 
 	return FALSE;
 }
-
-#endif

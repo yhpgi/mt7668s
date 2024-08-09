@@ -110,16 +110,14 @@ int mtk_cfg80211_change_iface(
 #endif
 
 	/* reset wpa info */
-	prGlueInfo->rWpaInfo.u4WpaVersion	  = IW_AUTH_WPA_VERSION_DISABLED;
-	prGlueInfo->rWpaInfo.u4KeyMgmt		  = 0;
-	prGlueInfo->rWpaInfo.u4CipherGroup	  = IW_AUTH_CIPHER_NONE;
-	prGlueInfo->rWpaInfo.u4CipherPairwise = IW_AUTH_CIPHER_NONE;
-	prGlueInfo->rWpaInfo.u4AuthAlg		  = IW_AUTH_ALG_OPEN_SYSTEM;
-#if CFG_SUPPORT_802_11W
+	prGlueInfo->rWpaInfo.u4WpaVersion	   = IW_AUTH_WPA_VERSION_DISABLED;
+	prGlueInfo->rWpaInfo.u4KeyMgmt		   = 0;
+	prGlueInfo->rWpaInfo.u4CipherGroup	   = IW_AUTH_CIPHER_NONE;
+	prGlueInfo->rWpaInfo.u4CipherPairwise  = IW_AUTH_CIPHER_NONE;
+	prGlueInfo->rWpaInfo.u4AuthAlg		   = IW_AUTH_ALG_OPEN_SYSTEM;
 	prGlueInfo->rWpaInfo.u4Mfp			   = IW_AUTH_MFP_DISABLED;
 	prGlueInfo->rWpaInfo.ucRSNMfpCap	   = 0;
 	prGlueInfo->rWpaInfo.u4CipherGroupMgmt = IW_AUTH_CIPHER_NONE;
-#endif
 
 	return 0;
 }
@@ -209,11 +207,9 @@ int mtk_cfg80211_add_key(struct wiphy *wiphy, struct net_device *ndev, u8 key_in
 
 	} else { /* Group key */
 		COPY_MAC_ADDR(rKey.arBSSID, aucBCAddr);
-#if CFG_KEY_ERROR_STATISTIC_RECOVERY
 		RX_RESET_CNT(&prGlueInfo->prAdapter->rRxCtrl, RX_BMC_NO_KEY_COUNT);
 		RX_RESET_CNT(&prGlueInfo->prAdapter->rRxCtrl, RX_BMC_KEY_ERROR_COUNT);
 		RX_RESET_CNT(&prGlueInfo->prAdapter->rRxCtrl, RX_BMC_PKT_COUNT);
-#endif
 	}
 
 	if (params->key) {
@@ -346,7 +342,6 @@ int mtk_cfg80211_del_key(struct wiphy *wiphy, struct net_device *ndev, u8 key_in
 
 	prBssInfo = GET_BSS_INFO_BY_INDEX(prGlueInfo->prAdapter, ucBssIndex);
 
-#if CFG_SUPPORT_802_11W
 	/* if encrypted deauth frame is in process, pending remove key */
 	if (IS_BSS_INDEX_AIS(prGlueInfo->prAdapter, ucBssIndex) && prBssInfo->encryptedDeauthIsInProcess == TRUE) {
 		waitRet = wait_for_completion_timeout(&prBssInfo->rDeauthComp, MSEC_TO_JIFFIES(1000));
@@ -356,7 +351,6 @@ int mtk_cfg80211_del_key(struct wiphy *wiphy, struct net_device *ndev, u8 key_in
 		} else
 			DBGLOG(RSN, INFO, "complete\n");
 	}
-#endif
 
 	rStatus =
 			kalIoctl(prGlueInfo, wlanoidSetRemoveKey, &rRemoveKey, rRemoveKey.u4Length, FALSE, FALSE, TRUE, &u4BufLen);
@@ -663,7 +657,6 @@ int mtk_cfg80211_scan(struct wiphy *wiphy, struct cfg80211_scan_request *request
 	if (request->ie_len > 0)
 		rScanRequest.pucIE = (PUINT_8)(request->ie);
 
-#if CFG_SCAN_CHANNEL_SPECIFIED
 	DBGLOG(REQ, WARN, "scan channel num = %d\n", request->n_channels);
 
 	if (request->n_channels > MAXIMUM_OPERATION_CHANNEL_LIST) {
@@ -682,7 +675,6 @@ int mtk_cfg80211_scan(struct wiphy *wiphy, struct cfg80211_scan_request *request
 					ieee80211_frequency_to_channel(request->channels[i]->center_freq);
 		}
 	}
-#endif
 
 	/* 2018/04/18 frog: The point should be ready before doing IOCTL. */
 	prGlueInfo->prScanRequest = request;
@@ -888,7 +880,6 @@ int mtk_cfg80211_auth(struct wiphy *wiphy, struct net_device *ndev, struct cfg80
 		fgNewAuthParam = TRUE;
 	}
 
-#if CFG_SUPPORT_802_11V_BSS_TRANSITION_MGT
 	DBGLOG(REQ, WARN, "req IE len %d, ssid %.*s, ssid_len %d\n", req->bss->ies->len,
 			SSID_IE(req->bss->ies->data)->ucLength, SSID_IE(req->bss->ies->data)->aucSSID,
 			SSID_IE(req->bss->ies->data)->ucLength);
@@ -896,9 +887,6 @@ int mtk_cfg80211_auth(struct wiphy *wiphy, struct net_device *ndev, struct cfg80
 		rNewSsid.pucSsid   = SSID_IE(req->bss->ies->data)->aucSSID;
 		rNewSsid.u4SsidLen = SSID_IE(req->bss->ies->data)->ucLength;
 	}
-#endif
-	/* rNewSsid.pucSsid = (uint8_t *)sme->ssid;*/
-	/* rNewSsid.u4SsidLen = sme->ssid_len;*/
 
 	DBGLOG(REQ, STATE, "auth to  BSS [" MACSTR "],UpperReq [" MACSTR "]\n", MAC2STR(rNewSsid.pucBssid),
 			MAC2STR((uint8_t *)req->bss->bssid));
@@ -1003,7 +991,6 @@ int mtk_cfg80211_connect(struct wiphy *wiphy, struct net_device *ndev, struct cf
 	kalMemZero(prDetRplyInfo, sizeof(struct SEC_DETECT_REPLAY_INFO));
 #endif
 
-#if CFG_SUPPORT_802_11W
 	prGlueInfo->rWpaInfo.u4CipherGroupMgmt = IW_AUTH_CIPHER_NONE;
 	prGlueInfo->rWpaInfo.ucRSNMfpCap	   = RSN_AUTH_MFP_DISABLED;
 	prGlueInfo->rWpaInfo.u4Mfp			   = IW_AUTH_MFP_DISABLED;
@@ -1018,8 +1005,6 @@ int mtk_cfg80211_connect(struct wiphy *wiphy, struct net_device *ndev, struct cf
 		prGlueInfo->rWpaInfo.u4Mfp = IW_AUTH_MFP_DISABLED;
 		break;
 	}
-	/* DBGLOG(SCN, INFO, ("MFP=%d\n", prGlueInfo->rWpaInfo.u4Mfp)); */
-#endif
 
 	if (sme->crypto.wpa_versions & NL80211_WPA_VERSION_1)
 		prGlueInfo->rWpaInfo.u4WpaVersion = IW_AUTH_WPA_VERSION_WPA;
@@ -1061,14 +1046,12 @@ int mtk_cfg80211_connect(struct wiphy *wiphy, struct net_device *ndev, struct cf
 		case WLAN_CIPHER_SUITE_AES_CMAC:
 			prGlueInfo->rWpaInfo.u4CipherPairwise = IW_AUTH_CIPHER_CCMP;
 			break;
-#if CFG_SUPPORT_SUITB
 		case WLAN_CIPHER_SUITE_BIP_GMAC_256:
 			prGlueInfo->rWpaInfo.u4CipherPairwise = IW_AUTH_CIPHER_GCMP256;
 			break;
 		case WLAN_CIPHER_SUITE_GCMP_256:
 			prGlueInfo->rWpaInfo.u4CipherPairwise = IW_AUTH_CIPHER_GCMP256;
 			break;
-#endif
 		default:
 			DBGLOG(REQ, WARN, "invalid cipher pairwise (%d)\n", sme->crypto.ciphers_pairwise[0]);
 			return -EINVAL;
@@ -1093,7 +1076,6 @@ int mtk_cfg80211_connect(struct wiphy *wiphy, struct net_device *ndev, struct cf
 		case WLAN_CIPHER_SUITE_AES_CMAC:
 			prGlueInfo->rWpaInfo.u4CipherGroup = IW_AUTH_CIPHER_CCMP;
 			break;
-#if CFG_SUPPORT_SUITB
 		case WLAN_CIPHER_SUITE_BIP_GMAC_256:
 			prGlueInfo->rWpaInfo.u4CipherGroup = IW_AUTH_CIPHER_GCMP256;
 			break;
@@ -1102,7 +1084,6 @@ int mtk_cfg80211_connect(struct wiphy *wiphy, struct net_device *ndev, struct cf
 			break;
 		case WLAN_CIPHER_SUITE_NO_GROUP_ADDR:
 			break;
-#endif
 		default:
 			DBGLOG(REQ, WARN, "invalid cipher group (%d)\n", sme->crypto.cipher_group);
 			return -EINVAL;
@@ -1136,7 +1117,6 @@ int mtk_cfg80211_connect(struct wiphy *wiphy, struct net_device *ndev, struct cf
 				eAuthMode  = AUTH_MODE_WPA2_PSK;
 				u4AkmSuite = RSN_AKM_SUITE_PSK;
 				break;
-#if CFG_SUPPORT_802_11W
 				/* Notice:: Need kernel patch!! */
 			case WLAN_AKM_SUITE_8021X_SHA256:
 				eAuthMode  = AUTH_MODE_WPA2;
@@ -1146,8 +1126,6 @@ int mtk_cfg80211_connect(struct wiphy *wiphy, struct net_device *ndev, struct cf
 				eAuthMode  = AUTH_MODE_WPA2_PSK;
 				u4AkmSuite = RSN_AKM_SUITE_PSK_SHA256;
 				break;
-#endif
-#if CFG_SUPPORT_SUITB
 			case WLAN_AKM_SUITE_8021X_SUITE_B:
 				eAuthMode  = AUTH_MODE_WPA2_PSK;
 				u4AkmSuite = RSN_AKM_SUITE_8021X_SUITE_B_192;
@@ -1156,13 +1134,10 @@ int mtk_cfg80211_connect(struct wiphy *wiphy, struct net_device *ndev, struct cf
 				eAuthMode  = AUTH_MODE_WPA2_PSK;
 				u4AkmSuite = RSN_AKM_SUITE_8021X_SUITE_B_192;
 				break;
-#endif
-#if CFG_SUPPORT_OWE
 			case WLAN_AKM_SUITE_OWE:
 				eAuthMode  = AUTH_MODE_WPA2_PSK;
 				u4AkmSuite = RSN_AKM_SUITE_OWE;
 				break;
-#endif
 			default:
 				DBGLOG(REQ, WARN, "invalid Akm Suite (%d)\n", sme->crypto.akm_suites[0]);
 				return -EINVAL;
@@ -1184,7 +1159,6 @@ int mtk_cfg80211_connect(struct wiphy *wiphy, struct net_device *ndev, struct cf
 		PUINT_8		prDesiredIE = NULL;
 		PUINT_8		pucIEStart	= (PUINT_8)sme->ie;
 
-#if CFG_SUPPORT_WPS2
 		if (wextSrchDesiredWPSIE(pucIEStart, sme->ie_len, 0xDD, (PUINT_8 *)&prDesiredIE)) {
 			prGlueInfo->fgWpsActive = TRUE;
 			fgCarryWPSIE			= TRUE;
@@ -1194,13 +1168,11 @@ int mtk_cfg80211_connect(struct wiphy *wiphy, struct net_device *ndev, struct cf
 			if (rStatus != WLAN_STATUS_SUCCESS)
 				DBGLOG(SEC, WARN, "[WSC] set WSC assoc info error:%lx\n", rStatus);
 		}
-#endif
 
 		if (wextSrchDesiredWPAIE(pucIEStart, sme->ie_len, 0x30, (PUINT_8 *)&prDesiredIE)) {
 			RSN_INFO_T rRsnInfo;
 
 			if (rsnParseRsnIE(prGlueInfo->prAdapter, (P_RSN_INFO_ELEM_T)prDesiredIE, &rRsnInfo)) {
-#if CFG_SUPPORT_802_11W
 				/* Fill RSNE MFP Cap */
 				if (rRsnInfo.u2RsnCap & ELEM_WPA_CAP_MFPC) {
 					prGlueInfo->rWpaInfo.u4CipherGroupMgmt = rRsnInfo.u4GroupMgmtKeyCipherSuite;
@@ -1209,7 +1181,6 @@ int mtk_cfg80211_connect(struct wiphy *wiphy, struct net_device *ndev, struct cf
 						prGlueInfo->rWpaInfo.ucRSNMfpCap = RSN_AUTH_MFP_REQUIRED;
 				} else
 					prGlueInfo->rWpaInfo.ucRSNMfpCap = RSN_AUTH_MFP_DISABLED;
-#endif
 			}
 		}
 	}
@@ -1224,7 +1195,6 @@ int mtk_cfg80211_connect(struct wiphy *wiphy, struct net_device *ndev, struct cf
 	/* Must put after paring RSNE from upper layer
 	 * for prGlueInfo->rWpaInfo.ucRSNMfpCap assignment
 	 */
-#if CFG_SUPPORT_802_11W
 	switch (sme->mfp) {
 	case NL80211_MFP_NO:
 		prGlueInfo->rWpaInfo.u4Mfp = IW_AUTH_MFP_DISABLED;
@@ -1245,7 +1215,6 @@ int mtk_cfg80211_connect(struct wiphy *wiphy, struct net_device *ndev, struct cf
 		prGlueInfo->rWpaInfo.u4Mfp = IW_AUTH_MFP_DISABLED;
 		break;
 	}
-#endif
 
 	rStatus = kalIoctl(prGlueInfo, wlanoidSetAuthMode, &eAuthMode, sizeof(eAuthMode), FALSE, FALSE, FALSE, &u4BufLen);
 	if (rStatus != WLAN_STATUS_SUCCESS)
@@ -1266,12 +1235,9 @@ int mtk_cfg80211_connect(struct wiphy *wiphy, struct net_device *ndev, struct cf
 	cipher = prGlueInfo->rWpaInfo.u4CipherGroup | prGlueInfo->rWpaInfo.u4CipherPairwise;
 
 	if (1 /* prGlueInfo->rWpaInfo.fgPrivacyInvoke */) {
-#if CFG_SUPPORT_SUITB
 		if (cipher & IW_AUTH_CIPHER_GCMP256) {
 			eEncStatus = ENUM_ENCRYPTION4_ENABLED;
-		} else
-#endif
-				if (cipher & IW_AUTH_CIPHER_CCMP) {
+		} else if (cipher & IW_AUTH_CIPHER_CCMP) {
 			eEncStatus = ENUM_ENCRYPTION3_ENABLED;
 		} else if (cipher & IW_AUTH_CIPHER_TKIP) {
 			eEncStatus = ENUM_ENCRYPTION2_ENABLED;
@@ -2525,19 +2491,8 @@ int mtk_cfg80211_assoc(struct wiphy *wiphy, struct net_device *ndev, struct cfg8
 	DBGLOG(REQ, INFO, "mtk_cfg80211_assoc, media state:%d\n", prGlueInfo->eParamMediaStateIndicated);
 
 	kalMemZero(arBssid, MAC_ADDR_LEN);
-	if (prGlueInfo->eParamMediaStateIndicated == PARAM_MEDIA_STATE_CONNECTED) {
+	if (prGlueInfo->eParamMediaStateIndicated == PARAM_MEDIA_STATE_CONNECTED)
 		wlanQueryInformation(prGlueInfo->prAdapter, wlanoidQueryBssid, &arBssid[0], sizeof(arBssid), &u4BufLen);
-
-#if !CFG_SUPPORT_802_11V_BSS_TRANSITION_MGT
-		/* 1. check BSSID */
-		if (UNEQUAL_MAC_ADDR(arBssid, req->bss->bssid)) {
-			/* wrong MAC address */
-			DBGLOG(REQ, WARN, "incorrect BSSID: [" MACSTR "] currently connected BSSID[" MACSTR "]\n",
-					MAC2STR(req->bss->bssid), MAC2STR(arBssid));
-			return -ENOENT;
-		}
-#endif
-	}
 
 	/* <1> Reset WPA info */
 	prGlueInfo->rWpaInfo.u4WpaVersion	   = IW_AUTH_WPA_VERSION_DISABLED;
@@ -2631,10 +2586,8 @@ int mtk_cfg80211_assoc(struct wiphy *wiphy, struct net_device *ndev, struct cfg8
 	if (1 /* prGlueInfo->rWpaInfo.fgPrivacyInvoke */) {
 		if (cipher & IW_AUTH_CIPHER_CCMP) {
 			eEncStatus = ENUM_ENCRYPTION3_ENABLED;
-#if CFG_SUPPORT_SUITB
 		} else if (cipher & IW_AUTH_CIPHER_GCMP256) {
 			eEncStatus = ENUM_ENCRYPTION4_ENABLED;
-#endif
 		} else if (cipher & IW_AUTH_CIPHER_TKIP) {
 			eEncStatus = ENUM_ENCRYPTION2_ENABLED;
 		} else if (cipher & (IW_AUTH_CIPHER_WEP104 | IW_AUTH_CIPHER_WEP40)) {
@@ -2692,7 +2645,6 @@ int mtk_cfg80211_assoc(struct wiphy *wiphy, struct net_device *ndev, struct cfg8
 				eAuthMode  = AUTH_MODE_WPA2_PSK;
 				u4AkmSuite = RSN_AKM_SUITE_PSK;
 				break;
-#if CFG_SUPPORT_802_11W
 			/* Notice:: Need kernel patch!! */
 			case WLAN_AKM_SUITE_8021X_SHA256:
 				eAuthMode  = AUTH_MODE_WPA2;
@@ -2702,29 +2654,23 @@ int mtk_cfg80211_assoc(struct wiphy *wiphy, struct net_device *ndev, struct cfg8
 				eAuthMode  = AUTH_MODE_WPA2_PSK;
 				u4AkmSuite = RSN_AKM_SUITE_PSK_SHA256;
 				break;
-#endif
 			case WLAN_AKM_SUITE_8021X_SUITE_B:
 				eAuthMode  = AUTH_MODE_WPA2_PSK;
 				u4AkmSuite = RSN_AKM_SUITE_8021X_SUITE_B_192;
 				break;
-
 			case WLAN_AKM_SUITE_8021X_SUITE_B_192:
 				eAuthMode  = AUTH_MODE_WPA2_PSK;
 				u4AkmSuite = RSN_AKM_SUITE_8021X_SUITE_B_192;
 				break;
-#if CFG_SUPPORT_SAE
 			/* Need to add in WPA also? */
 			case WLAN_AKM_SUITE_SAE:
 				eAuthMode  = AUTH_MODE_WPA2_SAE;
 				u4AkmSuite = RSN_AKM_SUITE_SAE;
 				break;
-#endif
-#if CFG_SUPPORT_OWE
 			case WLAN_AKM_SUITE_OWE:
 				eAuthMode  = AUTH_MODE_WPA2_PSK;
 				u4AkmSuite = RSN_AKM_SUITE_OWE;
 				break;
-#endif
 			default:
 				DBGLOG(REQ, WARN, "invalid Akm Suite (%08x)\n", req->crypto.akm_suites[0]);
 				return -EINVAL;
@@ -2871,8 +2817,6 @@ int mtk_cfg80211_assoc(struct wiphy *wiphy, struct net_device *ndev, struct cfg8
 	return 0;
 }
 
-#if CFG_SUPPORT_NFC_BEAM_PLUS
-
 int mtk_cfg80211_testmode_get_scan_done(IN struct wiphy *wiphy, IN void *data, IN int len, IN P_GLUE_INFO_T prGlueInfo)
 {
 #define NL80211_TESTMODE_P2P_SCANDONE_INVALID 0
@@ -2931,10 +2875,6 @@ nla_put_failure:
 	return -EINVAL;
 #endif
 }
-
-#endif
-
-#if CFG_SUPPORT_TDLS
 
 /*----------------------------------------------------------------------------*/
 /*!
@@ -3225,17 +3165,12 @@ int mtk_cfg80211_tdls_oper(
 	return 0;
 }
 
-#endif
-
 INT_32 mtk_cfg80211_process_str_cmd(P_GLUE_INFO_T prGlueInfo, PUINT_8 cmd, INT_32 len)
 {
 	UINT_32 rStatus = WLAN_STATUS_SUCCESS;
 
-#if CFG_SUPPORT_802_11K || CFG_SUPPORT_802_11V_BSS_TRANSITION_MGT
 	UINT_32 u4SetInfoLen = 0;
-#endif
 
-#if CFG_SUPPORT_802_11K
 	if (strnicmp(cmd, "NEIGHBOR-REQUEST", 16) == 0) {
 		PUINT_8 pucSSID	  = NULL;
 		UINT_32 u4SSIDLen = 0;
@@ -3249,9 +3184,7 @@ INT_32 mtk_cfg80211_process_str_cmd(P_GLUE_INFO_T prGlueInfo, PUINT_8 cmd, INT_3
 				prGlueInfo, wlanoidSendNeighborRequest, (void *)pucSSID, u4SSIDLen, FALSE, FALSE, TRUE, &u4SetInfoLen);
 	} else
 		return -EOPNOTSUPP;
-#endif
 
-#if CFG_SUPPORT_802_11V_BSS_TRANSITION_MGT
 	if (strnicmp(cmd, "BSS-TRANSITION-QUERY", 20) == 0) {
 		PUINT_8 pucReason = NULL;
 
@@ -3260,7 +3193,6 @@ INT_32 mtk_cfg80211_process_str_cmd(P_GLUE_INFO_T prGlueInfo, PUINT_8 cmd, INT_3
 		rStatus = kalIoctl(prGlueInfo, wlanoidSendBTMQuery, (void *)pucReason, 1, FALSE, FALSE, TRUE, &u4SetInfoLen);
 	} else
 		return -EOPNOTSUPP;
-#endif
 
 	if (rStatus == WLAN_STATUS_SUCCESS)
 		return 0;
@@ -3510,10 +3442,7 @@ void cfg80211_regd_set_wiphy(IN struct wiphy *prWiphy)
 
 	/*ignore the hint from IE*/
 	prWiphy->regulatory_flags |= REGULATORY_COUNTRY_IE_IGNORE;
-
-#ifdef CFG_SUPPORT_DISABLE_BCN_HINTS
 	prWiphy->regulatory_flags |= REGULATORY_DISABLE_BEACON_HINTS;
-#endif
 
 	/*
 	 * set REGULATORY_CUSTOM_REG flag

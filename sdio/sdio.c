@@ -37,7 +37,7 @@
 #include <asm/memory.h>
 #endif
 
-#include "mt66xx_reg.h"
+#include "reg.h"
 
 /*******************************************************************************
  *                              C O N S T A N T S
@@ -59,7 +59,7 @@ static int mtk_sdio_pm_resume(struct device *pDev);
 
 const struct sdio_device_id mtk_sdio_ids[] = {
 	/* Not an SDIO standard class device */
-	{ SDIO_DEVICE(0x037a, 0x7608), .driver_data = (kernel_ulong_t)&mt66xx_driver_data_mt7668 },
+	{ SDIO_DEVICE(0x037a, 0x7608), .driver_data = (kernel_ulong_t)&driver_data_mt7668 },
 	{ /* end: all zeroes */ },
 };
 

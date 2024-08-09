@@ -16,26 +16,23 @@
  ********************************************************************************
  */
 
+#include <uapi/linux/nl80211.h>
+
 #include "precomp.h"
-#if CFG_SUPPORT_QA_TOOL
 #include "gl_wext.h"
 #include "gl_cfg80211.h"
 #include "gl_ate_agent.h"
 #include "gl_hook_api.h"
 #include "gl_qa_agent.h"
 
-#include <uapi/linux/nl80211.h>
-
 /*******************************************************************************
  *						C O N S T A N T S
  ********************************************************************************
  */
 
-#if CFG_SUPPORT_TX_BF
 PFMU_PROFILE_TAG1 g_rPfmuTag1;
 PFMU_PROFILE_TAG2 g_rPfmuTag2;
 PFMU_DATA		  g_rPfmuData;
-#endif
 
 typedef struct _ATE_PRIV_CMD {
 	UINT_8 *name;
@@ -46,7 +43,6 @@ ATE_PRIV_CMD rAtePrivCmdTable[] = { { "ResetCounter", Set_ResetStatCounter_Proc 
 	{ "ATEDA", SetATEDa }, { "ATESA", SetATESa }, { "ATECHANNEL", SetATEChannel }, { "ATETXPOW0", SetATETxPower0 },
 	{ "ATETXGI", SetATETxGi }, { "ATETXBW", SetATETxBw }, { "ATETXLEN", SetATETxLength }, { "ATETXCNT", SetATETxCount },
 	{ "ATETXMCS", SetATETxMcs }, { "ATETXMODE", SetATETxMode }, { "ATEIPG", SetATEIpg },
-#if CFG_SUPPORT_TX_BF
 	{ "TxBfProfileTagHelp", Set_TxBfProfileTag_Help }, { "TxBfProfileTagInValid", Set_TxBfProfileTag_InValid },
 	{ "TxBfProfileTagPfmuIdx", Set_TxBfProfileTag_PfmuIdx }, { "TxBfProfileTagBfType", Set_TxBfProfileTag_BfType },
 	{ "TxBfProfileTagBw", Set_TxBfProfileTag_DBW }, { "TxBfProfileTagSuMu", Set_TxBfProfileTag_SuMu },
@@ -64,21 +60,13 @@ ATE_PRIV_CMD rAtePrivCmdTable[] = { { "ResetCounter", Set_ResetStatCounter_Proc 
 	{ "TxBfManualAssoc", Set_TxBfManualAssoc }, { "TxBfPfmuMemAlloc", Set_TxBfPfmuMemAlloc },
 	{ "TxBfPfmuMemRelease", Set_TxBfPfmuMemRelease }, { "StaRecCmmUpdate", Set_StaRecCmmUpdate },
 	{ "StaRecBfUpdate", Set_StaRecBfUpdate }, { "DevInfoUpdate", Set_DevInfoUpdate },
-	{ "BssInfoUpdate", Set_BssInfoUpdate },
-#if CFG_SUPPORT_MU_MIMO
-	{ "MUGetInitMCS", Set_MUGetInitMCS }, { "MUCalInitMCS", Set_MUCalInitMCS }, { "MUCalLQ", Set_MUCalLQ },
-	{ "MUGetLQ", Set_MUGetLQ }, { "MUSetSNROffset", Set_MUSetSNROffset }, { "MUSetZeroNss", Set_MUSetZeroNss },
-	{ "MUSetSpeedUpLQ", Set_MUSetSpeedUpLQ }, { "MUSetMUTable", Set_MUSetMUTable }, { "MUSetGroup", Set_MUSetGroup },
-	{ "MUGetQD", Set_MUGetQD }, { "MUSetEnable", Set_MUSetEnable }, { "MUSetGID_UP", Set_MUSetGID_UP },
-	{ "MUTriggerTx", Set_MUTriggerTx },
-#endif
-#endif
-
-	{ "WriteEfuse", WriteEfuse }, { "TxPower", SetTxTargetPower },
-#if (CFG_SUPPORT_DFS_MASTER == 1)
-	{ "RDDReport", SetRddReport }, { "ByPassCac", SetByPassCac }, { "RadarDetectMode", SetRadarDetectMode },
-#endif
-
+	{ "BssInfoUpdate", Set_BssInfoUpdate }, { "MUGetInitMCS", Set_MUGetInitMCS }, { "MUCalInitMCS", Set_MUCalInitMCS },
+	{ "MUCalLQ", Set_MUCalLQ }, { "MUGetLQ", Set_MUGetLQ }, { "MUSetSNROffset", Set_MUSetSNROffset },
+	{ "MUSetZeroNss", Set_MUSetZeroNss }, { "MUSetSpeedUpLQ", Set_MUSetSpeedUpLQ },
+	{ "MUSetMUTable", Set_MUSetMUTable }, { "MUSetGroup", Set_MUSetGroup }, { "MUGetQD", Set_MUGetQD },
+	{ "MUSetEnable", Set_MUSetEnable }, { "MUSetGID_UP", Set_MUSetGID_UP }, { "MUTriggerTx", Set_MUTriggerTx },
+	{ "WriteEfuse", WriteEfuse }, { "TxPower", SetTxTargetPower }, { "RDDReport", SetRddReport },
+	{ "ByPassCac", SetByPassCac }, { "RadarDetectMode", SetRadarDetectMode },
 	{
 			NULL,
 	} };
@@ -537,7 +525,6 @@ int SetATEIpg(struct net_device *prNetDev, UINT_8 *prInBuf)
 	return i4Status;
 }
 
-#if CFG_SUPPORT_TX_BF
 int Set_TxBfProfileTag_Help(struct net_device *prNetDev, UINT_8 *prInBuf)
 {
 	DBGLOG(RFTEST, ERROR,
@@ -1401,7 +1388,6 @@ int Set_StaRecBfUpdate(struct net_device *prNetDev, UINT_8 *prInBuf)
 	return i4Status;
 }
 
-#if CFG_SUPPORT_MU_MIMO
 int Set_MUGetInitMCS(struct net_device *prNetDev, UINT_8 *prInBuf)
 {
 	P_GLUE_INFO_T						prGlueInfo = NULL;
@@ -1957,8 +1943,6 @@ int Set_MUTriggerTx(struct net_device *prNetDev, UINT_8 *prInBuf)
 
 	return i4Status;
 }
-#endif
-#endif
 
 /*----------------------------------------------------------------------------*/
 /*!
@@ -2040,7 +2024,6 @@ int SetTxTargetPower(struct net_device *prNetDev, UINT_8 *prInBuf)
 	return i4Status;
 }
 
-#if (CFG_SUPPORT_DFS_MASTER == 1)
 /*----------------------------------------------------------------------------*/
 /*!
  * \brief  This routine is called to Set RDD Report
@@ -2188,8 +2171,6 @@ int SetRadarDetectMode(struct net_device *prNetDev, UINT_8 *prInBuf)
 	return i4Status;
 }
 
-#endif
-
 /*----------------------------------------------------------------------------*/
 /*!
  * \brief  This routine is called to search the corresponding ATE agent function.
@@ -2240,4 +2221,3 @@ int AteCmdSetHandle(struct net_device *prNetDev, UINT_8 *prInBuf, UINT_32 u4InBu
 	}
 	return i4Status;
 }
-#endif /*CFG_SUPPORT_QA_TOOL */

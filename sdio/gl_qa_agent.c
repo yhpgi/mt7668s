@@ -16,14 +16,14 @@
  ********************************************************************************
  */
 
+#include <uapi/linux/nl80211.h>
+
 #include "precomp.h"
-#if (CFG_SUPPORT_QA_TOOL == 1)
 #include "gl_wext.h"
 #include "gl_cfg80211.h"
 #include "gl_ate_agent.h"
 #include "gl_qa_agent.h"
 #include "gl_hook_api.h"
-#include <uapi/linux/nl80211.h>
 
 /*******************************************************************************
  *						C O N S T A N T S
@@ -39,7 +39,6 @@ UINT_32 u4EepromMode	 = 4;
 UINT_32 g_u4Chip_ID;
 UINT_8	g_ucEepromCurrentMode = EFUSE_MODE;
 
-#if CFG_SUPPORT_BUFFER_MODE
 UINT_8 uacEEPROMImage[MAX_EEPROM_BUFFER_SIZE] = {
 	/* 0x000 ~ 0x00F */
 	0xAE, 0x86, 0x06, 0x00, 0x18, 0x0D, 0x00, 0x00, 0xC0, 0x1F, 0xBD, 0x81, 0x3F, 0x01, 0x19, 0x00,
@@ -192,7 +191,6 @@ UINT_8 uacEEPROMImage[MAX_EEPROM_BUFFER_SIZE] = {
 	/* 0x4A0 ~ 0x4AF */
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
-#endif
 
 /*----------------------------------------------------------------------------*/
 /*!
@@ -3589,11 +3587,7 @@ static INT_32 HQA_WriteBufferDone(
 	prGlueInfo = *((P_GLUE_INFO_T *)netdev_priv(prNetDev));
 	prAdapter  = prGlueInfo->prAdapter;
 
-#if (CFG_FW_Report_Efuse_Address)
 	u2InitAddr = prAdapter->u4EfuseStartAddress;
-#else
-	u2InitAddr	 = EFUSE_CONTENT_BUFFER_START;
-#endif
 
 	memcpy(&Value, HqaCmdFrame->Data + 4 * 0, 4);
 	Value = ntohl(Value);
@@ -3610,11 +3604,8 @@ static INT_32 HQA_WriteBufferDone(
 	kalMemZero(prSetEfuseBufModeInfo, sizeof(PARAM_CUSTOM_EFUSE_BUFFER_MODE_T));
 
 	/* copy to the command buffer */
-#if (CFG_FW_Report_Efuse_Address)
 	u4ContentLen = (prAdapter->u4EfuseEndAddress) - (prAdapter->u4EfuseStartAddress) + 1;
-#else
-	u4ContentLen = EFUSE_CONTENT_BUFFER_SIZE;
-#endif
+
 	if (u4ContentLen > MAX_EEPROM_BUFFER_SIZE)
 		goto label_exit;
 	kalMemCopy(prSetEfuseBufModeInfo->aBinContent, &uacEEPROMImage[u2InitAddr], u4ContentLen);
@@ -3721,11 +3712,11 @@ static INT_32 HQA_SetTxTonePower(
 /*----------------------------------------------------------------------------*/
 static INT_32 HQA_GetChipID(struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
-	INT_32					 i4Ret = 0;
-	UINT_32					 u4ChipId;
-	struct mt66xx_chip_info *prChipInfo;
-	P_ADAPTER_T				 prAdapter	= NULL;
-	P_GLUE_INFO_T			 prGlueInfo = NULL;
+	INT_32			  i4Ret = 0;
+	UINT_32			  u4ChipId;
+	struct chip_info *prChipInfo;
+	P_ADAPTER_T		  prAdapter	 = NULL;
+	P_GLUE_INFO_T	  prGlueInfo = NULL;
 	/*	UINT_32 u4BufLen = 0;
 	 *	PARAM_CUSTOM_MCR_RW_STRUCT_T rMcrInfo;
 	 */
@@ -4613,7 +4604,6 @@ static HQA_CMD_HANDLER HQA_CMD_SET5[] = {
 	HQA_MPSSetPerpacketBW,		  /* 0x1537 */
 };
 
-#if CFG_SUPPORT_TX_BF
 static INT_32 HQA_TxBfProfileTagInValid(
 		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
@@ -5637,7 +5627,6 @@ static HQA_CMD_HANDLER HQA_TXBF_CMDS[] = {
 	HQA_ManualAssoc,				/* 0x155A */
 };
 
-#if CFG_SUPPORT_MU_MIMO
 static INT_32 HQA_MUGetInitMCS(
 		struct net_device *prNetDev, IN union iwreq_data *prIwReqData, HQA_CMD_FRAME *HqaCmdFrame)
 {
@@ -6226,8 +6215,6 @@ static HQA_CMD_HANDLER HQA_TXMU_CMDS[] = {
 	HQA_MUSetGID_UP,	/* 0x156B */
 	HQA_MUTriggerTx,	/* 0x156C */
 };
-#endif
-#endif
 
 /*----------------------------------------------------------------------------*/
 /*!
@@ -7365,20 +7352,16 @@ static HQA_CMD_TABLE HQA_CMD_TABLES[] = {
 			sizeof(HQA_CMD_SET5) / sizeof(HQA_CMD_HANDLER),
 			0x1500,
 	},
-#if CFG_SUPPORT_TX_BF
 	{
 			HQA_TXBF_CMDS,
 			sizeof(HQA_TXBF_CMDS) / sizeof(HQA_CMD_HANDLER),
 			0x1540,
 	},
-#if CFG_SUPPORT_MU_MIMO
 	{
 			HQA_TXMU_CMDS,
 			sizeof(HQA_TXMU_CMDS) / sizeof(HQA_CMD_HANDLER),
 			0x1560,
 	},
-#endif
-#endif
 	{
 			HQA_ICAP_CMDS,
 			sizeof(HQA_ICAP_CMDS) / sizeof(HQA_CMD_HANDLER),
@@ -7499,4 +7482,3 @@ int priv_set_eeprom_mode(IN UINT_32 u4Mode)
 	g_ucEepromCurrentMode = u4Mode;
 	return 0;
 }
-#endif

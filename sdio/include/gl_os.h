@@ -118,10 +118,8 @@
 #include "version.h"
 #include "config.h"
 
-#if CFG_ENABLE_WIFI_DIRECT_CFG_80211
 #include <linux/wireless.h>
 #include <net/cfg80211.h>
-#endif
 
 #include <linux/module.h>
 #include <linux/can/netlink.h>
@@ -141,9 +139,7 @@
 #include "gl_kal.h"
 #include "hif.h"
 
-#if CFG_SUPPORT_TDLS
 #include "tdls.h"
-#endif
 
 #include "debug.h"
 
@@ -220,9 +216,7 @@ extern const INT_32								 mtk_iface_combinations_sta_num;
 #define WLAN_AKM_SUITE_8021X_SUITE_B_192 0x000FAC0C
 #endif
 
-#if CFG_SUPPORT_OWE
 #define WLAN_AKM_SUITE_OWE 0x000FAC12
-#endif
 
 #define IW_AUTH_CIPHER_GCMP256 0x00000080
 
@@ -237,18 +231,15 @@ typedef struct _GL_WPA_INFO_T {
 	UINT_32 u4CipherPairwise;
 	UINT_32 u4AuthAlg;
 	BOOLEAN fgPrivacyInvoke;
-#if CFG_SUPPORT_802_11W
 	UINT_32 u4CipherGroupMgmt;
 	UINT_32 u4Mfp;
 	UINT_8	ucRSNMfpCap;
-#endif
 	UINT_8 ucRsneLen;
 	UINT_8 aucKek[NL80211_KEK_LEN];
 	UINT_8 aucKck[NL80211_KCK_LEN];
 	UINT_8 aucReplayCtr[NL80211_REPLAY_CTR_LEN];
 } GL_WPA_INFO_T, *P_GL_WPA_INFO_T;
 
-#if CFG_SUPPORT_REPLAY_DETECTION
 struct SEC_REPLEY_PN_INFO {
 	UINT_8	auPN[16];
 	BOOLEAN fgRekey;
@@ -263,7 +254,6 @@ struct SEC_DETECT_REPLAY_INFO {
 	BOOLEAN					  fgPairwiseInstalled;
 	BOOLEAN					  fgKeyRscFresh;
 };
-#endif
 
 typedef enum _ENUM_NET_DEV_IDX_T {
 	NET_DEV_WLAN_IDX = 0,
@@ -280,7 +270,6 @@ typedef enum _ENUM_RSSI_TRIGGER_TYPE {
 	ENUM_RSSI_TRIGGER_NUM
 } ENUM_RSSI_TRIGGER_TYPE;
 
-#if CFG_ENABLE_WIFI_DIRECT
 typedef enum _ENUM_NET_REG_STATE_T {
 	ENUM_NET_REG_STATE_UNREGISTERED,
 	ENUM_NET_REG_STATE_REGISTERING,
@@ -296,7 +285,6 @@ typedef enum _ENUM_P2P_REG_STATE_T {
 	ENUM_P2P_REG_STATE_UNREGISTERING,
 	ENUM_P2P_REG_STATE_NUM
 } ENUM_P2P_REG_STATE_T;
-#endif
 
 typedef enum _ENUM_PKT_FLAG_T {
 	ENUM_PKT_802_11,		   /* 802.11 or non-802.11 */
@@ -307,12 +295,7 @@ typedef enum _ENUM_PKT_FLAG_T {
 	ENUM_PKT_VLAN_EXIST,	   /* VLAN tag exist */
 	ENUM_PKT_DHCP,			   /* DHCP frame */
 	ENUM_PKT_ARP,			   /* ARP */
-#ifdef CFG_SUPPORT_MULTICAST_ENHANCEMENT
-	ENUM_PKT_FIRST_DUP, /* The First Duplicate packet */
-#ifdef CFG_SUPPORT_MULTICAST_ENHANCEMENT_LOOKBACK
-	ENUM_PKT_LB, /* PKT LB flag */
-#endif
-#endif
+	ENUM_PKT_FIRST_DUP, 	   /* The First Duplicate packet */
 	ENUM_PKT_FLAG_NUM
 } ENUM_PKT_FLAG_T;
 
@@ -407,10 +390,7 @@ struct _GLUE_INFO_T {
 
 	/* Pointer to ADAPTER_T - main data structure of internal protocol stack */
 	P_ADAPTER_T prAdapter;
-
-#if WLAN_INCLUDE_PROC
 	struct proc_dir_entry *pProcRoot;
-#endif /* WLAN_INCLUDE_PROC */
 
 	/* Indicated media state */
 	ENUM_PARAM_MEDIA_STATE_T eParamMediaStateIndicated;
@@ -451,23 +431,12 @@ struct _GLUE_INFO_T {
 
 	struct timer_list tickfn;
 
-#if CFG_SUPPORT_EXT_CONFIG
-	UINT_16 au2ExtCfg[256]; /* NVRAM data buffer */
-	UINT_32 u4ExtCfgLength; /* 0 means data is NOT valid */
-#endif
-
 	/* Should be large than the PARAM_WAPI_ASSOC_INFO_T */
 	UINT_8	aucWapiAssocInfoIEs[42];
 	UINT_16 u2WapiAssocInfoIESz;
 
-#if CFG_ENABLE_WIFI_DIRECT
 	P_GL_P2P_DEV_INFO_T prP2PDevInfo;
 	P_GL_P2P_INFO_T		prP2PInfo[KAL_P2P_NUM];
-#if CFG_SUPPORT_P2P_RSSI_QUERY
-	/* Wireless statistics struct net_device */
-	struct iw_statistics rP2pIwStats;
-#endif
-#endif
 	BOOLEAN fgWpsActive;
 	UINT_8	aucWSCIE[500]; /*for probe req */
 	UINT_16 u2WSCIELen;
@@ -501,33 +470,22 @@ struct _GLUE_INFO_T {
 	UINT_32 u4ReqIeLength;
 	UINT_8	aucReqIe[CFG_CFG80211_IE_BUF_LEN];
 
-#if CFG_SUPPORT_SDIO_READ_WRITE_PATTERN
 	BOOLEAN fgEnSdioTestPattern;
 	BOOLEAN fgSdioReadWriteMode;
 	BOOLEAN fgIsSdioTestInitialized;
 	UINT_8	aucSdioTestBuffer[256];
-#endif
 
 	BOOLEAN fgIsInSuspendMode;
 
-#if CFG_MET_PACKET_TRACE_SUPPORT
 	BOOLEAN fgMetProfilingEn;
 	UINT_16 u2MetUdpPort;
-#endif
 
-#if CFG_SUPPORT_SNIFFER
 	BOOLEAN			   fgIsEnableMon;
 	struct net_device *prMonDevHandler;
 	struct work_struct monWork;
-#endif
 
 	INT_32	i4RssiCache;
 	UINT_32 u4LinkSpeedCache;
-
-#ifdef CFG_SUPPORT_MULTICAST_ENHANCEMENT_LOOKBACK
-	QUE_T rTxLookBackQueue;
-	QUE_T rRxLookBackQueue;
-#endif
 };
 
 typedef irqreturn_t (*PFN_WLANISR)(int irq, void *dev_id, struct pt_regs *regs);
@@ -535,9 +493,8 @@ typedef irqreturn_t (*PFN_WLANISR)(int irq, void *dev_id, struct pt_regs *regs);
 typedef void (*PFN_LINUX_TIMER_FUNC)(unsigned long);
 
 /* generic sub module init/exit handler
- *   now, we only have one sub module, p2p
+ * now, we only have one sub module, p2p
  */
-#if CFG_ENABLE_WIFI_DIRECT
 typedef BOOLEAN (*SUB_MODULE_INIT)(P_GLUE_INFO_T prGlueInfo);
 typedef BOOLEAN (*SUB_MODULE_EXIT)(P_GLUE_INFO_T prGlueInfo);
 
@@ -547,7 +504,6 @@ typedef struct _SUB_MODULE_HANDLER {
 	BOOLEAN			fgIsInited;
 } SUB_MODULE_HANDLER, *P_SUB_MODULE_HANDLER;
 
-#endif
 
 #ifdef CONFIG_NL80211_TESTMODE
 
@@ -737,36 +693,19 @@ static __KAL_INLINE__ VOID glPacketDataTypeCheck(VOID)
 static inline u16 mtk_wlan_ndev_select_queue(struct sk_buff *skb)
 {
 	static u16 ieee8021d_to_queue[8] = { 1, 0, 0, 1, 2, 2, 3, 3 };
-
 	/* cfg80211_classify8021d returns 0~7 */
 	skb->priority = cfg80211_classify8021d(skb, NULL);
-
 	return ieee8021d_to_queue[skb->priority];
 }
 
-#if KERNEL_VERSION(2, 6, 34) > LINUX_VERSION_CODE
-#define netdev_for_each_mc_addr(mclist, dev) for (mclist = dev->mc_list; mclist; mclist = mclist->next)
-#endif
-
-#if KERNEL_VERSION(2, 6, 34) > LINUX_VERSION_CODE
-#define GET_ADDR(ha) (ha->da_addr)
-#else
 #define GET_ADDR(ha) (ha->addr)
-#endif
-
-#if KERNEL_VERSION(2, 6, 35) <= LINUX_VERSION_CODE
 #define LIST_FOR_EACH_IPV6_ADDR(_prIfa, _ip6_ptr) \
 	list_for_each_entry(_prIfa, &((struct inet6_dev *)_ip6_ptr)->addr_list, if_list)
-#else
-#define LIST_FOR_EACH_IPV6_ADDR(_prIfa, _ip6_ptr) \
-	for (_prIfa = ((struct inet6_dev *)_ip6_ptr)->addr_list; _prIfa; _prIfa = _prIfa->if_next)
-#endif
 
 /*******************************************************************************
  *                  F U N C T I O N   D E C L A R A T I O N S
  ********************************************************************************
  */
-#if WLAN_INCLUDE_PROC
 INT_32 procCreateFsEntry(P_GLUE_INFO_T prGlueInfo);
 INT_32 procRemoveProcfs(VOID);
 
@@ -774,11 +713,8 @@ INT_32 procInitFs(VOID);
 INT_32 procUninitProcFs(VOID);
 
 INT_32 procInitProcfs(struct net_device *prDev, char *pucDevName);
-#endif /* WLAN_INCLUDE_PROC */
 
-#if CFG_ENABLE_WIFI_DIRECT
 void p2pSetMulticastListWorkQueueWrapper(P_GLUE_INFO_T prGlueInfo);
-#endif
 
 P_GLUE_INFO_T wlanGetGlueInfo(VOID);
 
@@ -811,11 +747,9 @@ struct wireless_dev *wlanGetWirelessDevice(void);
 extern struct net_device *gPrP2pDev[KAL_P2P_NUM];
 extern struct net_device *gPrDev;
 
-#ifdef CFG_DRIVER_INF_NAME_CHANGE
 extern char *gprifnameap;
 extern char *gprifnamep2p;
 extern char *gprifnamesta;
-#endif /* CFG_DRIVER_INF_NAME_CHANGE */
 
 extern void wlanRegisterNotifier(void);
 extern void wlanUnregisterNotifier(void);
@@ -823,25 +757,11 @@ extern void wlanUnregisterNotifier(void);
 extern void wlanRegisterRebootNotifier(void);
 extern void wlanUnregisterRebootNotifier(void);
 
-#if CFG_ENABLE_EARLY_SUSPEND
-extern int glRegisterEarlySuspend(
-		struct early_suspend *prDesc, early_suspend_callback wlanSuspend, late_resume_callback wlanResume);
-
-extern int glUnregisterEarlySuspend(struct early_suspend *prDesc);
-#endif
-
-#if CFG_MET_PACKET_TRACE_SUPPORT
 VOID kalMetTagPacket(IN P_GLUE_INFO_T prGlueInfo, IN P_NATIVE_PACKET prPacket, IN ENUM_TX_PROFILING_TAG_T eTag);
-
 VOID kalMetInit(IN P_GLUE_INFO_T prGlueInfo);
-#endif
-
 VOID wlanUpdateChannelTable(P_GLUE_INFO_T prGlueInfo);
 
-#if CFG_SUPPORT_SAP_DFS_CHANNEL
 void wlanUpdateDfsChannelTable(IN P_GLUE_INFO_T prGlueInfo, IN UINT_8 ucChannel);
-#endif
-
 int set_p2p_mode_handler(struct net_device *netdev, PARAM_CUSTOM_P2P_SET_STRUCT_T p2pmode);
 
 #endif /* _GL_OS_H */

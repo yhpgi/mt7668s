@@ -3,6 +3,8 @@
 config MT7668S_WIFI
 	tristate "Mediatek MT7668S WiFi support"
 	depends on MMC
+	select PM
+	select WIRELESS_EXT
 	select CFG80211_WEXT
 	select CFG80211_WEXT_EXPORT
 	default m

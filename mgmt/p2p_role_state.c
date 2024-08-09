@@ -245,7 +245,6 @@ VOID p2pRoleStateAbort_GC_JOIN(IN P_ADAPTER_T prAdapter, IN P_P2P_ROLE_FSM_INFO_
 	} while (FALSE);
 }
 
-#if (CFG_SUPPORT_DFS_MASTER == 1)
 VOID p2pRoleStateInit_DFS_CAC(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIdx, IN P_P2P_CHNL_REQ_INFO_T prChnlReqInfo)
 {
 	do {
@@ -282,7 +281,6 @@ VOID p2pRoleStateAbort_SWITCH_CHANNEL(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T 
 		p2pFuncReleaseCh(prAdapter, prP2pRoleFsmInfo->ucBssIndex, &(prP2pRoleFsmInfo->rChnlReqInfo));
 	} while (FALSE);
 } /* p2pRoleStateAbort_SWITCH_CHANNEL */
-#endif
 
 VOID p2pRoleStatePrepare_To_REQING_CHANNEL_STATE(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prBssInfo,
 		IN P_P2P_CONNECTION_REQ_INFO_T prConnReqInfo, OUT P_P2P_CHNL_REQ_INFO_T prChnlReqInfo)
@@ -348,7 +346,6 @@ VOID p2pRoleStatePrepare_To_REQING_CHANNEL_STATE(IN P_ADAPTER_T prAdapter, IN P_
 	} while (FALSE);
 }
 
-#if (CFG_SUPPORT_DFS_MASTER == 1)
 VOID p2pRoleStatePrepare_To_DFS_CAC_STATE(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prBssInfo,
 		IN ENUM_CHANNEL_WIDTH_T rChannelWidth, IN P_P2P_CONNECTION_REQ_INFO_T prConnReqInfo,
 		OUT P_P2P_CHNL_REQ_INFO_T prChnlReqInfo)
@@ -400,4 +397,3 @@ VOID p2pRoleStatePrepare_To_DFS_CAC_STATE(IN P_ADAPTER_T prAdapter, IN P_BSS_INF
 		prBssInfo->eBssSCO			= eSCOBackup;
 	} while (FALSE);
 }
-#endif

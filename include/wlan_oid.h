@@ -63,11 +63,10 @@
 #define PARAM_PACKET_FILTER_BROADCAST 0x00000008
 #define PARAM_PACKET_FILTER_PROMISCUOUS 0x00000020
 #define PARAM_PACKET_FILTER_ALL_LOCAL 0x00000080
-#if CFG_ENABLE_WIFI_DIRECT_CFG_80211
+
 #define PARAM_PACKET_FILTER_P2P_MASK 0xC0000000
 #define PARAM_PACKET_FILTER_PROBE_REQ 0x80000000
 #define PARAM_PACKET_FILTER_ACTION_FRAME 0x40000000
-#endif
 
 #define PARAM_PACKET_FILTER_SUPPORTED \
 	(PARAM_PACKET_FILTER_DIRECTED | PARAM_PACKET_FILTER_MULTICAST | PARAM_PACKET_FILTER_BROADCAST | \
@@ -78,7 +77,6 @@
 #define BT_PROFILE_PARAM_LEN 8
 
 #define EFUSE_ADDR_MAX 0x3BF /* Based on EEPROM layout 20160120 */
-#if CFG_SUPPORT_BUFFER_MODE
 
 /* For MT7668 */
 #define EFUSE_CONTENT_BUFFER_START 0x03A
@@ -93,14 +91,11 @@
 #define EFUSE_BLOCK_SIZE 16
 #define EEPROM_SIZE 1184
 #define MAX_EEPROM_BUFFER_SIZE 1200
-#endif /* CFG_SUPPORT_BUFFER_MODE */
 
-#if CFG_SUPPORT_TX_BF
 #define TXBF_CMD_NEED_TO_RESPONSE(u4TxBfCmdId) (u4TxBfCmdId == BF_PFMU_TAG_READ || u4TxBfCmdId == BF_PROFILE_READ)
-#endif /* CFG_SUPPORT_TX_BF */
 #define MU_CMD_NEED_TO_RESPONSE(u4MuCmdId) \
 	(u4MuCmdId == MU_GET_CALC_INIT_MCS || u4MuCmdId == MU_HQA_GET_QD || u4MuCmdId == MU_HQA_GET_CALC_LQ)
-#if CFG_SUPPORT_MU_MIMO
+
 /* @NITESH: MACROS For Init MCS calculation (MU Metric Table) */
 #define NUM_MUT_FEC 2
 #define NUM_MUT_MCS 10
@@ -109,7 +104,6 @@
 
 #define NUM_OF_USER 2
 #define NUM_OF_MODUL 5
-#endif /* CFG_SUPPORT_MU_MIMO */
 
 /*******************************************************************************
  *                             D A T A   T Y P E S
@@ -147,10 +141,8 @@ typedef enum _ENUM_WEP_STATUS_T {
 	ENUM_ENCRYPTION2_KEY_ABSENT,
 	ENUM_ENCRYPTION3_ENABLED,
 	ENUM_ENCRYPTION3_KEY_ABSENT,
-#if CFG_SUPPORT_SUITB
 	ENUM_ENCRYPTION4_ENABLED,
 	ENUM_ENCRYPTION4_KEY_ABSENT,
-#endif
 	ENUM_ENCRYPTION_NUM
 } ENUM_PARAM_ENCRYPTION_STATUS_T,
 		*P_ENUM_PARAM_ENCRYPTION_STATUS_T;
@@ -422,7 +414,6 @@ typedef struct _PARAM_POWER_MODE_T {
 	PARAM_POWER_MODE ePowerMode;
 } PARAM_POWER_MODE_T, *P_PARAM_POWER_MODE_T;
 
-#if CFG_SUPPORT_802_11D
 
 /*! \brief The enumeration definitions for OID_IPN_MULTI_DOMAIN_CAPABILITY */
 typedef enum _PARAM_MULTI_DOMAIN_CAPABILITY {
@@ -430,7 +421,6 @@ typedef enum _PARAM_MULTI_DOMAIN_CAPABILITY {
 	ParamMultiDomainCapEnabled
 } PARAM_MULTI_DOMAIN_CAPABILITY,
 		*P_PARAM_MULTI_DOMAIN_CAPABILITY;
-#endif
 
 typedef struct _COUNTRY_STRING_ENTRY {
 	UINT_8 aucCountryCode[2];
@@ -556,8 +546,6 @@ struct PARAM_COEX_ISO_DETECT {
 	UINT_32 u4Isolation;
 };
 
-#if CFG_SUPPORT_QA_TOOL
-#if CFG_SUPPORT_BUFFER_MODE
 typedef struct _BIN_CONTENT_T {
 	UINT_16 u2Addr;
 	UINT_8	ucValue;
@@ -594,7 +582,6 @@ typedef struct _PARAM_CUSTOM_GET_TX_POWER_T {
 
 /*#endif*/
 
-#endif /* CFG_SUPPORT_BUFFER_MODE */
 
 typedef struct _PARAM_CUSTOM_SET_TX_TARGET_POWER_T {
 	INT_8  cTxPwr2G4Cck;  /* signed, in unit of 0.5dBm */
@@ -645,7 +632,6 @@ typedef struct _PARAM_CUSTOM_SET_TX_TARGET_POWER_T {
 	INT_8 cTxPwr5GHT40_MCS7;
 } PARAM_CUSTOM_SET_TX_TARGET_POWER_T, *P_PARAM_CUSTOM_SET_TX_TARGET_POWER_T;
 
-#if (CFG_SUPPORT_DFS_MASTER == 1)
 typedef struct _PARAM_CUSTOM_SET_RDD_REPORT_T {
 	UINT_8 ucDbdcIdx; /* 0:Band 0, 1: Band1 */
 } PARAM_CUSTOM_SET_RDD_REPORT_T, *P_PARAM_CUSTOM_SET_RDD_REPORT_T;
@@ -653,7 +639,6 @@ typedef struct _PARAM_CUSTOM_SET_RDD_REPORT_T {
 struct PARAM_CUSTOM_SET_RADAR_DETECT_MODE {
 	UINT_8 ucRadarDetectMode; /* 0:Switch channel, 1: Don't switch channel */
 };
-#endif
 
 typedef struct _PARAM_CUSTOM_ACCESS_RX_STAT {
 	UINT_32 u4SeqNum;
@@ -679,7 +664,6 @@ typedef enum _EXT_ENUM_STAREC_TAG_HANDLE_T {
 	STA_REC_MAX_NUM
 } EXT_ENUM_TAG_STAREC_HANDLE_T;
 
-#if CFG_SUPPORT_TX_BF
 typedef enum _BF_ACTION_CATEGORY {
 	BF_SOUNDING_OFF = 0,
 	BF_SOUNDING_ON,
@@ -1052,7 +1036,6 @@ typedef struct _PARAM_CUSTOM_PFMU_TAG_READ_STRUCT_T {
 	PFMU_PROFILE_TAG2 ru4TxBfPFMUTag2;
 } PARAM_CUSTOM_PFMU_TAG_READ_STRUCT_T, *P_PARAM_CUSTOM_PFMU_TAG_READ_STRUCT_T;
 
-#if CFG_SUPPORT_MU_MIMO
 typedef struct _PARAM_CUSTOM_SHOW_GROUP_TBL_ENTRY_STRUCT_T {
 	UINT_32 u4EventId;
 	UINT_8	index;
@@ -1211,17 +1194,12 @@ typedef struct _PARAM_CUSTOM_MUMIMO_ACTION_STRUCT_T {
 		MU_TRIGGER_MU_TX_T	   rMuTriggerMuTx;
 	} unMuMimoParam;
 } PARAM_CUSTOM_MUMIMO_ACTION_STRUCT_T, *P_PARAM_CUSTOM_MUMIMO_ACTION_STRUCT_T;
-#endif /* CFG_SUPPORT_MU_MIMO */
-#endif /* CFG_SUPPORT_TX_BF */
-#endif /* CFG_SUPPORT_QA_TOOL */
 
 typedef struct _PARAM_CUSTOM_MEM_DUMP_STRUCT_T {
 	UINT_32 u4Address;
 	UINT_32 u4Length;
 	UINT_32 u4RemainLength;
-#if CFG_SUPPORT_QA_TOOL
 	UINT_32 u4IcapContent;
-#endif /* CFG_SUPPORT_QA_TOOL */
 	UINT_8 ucFragNum;
 } PARAM_CUSTOM_MEM_DUMP_STRUCT_T, *P_PARAM_CUSTOM_MEM_DUMP_STRUCT_T;
 
@@ -1452,7 +1430,6 @@ typedef struct _PARAM_NETWORK_ADDRESS_LIST {
 	PARAM_NETWORK_ADDRESS arAddress[1];	  /* actually AddressCount elements long */
 } PARAM_NETWORK_ADDRESS_LIST, *P_PARAM_NETWORK_ADDRESS_LIST;
 
-#if CFG_SUPPORT_MSP
 /* Should by chip */
 typedef struct _PARAM_SEC_CONFIG_T {
 	BOOL fgWPIFlag;
@@ -1662,7 +1639,6 @@ typedef struct _PARAM_HW_MIB_INFO_T {
 	HW_MIB2_COUNTER_T	  rHwMib2Cnt;
 	HW_TX_AMPDU_METRICS_T rHwTxAmpduMts;
 } PARAM_HW_MIB_INFO_T, *P_PARAM_HW_MIB_INFO_T;
-#endif
 
 #if CFG_SUPPORT_LAST_SEC_MCS_INFO
 struct PARAM_TX_MCS_INFO {
@@ -1672,7 +1648,6 @@ struct PARAM_TX_MCS_INFO {
 };
 #endif
 
-#ifdef CFG_DUMP_TXPOWR_TABLE
 struct PARAM_CMD_GET_TXPWR_TBL {
 	UINT_8			   ucDbdcIdx;
 	UINT_8			   ucCenterCh;
@@ -1704,7 +1679,7 @@ struct txpwr_table {
 	struct txpwr_table_entry *tables;
 	int						  n_tables;
 };
-#endif
+
 
 /*--------------------------------------------------------------*/
 /*! \brief For Fixed Rate Configuration (Registry)              */
@@ -1811,10 +1786,8 @@ typedef struct _PARAM_SCAN_REQUEST_ADV_T {
 	PARAM_SSID_T rSsid[CFG_SCAN_SSID_MAX_NUM];
 	UINT_32		 u4IELength;
 	PUINT_8		 pucIE;
-#if CFG_SCAN_CHANNEL_SPECIFIED
 	UINT_8			  ucChannelListNum;
 	RF_CHANNEL_INFO_T arChnlInfoList[MAXIMUM_OPERATION_CHANNEL_LIST];
-#endif
 } PARAM_SCAN_REQUEST_ADV_T, *P_PARAM_SCAN_REQUEST_ADV_T;
 
 /*--------------------------------------------------------------*/
@@ -1828,7 +1801,6 @@ typedef struct _PARAM_SCHED_SCAN_REQUEST_T {
 	UINT_16		 u2ScanInterval; /* in milliseconds */
 } PARAM_SCHED_SCAN_REQUEST, *P_PARAM_SCHED_SCAN_REQUEST;
 
-#if CFG_SUPPORT_SNIFFER
 typedef struct _PARAM_CUSTOM_MONITOR_SET_STRUCT_T {
 	UINT_8 ucEnable;
 	UINT_8 ucBand;
@@ -1839,9 +1811,7 @@ typedef struct _PARAM_CUSTOM_MONITOR_SET_STRUCT_T {
 	UINT_8 ucChannelS2;
 	UINT_8 aucResv[9];
 } PARAM_CUSTOM_MONITOR_SET_STRUCT_T, *P_PARAM_CUSTOM_MONITOR_SET_STRUCT_T;
-#endif
 
-#if CFG_AUTO_CHANNEL_SEL_SUPPORT
 /*--------------------------------------------------------------*/
 /*! \brief MTK Auto Channel Selection related Container         */
 /*--------------------------------------------------------------*/
@@ -1876,7 +1846,6 @@ typedef struct _PARAM_PREFER_CHN_INFO {
 	UINT_16 u2APNumScore;
 	UINT_8	ucReserved;
 } PARAM_PREFER_CHN_INFO, *P_PARAM_PREFER_CHN_INFO;
-#endif
 
 typedef struct _UMAC_STAT2_GET_T {
 	UINT_16 u2PleRevPgHif0Group0;
@@ -2135,8 +2104,6 @@ WLAN_STATUS
 wlanoidQueryLinkSpeed(
 		IN P_ADAPTER_T prAdapter, IN PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
 
-#if CFG_SUPPORT_QA_TOOL
-#if CFG_SUPPORT_BUFFER_MODE
 WLAN_STATUS wlanoidSetEfusBufferMode(
 		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
@@ -2158,7 +2125,7 @@ wlanoidQueryGetTxPower(
 		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 /*#endif*/
 
-#endif /* CFG_SUPPORT_BUFFER_MODE */
+
 WLAN_STATUS
 wlanoidQueryRxStatistics(
 		IN P_ADAPTER_T prAdapter, IN PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
@@ -2175,7 +2142,6 @@ WLAN_STATUS
 wlanoidManualAssoc(
 		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
-#if CFG_SUPPORT_TX_BF
 WLAN_STATUS
 wlanoidTxBfAction(
 		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
@@ -2185,8 +2151,6 @@ WLAN_STATUS wlanoidStaRecUpdate(
 		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 WLAN_STATUS wlanoidStaRecBFUpdate(
 		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
-#endif /* CFG_SUPPORT_TX_BF */
-#endif /* CFG_SUPPORT_QA_TOOL */
 
 WLAN_STATUS
 wlanoidQueryMcrRead(
@@ -2367,11 +2331,9 @@ WLAN_STATUS
 wlanoidSetCurrentAddr(
 		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
-#if CFG_TCP_IP_CHKSUM_OFFLOAD
 WLAN_STATUS
 wlanoidSetCSUMOffload(
 		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
-#endif /* CFG_TCP_IP_CHKSUM_OFFLOAD */
 
 WLAN_STATUS
 wlanoidSetNetworkAddress(
@@ -2410,29 +2372,9 @@ WLAN_STATUS
 wlanoidRftestSetAutoTest(
 		IN P_ADAPTER_T prAdapter, OUT PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
-#if CFG_SUPPORT_WPS2
 WLAN_STATUS
 wlanoidSetWSCAssocInfo(
 		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
-#endif
-
-#if CFG_ENABLE_WAKEUP_ON_LAN
-WLAN_STATUS
-wlanoidSetAddWakeupPattern(
-		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
-
-WLAN_STATUS
-wlanoidSetRemoveWakeupPattern(
-		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
-
-WLAN_STATUS
-wlanoidQueryEnableWakeup(
-		IN P_ADAPTER_T prAdapter, OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 u4QueryInfoLen);
-
-WLAN_STATUS
-wlanoidSetEnableWakeup(
-		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
-#endif
 
 WLAN_STATUS
 wlanoidSetWiFiWmmPsTest(
@@ -2503,11 +2445,9 @@ WLAN_STATUS
 wlanoidSetTxPower(
 		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
-#if CFG_ENABLE_WIFI_DIRECT
 WLAN_STATUS
 wlanoidSetP2pMode(
 		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
-#endif
 
 WLAN_STATUS
 wlanoidSetDefaultKey(
@@ -2525,7 +2465,6 @@ WLAN_STATUS
 wlanoidSetStopSchedScan(
 		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
-#if CFG_SUPPORT_BATCH_SCAN
 WLAN_STATUS
 wlanoidSetBatchScanReq(
 		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
@@ -2533,33 +2472,23 @@ wlanoidSetBatchScanReq(
 WLAN_STATUS
 wlanoidQueryBatchScanResult(
 		IN P_ADAPTER_T prAdapter, OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
-#endif
 
-#if CFG_SUPPORT_SNIFFER
 WLAN_STATUS wlanoidSetMonitor(
 		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
-#endif
 
-#if CFG_STR_DHCP_RENEW_OFFLOAD
-WLAN_STATUS
-wlanoidSetDhcpOffladInfo(
-		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
-#endif
 
 WLAN_STATUS
 wlanoidNotifyFwSuspend(
 		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
-#if CFG_SUPPORT_DBDC
+
 WLAN_STATUS
 wlanoidSetDbdcEnable(
 		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
-#endif /*#if CFG_SUPPORT_DBDC*/
 
 WLAN_STATUS
 wlanoidQuerySetTxTargetPower(
 		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
-#if (CFG_SUPPORT_DFS_MASTER == 1)
 WLAN_STATUS
 wlanoidQuerySetRddReport(
 		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
@@ -2567,9 +2496,7 @@ wlanoidQuerySetRddReport(
 WLAN_STATUS
 wlanoidQuerySetRadarDetectMode(
 		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
-#endif
 
-#if CFG_AUTO_CHANNEL_SEL_SUPPORT
 WLAN_STATUS
 wlanoidQueryLteSafeChannel(
 		IN P_ADAPTER_T prAdapter, IN PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
@@ -2581,12 +2508,6 @@ wlanGetChannelIndex(IN UINT_8 channel);
 UINT_8
 wlanGetChannelNumFromIndex(IN UINT_8 ucIdx);
 VOID wlanSortChannel(IN P_ADAPTER_T prAdapter);
-#endif
-
-#ifdef CFG_SUPPORT_ANT_DIV
-WLAN_STATUS
-wlanoidAntDivCfg(IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
-#endif
 
 WLAN_STATUS
 wlanoidLinkDown(IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
@@ -2599,29 +2520,23 @@ WLAN_STATUS
 wlanoidSetCSIControl(
 		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
-#ifdef CFG_DUMP_TXPOWR_TABLE
 WLAN_STATUS
 wlanoidGetTxPwrTbl(
 		IN P_ADAPTER_T prAdapter, IN PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
-#endif
 
 uint32_t wlanGetSupportedFeatureSet(IN P_GLUE_INFO_T prGlueInfo);
 
 WLAN_STATUS wlanSuspendLinkDown(IN P_GLUE_INFO_T prGlueInfo);
 
-#if CFG_SUPPORT_802_11K
 WLAN_STATUS
 wlanoidSendNeighborRequest(
 		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, UINT_32 u4SetBufferLen, PUINT_32 pu4SetInfoLen);
-#endif
 
-#if CFG_SUPPORT_802_11V_BSS_TRANSITION_MGT
 WLAN_STATUS
 wlanoidSendBTMQuery(IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, UINT_32 u4SetBufferLen, PUINT_32 pu4SetInfoLen);
 
 WLAN_STATUS
 wlanoidPktProcessIT(IN P_ADAPTER_T prAdapter, IN PVOID pvBuffer, UINT_32 u4BufferLen, PUINT_32 pu4InfoLen);
-#endif
 
 /*******************************************************************************
  *                              F U N C T I O N S

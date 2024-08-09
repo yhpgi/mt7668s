@@ -28,13 +28,10 @@
  */
 #define AIS_BG_SCAN_INTERVAL_MIN_SEC 2 /* 30 // exponential to 960 */
 #define AIS_BG_SCAN_INTERVAL_MAX_SEC 2 /* 960 // 16min */
-#if CFG_SUPPORT_ROAMING
-#define AIS_DELAY_TIME_OF_DISCONNECT_SEC \
-	0 /* 100 Milli-seconds - Immediate indication to reduce inter-SSID roam time \
-	   */
-#else
-#define AIS_DELAY_TIME_OF_DISCONNECT_SEC 5 /* 10 */
-#endif									   /* CFG_SUPPORT_ROAMING */
+
+#define AIS_DELAY_TIME_OF_DISCONNECT_SEC 0 
+/* 100 Milli-seconds - Immediate indication to reduce inter-SSID roam time */
+
 #define AIS_IBSS_ALONE_TIMEOUT_SEC 20	   /* seconds */
 
 #define AIS_BEACON_TIMEOUT_COUNT_ADHOC 30
@@ -135,9 +132,7 @@ typedef struct _AIS_FSM_INFO_T {
 	BOOLEAN fgIsChannelRequested;
 	BOOLEAN fgIsChannelGranted;
 
-#if CFG_SUPPORT_ROAMING
 	BOOLEAN fgIsRoamingScanPending;
-#endif /* CFG_SUPPORT_ROAMING */
 
 	UINT_8 ucAvailableAuthTypes; /* Used for AUTH_MODE_AUTO_SWITCH */
 
@@ -177,10 +172,9 @@ typedef struct _AIS_FSM_INFO_T {
 	UINT_32 u4ScanIELength;
 	UINT_8	aucScanIEBuf[MAX_IE_LENGTH];
 
-#if CFG_SCAN_CHANNEL_SPECIFIED
 	UINT_8			  ucScanChannelListNum;
 	RF_CHANNEL_INFO_T arScanChnlInfoList[MAXIMUM_OPERATION_CHANNEL_LIST];
-#endif
+
 	UINT_8 fgIsScanOidAborted;
 
 	/* Pending Request List */
@@ -332,24 +326,18 @@ VOID aisBssBeaconTimeout(IN P_ADAPTER_T prAdapter, IN UINT_8 ucReasonCode);
 
 VOID aisBssLinkDown(IN P_ADAPTER_T prAdapter);
 
-#if CFG_SUPPORT_DBDC_TC6
 BOOLEAN aisBssChangeNSS(IN P_ADAPTER_T prAdapter, IN UINT_8 fgDbdcEn);
-#endif
 
 WLAN_STATUS
 aisDeauthXmitComplete(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo, IN ENUM_TX_RESULT_CODE_T rTxDoneStatus);
 
-#if CFG_SUPPORT_ROAMING
 VOID aisFsmRunEventRoamingDiscovery(IN P_ADAPTER_T prAdapter, UINT_32 u4ReqScan);
 
 ENUM_AIS_STATE_T aisFsmRoamingScanResultsUpdate(IN P_ADAPTER_T prAdapter);
 
 VOID aisFsmRoamingDisconnectPrevAP(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prTargetStaRec);
-#endif /*CFG_SUPPORT_ROAMING */
 
-#if CFG_SUPPORT_ROAMING || CFG_SUPPORT_SAME_BSS_REASSOC
 VOID aisUpdateBssInfoForRoamingAP(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec, IN P_SW_RFB_T prAssocRspSwRfb);
-#endif /*CFG_SUPPORT_ROAMING || CFG_SUPPORT_SAME_BSS_REASSOC*/
 
 /*----------------------------------------------------------------------------*/
 /* Timeout Handling                                                           */
@@ -397,19 +385,13 @@ VOID aisFsmRunEventMgmtFrameTx(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMsgHdr
 
 VOID aisFuncValidateRxActionFrame(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb);
 
-#if CFG_SUPPORT_802_11V_BSS_TRANSITION_MGT
 VOID aisFsmRunEventBssTransition(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMsgHdr);
-#endif
 
-#if CFG_SUPPORT_802_11K
 VOID aisSendNeighborRequest(IN P_ADAPTER_T prAdapter);
-#endif
 
-#if CFG_SUPPORT_802_11K || CFG_SUPPORT_802_11V_BSS_TRANSITION_MGT
 VOID aisResetNeighborApList(IN P_ADAPTER_T prAdapter);
 
 VOID aisCollectNeighborAP(IN P_ADAPTER_T prAdapter, UINT_8 *pucApBuf, UINT_16 u2ApBufLen, UINT_8 ucValidInterval);
-#endif
 
 enum _ENUM_AIS_STATE_T aisFsmStateSearchAction(IN struct _ADAPTER_T *prAdapter, UINT_8 ucPhase);
 #if defined(CFG_TEST_MGMT_FSM) && (CFG_TEST_MGMT_FSM != 0)

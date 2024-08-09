@@ -20,8 +20,6 @@
  */
 #include "precomp.h"
 
-#if CFG_ENABLE_WIFI_DIRECT
-
 /*******************************************************************************
  *                              C O N S T A N T S
  ********************************************************************************
@@ -185,7 +183,6 @@ VOID p2pFsmRunEventUpdateMgmtFrame(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMs
 	cnmMemFree(prAdapter, prMsgHdr);
 } /* p2pFsmRunEventUpdateMgmtFrame */
 
-#if CFG_SUPPORT_WFD
 VOID p2pFsmRunEventWfdSettingUpdate(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMsgHdr)
 {
 	P_WFD_CFG_SETTINGS_T				prWfdCfgSettings	= (P_WFD_CFG_SETTINGS_T)NULL;
@@ -222,8 +219,6 @@ VOID p2pFsmRunEventWfdSettingUpdate(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prM
 }
 
 /* p2pFsmRunEventWfdSettingUpdate */
-
-#endif /* CFG_SUPPORT_WFD */
 
 /*----------------------------------------------------------------------------*/
 /*!
@@ -268,5 +263,3 @@ VOID p2pFsmRunEventScanDone(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMsgHdr)
 		break;
 	}
 } /* p2pFsmRunEventScanDone */
-
-#endif /* CFG_ENABLE_WIFI_DIRECT */

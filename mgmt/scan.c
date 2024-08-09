@@ -74,22 +74,18 @@
 /*----------------------------------------------------------------------------*/
 VOID scnInit(IN P_ADAPTER_T prAdapter)
 {
-	P_SCAN_INFO_T prScanInfo;
-	P_BSS_DESC_T  prBSSDesc;
-	PUINT_8		  pucBSSBuff;
-	UINT_32		  i;
-#if CFG_SUPPORT_ROAMING_SKIP_ONE_AP
+	P_SCAN_INFO_T	  prScanInfo;
+	P_BSS_DESC_T	  prBSSDesc;
+	PUINT_8			  pucBSSBuff;
+	UINT_32			  i;
 	P_ROAM_BSS_DESC_T prRoamBSSDesc;
 	PUINT_8			  pucRoamBSSBuff;
-#endif
 
 	ASSERT(prAdapter);
 
-	prScanInfo = &(prAdapter->rWifiVar.rScanInfo);
-	pucBSSBuff = &prScanInfo->aucScanBuffer[0];
-#if CFG_SUPPORT_ROAMING_SKIP_ONE_AP
+	prScanInfo	   = &(prAdapter->rWifiVar.rScanInfo);
+	pucBSSBuff	   = &prScanInfo->aucScanBuffer[0];
 	pucRoamBSSBuff = &prScanInfo->aucScanRoamBuffer[0];
-#endif
 
 	DBGLOG(SCN, INFO, "->scnInit()\n");
 
@@ -102,16 +98,12 @@ VOID scnInit(IN P_ADAPTER_T prAdapter)
 
 	/* 4 <2> Reset link list of BSS_DESC_T */
 	kalMemZero((PVOID)pucBSSBuff, SCN_MAX_BUFFER_SIZE);
-#if CFG_SUPPORT_ROAMING_SKIP_ONE_AP
 	kalMemZero((PVOID)pucRoamBSSBuff, SCN_ROAM_MAX_BUFFER_SIZE);
-#endif
 
 	LINK_INITIALIZE(&prScanInfo->rFreeBSSDescList);
 	LINK_INITIALIZE(&prScanInfo->rBSSDescList);
-#if CFG_SUPPORT_ROAMING_SKIP_ONE_AP
 	LINK_INITIALIZE(&prScanInfo->rRoamFreeBSSDescList);
 	LINK_INITIALIZE(&prScanInfo->rRoamBSSDescList);
-#endif
 
 	for (i = 0; i < CFG_MAX_NUM_BSS_LIST; i++) {
 		prBSSDesc = (P_BSS_DESC_T)pucBSSBuff;
@@ -123,7 +115,6 @@ VOID scnInit(IN P_ADAPTER_T prAdapter)
 	/* Check if the memory allocation consist with this initialization function */
 	ASSERT(((ULONG)pucBSSBuff - (ULONG)&prScanInfo->aucScanBuffer[0]) == SCN_MAX_BUFFER_SIZE);
 
-#if CFG_SUPPORT_ROAMING_SKIP_ONE_AP
 	for (i = 0; i < CFG_MAX_NUM_ROAM_BSS_LIST; i++) {
 		prRoamBSSDesc = (P_ROAM_BSS_DESC_T)pucRoamBSSBuff;
 
@@ -132,7 +123,7 @@ VOID scnInit(IN P_ADAPTER_T prAdapter)
 		pucRoamBSSBuff += ALIGN_4(sizeof(ROAM_BSS_DESC_T));
 	}
 	ASSERT(((ULONG)pucRoamBSSBuff - (ULONG)&prScanInfo->aucScanRoamBuffer[0]) == SCN_ROAM_MAX_BUFFER_SIZE);
-#endif
+
 	/* reset freest channel information */
 	prScanInfo->fgIsSparseChannelValid = FALSE;
 
@@ -197,10 +188,8 @@ VOID scnUninit(IN P_ADAPTER_T prAdapter)
 	/* 4 <2> Reset link list of BSS_DESC_T */
 	LINK_INITIALIZE(&prScanInfo->rFreeBSSDescList);
 	LINK_INITIALIZE(&prScanInfo->rBSSDescList);
-#if CFG_SUPPORT_ROAMING_SKIP_ONE_AP
 	LINK_INITIALIZE(&prScanInfo->rRoamFreeBSSDescList);
 	LINK_INITIALIZE(&prScanInfo->rRoamBSSDescList);
-#endif
 } /* end of scnUninit() */
 
 /*----------------------------------------------------------------------------*/
@@ -396,7 +385,6 @@ scanSearchExistingBssDesc(
 	return scanSearchExistingBssDescWithSsid(prAdapter, eBSSType, aucBSSID, aucSrcAddr, FALSE, NULL);
 }
 
-#if CFG_SUPPORT_ROAMING_SKIP_ONE_AP
 /*----------------------------------------------------------------------------*/
 /*!
  * @brief
@@ -572,8 +560,6 @@ VOID scanSearchBssDescOfRoamSsid(IN P_ADAPTER_T prAdapter)
 	}
 }
 
-#endif /* CFG_SUPPORT_ROAMING_SKIP_ONE_AP */
-
 /*----------------------------------------------------------------------------*/
 /*!
  * @brief Find the corresponding BSS Descriptor according to
@@ -609,10 +595,8 @@ scanSearchExistingBssDescWithSsid(IN P_ADAPTER_T prAdapter, IN ENUM_BSS_TYPE_T e
 		// No break; intentional fall-through
 
 	} else if (eBSSType == BSS_TYPE_INFRASTRUCTURE) {
-#if CFG_SUPPORT_ROAMING_SKIP_ONE_AP
 		scanSearchBssDescOfRoamSsid(prAdapter);
 		// No break; intentional fall-through
-#endif
 
 	} else if (eBSSType == BSS_TYPE_BOW_DEVICE) {
 		prBssDesc = scanSearchBssDescByBssidAndSsid(prAdapter, aucBSSID, fgCheckSsid, prSsid);
@@ -1039,10 +1023,8 @@ P_BSS_DESC_T scanAllocateBssDesc(IN P_ADAPTER_T prAdapter)
 
 		kalMemZero(prBssDesc, sizeof(BSS_DESC_T));
 
-#if CFG_ENABLE_WIFI_DIRECT
 		LINK_INITIALIZE(&(prBssDesc->rP2pDeviceList));
 		prBssDesc->fgIsP2PPresent = FALSE;
-#endif /* CFG_ENABLE_WIFI_DIRECT */
 
 		prBSSDescList = &prScanInfo->rBSSDescList;
 
@@ -1419,11 +1401,9 @@ P_BSS_DESC_T scanAddToBssDesc(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb)
 			break;
 		case ELEM_ID_VHT_CAP:
 			prBssDesc->fgIsVHTPresent = TRUE;
-#if CFG_SUPPORT_BFEE
 			prBssDesc->ucVhtCapNumSoundingDimensions =
 					((((P_IE_VHT_CAP_T)pucIE)->u4VhtCapInfo) & VHT_CAP_INFO_NUMBER_OF_SOUNDING_DIMENSIONS) >>
 					VHT_CAP_INFO_NUMBER_OF_SOUNDING_DIMENSIONS_OFFSET;
-#endif
 			break;
 
 		case ELEM_ID_VHT_OP:
@@ -1451,22 +1431,21 @@ P_BSS_DESC_T scanAddToBssDesc(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb)
 					prBssDesc->fgIEWPA = TRUE;
 				}
 			}
-#if CFG_ENABLE_WIFI_DIRECT
+
 			if (prAdapter->fgIsP2PRegistered) {
 				if ((p2pFuncParseCheckForP2PInfoElem(prAdapter, pucIE, &ucOuiType)) &&
 						(ucOuiType == VENDOR_OUI_TYPE_P2P)) {
 					prBssDesc->fgIsP2PPresent = TRUE;
 				}
 			}
-#endif /* CFG_ENABLE_WIFI_DIRECT */
+
 		} break;
-#if CFG_SUPPORT_802_11K
+
 		case ELEM_ID_RRM_ENABLED_CAP:
 			/* RRM Capability IE is always in length 5 bytes */
 			kalMemZero(prBssDesc->aucRrmCap, sizeof(prBssDesc->aucRrmCap));
 			kalMemCopy(prBssDesc->aucRrmCap, pucIE + 2, sizeof(prBssDesc->aucRrmCap));
 			break;
-#endif
 			/* no default */
 		}
 	}
@@ -1791,7 +1770,6 @@ WLAN_STATUS scanProcessBeaconAndProbeResp(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_
 					nicPmIndicateBssConnected(prAdapter, prAisBssInfo->ucBssIndex);
 				}
 			}
-#if CFG_SUPPORT_ADHOC
 			if (EQUAL_SSID(
 						prBssDesc->aucSSID, prBssDesc->ucSSIDLen, prConnSettings->aucSSID, prConnSettings->ucSSIDLen) &&
 					(prBssDesc->eBSSType == BSS_TYPE_IBSS) && (prAisBssInfo->eCurrentOPMode == OP_MODE_IBSS)) {
@@ -1800,7 +1778,6 @@ WLAN_STATUS scanProcessBeaconAndProbeResp(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_
 				ibssProcessMatchedBeacon(
 						prAdapter, prAisBssInfo, prBssDesc, nicRxGetRcpiValueFromRxv(RCPI_MODE_WF0, prSwRfb));
 			}
-#endif /* CFG_SUPPORT_ADHOC */
 		}
 
 		rlmProcessBcn(prAdapter, prSwRfb, ((P_WLAN_BEACON_FRAME_T)(prSwRfb->pvHeader))->aucInfoElem,
@@ -1823,10 +1800,9 @@ WLAN_STATUS scanProcessBeaconAndProbeResp(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_
 					rStatus = scanAddScanResult(prAdapter, prBssDesc, prSwRfb);
 			}
 		}
-#if CFG_ENABLE_WIFI_DIRECT
+
 		if (prAdapter->fgIsP2PRegistered)
 			scanP2pProcessBeaconAndProbeResp(prAdapter, prSwRfb, &rStatus, prBssDesc, prWlanBeaconFrame);
-#endif
 	}
 
 	return rStatus;
@@ -1878,11 +1854,7 @@ P_BSS_DESC_T scanSearchBssDescByPolicy(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBss
 
 	/* check for fixed channel operation */
 	if (prBssInfo->eNetworkType == NETWORK_TYPE_AIS) {
-#if CFG_SUPPORT_CHNL_CONFLICT_REVISE
-		fgIsFixedChannel = cnmAisDetectP2PChannel(prAdapter, &eBand, &ucChannel);
-#else
 		fgIsFixedChannel = cnmAisInfraChannelFixed(prAdapter, &eBand, &ucChannel);
-#endif
 	} else
 		fgIsFixedChannel = FALSE;
 
@@ -2220,22 +2192,18 @@ VOID scanReportBss2Cfg80211(IN P_ADAPTER_T prAdapter, IN ENUM_BSS_TYPE_T eBSSTyp
 			SpecificprBssDesc->fgIsP2PReport = FALSE;
 		}
 	} else {
-#if CFG_AUTO_CHANNEL_SEL_SUPPORT
 		/* Clear old ACS data (APNum, Dirtiness, ...) and initialize the ch number */
 		kalMemZero(&(prAdapter->rWifiVar.rChnLoadInfo), sizeof(prAdapter->rWifiVar.rChnLoadInfo));
 		wlanInitChnLoadInfoChannelList(prAdapter);
-#endif
 
 		/* Search BSS Desc from current SCAN result list. */
 		LINK_FOR_EACH_ENTRY(prBssDesc, prBSSDescList, rLinkEntry, BSS_DESC_T)
 		{
-#if CFG_AUTO_CHANNEL_SEL_SUPPORT
 			/* Record channel loading with channel's AP number */
 			UINT_8 ucIdx = wlanGetChannelIndex(prBssDesc->ucChannelNum);
 
 			if (ucIdx < MAX_CHN_NUM)
 				prAdapter->rWifiVar.rChnLoadInfo.rEachChnLoad[ucIdx].u2APNum++;
-#endif
 
 			/* check BSSID is legal channel */
 			if (!scanCheckBssIsLegal(prAdapter, prBssDesc)) {
@@ -2281,12 +2249,10 @@ VOID scanReportBss2Cfg80211(IN P_ADAPTER_T prAdapter, IN ENUM_BSS_TYPE_T eBSSTyp
 				prBssDesc->u2RawLength = 0;
 			}
 		}
-#if CFG_AUTO_CHANNEL_SEL_SUPPORT
 		wlanCalculateAllChannelDirtiness(prAdapter);
 		wlanSortChannel(prAdapter);
 
 		prAdapter->rWifiVar.rChnLoadInfo.fgDataReadyBit = TRUE;
-#endif
 	}
 }
 

@@ -2,17 +2,14 @@
 /*
  * Copyright(C) 2016 MediaTek Inc.
  */
+
 #include "precomp.h"
 #include "p2p_dev_state.h"
-#if CFG_ENABLE_WIFI_DIRECT
 
 #if !DBG_DISABLE_ALL_LOG
-/*lint -save -e64 Type mismatch */
 static PUINT_8 apucDebugP2pDevState[P2P_DEV_STATE_NUM] = { (PUINT_8)DISP_STRING("P2P_DEV_STATE_IDLE"),
 	(PUINT_8)DISP_STRING("P2P_DEV_STATE_SCAN"), (PUINT_8)DISP_STRING("P2P_DEV_STATE_REQING_CHANNEL"),
 	(PUINT_8)DISP_STRING("P2P_DEV_STATE_CHNL_ON_HAND"), (PUINT_8)DISP_STRING("P2P_DEV_STATE_NUM") };
-
-/*lint -restore */
 #endif
 
 UINT_8 p2pDevFsmInit(IN P_ADAPTER_T prAdapter)
@@ -47,22 +44,14 @@ UINT_8 p2pDevFsmInit(IN P_ADAPTER_T prAdapter)
 			prP2pBssInfo->eCurrentOPMode		   = OP_MODE_P2P_DEVICE;
 			prP2pBssInfo->ucConfigAdHocAPMode	   = AP_MODE_11G_P2P;
 			prP2pBssInfo->u2HwDefaultFixedRateCode = RATE_OFDM_6M;
-
-			prP2pBssInfo->eBand		= BAND_2G4;
-			prP2pBssInfo->eDBDCBand = ENUM_BAND_0;
-#if (CFG_HW_WMM_BY_BSS == 1)
-			prP2pBssInfo->ucWmmQueSet = MAX_HW_WMM_INDEX;
-#else
-			prP2pBssInfo->ucWmmQueSet = (prAdapter->rWifiVar.ucDbdcMode == DBDC_MODE_DISABLED) ? DBDC_5G_WMM_INDEX :
-																								 DBDC_2G_WMM_INDEX;
-#endif
-			prP2pBssInfo->ucPhyTypeSet = prAdapter->rWifiVar.ucAvailablePhyTypeSet & PHY_TYPE_SET_802_11GN;
-
+			prP2pBssInfo->eBand					   = BAND_2G4;
+			prP2pBssInfo->eDBDCBand				   = ENUM_BAND_0;
+			prP2pBssInfo->ucWmmQueSet			   = MAX_HW_WMM_INDEX;
+			prP2pBssInfo->ucPhyTypeSet			   = prAdapter->rWifiVar.ucAvailablePhyTypeSet & PHY_TYPE_SET_802_11GN;
 			prP2pBssInfo->ucNonHTBasicPhyType =
 					(UINT_8)rNonHTApModeAttributes[prP2pBssInfo->ucConfigAdHocAPMode].ePhyTypeIndex;
 			prP2pBssInfo->u2BSSBasicRateSet =
 					rNonHTApModeAttributes[prP2pBssInfo->ucConfigAdHocAPMode].u2BSSBasicRateSet;
-
 			prP2pBssInfo->u2OperationalRateSet =
 					rNonHTPhyAttributes[prP2pBssInfo->ucNonHTBasicPhyType].u2SupportedRateSet;
 			prP2pBssInfo->u4PrivateData = 0; /* TH3 Huang */
@@ -656,5 +645,3 @@ VOID p2pDevFsmRunEventActiveDevBss(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMs
 	if (prMsgHdr)
 		cnmMemFree(prAdapter, prMsgHdr);
 } /* p2pDevFsmRunEventActiveDevBss */
-
-#endif /* RunEventWfdSettingUpdate */

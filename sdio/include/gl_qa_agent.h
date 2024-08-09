@@ -9,7 +9,6 @@
 
 #ifndef _GL_QA_AGENT_H
 #define _GL_QA_AGENT_H
-#if CFG_SUPPORT_QA_TOOL
 /*******************************************************************************
  *                         C O M P I L E R   F L A G S
  ********************************************************************************
@@ -39,9 +38,7 @@
 #define HQA_CHIP_ID_6632 0x6632
 #define HQA_CHIP_ID_7668 0x7668
 
-#if CFG_SUPPORT_TX_BF
 #define HQA_BF_STR_SIZE 512
-#endif
 
 #define HQA_RX_STATISTIC_NUM 66
 #define BUFFER_BIN_MODE 0x0
@@ -160,5 +157,4 @@ int priv_qa_agent(IN struct net_device *prNetDev, IN struct iw_request_info *prI
 		IN union iwreq_data *prIwReqData, IN char *pcExtra);
 
 int priv_set_eeprom_mode(IN UINT_32 u4Mode);
-#endif /*CFG_SUPPORT_QA_TOOL */
 #endif /* _GL_QA_AGENT_H */

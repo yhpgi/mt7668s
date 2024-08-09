@@ -40,12 +40,8 @@
  *                           P R I V A T E   D A T A
  ********************************************************************************
  */
-#if CFG_SUPPORT_802_11V_TIMING_MEASUREMENT
-static UINT_8 ucTimingMeasToken;
-#endif
-#if CFG_SUPPORT_802_11V_BSS_TRANSITION_MGT
+
 static UINT_8 ucBtmMgtToken = 1;
-#endif
 
 /*******************************************************************************
  *                                 M A C R O S
@@ -73,7 +69,6 @@ static UINT_8 ucBtmMgtToken = 1;
  *      Called by: Handle Rx mgmt request
  */
 /*----------------------------------------------------------------------------*/
-#if CFG_SUPPORT_802_11V
 VOID wnmWNMAction(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb)
 {
 	P_WLAN_ACTION_FRAME prRxFrame;
@@ -86,13 +81,7 @@ VOID wnmWNMAction(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb)
 	DBGLOG(WNM, TRACE, "WNM action frame: %d from " MACSTR "\n", prRxFrame->ucAction, MAC2STR(prRxFrame->aucSrcAddr));
 
 	switch (prRxFrame->ucAction) {
-#if CFG_SUPPORT_802_11V_TIMING_MEASUREMENT
-	case ACTION_WNM_TIMING_MEASUREMENT_REQUEST:
-		break;
-#endif
-#if CFG_SUPPORT_802_11V_BSS_TRANSITION_MGT
 	case ACTION_WNM_BSS_TRANSITION_MANAGEMENT_REQ:
-#endif
 	default:
 		DBGLOG(WNM, INFO, "WNM: action frame %d, try to send to supplicant\n", prRxFrame->ucAction);
 		aisFuncValidateRxActionFrame(prAdapter, prSwRfb);
@@ -259,7 +248,6 @@ VOID wnmSendBTMQueryFrame(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec)
  *      Handle Rx mgmt request
  */
 /*----------------------------------------------------------------------------*/
-#if CFG_SUPPORT_802_11V_BSS_TRANSITION_MGT
 VOID wnmRecvBTMRequest(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb)
 {
 	P_ACTION_BTM_REQ_FRAME_T	 prRxFrame	   = NULL;
@@ -331,5 +319,3 @@ VOID wnmRecvBTMRequest(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb)
 		prMsg->fgNeedResponse = FALSE;
 	mboxSendMsg(prAdapter, MBOX_ID_0, (P_MSG_HDR_T)prMsg, MSG_SEND_METHOD_BUF);
 }
-#endif /* #if CFG_SUPPORT_802_11V_BSS_TRANSITION_MGT */
-#endif /* #if CFG_SUPPORT_802_11V */

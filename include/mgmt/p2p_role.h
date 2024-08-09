@@ -124,7 +124,6 @@ typedef struct _MSG_P2P_START_AP_T {
 	INT_32				 i4InactiveTimeout;
 } MSG_P2P_START_AP_T, *P_MSG_P2P_START_AP_T;
 
-#if (CFG_SUPPORT_DFS_MASTER == 1)
 typedef struct _MSG_P2P_DFS_CAC_T {
 	MSG_HDR_T			 rMsgHdr;
 	ENUM_CHANNEL_WIDTH_T eChannelWidth;
@@ -165,7 +164,6 @@ typedef struct _MSG_P2P_CSA_DONE_T {
 	MSG_HDR_T rMsgHdr;
 	UINT_8	  ucBssIndex;
 } MSG_P2P_CSA_DONE_T, *P_MSG_P2P_CSA_DONE_T;
-#endif
 
 typedef struct _MSG_P2P_DEL_IFACE_T {
 	MSG_HDR_T rMsgHdr;
@@ -200,10 +198,8 @@ typedef enum _ENUM_P2P_ROLE_STATE_T {
 	P2P_ROLE_STATE_REQING_CHANNEL,
 	P2P_ROLE_STATE_AP_CHNL_DETECTION, /* Requesting Channel to Send Specific Frame. */
 	P2P_ROLE_STATE_GC_JOIN,
-#if (CFG_SUPPORT_DFS_MASTER == 1)
 	P2P_ROLE_STATE_DFS_CAC,
 	P2P_ROLE_STATE_SWITCH_CHANNEL,
-#endif
 	P2P_ROLE_STATE_NUM
 } ENUM_P2P_ROLE_STATE_T,
 		*P_ENUM_P2P_ROLE_STATE_T;
@@ -250,10 +246,8 @@ typedef struct _P2P_CONNECTION_REQ_INFO_T {
 	/* To record Channel Center Frequency Segment 1 (MHz) from CFG80211 */
 	UINT_32 u4CenterFreq2;
 
-#if (CFG_SUPPORT_DFS_MASTER == 1)
 	/* To record Channel DFS State */
 	UINT_32 u4ChnlDfsState;
-#endif
 
 	/* For ASSOC Req. */
 	UINT_32 u4BufLength;
@@ -279,13 +273,9 @@ struct _P2P_ROLE_FSM_INFO_T {
 	/* FSM Timer */
 	TIMER_T rP2pRoleFsmTimeoutTimer;
 
-#if (CFG_SUPPORT_DFS_MASTER == 1)
 	TIMER_T rDfsShutDownTimer;
-#if CFG_SUPPORT_DBDC
 	TIMER_T				 rDfsStartCacTimer;
 	ENUM_CHANNEL_WIDTH_T rChannelWidth;
-#endif
-#endif
 
 	/* Packet filter for P2P module. */
 	UINT_32 u4P2pPacketFilter;
@@ -316,7 +306,6 @@ VOID p2pRoleFsmRunEventDelIface(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMsgHd
 
 VOID p2pRoleFsmRunEventStopAP(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMsgHdr);
 
-#if (CFG_SUPPORT_DFS_MASTER == 1)
 VOID p2pRoleFsmRunEventDfsCac(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMsgHdr);
 
 VOID p2pRoleFsmRunEventRadarDet(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMsgHdr);
@@ -326,11 +315,8 @@ VOID p2pRoleFsmRunEventSetNewChannel(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T pr
 VOID p2pRoleFsmRunEventCsaDone(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMsgHdr);
 
 VOID p2pRoleFsmRunEventDfsShutDownTimeout(IN P_ADAPTER_T prAdapter, IN ULONG ulParamPtr);
-#endif
 
-#if CFG_SUPPORT_DBDC_TC6
 VOID p2pRoleFsmRunEventStartDfsCacTimeout(IN P_ADAPTER_T prAdapter, IN ULONG ulParamPtr);
-#endif
 
 VOID p2pRoleFsmRunEventScanRequest(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMsgHdr);
 

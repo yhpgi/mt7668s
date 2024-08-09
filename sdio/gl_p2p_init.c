@@ -46,7 +46,7 @@
  */
 static PUCHAR  ifname  = P2P_INF_NAME;
 static PUCHAR  ifname2 = P2P_INF_NAME;
-static UINT_16 mode	   = RUNNING_P2P_MODE;
+static UINT_16 mode	   = RUNNING_AP_MODE;
 
 /*******************************************************************************
  *                                 M A C R O S
@@ -124,7 +124,7 @@ BOOLEAN p2pLaunch(P_GLUE_INFO_T prGlueInfo)
 
 	GLUE_ACQUIRE_SPIN_LOCK(prGlueInfo, SPIN_LOCK_NET_DEV);
 	prAdapter->fgIsP2PRegistered	   = TRUE;
-	prAdapter->p2p_scan_report_all_bss = CFG_P2P_SCAN_REPORT_ALL_BSS;
+	prAdapter->p2p_scan_report_all_bss = FALSE;
 	prAdapter->rP2PRegState			   = ENUM_P2P_REG_STATE_REGISTERED;
 	DBGLOG(P2P, INFO, "Launch success, fgIsP2PRegistered TRUE\n");
 	GLUE_RELEASE_SPIN_LOCK(prGlueInfo, SPIN_LOCK_NET_DEV);
@@ -136,8 +136,6 @@ VOID p2pSetMode(IN UINT_8 ucAPMode)
 	PUCHAR prAPInfName	= AP_INF_NAME;
 	PUCHAR prP2PInfName = P2P_INF_NAME;
 
-#ifdef CFG_DRIVER_INF_NAME_CHANGE
-
 	if (kalStrLen(gprifnamep2p) > 0) {
 		prP2PInfName = kalStrCat(gprifnamep2p, "%d");
 		DBGLOG(INIT, WARN, "P2P ifname customized, use %s\n", prP2PInfName);
@@ -147,8 +145,6 @@ VOID p2pSetMode(IN UINT_8 ucAPMode)
 		prAPInfName = kalStrCat(gprifnameap, "%d");
 		DBGLOG(INIT, WARN, "AP ifname customized, use %s\n", prAPInfName);
 	}
-
-#endif /* CFG_DRIVER_INF_NAME_CHANGE */
 
 	switch (ucAPMode) {
 	case 0:
@@ -204,7 +200,10 @@ BOOLEAN p2pRemove(P_GLUE_INFO_T prGlueInfo)
 	prAdapter->p2p_scan_report_all_bss = FALSE;
 	GLUE_RELEASE_SPIN_LOCK(prGlueInfo, SPIN_LOCK_NET_DEV);
 
-	glUnregisterP2P(prGlueInfo);
+	if (!glUnregisterP2P(prGlueInfo)) {
+		pr_err("failed to remove p2p registration");
+		return FALSE;
+	}
 
 	GLUE_ACQUIRE_SPIN_LOCK(prGlueInfo, SPIN_LOCK_NET_DEV);
 	prAdapter->rP2PRegState		 = ENUM_P2P_REG_STATE_UNREGISTERED;

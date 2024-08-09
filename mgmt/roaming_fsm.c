@@ -20,7 +20,6 @@
  */
 #include "precomp.h"
 
-#if CFG_SUPPORT_ROAMING
 /*******************************************************************************
  *                              C O N S T A N T S
  ********************************************************************************
@@ -164,7 +163,6 @@ VOID roamingFsmScanResultsUpdate(IN P_ADAPTER_T prAdapter)
 	GET_CURRENT_SYSTIME(&prRoamingFsmInfo->rRoamingDiscoveryUpdateTime);
 } /* end of roamingFsmScanResultsUpdate() */
 
-#if CFG_SUPPORT_ROAMING_SKIP_ONE_AP
 /*----------------------------------------------------------------------------*/
 /*
  * @brief Check if need to do scan for roaming
@@ -252,7 +250,6 @@ static BOOLEAN roamingFsmIsNeedScan(IN P_ADAPTER_T prAdapter)
 
 	return fgIsNeedScan;
 }
-#endif
 
 /*----------------------------------------------------------------------------*/
 /*!
@@ -296,11 +293,7 @@ VOID roamingFsmSteps(IN P_ADAPTER_T prAdapter, IN ENUM_ROAMING_STATE_T eNextStat
 
 		case ROAMING_STATE_DISCOVERY: {
 			OS_SYSTIME rCurrentTime;
-#if CFG_SUPPORT_ROAMING_SKIP_ONE_AP
 			fgIsNeedScan = roamingFsmIsNeedScan(prAdapter);
-#else
-			fgIsNeedScan = TRUE;
-#endif
 
 			GET_CURRENT_SYSTIME(&rCurrentTime);
 			if (CHECK_FOR_TIMEOUT(rCurrentTime, prRoamingFsmInfo->rRoamingDiscoveryUpdateTime,
@@ -552,5 +545,3 @@ WLAN_STATUS roamingFsmProcessEvent(IN P_ADAPTER_T prAdapter, IN P_CMD_ROAMING_TR
 
 	return WLAN_STATUS_SUCCESS;
 }
-
-#endif

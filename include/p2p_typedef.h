@@ -13,8 +13,6 @@
 #ifndef _P2P_TYPEDEF_H
 #define _P2P_TYPEDEF_H
 
-#if CFG_ENABLE_WIFI_DIRECT
-
 /*******************************************************************************
  *                         C O M P I L E R   F L A G S
  ********************************************************************************
@@ -35,10 +33,6 @@
  ********************************************************************************
  */
 
-/*
- * type definition of pointer to p2p structure
- */
-/* typedef struct _GL_P2P_INFO_T   GL_P2P_INFO_T, *P_GL_P2P_INFO_T; */
 typedef struct _P2P_INFO_T P2P_INFO_T, *P_P2P_INFO_T;
 
 typedef struct _P2P_FSM_INFO_T P2P_FSM_INFO_T, *P_P2P_FSM_INFO_T;
@@ -159,6 +153,4 @@ typedef UINT_32 (*P2P_CALCULATE_P2P_IE_LEN)(IN P_ADAPTER_T prAdapter, IN UINT_8 
  *                              F U N C T I O N S
  ********************************************************************************
  */
-#endif /*CFG_ENABLE_WIFI_DIRECT */
-
 #endif /* _P2P_TYPEDEF_H */

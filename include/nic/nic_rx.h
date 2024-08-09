@@ -454,7 +454,6 @@ typedef enum _ENUM_RX_STATISTIC_COUNTER_T {
 	RX_CLASS_ERR_DROP_COUNT,
 	RX_DST_NULL_DROP_COUNT,
 
-#if CFG_TCP_IP_CHKSUM_OFFLOAD || CFG_TCP_IP_CHKSUM_OFFLOAD_NDIS_60
 	RX_CSUM_TCP_FAILED_COUNT,
 	RX_CSUM_UDP_FAILED_COUNT,
 	RX_CSUM_IP_FAILED_COUNT,
@@ -464,12 +463,9 @@ typedef enum _ENUM_RX_STATISTIC_COUNTER_T {
 	RX_CSUM_UNKNOWN_L4_PKT_COUNT,
 	RX_CSUM_UNKNOWN_L3_PKT_COUNT,
 	RX_IP_V6_PKT_CCOUNT,
-#endif
-#if CFG_KEY_ERROR_STATISTIC_RECOVERY
 	RX_BMC_NO_KEY_COUNT,
 	RX_BMC_KEY_ERROR_COUNT,
 	RX_BMC_PKT_COUNT,
-#endif
 	RX_STATISTIC_COUNTER_NUM
 } ENUM_RX_STATISTIC_COUNTER_T;
 
@@ -686,23 +682,7 @@ typedef struct _RX_CTRL_T {
 	UINT_8	ucNumRetainedPacket;
 	UINT_64 au8Statistics[RX_STATISTIC_COUNTER_NUM]; /*!< RX Counters */
 
-#if CFG_HIF_STATISTICS
-	UINT_32 u4TotalRxAccessNum;
-	UINT_32 u4TotalRxPacketNum;
-#endif
-
-#if CFG_HIF_RX_STARVATION_WARNING
-	UINT_32 u4QueuedCnt;
-	UINT_32 u4DequeuedCnt;
-#endif
-
-#if CFG_RX_PKTS_DUMP
-	UINT_32 u4RxPktsDumpTypeMask;
-#endif
-
-#if CFG_SUPPORT_SNIFFER
 	UINT_32 u4AmpduRefNum;
-#endif
 } RX_CTRL_T, *P_RX_CTRL_T;
 
 typedef struct _RX_MAILBOX_T {
@@ -970,9 +950,7 @@ P_SW_RFB_T incRxDefragMPDU(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSWRfb, OUT 
 
 BOOLEAN nicRxIsDuplicateFrame(IN OUT P_SW_RFB_T prSwRfb);
 
-#if CFG_SUPPORT_SNIFFER
 VOID nicRxProcessMonitorPacket(IN P_ADAPTER_T prAdapter, IN OUT P_SW_RFB_T prSwRfb);
-#endif
 
 VOID nicRxProcessDataPacket(IN P_ADAPTER_T prAdapter, IN OUT P_SW_RFB_T prSwRfb);
 
@@ -980,11 +958,9 @@ VOID nicRxProcessEventPacket(IN P_ADAPTER_T prAdapter, IN OUT P_SW_RFB_T prSwRfb
 
 VOID nicRxProcessMgmtPacket(IN P_ADAPTER_T prAdapter, IN OUT P_SW_RFB_T prSwRfb);
 
-#if CFG_TCP_IP_CHKSUM_OFFLOAD
 VOID nicRxFillChksumStatus(IN P_ADAPTER_T prAdapter, IN OUT P_SW_RFB_T prSwRfb, IN UINT_32 u4TcpUdpIpCksStatus);
 
 VOID nicRxUpdateCSUMStatistics(IN P_ADAPTER_T prAdapter, IN const ENUM_CSUM_RESULT_T aeCSUM[]);
-#endif /* CFG_TCP_IP_CHKSUM_OFFLOAD */
 
 VOID nicRxQueryStatus(IN P_ADAPTER_T prAdapter, IN PUINT_8 pucBuffer, OUT PUINT_32 pu4Count);
 

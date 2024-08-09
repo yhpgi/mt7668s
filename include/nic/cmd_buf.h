@@ -118,12 +118,10 @@ wlanSendSetQueryCmd(IN P_ADAPTER_T prAdapter, UINT_8 ucCID, BOOLEAN fgSetQuery, 
 		PFN_CMD_DONE_HANDLER pfCmdDoneHandler, PFN_CMD_TIMEOUT_HANDLER pfCmdTimeoutHandler, UINT_32 u4SetQueryInfoLen,
 		PUINT_8 pucInfoBuffer, OUT PVOID pvSetQueryBuffer, IN UINT_32 u4SetQueryBufferLen);
 
-#if CFG_SUPPORT_TX_BF
 WLAN_STATUS
 wlanSendSetQueryExtCmd(IN P_ADAPTER_T prAdapter, UINT_8 ucCID, UINT_8 ucExtCID, BOOLEAN fgSetQuery, BOOLEAN fgNeedResp,
 		BOOLEAN fgIsOid, PFN_CMD_DONE_HANDLER pfCmdDoneHandler, PFN_CMD_TIMEOUT_HANDLER pfCmdTimeoutHandler,
 		UINT_32 u4SetQueryInfoLen, PUINT_8 pucInfoBuffer, OUT PVOID pvSetQueryBuffer, IN UINT_32 u4SetQueryBufferLen);
-#endif
 
 /*******************************************************************************
  *                              F U N C T I O N S

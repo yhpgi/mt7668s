@@ -35,7 +35,7 @@
 #include <asm/memory.h>
 #endif
 
-#include "mt66xx_reg.h"
+#include "reg.h"
 
 /*******************************************************************************
  *                              C O N S T A N T S
@@ -86,8 +86,8 @@
 /*----------------------------------------------------------------------------*/
 BOOL halVerifyChipID(IN P_ADAPTER_T prAdapter)
 {
-	UINT_32					 u4CIR = 0;
-	struct mt66xx_chip_info *prChipInfo;
+	UINT_32			  u4CIR = 0;
+	struct chip_info *prChipInfo;
 
 	ASSERT(prAdapter);
 
@@ -1225,11 +1225,6 @@ VOID halRxSDIOAggReceiveRFBs(IN P_ADAPTER_T prAdapter)
 		if (u2RxPktNum == 0)
 			continue;
 
-#if CFG_HIF_STATISTICS
-		prRxCtrl->u4TotalRxAccessNum++;
-		prRxCtrl->u4TotalRxPacketNum += u2RxPktNum;
-#endif
-
 		mutex_lock(&prHifInfo->rRxFreeBufQueMutex);
 		fgNoFreeBuf = QUEUE_IS_EMPTY(&prHifInfo->rRxFreeBufQueue);
 		mutex_unlock(&prHifInfo->rRxFreeBufQueMutex);
@@ -1451,138 +1446,6 @@ UINT_32 halDumpHifStatus(IN P_ADAPTER_T prAdapter, IN PUINT_8 pucBuf, IN UINT_32
 
 	return u4Len;
 }
-
-#if (CFG_SDIO_ACCESS_N9_REGISTER_BY_MAILBOX == 1)
-/*----------------------------------------------------------------------------*/
-/*!
- * \brief
- *       This routine is used to get the value of N9 register
- *       by SDIO SW interrupt and mailbox.
- *
- * \param[in]
- *       pvAdapter: Pointer to the Adapter structure.
- *       addr: the interested address to be read
- *       prresult: to stored the value of the addr
- *
- * \return
- *       the error of the reading operation
- */
-/*----------------------------------------------------------------------------*/
-
-BOOL halReadN9RegisterByMailBox(IN P_ADAPTER_T prAdapter, IN UINT_32 addr, IN UINT_32 *prresult)
-{
-	UINT_32 ori_whlpcr, temp, counter = 0;
-	BOOL	err = TRUE, stop = FALSE;
-
-	/* use polling mode */
-	HAL_MCR_RD(prAdapter, MCR_WHLPCR, &ori_whlpcr); /* backup the original setting of W_INT_EN */
-	ori_whlpcr &= WHLPCR_INT_EN_SET;
-	HAL_MCR_WR(prAdapter, MCR_WHLPCR, WHLPCR_INT_EN_CLR); /* disabel interrupt */
-
-	/* progrqm h2d mailbox0 as interested register address */
-	HAL_MCR_WR(prAdapter, MCR_H2DSM0R, addr);
-
-	/* set h2d interrupt to notify firmware (bit16) */
-	HAL_MCR_WR(prAdapter, MCR_WSICR, SDIO_MAILBOX_FUNC_READ_REG_IDX);
-
-	/* polling interrupt status for the returned result */
-	while (!stop) {
-		HAL_MCR_RD(prAdapter, MCR_WHISR, &temp); /* read clear mode */
-		if (temp & SDIO_MAILBOX_FUNC_READ_REG_IDX) {
-			/* get the result */
-
-			/* read d2h mailbox0 for interested register address */
-			HAL_MCR_RD(prAdapter, MCR_D2HRM0R, &temp);
-			if (temp == addr) {
-				/* read d2h mailbox1 for the value of the register */
-				HAL_MCR_RD(prAdapter, MCR_D2HRM1R, prresult);
-				err = FALSE;
-			} else {
-				DBGLOG(HAL, ERROR, "halReadN9RegisterByMailBox >> interested address is not correct.\n");
-			}
-			stop = TRUE;
-		} else {
-			counter++;
-
-			if (counter > 300000) {
-				DBGLOG(HAL, ERROR, "halReadN9RegisterByMailBox >> get response failure.\n");
-				ASSERT(0);
-				break;
-			}
-		}
-	}
-
-	HAL_MCR_WR(prAdapter, MCR_WHLPCR, ori_whlpcr); /* restore the W_INT_EN */
-
-	return err;
-}
-
-/*----------------------------------------------------------------------------*/
-/*!
- * \brief
- *       This routine is used to write the value of N9 register by SDIO SW interrupt and mailbox.
- *
- * \param[in]
- *       pvAdapter: Pointer to the Adapter structure.
- *       addr: the interested address to be write
- *       value: the value to write into the addr
- *
- * \return
- *       the error of the write operation
- */
-/*----------------------------------------------------------------------------*/
-
-BOOL halWriteN9RegisterByMailBox(IN P_ADAPTER_T prAdapter, IN UINT_32 addr, IN UINT_32 value)
-{
-	UINT_32 ori_whlpcr, temp, counter = 0;
-	BOOL	err = TRUE, stop = FALSE;
-
-	/* use polling mode */
-	HAL_MCR_RD(prAdapter, MCR_WHLPCR, &ori_whlpcr); /* backup the original setting of W_INT_EN */
-	ori_whlpcr &= WHLPCR_INT_EN_SET;
-	HAL_MCR_WR(prAdapter, MCR_WHLPCR, WHLPCR_INT_EN_CLR); /* disabel interrupt */
-
-	/* progrqm h2d mailbox0 as interested register address */
-	HAL_MCR_WR(prAdapter, MCR_H2DSM0R, addr);
-
-	/* progrqm h2d mailbox1 as the value to write */
-	HAL_MCR_WR(prAdapter, MCR_H2DSM1R, value);
-
-	/* set h2d interrupt to notify firmware (bit17) */
-	HAL_MCR_WR(prAdapter, MCR_WSICR, SDIO_MAILBOX_FUNC_WRITE_REG_IDX);
-
-	/* polling interrupt status for the returned result */
-	while (!stop) {
-		HAL_MCR_RD(prAdapter, MCR_WHISR, &temp); /* read clear mode */
-
-		if (temp & SDIO_MAILBOX_FUNC_WRITE_REG_IDX) {
-			/* get the result */
-
-			/* read d2h mailbox0 for interested register address */
-			HAL_MCR_RD(prAdapter, MCR_D2HRM0R, &temp);
-			if (temp == addr)
-				err = FALSE;
-			else {
-				DBGLOG(HAL, ERROR, "halWriteN9RegisterByMailBox >> ");
-				DBGLOG(HAL, ERROR, "interested address is not correct.\n");
-			}
-			stop = TRUE;
-		} else {
-			counter++;
-
-			if (counter > 300000) {
-				DBGLOG(HAL, ERROR, "halWriteN9RegisterByMailBox >> get response failure.\n");
-				ASSERT(0);
-				break;
-			}
-		}
-	}
-
-	HAL_MCR_WR(prAdapter, MCR_WHLPCR, ori_whlpcr); /* restore the W_INT_EN */
-
-	return err;
-}
-#endif
 
 BOOLEAN halIsPendingRx(IN P_ADAPTER_T prAdapter)
 {
@@ -2022,33 +1885,13 @@ WLAN_STATUS halHifPowerOffWifi(IN P_ADAPTER_T prAdapter)
 			UINT_32 i;
 			/* 2. Clear pending interrupt */
 			i = 0;
-			while (i < CFG_IST_LOOP_COUNT && nicProcessIST(prAdapter) != WLAN_STATUS_NOT_INDICATING) {
+			while (i < HIF_IST_LOOP_COUNT && nicProcessIST(prAdapter) != WLAN_STATUS_NOT_INDICATING) {
 				i++;
 			};
 
 			/* 3. Wait til RDY bit has been cleaerd */
 			rStatus = wlanCheckWifiFunc(prAdapter, FALSE);
 		}
-#if !CFG_ENABLE_FULL_PM
-		/* 4. Set Onwership to F/W */
-		nicpmSetFWOwn(prAdapter, FALSE);
-#endif
-
-#if CFG_FORCE_RESET_UNDER_BUS_ERROR
-		if (HAL_TEST_FLAG(prAdapter, ADAPTER_FLAG_HW_ERR) == TRUE) {
-			/* force acquire firmware own */
-			kalDevRegWrite(prAdapter->prGlueInfo, MCR_WHLPCR, WHLPCR_FW_OWN_REQ_CLR);
-
-			/* delay for 10ms */
-			kalMdelay(10);
-
-			/* force firmware reset via software interrupt */
-			kalDevRegWrite(prAdapter->prGlueInfo, MCR_WSICR, WSICR_H2D_SW_INT_SET);
-
-			/* force release firmware own */
-			kalDevRegWrite(prAdapter->prGlueInfo, MCR_WHLPCR, WHLPCR_FW_OWN_REQ_SET);
-		}
-#endif
 
 		RECLAIM_POWER_CONTROL_TO_PM(prAdapter, FALSE);
 	}

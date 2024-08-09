@@ -17,6 +17,7 @@
  *                    E X T E R N A L   R E F E R E N C E S
  *******************************************************************************
  */
+
 #include "precomp.h"
 #include "gl_p2p_ioctl.h"
 
@@ -714,7 +715,6 @@ wlanoidSetP2PTerminateSDPhase(
 	return rWlanStatus;
 } /* end of wlanoidSetP2PTerminateSDPhase() */
 
-#if CFG_SUPPORT_ANTI_PIRACY
 /*----------------------------------------------------------------------------*/
 /*!
  * \brief This routine is called to
@@ -746,8 +746,6 @@ wlanoidSetSecCheckRequest(
 	return WLAN_STATUS_NOT_SUPPORTED;
 
 } /* end of wlanoidSetSecCheckRequest() */
-
-#endif
 
 WLAN_STATUS
 wlanoidSetNoaParam(
@@ -893,8 +891,6 @@ wlanoidQueryP2pVersion(
 	return rResult;
 } /* wlanoidQueryP2pVersion */
 
-#if CFG_SUPPORT_HOTSPOT_WPS_MANAGER
-
 /*----------------------------------------------------------------------------*/
 /*!
  * \brief This routine is used to set the WPS mode.
@@ -939,8 +935,6 @@ wlanoidSetP2pWPSmode(
 	return status;
 } /* end of wlanoidSetP2pWPSmode() */
 
-#endif
-
 WLAN_STATUS
 wlanoidSetP2pSupplicantVersion(
 		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen)
@@ -973,47 +967,3 @@ wlanoidSetP2pSupplicantVersion(
 
 	return rResult;
 } /* wlanoidSetP2pSupplicantVersion */
-
-#if CFG_SUPPORT_P2P_RSSI_QUERY
-WLAN_STATUS
-wlanoidQueryP2pRssi(
-		IN P_ADAPTER_T prAdapter, IN PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen)
-{
-	DEBUGFUNC("wlanoidQueryP2pRssi");
-
-	ASSERT(prAdapter);
-	ASSERT(pu4QueryInfoLen);
-	if (u4QueryBufferLen)
-		ASSERT(pvQueryBuffer);
-
-	if (prAdapter->fgIsEnableLpdvt)
-		return WLAN_STATUS_NOT_SUPPORTED;
-
-	*pu4QueryInfoLen = sizeof(PARAM_RSSI);
-
-	/* Check for query buffer length */
-	if (u4QueryBufferLen < *pu4QueryInfoLen) {
-		DBGLOG(REQ, WARN, "Too short length %ld\n", u4QueryBufferLen);
-		return WLAN_STATUS_BUFFER_TOO_SHORT;
-	}
-
-	if (prAdapter->fgIsP2pLinkQualityValid == TRUE &&
-			(kalGetTimeTick() - prAdapter->rP2pLinkQualityUpdateTime) <= CFG_LINK_QUALITY_VALID_PERIOD) {
-		PARAM_RSSI rRssi;
-
-		rRssi = (PARAM_RSSI)prAdapter->rP2pLinkQuality.cRssi; /* ranged from (-128 ~ 30) in unit of dBm */
-
-		if (rRssi > PARAM_WHQL_RSSI_MAX_DBM)
-			rRssi = PARAM_WHQL_RSSI_MAX_DBM;
-		else if (rRssi < PARAM_WHQL_RSSI_MIN_DBM)
-			rRssi = PARAM_WHQL_RSSI_MIN_DBM;
-
-		kalMemCopy(pvQueryBuffer, &rRssi, sizeof(PARAM_RSSI));
-		return WLAN_STATUS_SUCCESS;
-	}
-
-	return wlanSendSetQueryCmd(prAdapter, CMD_ID_GET_LINK_QUALITY, FALSE, TRUE, TRUE, nicCmdEventQueryLinkQuality,
-			nicOidCmdTimeoutCommon, *pu4QueryInfoLen, pvQueryBuffer, pvQueryBuffer, u4QueryBufferLen);
-
-} /* wlanoidQueryP2pRssi */
-#endif

@@ -47,7 +47,6 @@ static PUINT_8 apucStaRecType[STA_TYPE_INDEX_NUM] = { (PUINT_8) "LEGACY", (PUINT
 static PUINT_8 apucStaRecRole[STA_ROLE_INDEX_NUM] = { (PUINT_8) "ADHOC", (PUINT_8) "CLIENT", (PUINT_8) "AP",
 	(PUINT_8) "DLS" };
 
-#if CFG_SUPPORT_TDLS
 /* The list of valid data rates. */
 const UINT_8 aucValidDataRate[] = {
 	RATE_1M,	  /* RATE_1M_INDEX = 0 */
@@ -67,7 +66,6 @@ const UINT_8 aucValidDataRate[] = {
 	RATE_VHT_PHY, /* RATE_VHT_PHY_INDEX */
 	RATE_HT_PHY	  /* RATE_HT_PHY_INDEX */
 };
-#endif
 
 /*******************************************************************************
  *                                 M A C R O S
@@ -170,10 +168,8 @@ P_MSDU_INFO_T cnmPktAlloc(P_ADAPTER_T prAdapter, UINT_32 u4Length)
 		DBGLOG(MEM, WARN, "\n");
 		DBGLOG(MEM, WARN, "MgtDesc#=%ld\n", prQueList->u4NumElem);
 
-#if CFG_DBG_MGT_BUF
 		DBGLOG(MEM, WARN, "rMgtBufInfo: alloc#=%ld, free#=%ld, null#=%ld\n", prAdapter->rMgtBufInfo.u4AllocCount,
 				prAdapter->rMgtBufInfo.u4FreeCount, prAdapter->rMgtBufInfo.u4AllocNullCount);
-#endif
 
 		DBGLOG(MEM, WARN, "\n");
 	}
@@ -297,9 +293,7 @@ PVOID cnmMemAlloc(IN P_ADAPTER_T prAdapter, IN ENUM_RAM_TYPE_T eRamType, IN UINT
 
 	KAL_ACQUIRE_SPIN_LOCK(prAdapter, eRamType == RAM_TYPE_MSG ? SPIN_LOCK_MSG_BUF : SPIN_LOCK_MGT_BUF);
 
-#if CFG_DBG_MGT_BUF
 	prBufInfo->u4AllocCount++;
-#endif
 
 	if ((u4BlockNum > 0) && (u4BlockNum <= MAX_NUM_OF_BUF_BLOCKS)) {
 		/* Convert number of block into bit cluster */
@@ -324,9 +318,7 @@ PVOID cnmMemAlloc(IN P_ADAPTER_T prAdapter, IN ENUM_RAM_TYPE_T eRamType, IN UINT
 		}
 	}
 
-#if CFG_DBG_MGT_BUF
 	prBufInfo->u4AllocNullCount++;
-#endif
 
 	/* kalMemAlloc() shall not included in spin_lock */
 	KAL_RELEASE_SPIN_LOCK(prAdapter, eRamType == RAM_TYPE_MSG ? SPIN_LOCK_MSG_BUF : SPIN_LOCK_MGT_BUF);
@@ -335,10 +327,8 @@ PVOID cnmMemAlloc(IN P_ADAPTER_T prAdapter, IN ENUM_RAM_TYPE_T eRamType, IN UINT
 	if (!pvMemory)
 		DBGLOG(MEM, WARN, "kmalloc fail: %u\n", u4Length);
 
-#if CFG_DBG_MGT_BUF
 	if (pvMemory)
 		GLUE_INC_REF_CNT(prAdapter->u4MemAllocDynamicCount);
-#endif
 
 	return pvMemory;
 
@@ -381,20 +371,14 @@ VOID cnmMemFree(IN P_ADAPTER_T prAdapter, IN PVOID pvMemory)
 		ASSERT(u4BlockIndex < MAX_NUM_OF_BUF_BLOCKS);
 		eRamType = RAM_TYPE_BUF;
 	} else {
-		/* For Linux, it is supported because size is not needed */
 		kalMemFree(pvMemory, PHY_MEM_TYPE, 0);
-
-#if CFG_DBG_MGT_BUF
 		GLUE_INC_REF_CNT(prAdapter->u4MemFreeDynamicCount);
-#endif
 		return;
 	}
 
 	KAL_ACQUIRE_SPIN_LOCK(prAdapter, eRamType == RAM_TYPE_MSG ? SPIN_LOCK_MSG_BUF : SPIN_LOCK_MGT_BUF);
 
-#if CFG_DBG_MGT_BUF
 	prBufInfo->u4FreeCount++;
-#endif
 
 	/* Convert number of block into bit cluster */
 	if (prBufInfo->aucAllocatedBlockNum[u4BlockIndex] > 0) {
@@ -478,23 +462,19 @@ P_STA_RECORD_T cnmStaRecAlloc(P_ADAPTER_T prAdapter, ENUM_STA_TYPE_T eStaType, U
 				prStaRec->afgIsIgnoreAmsduDuplicate[k] = FALSE;
 			}
 
-#if CFG_SUPPORT_AMSDU_ATTACK_DETECTION
 			for (k = 0; k < TID_NUM + 1; k++) {
 				prStaRec->au2AmsduInvalidSN[k] = 0xFFFF;
 				prStaRec->afgIsAmsduInvalid[k] = FALSE;
 			}
-#endif
 
 			/* Initialize SW TX queues in STA_REC */
 			for (k = 0; k < STA_WAIT_QUEUE_NUM; k++)
 				LINK_INITIALIZE(&prStaRec->arStaWaitQueue[k]);
 
-#if CFG_ENABLE_PER_STA_STATISTICS && CFG_ENABLE_PKT_LIFETIME_PROFILE
 			prStaRec->u4TotalTxPktsNumber = 0;
 			prStaRec->u4TotalTxPktsTime	  = 0;
 			prStaRec->u4TotalRxPktsNumber = 0;
 			prStaRec->u4MaxTxPktsTime	  = 0;
-#endif
 
 			for (k = 0; k < NUM_OF_PER_STA_TX_QUEUES; k++) {
 				QUEUE_INITIALIZE(&prStaRec->arTxQueue[k]);
@@ -607,9 +587,7 @@ static VOID cnmStaRoutinesForAbort(P_ADAPTER_T prAdapter, P_STA_RECORD_T prStaRe
 /*----------------------------------------------------------------------------*/
 VOID cnmStaFreeAllStaByNetwork(P_ADAPTER_T prAdapter, UINT_8 ucBssIndex, UINT_8 ucStaRecIndexExcluded)
 {
-#if CFG_ENABLE_WIFI_DIRECT
-	P_BSS_INFO_T prBssInfo;
-#endif
+	P_BSS_INFO_T   prBssInfo;
 	P_STA_RECORD_T prStaRec;
 	UINT_16		   i;
 
@@ -629,7 +607,6 @@ VOID cnmStaFreeAllStaByNetwork(P_ADAPTER_T prAdapter, UINT_8 ucBssIndex, UINT_8 
 			(ucStaRecIndexExcluded < CFG_STA_REC_NUM) ? STA_REC_CMD_ACTION_BSS_EXCLUDE_STA : STA_REC_CMD_ACTION_BSS,
 			ucStaRecIndexExcluded, ucBssIndex);
 
-#if CFG_ENABLE_WIFI_DIRECT
 	/* To do: Confirm if it is invoked here or other location, but it should
 	 *        be invoked after state sync of STA_REC
 	 * Update system operation parameters for AP mode
@@ -637,7 +614,6 @@ VOID cnmStaFreeAllStaByNetwork(P_ADAPTER_T prAdapter, UINT_8 ucBssIndex, UINT_8 
 	prBssInfo = GET_BSS_INFO_BY_INDEX(prAdapter, ucBssIndex);
 	if (prAdapter->fgIsP2PRegistered && prBssInfo->eCurrentOPMode == OP_MODE_ACCESS_POINT)
 		rlmUpdateParamsForAP(prAdapter, prBssInfo, FALSE);
-#endif
 }
 
 /*----------------------------------------------------------------------------*/
@@ -777,7 +753,6 @@ VOID cnmStaRecChangeState(P_ADAPTER_T prAdapter, P_STA_RECORD_T prStaRec, UINT_8
 
 	cnmStaSendUpdateCmd(prAdapter, prStaRec, NULL, fgNeedResp);
 
-#if CFG_ENABLE_WIFI_DIRECT
 	/* To do: Confirm if it is invoked here or other location, but it should
 	 *        be invoked after state sync of STA_REC
 	 * Update system operation parameters for AP mode
@@ -790,7 +765,6 @@ VOID cnmStaRecChangeState(P_ADAPTER_T prAdapter, P_STA_RECORD_T prStaRec, UINT_8
 		if (prBssInfo->eCurrentOPMode == OP_MODE_ACCESS_POINT)
 			rlmUpdateParamsForAP(prAdapter, prBssInfo, FALSE);
 	}
-#endif
 }
 
 /*----------------------------------------------------------------------------*/
@@ -1150,8 +1124,7 @@ VOID cnmDumpStaRec(IN P_ADAPTER_T prAdapter, IN UINT_8 ucStaRecIdx)
 
 UINT_32 cnmDumpMemoryStatus(IN P_ADAPTER_T prAdapter, IN PUINT_8 pucBuf, IN UINT_32 u4Max)
 {
-	UINT_32 u4Len = 0;
-#if CFG_DBG_MGT_BUF
+	UINT_32		 u4Len = 0;
 	P_BUF_INFO_T prBufInfo;
 
 	LOGBUF(pucBuf, u4Max, u4Len, "\n");
@@ -1172,12 +1145,9 @@ UINT_32 cnmDumpMemoryStatus(IN P_ADAPTER_T prAdapter, IN PUINT_8 pucBuf, IN UINT
 
 	LOGBUF(pucBuf, u4Max, u4Len, "============= DUMP END =============\n");
 
-#endif
-
 	return u4Len;
 }
 
-#if CFG_SUPPORT_TDLS
 /*----------------------------------------------------------------------------*/
 /*!
  * \brief This routine is called to add a peer record.
@@ -1274,16 +1244,11 @@ cnmPeerUpdate(P_ADAPTER_T prAdapter, PVOID pvSetBuffer, UINT_32 u4SetBufferLen, 
 	BSS_INFO_T		   *prAisBssInfo;
 	STA_RECORD_T		 *prStaRec;
 	UINT_8			   ucNonHTPhyTypeSet;
-
-	UINT_16 u2OperationalRateSet = 0;
-
-	UINT_8	ucRate;
-	UINT_16 i, j;
-
-#if CFG_SUPPORT_802_11AC
-	UINT_8		 ucRxNss = 1;
-	P_WIFI_VAR_T prWifiVar;
-#endif /* CFG_SUPPORT_802_11AC */
+	UINT_16			   u2OperationalRateSet = 0;
+	UINT_8			   ucRate;
+	UINT_16			   i, j;
+	UINT_8			   ucRxNss = 1;
+	P_WIFI_VAR_T	   prWifiVar;
 
 	/* sanity check */
 	if ((!prAdapter) || (!pvSetBuffer) || (!pu4SetInfoLen))
@@ -1427,7 +1392,6 @@ cnmPeerUpdate(P_ADAPTER_T prAdapter, PVOID pvSetBuffer, UINT_32 u4SetBufferLen, 
 		kalMemCopy(prStaRec->aucRxMcsBitmask, prCmd->rHtCap.rMCS.arRxMask, sizeof(prStaRec->aucRxMcsBitmask));
 	}
 
-#if CFG_SUPPORT_802_11AC
 	prWifiVar = &prAdapter->rWifiVar;
 	/* ++VHT capability */
 	if (prCmd->fgIsSupVht) {
@@ -1480,7 +1444,6 @@ cnmPeerUpdate(P_ADAPTER_T prAdapter, PVOID pvSetBuffer, UINT_32 u4SetBufferLen, 
 			ucRxNss = 2;
 		prStaRec->ucVhtOpMode |= ((ucRxNss - 1) << VHT_OP_MODE_RX_NSS_OFFSET) & VHT_OP_MODE_RX_NSS;
 	}
-#endif /* CFG_SUPPORT_802_11AC */
 
 	cnmStaRecChangeState(prAdapter, prStaRec, STA_STATE_3);
 
@@ -1516,5 +1479,3 @@ P_STA_RECORD_T cnmGetTdlsPeerByAddress(P_ADAPTER_T prAdapter, UINT_8 ucBssIndex,
 
 	return prStaRec;
 }
-
-#endif

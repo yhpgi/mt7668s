@@ -31,10 +31,6 @@
 #include "precomp.h"
 #include "gl_os.h"
 
-#if CFG_ENABLE_EARLY_SUSPEND
-#include <linux/earlysuspend.h>
-#endif
-
 /*******************************************************************************
  *                              C O N S T A N T S
  ********************************************************************************
@@ -99,9 +95,7 @@ static int netdev_event(struct notifier_block *nb, unsigned long notification, v
 		return NOTIFY_DONE;
 	}
 
-#if CFG_GARP_KEEPALIVE
-	// garp keepalive needs IP address update when host is awake
-#else
+#if !CFG_GARP_KEEPALIVE
 	if (prGlueInfo->fgIsInSuspendMode == FALSE) {
 		/* DBGLOG(REQ, INFO,
 		 *  ("netdev_event: PARAM_MEDIA_STATE_DISCONNECTED. (%d)\n",
@@ -109,7 +103,7 @@ static int netdev_event(struct notifier_block *nb, unsigned long notification, v
 		 */
 		return NOTIFY_DONE;
 	}
-#endif // CFG_GARP_KEEPALIVE
+#endif // !CFG_GARP_KEEPALIVE
 
 	kalSetNetAddressFromInterface(prGlueInfo, prDev, TRUE);
 
@@ -122,73 +116,13 @@ static struct notifier_block inetaddr_notifier = {
 
 void wlanRegisterNotifier(void)
 {
-#if CFG_ENABLE_NET_DEV_NOTIFY
 	register_inetaddr_notifier(&inetaddr_notifier);
-#endif
 }
 
 void wlanUnregisterNotifier(void)
 {
-#if CFG_ENABLE_NET_DEV_NOTIFY
 	unregister_inetaddr_notifier(&inetaddr_notifier);
-#endif
 }
-
-#if CFG_ENABLE_EARLY_SUSPEND
-/*----------------------------------------------------------------------------*/
-/*!
- * \brief This function will register platform driver to os
- *
- * \param[in] wlanSuspend    Function pointer to platform suspend function
- * \param[in] wlanResume   Function pointer to platform resume   function
- *
- * \return The result of registering earlysuspend
- */
-/*----------------------------------------------------------------------------*/
-
-int glRegisterEarlySuspend(
-		struct early_suspend *prDesc, early_suspend_callback wlanSuspend, late_resume_callback wlanResume)
-{
-	int ret = 0;
-
-	if (wlanSuspend != NULL)
-		prDesc->suspend = wlanSuspend;
-	else {
-		DBGLOG(REQ, INFO, "glRegisterEarlySuspend wlanSuspend ERROR.\n");
-		ret = -1;
-	}
-
-	if (wlanResume != NULL)
-		prDesc->resume = wlanResume;
-	else {
-		DBGLOG(REQ, INFO, "glRegisterEarlySuspend wlanResume ERROR.\n");
-		ret = -1;
-	}
-
-	register_early_suspend(prDesc);
-	return ret;
-}
-
-/*----------------------------------------------------------------------------*/
-/*!
- * \brief This function will un-register platform driver to os
- *
- * \return The result of un-registering earlysuspend
- */
-/*----------------------------------------------------------------------------*/
-
-int glUnregisterEarlySuspend(struct early_suspend *prDesc)
-{
-	int ret = 0;
-
-	unregister_early_suspend(prDesc);
-
-	prDesc->suspend = NULL;
-	prDesc->resume	= NULL;
-
-	return ret;
-}
-#endif
 
 /*----------------------------------------------------------------------------*/
 /*!
@@ -206,7 +140,6 @@ int glUnregisterEarlySuspend(struct early_suspend *prDesc)
 /*----------------------------------------------------------------------------*/
 static int nvram_read(char *filename, char *buf, ssize_t len, int offset)
 {
-#if CFG_SUPPORT_NVRAM
 	struct file *fd;
 	int			 retLen = -1;
 
@@ -248,12 +181,6 @@ static int nvram_read(char *filename, char *buf, ssize_t len, int offset)
 	set_fs(old_fs);
 
 	return retLen;
-
-#else /* !CFG_SUPPORT_NVRAM */
-
-	return -EIO;
-
-#endif
 }
 
 /*----------------------------------------------------------------------------*/
@@ -271,7 +198,6 @@ static int nvram_read(char *filename, char *buf, ssize_t len, int offset)
 /*----------------------------------------------------------------------------*/
 static int nvram_write(char *filename, char *buf, ssize_t len, int offset)
 {
-#if CFG_SUPPORT_NVRAM
 	struct file *fd;
 	int			 retLen = -1;
 
@@ -313,12 +239,6 @@ static int nvram_write(char *filename, char *buf, ssize_t len, int offset)
 	set_fs(old_fs);
 
 	return retLen;
-
-#else /* !CFG_SUPPORT_NVRAMS */
-
-	return -EIO;
-
-#endif
 }
 
 /*----------------------------------------------------------------------------*/

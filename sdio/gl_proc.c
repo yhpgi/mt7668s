@@ -34,10 +34,7 @@
 #define PROC_MCR_ACCESS "mcr"
 
 #define PROC_ROOT_NAME "wlan"
-
-#if CFG_SUPPORT_DEBUG_FS
 #define PROC_COUNTRY "country"
-#endif
 #define PROC_DRV_STATUS "status"
 #define PROC_RX_STATISTICS "rx_statistics"
 #define PROC_TX_STATISTICS "tx_statistics"
@@ -45,9 +42,7 @@
 #define PROC_DRIVER_CMD "driver"
 #define PROC_CFG "cfg"
 #define PROC_EFUSE_DUMP "efuse_dump"
-#ifdef CFG_DUMP_TXPOWR_TABLE
 #define PROC_GET_TXPWR_TBL "get_txpwr_tbl"
-#endif
 
 #define PROC_MCR_ACCESS_MAX_USER_INPUT_LEN 20
 #define PROC_RX_STATISTICS_MAX_USER_INPUT_LEN 10
@@ -136,9 +131,6 @@ freeBuf:
 		kalMemFree(pucProcBuf, VIR_MEM_TYPE, PROC_MAX_BUF_SIZE);
 	return i4Ret;
 }
-
-#if WLAN_INCLUDE_PROC
-#if CFG_SUPPORT_EASY_DEBUG
 
 static void *procEfuseDump_start(struct seq_file *s, loff_t *pos)
 {
@@ -375,9 +367,6 @@ freeBuf:
 	return i4Ret;
 }
 
-#endif
-#endif
-
 static ssize_t procDbgLevelWrite(struct file *file, const char __user *buffer, size_t count, loff_t *data)
 {
 	UINT_32	 u4NewDbgModule, u4NewDbgLevel;
@@ -432,7 +421,6 @@ freeBuf:
 	return i4Ret;
 }
 
-#ifdef CFG_DUMP_TXPOWR_TABLE
 #define TXPWR_TABLE_ENTRY(_siso_mcs, _cdd_mcs, _mimo_mcs, _idx) \
 	{ \
 		.mcs[STREAM_SISO] = _siso_mcs, .mcs[STREAM_CDD] = _cdd_mcs, .mcs[STREAM_MIMO] = _mimo_mcs, .idx = (_idx), \
@@ -729,7 +717,6 @@ out:
 	}
 	return ret;
 }
-#endif
 
 #if KERNEL_VERSION(5, 6, 0) <= LINUX_VERSION_CODE
 static const struct proc_ops dbglevel_ops = {
@@ -737,8 +724,6 @@ static const struct proc_ops dbglevel_ops = {
 	.proc_write = procDbgLevelWrite,
 };
 
-#if WLAN_INCLUDE_PROC
-#if CFG_SUPPORT_EASY_DEBUG
 static const struct proc_ops efusedump_ops = {
 	.proc_open	  = procEfuseDumpOpen,
 	.proc_read	  = seq_read,
@@ -755,53 +740,42 @@ static const struct proc_ops cfg_ops = {
 	.proc_read	= procCfgRead,
 	.proc_write = procCfgWrite,
 };
-#endif
-#endif
 
-#ifdef CFG_DUMP_TXPOWR_TABLE
 static const struct proc_ops get_txpwr_tbl_ops = {
 	.proc_read = procGetTxpwrTblRead,
 };
-#endif
 #else
 
 static const struct file_operations dbglevel_ops = {
 	.owner = THIS_MODULE,
-	.read  = procDbgLevelRead,
+	.read = procDbgLevelRead,
 	.write = procDbgLevelWrite,
 };
 
-#if WLAN_INCLUDE_PROC
-#if CFG_SUPPORT_EASY_DEBUG
-
 static const struct file_operations efusedump_ops = {
-	.owner	 = THIS_MODULE,
-	.open	 = procEfuseDumpOpen,
-	.read	 = seq_read,
-	.llseek	 = seq_lseek,
+	.owner = THIS_MODULE,
+	.open = procEfuseDumpOpen,
+	.read = seq_read,
+	.llseek = seq_lseek,
 	.release = seq_release,
 };
 
 static const struct file_operations drivercmd_ops = {
 	.owner = THIS_MODULE,
-	.read  = procDriverCmdRead,
+	.read = procDriverCmdRead,
 	.write = procDriverCmdWrite,
 };
 
 static const struct file_operations cfg_ops = {
 	.owner = THIS_MODULE,
-	.read  = procCfgRead,
+	.read = procCfgRead,
 	.write = procCfgWrite,
 };
-#endif
-#endif
 
-#ifdef CFG_DUMP_TXPOWR_TABLE
 static const struct file_operations get_txpwr_tbl_ops = {
 	.owner = THIS_MODULE,
-	.read  = procGetTxpwrTblRead,
+	.read = procGetTxpwrTblRead,
 };
-#endif
 #endif
 
 /*******************************************************************************
@@ -946,12 +920,11 @@ static const struct proc_ops mcr_ops = {
 #else
 static const struct file_operations mcr_ops = {
 	.owner = THIS_MODULE,
-	.read  = procMCRRead,
+	.read = procMCRRead,
 	.write = procMCRWrite,
 };
 #endif
 
-#if CFG_SUPPORT_DEBUG_FS
 static ssize_t procCountryRead(struct file *filp, char __user *buf, size_t count, loff_t *f_pos)
 {
 	uint8_t *pucProcBuf = kalMemZAlloc(PROC_MAX_BUF_SIZE, VIR_MEM_TYPE);
@@ -999,9 +972,8 @@ static const struct proc_ops country_ops = {
 #else
 static const struct file_operations country_ops = {
 	.owner = THIS_MODULE,
-	.read  = procCountryRead,
+	.read = procCountryRead,
 };
-#endif
 #endif
 
 INT_32 procInitFs(VOID)
@@ -1050,12 +1022,8 @@ INT_32 procRemoveProcfs(VOID)
 	remove_proc_entry(PROC_DBG_LEVEL_NAME, gprProcRoot);
 	remove_proc_entry(PROC_CFG, gprProcRoot);
 	remove_proc_entry(PROC_EFUSE_DUMP, gprProcRoot);
-#ifdef CFG_DUMP_TXPOWR_TABLE
 	remove_proc_entry(PROC_GET_TXPWR_TBL, gprProcRoot);
-#endif
-#if CFG_SUPPORT_DEBUG_FS
 	remove_proc_entry(PROC_COUNTRY, gprProcRoot);
-#endif
 
 	return 0;
 } /* end of procRemoveProcfs() */
@@ -1072,15 +1040,12 @@ INT_32 procCreateFsEntry(P_GLUE_INFO_T prGlueInfo)
 		DBGLOG(INIT, ERROR, "Unable to create /proc entry\n\r");
 		return -1;
 	}
-#if CFG_SUPPORT_DEBUG_FS
+
 	prEntry = proc_create(PROC_COUNTRY, 0664, gprProcRoot, &country_ops);
 	if (prEntry == NULL) {
 		DBGLOG(INIT, ERROR, "Unable to create /proc entry\n\r");
 		return -1;
 	}
-#endif
-#if WLAN_INCLUDE_PROC
-#if CFG_SUPPORT_EASY_DEBUG
 
 	prEntry = proc_create(PROC_DRIVER_CMD, 0664, gprProcRoot, &drivercmd_ops);
 	if (prEntry == NULL) {
@@ -1099,16 +1064,12 @@ INT_32 procCreateFsEntry(P_GLUE_INFO_T prGlueInfo)
 		DBGLOG(INIT, ERROR, "Unable to create /proc entry efuse\n\r");
 		return -1;
 	}
-#endif
-#endif
 
-#ifdef CFG_DUMP_TXPOWR_TABLE
 	prEntry = proc_create(PROC_GET_TXPWR_TBL, 0664, gprProcRoot, &get_txpwr_tbl_ops);
 	if (prEntry == NULL) {
 		DBGLOG(INIT, ERROR, "Unable to create /proc entry efuse\n\r");
 		return -1;
 	}
-#endif
 
 	prEntry = proc_create(PROC_DBG_LEVEL_NAME, 0664, gprProcRoot, &dbglevel_ops);
 	if (prEntry == NULL) {

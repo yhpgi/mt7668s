@@ -30,13 +30,11 @@ UINT_32 p2pCalculate_IEForAssocReq(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssInde
 				(prStaRec->ucPhyTypeSet & PHY_TYPE_SET_802_11N)) {
 			u4RetValue += (ELEM_HDR_LEN + ELEM_MAX_LEN_HT_CAP);
 		}
-#if CFG_SUPPORT_802_11AC
 		/* ADD VHT Capability */
 		if ((prAdapter->rWifiVar.ucAvailablePhyTypeSet & PHY_TYPE_SET_802_11AC) &&
 				(prStaRec->ucPhyTypeSet & PHY_TYPE_SET_802_11AC)) {
 			u4RetValue += (ELEM_HDR_LEN + ELEM_MAX_LEN_VHT_CAP);
 		}
-#endif
 
 #if CFG_SUPPORT_MTK_SYNERGY
 		if (prAdapter->rWifiVar.ucMtkOui == FEATURE_ENABLED)
@@ -84,11 +82,9 @@ VOID p2pGenerate_IEForAssocReq(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsdu
 		/* Add HT IE */
 		rlmReqGenerateHtCapIE(prAdapter, prMsduInfo);
 
-#if CFG_SUPPORT_802_11AC
 		/* Add VHT IE */
 		rlmReqGenerateVhtCapIE(prAdapter, prMsduInfo);
 		rlmReqGenerateVhtOpNotificationIE(prAdapter, prMsduInfo);
-#endif
 
 #if CFG_SUPPORT_MTK_SYNERGY
 		rlmGenerateMTKOuiIE(prAdapter, prMsduInfo);

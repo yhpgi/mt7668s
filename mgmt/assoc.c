@@ -35,68 +35,48 @@
  ********************************************************************************
  */
 APPEND_VAR_IE_ENTRY_T txAssocReqIETable[] = {
-#if CFG_SUPPORT_SPEC_MGMT
-	{ (ELEM_HDR_LEN + ELEM_MAX_LEN_POWER_CAP), NULL, rlmReqGeneratePowerCapIE },			 /* 33 */
-	{ (ELEM_HDR_LEN + ELEM_MAX_LEN_SUPPORTED_CHANNELS), NULL, rlmReqGenerateSupportedChIE }, /* 36 */
-#endif
-	{ (ELEM_HDR_LEN + ELEM_MAX_LEN_HT_CAP), NULL, rlmReqGenerateHtCapIE }, /* 45 */
-#if CFG_SUPPORT_802_11K
-	{ (ELEM_HDR_LEN + 5), NULL, rlmReqGenerateRRMEnabledCapIE }, /* 70 */
-#endif
-#if CFG_SUPPORT_WPS2
-	{ (ELEM_HDR_LEN + ELEM_MAX_LEN_WSC), NULL, rsnGenerateWSCIE }, /* 221 */
-#endif
-	{ (ELEM_HDR_LEN + ELEM_MAX_LEN_EXT_CAP), NULL, rlmReqGenerateExtCapIE }, /* 127 */
-	{ (ELEM_HDR_LEN + ELEM_MAX_LEN_WMM_INFO), NULL, mqmGenerateWmmInfoIE },	 /* 221 */
-	{ (ELEM_HDR_LEN + ELEM_MAX_LEN_RSN), NULL, rsnGenerateRSNIE },			 /* 48 */
-#if CFG_SUPPORT_802_11AC
+	{ (ELEM_HDR_LEN + ELEM_MAX_LEN_POWER_CAP), NULL, rlmReqGeneratePowerCapIE },						 /* 33 */
+	{ (ELEM_HDR_LEN + ELEM_MAX_LEN_SUPPORTED_CHANNELS), NULL, rlmReqGenerateSupportedChIE },			 /* 36 */
+	{ (ELEM_HDR_LEN + ELEM_MAX_LEN_HT_CAP), NULL, rlmReqGenerateHtCapIE },								 /* 45 */
+	{ (ELEM_HDR_LEN + 5), NULL, rlmReqGenerateRRMEnabledCapIE },										 /* 70 */
+	{ (ELEM_HDR_LEN + ELEM_MAX_LEN_WSC), NULL, rsnGenerateWSCIE },										 /* 221 */
+	{ (ELEM_HDR_LEN + ELEM_MAX_LEN_EXT_CAP), NULL, rlmReqGenerateExtCapIE },							 /* 127 */
+	{ (ELEM_HDR_LEN + ELEM_MAX_LEN_WMM_INFO), NULL, mqmGenerateWmmInfoIE },								 /* 221 */
+	{ (ELEM_HDR_LEN + ELEM_MAX_LEN_RSN), NULL, rsnGenerateRSNIE },										 /* 48 */
 	{ (ELEM_HDR_LEN + ELEM_MAX_LEN_VHT_CAP), NULL, rlmReqGenerateVhtCapIE },							 /*191 */
 	{ (ELEM_HDR_LEN + ELEM_MAX_LEN_VHT_OP_MODE_NOTIFICATION), NULL, rlmReqGenerateVhtOpNotificationIE }, /*199 */
-#endif
 #if CFG_SUPPORT_MTK_SYNERGY
 	{ (ELEM_HDR_LEN + ELEM_MIN_LEN_MTK_OUI), NULL, rlmGenerateMTKOuiIE }, /* 221 */
 #endif
 	{ (ELEM_HDR_LEN + ELEM_MAX_LEN_WPA), NULL, rsnGenerateWPAIE } /* 221 */
 	,
-#if CFG_SUPPORT_H2E
 	{ 0, rsnCalRSNXELen, rsnGenerateRSNXE } /* 244 */
-#endif
 };
 
-#if CFG_SUPPORT_AAA
 VERIFY_IE_ENTRY_T rxAssocReqIETable[] = {
 	{ ELEM_ID_RESERVED, NULL } /* 255 */
 };
 
 APPEND_VAR_IE_ENTRY_T txAssocRespIETable[] = {
-	{ (ELEM_HDR_LEN + ELEM_MAX_LEN_ERP), NULL, rlmRspGenerateErpIE },	   /* 42 */
-	{ (ELEM_HDR_LEN + ELEM_MAX_LEN_HT_CAP), NULL, rlmRspGenerateHtCapIE }, /* 45 */
-	{ (ELEM_HDR_LEN + ELEM_MAX_LEN_HT_OP), NULL, rlmRspGenerateHtOpIE },   /* 61 */
-#if CFG_ENABLE_WIFI_DIRECT
-	{ (ELEM_HDR_LEN + ELEM_MAX_LEN_OBSS_SCAN), NULL, rlmRspGenerateObssScanIE },	 /* 74 */
-	{ (0), p2pFuncCalculateP2p_IELenForAssocRsp, p2pFuncGenerateP2p_IEForAssocRsp }, /* 221 */
-#if (CFG_SUPPORT_WFD)
-	{ (0), wfdFuncCalculateWfdIELenForAssocRsp, wfdFuncGenerateWfdIEForAssocRsp }, /* 221 */
-#endif
-#endif
-	{ (ELEM_HDR_LEN + ELEM_MAX_LEN_EXT_CAP), NULL, rlmRspGenerateExtCapIE }, /* 127 */
-#if CFG_SUPPORT_802_11AC
+	{ (ELEM_HDR_LEN + ELEM_MAX_LEN_ERP), NULL, rlmRspGenerateErpIE },									 /* 42 */
+	{ (ELEM_HDR_LEN + ELEM_MAX_LEN_HT_CAP), NULL, rlmRspGenerateHtCapIE },								 /* 45 */
+	{ (ELEM_HDR_LEN + ELEM_MAX_LEN_HT_OP), NULL, rlmRspGenerateHtOpIE },								 /* 61 */
+	{ (ELEM_HDR_LEN + ELEM_MAX_LEN_OBSS_SCAN), NULL, rlmRspGenerateObssScanIE },						 /* 74 */
+	{ (0), p2pFuncCalculateP2p_IELenForAssocRsp, p2pFuncGenerateP2p_IEForAssocRsp },					 /* 221 */
+	{ (0), wfdFuncCalculateWfdIELenForAssocRsp, wfdFuncGenerateWfdIEForAssocRsp },						 /* 221 */
+	{ (ELEM_HDR_LEN + ELEM_MAX_LEN_EXT_CAP), NULL, rlmRspGenerateExtCapIE },							 /* 127 */
 	{ (ELEM_HDR_LEN + ELEM_MAX_LEN_VHT_CAP), NULL, rlmRspGenerateVhtCapIE },							 /*191 */
 	{ (ELEM_HDR_LEN + ELEM_MAX_LEN_VHT_OP), NULL, rlmRspGenerateVhtOpIE },								 /*192 */
 	{ (ELEM_HDR_LEN + ELEM_MAX_LEN_VHT_OP_MODE_NOTIFICATION), NULL, rlmRspGenerateVhtOpNotificationIE }, /*199 */
-#endif
-	{ (ELEM_HDR_LEN + ELEM_MAX_LEN_WMM_PARAM), NULL, mqmGenerateWmmParamIE },			   /* 221 */
-	{ (ELEM_HDR_LEN + ELEM_MAX_LEN_ASSOC_RSP_WSC_IE), NULL, rsnGenerateWSCIEForAssocRsp }, /* 221 */
+	{ (ELEM_HDR_LEN + ELEM_MAX_LEN_WMM_PARAM), NULL, mqmGenerateWmmParamIE },							 /* 221 */
+	{ (ELEM_HDR_LEN + ELEM_MAX_LEN_ASSOC_RSP_WSC_IE), NULL, rsnGenerateWSCIEForAssocRsp },				 /* 221 */
 #if CFG_SUPPORT_MTK_SYNERGY
 	{ (ELEM_HDR_LEN + ELEM_MIN_LEN_MTK_OUI), NULL, rlmGenerateMTKOuiIE } /* 221 */
 	,
 #endif
-#if CFG_SUPPORT_802_11W
 	{ (ELEM_HDR_LEN + ELEM_MAX_LEN_TIMEOUT_IE), NULL, rsnPmfGenerateTimeoutIE } /* 56 */
-#endif
 
 };
-#endif /* CFG_SUPPORT_AAA */
 
 /*******************************************************************************
  *                           P R I V A T E   D A T A
@@ -140,9 +120,7 @@ UINT_16 assocBuildCapabilityInfo(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prS
 	/* Set up our requested capabilities. */
 	u2CapInfo = CAP_INFO_ESS;
 	u2CapInfo |= CAP_CF_STA_NOT_POLLABLE;
-#if CFG_SUPPORT_802_11K
 	u2CapInfo |= CAP_INFO_RADIO_MEASUREMENT;
-#endif
 	if (prStaRec->u2CapInfo & CAP_INFO_PRIVACY)
 		u2CapInfo |= CAP_INFO_PRIVACY;
 
@@ -162,7 +140,6 @@ UINT_16 assocBuildCapabilityInfo(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prS
 			u2CapInfo |= CAP_INFO_SHORT_PREAMBLE;
 		}
 
-#if CFG_SUPPORT_SPEC_MGMT
 		/* 802.11h spectrum management is for 5G band, so
 		 * now we only enable spectrum management bit for 5G case.
 		 * In TGn 5.2.22, spectrum management bit should set to 1
@@ -170,7 +147,6 @@ UINT_16 assocBuildCapabilityInfo(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prS
 		 */
 		if (prBssInfo && prBssInfo->eBand == BAND_5G)
 			u2CapInfo |= CAP_INFO_SPEC_MGT;
-#endif
 
 		if (rNonHTPhyAttributes[u4NonHTPhyType].fgIsShortSlotTimeOptionImplemented &&
 				prAdapter->rWifiVar.fgIsShortSlotTimeOptionEnable) {
@@ -233,12 +209,8 @@ static __KAL_INLINE__ VOID assocBuildReAssocReqFrameCommonIEs(IN P_ADAPTER_T prA
 		prMsduInfo->u2FrameLength += IE_SIZE(pucBuffer);
 		pucBuffer += IE_SIZE(pucBuffer);
 
-	}
-#if CFG_ENABLE_WIFI_DIRECT
-	else if ((prAdapter->fgIsP2PRegistered) && (IS_STA_IN_P2P(prStaRec)))
+	} else if ((prAdapter->fgIsP2PRegistered) && (IS_STA_IN_P2P(prStaRec)))
 		pucBuffer = p2pBuildReAssocReqFrameCommonIEs(prAdapter, prMsduInfo, pucBuffer);
-
-#endif
 
 	/* NOTE(Kevin 2008/12/19): 16.3.6.3 MLME-ASSOCIATE.indication -
 	 * SupportedRates - The set of data rates that are supported by the STA
@@ -426,7 +398,6 @@ WLAN_STATUS assocSendReAssocReqFrame(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T
 	/* + Extra IE Length */
 	u2EstimatedExtraIELen = 0;
 
-#if CFG_ENABLE_WIFI_DIRECT_CFG_80211 && CFG_ENABLE_WIFI_DIRECT
 	if (IS_STA_IN_P2P(prStaRec)) {
 		if ((prAdapter->fgIsP2PRegistered)) {
 			u2EstimatedExtraIELen = p2pCalculate_IEForAssocReq(prAdapter, prStaRec->ucBssIndex, prStaRec);
@@ -444,16 +415,6 @@ WLAN_STATUS assocSendReAssocReqFrame(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T
 			}
 		}
 	}
-#else
-	for (i = 0; i < sizeof(txAssocReqIETable) / sizeof(APPEND_VAR_IE_ENTRY_T); i++) {
-		if (txAssocReqIETable[i].u2EstimatedFixedIELen != 0) {
-			u2EstimatedExtraIELen += txAssocReqIETable[i].u2EstimatedFixedIELen;
-		} else {
-			u2EstimatedExtraIELen +=
-					(UINT_16)txAssocReqIETable[i].pfnCalculateVariableIELen(prAdapter, prStaRec->ucBssIndex, prStaRec);
-		}
-	}
-#endif
 
 	ASSERT(prStaRec->ucBssIndex <= MAX_BSS_INDEX);
 
@@ -480,7 +441,6 @@ WLAN_STATUS assocSendReAssocReqFrame(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T
 	assocBuildReAssocReqFrameCommonIEs(prAdapter, prMsduInfo);
 
 	/* 4 <5> Compose IEs in MSDU_INFO_T */
-#if CFG_ENABLE_WIFI_DIRECT_CFG_80211 && CFG_ENABLE_WIFI_DIRECT
 	if (IS_STA_IN_P2P(prStaRec)) {
 		if ((prAdapter->fgIsP2PRegistered)) {
 			p2pGenerate_IEForAssocReq(prAdapter, prMsduInfo);
@@ -495,13 +455,6 @@ WLAN_STATUS assocSendReAssocReqFrame(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T
 				txAssocReqIETable[i].pfnAppendIE(prAdapter, prMsduInfo);
 		}
 	}
-#else
-	/* Append IE */
-	for (i = 0; i < sizeof(txAssocReqIETable) / sizeof(APPEND_VAR_IE_ENTRY_T); i++) {
-		if (txAssocReqIETable[i].pfnAppendIE)
-			txAssocReqIETable[i].pfnAppendIE(prAdapter, prMsduInfo);
-	}
-#endif
 
 	/* 4 <6> Update the (Re)association request information */
 	if (IS_STA_IN_AIS(prStaRec)) {
@@ -512,7 +465,7 @@ WLAN_STATUS assocSendReAssocReqFrame(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T
 		kalUpdateReAssocReqInfo(prAdapter->prGlueInfo, (PUINT_8)&prAssocFrame->u2CapInfo,
 				prMsduInfo->u2FrameLength - offsetof(WLAN_ASSOC_REQ_FRAME_T, u2CapInfo), fgIsReAssoc);
 	}
-#if CFG_ENABLE_WIFI_DIRECT
+
 	if ((prAdapter->fgIsP2PRegistered) && (IS_STA_IN_P2P(prStaRec))) {
 		P_WLAN_ASSOC_REQ_FRAME_T prAssocFrame;
 
@@ -522,10 +475,8 @@ WLAN_STATUS assocSendReAssocReqFrame(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T
 				prMsduInfo->u2FrameLength - offsetof(WLAN_ASSOC_REQ_FRAME_T, u2CapInfo), fgIsReAssoc,
 				prStaRec->ucBssIndex);
 	}
-#endif
 
 	/* TODO(Kevin): Also release the unused tail room of the composed MMPDU */
-
 	nicTxConfigPktControlFlag(prMsduInfo, MSDU_CONTROL_FLAG_FORCE_TX, TRUE);
 
 	/* 4 <6> Enqueue the frame to send this (Re)Association request frame. */
@@ -701,19 +652,9 @@ assocCheckRxReAssocRspFrameStatus(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRf
 	 * of our SCAN result didn't consist with AP's Association Resp.
 	 */
 	if (u2RxStatusCode == STATUS_CODE_SUCCESSFUL) {
-#if CFG_ENABLE_WIFI_DIRECT
 		if (prAdapter->fgIsP2PRegistered && 1) {
-			/* Todo:: Fixed this */
-		} else
-#endif
-		{
+		} else {
 		}
-
-#if CFG_STRICT_CHECK_CAPINFO_PRIVACY
-		if ((prStaRec->u2CapInfo & CAP_INFO_PRIVACY) ^ (u2RxCapInfo & CAP_INFO_PRIVACY))
-			u2RxStatusCode = STATUS_CODE_CAP_NOT_SUPPORTED;
-
-#endif
 	}
 
 	if (u2RxStatusCode == STATUS_CODE_SUCCESSFUL) {
@@ -742,7 +683,6 @@ assocCheckRxReAssocRspFrameStatus(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRf
 			prStaRec->u2AssocId = u2RxAssocId & ~BITS(6, 7);
 		} else {
 			prStaRec->u2AssocId = u2RxAssocId & ~AID_MSB;
-#if CFG_SUPPORT_802_11W
 			if (prStaRec->eStaType == STA_TYPE_LEGACY_AP) {
 				P_AIS_SPECIFIC_BSS_INFO_T prBssSpecInfo;
 
@@ -751,11 +691,9 @@ assocCheckRxReAssocRspFrameStatus(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRf
 
 				prBssSpecInfo->ucSaQueryTimedOut = 0;
 			}
-#endif
 		}
 	}
 
-#if CFG_SUPPORT_802_11V
 	if (u2RxStatusCode == STATUS_CODE_SUCCESSFUL) {
 #define DEFAULT_AGE_NULL_PERIOD 30
 		PUINT_8 pucIE;
@@ -797,9 +735,7 @@ assocCheckRxReAssocRspFrameStatus(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRf
 
 		wlanCfgSet(prAdapter, "AgeNullPeriod", pcCommand, 0);
 	}
-#endif
 
-#if CFG_SUPPORT_802_11W
 	if (u2RxStatusCode == STATUS_CODE_AUTH_ALGORITHM_NOT_SUPPORTED) {
 		DBGLOG(SAA, INFO, "AP rejected due the authentication algorithm not support\n");
 	} else if (u2RxStatusCode == STATUS_CODE_ASSOC_REJECTED_TEMPORARILY) {
@@ -829,7 +765,6 @@ assocCheckRxReAssocRspFrameStatus(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRf
 			}
 		} /* end of IE_FOR_EACH */
 	}
-#endif
 	*pu2StatusCode = u2RxStatusCode;
 
 	return WLAN_STATUS_SUCCESS;
@@ -927,7 +862,6 @@ WLAN_STATUS assocSendDisAssocFrame(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T p
 	assocComposeDisassocFrame(
 			prStaRec, (PUINT_8)((ULONG)(prMsduInfo->prPacket) + MAC_TX_RESERVED_FIELD), pucMacAddress, u2ReasonCode);
 
-#if CFG_SUPPORT_802_11W
 	/* AP PMF */
 	if (rsnCheckBipKeyInstalled(prAdapter, prStaRec)) {
 		/* PMF certification 4.3.3.1, 4.3.3.2 send unprotected deauth reason 6/7 */
@@ -939,7 +873,6 @@ WLAN_STATUS assocSendDisAssocFrame(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T p
 			prDisassocFrame->u2FrameCtrl |= MASK_FC_PROTECTED_FRAME;
 		}
 	}
-#endif
 
 	u2PayloadLen = REASON_CODE_FIELD_LEN;
 
@@ -947,7 +880,6 @@ WLAN_STATUS assocSendDisAssocFrame(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T p
 	TX_SET_MMPDU(prAdapter, prMsduInfo, prStaRec->ucBssIndex, prStaRec->ucIndex, WLAN_MAC_MGMT_HEADER_LEN,
 			WLAN_MAC_MGMT_HEADER_LEN + u2PayloadLen, NULL, MSDU_RATE_MODE_AUTO);
 
-#if CFG_SUPPORT_802_11W
 	/* AP PMF */
 	/* caution: access prStaRec only if true */
 	if (rsnCheckBipKeyInstalled(prAdapter, prStaRec)) {
@@ -959,7 +891,6 @@ WLAN_STATUS assocSendDisAssocFrame(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T p
 
 		prStaRec->rPmfCfg.fgRxDeauthResp = FALSE;
 	}
-#endif
 
 	{
 		P_WLAN_DISASSOC_FRAME_T prDisassocFrame;
@@ -1072,7 +1003,6 @@ assocProcessRxDisassocFrame(
 
 } /* end of assocProcessRxDisassocFrame() */
 
-#if CFG_SUPPORT_AAA
 /*----------------------------------------------------------------------------*/
 /*!
  * @brief This function will parse and process the incoming Association Req frame
@@ -1197,7 +1127,6 @@ WLAN_STATUS assocProcessRxAssocReqFrame(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T 
 			prStaRec->ucPhyTypeSet |= PHY_TYPE_BIT_VHT;
 			break;
 		case ELEM_ID_RSN:
-#if CFG_ENABLE_WIFI_DIRECT && CFG_ENABLE_HOTSPOT_PRIVACY_CHECK
 			if (prAdapter->fgIsP2PRegistered && IS_STA_IN_P2P(prStaRec)) {
 				prIeRsn = RSN_IE(pucIE);
 				rsnParserCheckForRSNCCMPPSK(prAdapter, prIeRsn, prStaRec, &u2StatusCode);
@@ -1209,13 +1138,11 @@ WLAN_STATUS assocProcessRxAssocReqFrame(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T 
 					return WLAN_STATUS_SUCCESS;
 				}
 			}
-#endif
 			break;
 		case ELEM_ID_VENDOR:
 			if (p2pFuncParseCheckForTKIPInfoElem(pucIE))
 				fgIsTKIP = TRUE;
 
-#if CFG_ENABLE_WIFI_DIRECT
 			{
 				if ((prAdapter->fgIsP2PRegistered)) {
 					UINT_8 ucOuiType = 0;
@@ -1228,7 +1155,6 @@ WLAN_STATUS assocProcessRxAssocReqFrame(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T 
 					}
 				}
 			}
-#endif
 			break;
 		case ELEM_ID_IBSS_PARAM_SET:
 			/* Check IBSS parameter set length to avoid abnormal content */
@@ -1311,7 +1237,6 @@ WLAN_STATUS assocProcessRxAssocReqFrame(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T 
 		/* Update default Tx rate */
 		nicTxUpdateStaRecDefaultRate(prStaRec);
 
-#if CFG_ENABLE_WIFI_DIRECT && CFG_ENABLE_HOTSPOT_PRIVACY_CHECK
 		if (prAdapter->fgIsP2PRegistered && IS_STA_IN_P2P(prStaRec)) {
 			if (prIeRsn) {
 				if (!kalP2PGetCipher(prAdapter->prGlueInfo, (UINT_8)prBssInfo->u4PrivateData)) {
@@ -1319,19 +1244,11 @@ WLAN_STATUS assocProcessRxAssocReqFrame(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T 
 					break;
 				}
 			} else {
-				/* prStaRec->rSecInfo.fgAllowOnly1x = FALSE; */
-				/* if (kalP2PGetCipher(prAdapter->prGlueInfo)) { */
-				/* Only Allow 1x */
-				/* prStaRec->rSecInfo.fgAllowOnly1x = TRUE; */
-				/* break; */
-				/* } */
 			}
 		}
-#endif
 
 	} while (FALSE);
 
-#if CFG_ENABLE_WIFI_DIRECT
 	if (prAdapter->fgIsP2PRegistered && IS_STA_IN_P2P(prStaRec)) {
 		{
 			PUINT_8 cp = (PUINT_8)&prAssocReqFrame->u2CapInfo;
@@ -1358,7 +1275,6 @@ WLAN_STATUS assocProcessRxAssocReqFrame(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T 
 		kalP2PUpdateAssocInfo(prAdapter->prGlueInfo, (PUINT_8)&prAssocReqFrame->u2CapInfo,
 				u2IELength + (prStaRec->fgIsReAssoc ? 10 : 4), prStaRec->fgIsReAssoc, prStaRec->ucBssIndex);
 	}
-#endif
 
 	if (fgIsHT && fgIsTKIP && prBssInfo->eCurrentOPMode == OP_MODE_ACCESS_POINT)
 		u2StatusCode = STATUS_CODE_REQ_DECLINED;
@@ -1568,13 +1484,7 @@ WLAN_STATUS assocSendReAssocRespFrame(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_
 			txAssocRespIETable[i].pfnAppendIE(prAdapter, prMsduInfo);
 	}
 
-#if CFG_SUPPORT_WFD
-	/* TODO put WFD IE in assoc resp if driver will send assoc resp */
-
-#endif
-
 	/* TODO(Kevin): Also release the unused tail room of the composed MMPDU */
-
 	nicTxConfigPktControlFlag(prMsduInfo, MSDU_CONTROL_FLAG_FORCE_TX, TRUE);
 
 	/* 4 <6> Enqueue the frame to send this (Re)Association request frame. */
@@ -1583,5 +1493,3 @@ WLAN_STATUS assocSendReAssocRespFrame(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_
 	return WLAN_STATUS_SUCCESS;
 
 } /* end of assocSendReAssocRespFrame() */
-
-#endif /* CFG_SUPPORT_AAA */

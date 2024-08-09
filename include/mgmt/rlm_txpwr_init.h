@@ -36,8 +36,6 @@
 #define PWR_LIMIT_UNII2C_IN_MW_MHZ BIT(3)
 #define PWR_LIMIT_UNII3_IN_MW_MHZ BIT(4)
 
-#if CFG_SUPPORT_PWR_LIMIT_COUNTRY
-
 COUNTRY_POWER_LIMIT_TABLE_DEFAULT g_rRlmPowerLimitDefault[] = {
 
 	{ { 'A', 'O' }, { 40, 63, 63, 63, 63 }, 0 }, { { 'B', 'Z' }, { 40, 63, 63, 63, 63 }, 0 },
@@ -181,7 +179,6 @@ COUNTRY_POWER_LIMIT_TABLE_CONFIGURATION g_rRlmPowerLimitConfiguration[] = {
 	{ { 0, 0 }, 165, { 63, 63, 63, 63, 63 } }
 };
 
-#endif
 
 /*******************************************************************************
  *                            P U B L I C   D A T A

@@ -32,9 +32,7 @@
 #define DISCONNECT_REASON_CODE_DISASSOCIATED 3
 #define DISCONNECT_REASON_CODE_NEW_CONNECTION 4
 #define DISCONNECT_REASON_CODE_REASSOCIATION 5
-#if CFG_SUPPORT_DBDC_TC6
 #define DISCONNECT_REASON_CODE_DBDC_REASSOCIATION 6
-#endif
 
 /* Beacon Timeout Event Reason */
 #define BEACON_TIMEOUT_REASON_DUE_2_BMC_ERR 0x40
@@ -523,7 +521,6 @@ enum PWR_VHT_OFST_CAT {
 	PWR_VHT_OFST_NUM
 };
 
-#ifdef CFG_DUMP_TXPOWR_TABLE
 struct POWER_LIMIT {
 	UINT_8 ucCentralCh;
 	UINT_8 tx_pwr_dsss[PWR_DSSS_NUM];		  /*unit: 0.5 dbm*/
@@ -535,7 +532,6 @@ struct POWER_LIMIT {
 };
 
 enum ENUM_TXPWR_TBL_IDX { LIMIT_TBL, EEPROM_TBL, MAC_TBL, TXPWR_TBL_NUM };
-#endif
 
 typedef enum _ENUM_ACPI_STATE_T { ACPI_STATE_D0 = 0, ACPI_STATE_D1, ACPI_STATE_D2, ACPI_STATE_D3 } ENUM_ACPI_STATE_T;
 
@@ -581,14 +577,12 @@ typedef enum _ENUM_DBDC_BN_T {
 /* Provide supported channel list to other components in array format */
 typedef struct _RF_CHANNEL_INFO_T {
 	ENUM_BAND_T eBand;
-	UINT_32		u4CenterFreq1; /* To record Channel Center Frequency Segment 0 (MHz) from CFG80211 */
-	UINT_32		u4CenterFreq2; /* To record Channel Center Frequency Segment 1 (MHz) from CFG80211 */
-	UINT_16		u2PriChnlFreq; /* To record primary channel frequency (MHz) from CFG80211 */
-	UINT_8		ucChnlBw;	   /* To record channel bandwidth from CFG80211 */
+	UINT_32		u4CenterFreq1;  /* To record Channel Center Frequency Segment 0 (MHz) from CFG80211 */
+	UINT_32		u4CenterFreq2;  /* To record Channel Center Frequency Segment 1 (MHz) from CFG80211 */
+	UINT_16		u2PriChnlFreq;  /* To record primary channel frequency (MHz) from CFG80211 */
+	UINT_8		ucChnlBw;	    /* To record channel bandwidth from CFG80211 */
 	UINT_8		ucChannelNum;
-#if (CFG_SUPPORT_DFS_MASTER == 1)
-	UINT_32 u4ChnlDfsState; /* Channel DFS State */
-#endif
+	UINT_32 	u4ChnlDfsState; /* Channel DFS State */
 } RF_CHANNEL_INFO_T, *P_RF_CHANNEL_INFO_T;
 
 typedef enum _ENUM_PS_FORWARDING_TYPE_T {
@@ -732,10 +726,8 @@ typedef enum _ENUM_STA_TYPE_T {
 	STA_TYPE_LEGACY_AP	   = (STA_TYPE_LEGACY_MASK | STA_TYPE_AP_MASK),
 	STA_TYPE_LEGACY_CLIENT = (STA_TYPE_LEGACY_MASK | STA_TYPE_CLIENT_MASK),
 	STA_TYPE_ADHOC_PEER	   = (STA_TYPE_LEGACY_MASK | STA_TYPE_ADHOC_MASK),
-#if CFG_ENABLE_WIFI_DIRECT
 	STA_TYPE_P2P_GO = (STA_TYPE_P2P_MASK | STA_TYPE_AP_MASK),
 	STA_TYPE_P2P_GC = (STA_TYPE_P2P_MASK | STA_TYPE_CLIENT_MASK),
-#endif
 
 	STA_TYPE_DLS_PEER = (STA_TYPE_LEGACY_MASK | STA_TYPE_DLS_MASK),
 } ENUM_STA_TYPE_T,
@@ -804,13 +796,7 @@ typedef struct _WAPI_INFO_T {
 	UINT_16 u2WapiCap;
 	UINT_16 u2Bkid;
 	UINT_8	aucBkid[1][16];
-} /* __KAL_ATTRIB_PACKED__ */ WAPI_INFO_T, *P_WAPI_INFO_T;
-
-/* #if defined(WINDOWS_DDK) || defined(WINDOWS_CE) */
-/* #pragma pack() */
-/* #endif */
-
-#if CFG_ENABLE_WIFI_DIRECT
+} WAPI_INFO_T, *P_WAPI_INFO_T;
 
 typedef struct _P2P_DEVICE_TYPE_T {
 	UINT_16 u2CategoryID;
@@ -833,9 +819,6 @@ typedef struct _P2P_DEVICE_DESC_T {
 								   /* TODO: Service Information or PasswordID valid? */
 } P2P_DEVICE_DESC_T, *P_P2P_DEVICE_DESC_T;
 
-#endif
-
-#if CFG_SUPPORT_OWE
 /* Structure of OWE Information */
 struct OWE_INFO_T {
 	UINT_8	ucElemId;
@@ -844,15 +827,12 @@ struct OWE_INFO_T {
 	UINT_16 u2Group;
 	UINT_8	aucPublicKey[100];
 };
-#endif
 
-#if CFG_SUPPORT_H2E
 struct RSNXE {
 	UINT_8	ucElemId;
 	UINT_8	ucLength;
 	UINT_16 u2Cap;
 } __KAL_ATTRIB_PACKED__;
-#endif
 
 /*******************************************************************************
  *                            P U B L I C   D A T A

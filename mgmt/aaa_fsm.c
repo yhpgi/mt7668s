@@ -18,6 +18,7 @@
  *                    E X T E R N A L   R E F E R E N C E S
  ********************************************************************************
  */
+
 #include "precomp.h"
 
 /*******************************************************************************
@@ -55,8 +56,6 @@
  ********************************************************************************
  */
 
-#if CFG_SUPPORT_AAA
-
 VOID aaaFsmRunEventTxReqTimeOut(IN P_ADAPTER_T prAdapter, IN ULONG plParamPtr)
 {
 	P_STA_RECORD_T prStaRec = (P_STA_RECORD_T)plParamPtr;
@@ -83,10 +82,8 @@ VOID aaaFsmRunEventTxReqTimeOut(IN P_ADAPTER_T prAdapter, IN ULONG plParamPtr)
 		/* NOTE(Kevin): Change to STATE_1 */
 		cnmStaRecChangeState(prAdapter, prStaRec, STA_STATE_1);
 
-#if CFG_ENABLE_WIFI_DIRECT
 		if (prBssInfo->eNetworkType == NETWORK_TYPE_P2P)
 			p2pRoleFsmRunEventAAATxFail(prAdapter, prStaRec, prBssInfo);
-#endif /* CFG_ENABLE_WIFI_DIRECT */
 		break;
 
 	default:
@@ -119,7 +116,6 @@ VOID aaaFsmRunEventRxAuth(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb)
 	do {
 		prAuthFrame = (P_WLAN_AUTH_FRAME_T)prSwRfb->pvHeader;
 
-#if CFG_ENABLE_WIFI_DIRECT
 		prBssInfo = p2pFuncBSSIDFindBssInfo(prAdapter, prAuthFrame->aucBSSID);
 
 		/* 4 <1> Check P2P network conditions */
@@ -139,21 +135,18 @@ VOID aaaFsmRunEventRxAuth(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb)
 					/* 4 <1.2> Validate Auth Frame for Network Specific Conditions */
 					fgReplyAuth = p2pFuncValidateAuth(prAdapter, prBssInfo, prSwRfb, &prStaRec, &u2StatusCode);
 
-#if CFG_SUPPORT_802_11W
 					/* AP PMF, if PMF connection, ignore Rx auth */
 					/* Certification 4.3.3.4 */
 					if (rsnCheckBipKeyInstalled(prAdapter, prStaRec)) {
 						DBGLOG(AAA, INFO, "Drop RxAuth\n");
 						return;
 					}
-#endif
 				} else {
 					fgReplyAuth = TRUE;
 				}
 				break;
 			}
 		}
-#endif /* CFG_ENABLE_WIFI_DIRECT */
 
 bow_proc:
 		return;
@@ -269,7 +262,6 @@ WLAN_STATUS aaaFsmRunEventRxAssoc(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRf
 		prStaRec->ucRCPI = nicRxGetRcpiValueFromRxv(RCPI_MODE_WF0, prSwRfb);
 
 		/* 4 <2> Check P2P network conditions */
-#if CFG_ENABLE_WIFI_DIRECT
 		if ((prAdapter->fgIsP2PRegistered) && (IS_STA_IN_P2P(prStaRec))) {
 			prBssInfo = GET_BSS_INFO_BY_INDEX(prAdapter, prStaRec->ucBssIndex);
 
@@ -288,7 +280,6 @@ WLAN_STATUS aaaFsmRunEventRxAssoc(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRf
 				}
 			}
 		}
-#endif /* CFG_ENABLE_WIFI_DIRECT */
 
 		return WLAN_STATUS_SUCCESS; /* To release the SW_RFB_T */
 	} while (FALSE);
@@ -314,7 +305,6 @@ WLAN_STATUS aaaFsmRunEventRxAssoc(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRf
 
 		/* 4 <4.1> Assign Association ID */
 		if (u2StatusCode == STATUS_CODE_SUCCESSFUL) {
-#if CFG_ENABLE_WIFI_DIRECT
 			if ((prAdapter->fgIsP2PRegistered) && (IS_STA_IN_P2P(prStaRec))) {
 				prBssInfo = GET_BSS_INFO_BY_INDEX(prAdapter, prStaRec->ucBssIndex);
 				if (p2pRoleFsmRunEventAAAComplete(prAdapter, prStaRec, prBssInfo) == WLAN_STATUS_SUCCESS) {
@@ -337,18 +327,14 @@ WLAN_STATUS aaaFsmRunEventRxAssoc(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRf
 					cnmStaRecChangeState(prAdapter, prStaRec, STA_STATE_2);
 				}
 			}
-#endif
 
 		} else {
-#if CFG_SUPPORT_802_11W
 			/* AP PMF */
 			/* don't change state, just send assoc resp (NO need TX done, TIE + code30) and then SAQ */
 			if (u2StatusCode == STATUS_CODE_ASSOC_REJECTED_TEMPORARILY) {
 				DBGLOG(AAA, INFO, "AP send SAQ\n");
 				fgSendSAQ = TRUE;
-			} else
-#endif
-			{
+			} else {
 				prStaRec->u2AssocId = 0; /* Invalid Association ID */
 
 				/* If (Re)association fail, remove sta record and use class error to handle sta */
@@ -378,13 +364,11 @@ WLAN_STATUS aaaFsmRunEventRxAssoc(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRf
 		/* 4 <4.2> Reply  Assoc Resp */
 		assocSendReAssocRespFrame(prAdapter, prStaRec);
 
-#if CFG_SUPPORT_802_11W
 		/* AP PMF */
 		if (fgSendSAQ) {
 			/* if PMF connection, and return code 30, send SAQ */
 			rsnApStartSaQuery(prAdapter, prStaRec);
 		}
-#endif
 	}
 
 	return WLAN_STATUS_SUCCESS;
@@ -448,10 +432,8 @@ aaaFsmRunEventTxDone(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo, IN E
 				/* NOTE(Kevin): Change to STATE_1 */
 				cnmStaRecChangeState(prAdapter, prStaRec, STA_STATE_1);
 
-#if CFG_ENABLE_WIFI_DIRECT
 				if (prBssInfo->eNetworkType == NETWORK_TYPE_P2P)
 					p2pRoleFsmRunEventAAATxFail(prAdapter, prStaRec, prBssInfo);
-#endif /* CFG_ENABLE_WIFI_DIRECT */
 			}
 		}
 		/* NOTE(Kevin): Ignore the TX Done Event of Auth Frame with Error Status Code */
@@ -468,10 +450,8 @@ aaaFsmRunEventTxDone(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo, IN E
 				prStaRec->eAuthAssocState = AA_STATE_IDLE;
 
 				/* NOTE(Kevin): Change to STATE_3 at TX Done */
-#if CFG_ENABLE_WIFI_DIRECT
 				if (prBssInfo->eNetworkType == NETWORK_TYPE_P2P)
 					p2pRoleFsmRunEventAAASuccess(prAdapter, prStaRec, prBssInfo);
-#endif /* CFG_ENABLE_WIFI_DIRECT */
 
 			} else {
 				prStaRec->eAuthAssocState = AAA_STATE_SEND_AUTH2;
@@ -479,10 +459,8 @@ aaaFsmRunEventTxDone(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo, IN E
 				/* NOTE(Kevin): Change to STATE_2 */
 				cnmStaRecChangeState(prAdapter, prStaRec, STA_STATE_2);
 
-#if CFG_ENABLE_WIFI_DIRECT
 				if (prBssInfo->eNetworkType == NETWORK_TYPE_P2P)
 					p2pRoleFsmRunEventAAATxFail(prAdapter, prStaRec, prBssInfo);
-#endif /* CFG_ENABLE_WIFI_DIRECT */
 			}
 		}
 		/* NOTE(Kevin): Ignore the TX Done Event of Auth Frame with Error Status Code */
@@ -510,4 +488,3 @@ aaaFsmRunEventTxDone(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo, IN E
 	return WLAN_STATUS_SUCCESS;
 
 } /* end of aaaFsmRunEventTxDone() */
-#endif /* CFG_SUPPORT_AAA */

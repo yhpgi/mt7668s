@@ -21,7 +21,6 @@
  ********************************************************************************
  */
 
-#if CFG_ENABLE_WIFI_DIRECT
 /*******************************************************************************
  *                              C O N S T A N T S
  ********************************************************************************
@@ -152,16 +151,9 @@ WLAN_STATUS
 wlanoidSetP2PTerminateSDPhase(
 		IN P_ADAPTER_T prAdapter, IN PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
 
-#if CFG_SUPPORT_ANTI_PIRACY
 WLAN_STATUS
 wlanoidSetSecCheckRequest(
 		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
-
-/*WLAN_STATUS
- *wlanoidGetSecCheckResponse(IN P_ADAPTER_T prAdapter,
- *			   IN PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
- */
-#endif
 
 WLAN_STATUS
 wlanoidSetNoaParam(
@@ -195,17 +187,9 @@ WLAN_STATUS
 wlanoidSetP2pSupplicantVersion(
 		IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4SetInfoLen);
 
-#if CFG_SUPPORT_HOTSPOT_WPS_MANAGER
 WLAN_STATUS
 wlanoidSetP2pWPSmode(
 		IN P_ADAPTER_T prAdapter, IN PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
-#endif
-
-#if CFG_SUPPORT_P2P_RSSI_QUERY
-WLAN_STATUS
-wlanoidQueryP2pRssi(
-		IN P_ADAPTER_T prAdapter, IN PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen);
-#endif
 
 /*--------------------------------------------------------------*/
 /* Callbacks for event indication                               */
@@ -216,5 +200,4 @@ wlanoidQueryP2pRssi(
  ********************************************************************************
  */
 
-#endif
 #endif /* _WLAN_P2P_H */

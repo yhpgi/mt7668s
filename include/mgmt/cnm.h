@@ -35,12 +35,10 @@
 #if CFG_SUPPORT_DBDC
 #define DBDC_SWITCH_GUARD_TIME (4 * 1000)	   /*ms*/
 #define DBDC_DISABLE_COUNTDOWN_TIME (2 * 1000) /*ms*/
-#if CFG_SUPPORT_DBDC_TC6
 #define DBDC_AIS_BCN_TIMEOUT_RECONNECT_COUNTDOWN_TIME (10 * 1000) /*ms*/
 #define DBDC_AIS_REASSOC_COUNTDOWN_TIME (10 * 1000)				  /*ms*/
 #define DBDC_AIS_CONNECT_COUNTDOWN_TIME (10 * 1000)				  /*ms*/
 #define DBDC_AIS_REASSOC_DELAY_DISCONNECT_EVENT_TIME (15 * 1000)  /*ms*/
-#endif
 #endif /*CFG_SUPPORT_DBDC*/
 
 /*******************************************************************************
@@ -53,9 +51,7 @@ typedef enum _ENUM_CH_REQ_TYPE_T {
 	CH_REQ_TYPE_P2P_LISTEN,
 	CH_REQ_TYPE_OFFCHNL_TX,
 	CH_REQ_TYPE_GO_START_BSS,
-#if (CFG_SUPPORT_DFS_MASTER == 1)
 	CH_REQ_TYPE_DFS_CAC,
-#endif
 	CH_REQ_TYPE_NUM
 } ENUM_CH_REQ_TYPE_T,
 		*P_ENUM_CH_REQ_TYPE_T;
@@ -114,20 +110,17 @@ typedef struct _CNM_INFO_T {
 	BOOLEAN fgChGranted;
 	UINT_8	ucBssIndex;
 	UINT_8	ucTokenID;
-#if CFG_SUPPORT_DBDC_TC6
 	LINK_T	rDbdcSwitchGuradPendingReqList; /* Pending Request List for DBDC switch guard */
 	BOOLEAN fgSkipDbdcDisable;				/* Skip DBDC diable to keep DBDC status for BCN timeout */
-#endif
 } CNM_INFO_T, *P_CNM_INFO_T;
 
-#if CFG_ENABLE_WIFI_DIRECT
 /* Moved from p2p_fsm.h */
 typedef struct _DEVICE_TYPE_T {
 	UINT_16 u2CategoryId;	 /* Category ID */
 	UINT_8	aucOui[4];		 /* OUI */
 	UINT_16 u2SubCategoryId; /* Sub Category ID */
 } __KAL_ATTRIB_PACKED__ DEVICE_TYPE_T, *P_DEVICE_TYPE_T;
-#endif
+
 
 #if CFG_SUPPORT_DBDC
 typedef struct _CNM_DBDC_CAP_T {
@@ -155,11 +148,9 @@ typedef enum _ENUM_CNM_DBDC_SWITCH_MECHANISM_T { /* When DBDC available in dynam
 typedef enum _ENUM_CNM_DBDC_DECISION_TIMER_T {
 	DBDC_DECISION_TIMER_SWITCH_GUARD_TIME,
 	DBDC_DECISION_TIMER_DISABLE_COUNT_DOWN,
-#if CFG_SUPPORT_DBDC_TC6
 	DBDC_DECISION_TIMER_RECONNECT_COUNT_DOWN,
 	DBDC_DECISION_TIMER_AIS_CONNECT_COUNT_DOWN,
 	DBDC_DECISION_AIS_RECONNECT,
-#endif
 	DBDC_DECISION_STATE_NUM
 } ENUM_CNM_DBDC_DECISION_TIMER_T,
 		*P_ENUM_CNM_DBDC_DECISION_TIMER_T;
@@ -195,11 +186,9 @@ VOID cnmChMngrAbortPrivilege(P_ADAPTER_T prAdapter, P_MSG_HDR_T prMsgHdr);
 
 VOID cnmChMngrHandleChEvent(P_ADAPTER_T prAdapter, P_WIFI_EVENT_T prEvent, UINT_32 u4EventBufLen);
 
-#if (CFG_SUPPORT_DFS_MASTER == 1)
 VOID cnmRadarDetectEvent(P_ADAPTER_T prAdapter, P_WIFI_EVENT_T prEvent, UINT_32 u4EventBufLen);
 
 VOID cnmCsaDoneEvent(P_ADAPTER_T prAdapter, P_WIFI_EVENT_T prEvent, UINT_32 u4EventBufLen);
-#endif
 
 BOOLEAN
 cnmPreferredChannel(P_ADAPTER_T prAdapter, P_ENUM_BAND_T prBand, PUINT_8 pucPrimaryChannel, P_ENUM_CHNL_EXT_T prBssSCO);
@@ -223,16 +212,10 @@ UINT_8 cnmGetBssMaxBwToChnlBW(P_ADAPTER_T prAdapter, UINT_8 ucBssIndex);
 P_BSS_INFO_T cnmGetBssInfoAndInit(P_ADAPTER_T prAdapter, ENUM_NETWORK_TYPE_T eNetworkType, BOOLEAN fgIsP2pDevice);
 
 VOID cnmFreeBssInfo(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo);
-#if CFG_SUPPORT_CHNL_CONFLICT_REVISE
-BOOLEAN cnmAisDetectP2PChannel(P_ADAPTER_T prAdapter, P_ENUM_BAND_T prBand, PUINT_8 pucPrimaryChannel);
-#endif
 
-#if (CFG_HW_WMM_BY_BSS == 1)
 UINT_8 cnmWmmIndexDecision(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prBssInfo);
 VOID   cnmFreeWmmIndex(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prBssInfo);
-#endif
 
-#if CFG_SUPPORT_DBDC_TC6
 UINT_8 cnmSapIsActive(IN P_ADAPTER_T prAdapter);
 
 UINT_8 cnmSapIsConcurrent(IN P_ADAPTER_T prAdapter);
@@ -242,8 +225,6 @@ P_BSS_INFO_T cnmGetp2pSapBssInfo(IN P_ADAPTER_T prAdapter);
 void cnmSapChannelSwitchReq(IN P_ADAPTER_T prAdapter, IN P_RF_CHANNEL_INFO_T prRfChannelInfo, IN UINT_8 ucRoleIdx);
 
 UINT_8 cnmIdcCsaReq(IN P_ADAPTER_T prAdapter, IN UINT_8 ch_num, IN UINT_8 ucRoleIdx);
-
-#endif
 
 #if CFG_SUPPORT_DBDC
 VOID cnmInitDbdcSetting(IN P_ADAPTER_T prAdapter);

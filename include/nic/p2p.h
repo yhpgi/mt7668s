@@ -60,19 +60,14 @@
 /* Device Charactoristic. */
 #define P2P_AP_CHNL_HOLD_TIME_MS 5000 /* 1000 is too short , the deauth would block in the queue */
 #define P2P_DEFAULT_LISTEN_CHANNEL 1
-
-#if (CFG_SUPPORT_DFS_MASTER == 1)
 #define P2P_AP_CAC_WEATHER_CHNL_HOLD_TIME_MS (600 * 1000)
-#endif
 
 #define P2P_DEAUTH_TIMEOUT_TIME_MS 1000
 
 #define P2P_SAA_RETRY_COUNT 3
 
 /* Define the Delay time for DBDC DFS Master mode  */
-#if CFG_SUPPORT_DBDC_TC6
 #define P2P_DFS_CAC_DELAY_TIME_MS 5000
-#endif
 
 /*******************************************************************************
  *                                 M A C R O S
@@ -181,9 +176,7 @@ typedef struct _P2P_CHNL_REQ_INFO_T {
 	ENUM_CHNL_EXT_T		 eOriChnlSco;
 	UINT_32				 u4MaxInterval;
 	ENUM_CH_REQ_TYPE_T	 eChnlReqType;
-#if CFG_SUPPORT_NFC_BEAM_PLUS
 	UINT_32 NFC_BEAM; /*NFC Beam + Indication */
-#endif
 } P2P_CHNL_REQ_INFO_T, *P_P2P_CHNL_REQ_INFO_T;
 
 /* Glubal Connection Settings. */
@@ -194,9 +187,7 @@ struct _P2P_CONNECTION_SETTINGS_T {
 #endif
 
 	BOOLEAN fgIsApMode;
-#if CFG_SUPPORT_HOTSPOT_WPS_MANAGER
 	BOOLEAN fgIsWPSMode;
-#endif
 };
 
 typedef struct _NOA_TIMING_T {

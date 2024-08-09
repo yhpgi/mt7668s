@@ -12,14 +12,6 @@
 #ifndef _GL_TYPEDEF_H
 #define _GL_TYPEDEF_H
 
-#include <linux/mmc/ioctl.h>
-#include <linux/mmc/sdio.h>
-#include <linux/mmc/sdio_func.h>
-
-#if CFG_ENABLE_EARLY_SUSPEND
-#include <linux/earlysuspend.h>
-#endif
-
 /*******************************************************************************
  *                         C O M P I L E R   F L A G S
  ********************************************************************************
@@ -29,6 +21,10 @@
  *                    E X T E R N A L   R E F E R E N C E S
  ********************************************************************************
  */
+
+#include <linux/mmc/ioctl.h>
+#include <linux/mmc/sdio.h>
+#include <linux/mmc/sdio_func.h>
 
 /*******************************************************************************
  *                              C O N S T A N T S
@@ -49,11 +45,6 @@
 #else
 #define NULL ((void *)0)
 #endif
-#endif
-
-#if CFG_ENABLE_EARLY_SUSPEND
-typedef void (*early_suspend_callback)(struct early_suspend *h);
-typedef void (*late_resume_callback)(struct early_suspend *h);
 #endif
 
 /*******************************************************************************

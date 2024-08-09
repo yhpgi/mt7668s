@@ -31,9 +31,7 @@ const NIC_CAPABILITY_V2_REF_TABLE_T gNicCapabilityV2InfoTable[] = {
 	{ TAG_CAP_TX_EFUSEADDRESS, nicCmdEventQueryNicEfuseAddr },
 	{ TAG_CAP_COEX_FEATURE, nicCmdEventQueryNicCoexFeature },
 	{ TAG_CAP_SINGLE_SKU, rlmDomainExtractSingleSkuInfoFromFirmware },
-#if CFG_TCP_IP_CHKSUM_OFFLOAD
 	{ TAG_CAP_CSUM_OFFLOAD, nicCmdEventQueryNicCsumOffload },
-#endif
 	{ TAG_CAP_EFUSE_OFFSET, nicCmdEventQueryEfuseOffset },
 };
 
@@ -123,7 +121,6 @@ VOID nicCmdEventQueryCoexIso(
 	}
 }
 
-#if CFG_SUPPORT_QA_TOOL
 VOID nicCmdEventQueryRxStatistics(
 		IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo, IN PUINT_8 pucEventBuf, IN UINT_32 u4EventBufLen)
 {
@@ -185,7 +182,6 @@ VOID nicCmdEventQueryRxStatistics(
 	}
 }
 
-#if CFG_SUPPORT_TX_BF
 VOID nicCmdEventPfmuDataRead(
 		IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo, IN PUINT_8 pucEventBuf, IN UINT_32 u4EventBufLen)
 {
@@ -338,8 +334,6 @@ VOID nicCmdEventPfmuTagRead(
 	DBGLOG(INIT, INFO, "===============================================================\n");
 }
 
-#endif /* CFG_SUPPORT_TX_BF */
-#if CFG_SUPPORT_MU_MIMO
 VOID nicCmdEventGetQd(
 		IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo, IN PUINT_8 pucEventBuf, IN UINT_32 u4EventBufLen)
 {
@@ -498,8 +492,6 @@ VOID nicCmdEventGetCalcInitMcs(
 	DBGLOG(INIT, INFO, "dMcsUser0: 0/1/ = %x/%x\n", prEventShowGroupTblEntry->dMcsUser0,
 			prEventShowGroupTblEntry->dMcsUser1);
 }
-#endif /* CFG_SUPPORT_MU_MIMO */
-#endif /* CFG_SUPPORT_QA_TOOL */
 
 VOID nicCmdEventQuerySwCtrlRead(
 		IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo, IN PUINT_8 pucEventBuf, IN UINT_32 u4EventBufLen)
@@ -822,13 +814,11 @@ VOID nicCmdEventEnterRfTest(
 		/* Update Set Information Length */
 		kalOidComplete(prAdapter->prGlueInfo, prCmdInfo->fgSetQuery, prCmdInfo->u4SetInfoLen, WLAN_STATUS_SUCCESS);
 	}
-#if CFG_SUPPORT_NVRAM
 	/* 9. load manufacture data */
 	if (kalIsConfigurationExist(prAdapter->prGlueInfo) == TRUE)
 		wlanLoadManufactureData(prAdapter, kalGetConfiguration(prAdapter->prGlueInfo));
 	else
 		DBGLOG(REQ, INFO, "%s: load manufacture data fail\n", __func__);
-#endif
 }
 
 VOID nicCmdEventLeaveRfTest(
@@ -850,13 +840,11 @@ VOID nicCmdEventLeaveRfTest(
 
 		prAdapter->rWlanInfo.u4SysTime = kalGetTimeTick();
 	}
-#if CFG_SUPPORT_NVRAM
 	/* 9. load manufacture data */
 	if (kalIsConfigurationExist(prAdapter->prGlueInfo) == TRUE)
 		wlanLoadManufactureData(prAdapter, kalGetConfiguration(prAdapter->prGlueInfo));
 	else
 		DBGLOG(REQ, INFO, "%s: load manufacture data fail\n", __func__);
-#endif
 
 	/* 10. Override network address */
 	wlanUpdateNetworkAddress(prAdapter);
@@ -1411,7 +1399,6 @@ VOID nicOidCmdEnterRFTestTimeout(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmd
 	kalOidComplete(prAdapter->prGlueInfo, prCmdInfo->fgSetQuery, 0, WLAN_STATUS_FAILURE);
 }
 
-#if CFG_SUPPORT_QA_TOOL
 /*----------------------------------------------------------------------------*/
 /*!
  * @brief This function is called when received dump memory event packet.
@@ -1680,7 +1667,6 @@ UINT_32 TsfRawData2IqFmt(P_EVENT_DUMP_MEM_T prEventDumpMem)
 
 	return 0;
 }
-#endif /* CFG_SUPPORT_QA_TOOL */
 
 /*----------------------------------------------------------------------------*/
 /*!
@@ -1740,9 +1726,9 @@ VOID nicEventQueryMemDump(IN P_ADAPTER_T prAdapter, IN PUINT_8 pucEventBuf, IN U
 		/* Append current memory dump to the hex file */
 		kalWriteToFile(aucPath, TRUE, &prEventDumpMem->aucBuffer[0], prEventDumpMem->u4Length);
 	}
-#if CFG_SUPPORT_QA_TOOL
+
 	TsfRawData2IqFmt(prEventDumpMem);
-#endif /* CFG_SUPPORT_QA_TOOL */
+
 	DBGLOG(INIT, INFO, "iCap : ==> (u4RemainLength = %x, u4Address=%x )\n", prEventDumpMem->u4RemainLength,
 			prEventDumpMem->u4Address);
 
@@ -1760,12 +1746,11 @@ VOID nicEventQueryMemDump(IN P_ADAPTER_T prAdapter, IN PUINT_8 pucEventBuf, IN U
 		}
 		DBGLOG(INIT, INFO, ": ==> gen done_file\n");
 		kalWriteToFile(aucPath_done, FALSE, aucPath_done, sizeof(aucPath_done));
-#if CFG_SUPPORT_QA_TOOL
+
 		g_au4Offset[0][0] = 0;
 		g_au4Offset[0][1] = 9;
 		g_au4Offset[1][0] = 0;
 		g_au4Offset[1][1] = 9;
-#endif /* CFG_SUPPORT_QA_TOOL */
 
 		g_u2DumpIndex++;
 	}
@@ -1849,9 +1834,9 @@ VOID nicCmdEventQueryMemDump(
 				/* Append current memory dump to the hex file */
 				kalWriteToFile(aucPath, TRUE, &prEventDumpMem->aucBuffer[0], prEventDumpMem->u4Length);
 		}
-#if CFG_SUPPORT_QA_TOOL
+
 		TsfRawData2IqFmt(prEventDumpMem);
-#endif /* CFG_SUPPORT_QA_TOOL */
+
 write_file_done:
 		if (prEventDumpMem->u4RemainLength == 0 || prEventDumpMem->u4Address == 0xFFFFFFFF) {
 			/* The request is finished or firmware response a error */
@@ -1876,7 +1861,6 @@ write_file_done:
 	return;
 }
 
-#if CFG_SUPPORT_BATCH_SCAN
 /*----------------------------------------------------------------------------*/
 /*!
  * @brief This function is called when event for SUPPORT_BATCH_SCAN
@@ -1919,50 +1903,6 @@ VOID nicCmdEventBatchScanResult(
 		kalOidComplete(prGlueInfo, prCmdInfo->fgSetQuery, u4QueryInfoLen, WLAN_STATUS_SUCCESS);
 	}
 }
-#endif
-
-#if CFG_SUPPORT_BUILD_DATE_CODE
-/*----------------------------------------------------------------------------*/
-/*!
- * @brief This function is called when event for build date code information
- *        has been retrieved
- *
- * @param prAdapter          Pointer to the Adapter structure.
- * @param prCmdInfo          Pointer to the command information
- * @param pucEventBuf        Pointer to the event buffer
- *
- * @return none
- *
- */
-/*----------------------------------------------------------------------------*/
-VOID nicCmdEventBuildDateCode(
-		IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo, IN PUINT_8 pucEventBuf, IN UINT_32 u4EventBufLen)
-{
-	UINT_32					u4QueryInfoLen;
-	P_EVENT_BUILD_DATE_CODE prEvent;
-	P_GLUE_INFO_T			prGlueInfo;
-
-	ASSERT(prAdapter);
-	ASSERT(prCmdInfo);
-	ASSERT(pucEventBuf);
-
-	/* 4 <2> Update information of OID */
-	if (prCmdInfo->fgIsOid) {
-		prGlueInfo = prAdapter->prGlueInfo;
-		if (u4EventBufLen < sizeof(EVENT_BUILD_DATE_CODE)) {
-			DBGLOG(NIC, ERROR, "%s: Invalid event length: %d < %d\n", __func__, u4EventBufLen,
-					sizeof(EVENT_BUILD_DATE_CODE));
-			return;
-		}
-		prEvent = (P_EVENT_BUILD_DATE_CODE)pucEventBuf;
-
-		u4QueryInfoLen = sizeof(UINT_8) * 16;
-		kalMemCopy(prCmdInfo->pvInformationBuffer, prEvent->aucDateCode, sizeof(UINT_8) * 16);
-
-		kalOidComplete(prGlueInfo, prCmdInfo->fgSetQuery, u4QueryInfoLen, WLAN_STATUS_SUCCESS);
-	}
-}
-#endif
 
 /*----------------------------------------------------------------------------*/
 /*!
@@ -2081,7 +2021,6 @@ VOID nicCmdEventQueryStaStatistics(
 	}
 }
 
-#if CFG_AUTO_CHANNEL_SEL_SUPPORT
 /*----------------------------------------------------------------------------*/
 /*!
  * @brief This function is called when event for query LTE safe channels
@@ -2137,7 +2076,6 @@ VOID nicCmdEventQueryLteSafeChn(
 		kalOidComplete(prGlueInfo, prCmdInfo->fgSetQuery, u4QueryInfoLen, WLAN_STATUS_SUCCESS);
 	}
 }
-#endif
 
 VOID nicEventRddPulseDump(IN P_ADAPTER_T prAdapter, IN PUINT_8 pucEventBuf, IN UINT_32 u4EventBufLen)
 {
@@ -2217,7 +2155,6 @@ VOID nicCmdEventQueryAdvCtrl(
 }
 #endif
 
-#if CFG_SUPPORT_MSP
 VOID nicCmdEventQueryWlanInfo(
 		IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo, IN PUINT_8 pucEventBuf, IN UINT_32 u4EventBufLen)
 {
@@ -2291,7 +2228,6 @@ VOID nicCmdEventQueryMibInfo(
 		kalOidComplete(prGlueInfo, prCmdInfo->fgSetQuery, u4QueryInfoLen, WLAN_STATUS_SUCCESS);
 	}
 }
-#endif
 
 #if CFG_SUPPORT_LAST_SEC_MCS_INFO
 VOID nicCmdEventTxMcsInfo(
@@ -2327,7 +2263,6 @@ VOID nicCmdEventTxMcsInfo(
 }
 #endif
 
-#if CFG_TCP_IP_CHKSUM_OFFLOAD
 WLAN_STATUS nicCmdEventQueryNicCsumOffload(IN P_ADAPTER_T prAdapter, IN PUINT_8 pucEventBuf, IN UINT_32 u4EventBufLen)
 {
 	P_NIC_CSUM_OFFLOAD_T prChecksumOffload = (P_NIC_CSUM_OFFLOAD_T)pucEventBuf;
@@ -2342,7 +2277,6 @@ WLAN_STATUS nicCmdEventQueryNicCsumOffload(IN P_ADAPTER_T prAdapter, IN PUINT_8 
 
 	return WLAN_STATUS_SUCCESS;
 }
-#endif
 
 WLAN_STATUS nicCmdEventQueryNicCoexFeature(IN P_ADAPTER_T prAdapter, IN PUINT_8 pucEventBuf, IN UINT_32 u4EventBufLen)
 {
@@ -2455,32 +2389,6 @@ VOID nicEventLinkQuality(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent, IN
 {
 	P_CMD_INFO_T prCmdInfo;
 
-#if CFG_ENABLE_WIFI_DIRECT && CFG_SUPPORT_P2P_RSSI_QUERY
-	if (prEvent->u2PacketLen == EVENT_HDR_WITHOUT_RXD_SIZE + sizeof(EVENT_LINK_QUALITY_EX)) {
-		P_EVENT_LINK_QUALITY_EX prLqEx = (P_EVENT_LINK_QUALITY_EX)(prEvent->aucBuffer);
-		if (u4EventBufLen < sizeof(EVENT_LINK_QUALITY_EX)) {
-			DBGLOG(NIC, ERROR, "%s: Invalid event length: %d < %d\n", __func__, u4EventBufLen,
-					sizeof(EVENT_LINK_QUALITY_EX));
-			return;
-		}
-		if (prLqEx->ucIsLQ0Rdy)
-			nicUpdateLinkQuality(prAdapter, 0, (P_EVENT_LINK_QUALITY)prLqEx);
-		if (prLqEx->ucIsLQ1Rdy)
-			nicUpdateLinkQuality(prAdapter, 1, (P_EVENT_LINK_QUALITY)prLqEx);
-	} else {
-		if (u4EventBufLen < sizeof(EVENT_LINK_QUALITY)) {
-			DBGLOG(NIC, ERROR, "%s: Invalid event length: %d < %d\n", __func__, u4EventBufLen,
-					sizeof(EVENT_LINK_QUALITY));
-			return;
-		}
-		/* For old FW, P2P may invoke link quality query, and make driver flag becone TRUE. */
-		DBGLOG(P2P, WARN, "Old FW version, not support P2P RSSI query.\n");
-
-		/* Must not use NETWORK_TYPE_P2P_INDEX, cause the structure is mismatch. */
-		nicUpdateLinkQuality(prAdapter, 0, (P_EVENT_LINK_QUALITY)(prEvent->aucBuffer));
-	}
-#else
-	/*only support ais query */
 	{
 		UINT_8		 ucBssIndex;
 		P_BSS_INFO_T prBssInfo;
@@ -2498,13 +2406,8 @@ VOID nicEventLinkQuality(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent, IN
 
 		if (ucBssIndex >= BSS_INFO_NUM)
 			ucBssIndex = 1; /* No hit(bss1 for default ais network) */
-		/* printk("=======> rssi with bss%d ,%d\n",ucBssIndex,
-		 * ((P_EVENT_LINK_QUALITY_V2)(prEvent->aucBuffer))->rLq[ucBssIndex].cRssi);
-		 */
 		nicUpdateLinkQuality(prAdapter, ucBssIndex, (P_EVENT_LINK_QUALITY_V2)(prEvent->aucBuffer));
 	}
-
-#endif
 
 	/* command response handling */
 	prCmdInfo = nicGetPendingCmdInfo(prAdapter, prEvent->ucSeqNum);
@@ -2638,7 +2541,6 @@ VOID nicEventNloDone(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent, IN UIN
 		return;
 	}
 	scnEventNloDone(prAdapter, (P_EVENT_NLO_DONE_T)(prEvent->aucBuffer));
-#if CFG_SUPPORT_PNO
 	prAdapter->prAisBssInfo->fgIsPNOEnable = FALSE;
 	if (prAdapter->prAisBssInfo->fgIsNetRequestInActive && prAdapter->prAisBssInfo->fgIsPNOEnable) {
 		UNSET_NET_ACTIVE(prAdapter, prAdapter->prAisBssInfo->ucBssIndex);
@@ -2646,7 +2548,6 @@ VOID nicEventNloDone(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent, IN UIN
 		/* sync with firmware */
 		nicDeactivateNetwork(prAdapter, prAdapter->prAisBssInfo->ucBssIndex);
 	}
-#endif
 }
 
 VOID nicEventSleepyNotify(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent, IN UINT_32 u4EventBufLen)
@@ -2791,22 +2692,15 @@ VOID nicEventBeaconTimeout(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent, 
 						prAdapter->rWifiVar.ucWaitConnect * MSEC_PER_SEC);
 
 			kalIndicateStatusAndComplete(prAdapter->prGlueInfo, WLAN_STATUS_BEACON_TIMEOUT, NULL, 0);
-		}
-
-#if CFG_ENABLE_WIFI_DIRECT
-		else if (prBssInfo->eNetworkType == NETWORK_TYPE_P2P)
+		} else if (prBssInfo->eNetworkType == NETWORK_TYPE_P2P)
 			p2pRoleFsmRunEventBeaconTimeout(prAdapter, prBssInfo);
-#endif
-
-		else {
+		else
 			DBGLOG(RX, ERROR, "EVENT_ID_BSS_BEACON_TIMEOUT: (ucBssIndex = %d)\n", prEventBssBeaconTimeout->ucBssIndex);
-		}
 	}
 }
 
 VOID nicEventUpdateNoaParams(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent, IN UINT_32 u4EventBufLen)
 {
-#if CFG_ENABLE_WIFI_DIRECT
 	if (prAdapter->fgIsP2PRegistered) {
 		P_EVENT_UPDATE_NOA_PARAMS_T prEventUpdateNoaParam;
 		if (u4EventBufLen < sizeof(EVENT_UPDATE_NOA_PARAMS_T)) {
@@ -2826,9 +2720,6 @@ VOID nicEventUpdateNoaParams(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent
 			ASSERT(0);
 		}
 	}
-#else
-	ASSERT(0);
-#endif
 }
 
 VOID nicEventStaAgingTimeout(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent, IN UINT_32 u4EventBufLen)
@@ -2869,7 +2760,6 @@ VOID nicEventStaAgingTimeout(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent
 
 VOID nicEventApObssStatus(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent, IN UINT_32 u4EventBufLen)
 {
-#if CFG_ENABLE_WIFI_DIRECT
 	if (prAdapter->fgIsP2PRegistered) {
 		if (u4EventBufLen < sizeof(EVENT_AP_OBSS_STATUS_T)) {
 			DBGLOG(NIC, ERROR, "%s: Invalid event length: %d < %d\n", __func__, u4EventBufLen,
@@ -2878,12 +2768,10 @@ VOID nicEventApObssStatus(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent, I
 		}
 		rlmHandleObssStatusEventPkt(prAdapter, (P_EVENT_AP_OBSS_STATUS_T)prEvent->aucBuffer);
 	}
-#endif
 }
 
 VOID nicEventRoamingStatus(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent, IN UINT_32 u4EventBufLen)
 {
-#if CFG_SUPPORT_ROAMING
 	P_CMD_ROAMING_TRANSIT_T prTransit;
 	if (u4EventBufLen < sizeof(CMD_ROAMING_TRANSIT_T)) {
 		DBGLOG(NIC, ERROR, "%s: Invalid event length: %d < %d\n", __func__, u4EventBufLen,
@@ -2893,7 +2781,6 @@ VOID nicEventRoamingStatus(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent, 
 	prTransit = (P_CMD_ROAMING_TRANSIT_T)(prEvent->aucBuffer);
 
 	roamingFsmProcessEvent(prAdapter, prTransit);
-#endif /* CFG_SUPPORT_ROAMING */
 }
 
 VOID nicEventSendDeauth(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent, IN UINT_32 u4EventBufLen)
@@ -2923,16 +2810,6 @@ VOID nicEventSendDeauth(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent, IN 
 
 VOID nicEventUpdateRddStatus(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent, IN UINT_32 u4EventBufLen)
 {
-#if CFG_SUPPORT_RDD_TEST_MODE
-	P_EVENT_RDD_STATUS_T prEventRddStatus;
-	if (u4EventBufLen < sizeof(EVENT_RDD_STATUS_T)) {
-		DBGLOG(NIC, ERROR, "%s: Invalid event length: %d < %d\n", __func__, u4EventBufLen, sizeof(EVENT_RDD_STATUS_T));
-		return;
-	}
-	prEventRddStatus = (P_EVENT_RDD_STATUS_T)(prEvent->aucBuffer);
-
-	prAdapter->ucRddStatus = prEventRddStatus->ucRddStatus;
-#endif
 }
 
 VOID nicEventUpdateBwcsStatus(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent, IN UINT_32 u4EventBufLen)
@@ -2943,12 +2820,6 @@ VOID nicEventUpdateBwcsStatus(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEven
 		return;
 	}
 	prEventBwcsStatus = (P_PTA_IPC_T)(prEvent->aucBuffer);
-
-#if CFG_SUPPORT_BCM_BWCS_DEBUG
-	DBGLOG(RSN, EVENT, "BCM BWCS Event: %02x%02x%02x%02x\n", prEventBwcsStatus->u.aucBTPParams[0],
-			prEventBwcsStatus->u.aucBTPParams[1], prEventBwcsStatus->u.aucBTPParams[2],
-			prEventBwcsStatus->u.aucBTPParams[3]);
-#endif
 
 	kalIndicateStatusAndComplete(
 			prAdapter->prGlueInfo, WLAN_STATUS_BWCS_UPDATE, (PVOID)prEventBwcsStatus, sizeof(PTA_IPC_T));
@@ -2962,12 +2833,6 @@ VOID nicEventUpdateBcmDebug(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent,
 		return;
 	}
 	prEventBwcsStatus = (P_PTA_IPC_T)(prEvent->aucBuffer);
-
-#if CFG_SUPPORT_BCM_BWCS_DEBUG
-	DBGLOG(RSN, EVENT, "BCM FW status: %02x%02x%02x%02x\n", prEventBwcsStatus->u.aucBTPParams[0],
-			prEventBwcsStatus->u.aucBTPParams[1], prEventBwcsStatus->u.aucBTPParams[2],
-			prEventBwcsStatus->u.aucBTPParams[3]);
-#endif
 }
 
 VOID nicEventAddPkeyDone(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent, IN UINT_32 u4EventBufLen)
@@ -3004,11 +2869,9 @@ VOID nicEventIcapDone(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent, IN UI
 	}
 	prEventIcapStatus = (P_EVENT_ICAP_STATUS_T)(prEvent->aucBuffer);
 
-	rMemDumpInfo.u4Address = prEventIcapStatus->u4StartAddress;
-	rMemDumpInfo.u4Length  = prEventIcapStatus->u4IcapSieze;
-#if CFG_SUPPORT_QA_TOOL
+	rMemDumpInfo.u4Address	   = prEventIcapStatus->u4StartAddress;
+	rMemDumpInfo.u4Length	   = prEventIcapStatus->u4IcapSieze;
 	rMemDumpInfo.u4IcapContent = prEventIcapStatus->u4IcapContent;
-#endif
 
 	wlanoidQueryMemDump(prAdapter, &rMemDumpInfo, sizeof(rMemDumpInfo), &u4QueryInfo);
 }
@@ -3073,7 +2936,6 @@ VOID nicEventDebugMsg(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent, IN UI
 
 VOID nicEventTdls(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent, IN UINT_32 u4EventBufLen)
 {
-#if CFG_SUPPORT_TDLS
 	/* [TDLS  Event Format]
 	 * FW:   FW_EVT_HDR   + 8 + evt_payload
 	 * Host: HOST_EVT_HDR + 8 + evt_payload
@@ -3093,7 +2955,6 @@ VOID nicEventTdls(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent, IN UINT_3
 		return;
 	}
 	TdlsexEventHandle(prAdapter->prGlueInfo, (PUINT_8)prEvent->aucBuffer, (UINT_32)(prEvent->u2PacketLength - 8));
-#endif
 }
 
 VOID nicEventDumpMem(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent, IN UINT_32 u4EventBufLen)
@@ -3212,7 +3073,6 @@ VOID nicEventUpdateCoexPhyrate(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEve
 	}
 }
 
-#if (CFG_WOW_SUPPORT == 1)
 VOID nicEventWakeUpReason(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent, IN UINT_32 u4EventBufLen)
 {
 	struct _EVENT_WAKEUP_REASON_INFO *prWakeUpReason;
@@ -3245,7 +3105,6 @@ VOID nicEventWakeUpReason(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent, I
 	prGlueInfo->prAdapter->rWowCtrl.ucReason = prWakeUpReason->reason;
 	DBGLOG(NIC, INFO, "nicEventWakeUpReason:%d\n", prGlueInfo->prAdapter->rWowCtrl.ucReason);
 }
-#endif
 
 VOID nicEventCSIData(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent, IN UINT_32 u4EventBufLen)
 {
@@ -3374,44 +3233,8 @@ VOID nicEventGetGtkDataSync(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent,
 	DBGLOG(RSN, INFO, "Get BC/MC PN update from fw.\n");
 	DBGLOG_MEM8(RSN, INFO, (PUINT_8)prDetRplyInfo->arReplayPNInfo[ucCurKeyId].auPN, NL80211_REPLAY_CTR_LEN);
 }
-
 #endif
 
-#ifdef CFG_SUPPORT_ANT_DIV
-VOID nicCmdEventAntDiv(
-		IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo, IN PUINT_8 pucEventBuf, IN UINT_32 u4EventBufLen)
-{
-	P_GLUE_INFO_T			 prGlueInfo;
-	struct CMD_ANT_DIV_CTRL *prAntDivInfo;
-	UINT_32					 u4QueryInfoLen;
-
-	if (prAdapter == NULL) {
-		DBGLOG(RSN, INFO, "prAdapter is null\n");
-		return;
-	}
-	if (prCmdInfo == NULL) {
-		DBGLOG(RSN, INFO, "prCmdInfo is null\n");
-		return;
-	}
-
-	if (prCmdInfo->fgIsOid) {
-		prGlueInfo	   = prAdapter->prGlueInfo;
-		u4QueryInfoLen = sizeof(struct CMD_ANT_DIV_CTRL);
-		prAntDivInfo   = (struct CMD_ANT_DIV_CTRL *)prCmdInfo->pvInformationBuffer;
-
-		if (pucEventBuf && prAntDivInfo) {
-			if (u4EventBufLen < u4QueryInfoLen) {
-				DBGLOG(NIC, ERROR, "%s: Invalid event length: %d < %d\n", __func__, u4EventBufLen, u4QueryInfoLen);
-				return;
-			}
-			kalMemCopy(prAntDivInfo, pucEventBuf, u4QueryInfoLen);
-		}
-		kalOidComplete(prGlueInfo, prCmdInfo->fgSetQuery, u4QueryInfoLen, WLAN_STATUS_SUCCESS);
-	}
-}
-#endif
-
-#ifdef CFG_DUMP_TXPOWR_TABLE
 VOID nicCmdEventGetTxPwrTbl(
 		IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo, IN PUINT_8 pucEventBuf, IN UINT_32 u4EventBufLen)
 {
@@ -3466,4 +3289,3 @@ VOID nicCmdEventGetTxPwrTbl(
 		kalOidComplete(prGlueInfo, prCmdInfo->fgSetQuery, u4QueryInfoLen, WLAN_STATUS_SUCCESS);
 	}
 }
-#endif

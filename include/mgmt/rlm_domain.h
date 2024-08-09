@@ -294,14 +294,11 @@
 #define UNII3_LOWER_BOUND 149
 #define UNII3_UPPER_BOUND 173
 
-#if CFG_SUPPORT_PWR_LIMIT_COUNTRY
 
 #define POWER_LIMIT_TABLE_NULL 0xFFFF
 #define MAX_TX_POWER 63
 #define MIN_TX_POWER -64
 #define MAX_CMD_SUPPORT_CHANNEL_NUM 64
-
-#endif
 
 #if (CFG_SUPPORT_SINGLE_SKU == 1)
 #define MAX_SUPPORTED_CH_COUNT MAX_CHN_NUM
@@ -313,8 +310,6 @@
  ********************************************************************************
  */
 
-#if CFG_SUPPORT_PWR_LIMIT_COUNTRY
-
 typedef enum _ENUM_POWER_LIMIT_T {
 	PWR_LIMIT_CCK  = 0,
 	PWR_LIMIT_20M  = 1,
@@ -324,8 +319,6 @@ typedef enum _ENUM_POWER_LIMIT_T {
 	PWR_LIMIT_NUM
 } ENUM_POWER_LIMIT_T,
 		*P_ENUM_POWER_LIMIT_T;
-
-#endif
 
 typedef enum _ENUM_POWER_LIMIT_SUBBAND_T {
 	POWER_LIMIT_2G4	   = 0,
@@ -379,9 +372,7 @@ typedef struct _DOMAIN_INFO_ENTRY {
 	DOMAIN_SUBBAND_INFO rSubBand[MAX_SUBBAND_NUM];
 } DOMAIN_INFO_ENTRY, *P_DOMAIN_INFO_ENTRY;
 
-#if CFG_SUPPORT_PWR_LIMIT_COUNTRY
 
-#if (CFG_SUPPORT_SINGLE_SKU == 1)
 /*
  * MT_TxPwrLimit.dat format
  */
@@ -389,11 +380,7 @@ typedef struct _DOMAIN_INFO_ENTRY {
 #define ELEMENT_PREFIX (0xffff)
 #define VERSION (0x00000001)
 #define SIZE_OF_VERSION 4
-#if CFG_SUPPORT_LARGE_TX_PWR_LIMIT_TABLE
-#define WLAN_TX_PWR_LIMIT_FILE_BUF_SIZE (204800 * 2)
-#else
 #define WLAN_TX_PWR_LIMIT_FILE_BUF_SIZE 204800
-#endif
 #define WLAN_TX_PWR_LIMIT_FILE_NAME "TxPwrLimit_MT76x8.dat"
 
 struct tx_pwr_element {
@@ -448,9 +435,7 @@ struct tx_pwr_section {
 	UINT_32 prefix;
 	UINT_32 country_code;
 };
-#endif /*#if (CFG_SUPPORT_SINGLE_SKU == 1)*/
 
-/* CMD_SET_PWR_LIMIT_TABLE */
 typedef struct _CHANNEL_POWER_LIMIT {
 	UINT_8 ucCentralCh;
 	INT_8  cPwrLimitCCK;
@@ -502,7 +487,6 @@ typedef struct _SUBBAND_CHANNEL_T {
 	UINT_8 ucReserved;
 } SUBBAND_CHANNEL_T, *P_SUBBAND_CHANNEL_T;
 
-#endif
 
 #if (CFG_SUPPORT_SINGLE_SKU == 1)
 /*
@@ -594,10 +578,8 @@ P_DOMAIN_INFO_ENTRY rlmDomainGetDomainInfo(P_ADAPTER_T prAdapter);
 VOID rlmDomainGetChnlList(P_ADAPTER_T prAdapter, ENUM_BAND_T eSpecificBand, BOOLEAN fgNoDfs, UINT_8 ucMaxChannelNum,
 		PUINT_8 pucNumOfChannel, P_RF_CHANNEL_INFO_T paucChannelList);
 
-#ifdef CFG_SUPPORT_SAP_DFS_CHANNEL
 void rlmDomainGetDfsChnls(
 		P_ADAPTER_T prAdapter, UINT_8 ucMaxChannelNum, PUINT_8 pucNumOfChannel, P_RF_CHANNEL_INFO_T paucChannelList);
-#endif
 
 VOID rlmDomainSendCmd(P_ADAPTER_T prAdapter, BOOLEAN fgIsOid);
 
@@ -614,8 +596,6 @@ UINT_8 rlmDomainGetCenterChannel(ENUM_BAND_T eBand, UINT_8 ucPriChannel, ENUM_CH
 BOOLEAN rlmDomainIsValidRfSetting(P_ADAPTER_T prAdapter, ENUM_BAND_T eBand, UINT_8 ucPriChannel,
 		ENUM_CHNL_EXT_T eExtend, ENUM_CHANNEL_WIDTH_T eChannelWidth, UINT_8 ucChannelS1, UINT_8 ucChannelS2);
 
-#if CFG_SUPPORT_PWR_LIMIT_COUNTRY
-
 BOOLEAN
 rlmDomainCheckPowerLimitValid(P_ADAPTER_T		prAdapter,
 		COUNTRY_POWER_LIMIT_TABLE_CONFIGURATION rPowerLimitTableConfiguration, UINT_8 ucPwrLimitNum);
@@ -625,7 +605,6 @@ VOID rlmDomainCheckCountryPowerLimitTable(P_ADAPTER_T prAdapter);
 UINT_16 rlmDomainPwrLimitDefaultTableDecision(P_ADAPTER_T prAdapter, UINT_16 u2CountryCode);
 
 VOID rlmDomainSendPwrLimitCmd(P_ADAPTER_T prAdapter);
-#endif
 
 #if (CFG_SUPPORT_SINGLE_SKU == 1)
 extern struct ieee80211_supported_band mtk_band_2ghz;
@@ -662,9 +641,9 @@ void							  rlmDomainSendInfoToFirmware(IN P_ADAPTER_T prAdapter);
 WLAN_STATUS						  rlmDomainExtractSingleSkuInfoFromFirmware(
 							  IN P_ADAPTER_T prAdapter, IN PUINT_8 pucEventBuf, IN UINT_32 u4EventBufLen);
 BOOLEAN regd_is_single_sku_en(void);
-#ifdef CFG_SUPPORT_SAP_DFS_CHANNEL
+
 UINT_8 rlmDomainIsLegalDfsChannel(P_ADAPTER_T prAdapter, ENUM_BAND_T eBand, UINT_8 ucChannel);
-#endif
+
 BOOLEAN			rlmDomainIsLegalChannel(P_ADAPTER_T prAdapter, ENUM_BAND_T eBand, UINT_8 ucChannel);
 ENUM_CHNL_EXT_T rlmSelectSecondaryChannelType(P_ADAPTER_T prAdapter, ENUM_BAND_T band, u8 primary_ch);
 extern void		mtk_reg_notify(IN struct wiphy *pWiphy, IN struct regulatory_request *pRequest);

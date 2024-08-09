@@ -29,9 +29,7 @@
 /*! Maximum buffer size of SCAN list */
 #define SCN_MAX_BUFFER_SIZE (CFG_MAX_NUM_BSS_LIST * ALIGN_4(sizeof(BSS_DESC_T)))
 
-#if CFG_SUPPORT_ROAMING_SKIP_ONE_AP
 #define SCN_ROAM_MAX_BUFFER_SIZE (CFG_MAX_NUM_ROAM_BSS_LIST * ALIGN_4(sizeof(ROAM_BSS_DESC_T)))
-#endif
 
 #define SCN_RM_POLICY_EXCLUDE_SPECIFIC_SSID BIT(4) /* Remove SCAN result except the connected one. */
 
@@ -46,14 +44,13 @@
 									 */
 #define SCN_RM_POLICY_ENTIRE BIT(5) /* Remove entire SCAN result */
 
-#define SCN_BSS_DESC_SAME_SSID_THRESHOLD \
-	3 /* This is used by POLICY SMART WEAKEST, \
-	   * If exceed this value, remove weakest BSS_DESC_T \
-	   * with same SSID first in large network. \
-	   */
-#if CFG_SUPPORT_ROAMING_SKIP_ONE_AP
+#define SCN_BSS_DESC_SAME_SSID_THRESHOLD 3 
+/* This is used by POLICY SMART WEAKEST,
+ * If exceed this value, remove weakest BSS_DESC_T
+ * with same SSID first in large network.
+ */
+
 #define REMOVE_TIMEOUT_TWO_DAY (60 * 60 * 24 * 2)
-#endif
 
 #define SCN_BSS_DESC_REMOVE_TIMEOUT_SEC 30
 #define SCN_BSS_DESC_STALE_SEC 20 /* Scan Request Timeout */
@@ -85,14 +82,12 @@
 #define SCN_BSS_JOIN_FAIL_CNT_RESET_SEC 15
 #define SCN_BSS_JOIN_FAIL_RESET_STEP 2
 
-#if CFG_SUPPORT_BATCH_SCAN
 /*----------------------------------------------------------------------------*/
 /* SCAN_BATCH_REQ                                                             */
 /*----------------------------------------------------------------------------*/
 #define SCAN_BATCH_REQ_START BIT(0)
 #define SCAN_BATCH_REQ_STOP BIT(1)
 #define SCAN_BATCH_REQ_RESULT BIT(2)
-#endif
 
 #define SCAN_NLO_CHECK_SSID_ONLY 0x00000001
 #define SCAN_NLO_DEFAULT_INTERVAL 30000
@@ -236,7 +231,6 @@ struct _BSS_DESC_T {
 	 */
 	UINT_8 ucEncLevel;
 
-#if CFG_ENABLE_WIFI_DIRECT
 	BOOLEAN				fgIsP2PPresent;
 	BOOLEAN				fgIsP2PReport; /* TRUE: report to upper layer */
 	P_P2P_DEVICE_DESC_T prP2pDesc;
@@ -257,7 +251,6 @@ struct _BSS_DESC_T {
 	 *    5. P2P Device Info. (Probe Rsp)
 	 *    6. P2P Group Info. (Probe Rsp)
 	 */
-#endif
 
 	BOOLEAN fgIsIEOverflow; /* The received IE length exceed the maximum IE buffer size */
 	UINT_16 u2RawLength;	/* The byte count of aucRawBuf[] */
@@ -268,19 +261,16 @@ struct _BSS_DESC_T {
 	UINT_8		   aucIEBuf[CFG_IE_BUFFER_SIZE];
 	UINT_8		   ucJoinFailureCount;
 	OS_SYSTIME	   rJoinFailTime;
-#if CFG_SUPPORT_802_11K
 	UINT_8 aucRrmCap[5];
-#endif
+
 };
 
-#if CFG_SUPPORT_ROAMING_SKIP_ONE_AP
 struct _ROAM_BSS_DESC_T {
 	LINK_ENTRY_T rLinkEntry;
 	UINT_8		 ucSSIDLen;
 	UINT_8		 aucSSID[ELEM_MAX_LEN_SSID];
 	OS_SYSTIME	 rUpdateTime;
 };
-#endif
 
 typedef struct _SCAN_PARAM_T { /* Used by SCAN FSM */
 	/* Active or Passive */
@@ -299,14 +289,11 @@ typedef struct _SCAN_PARAM_T { /* Used by SCAN FSM */
 	/* Specified SSID */
 	UINT_8 aucSpecifiedSSID[SCN_SSID_MAX_NUM][ELEM_MAX_LEN_SSID];
 
-#if CFG_ENABLE_WIFI_DIRECT
+
 	BOOLEAN			  fgFindSpecificDev; /* P2P: Discovery Protocol */
 	UINT_8			  aucDiscoverDevAddr[MAC_ADDR_LEN];
 	BOOLEAN			  fgIsDevType;
 	P2P_DEVICE_TYPE_T rDiscoverDevType;
-
-	/* TODO: Find Specific Device Type. */
-#endif /* CFG_SUPPORT_P2P */
 
 	UINT_16 u2ChannelDwellTime;
 	UINT_16 u2TimeoutValue;
@@ -368,11 +355,9 @@ typedef struct _SCAN_INFO_T {
 	LINK_T rFreeBSSDescList;
 
 	LINK_T rPendingMsgList;
-#if CFG_SUPPORT_ROAMING_SKIP_ONE_AP
 	UINT_8 aucScanRoamBuffer[SCN_ROAM_MAX_BUFFER_SIZE];
 	LINK_T rRoamFreeBSSDescList;
 	LINK_T rRoamBSSDescList;
-#endif
 	/* Sparse Channel Detection */
 	BOOLEAN			  fgIsSparseChannelValid;
 	RF_CHANNEL_INFO_T rSparseChannel;
@@ -594,13 +579,12 @@ WLAN_STATUS scanAddScanResult(IN P_ADAPTER_T prAdapter, IN P_BSS_DESC_T prBssDes
 
 VOID scanReportBss2Cfg80211(IN P_ADAPTER_T prAdapter, IN ENUM_BSS_TYPE_T eBSSType, IN P_BSS_DESC_T SpecificprBssDesc);
 
-#if CFG_SUPPORT_ROAMING_SKIP_ONE_AP
 P_ROAM_BSS_DESC_T scanSearchRoamBssDescBySsid(IN P_ADAPTER_T prAdapter, IN P_BSS_DESC_T prBssDesc);
 P_ROAM_BSS_DESC_T scanAllocateRoamBssDesc(IN P_ADAPTER_T prAdapter);
 VOID			  scanAddToRoamBssDesc(IN P_ADAPTER_T prAdapter, IN P_BSS_DESC_T prBssDesc);
 VOID			  scanSearchBssDescOfRoamSsid(IN P_ADAPTER_T prAdapter);
 VOID			  scanRemoveRoamBssDescsByTime(IN P_ADAPTER_T prAdapter, IN UINT_32 u4RemoveTime);
-#endif
+
 /*----------------------------------------------------------------------------*/
 /* Routines in scan_fsm.c                                                     */
 /*----------------------------------------------------------------------------*/
@@ -661,12 +645,10 @@ BOOLEAN scnFsmSchedScanStopRequest(IN P_ADAPTER_T prAdapter);
 
 VOID scanReportScanResultToAgps(P_ADAPTER_T prAdapter);
 
-#if CFG_SCAN_CHANNEL_SPECIFIED
 static inline bool is_valid_scan_chnl_cnt(UINT_8 num)
 {
 	return (num && num < MAXIMUM_OPERATION_CHANNEL_LIST);
 }
-#endif
 
 BOOLEAN scnFsmIsScanning(IN P_ADAPTER_T prAdapter);
 

@@ -7,20 +7,11 @@
 #include "gl_p2p_os.h"
 
 #if !DBG_DISABLE_ALL_LOG
-/*lint -save -e64 Type mismatch */
-static PUINT_8 apucDebugP2pRoleState[P2P_ROLE_STATE_NUM] = {
-	(PUINT_8)DISP_STRING("P2P_ROLE_STATE_IDLE"), (PUINT_8)DISP_STRING("P2P_ROLE_STATE_SCAN"),
-	(PUINT_8)DISP_STRING("P2P_ROLE_STATE_REQING_CHANNEL"), (PUINT_8)DISP_STRING("P2P_ROLE_STATE_AP_CHNL_DETECTION"),
-#if (CFG_SUPPORT_DFS_MASTER == 1)
-	(PUINT_8)DISP_STRING("P2P_ROLE_STATE_GC_JOIN"), (PUINT_8)DISP_STRING("P2P_ROLE_STATE_DFS_CAC"),
-	(PUINT_8)DISP_STRING("P2P_ROLE_STATE_SWITCH_CHANNEL")
-#else
-	(PUINT_8)DISP_STRING("P2P_ROLE_STATE_GC_JOIN")
+static PUINT_8 apucDebugP2pRoleState[P2P_ROLE_STATE_NUM] = { (PUINT_8)DISP_STRING("P2P_ROLE_STATE_IDLE"),
+	(PUINT_8)DISP_STRING("P2P_ROLE_STATE_SCAN"), (PUINT_8)DISP_STRING("P2P_ROLE_STATE_REQING_CHANNEL"),
+	(PUINT_8)DISP_STRING("P2P_ROLE_STATE_AP_CHNL_DETECTION"), (PUINT_8)DISP_STRING("P2P_ROLE_STATE_GC_JOIN"),
+	(PUINT_8)DISP_STRING("P2P_ROLE_STATE_DFS_CAC"), (PUINT_8)DISP_STRING("P2P_ROLE_STATE_SWITCH_CHANNEL") };
 #endif
-};
-
-/*lint -restore */
-#endif /* DBG */
 
 VOID p2pRoleFsmStateTransition(
 		IN P_ADAPTER_T prAdapter, IN P_P2P_ROLE_FSM_INFO_T prP2pRoleFsmInfo, IN ENUM_P2P_ROLE_STATE_T eNextState);
@@ -44,10 +35,8 @@ UINT_8 p2pRoleFsmInit(IN P_ADAPTER_T prAdapter, IN UINT_8 ucRoleIdx)
 
 		kalMemZero(prP2pRoleFsmInfo, sizeof(P2P_ROLE_FSM_INFO_T));
 
-		prP2pRoleFsmInfo->ucRoleIndex = ucRoleIdx;
-
-		prP2pRoleFsmInfo->eCurrentState = P2P_ROLE_STATE_IDLE;
-
+		prP2pRoleFsmInfo->ucRoleIndex		= ucRoleIdx;
+		prP2pRoleFsmInfo->eCurrentState		= P2P_ROLE_STATE_IDLE;
 		prP2pRoleFsmInfo->u4P2pPacketFilter = PARAM_PACKET_FILTER_SUPPORTED;
 
 		prP2pChnlReqInfo = &prP2pRoleFsmInfo->rChnlReqInfo;
@@ -55,15 +44,10 @@ UINT_8 p2pRoleFsmInit(IN P_ADAPTER_T prAdapter, IN UINT_8 ucRoleIdx)
 
 		cnmTimerInitTimer(prAdapter, &(prP2pRoleFsmInfo->rP2pRoleFsmTimeoutTimer),
 				(PFN_MGMT_TIMEOUT_FUNC)p2pRoleFsmRunEventTimeout, (ULONG)prP2pRoleFsmInfo);
-
-#if (CFG_SUPPORT_DFS_MASTER == 1)
 		cnmTimerInitTimer(prAdapter, &(prP2pRoleFsmInfo->rDfsShutDownTimer),
 				(PFN_MGMT_TIMEOUT_FUNC)p2pRoleFsmRunEventDfsShutDownTimeout, (ULONG)prP2pRoleFsmInfo);
-#if CFG_SUPPORT_DBDC_TC6
 		cnmTimerInitTimer(prAdapter, &(prP2pRoleFsmInfo->rDfsStartCacTimer),
 				(PFN_MGMT_TIMEOUT_FUNC)p2pRoleFsmRunEventStartDfsCacTimeout, (ULONG)prP2pRoleFsmInfo);
-#endif
-#endif
 
 		prP2pBssInfo = cnmGetBssInfoAndInit(prAdapter, NETWORK_TYPE_P2P, FALSE);
 
@@ -123,23 +107,16 @@ UINT_8 p2pRoleFsmInit(IN P_ADAPTER_T prAdapter, IN UINT_8 ucRoleIdx)
 		prP2pBssInfo->eBssSCO						   = CHNL_EXT_SCN;
 		prP2pBssInfo->ucNss							   = wlanGetSupportNss(prAdapter, prP2pBssInfo->ucBssIndex);
 		prP2pBssInfo->eDBDCBand						   = ENUM_BAND_0;
-#if (CFG_HW_WMM_BY_BSS == 0)
-		prP2pBssInfo->ucWmmQueSet = (prAdapter->rWifiVar.ucDbdcMode == DBDC_MODE_DISABLED) ? DBDC_5G_WMM_INDEX :
-																							 DBDC_2G_WMM_INDEX;
-#endif
+
 		if (IS_FEATURE_ENABLED(prAdapter->rWifiVar.ucQoS))
 			prP2pBssInfo->fgIsQBSS = TRUE;
 		else
 			prP2pBssInfo->fgIsQBSS = FALSE;
 
-#if (CFG_SUPPORT_DFS_MASTER == 1)
 		p2pFuncRadarInfoInit();
-#endif
-#if CFG_SUPPORT_802_11W
+
 		init_completion(&prP2pBssInfo->rDeauthComp);
 		prP2pBssInfo->encryptedDeauthIsInProcess = FALSE;
-#endif
-		/* SET_NET_PWR_STATE_IDLE(prAdapter, prP2pBssInfo->ucBssIndex); */
 
 		p2pRoleFsmStateTransition(prAdapter, prP2pRoleFsmInfo, P2P_ROLE_STATE_IDLE);
 
@@ -202,13 +179,8 @@ VOID p2pRoleFsmUninit(IN P_ADAPTER_T prAdapter, IN UINT_8 ucRoleIdx)
 
 		/* ensure the timer be stopped */
 		cnmTimerStopTimer(prAdapter, &(prP2pRoleFsmInfo->rP2pRoleFsmTimeoutTimer));
-
-#if (CFG_SUPPORT_DFS_MASTER == 1)
 		cnmTimerStopTimer(prAdapter, &(prP2pRoleFsmInfo->rDfsShutDownTimer));
-#if CFG_SUPPORT_DBDC
 		cnmTimerStopTimer(prAdapter, &(prP2pRoleFsmInfo->rDfsStartCacTimer));
-#endif
-#endif
 
 		if (prP2pRoleFsmInfo)
 			kalMemFree(prP2pRoleFsmInfo, VIR_MEM_TYPE, sizeof(P2P_ROLE_FSM_INFO_T));
@@ -287,7 +259,6 @@ VOID p2pRoleFsmStateTransition(
 			}
 			break;
 
-#if (CFG_SUPPORT_DFS_MASTER == 1)
 		case P2P_ROLE_STATE_DFS_CAC:
 			if (!fgIsTransitionOut) {
 				p2pRoleStateInit_DFS_CAC(prAdapter, prP2pRoleFsmInfo->ucBssIndex, &(prP2pRoleFsmInfo->rChnlReqInfo));
@@ -303,7 +274,6 @@ VOID p2pRoleFsmStateTransition(
 				p2pRoleStateAbort_SWITCH_CHANNEL(prAdapter, prP2pRoleBssInfo, prP2pRoleFsmInfo, eNextState);
 			}
 			break;
-#endif
 		default:
 			ASSERT(FALSE);
 			break;
@@ -339,18 +309,11 @@ VOID p2pRoleFsmRunEventTimeout(IN P_ADAPTER_T prAdapter, IN ULONG ulParamPtr)
 		case P2P_ROLE_STATE_GC_JOIN:
 			DBGLOG(P2P, ERROR, "Current P2P Role State P2P_ROLE_STATE_GC_JOIN is unexpected for FSM timeout event.\n");
 			break;
-#if (CFG_SUPPORT_DFS_MASTER == 1)
 		case P2P_ROLE_STATE_DFS_CAC:
 			p2pRoleFsmStateTransition(prAdapter, prP2pRoleFsmInfo, P2P_ROLE_STATE_IDLE);
 			kalP2PCacFinishedUpdate(prAdapter->prGlueInfo, prP2pRoleFsmInfo->ucRoleIndex);
-#ifndef CFG_SUPPORT_DISABLE_SAP_DFS_RDD
-			p2pFuncSetDfsState(DFS_STATE_ACTIVE);
-			cnmTimerStartTimer(prAdapter, &(prP2pRoleFsmInfo->rDfsShutDownTimer), 5000);
-#else
 			p2pFuncSetDfsState(DFS_STATE_INACTIVE);
-#endif
 			break;
-#endif
 		default:
 			DBGLOG(P2P, ERROR, "Current P2P Role State %d is unexpected for FSM timeout event.\n",
 					prP2pRoleFsmInfo->eCurrentState);
@@ -402,7 +365,6 @@ static VOID p2pRoleFsmDeauthComplete(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T
 		return;
 	}
 
-#if CFG_SUPPORT_802_11W
 	/* Notify completion after encrypted deauth frame tx done */
 	if (prP2pBssInfo->encryptedDeauthIsInProcess == TRUE) {
 		if (!completion_done(&prP2pBssInfo->rDeauthComp)) {
@@ -411,7 +373,6 @@ static VOID p2pRoleFsmDeauthComplete(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T
 		}
 	}
 	prP2pBssInfo->encryptedDeauthIsInProcess = FALSE;
-#endif
 
 	/*
 	 * After EAP exchange, GO/GC will disconnect
@@ -584,7 +545,6 @@ VOID p2pRoleFsmRunEventRxDeauthentication(IN P_ADAPTER_T prAdapter, IN P_STA_REC
 		case OP_MODE_ACCESS_POINT:
 			/* Delete client from client list. */
 			if (authProcessRxDeauthFrame(prSwRfb, prP2pBssInfo->aucBSSID, &u2ReasonCode) == WLAN_STATUS_SUCCESS) {
-#if CFG_SUPPORT_802_11W
 				/* AP PMF */
 				if (rsnCheckBipKeyInstalled(prAdapter, prStaRec)) {
 					if (HAL_RX_STATUS_IS_CIPHER_MISMATCH(prSwRfb->prRxStatus) ||
@@ -600,7 +560,6 @@ VOID p2pRoleFsmRunEventRxDeauthentication(IN P_ADAPTER_T prAdapter, IN P_STA_REC
 					u2ReasonCode					 = REASON_CODE_CLASS_2_ERR;
 					prStaRec->rPmfCfg.fgRxDeauthResp = TRUE;
 				}
-#endif
 
 				if (bssRemoveClient(prAdapter, prP2pBssInfo, prStaRec)) {
 					/* Indicate disconnect to Host. */
@@ -681,7 +640,6 @@ VOID p2pRoleFsmRunEventRxDisassociation(IN P_ADAPTER_T prAdapter, IN P_STA_RECOR
 		/* Delete client from client list. */
 		if (assocProcessRxDisassocFrame(prAdapter, prSwRfb, prP2pBssInfo->aucBSSID, &u2ReasonCode) ==
 				WLAN_STATUS_SUCCESS) {
-#if CFG_SUPPORT_802_11W
 			/* AP PMF */
 			if (rsnCheckBipKeyInstalled(prAdapter, prStaRec)) {
 				if (HAL_RX_STATUS_IS_CIPHER_MISMATCH(prSwRfb->prRxStatus) ||
@@ -697,7 +655,6 @@ VOID p2pRoleFsmRunEventRxDisassociation(IN P_ADAPTER_T prAdapter, IN P_STA_RECOR
 				u2ReasonCode					 = REASON_CODE_CLASS_2_ERR;
 				prStaRec->rPmfCfg.fgRxDeauthResp = TRUE;
 			}
-#endif
 
 			if (bssRemoveClient(prAdapter, prP2pBssInfo, prStaRec)) {
 				/* Indicate disconnect to Host. */
@@ -843,7 +800,6 @@ VOID p2pRoleFsmRunEventStartAP(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMsgHdr
 		cnmTimerStopTimer(prAdapter, &(prP2pRoleFsmInfo->rP2pRoleFsmTimeoutTimer));
 	}
 
-#if (CFG_SUPPORT_DFS_MASTER == 1)
 	if (timerPendingTimer(&(prP2pRoleFsmInfo->rDfsShutDownTimer))) {
 		DBGLOG(P2P, INFO, "p2pRoleFsmRunEventStartAP: Stop DFS shut down timer.\n");
 		cnmTimerStopTimer(prAdapter, &(prP2pRoleFsmInfo->rDfsShutDownTimer));
@@ -851,19 +807,12 @@ VOID p2pRoleFsmRunEventStartAP(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMsgHdr
 
 	/* Check if Channel is DFS Available State. If yes, Change DFS State and Start RDD */
 	if ((prP2pConnReqInfo->u4ChnlDfsState == NL80211_DFS_AVAILABLE) && (p2pFuncGetDfsState() != DFS_STATE_ACTIVE)) {
-#ifndef CFG_SUPPORT_DISABLE_SAP_DFS_RDD
-		p2pFuncSetDfsState(DFS_STATE_ACTIVE);
-		p2pFuncStartRdd(prAdapter, prP2pRoleFsmInfo->ucBssIndex);
-#endif
 	}
-#endif
 
-#if (CFG_HW_WMM_BY_BSS == 1)
 	if (prP2pBssInfo->fgIsWmmInited == FALSE)
 		prP2pBssInfo->ucWmmQueSet = cnmWmmIndexDecision(prAdapter, prP2pBssInfo);
 	prP2pBssInfo->eBand = prP2pConnReqInfo->rChannelInfo.eBand;
-#endif
-#if CFG_SUPPORT_DBDC
+
 	cnmDbdcEnableDecision(prAdapter, prP2pBssInfo->ucBssIndex, prP2pConnReqInfo->rChannelInfo.eBand);
 	cnmGetDbdcCapability(prAdapter, prP2pBssInfo->ucBssIndex, prP2pConnReqInfo->rChannelInfo.eBand,
 			prP2pConnReqInfo->rChannelInfo.ucChannelNum, wlanGetSupportNss(prAdapter, prP2pBssInfo->ucBssIndex),
@@ -872,12 +821,8 @@ VOID p2pRoleFsmRunEventStartAP(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMsgHdr
 	DBGLOG(P2P, STATE, "p2pRoleFsmRunEventStartAP: start AP at CH %u NSS=%u.\n",
 			prP2pConnReqInfo->rChannelInfo.ucChannelNum, rDbdcCap.ucNss);
 
-	prP2pBssInfo->eDBDCBand = ENUM_BAND_AUTO;
-	prP2pBssInfo->ucNss		= rDbdcCap.ucNss;
-#if (CFG_HW_WMM_BY_BSS == 0)
-	prP2pBssInfo->ucWmmQueSet = rDbdcCap.ucWmmSetIndex;
-#endif
-#endif /*CFG_SUPPORT_DBDC*/
+	prP2pBssInfo->eDBDCBand		  = ENUM_BAND_AUTO;
+	prP2pBssInfo->ucNss			  = rDbdcCap.ucNss;
 	prP2pBssInfo->eHiddenSsidType = prP2pStartAPMsg->ucHiddenSsidType;
 
 	/*
@@ -1009,10 +954,8 @@ VOID p2pRoleFsmRunEventStopAP(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMsgHdr)
 		goto error;
 	}
 
-#if (CFG_SUPPORT_DFS_MASTER == 1)
 	p2pFuncSetDfsState(DFS_STATE_INACTIVE);
 	p2pFuncStopRdd(prAdapter, prP2pBssInfo->ucBssIndex);
-#endif
 
 	if (prP2pRoleFsmInfo->eCurrentState != P2P_ROLE_STATE_REQING_CHANNEL) {
 		p2pFuncStopGO(prAdapter, prP2pBssInfo);
@@ -1043,17 +986,13 @@ error:
 
 } /* p2pRoleFsmRunEventStopAP */
 
-#if (CFG_SUPPORT_DFS_MASTER == 1)
-#if CFG_SUPPORT_DBDC_TC6
 VOID p2pRoleFsmRunEventDfsCac(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMsgHdr)
 {
 	P_P2P_ROLE_FSM_INFO_T		prP2pRoleFsmInfo = (P_P2P_ROLE_FSM_INFO_T)NULL;
 	P_MSG_P2P_DFS_CAC_T			prP2pDfsCacMsg	 = (P_MSG_P2P_DFS_CAC_T)NULL;
 	P_P2P_CONNECTION_REQ_INFO_T prP2pConnReqInfo = (P_P2P_CONNECTION_REQ_INFO_T)NULL;
 	P_BSS_INFO_T				prP2pBssInfo	 = (P_BSS_INFO_T)NULL;
-#if CFG_SUPPORT_DBDC
-	CNM_DBDC_CAP_T rDbdcCap;
-#endif /*CFG_SUPPORT_DBDC*/
+	CNM_DBDC_CAP_T				rDbdcCap;
 
 	DBGLOG(P2P, STATE, "p2pRoleFsmRunEventDfsCac\n");
 
@@ -1085,12 +1024,10 @@ VOID p2pRoleFsmRunEventDfsCac(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMsgHdr)
 	else
 		prP2pConnReqInfo->eConnRequest = P2P_CONNECTION_TYPE_GO;
 
-#if (CFG_HW_WMM_BY_BSS == 1)
 	if (prP2pBssInfo->fgIsWmmInited == FALSE)
 		prP2pBssInfo->ucWmmQueSet = cnmWmmIndexDecision(prAdapter, prP2pBssInfo);
 	prP2pBssInfo->eBand = prP2pConnReqInfo->rChannelInfo.eBand;
-#endif
-#if CFG_SUPPORT_DBDC
+
 	cnmDbdcEnableDecision(prAdapter, prP2pBssInfo->ucBssIndex, prP2pConnReqInfo->rChannelInfo.eBand);
 	cnmGetDbdcCapability(prAdapter, prP2pBssInfo->ucBssIndex, prP2pConnReqInfo->rChannelInfo.eBand,
 			prP2pConnReqInfo->rChannelInfo.ucChannelNum, prAdapter->rWifiVar.ucNSS, &rDbdcCap);
@@ -1099,9 +1036,6 @@ VOID p2pRoleFsmRunEventDfsCac(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMsgHdr)
 
 	prP2pBssInfo->eDBDCBand = ENUM_BAND_AUTO;
 	prP2pBssInfo->ucNss		= rDbdcCap.ucNss;
-#if (CFG_HW_WMM_BY_BSS == 0)
-	prP2pBssInfo->ucWmmQueSet = rDbdcCap.ucWmmSetIndex;
-#endif
 
 	if (prAdapter->rWifiVar.fgDbDcModeEn == TRUE) {
 		DBGLOG(P2P, INFO, "Delay DFS CAC for DBDC Switch: %d sec\n", P2P_DFS_CAC_DELAY_TIME_MS / 1000);
@@ -1110,7 +1044,6 @@ VOID p2pRoleFsmRunEventDfsCac(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMsgHdr)
 		DBGLOG(P2P, INFO, "Start DFS CAC immediately\n");
 		cnmTimerStartTimer(prAdapter, &(prP2pRoleFsmInfo->rDfsStartCacTimer), 0);
 	}
-#endif /*CFG_SUPPORT_DBDC*/
 
 error:
 	cnmMemFree(prAdapter, prMsgHdr);
@@ -1155,96 +1088,6 @@ VOID p2pRoleFsmRunEventStartDfsCacTimeout(IN P_ADAPTER_T prAdapter, IN ULONG ulP
 	}
 
 } /*p2pRoleFsmRunEventDfsCac*/
-
-#else
-
-VOID p2pRoleFsmRunEventDfsCac(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMsgHdr)
-{
-	P_P2P_ROLE_FSM_INFO_T prP2pRoleFsmInfo = (P_P2P_ROLE_FSM_INFO_T)NULL;
-	P_MSG_P2P_DFS_CAC_T prP2pDfsCacMsg = (P_MSG_P2P_DFS_CAC_T)NULL;
-	P_P2P_CONNECTION_REQ_INFO_T prP2pConnReqInfo = (P_P2P_CONNECTION_REQ_INFO_T)NULL;
-	P_BSS_INFO_T prP2pBssInfo = (P_BSS_INFO_T)NULL;
-	ENUM_CHANNEL_WIDTH_T rChannelWidth;
-#if CFG_SUPPORT_DBDC
-	CNM_DBDC_CAP_T rDbdcCap;
-#endif /*CFG_SUPPORT_DBDC*/
-
-	DBGLOG(P2P, INFO, "p2pRoleFsmRunEventDfsCac\n");
-
-	prP2pDfsCacMsg = (P_MSG_P2P_DFS_CAC_T)prMsgHdr;
-
-	rChannelWidth = prP2pDfsCacMsg->eChannelWidth;
-
-	prP2pRoleFsmInfo = P2P_ROLE_INDEX_2_ROLE_FSM_INFO(prAdapter, prP2pDfsCacMsg->ucRoleIdx);
-
-	DBGLOG(P2P, INFO, "p2pRoleFsmRunEventDfsCac with Role(%d)\n", prP2pDfsCacMsg->ucRoleIdx);
-
-	if (!prP2pRoleFsmInfo) {
-		DBGLOG(P2P, ERROR, "p2pRoleFsmRunEventDfsCac: Corresponding P2P Role FSM empty: %d.\n",
-				prP2pDfsCacMsg->ucRoleIdx);
-		goto error;
-	}
-
-	if (timerPendingTimer(&(prP2pRoleFsmInfo->rDfsShutDownTimer))) {
-		DBGLOG(P2P, INFO, "p2pRoleFsmRunEventDfsCac: Stop DFS shut down timer.\n");
-		cnmTimerStopTimer(prAdapter, &(prP2pRoleFsmInfo->rDfsShutDownTimer));
-	}
-
-	prP2pBssInfo = prAdapter->aprBssInfo[prP2pRoleFsmInfo->ucBssIndex];
-
-	prP2pConnReqInfo = &(prP2pRoleFsmInfo->rConnReqInfo);
-
-	if (p2pFuncIsAPMode(prAdapter->rWifiVar.prP2PConnSettings[prP2pDfsCacMsg->ucRoleIdx]))
-		prP2pConnReqInfo->eConnRequest = P2P_CONNECTION_TYPE_PURE_AP;
-	else
-		prP2pConnReqInfo->eConnRequest = P2P_CONNECTION_TYPE_GO;
-
-#if (CFG_HW_WMM_BY_BSS == 1)
-	if (prP2pBssInfo->fgIsWmmInited == FALSE)
-		prP2pBssInfo->ucWmmQueSet = cnmWmmIndexDecision(prAdapter, prP2pBssInfo);
-	prP2pBssInfo->eBand = prP2pConnReqInfo->rChannelInfo.eBand;
-#endif
-#if CFG_SUPPORT_DBDC
-	cnmDbdcEnableDecision(prAdapter, prP2pBssInfo->ucBssIndex, prP2pConnReqInfo->rChannelInfo.eBand);
-	cnmGetDbdcCapability(prAdapter, prP2pBssInfo->ucBssIndex, prP2pConnReqInfo->rChannelInfo.eBand,
-			prP2pConnReqInfo->rChannelInfo.ucChannelNum, prAdapter->rWifiVar.ucNSS, &rDbdcCap);
-
-	DBGLOG(P2P, INFO, "p2pRoleFsmRunEventDfsCac: Set channel at CH %u.\n", prP2pConnReqInfo->rChannelInfo.ucChannelNum);
-
-	prP2pBssInfo->eDBDCBand = ENUM_BAND_AUTO;
-	prP2pBssInfo->ucNss = rDbdcCap.ucNss;
-#if (CFG_HW_WMM_BY_BSS == 0)
-	prP2pBssInfo->ucWmmQueSet = rDbdcCap.ucWmmSetIndex;
-#endif
-#endif /*CFG_SUPPORT_DBDC*/
-
-	if (prP2pRoleFsmInfo->eCurrentState != P2P_ROLE_STATE_IDLE) {
-		/* Make sure the state is in IDLE state. */
-		p2pRoleFsmRunEventAbort(prAdapter, prP2pRoleFsmInfo);
-	}
-
-	/* Leave IDLE state. */
-	SET_NET_PWR_STATE_ACTIVE(prAdapter, prP2pBssInfo->ucBssIndex);
-
-	prP2pBssInfo->eIntendOPMode = OP_MODE_ACCESS_POINT;
-	prP2pBssInfo->fgIsDfsActive = TRUE;
-
-	if (prP2pRoleFsmInfo->rConnReqInfo.rChannelInfo.ucChannelNum != 0) {
-		DBGLOG(P2P, INFO, "Role(%d) Set channel at CH(%d)\n", prP2pDfsCacMsg->ucRoleIdx,
-				prP2pRoleFsmInfo->rConnReqInfo.rChannelInfo.ucChannelNum);
-
-		p2pRoleStatePrepare_To_DFS_CAC_STATE(prAdapter, GET_BSS_INFO_BY_INDEX(prAdapter, prP2pRoleFsmInfo->ucBssIndex),
-				rChannelWidth, &(prP2pRoleFsmInfo->rConnReqInfo), &(prP2pRoleFsmInfo->rChnlReqInfo));
-		p2pRoleFsmStateTransition(prAdapter, prP2pRoleFsmInfo, P2P_ROLE_STATE_DFS_CAC);
-	} else {
-		DBGLOG(P2P, ERROR, "prP2pRoleFsmInfo->rConnReqInfo.rChannelInfo.ucChannelNum %d shouldn't be 0\n");
-	}
-
-error:
-	cnmMemFree(prAdapter, prMsgHdr);
-} /*p2pRoleFsmRunEventDfsCac*/
-
-#endif
 
 VOID p2pRoleFsmRunEventRadarDet(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMsgHdr)
 {
@@ -1347,8 +1190,6 @@ VOID p2pRoleFsmRunEventDfsShutDownTimeout(IN P_ADAPTER_T prAdapter, IN ULONG ulP
 	p2pFuncStopRdd(prAdapter, prP2pRoleFsmInfo->ucBssIndex);
 
 } /* p2pRoleFsmRunEventDfsShutDownTimeout */
-
-#endif
 
 VOID p2pRoleFsmScanTargetBss(IN P_ADAPTER_T prAdapter, IN P_P2P_ROLE_FSM_INFO_T prP2pRoleFsmInfo,
 		IN UINT_8 ucChannelNum, IN ENUM_BAND_T eBand, IN P_P2P_SSID_STRUCT_T prSsid)
@@ -1460,12 +1301,10 @@ VOID p2pRoleFsmRunEventConnectionRequest(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_
 		rlmReviseMaxBw(prAdapter, prP2pBssInfo->ucBssIndex, &prChnlReqInfo->eChnlSco,
 				(PUINT_8)&prChnlReqInfo->eChannelWidth, &prChnlReqInfo->ucCenterFreqS1, &prChnlReqInfo->ucReqChnlNum);
 
-#if (CFG_HW_WMM_BY_BSS == 1)
 		if (prP2pBssInfo->fgIsWmmInited == FALSE)
 			prP2pBssInfo->ucWmmQueSet = cnmWmmIndexDecision(prAdapter, prP2pBssInfo);
 		prP2pBssInfo->eBand = prChnlReqInfo->eBand;
-#endif
-#if CFG_SUPPORT_DBDC
+
 		cnmDbdcEnableDecision(prAdapter, prP2pBssInfo->ucBssIndex, prChnlReqInfo->eBand);
 		cnmGetDbdcCapability(prAdapter, prP2pBssInfo->ucBssIndex, prChnlReqInfo->eBand, prChnlReqInfo->ucReqChnlNum,
 				wlanGetSupportNss(prAdapter, prP2pBssInfo->ucBssIndex), &rDbdcCap);
@@ -1475,10 +1314,7 @@ VOID p2pRoleFsmRunEventConnectionRequest(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_
 
 		prP2pBssInfo->eDBDCBand = ENUM_BAND_AUTO;
 		prP2pBssInfo->ucNss		= rDbdcCap.ucNss;
-#if (CFG_HW_WMM_BY_BSS == 0)
-		prP2pBssInfo->ucWmmQueSet = rDbdcCap.ucWmmSetIndex;
-#endif
-#endif
+
 		p2pRoleFsmStateTransition(prAdapter, prP2pRoleFsmInfo, P2P_ROLE_STATE_REQING_CHANNEL);
 	}
 
@@ -1581,14 +1417,13 @@ VOID p2pRoleFsmRunEventConnectionAbort(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T 
 					(PFN_MGMT_TIMEOUT_FUNC)p2pRoleFsmDeauthTimeout, (ULONG)prCurrStaRec);
 
 			cnmTimerStartTimer(prAdapter, &(prCurrStaRec->rDeauthTxDoneTimer), P2P_DEAUTH_TIMEOUT_TIME_MS);
-#if CFG_SUPPORT_802_11W
+
 		} else if (prP2pBssInfo->u4RsnSelectedAKMSuite == RSN_AKM_SUITE_SAE) {
 			if (!completion_done(&prP2pBssInfo->rDeauthComp)) {
 				DBGLOG(P2P, INFO, "Complete rDeauthComp\n");
 				complete(&prP2pBssInfo->rDeauthComp);
 			}
 			prP2pBssInfo->encryptedDeauthIsInProcess = FALSE;
-#endif
 		}
 	} break;
 	case OP_MODE_P2P_DEVICE:
@@ -1690,11 +1525,6 @@ VOID p2pRoleFsmRunEventJoinComplete(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prM
 
 			/* 4 <1.4> Activate current AP's STA_RECORD_T in Driver. */
 			cnmStaRecChangeState(prAdapter, prStaRec, STA_STATE_3);
-
-#if CFG_SUPPORT_P2P_RSSI_QUERY
-			/* <1.5> Update RSSI if necessary */
-			nicUpdateRSSI(prAdapter, prP2pBssInfo->ucBssIndex, (INT_8)(RCPI_TO_dBm(prStaRec->ucRCPI)), 0);
-#endif
 
 			/* 4 <1.6> Indicate Connected Event to Host immediately. */
 			/* Require BSSID, Association ID, Beacon Interval.. from AIS_BSS_INFO_T */
@@ -1897,12 +1727,11 @@ VOID p2pRoleFsmRunEventScanDone(
 				prChnlReqInfo = &(prP2pRoleFsmInfo->rChnlReqInfo);
 				if (!prChnlReqInfo)
 					break;
-#if (CFG_HW_WMM_BY_BSS == 1)
+
 				if (prP2pBssInfo->fgIsWmmInited == FALSE)
 					prP2pBssInfo->ucWmmQueSet = cnmWmmIndexDecision(prAdapter, prP2pBssInfo);
 				prP2pBssInfo->eBand = prChnlReqInfo->eBand;
-#endif
-#if CFG_SUPPORT_DBDC
+
 				cnmDbdcEnableDecision(prAdapter, prP2pRoleFsmInfo->ucBssIndex, prChnlReqInfo->eBand);
 				cnmGetDbdcCapability(prAdapter, prP2pRoleFsmInfo->ucBssIndex, prChnlReqInfo->eBand,
 						prChnlReqInfo->ucReqChnlNum, wlanGetSupportNss(prAdapter, prP2pRoleFsmInfo->ucBssIndex),
@@ -1913,10 +1742,7 @@ VOID p2pRoleFsmRunEventScanDone(
 
 				prP2pBssInfo->eDBDCBand = ENUM_BAND_AUTO;
 				prP2pBssInfo->ucNss		= rDbdcCap.ucNss;
-#if (CFG_HW_WMM_BY_BSS == 0)
-				prP2pBssInfo->ucWmmQueSet = rDbdcCap.ucWmmSetIndex;
-#endif
-#endif
+
 				/* For GC join. */
 				eNextState = P2P_ROLE_STATE_REQING_CHANNEL;
 			}
@@ -1947,11 +1773,9 @@ VOID p2pRoleFsmRunEventChnlGrant(
 {
 	P_P2P_CHNL_REQ_INFO_T prChnlReqInfo = (P_P2P_CHNL_REQ_INFO_T)NULL;
 	P_MSG_CH_GRANT_T	  prMsgChGrant	= (P_MSG_CH_GRANT_T)NULL;
-#if (CFG_SUPPORT_DFS_MASTER == 1)
-	P_BSS_INFO_T prP2pBssInfo = (P_BSS_INFO_T)NULL;
-	UINT_32		 u4CacTimeMs;
-#endif
-	UINT_8 ucTokenID = 0;
+	P_BSS_INFO_T		  prP2pBssInfo	= (P_BSS_INFO_T)NULL;
+	UINT_32				  u4CacTimeMs;
+	UINT_8				  ucTokenID = 0;
 
 	if (!prP2pRoleFsmInfo) {
 		DBGLOG(P2P, ERROR, "prP2pRoleFsmInfo is NULL!\n");
@@ -1963,10 +1787,7 @@ VOID p2pRoleFsmRunEventChnlGrant(
 	prMsgChGrant  = (P_MSG_CH_GRANT_T)prMsgHdr;
 	ucTokenID	  = prMsgChGrant->ucTokenID;
 	prChnlReqInfo = &(prP2pRoleFsmInfo->rChnlReqInfo);
-
-#if (CFG_SUPPORT_DFS_MASTER == 1)
-	prP2pBssInfo = GET_BSS_INFO_BY_INDEX(prAdapter, prMsgChGrant->ucBssIndex);
-#endif
+	prP2pBssInfo  = GET_BSS_INFO_BY_INDEX(prAdapter, prMsgChGrant->ucBssIndex);
 	if (prChnlReqInfo->u4MaxInterval != prMsgChGrant->u4GrantInterval) {
 		DBGLOG(P2P, WARN, "P2P Role:%d Request Channel Interval:%d, Grant Interval:%d\n", prP2pRoleFsmInfo->ucRoleIndex,
 				prChnlReqInfo->u4MaxInterval, prMsgChGrant->u4GrantInterval);
@@ -1995,18 +1816,8 @@ VOID p2pRoleFsmRunEventChnlGrant(
 			p2pRoleFsmStateTransition(prAdapter, prP2pRoleFsmInfo, eNextState);
 			break;
 
-#if (CFG_SUPPORT_DFS_MASTER == 1)
 		case P2P_ROLE_STATE_DFS_CAC:
-#ifndef CFG_SUPPORT_DISABLE_SAP_DFS_RDD
-			p2pFuncStartRdd(prAdapter, prMsgChGrant->ucBssIndex);
-
-			if (p2pFuncCheckWeatherRadarBand(prChnlReqInfo))
-				u4CacTimeMs = P2P_AP_CAC_WEATHER_CHNL_HOLD_TIME_MS;
-			else
-				u4CacTimeMs = prP2pRoleFsmInfo->rChnlReqInfo.u4MaxInterval;
-#else
 			u4CacTimeMs = 0;
-#endif
 
 			if (p2pFuncIsManualCac())
 				u4CacTimeMs = p2pFuncGetDriverCacTime() * 1000;
@@ -2025,7 +1836,6 @@ VOID p2pRoleFsmRunEventChnlGrant(
 			p2pFuncDfsSwitchCh(prAdapter, prP2pBssInfo, prP2pRoleFsmInfo->rChnlReqInfo);
 			p2pRoleFsmStateTransition(prAdapter, prP2pRoleFsmInfo, P2P_ROLE_STATE_IDLE);
 			break;
-#endif
 		default:
 			/* Channel is granted under unexpected state.
 			 * Driver should cancel channel privileagea before leaving the states.
@@ -2179,12 +1989,9 @@ p2pRoleFsmRunEventAAAComplete(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaR
 		bssRemoveClient(prAdapter, prP2pBssInfo, prStaRec);
 
 		if (prP2pBssInfo->rStaRecOfClientList.u4NumElem >= P2P_MAXIMUM_CLIENT_COUNT ||
-				!p2pRoleProcessACLInspection(prAdapter, prStaRec->aucMacAddr, prP2pBssInfo->ucBssIndex)
-#if CFG_SUPPORT_HOTSPOT_WPS_MANAGER
-				|| kalP2PMaxClients(prAdapter->prGlueInfo, prP2pBssInfo->rStaRecOfClientList.u4NumElem,
-						   (UINT_8)prP2pBssInfo->u4PrivateData)
-#endif
-		) {
+				!p2pRoleProcessACLInspection(prAdapter, prStaRec->aucMacAddr, prP2pBssInfo->ucBssIndex) ||
+				kalP2PMaxClients(prAdapter->prGlueInfo, prP2pBssInfo->rStaRecOfClientList.u4NumElem,
+						(UINT_8)prP2pBssInfo->u4PrivateData)) {
 			rStatus = WLAN_STATUS_RESOURCES;
 			break;
 		}
@@ -2194,15 +2001,6 @@ p2pRoleFsmRunEventAAAComplete(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaR
 		prStaRec->u2AssocId = bssAssignAssocID(prStaRec);
 
 		cnmStaRecChangeState(prAdapter, prStaRec, STA_STATE_3);
-
-#if CFG_SUPPORT_BFER
-		if ((IS_FEATURE_ENABLED(prAdapter->rWifiVar.ucStaVhtBfer) ||
-					IS_FEATURE_ENABLED(prAdapter->rWifiVar.ucStaHtBfer)) &&
-				prAdapter->fgIsHwSupportBfer) {
-			rlmBfStaRecPfmuUpdate(prAdapter, prStaRec);
-			rlmETxBfTriggerPeriodicSounding(prAdapter);
-		}
-#endif
 
 		p2pChangeMediaState(prAdapter, prP2pBssInfo, PARAM_MEDIA_STATE_CONNECTED);
 

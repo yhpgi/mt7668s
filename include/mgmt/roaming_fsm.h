@@ -28,9 +28,7 @@
  */
 /* Roaming Discovery interval, SCAN result need to be updated */
 #define ROAMING_DISCOVERY_TIMEOUT_SEC 5 /* Seconds. */
-#if CFG_SUPPORT_ROAMING_SKIP_ONE_AP
 #define ROAMING_ONE_AP_SKIP_TIMES 3
-#endif
 
 /* #define ROAMING_NO_SWING_RCPI_STEP                  5 //rcpi */
 /*******************************************************************************
@@ -80,21 +78,17 @@ typedef struct _CMD_ROAMING_CTRL_T {
 	UINT_8	aucReserved[2];
 } CMD_ROAMING_CTRL_T, *P_CMD_ROAMING_CTRL_T;
 
-#if CFG_SUPPORT_ROAMING_SKIP_ONE_AP
 typedef struct _CMD_ROAMING_SKIP_ONE_AP_T {
 	UINT_8 fgIsRoamingSkipOneAP;
 	UINT_8 aucReserved[3];
 	UINT_8 aucReserved2[8];
 } CMD_ROAMING_SKIP_ONE_AP_T, *P_CMD_ROAMING_SKIP_ONE_AP_T;
-#endif
 
 /**/ typedef enum _ENUM_ROAMING_STATE_T {
 	ROAMING_STATE_IDLE = 0,
 	ROAMING_STATE_DECISION,
 	ROAMING_STATE_DISCOVERY,
-#if CFG_SUPPORT_802_11V_BSS_TRANSITION_MGT
 	ROAMING_STATE_REQ_CAND_LIST,
-#endif
 	ROAMING_STATE_ROAM,
 	ROAMING_STATE_NUM
 } ENUM_ROAMING_STATE_T;
@@ -122,11 +116,7 @@ typedef struct _ROAMING_INFO_T {
  ********************************************************************************
  */
 
-#if CFG_SUPPORT_ROAMING
 #define IS_ROAMING_ACTIVE(prAdapter) (prAdapter->rWifiVar.rRoamingInfo.eCurrentState == ROAMING_STATE_ROAM)
-#else
-#define IS_ROAMING_ACTIVE(prAdapter) FALSE
-#endif /* CFG_SUPPORT_ROAMING */
 
 /*******************************************************************************
  *                  F U N C T I O N   D E C L A R A T I O N S

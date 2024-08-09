@@ -614,7 +614,6 @@ VOID rlmDomainGetChnlList(P_ADAPTER_T prAdapter, ENUM_BAND_T eSpecificBand, BOOL
 	*pucNumOfChannel = ucNum;
 }
 
-#ifdef CFG_SUPPORT_SAP_DFS_CHANNEL
 /*----------------------------------------------------------------------------*/
 /*!
  * \brief Retrieve DFS channels from 5G band
@@ -662,7 +661,6 @@ void rlmDomainGetDfsChnls(
 
 	*pucNumOfChannel = ucNum;
 }
-#endif
 
 /*----------------------------------------------------------------------------*/
 /*!
@@ -678,9 +676,7 @@ VOID rlmDomainSendCmd(P_ADAPTER_T prAdapter, BOOLEAN fgIsOid)
 	if (!regd_is_single_sku_en())
 		rlmDomainSendPassiveScanInfoCmd(prAdapter, fgIsOid);
 	rlmDomainSendDomainInfoCmd(prAdapter, fgIsOid);
-#if CFG_SUPPORT_PWR_LIMIT_COUNTRY
 	rlmDomainSendPwrLimitCmd(prAdapter);
-#endif
 }
 
 static BOOL isEUCountry(P_ADAPTER_T prAdapter, UINT_32 u4CountryCode)
@@ -964,7 +960,6 @@ BOOLEAN rlmDomainIsLegalChannel_V2(P_ADAPTER_T prAdapter, ENUM_BAND_T eBand, UIN
 	return FALSE;
 #endif
 }
-#ifdef CFG_SUPPORT_SAP_DFS_CHANNEL
 UINT_8 rlmDomainIsLegalDfsChannel(P_ADAPTER_T prAdapter, ENUM_BAND_T eBand, UINT_8 ucChannel)
 {
 	UINT_8				  i, j;
@@ -991,7 +986,7 @@ UINT_8 rlmDomainIsLegalDfsChannel(P_ADAPTER_T prAdapter, ENUM_BAND_T eBand, UINT
 
 	return FALSE;
 }
-#endif
+
 BOOLEAN rlmDomainIsLegalChannel(P_ADAPTER_T prAdapter, ENUM_BAND_T eBand, UINT_8 ucChannel)
 {
 	UINT_8				  i, j;
@@ -1774,8 +1769,6 @@ error:
 
 #endif
 
-#if CFG_SUPPORT_PWR_LIMIT_COUNTRY
-
 /*----------------------------------------------------------------------------*/
 /*!
  * @brief
@@ -2293,7 +2286,7 @@ VOID rlmDomainSendPwrLimitCmd(P_ADAPTER_T prAdapter)
 
 	cnmMemFree(prAdapter, prCmd);
 }
-#endif
+
 BOOLEAN regd_is_single_sku_en(void)
 {
 #if (CFG_SUPPORT_SINGLE_SKU == 1)

@@ -273,10 +273,6 @@ VOID nicUpdateRSSI(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex, IN INT_8 cRss
 
 VOID nicUpdateLinkSpeed(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex, IN UINT_16 u2LinkSpeed);
 
-#if CFG_SUPPORT_RDD_TEST_MODE
-WLAN_STATUS nicUpdateRddTestMode(IN P_ADAPTER_T prAdapter, IN P_CMD_RDD_CH_T prRddChParam);
-#endif
-
 /*----------------------------------------------------------------------------*/
 /* Address Setting Apply                                                      */
 /*----------------------------------------------------------------------------*/

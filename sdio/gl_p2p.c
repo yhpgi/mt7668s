@@ -45,14 +45,8 @@
 /*For CFG80211 - wiphy parameters*/
 #define MAX_SCAN_LIST_NUM (1)
 #define MAX_SCAN_IE_LEN (512)
-
-#if (CFG_SUPPORT_DFS_MASTER == 1)
 #define MAX_CSA_COUNTER 10
-#endif
 
-#ifdef CFG_SUPPORT_MULTICAST_ENHANCEMENT_LOOKBACK
-#define MAX_LOOK_BACK_NUN (3)
-#endif
 /*******************************************************************************
  *                             D A T A   T Y P E S
  ********************************************************************************
@@ -73,7 +67,6 @@ struct wireless_dev *gprP2pWdev;
 struct wireless_dev *gprP2pRoleWdev[KAL_P2P_NUM];
 struct net_device	  *gPrP2pDev[KAL_P2P_NUM];
 
-#if CFG_ENABLE_WIFI_DIRECT_CFG_80211
 static struct cfg80211_ops mtk_p2p_ops = {
 	.add_virtual_intf		  = mtk_p2p_cfg80211_add_iface,
 	.change_virtual_intf	  = mtk_p2p_cfg80211_change_iface, /* 1 st */
@@ -137,8 +130,6 @@ static const struct ieee80211_txrx_stypes
 			[NL80211_IFTYPE_P2P_GO]		= { .tx = 0xffff, .rx = BIT(IEEE80211_STYPE_PROBE_REQ >> 4) | BIT(IEEE80211_STYPE_ACTION >> 4) }
 		};
 
-#endif
-
 static const struct iw_priv_args rP2PIwPrivTable[] = {
 	{ IOCTL_GET_DRIVER, IW_PRIV_TYPE_CHAR | 2000, IW_PRIV_TYPE_CHAR | 2000, "driver" },
 };
@@ -163,27 +154,19 @@ static const struct ieee80211_iface_limit mtk_p2p_sta_go_limits[] = {
 
 static const struct ieee80211_iface_combination mtk_iface_combinations_sta[] = {
 	{
-#ifdef CFG_NUM_DIFFERENT_CHANNELS_STA
-			.num_different_channels = CFG_NUM_DIFFERENT_CHANNELS_STA,
-#else
 			.num_different_channels = 2,
-#endif
-			.max_interfaces = 3,
-			.limits			= mtk_p2p_sta_go_limits,
-			.n_limits		= 1, /* include p2p */
+			.max_interfaces			= 3,
+			.limits					= mtk_p2p_sta_go_limits,
+			.n_limits				= 1, /* include p2p */
 	},
 };
 
 static const struct ieee80211_iface_combination mtk_iface_combinations_p2p[] = {
 	{
-#ifdef CFG_NUM_DIFFERENT_CHANNELS_P2P
-			.num_different_channels = CFG_NUM_DIFFERENT_CHANNELS_P2P,
-#else
 			.num_different_channels = 2,
-#endif
-			.max_interfaces = 3,
-			.limits			= mtk_p2p_sta_go_limits,
-			.n_limits		= ARRAY_SIZE(mtk_p2p_sta_go_limits), /* include p2p */
+			.max_interfaces			= 3,
+			.limits					= mtk_p2p_sta_go_limits,
+			.n_limits				= ARRAY_SIZE(mtk_p2p_sta_go_limits), /* include p2p */
 	},
 };
 
@@ -193,7 +176,6 @@ const INT_32							  mtk_iface_combinations_sta_num = ARRAY_SIZE(mtk_iface_combi
 const struct ieee80211_iface_combination *p_mtk_iface_combinations_p2p	 = mtk_iface_combinations_p2p;
 const INT_32							  mtk_iface_combinations_p2p_num = ARRAY_SIZE(mtk_iface_combinations_p2p);
 
-#ifdef STA_P2P_MCC
 static const struct ieee80211_iface_limit p2p_iface_limits_mcc[] = { { .max = 2,
 		.types = (BIT(NL80211_IFTYPE_STATION) | BIT(NL80211_IFTYPE_P2P_CLIENT) | BIT(NL80211_IFTYPE_AP) |
 				  BIT(NL80211_IFTYPE_P2P_GO)) } };
@@ -205,7 +187,6 @@ static const struct ieee80211_iface_combination p2p_iface_comb_mcc[] = { {
 		.num_different_channels = 2,
 		.beacon_int_infra_match = false,
 } };
-#endif
 
 /*******************************************************************************
  *                                 M A C R O S
@@ -496,10 +477,7 @@ BOOLEAN p2pNetRegister(P_GLUE_INFO_T prGlueInfo, BOOLEAN fgIsRtnlLockAcquired)
 	} else {
 		prAdapter->rP2PNetRegState = ENUM_NET_REG_STATE_REGISTERED;
 		gPrP2pDev[0]			   = prGlueInfo->prP2PInfo[0]->prDevHandler;
-#if CFG_RESET_DUE_TO_REG_NETDEV_FAIL
-		prGlueInfo->prP2PInfo[0]->fgIsNetDevRegistered = TRUE;
-#endif
-		ret = TRUE;
+		ret						   = TRUE;
 	}
 
 	if (prAdapter->prP2pInfo->u4DeviceNum == RUNNING_DUAL_AP_MODE) {
@@ -517,12 +495,7 @@ BOOLEAN p2pNetRegister(P_GLUE_INFO_T prGlueInfo, BOOLEAN fgIsRtnlLockAcquired)
 		} else {
 			prAdapter->rP2PNetRegState = ENUM_NET_REG_STATE_REGISTERED;
 			gPrP2pDev[1]			   = prGlueInfo->prP2PInfo[1]->prDevHandler;
-#if CFG_RESET_DUE_TO_REG_NETDEV_FAIL
-			DBGLOG(P2P, STATE, "P2P 2nd NetDev registered\n");
-			prGlueInfo->prP2PInfo[1]->fgIsNetDevRegistered = TRUE;
-#else
-			ret = TRUE;
-#endif
+			ret						   = TRUE;
 		}
 
 		DBGLOG(P2P, INFO, "P2P 2nd interface work\n");
@@ -603,15 +576,8 @@ BOOLEAN p2pNetUnregister(P_GLUE_INFO_T prGlueInfo, BOOLEAN fgIsRtnlLockAcquired)
 		DBGLOG(INIT, INFO, "unregister p2p[0]\n");
 		unregister_netdev(prGlueInfo->prP2PInfo[0]->aprRoleHandler);
 	}
-#if CFG_RESET_DUE_TO_REG_NETDEV_FAIL
-	if (prGlueInfo->prP2PInfo[0]->fgIsNetDevRegistered == TRUE) {
-		prGlueInfo->prP2PInfo[0]->fgIsNetDevRegistered = FALSE;
-#endif
-		DBGLOG(INIT, INFO, "unregister p2pdev[0]\n");
-		unregister_netdev(prGlueInfo->prP2PInfo[0]->prDevHandler);
-#if CFG_RESET_DUE_TO_REG_NETDEV_FAIL
-	}
-#endif
+	DBGLOG(INIT, INFO, "unregister p2pdev[0]\n");
+	unregister_netdev(prGlueInfo->prP2PInfo[0]->prDevHandler);
 
 	/* unregister the netdev and index > 0 */
 	if (prAdapter->prP2pInfo->u4DeviceNum >= 2) {
@@ -627,15 +593,7 @@ BOOLEAN p2pNetUnregister(P_GLUE_INFO_T prGlueInfo, BOOLEAN fgIsRtnlLockAcquired)
 				rtnl_unlock();
 			}
 			/* Here are functions which need rtnl_lock */
-#if CFG_RESET_DUE_TO_REG_NETDEV_FAIL
-			if (prGlueInfo->prP2PInfo[ucRoleIdx]->fgIsNetDevRegistered == TRUE) {
-				prGlueInfo->prP2PInfo[ucRoleIdx]->fgIsNetDevRegistered = FALSE;
-				DBGLOG(INIT, INFO, "unregister p2pdev[%d]\n", ucRoleIdx);
-#endif
-				unregister_netdev(prGlueInfo->prP2PInfo[ucRoleIdx]->prDevHandler);
-#if CFG_RESET_DUE_TO_REG_NETDEV_FAIL
-			}
-#endif
+			unregister_netdev(prGlueInfo->prP2PInfo[ucRoleIdx]->prDevHandler);
 		}
 	}
 
@@ -666,10 +624,8 @@ BOOLEAN glRegisterP2P(P_GLUE_INFO_T prGlueInfo, const char *prDevName, const cha
 	BOOLEAN					   fgIsApMode	 = FALSE;
 	UINT_8					   ucRegisterNum = 1, i = 0;
 	struct wireless_dev		*prP2pWdev;
-#if CFG_ENABLE_WIFI_DIRECT_CFG_80211
-	struct device *prDev;
-#endif
-	const char *prSetDevName;
+	struct device			  *prDev;
+	const char				*prSetDevName;
 
 	ASSERT(prGlueInfo);
 
@@ -699,12 +655,10 @@ BOOLEAN glRegisterP2P(P_GLUE_INFO_T prGlueInfo, const char *prDevName, const cha
 			prSetDevName = prDevName2;
 			fgIsApMode	 = TRUE;
 		}
-#if CFG_ENABLE_WIFI_DIRECT_CFG_80211
 		if (!gprP2pRoleWdev[i]) {
 			DBGLOG(P2P, ERROR, "gl_p2p, wireless device is not exist\n");
 			return FALSE;
 		}
-#endif
 		prP2pWdev = gprP2pRoleWdev[i];
 		DBGLOG(INIT, INFO, "glRegisterP2P(%d), fgIsApMode(%d)\n", i, fgIsApMode);
 		/*0. allocate p2pinfo */
@@ -713,7 +667,6 @@ BOOLEAN glRegisterP2P(P_GLUE_INFO_T prGlueInfo, const char *prDevName, const cha
 			ASSERT(0);
 			return FALSE;
 		}
-#if CFG_ENABLE_WIFI_DIRECT_CFG_80211
 
 		/* 1.1 fill wiphy parameters */
 		glGetHifDev(prHif, &prDev);
@@ -738,8 +691,6 @@ BOOLEAN glRegisterP2P(P_GLUE_INFO_T prGlueInfo, const char *prDevName, const cha
 			prP2pWdev->iftype = NL80211_IFTYPE_AP;
 		else
 			prP2pWdev->iftype = NL80211_IFTYPE_P2P_CLIENT;
-
-#endif
 
 		/* 3. allocate netdev */
 		prGlueInfo->prP2PInfo[i]->prDevHandler = alloc_netdev_mq(
@@ -775,16 +726,12 @@ BOOLEAN glRegisterP2P(P_GLUE_INFO_T prGlueInfo, const char *prDevName, const cha
 
 		SET_NETDEV_DEV(prGlueInfo->prP2PInfo[i]->prDevHandler, &(prHif->func->dev));
 
-#if CFG_ENABLE_WIFI_DIRECT_CFG_80211
 		prGlueInfo->prP2PInfo[i]->prDevHandler->ieee80211_ptr = prP2pWdev;
 		prP2pWdev->netdev									  = prGlueInfo->prP2PInfo[i]->prDevHandler;
-#endif
 
-#if CFG_TCP_IP_CHKSUM_OFFLOAD
 		/* set HW checksum offload */
 		if (prAdapter->fgIsSupportCsumOffload)
 			prGlueInfo->prP2PInfo[i]->prDevHandler->features = NETIF_F_IP_CSUM | NETIF_F_IPV6_CSUM | NETIF_F_RXCSUM;
-#endif /* CFG_TCP_IP_CHKSUM_OFFLOAD */
 
 		kalResetStats(prGlueInfo->prP2PInfo[i]->prDevHandler);
 
@@ -844,7 +791,6 @@ BOOLEAN glP2pCreateWirelessDevice(P_GLUE_INFO_T prGlueInfo)
 	struct ieee80211_supported_band *sband = NULL;
 	struct ieee80211_channel		 *chan  = NULL;
 
-#if CFG_ENABLE_WIFI_DIRECT_CFG_80211
 	prWdev = kzalloc(sizeof(struct wireless_dev), GFP_KERNEL);
 	if (!prWdev) {
 		DBGLOG(P2P, ERROR, "allocate p2p wireless device fail, no memory\n");
@@ -942,7 +888,6 @@ free_wiphy:
 	wiphy_free(prWiphy);
 free_wdev:
 	kfree(prWdev);
-#endif
 	return FALSE;
 }
 
@@ -1054,19 +999,12 @@ static int p2pOpen(IN struct net_device *prDev)
 {
 	ASSERT(prDev);
 
-	/* 2. carrier on & start TX queue */
-	/*DFS todo 20161220_DFS*/
-#if (CFG_SUPPORT_DFS_MASTER == 1)
 	if (prDev->ieee80211_ptr->iftype != NL80211_IFTYPE_AP) {
 		netif_carrier_on(prDev);
 		netif_tx_start_all_queues(prDev);
 	}
-#else
-	netif_carrier_on(prDev);
-	netif_tx_start_all_queues(prDev);
-#endif
 
-	return 0; /* success */
+	return 0;
 } /* end of p2pOpen() */
 
 /*----------------------------------------------------------------------------*/
@@ -1263,16 +1201,8 @@ int p2pHardStartXmit(IN struct sk_buff *prSkb, IN struct net_device *prDev)
 	P_NETDEV_PRIVATE_GLUE_INFO prNetDevPrivate = (P_NETDEV_PRIVATE_GLUE_INFO)NULL;
 	P_GLUE_INFO_T			   prGlueInfo	   = NULL;
 	UINT_8					   ucBssIndex;
-#ifdef CFG_SUPPORT_MULTICAST_ENHANCEMENT
-	P_ADAPTER_T prAdapter = NULL;
-	UINT_8		aucEthDestAddr[PARAM_MAC_ADDR_LEN];
-#ifdef CFG_SUPPORT_MULTICAST_ENHANCEMENT_LOOKBACK
-	UINT_8			i				  = 0;
-	struct sk_buff *prSkbLb			  = NULL;
-	struct sk_buff *prSkbkick		  = NULL;
-	P_QUE_T			prTxLookBackQueue = NULL;
-#endif
-#endif
+	P_ADAPTER_T				   prAdapter = NULL;
+	UINT_8					   aucEthDestAddr[PARAM_MAC_ADDR_LEN];
 
 	ASSERT(prSkb);
 	ASSERT(prDev);
@@ -1281,7 +1211,6 @@ int p2pHardStartXmit(IN struct sk_buff *prSkb, IN struct net_device *prDev)
 	prGlueInfo		= prNetDevPrivate->prGlueInfo;
 	ucBssIndex		= prNetDevPrivate->ucBssIdx;
 
-#ifdef CFG_SUPPORT_MULTICAST_ENHANCEMENT
 	prAdapter = prGlueInfo->prAdapter;
 	// Get dest Addr
 	kalGetEthDestAddr(prGlueInfo, (P_NATIVE_PACKET)prSkb, aucEthDestAddr);
@@ -1294,183 +1223,10 @@ int p2pHardStartXmit(IN struct sk_buff *prSkb, IN struct net_device *prDev)
 			for (i = 0; i < prAdapter->ucDupMcastPacketNum; i++) {
 				prSkbDup = skb_copy(prSkb, GFP_ATOMIC);
 				kalResetPacket(prGlueInfo, (P_NATIVE_PACKET)prSkbDup);
-#ifdef CFG_SUPPORT_MULTICAST_ENHANCEMENT_LOOKBACK
-				if (i == 0) {
-					// Set first packet of duplicated packet flag
-					GLUE_SET_PKT_FLAG((P_NATIVE_PACKET)prSkbDup, ENUM_PKT_FIRST_DUP);
-				}
-#endif
 				kalHardStartXmit(prSkbDup, prDev, prGlueInfo, ucBssIndex);
 			}
 		}
 	}
-#ifdef CFG_SUPPORT_MULTICAST_ENHANCEMENT_LOOKBACK
-	if (prAdapter->fgIsLookBackMode && IS_BMCAST_MAC_ADDR(aucEthDestAddr)) {
-		P_QUE_ENTRY_T prQueueEntry = NULL;
-		struct iphdr *ip_header;
-		GLUE_SPIN_LOCK_DECLARATION();
-
-		ip_header = (struct iphdr *)skb_network_header(prSkb);
-		// DBGLOG(INIT, ERROR, "The TOS is : %02x\n", ip_header->tos);
-		if ((ip_header->tos != prAdapter->ucAudioTOS) || prAdapter->ucAudioTOS == 0) {
-			/* Not expect packet, just send and return */
-			kalResetPacket(prGlueInfo, (P_NATIVE_PACKET)prSkb);
-			kalHardStartXmit(prSkb, prDev, prGlueInfo, ucBssIndex);
-			return NETDEV_TX_OK;
-		}
-
-		prTxLookBackQueue = &prGlueInfo->rTxLookBackQueue;
-		prSkbLb			  = skb_copy(prSkb, GFP_ATOMIC);
-		kalResetPacket(prGlueInfo, (P_NATIVE_PACKET)prSkbLb);
-
-		/* set tag on first packet */
-		/* add latest one in tail */
-		prQueueEntry = (P_QUE_ENTRY_T)GLUE_GET_PKT_QUEUE_ENTRY(prSkbLb);
-		GLUE_ACQUIRE_SPIN_LOCK(prGlueInfo, SPIN_LOCK_TX_LB_QUE);
-		QUEUE_INSERT_TAIL(prTxLookBackQueue, prQueueEntry);
-		GLUE_RELEASE_SPIN_LOCK(prGlueInfo, SPIN_LOCK_TX_LB_QUE);
-
-		DBGLOG(INIT, LOUD, "LB ADD: %p LB list size %d\n", prSkbLb, QUEUE_GET_SIZE(prTxLookBackQueue));
-
-		if (QUEUE_GET_SIZE(prTxLookBackQueue) == 1) {
-			/* Not expect packet, just send and return */
-			DBGLOG(INIT, ERROR, "first packet, just send out %d\n", prSkbLb);
-			kalResetPacket(prGlueInfo, (P_NATIVE_PACKET)prSkb);
-			kalHardStartXmit(prSkb, prDev, prGlueInfo, ucBssIndex);
-			return NETDEV_TX_OK;
-		} else if (QUEUE_GET_SIZE(prTxLookBackQueue) == 2) {
-			prSkbkick = NULL;
-			GLUE_ACQUIRE_SPIN_LOCK(prGlueInfo, SPIN_LOCK_TX_LB_QUE);
-			/* get packet from look-back queue then kick */
-			QUEUE_REMOVE_HEAD(prTxLookBackQueue, prQueueEntry, P_QUE_ENTRY_T);
-			GLUE_RELEASE_SPIN_LOCK(prGlueInfo, SPIN_LOCK_TX_LB_QUE);
-			prSkbLb = (struct sk_buff *)GLUE_GET_PKT_DESCRIPTOR(prQueueEntry);
-			/* fill lookback sequence here */
-			ip_header = (struct iphdr *)skb_network_header(prSkbLb);
-			ip_header->tos |= BIT(1);
-			prSkbkick = skb_copy(prSkbLb, GFP_ATOMIC);
-			/* re-queue the packet for next look-back */
-			GLUE_ACQUIRE_SPIN_LOCK(prGlueInfo, SPIN_LOCK_TX_LB_QUE);
-			QUEUE_INSERT_HEAD(prTxLookBackQueue, prQueueEntry);
-			GLUE_RELEASE_SPIN_LOCK(prGlueInfo, SPIN_LOCK_TX_LB_QUE);
-			/* proccess packet if Skbkick != NULL */
-			if (prSkbkick) {
-				/* send the look-back packet */
-				kalResetPacket(prGlueInfo, (P_NATIVE_PACKET)prSkbkick);
-				kalHardStartXmit(prSkbkick, prDev, prGlueInfo, ucBssIndex);
-				DBGLOG(INIT, LOUD, "[%d] LB kick/requeue: %p\n", i, prSkbLb);
-			}
-			kalResetPacket(prGlueInfo, (P_NATIVE_PACKET)prSkb);
-			kalHardStartXmit(prSkb, prDev, prGlueInfo, ucBssIndex);
-			return NETDEV_TX_OK;
-		} else if (QUEUE_GET_SIZE(prTxLookBackQueue) == 3) {
-			for (i = 0; i < QUEUE_GET_SIZE(prTxLookBackQueue); i++) {
-				prSkbkick = NULL;
-				GLUE_ACQUIRE_SPIN_LOCK(prGlueInfo, SPIN_LOCK_TX_LB_QUE);
-				/* get packet from look-back queue then kick */
-				QUEUE_REMOVE_HEAD(prTxLookBackQueue, prQueueEntry, P_QUE_ENTRY_T);
-				GLUE_RELEASE_SPIN_LOCK(prGlueInfo, SPIN_LOCK_TX_LB_QUE);
-				prSkbLb = (struct sk_buff *)GLUE_GET_PKT_DESCRIPTOR(prQueueEntry);
-				/* fill lookback sequence here */
-				ip_header = (struct iphdr *)skb_network_header(prSkbLb);
-				/* switch tag to be 0xaa,0xbb,0xcc,0xdd */
-				/* Tagging packet number for our propritry usage
-				 *  Rx side will recover the tag
-				 */
-				switch (i) {
-				case 0:
-					ip_header->tos |= BIT(2);
-					prSkbkick = skb_copy(prSkbLb, GFP_ATOMIC);
-					break;
-				case 1:
-					ip_header->tos |= BIT(1);
-					prSkbkick = skb_copy(prSkbLb, GFP_ATOMIC);
-					break;
-				};
-				/* re-queue the packet for next look-back */
-				GLUE_ACQUIRE_SPIN_LOCK(prGlueInfo, SPIN_LOCK_TX_LB_QUE);
-				QUEUE_INSERT_TAIL(prTxLookBackQueue, prQueueEntry);
-				GLUE_RELEASE_SPIN_LOCK(prGlueInfo, SPIN_LOCK_TX_LB_QUE);
-				/* proccess packet if Skbkick != NULL */
-				if (prSkbkick) {
-					/* send the look-back packet */
-					kalResetPacket(prGlueInfo, (P_NATIVE_PACKET)prSkbkick);
-					kalHardStartXmit(prSkbkick, prDev, prGlueInfo, ucBssIndex);
-					DBGLOG(INIT, LOUD, "[%d] LB kick/requeue: %p\n", i, prSkbLb);
-				}
-			}
-			kalResetPacket(prGlueInfo, (P_NATIVE_PACKET)prSkb);
-			kalHardStartXmit(prSkb, prDev, prGlueInfo, ucBssIndex);
-			return NETDEV_TX_OK;
-		}
-
-		/* kick look-back */
-		for (i = 0; i <= MAX_LOOK_BACK_NUN; i++) {
-			prSkbkick = NULL;
-			GLUE_ACQUIRE_SPIN_LOCK(prGlueInfo, SPIN_LOCK_TX_LB_QUE);
-			/* get packet from look-back queue then kick */
-			QUEUE_REMOVE_HEAD(prTxLookBackQueue, prQueueEntry, P_QUE_ENTRY_T);
-			GLUE_RELEASE_SPIN_LOCK(prGlueInfo, SPIN_LOCK_TX_LB_QUE);
-			prSkbLb = (struct sk_buff *)GLUE_GET_PKT_DESCRIPTOR(prQueueEntry);
-			/* fill lookback sequence here */
-			ip_header = (struct iphdr *)skb_network_header(prSkbLb);
-			/* switch tag to be 0xaa,0xbb,0xcc,0xdd */
-			/* Tagging packet number for our propritry usage
-			 *  Rx side will recover the tag
-			 */
-			switch (i) {
-			case 0:
-				ip_header->tos |= BITS(0, 1);
-				break;
-			case 1:
-				ip_header->tos |= BIT(2);
-				break;
-			case 2:
-				ip_header->tos |= BIT(1);
-				break;
-			};
-
-			/* packet from driver all be kicked out after MAX_LOOK_BACK_NUM - 1
-			 * transmit MAX_LOOK_BACK_NUM of packet in total
-			 */
-			if (i < MAX_LOOK_BACK_NUN)
-				prSkbkick = skb_copy(prSkbLb, GFP_ATOMIC);
-			/* re-queue the packet for next look-back */
-			GLUE_ACQUIRE_SPIN_LOCK(prGlueInfo, SPIN_LOCK_TX_LB_QUE);
-			QUEUE_INSERT_TAIL(prTxLookBackQueue, prQueueEntry);
-			GLUE_RELEASE_SPIN_LOCK(prGlueInfo, SPIN_LOCK_TX_LB_QUE);
-
-			/* proccess packet if Skbkick != NULL */
-			if (prSkbkick) {
-				/* send the look-back packet */
-				kalResetPacket(prGlueInfo, (P_NATIVE_PACKET)prSkbkick);
-				ip_header = (struct iphdr *)skb_network_header(prSkbkick);
-				if (i == 0) {
-					// Set first packet of duplicated packet flag for HIF Agg
-					GLUE_SET_PKT_FLAG((P_NATIVE_PACKET)prSkbkick, ENUM_PKT_FIRST_DUP);
-					DBGLOG(INIT, LOUD, "Flag before Set ENUM_PKT_FIRST_DUP %04x \n",
-							GLUE_IS_PKT_FLAG_SET((P_NATIVE_PACKET)prSkbkick));
-				}
-				kalHardStartXmit(prSkbkick, prDev, prGlueInfo, ucBssIndex);
-				DBGLOG(INIT, LOUD, "[%d] LB kick/requeue: %p\n", i, prSkbLb);
-			}
-			DBGLOG(INIT, LOUD, "The TOS in queue is : %02x\n", ip_header->tos);
-		}
-		/* check if too much packet in lookback queue */
-		prQueueEntry = NULL;
-		GLUE_ACQUIRE_SPIN_LOCK(prGlueInfo, SPIN_LOCK_TX_LB_QUE);
-		if (QUEUE_GET_SIZE(prTxLookBackQueue) > MAX_LOOK_BACK_NUN) {
-			QUEUE_REMOVE_HEAD(prTxLookBackQueue, prQueueEntry, P_QUE_ENTRY_T);
-			DBGLOG(INIT, LOUD, "LB Remove: %p\n", (struct sk_buff *)GLUE_GET_PKT_DESCRIPTOR(prQueueEntry));
-		}
-		GLUE_RELEASE_SPIN_LOCK(prGlueInfo, SPIN_LOCK_TX_LB_QUE);
-		if (prQueueEntry)
-			dev_kfree_skb((struct sk_buff *)GLUE_GET_PKT_DESCRIPTOR(prQueueEntry));
-		ip_header = (struct iphdr *)skb_network_header(prSkb);
-		DBGLOG(INIT, LOUD, "The TOS in new packet is : %02x\n", ip_header->tos);
-	}
-#endif
-#endif
 	kalResetPacket(prGlueInfo, (P_NATIVE_PACKET)prSkb);
 	kalHardStartXmit(prSkb, prDev, prGlueInfo, ucBssIndex);
 	return NETDEV_TX_OK;

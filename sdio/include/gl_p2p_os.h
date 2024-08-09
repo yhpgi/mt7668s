@@ -29,9 +29,8 @@
  *                    E X T E R N A L   V A R I A B L E
  ********************************************************************************
  */
-#if CFG_ENABLE_WIFI_DIRECT && CFG_ENABLE_WIFI_DIRECT_CFG_80211
+
 extern const struct net_device_ops p2p_netdev_ops;
-#endif
 
 /*******************************************************************************
  *                              C O N S T A N T S
@@ -67,100 +66,28 @@ extern struct wireless_dev *gprP2pRoleWdev[KAL_P2P_NUM];
  */
 
 struct _GL_P2P_INFO_T {
-	/* P2P Device interface handle */
-	/*only first p2p have this devhandler*/
 	struct net_device *prDevHandler;
-	/*struct net_device *prRoleDevHandler;*/ /* TH3 multiple P2P */
-
 	struct net_device *aprRoleHandler;
-
-	/* Todo : should move to the glueinfo or not*/
-	/*UINT_8 ucRoleInterfaceNum;*/ /* TH3 multiple P2P */
-
-#if CFG_ENABLE_WIFI_DIRECT_CFG_80211
 	/* cfg80211 */
 	struct wireless_dev *prWdev;
-	/*struct wireless_dev *prRoleWdev[KAL_P2P_NUM];*/ /* TH3 multiple P2P */
-
-	/*struct cfg80211_scan_request *prScanRequest;*/ /* TH3 multiple P2P */
-
-	/*UINT_64 u8Cookie;*/ /* TH3 multiple P2P */
-
-	/* Generation for station list update. */
 	INT_32 i4Generation;
-
-	/*UINT_32 u4OsMgmtFrameFilter;*/ /* TH3 multiple P2P */
-
-#endif
-
-	/* Device statistics */
-	/*struct net_device_stats rNetDevStats;*/ /* TH3 multiple P2P */
-
-	/* glue layer variables */
-	/*move to glueinfo->adapter */
-	/* BOOLEAN                     fgIsRegistered; */
-	/*UINT_32 u4FreqInKHz;*/ /* TH3 multiple P2P */ /* frequency */
-	UINT_8 ucRole;									/* 0: P2P Device, 1: Group Client, 2: Group Owner */
-	/*UINT_8 ucIntent;*/ /* TH3 multiple P2P */		/* range: 0-15 */
-	/*UINT_8 ucScanMode;*/ /* TH3 multiple P2P */	/* 0: Search & Listen, 1: Scan without probe response */
-
-	/*ENUM_PARAM_MEDIA_STATE_T eState;*/					 /* TH3 multiple P2P */
-	/*UINT_32 u4PacketFilter;*/								 /* TH3 multiple P2P */
-	/*PARAM_MAC_ADDRESS aucMCAddrList[MAX_NUM_GROUP_ADDR];*/ /* TH3 multiple P2P */
-
-	/* connection-requested peer information */						/* TH3 multiple P2P */
-	/*UINT_8 aucConnReqDevName[32];*/								/* TH3 multiple P2P */
-	/*INT_32 u4ConnReqNameLength;*/									/* TH3 multiple P2P */
-	/*PARAM_MAC_ADDRESS rConnReqPeerAddr;*/							/* TH3 multiple P2P */
-	/*PARAM_MAC_ADDRESS rConnReqGroupAddr;*/ /* TH3 multiple P2P */ /* For invitation group. */
-	/*UINT_8 ucConnReqDevType;*/									/* TH3 multiple P2P */
-	/*INT_32 i4ConnReqConfigMethod;*/								/* TH3 multiple P2P */
-	/*INT_32 i4ConnReqActiveConfigMethod;*/							/* TH3 multiple P2P */
-
+	UINT_8 ucRole; /* 0: P2P Device, 1: Group Client, 2: Group Owner */
 	UINT_32 u4CipherPairwise;
-	/*UINT_8 ucWSCRunning;*/ /* TH3 multiple P2P */
-
 	UINT_8	aucWSCIE[4][400]; /* 0 for beacon, 1 for probe req, 2 for probe response, 3 for assoc response */
 	UINT_16 u2WSCIELen[4];
-
-#if CFG_SUPPORT_WFD
 	UINT_8	aucWFDIE[400]; /* 0 for beacon, 1 for probe req, 2 for probe response */
 	UINT_16 u2WFDIELen;
-	/* UINT_8                      aucVenderIE[1024]; */ /* Save the other IE for prove resp */
-/* UINT_16                     u2VenderIELen; */
-#endif
-
-#if (CFG_SUPPORT_DFS_MASTER == 1)
 	struct cfg80211_chan_def *chandef;
 	UINT_32					  cac_time_ms;
-#endif
-
-#if CFG_SUPPORT_HOTSPOT_WPS_MANAGER
-	/* Hotspot Client Management */
-	/* dependent with  #define P2P_MAXIMUM_CLIENT_COUNT 10,
-	 * fix me to PARAM_MAC_ADDRESS aucblackMACList[P2P_MAXIMUM_CLIENT_COUNT];
-	 */
 	PARAM_MAC_ADDRESS aucblackMACList[10];
 	UINT_8			  ucMaxClients;
-#endif
-
-#if CFG_SUPPORT_HOTSPOT_OPTIMIZATION
-	/*BOOLEAN fgEnableHotspotOptimization;*/ /* TH3 multiple P2P */
-	/*UINT_32 u4PsLevel;*/					 /* TH3 multiple P2P */
-#endif
-
-#if CFG_RESET_DUE_TO_REG_NETDEV_FAIL
-	BOOLEAN fgIsNetDevRegistered;
-#endif
 };
 
 struct _GL_P2P_DEV_INFO_T {
-#if CFG_ENABLE_WIFI_DIRECT_CFG_80211
 	struct cfg80211_scan_request *prScanRequest;
 	struct cfg80211_scan_request  rBackupScanRequest;
 	UINT_64						  u8Cookie;
 	UINT_32						  u4OsMgmtFrameFilter;
-#endif
 	UINT_32			  u4PacketFilter;
 	PARAM_MAC_ADDRESS aucMCAddrList[MAX_NUM_GROUP_ADDR];
 	UINT_8			  ucWSCRunning;
@@ -192,7 +119,6 @@ typedef struct _NL80211_DRIVER_hotspot_block_PARAMS {
 	UINT_8					   aucBssid[MAC_ADDR_LEN];
 } NL80211_DRIVER_hotspot_block_PARAMS, *P_NL80211_DRIVER_hotspot_block_PARAMS;
 
-#if CFG_SUPPORT_WFD
 typedef struct _NL80211_DRIVER_WFD_PARAMS {
 	NL80211_DRIVER_TEST_PARAMS hdr;
 	UINT_32					   WfdCmdType;
@@ -230,7 +156,6 @@ typedef struct _NL80211_DRIVER_WFD_PARAMS {
 	/* Group 3 64 bytes */
 	UINT_8 aucReserved4[64];
 } NL80211_DRIVER_WFD_PARAMS, *P_NL80211_DRIVER_WFD_PARAMS;
-#endif
 #endif
 
 /*******************************************************************************

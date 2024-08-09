@@ -19,8 +19,8 @@
  *                    E X T E R N A L   R E F E R E N C E S
  ********************************************************************************
  */
-#include "precomp.h"
 
+#include "precomp.h"
 #include "mt7668.h"
 
 /*******************************************************************************
@@ -29,7 +29,7 @@
  */
 
 ECO_INFO_T mt7668_eco_table[] = {
-	/* HW version,  ROM version,    Factory version, Eco version */
+	/* HW version, ROM version, Factory version, Eco version */
 	{ 0x00, 0x00, 0xA, 0x1 }, /* E1 */
 	{ 0x10, 0x01, 0xB, 0x2 }, /* E2 */
 	{ 0x11, 0x01, 0xB, 0x2 }, /* E2 */
@@ -44,9 +44,9 @@ ECO_INFO_T mt7668_eco_table[] = {
 VOID mt7668ConstructFirmwarePrio(
 		P_GLUE_INFO_T prGlueInfo, PPUINT_8 apucNameTable, PPUINT_8 apucName, PUINT_8 pucNameIdx, UINT_8 ucMaxNameIdx)
 {
-	struct mt66xx_chip_info *prChipInfo = prGlueInfo->prAdapter->chip_info;
-	UINT_32					 chip_id	= prChipInfo->chip_id;
-	UINT_8					 sub_idx	= 0;
+	struct chip_info *prChipInfo = prGlueInfo->prAdapter->chip_info;
+	UINT_32			  chip_id	 = prChipInfo->chip_id;
+	UINT_8			  sub_idx	 = 0;
 
 	for (sub_idx = 0; apucNameTable[sub_idx]; sub_idx++) {
 		if (((*pucNameIdx) + 3) < ucMaxNameIdx) {
@@ -76,7 +76,7 @@ VOID mt7668ConstructFirmwarePrio(
 }
 
 /* Litien code refine to support multi chip */
-struct mt66xx_chip_info mt66xx_chip_info_mt7668 = {
+struct chip_info chip_info_mt7668 = {
 	.chip_id			   = MT7668_CHIP_ID,
 	.sw_sync0			   = MT7668_SW_SYNC0,
 	.sw_ready_bit_offset   = MT7668_SW_SYNC0_RDY_OFFSET,
@@ -87,6 +87,6 @@ struct mt66xx_chip_info mt66xx_chip_info_mt7668 = {
 	.features			   = 0,
 };
 
-struct mt66xx_hif_driver_data mt66xx_driver_data_mt7668 = {
-	.chip_info = &mt66xx_chip_info_mt7668,
+struct hif_driver_data driver_data_mt7668 = {
+	.chip_info = &chip_info_mt7668,
 };

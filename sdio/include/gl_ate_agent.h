@@ -9,7 +9,6 @@
 
 #ifndef _GL_ATE_AGENT_H
 #define _GL_ATE_AGENT_H
-#if CFG_SUPPORT_QA_TOOL
 /*******************************************************************************
  *                         C O M P I L E R   F L A G S
  ********************************************************************************
@@ -22,11 +21,9 @@
 
 extern UINT_32 u4RxStatSeqNum;
 
-#if CFG_SUPPORT_TX_BF
 extern PFMU_PROFILE_TAG1 g_rPfmuTag1;
 extern PFMU_PROFILE_TAG2 g_rPfmuTag2;
 extern PFMU_DATA		 g_rPfmuData;
-#endif
 extern BOOLEAN g_bCaptureDone;
 
 /*******************************************************************************
@@ -83,7 +80,6 @@ int SetATETxCount(struct net_device *prNetDev, UINT_8 *prInBuf);
 int SetATETxMcs(struct net_device *prNetDev, UINT_8 *prInBuf);
 int SetATEIpg(struct net_device *prNetDev, UINT_8 *prInBuf);
 
-#if CFG_SUPPORT_TX_BF
 int Set_TxBfProfileTag_Help(struct net_device *prNetDev, UINT_8 *prInBuf);
 int Set_TxBfProfileTag_InValid(struct net_device *prNetDev, UINT_8 *prInBuf);
 int Set_TxBfProfileTag_PfmuIdx(struct net_device *prNetDev, UINT_8 *prInBuf);
@@ -120,7 +116,6 @@ int Set_TxBfManualAssoc(struct net_device *prNetDev, UINT_8 *prInBuf);
 int Set_TxBfPfmuMemAlloc(struct net_device *prNetDev, UINT_8 *prInBuf);
 int Set_TxBfPfmuMemRelease(struct net_device *prNetDev, UINT_8 *prInBuf);
 
-#if CFG_SUPPORT_MU_MIMO
 int Set_MUGetInitMCS(struct net_device *prNetDev, UINT_8 *prInBuf);
 int Set_MUCalInitMCS(struct net_device *prNetDev, UINT_8 *prInBuf);
 int Set_MUCalLQ(struct net_device *prNetDev, UINT_8 *prInBuf);
@@ -134,18 +129,13 @@ int Set_MUGetQD(struct net_device *prNetDev, UINT_8 *prInBuf);
 int Set_MUSetEnable(struct net_device *prNetDev, UINT_8 *prInBuf);
 int Set_MUSetGID_UP(struct net_device *prNetDev, UINT_8 *prInBuf);
 int Set_MUTriggerTx(struct net_device *prNetDev, UINT_8 *prInBuf);
-#endif
-#endif
 
 int WriteEfuse(struct net_device *prNetDev, UINT_8 *prInBuf);
 int SetTxTargetPower(struct net_device *prNetDev, UINT_8 *prInBuf);
 
-#if (CFG_SUPPORT_DFS_MASTER == 1)
 int SetRddReport(struct net_device *prNetDev, UINT_8 *prInBuf);
 int SetByPassCac(struct net_device *prNetDev, UINT_8 *prInBuf);
 int SetRadarDetectMode(struct net_device *prNetDev, UINT_8 *prInBuf);
-#endif
 
 int AteCmdSetHandle(struct net_device *prNetDev, UINT_8 *prInBuf, UINT_32 u4InBufLen);
-#endif /*CFG_SUPPORT_QA_TOOL */
 #endif /* _GL_ATE_AGENT_H */

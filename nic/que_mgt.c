@@ -98,7 +98,6 @@ const UINT_8 aucWmmAC2TcResourceSet2[WMM_AC_INDEX_NUM] = { TC7_INDEX, TC6_INDEX,
  ********************************************************************************
  */
 
-#if CFG_RX_REORDERING_ENABLED
 #define qmHandleRxPackets_AOSP_1 \
 	do { \
 		/* ToDo[6630]: duplicate removal */ \
@@ -154,7 +153,6 @@ const UINT_8 aucWmmAC2TcResourceSet2[WMM_AC_INDEX_NUM] = { TC7_INDEX, TC6_INDEX,
 			QUEUE_INSERT_TAIL(prReturnedQue, (P_QUE_ENTRY_T)prCurrSwRfb); \
 		} \
 	} while (0)
-#endif
 
 #define RX_DIRECT_REORDER_LOCK(pad, dbg) \
 	do { \
@@ -222,12 +220,12 @@ VOID qmInit(IN P_ADAPTER_T prAdapter, IN BOOLEAN isTxResrouceControlEn)
 
 		prQM->arRxBaTable[u4Idx].fgIsWaitingForPktWithSsn = FALSE;
 		prQM->arRxBaTable[u4Idx].fgHasBubble			  = FALSE;
-#if CFG_SUPPORT_RX_AMSDU
+
 		/* RX reorder for one MSDU in AMSDU issue */
 		prQM->arRxBaTable[u4Idx].u8LastAmsduSubIdx	  = RX_PAYLOAD_FORMAT_MSDU;
 		prQM->arRxBaTable[u4Idx].fgAmsduNeedLastFrame = FALSE;
 		prQM->arRxBaTable[u4Idx].fgIsAmsduDuplicated  = FALSE;
-#endif
+
 		prQM->arRxBaTable[u4Idx].fgFirstSnToWinStart = FALSE;
 		cnmTimerInitTimer(prAdapter, &(prQM->arRxBaTable[u4Idx].rReorderBubbleTimer),
 				(PFN_MGMT_TIMEOUT_FUNC)qmHandleReorderBubbleTimeout, (ULONG)(&prQM->arRxBaTable[u4Idx]));
@@ -1120,8 +1118,6 @@ VOID qmDetermineStaRecIndex(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInf
 	case OP_MODE_INFRASTRUCTURE:
 	case OP_MODE_BOW:
 		if (prBssInfo->prStaRecOfAP) {
-#if CFG_SUPPORT_TDLS
-
 			prTempStaRec = cnmGetTdlsPeerByAddress(prAdapter, prBssInfo->ucBssIndex, prMsduInfo->aucEthDestAddr);
 			if (IS_DLS_STA(prTempStaRec) && prTempStaRec->ucStaState == STA_STATE_3) {
 				if (g_arTdlsLink[prTempStaRec->ucTdlsIndex]) {
@@ -1129,7 +1125,6 @@ VOID qmDetermineStaRecIndex(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInf
 					return;
 				}
 			}
-#endif
 			/* 4 <2> Check if an AP STA is present */
 			prTempStaRec = prBssInfo->prStaRecOfAP;
 
@@ -1228,7 +1223,6 @@ qmDequeueTxPacketsFromPerStaQueues(
 		return u4CurrentQuota;
 	}
 
-#ifdef CFG_SUPPORT_MULTICAST_ENHANCEMENT
 	/* check all active peer has one VO mapping to TC3_INDEX
 		based on aucTid2ACI & arNetwork2TcResource
 		TID6/7 => WMM_AC_VO_INDEX => TC3_INDEX
@@ -1276,7 +1270,6 @@ qmDequeueTxPacketsFromPerStaQueues(
 			return 0;
 		}
 	}
-#endif
 
 	/* 4 <1> Assign init value */
 	u4AvaliableResource = u4CurrentQuota;
@@ -1617,12 +1610,8 @@ qmDequeueTxPacketsFromGlobalQueue(
 	QUE_T		  rMergeQue;
 	P_QUE_T		  prMergeQue;
 	P_QUE_MGT_T	  prQM;
-#if (HIF_TX_RSRC_WMM_ENHANCE == 1)
-	UINT_8 ucWmmSet, i;
-#ifdef CFG_SUPPORT_MULTICAST_ENHANCEMENT
-	UINT_8 ucBmcTcIdx;
-#endif
-#endif
+	UINT_8		  ucWmmSet, i;
+	UINT_8		  ucBmcTcIdx;
 
 	DBGLOG(QM, LOUD, "Enter %s (TC = %d, quota = %u)\n", __func__, ucTC, u4CurrentQuota);
 
@@ -1637,13 +1626,8 @@ qmDequeueTxPacketsFromGlobalQueue(
 	/*check if it is a TC that supports BCM_IDX too.*/
 	ucWmmSet = 0xFF;
 	for (i = 0; i < HW_WMM_NUM; i++) {
-#ifdef CFG_SUPPORT_MULTICAST_ENHANCEMENT
 		ucBmcTcIdx = qmFuncGetBmcTcIdx(0);
-		if (ucTC == arTcRemapTable[i][ucBmcTcIdx])
-#else
-		if (ucTC == arTcRemapTable[i][BMC_TC_INDEX])
-#endif
-		{
+		if (ucTC == arTcRemapTable[i][ucBmcTcIdx]) {
 			ucWmmSet = i;
 			break;
 		}
@@ -1716,11 +1700,7 @@ P_MSDU_INFO_T qmDequeueTxPackets(IN P_ADAPTER_T prAdapter, IN P_TX_TCQ_STATUS_T 
 	P_MSDU_INFO_T prReturnedPacketListHead;
 	QUE_T		  rReturnedQue;
 	UINT_32		  u4MaxQuotaLimit;
-#if (HIF_TX_RSRC_WMM_ENHANCE == 1)
-#ifdef CFG_SUPPORT_MULTICAST_ENHANCEMENT
-	UINT_8 ucBmcTcIdx;
-#endif
-#endif
+	UINT_8		  ucBmcTcIdx;
 
 	DBGLOG(QM, LOUD, "Enter qmDequeueTxPackets\n");
 
@@ -1749,29 +1729,10 @@ P_MSDU_INFO_T qmDequeueTxPackets(IN P_ADAPTER_T prAdapter, IN P_TX_TCQ_STATUS_T 
 		else
 			u4MaxQuotaLimit = (UINT_32)prTcqStatus->au4MaxNumOfPage[i];
 
-#if (HIF_TX_RSRC_WMM_ENHANCE == 1)
-#ifdef CFG_SUPPORT_MULTICAST_ENHANCEMENT
 		ucBmcTcIdx = qmFuncGetBmcTcIdx(0);
 
 		if ((i == ucBmcTcIdx) || (i == arTcRemapTable[1][ucBmcTcIdx]) || (i == arTcRemapTable[2][ucBmcTcIdx]) ||
 				(i == arTcRemapTable[3][ucBmcTcIdx]))
-#else
-		if ((i == BMC_TC_INDEX) || (i == arTcRemapTable[1][BMC_TC_INDEX]) || (i == arTcRemapTable[2][BMC_TC_INDEX]) ||
-				(i == arTcRemapTable[3][BMC_TC_INDEX]))
-#endif
-#else
-#ifdef CFG_SUPPORT_MULTICAST_ENHANCEMENT
-		/* Due to dynamic BMC TC index feature.
-		 *  Replace this MACRO to a true TC index which BMC would use.
-		 *
-		 *  Always get TcIdx from WmmSet0 as there is only one WmmSet
-		 *  when Tx Wmm Res Enhancement is disabled
-		 */
-		if (i == qmFuncGetBmcTcIdx(0))
-#else
-		if (i == BMC_TC_INDEX)
-#endif
-#endif
 			qmDequeueTxPacketsFromPerTypeQueues(
 					prAdapter, &rReturnedQue, (UINT_8)i, prTcqStatus->au4FreePageCount[i], u4MaxQuotaLimit);
 		else
@@ -2075,12 +2036,8 @@ VOID qmUpdateAverageTxQueLen(IN P_ADAPTER_T prAdapter)
 	P_STA_RECORD_T prStaRec;
 	P_QUE_MGT_T	   prQM = &prAdapter->rQM;
 	P_BSS_INFO_T   prBssInfo;
-#if (HIF_TX_RSRC_WMM_ENHANCE == 0)
-	INT_32 u4CurrQueLen;
-#endif
-#if (HIF_TX_RSRC_WMM_ENHANCE == 1)
-	UINT_32 arStaQNum[TC_NUM] = { 0 }, ucBcmCnt;
-	UINT_8	ucWmmSet		  = 0;
+	UINT_32		   arStaQNum[TC_NUM] = { 0 }, ucBcmCnt;
+	UINT_8		   ucWmmSet			 = 0;
 
 	/* 1. Collect stations' each queue length*/
 	/*based on AC q index to search all STA_TxQ*/
@@ -2120,50 +2077,6 @@ VOID qmUpdateAverageTxQueLen(IN P_ADAPTER_T prAdapter)
 		/*Update total queue length for each TC*/
 		qmCalAveQLen(prQM, u4Tc, ucBcmCnt + arStaQNum[u4Tc]);
 	}
-#else
-
-	/* 4 <1> Update the queue lengths for TC0 to TC3 (skip TC4) and TC5 */
-	for (u4Tc = 0; u4Tc < QM_ACTIVE_TC_NUM; u4Tc++) {
-		u4CurrQueLen = 0;
-
-		/* Calculate per-STA queue length */
-		if (u4Tc < NUM_OF_PER_STA_TX_QUEUES) {
-			for (u4StaRecIdx = 0; u4StaRecIdx < CFG_STA_REC_NUM; u4StaRecIdx++) {
-				prStaRec = cnmGetStaRecByIndex(prAdapter, u4StaRecIdx);
-				if (prStaRec) {
-					prBssInfo = GET_BSS_INFO_BY_INDEX(prAdapter, prStaRec->ucBssIndex);
-
-					/* If the STA is activated, get the queue length */
-					if ((prStaRec->fgIsValid) && (!prBssInfo->fgIsNetAbsent))
-						u4CurrQueLen += (prStaRec->arTxQueue[u4Tc].u4NumElem);
-				}
-			}
-		}
-
-#ifdef CFG_SUPPORT_MULTICAST_ENHANCEMENT
-		/* Due to dynamic BMC TC index feature.
-		 *  Replace this MACRO to a true TC index which BMC would use.
-		 *
-		 *  Always get TcIdx from WmmSet0 as there is only one WmmSet
-		 *  when Tx Wmm Res Enhancement is disabled
-		 */
-		if (u4Tc == qmFuncGetBmcTcIdx(0)) {
-#else
-		if (u4Tc == BMC_TC_INDEX) {
-#endif
-			/* Update the queue length for (BMCAST) */
-			u4CurrQueLen += prQM->arTxQueue[TX_QUEUE_INDEX_BMCAST].u4NumElem;
-		}
-
-		if (prQM->au4AverageQueLen[u4Tc] == 0) {
-			prQM->au4AverageQueLen[u4Tc] = (u4CurrQueLen << prQM->u4QueLenMovingAverage);
-		} else {
-			prQM->au4AverageQueLen[u4Tc] -= (prQM->au4AverageQueLen[u4Tc] >> prQM->u4QueLenMovingAverage);
-			prQM->au4AverageQueLen[u4Tc] += (u4CurrQueLen);
-		}
-	}
-
-#endif
 }
 
 VOID qmAllocateResidualTcResource(
@@ -2561,7 +2474,6 @@ VOID qmInitRxQueues(IN P_ADAPTER_T prAdapter)
 /*----------------------------------------------------------------------------*/
 P_SW_RFB_T qmHandleRxPackets(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfbListHead)
 {
-#if CFG_RX_REORDERING_ENABLED
 	/* UINT_32 i; */
 	P_SW_RFB_T		   prCurrSwRfb;
 	P_SW_RFB_T		   prNextSwRfb;
@@ -2571,12 +2483,8 @@ P_SW_RFB_T qmHandleRxPackets(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfbList
 	PUINT_8			   pucEthDestAddr;
 	BOOLEAN			   fgIsBMC, fgIsHTran;
 	BOOLEAN			   fgMicErr;
-#if CFG_SUPPORT_REPLAY_DETECTION
-	UINT_8		 ucBssIndexRly = 0;
-	P_BSS_INFO_T prBssInfoRly  = NULL;
-#endif
-
-	/* DbgPrint("QM: Enter qmHandleRxPackets()\n"); */
+	UINT_8			   ucBssIndexRly = 0;
+	P_BSS_INFO_T	   prBssInfoRly	 = NULL;
 
 	DEBUGFUNC("qmHandleRxPackets");
 
@@ -2598,17 +2506,6 @@ P_SW_RFB_T qmHandleRxPackets(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfbList
 		prCurrSwRfb->eDst = RX_PKT_DESTINATION_HOST;
 
 		/* Decide the Destination */
-#if CFG_RX_PKTS_DUMP
-		if (prAdapter->rRxCtrl.u4RxPktsDumpTypeMask & BIT(HIF_RX_PKT_TYPE_DATA)) {
-			DBGLOG(SW4, INFO, "QM RX DATA: sta idx %u wlan idx %u ssn:%u\n", prCurrSwRfb->ucStaRecIdx,
-					prRxStatus->ucWlanIdx, prCurrSwRfb->u2SSN);
-			DBGLOG(SW4, INFO, "QM RX DATA: tid %u ptype %u reorder %u\n", HAL_RX_STATUS_GET_TID(prRxStatus),
-					prCurrSwRfb->ucPacketType, prCurrSwRfb->fgReorderBuffer);
-
-			DBGLOG_MEM8(SW4, TRACE, (PUINT_8)prCurrSwRfb->pvHeader, prCurrSwRfb->u2PacketLen);
-		}
-#endif
-
 		fgIsBMC	  = HAL_RX_STATUS_IS_BC(prRxStatus) | HAL_RX_STATUS_IS_MC(prRxStatus);
 		fgIsHTran = FALSE;
 		if (HAL_RX_STATUS_GET_HEADER_TRAN(prRxStatus) == TRUE) {
@@ -2646,16 +2543,10 @@ P_SW_RFB_T qmHandleRxPackets(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfbList
 				prCurrSwRfb->ucWlanIdx = prCurrSwRfb->prStaRec->ucWlanIndex;
 				GLUE_SET_PKT_BSS_IDX(prCurrSwRfb->pvPacket, secGetBssIdxByWlanIdx(prAdapter, prCurrSwRfb->ucWlanIdx));
 			}
-			/* ASSERT(prAdapter->rWifiVar.arWtbl[prCurrSwRfb->ucWlanIdx].ucUsed); */
-			if (prAdapter->rRxCtrl.rFreeSwRfbList.u4NumElem > (CFG_RX_MAX_PKT_NUM - CFG_NUM_OF_QM_RX_PKT_NUM) || TRUE) {
+
+			if (prAdapter->rRxCtrl.rFreeSwRfbList.u4NumElem > (CFG_RX_MAX_PKT_NUM - HIF_NUM_OF_QM_RX_PKT_NUM) || TRUE) {
 				ucBssIndex = prCurrSwRfb->prStaRec->ucBssIndex;
 				prBssInfo  = GET_BSS_INFO_BY_INDEX(prAdapter, ucBssIndex);
-				/* DBGLOG_MEM8(QM, TRACE,prCurrSwRfb->pvHeader, 16); */
-				/*  */
-
-				/* if ((OP_MODE_ACCESS_POINT != prBssInfo->eCurrentOPMode)) { */
-				/* fgIsBMC = HAL_RX_STATUS_IS_BC(prRxStatus) | HAL_RX_STATUS_IS_MC(prRxStatus); */
-				/* } */
 
 				if (!IS_BSS_ACTIVE(prBssInfo)) {
 					DBGLOG(QM, TRACE, "Mark NULL the Packet for inactive Bss %u\n", ucBssIndex);
@@ -2684,9 +2575,7 @@ P_SW_RFB_T qmHandleRxPackets(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfbList
 				continue;
 			}
 
-		}
-#if CFG_KEY_ERROR_STATISTIC_RECOVERY
-		else {
+		} else {
 			UINT_16				u2AisFrameCtrl = 0;
 			P_WLAN_MAC_HEADER_T prWlanHeader   = NULL;
 			P_BSS_INFO_T		prAisBssInfo   = NULL;
@@ -2725,7 +2614,6 @@ P_SW_RFB_T qmHandleRxPackets(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfbList
 				}
 			}
 		}
-#endif
 
 		/* Todo:: Move the data class error check here */
 
@@ -2748,21 +2636,17 @@ P_SW_RFB_T qmHandleRxPackets(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfbList
 		}
 #endif
 
-#if CFG_SUPPORT_AMSDU_ATTACK_DETECTION
 		if (prCurrSwRfb->fgDataFrame && prCurrSwRfb->prStaRec && qmAmsduAttackDetection(prAdapter, prCurrSwRfb)) {
 			prCurrSwRfb->eDst = RX_PKT_DESTINATION_NULL;
 			DBGLOG(QM, INFO, "drop AMSDU attack packet SN:%d\n", prCurrSwRfb->u2SSN);
 		}
-#endif /* CFG_SUPPORT_AMSDU_ATTACK_DETECTION */
 
-#if CFG_SUPPORT_FAKE_EAPOL_DETECTION
 		if (prCurrSwRfb->fgDataFrame && prCurrSwRfb->prStaRec && qmDetectRxInvalidEAPOL(prAdapter, prCurrSwRfb)) {
 			prCurrSwRfb->eDst = RX_PKT_DESTINATION_NULL;
 			QUEUE_INSERT_TAIL(prReturnedQue, (P_QUE_ENTRY_T)prCurrSwRfb);
 			DBGLOG(QM, INFO, "Drop by EAPOL filter\n");
 			continue;
 		}
-#endif /* CFG_SUPPORT_FAKE_EAPOL_DETECTION */
 
 		if (prCurrSwRfb->fgReorderBuffer && !fgIsBMC && fgIsHTran) {
 			/* If this packet should dropped or indicated to the host immediately,
@@ -2839,16 +2723,8 @@ P_SW_RFB_T qmHandleRxPackets(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfbList
 		QM_TX_SET_NEXT_MSDU_INFO((P_SW_RFB_T)QUEUE_GET_TAIL(prReturnedQue), NULL);
 
 	return (P_SW_RFB_T)QUEUE_GET_HEAD(prReturnedQue);
-
-#else
-
-	/* DbgPrint("QM: Enter qmHandleRxPackets()\n"); */
-	return prSwRfbListHead;
-
-#endif
 }
 
-#if CFG_SUPPORT_FAKE_EAPOL_DETECTION
 /*----------------------------------------------------------------------------*/
 /*!
  * \brief qmDetectRxInvalidEAPOL() is used for fake EAPOL checking.
@@ -3004,9 +2880,7 @@ UINT_8 qmDetectRxInvalidEAPOL(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb)
 
 	return fgDrop;
 }
-#endif /* CFG_SUPPORT_FAKE_EAPOL_DETECTION */
 
-#if CFG_SUPPORT_AMSDU_ATTACK_DETECTION
 /*----------------------------------------------------------------------------*/
 /*!
  * \brief AMSDU Attack Detection
@@ -3131,7 +3005,6 @@ UINT_8 qmAmsduAttackDetection(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb)
 
 	return fgDrop;
 }
-#endif /* CFG_SUPPORT_AMSDU_ATTACK_DETECTION */
 
 /*----------------------------------------------------------------------------*/
 /*!
@@ -3149,12 +3022,9 @@ VOID qmProcessPktWithReordering(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb,
 	P_HW_MAC_RX_DESC_T		  prRxStatus;
 	P_HW_MAC_RX_STS_GROUP_4_T prRxStatusGroup4 = NULL;
 	P_RX_BA_ENTRY_T			  prReorderQueParm = NULL;
+	UINT_8					  u8AmsduSubframeIdx;
+	UINT_32					  u4SeqNo;
 
-	/* P_SW_RFB_T prReorderedSwRfb; */
-#if CFG_SUPPORT_RX_AMSDU
-	UINT_8	u8AmsduSubframeIdx;
-	UINT_32 u4SeqNo;
-#endif
 	DEBUGFUNC("qmProcessPktWithReordering");
 
 	ASSERT(prSwRfb);
@@ -3204,9 +3074,7 @@ VOID qmProcessPktWithReordering(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb,
 		ASSERT(prRxStatusGroup4);
 	}
 
-#if CFG_SUPPORT_RX_AMSDU
 	/* RX reorder for one MSDU in AMSDU issue */
-	/* QUEUE_INITIALIZE(&prSwRfb->rAmsduQue); */
 
 	u8AmsduSubframeIdx = HAL_RX_STATUS_GET_PAYLOAD_FORMAT(prRxStatus);
 
@@ -3251,7 +3119,6 @@ VOID qmProcessPktWithReordering(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb,
 	}
 
 	prReorderQueParm->u4SeqNo = u4SeqNo;
-#endif
 
 	RX_DIRECT_REORDER_LOCK(prAdapter, 0);
 	/* After resuming, WinStart and WinEnd are obsolete and unsync
@@ -3348,10 +3215,8 @@ VOID qmProcessBarFrame(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb, OUT P_QU
 		prReorderQueParm->u2WinStart = (UINT_16)u4SSN;
 		prReorderQueParm->u2WinEnd =
 				((prReorderQueParm->u2WinStart) + (prReorderQueParm->u2WinSize) - 1) % MAX_SEQ_NO_COUNT;
-#if CFG_SUPPORT_RX_AMSDU
 		/* RX reorder for one MSDU in AMSDU issue */
 		prReorderQueParm->u8LastAmsduSubIdx = RX_PAYLOAD_FORMAT_MSDU;
-#endif
 		DBGLOG(QM, TRACE, "QM:(BAR)[%d](%ld){%d,%d}\n", prSwRfb->ucTid, u4SSN, prReorderQueParm->u2WinStart,
 				prReorderQueParm->u2WinEnd);
 		qmPopOutDueToFallAhead(prAdapter, prReorderQueParm, prReturnedQue);
@@ -3394,10 +3259,9 @@ VOID qmInsertReorderPkt(
 			prReorderQueParm->u2WinEnd =
 					((prReorderQueParm->u2WinStart) + (prReorderQueParm->u2WinSize) - 1) % MAX_SEQ_NO_COUNT;
 			prReorderQueParm->fgIsWaitingForPktWithSsn = FALSE;
-#if CFG_SUPPORT_RX_AMSDU
+
 			/* RX reorder for one MSDU in AMSDU issue */
 			prReorderQueParm->u8LastAmsduSubIdx = RX_PAYLOAD_FORMAT_MSDU;
-#endif
 		}
 #endif
 
@@ -3431,10 +3295,10 @@ VOID qmInsertReorderPkt(
 		prReorderQueParm->u2WinStart =
 				(((prReorderQueParm->u2WinEnd) - (prReorderQueParm->u2WinSize) + MAX_SEQ_NO_COUNT + 1) %
 						MAX_SEQ_NO_COUNT);
-#if CFG_SUPPORT_RX_AMSDU
+
 		/* RX reorder for one MSDU in AMSDU issue */
 		prReorderQueParm->u8LastAmsduSubIdx = RX_PAYLOAD_FORMAT_MSDU;
-#endif
+
 		u4BeforeCount = prReorderQueParm->rReOrderQue.u4NumElem;
 		qmPopOutDueToFallAhead(prAdapter, prReorderQueParm, prReturnedQue);
 
@@ -3507,7 +3371,6 @@ VOID qmInsertFallWithinReorderPkt(
 		do {
 			/* Case 1: Terminate. A duplicate packet */
 			if (((prExaminedQueuedSwRfb->u2SSN) == (prSwRfb->u2SSN))) {
-#if CFG_SUPPORT_RX_AMSDU
 				/* RX reorder for one MSDU in AMSDU issue */
 				/* if middle or last and first is not duplicated, not a duplicat packet */
 				if (!prReorderQueParm->fgIsAmsduDuplicated &&
@@ -3522,7 +3385,7 @@ VOID qmInsertFallWithinReorderPkt(
 				/* if first is duplicated, drop subsequent middle and last frames */
 				if (u8AmsduSubframeIdx == RX_PAYLOAD_FORMAT_FIRST_SUB_AMSDU)
 					prReorderQueParm->fgIsAmsduDuplicated = TRUE;
-#endif
+
 				prSwRfb->eDst = RX_PKT_DESTINATION_NULL;
 				qmPopOutReorderPkt(prAdapter, prSwRfb, prReturnedQue, RX_DUPICATE_DROP_COUNT);
 				return;
@@ -3536,9 +3399,9 @@ VOID qmInsertFallWithinReorderPkt(
 			else
 				prExaminedQueuedSwRfb = (P_SW_RFB_T)(((P_QUE_ENTRY_T)prExaminedQueuedSwRfb)->prNext);
 		} while (prExaminedQueuedSwRfb);
-#if CFG_SUPPORT_RX_AMSDU
+
 		prReorderQueParm->fgIsAmsduDuplicated = FALSE;
-#endif
+
 		/* Update the Reorder Queue Parameters according to the found insert position */
 		if (prExaminedQueuedSwRfb == NULL) {
 			/* The received packet shall be placed at the tail */
@@ -3570,10 +3433,10 @@ VOID qmInsertFallAheadReorderPkt(
 	ASSERT(prSwRfb);
 	ASSERT(prReorderQueParm);
 	ASSERT(prReturnedQue);
-#if CFG_SUPPORT_RX_AMSDU
+
 	/* RX reorder for one MSDU in AMSDU issue */
 	prReorderQueParm->fgIsAmsduDuplicated = FALSE;
-#endif
+
 	prReorderQue = &(prReorderQueParm->rReOrderQue);
 
 	/* There are no packets queued in the Reorder Queue */
@@ -3633,7 +3496,7 @@ VOID qmPopOutDueToFallWithin(IN P_ADAPTER_T prAdapter, IN P_RX_BA_ENTRY_T prReor
 		/* RX reorder for one MSDU in AMSDU issue */
 		prRxStatus		  = prReorderedSwRfb->prRxStatus;
 		fgIsAmsduSubframe = HAL_RX_STATUS_GET_PAYLOAD_FORMAT(prRxStatus);
-#if CFG_SUPPORT_RX_AMSDU
+
 		/* If SN + 1 come and last frame is first or middle, update winstart */
 		if ((qmCompareSnIsLessThan((prReorderQueParm->u2WinStart), (prReorderedSwRfb->u2SSN))) &&
 				(prReorderQueParm->u4SeqNo != prReorderQueParm->u2WinStart)) {
@@ -3643,7 +3506,7 @@ VOID qmPopOutDueToFallWithin(IN P_ADAPTER_T prAdapter, IN P_RX_BA_ENTRY_T prReor
 				prReorderQueParm->u8LastAmsduSubIdx = RX_PAYLOAD_FORMAT_MSDU;
 			}
 		}
-#endif
+
 		/* SN == WinStart, so the head packet shall be indicated (advance the window) */
 		if ((prReorderedSwRfb->u2SSN) == (prReorderQueParm->u2WinStart)) {
 			fgDequeuHead = TRUE;
@@ -3651,9 +3514,8 @@ VOID qmPopOutDueToFallWithin(IN P_ADAPTER_T prAdapter, IN P_RX_BA_ENTRY_T prReor
 			/* if last frame, winstart++. Otherwise, keep winstart */
 			if (fgIsAmsduSubframe == RX_PAYLOAD_FORMAT_LAST_SUB_AMSDU || fgIsAmsduSubframe == RX_PAYLOAD_FORMAT_MSDU)
 				prReorderQueParm->u2WinStart = (((prReorderedSwRfb->u2SSN) + 1) % MAX_SEQ_NO_COUNT);
-#if CFG_SUPPORT_RX_AMSDU
+
 			prReorderQueParm->u8LastAmsduSubIdx = fgIsAmsduSubframe;
-#endif
 		}
 		/* SN > WinStart, break to update WinEnd */
 		else {
@@ -3674,11 +3536,10 @@ VOID qmPopOutDueToFallWithin(IN P_ADAPTER_T prAdapter, IN P_RX_BA_ENTRY_T prReor
 						prReorderedSwRfb->u2SSN);
 				fgDequeuHead				 = TRUE;
 				prReorderQueParm->u2WinStart = (((prReorderedSwRfb->u2SSN) + 1) % MAX_SEQ_NO_COUNT);
-#if CFG_SUPPORT_RX_AMSDU
+
 				/* RX reorder for one MSDU in AMSDU issue */
 				prReorderQueParm->u8LastAmsduSubIdx = RX_PAYLOAD_FORMAT_MSDU;
-#endif
-				fgMissing = FALSE;
+				fgMissing							= FALSE;
 			} else
 				break;
 		}
@@ -3733,7 +3594,7 @@ VOID qmPopOutDueToFallAhead(IN P_ADAPTER_T prAdapter, IN P_RX_BA_ENTRY_T prReord
 		/* RX reorder for one MSDU in AMSDU issue */
 		prRxStatus		  = prReorderedSwRfb->prRxStatus;
 		fgIsAmsduSubframe = HAL_RX_STATUS_GET_PAYLOAD_FORMAT(prRxStatus);
-#if CFG_SUPPORT_RX_AMSDU
+
 		/* If SN + 1 come and last frame is first or middle, update winstart */
 		if ((qmCompareSnIsLessThan((prReorderQueParm->u2WinStart), (prReorderedSwRfb->u2SSN))) &&
 				(prReorderQueParm->u4SeqNo != prReorderQueParm->u2WinStart)) {
@@ -3743,7 +3604,7 @@ VOID qmPopOutDueToFallAhead(IN P_ADAPTER_T prAdapter, IN P_RX_BA_ENTRY_T prReord
 				prReorderQueParm->u8LastAmsduSubIdx = RX_PAYLOAD_FORMAT_MSDU;
 			}
 		}
-#endif
+
 		/* SN == WinStart, so the head packet shall be indicated (advance the window) */
 		if ((prReorderedSwRfb->u2SSN) == (prReorderQueParm->u2WinStart)) {
 			fgDequeuHead = TRUE;
@@ -3751,9 +3612,9 @@ VOID qmPopOutDueToFallAhead(IN P_ADAPTER_T prAdapter, IN P_RX_BA_ENTRY_T prReord
 			/* if last frame, winstart++. Otherwise, keep winstart */
 			if (fgIsAmsduSubframe == RX_PAYLOAD_FORMAT_LAST_SUB_AMSDU || fgIsAmsduSubframe == RX_PAYLOAD_FORMAT_MSDU)
 				prReorderQueParm->u2WinStart = (((prReorderedSwRfb->u2SSN) + 1) % MAX_SEQ_NO_COUNT);
-#if CFG_SUPPORT_RX_AMSDU
+
 			prReorderQueParm->u8LastAmsduSubIdx = fgIsAmsduSubframe;
-#endif
+
 		}
 
 		/* SN < WinStart, so the head packet shall be indicated (do not advance the window) */
@@ -3929,9 +3790,9 @@ VOID qmHandleEventCheckReorderBubble(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T
 		prReorderQueParm->u2WinStart = prReorderedSwRfb->u2SSN + 1;
 		prReorderQueParm->u2WinEnd =
 				((prReorderQueParm->u2WinStart) + (prReorderQueParm->u2WinSize) - 1) % MAX_SEQ_NO_COUNT;
-#if CFG_SUPPORT_RX_AMSDU
+
 		prReorderQueParm->u8LastAmsduSubIdx = RX_PAYLOAD_FORMAT_MSDU;
-#endif
+
 		qmPopOutDueToFallAhead(prAdapter, prReorderQueParm, prReturnedQue);
 
 		DBGLOG(QM, TRACE, "QM:(Bub Flush) STA[%u] TID[%u] BubSN[%u] Win{%d, %d}\n", prReorderQueParm->ucStaRecIdx,
@@ -4156,12 +4017,11 @@ BOOL qmAddRxBaEntry(
 		prRxBaEntry->u2WinStart	 = u2WinStart;
 		prRxBaEntry->u2WinSize	 = u2WinSize;
 		prRxBaEntry->u2WinEnd	 = ((u2WinStart + u2WinSize - 1) % MAX_SEQ_NO_COUNT);
-#if CFG_SUPPORT_RX_AMSDU
+
 		/* RX reorder for one MSDU in AMSDU issue */
-		prRxBaEntry->u8LastAmsduSubIdx	  = RX_PAYLOAD_FORMAT_MSDU;
-		prRxBaEntry->fgAmsduNeedLastFrame = FALSE;
-		prRxBaEntry->fgIsAmsduDuplicated  = FALSE;
-#endif
+		prRxBaEntry->u8LastAmsduSubIdx		  = RX_PAYLOAD_FORMAT_MSDU;
+		prRxBaEntry->fgAmsduNeedLastFrame	  = FALSE;
+		prRxBaEntry->fgIsAmsduDuplicated	  = FALSE;
 		prRxBaEntry->fgIsValid				  = TRUE;
 		prRxBaEntry->fgIsWaitingForPktWithSsn = TRUE;
 		prRxBaEntry->fgHasBubble			  = FALSE;
@@ -4241,17 +4101,6 @@ VOID qmDelRxBaEntry(IN P_ADAPTER_T prAdapter, IN UINT_8 ucStaRecIdx, IN UINT_8 u
 
 		DBGLOG(QM, INFO, "QM: -RxBA(STA=%d,TID=%d)\n", ucStaRecIdx, ucTid);
 	}
-
-	/* Debug */
-#if CFG_HIF_RX_STARVATION_WARNING
-	{
-		P_RX_CTRL_T prRxCtrl;
-
-		prRxCtrl = &prAdapter->rRxCtrl;
-		DBGLOG(QM, TRACE, "QM: (RX DEBUG) Enqueued: %d / Dequeued: %d\n", prRxCtrl->u4QueuedCnt,
-				prRxCtrl->u4DequeuedCnt);
-	}
-#endif
 }
 
 VOID mqmParseAssocReqWmmIe(IN P_ADAPTER_T prAdapter, IN PUINT_8 pucIE, IN P_STA_RECORD_T prStaRec)
@@ -4741,12 +4590,8 @@ VOID mqmProcessScanResult(IN P_ADAPTER_T prAdapter, IN P_BSS_DESC_T prScanResult
 	{
 		switch (IE_ID(pucIE)) {
 		case ELEM_ID_EXTENDED_CAP:
-#if CFG_SUPPORT_TDLS
 			TdlsBssExtCapParse(prStaRec, pucIE);
-#endif /* CFG_SUPPORT_TDLS */
-#if CFG_SUPPORT_802_11V_BSS_TRANSITION_MGT
 			prStaRec->fgSupportBTM = !!((*(PUINT_32)(pucIE + 2)) & BIT(ELEM_EXT_CAP_BSS_TRANSITION_BIT));
-#endif
 			break;
 
 		case ELEM_ID_WMM:
@@ -5043,7 +4888,6 @@ VOID mqmGenerateWmmParamIE(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo
 	prMsduInfo->u2FrameLength += IE_SIZE(prIeWmmParam);
 }
 
-#if CFG_SUPPORT_TDLS
 /*----------------------------------------------------------------------------*/
 /*!
  * @brief Generate the WMM Param IE
@@ -5164,8 +5008,6 @@ UINT_32 mqmGenerateWmmParamIEByParam(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssIn
 	return IE_SIZE(prIeWmmParam);
 }
 
-#endif
-
 BOOLEAN isProbeResponse(IN P_MSDU_INFO_T prMgmtTxMsdu)
 {
 	P_WLAN_MAC_HEADER_T prWlanHdr = (P_WLAN_MAC_HEADER_T)NULL;
@@ -5260,7 +5102,6 @@ qmGetFrameAction(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex, IN UINT_8 ucSta
 		}
 
 		/* <6> Timeout check! */
-#if CFG_ENABLE_PKT_LIFETIME_PROFILE
 		if ((eFrameAction == FRAME_ACTION_QUEUE_PKT) && prMsduInfo) {
 			OS_SYSTIME rCurrentTime, rEnqTime;
 
@@ -5273,7 +5114,6 @@ qmGetFrameAction(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex, IN UINT_8 ucSta
 						prWifiVar->u4MgmtQueueDelayTimeout);
 			}
 		}
-#endif
 	}
 
 	return eFrameAction;
@@ -5533,7 +5373,7 @@ UINT_32 qmGetRxReorderQueuedBufferCount(IN P_ADAPTER_T prAdapter)
 	for (i = 0; i < CFG_NUM_OF_RX_BA_AGREEMENTS; i++) {
 		u4Total += prQM->arRxBaTable[i].rReOrderQue.u4NumElem;
 	}
-	ASSERT(u4Total <= (CFG_NUM_OF_QM_RX_PKT_NUM * 2));
+	ASSERT(u4Total <= (HIF_NUM_OF_QM_RX_PKT_NUM * 2));
 	return u4Total;
 }
 
@@ -5699,7 +5539,6 @@ VOID qmResetTcControlResource(IN P_ADAPTER_T prAdapter)
 }
 #endif
 
-#if CFG_SUPPORT_REPLAY_DETECTION
 /* To change PN number to UINT64 */
 #define CCMPTSCPNNUM 6
 BOOLEAN qmRxPNtoU64(PUINT_8 pucPN, UINT_8 uPNNum, PUINT_64 pu8Rets)
@@ -5829,7 +5668,6 @@ BOOLEAN qmHandleRxReplay(P_ADAPTER_T prAdapter, P_SW_RFB_T prSwRfb)
 	return FALSE;
 }
 
-#ifdef CFG_SUPPORT_MULTICAST_ENHANCEMENT
 void qmFuncChangeBmcTcIdx(UINT_8 ucAc)
 {
 	UINT_8 i;
@@ -5844,5 +5682,3 @@ UINT_8 qmFuncGetBmcTcIdx(UINT_8 ucWmmIdx)
 {
 	return arNetwork2TcResource[ucWmmIdx][NET_TC_BMC_INDEX];
 }
-#endif
-#endif

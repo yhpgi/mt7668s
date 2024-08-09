@@ -118,13 +118,11 @@ VOID rlmObssScanDone(P_ADAPTER_T prAdapter, P_MSG_HDR_T prMsgHdr)
 
 	cnmMemFree(prAdapter, prMsgHdr);
 
-#if CFG_ENABLE_WIFI_DIRECT
 	/* AP mode */
 	if ((prAdapter->fgIsP2PRegistered) && (IS_NET_ACTIVE(prAdapter, prBssInfo->ucBssIndex)) &&
 			(prBssInfo->eCurrentOPMode == OP_MODE_ACCESS_POINT)) {
 		return;
 	}
-#endif
 
 	/* STA mode */
 	if (prBssInfo->eCurrentOPMode != OP_MODE_INFRASTRUCTURE || !RLM_NET_PARAM_VALID(prBssInfo) ||
@@ -212,7 +210,6 @@ static VOID rlmObssScanTimeout(P_ADAPTER_T prAdapter, ULONG ulParamPtr)
 	prBssInfo = (P_BSS_INFO_T)ulParamPtr;
 	ASSERT(prBssInfo);
 
-#if CFG_ENABLE_WIFI_DIRECT
 	/* AP mode */
 	if (prAdapter->fgIsP2PRegistered && (IS_NET_ACTIVE(prAdapter, prBssInfo->ucBssIndex)) &&
 			(prBssInfo->eCurrentOPMode == OP_MODE_ACCESS_POINT)) {
@@ -222,10 +219,7 @@ static VOID rlmObssScanTimeout(P_ADAPTER_T prAdapter, ULONG ulParamPtr)
 		rlmUpdateParamsForAP(prAdapter, prBssInfo, FALSE);
 
 		return;
-	}
-#if CFG_SUPPORT_WFD
-	/* WFD streaming */
-	else {
+	} else {
 		P_WFD_CFG_SETTINGS_T prWfdCfgSettings = &prAdapter->rWifiVar.rWfdConfigureSettings;
 
 		/* If WFD is enabled & connected */
@@ -236,8 +230,6 @@ static VOID rlmObssScanTimeout(P_ADAPTER_T prAdapter, ULONG ulParamPtr)
 			return;
 		} /* WFD is enabled */
 	}
-#endif
-#endif /* end of CFG_ENABLE_WIFI_DIRECT */
 
 	/* STA mode */
 	if (prBssInfo->eCurrentOPMode != OP_MODE_INFRASTRUCTURE || !RLM_NET_PARAM_VALID(prBssInfo) ||

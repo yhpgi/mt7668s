@@ -15,14 +15,13 @@
  *						E X T E R N A L	R E F E R E N C E S
  ********************************************************************************
  */
+#include <uapi/linux/nl80211.h>
+
 #include "precomp.h"
-#if CFG_SUPPORT_QA_TOOL
 #include "gl_wext.h"
 #include "gl_cfg80211.h"
 #include "gl_ate_agent.h"
 #include "gl_qa_agent.h"
-
-#include <uapi/linux/nl80211.h>
 
 /*******************************************************************************
  *						C O N S T A N T S
@@ -2492,7 +2491,6 @@ INT_32 MT_ATESetTxTargetPower(struct net_device *prNetDev, UINT_8 ucTxTargetPowe
 	return i4Status;
 }
 
-#if (CFG_SUPPORT_DFS_MASTER == 1)
 /*----------------------------------------------------------------------------*/
 /*!
  * \brief  Hook API for Set Rdd Report.
@@ -2565,9 +2563,6 @@ INT_32 MT_ATESetRadarDetectMode(struct net_device *prNetDev, UINT_8 ucRadarDetec
 	return i4Status;
 }
 
-#endif
-
-#if CFG_SUPPORT_TX_BF
 INT_32 TxBfProfileTag_InValid(struct net_device *prNetDev, P_PFMU_PROFILE_TAG1 prPfmuTag1, UINT_8 ucInValid)
 {
 	INT_32 i4Status = 0;
@@ -3422,6 +3417,3 @@ INT_32 TxBfManualAssoc(struct net_device *prNetDev, UINT_8 aucMac[MAC_ADDR_LEN],
 
 	return i4Status;
 }
-
-#endif
-#endif /*CFG_SUPPORT_QA_TOOL */

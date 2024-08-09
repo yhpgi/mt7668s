@@ -152,9 +152,7 @@ typedef struct _CONNECTION_SETTINGS_T {
 	UINT_8	uc2G4BandwidthMode; /* 20/40M or 20M only */ /* Not used */
 	UINT_8	uc5GBandwidthMode; /* 20/40M or 20M only */	 /* Not used */
 
-#if CFG_SUPPORT_802_11D
 	BOOLEAN fgMultiDomainCapabilityEnabled;
-#endif /* CFG_SUPPORT_802_11D */
 
 	BOOL	fgWapiMode;
 	UINT_32 u4WapiSelectedGroupCipher;
@@ -174,9 +172,7 @@ typedef struct _CONNECTION_SETTINGS_T {
 	struct cfg80211_bss *bss;
 
 	BOOLEAN fgIsConnInitialized;
-
 	BOOLEAN fgIsSendAssoc;
-
 	BOOLEAN ucAuthDataLen;
 	/* Temp assign a fixed large number
 	 * Additional elements for Authentication frame,
@@ -185,14 +181,9 @@ typedef struct _CONNECTION_SETTINGS_T {
 	BOOLEAN aucAuthData[AUTH_DATA_MAX_LEN];
 	UINT_8	ucChannelNum;
 
-#if CFG_SUPPORT_OWE
 	/* for OWE info store, when upper layer set rsn info */
 	struct OWE_INFO_T rOweInfo;
-#endif
-
-#if CFG_SUPPORT_H2E
 	struct RSNXE rRsnXE;
-#endif
 } CONNECTION_SETTINGS_T, *P_CONNECTION_SETTINGS_T;
 
 struct _BSS_INFO_T {
@@ -205,20 +196,14 @@ struct _BSS_INFO_T {
 	ENUM_PARAM_MEDIA_STATE_T eConnectionStateIndicated; /* The Media State that report to HOST */
 
 	ENUM_OP_MODE_T eCurrentOPMode; /* Current Operation Mode - Infra/IBSS */
-#if CFG_ENABLE_WIFI_DIRECT
+
 	ENUM_OP_MODE_T eIntendOPMode;
-#endif
-
-#if (CFG_SUPPORT_DFS_MASTER == 1)
 	BOOLEAN fgIsDfsActive;
-#endif
 
-#if CFG_SUPPORT_DBDC_TC6
 	BOOLEAN fgReConnBypassScan;
 	/* Ignore stale state of target BSS
 	 * during DBDC sta reconnect searching to bypass scan
 	 */
-#endif
 
 	BOOLEAN fgIsInUse;	   /* For CNM to assign BSS_INFO */
 	BOOLEAN fgIsNetActive; /* TRUE if this network has been activated */
@@ -229,9 +214,7 @@ struct _BSS_INFO_T {
 
 	UINT_8 ucSSIDLen; /* Length of SSID */
 
-#if CFG_ENABLE_WIFI_DIRECT
 	ENUM_HIDDEN_SSID_TYPE_T eHiddenSsidType; /* For Hidden SSID usage. */
-#endif
 
 	UINT_8 aucSSID[ELEM_MAX_LEN_SSID]; /* SSID used in this BSS */
 
@@ -342,9 +325,8 @@ struct _BSS_INFO_T {
 	UINT_8		   aucCWmaxLog2ForBcast[WMM_AC_INDEX_NUM]; /* For AP mode, broadcast the CWmaxLog2 */
 	AC_QUE_PARMS_T arACQueParmsForBcast[WMM_AC_INDEX_NUM]; /* For AP mode, broadcast the value */
 	UINT_8		   ucWmmQueSet;
-#if (CFG_HW_WMM_BY_BSS == 1)
-	BOOLEAN fgIsWmmInited;
-#endif
+	BOOLEAN 	   fgIsWmmInited;
+
 
 	/*------------------------------------------------------------------------*/
 	/* 802.11n HT operation IE when (prStaRec->ucPhyTypeSet & PHY_TYPE_BIT_HT) */
@@ -413,14 +395,13 @@ struct _BSS_INFO_T {
 	BOOLEAN fgObssActionForcedTo20M; /* GO only */
 	BOOLEAN fgObssBeaconForcedTo20M; /* GO only */
 
-#if CFG_SUPPORT_QUIET
 	TIMER_T rTxQuietTimer;
 	UINT_8	ucQuietPeriod;
 	UINT_16 u2QuietOffset;
 	UINT_16 u2QuietDuration;
 	BOOLEAN fgRequestQuietInterval;
 	BOOLEAN fgIsInQuietInterval;
-#endif
+
 	/*------------------------------------------------------------------------*/
 	/* HW Related Fields (Kevin)                                              */
 	/*------------------------------------------------------------------------*/
@@ -431,14 +412,10 @@ struct _BSS_INFO_T {
 
 	UINT_16 u2DeauthReason;
 
-#if CFG_SUPPORT_TDLS
 	BOOLEAN fgTdlsIsProhibited;
 	BOOLEAN fgTdlsIsChSwProhibited;
-#endif
-#if CFG_SUPPORT_PNO
 	BOOLEAN fgIsPNOEnable;
 	BOOLEAN fgIsNetRequestInActive;
-#endif
 
 	WIFI_WMM_AC_STAT_T arLinkStatistics[WMM_AC_INDEX_NUM]; /*link layer statistics */
 
@@ -446,42 +423,28 @@ struct _BSS_INFO_T {
 
 	UINT_32 u4CoexPhyRateLimit;
 
-#if CFG_SUPPORT_ROAMING_SKIP_ONE_AP
 	UINT_8	ucRoamSkipTimes;
 	BOOLEAN fgGoodRcpiArea;
 	BOOLEAN fgPoorRcpiArea;
-#endif
 
 	BOOLEAN			 fgIsGranted;
 	ENUM_BAND_T		 eBandGranted;
 	UINT_8			 ucPrimaryChannelGranted;
 	PARAM_CUSTOM_ACL rACL;
 
-#if CFG_SUPPORT_802_11W
 	/* AP PMF */
 	struct AP_PMF_CFG rApPmfCfg;
 	/* STA PMF: for encrypted deauth frame */
 	struct completion rDeauthComp;
 	UINT_8			  encryptedDeauthIsInProcess;
-#endif
 
-#if CFG_SUPPORT_REPLAY_DETECTION
 	struct SEC_DETECT_REPLAY_INFO rDetRplyInfo;
-#endif
 
 	PARAM_POWER_MODE ePowerModeFromUser;
 
-#if CFG_SUPPORT_DFS
 	TIMER_T						rCsaTimer;
 	SWITCH_CH_AND_BAND_PARAMS_T CSAParams;
 	UINT_8						fgHasStopTx;
-#endif
-
-#if CFG_STR_DHCP_RENEW_OFFLOAD
-	BOOLEAN fgIsDhcpAcked;
-	UINT_8	aucDhcpServerIpAddr[4];
-	UINT_32 u4DhcpRenewIntv; /* DHCP renew offload interval configured by upper-layer */
-#endif
 };
 
 struct _NEIGHBOR_AP_T {
@@ -541,7 +504,6 @@ struct _AIS_SPECIFIC_BSS_INFO_T {
 	UINT_32			  u4PmkidCacheCount;
 	PMKID_ENTRY_T	  arPmkidCache[CFG_MAX_PMKID_CACHE];
 	BOOLEAN			  fgIndicatePMKID;
-#if CFG_SUPPORT_802_11W
 	BOOLEAN fgMgmtProtection;
 	BOOLEAN fgAPApplyPmfReq;
 	UINT_32 u4SaQueryStart;
@@ -550,10 +512,7 @@ struct _AIS_SPECIFIC_BSS_INFO_T {
 	PUINT_8 pucSaQueryTransId;
 	TIMER_T rSaQueryTimer;
 	BOOLEAN fgBipKeyInstalled;
-#endif
-#if CFG_SUPPORT_802_11V
 	BSS_TRANSITION_MGT_PARAM_T rBTMParam;
-#endif
 	LINK_MGMT_T rNeighborApList;
 	OS_SYSTIME	rNeiApRcvTime;
 	UINT_32		u4NeiApValidInterval;
@@ -586,9 +545,7 @@ typedef struct _WIFI_VAR_T {
 
 	SCAN_INFO_T rScanInfo;
 
-#if CFG_SUPPORT_ROAMING
 	ROAMING_INFO_T rRoamingInfo;
-#endif /* CFG_SUPPORT_ROAMING */
 
 	AIS_FSM_INFO_T rAisFsmInfo;
 
@@ -600,7 +557,6 @@ typedef struct _WIFI_VAR_T {
 
 	AIS_SPECIFIC_BSS_INFO_T rAisSpecificBssInfo;
 
-#if CFG_ENABLE_WIFI_DIRECT
 	P_P2P_CONNECTION_SETTINGS_T prP2PConnSettings[BSS_P2P_NUM];
 
 	P_P2P_SPECIFIC_BSS_INFO_T prP2pSpecificBssInfo[BSS_P2P_NUM];
@@ -611,8 +567,6 @@ typedef struct _WIFI_VAR_T {
 
 	/* Currently we only support 2 p2p interface. */
 	P_P2P_ROLE_FSM_INFO_T aprP2pRoleFsmInfo[BSS_P2P_NUM];
-
-#endif /* CFG_ENABLE_WIFI_DIRECT */
 
 	WLAN_TABLE_T arWtbl[WTBL_SIZE];
 
@@ -639,10 +593,7 @@ typedef struct _WIFI_VAR_T {
 	BOOLEAN fgEnableJoinToHiddenSSID;
 	BOOLEAN fgSupportWZCDisassociation;
 
-#if CFG_SUPPORT_WFD
 	WFD_CFG_SETTINGS_T rWfdConfigureSettings;
-#endif
-
 	UINT_8	aucMediatekOuiIE[64];
 	UINT_16 u2MediatekOuiIELen;
 
@@ -746,9 +697,7 @@ typedef struct _WIFI_VAR_T {
 
 	UINT_32 u4NetifStopTh;
 	UINT_32 u4NetifStartTh;
-#if CFG_AUTO_CHANNEL_SEL_SUPPORT
 	PARAM_GET_CHN_INFO rChnLoadInfo;
-#endif
 #if CFG_SUPPORT_MTK_SYNERGY
 	UINT_8	ucMtkOui;
 	UINT_32 u4MtkOuiCap;
@@ -759,9 +708,7 @@ typedef struct _WIFI_VAR_T {
 	UINT_8	ucChannelSwitchMode;
 	UINT_8	ucNewChannelNumber;
 	UINT_8	ucChannelSwitchCount;
-#if CFG_SUPPORT_DBDC_TC6
 	BOOLEAN fgDelayInidicateDISCON;
-#endif
 
 	UINT_32 u4HifIstLoopCount;
 	UINT_32 u4Rx2OsLoopCount;
@@ -788,16 +735,14 @@ typedef struct _WIFI_VAR_T {
 	UINT_8 ucCtiaMode;
 	UINT_8 ucTpTestMode;
 	UINT_8 ucSigmaTestMode;
-#if CFG_SUPPORT_DBDC
+
 	UINT_8	ucDbdcMode;
 	BOOLEAN fgDbDcModeEn;
 	TIMER_T rDBDCDisableCountdownTimer; /* Prevent continuously trigger by reconnection  */
 	TIMER_T rDBDCSwitchGuardTimer;		/* Prevent switch too quick*/
-#endif
-#if CFG_SUPPORT_DBDC_TC6
-	TIMER_T rDBDCReconnectCountDown;  /* Prevent driver-level reconnection process from DBDC switching */
-	TIMER_T rDBDCAisConnectCountDown; /* Prevent AIS connect process from DBDC switching */
-#endif
+	TIMER_T rDBDCReconnectCountDown;    /* Prevent driver-level reconnection process from DBDC switching */
+	TIMER_T rDBDCAisConnectCountDown;   /* Prevent AIS connect process from DBDC switching */
+
 	UINT_8 u4ScanCtrl;
 	UINT_8 ucScanChannelListenTime;
 
@@ -869,26 +814,16 @@ typedef struct _WIFI_VAR_T {
 	UINT_8 ucN9Log2HostCtrl;
 	UINT_8 ucCR4Log2HostCtrl;
 
-#if CFG_SUPPORT_ANT_SELECT
 	UINT_8 ucSpeIdxCtrl;   /* 0:WF0, 1:WF1, 2: both WF0/1 */
 	UINT_8 ucSpeIdxCtrl2G; /* 0:WF0, 1:WF1, 2: both WF0/1 only in 2G*/
-#endif
 
-#ifdef CFG_SUPPORT_ADJUST_JOIN_CH_REQ_INTERVAL
-	UINT_32 u4AisJoinChReqIntervel;
-#endif
-
-#if CFG_SUPPORT_RSSI_COMP
 	RSSI_PATH_COMPASATION_T rRssiPathCompasation;
-#endif
 	INT_32 ucEd2GNonEU;
 	INT_32 ucEd5GNonEU;
 	INT_32 ucEd2GEU;
 	INT_32 ucEd5GEU;
 	UINT_8 ucDelayTimeOfDisconnect;
-#if CFG_KEY_ERROR_STATISTIC_RECOVERY
 	INT_32 u4BmcKeyErrorTh;
-#endif
 } WIFI_VAR_T, *P_WIFI_VAR_T; /* end of _WIFI_VAR_T */
 
 /* cnm_timer module */
@@ -920,41 +855,23 @@ typedef struct {
 
 	/* CR4 tailer */
 	tailer_format_t rCR4tailer;
-#if CFG_SUPPORT_COMPRESSION_FW_OPTION
-	/* N9 Compressed tailer */
-	tailer_format_t_2 rN9Compressedtailer;
-	/* CR4 tailer */
-	tailer_format_t_2 rCR4Compressedtailer;
-	BOOLEAN			  fgIsN9CompressedFW;
-	BOOLEAN			  fgIsCR4CompressedFW;
-#endif
+
 	/* Patch header */
 	PATCH_FORMAT_T rPatchHeader;
 	BOOLEAN		   fgPatchIsDlByDrv;
 } WIFI_VER_INFO_T, *P_WIFI_VER_INFO_T;
 
-#if CFG_ENABLE_WIFI_DIRECT
 /*
  * p2p function pointer structure
  */
-
 typedef struct _P2P_FUNCTION_LINKER {
-	P2P_REMOVE prP2pRemove;
-	/* NIC_P2P_MEDIA_STATE_CHANGE                  prNicP2pMediaStateChange; */
-	/* SCAN_UPDATE_P2P_DEVICE_DESC                 prScanUpdateP2pDeviceDesc; */
-	/* P2P_FSM_RUN_EVENT_RX_PROBE_RESPONSE_FRAME   prP2pFsmRunEventRxProbeResponseFrame; */
-	P2P_GENERATE_P2P_IE prP2pGenerateWSC_IEForBeacon;
-	/* P2P_CALCULATE_WSC_IE_LEN_FOR_PROBE_RSP      prP2pCalculateWSC_IELenForProbeRsp; */
-	/* P2P_GENERATE_WSC_IE_FOR_PROBE_RSP           prP2pGenerateWSC_IEForProbeRsp; */
-	/* SCAN_REMOVE_P2P_BSS_DESC                    prScanRemoveP2pBssDesc; */
-	/* P2P_HANDLE_SEC_CHECK_RSP                    prP2pHandleSecCheckRsp; */
+	P2P_REMOVE 				 prP2pRemove;
+	P2P_GENERATE_P2P_IE 	 prP2pGenerateWSC_IEForBeacon;
 	P2P_NET_REGISTER		 prP2pNetRegister;
 	P2P_NET_UNREGISTER		 prP2pNetUnregister;
 	P2P_CALCULATE_P2P_IE_LEN prP2pCalculateP2p_IELenForAssocReq; /* All IEs generated from supplicant. */
 	P2P_GENERATE_P2P_IE		 prP2pGenerateP2p_IEForAssocReq;	 /* All IEs generated from supplicant. */
 } P2P_FUNCTION_LINKER, *P_P2P_FUNCTION_LINKER;
-
-#endif
 
 typedef struct _WIFI_FEM_CFG_T {
 	/* WiFi FEM path */
@@ -979,9 +896,9 @@ struct CSI_DATA_T {
  * Major data structure for driver operation
  */
 struct _ADAPTER_T {
-	struct mt66xx_chip_info *chip_info;
-	UINT_8					 ucRevID;
-	BOOLEAN					 fgIsReadRevID;
+	struct chip_info *chip_info;
+	UINT_8			  ucRevID;
+	BOOLEAN			  fgIsReadRevID;
 
 	UINT_16 u2NicOpChnlNum;
 
@@ -994,10 +911,8 @@ struct _ADAPTER_T {
 	P_BSS_INFO_T aprBssInfo[HW_BSSID_NUM + 1];
 	P_BSS_INFO_T prAisBssInfo;
 
-#if CFG_TCP_IP_CHKSUM_OFFLOAD
 	BOOLEAN fgIsSupportCsumOffload; /* Does FW support Checksum Offload feature */
 	UINT_32 u4CSUMFlags;
-#endif /* CFG_TCP_IP_CHKSUM_OFFLOAD */
 
 	ENUM_BAND_T aePreferBand[BSS_INFO_NUM];
 
@@ -1022,10 +937,9 @@ struct _ADAPTER_T {
 	PUINT_8	   pucMgtBufCached;
 	UINT_32	   u4MgtBufCachedSize;
 	UINT_8	   aucMsgBuf[MSG_BUFFER_SIZE];
-#if CFG_DBG_MGT_BUF
+
 	UINT_32 u4MemAllocDynamicCount; /* Debug only */
 	UINT_32 u4MemFreeDynamicCount;	/* Debug only */
-#endif
 
 	STA_RECORD_T arStaRec[CFG_STA_REC_NUM];
 
@@ -1112,22 +1026,12 @@ struct _ADAPTER_T {
 	/* WLAN Info for DRIVER_CORE OID query */
 	WLAN_INFO_T rWlanInfo;
 
-#if CFG_ENABLE_WIFI_DIRECT
-#if CFG_SUPPORT_DBDC_TC6
 	UINT_8 u4P2pMode;
-#endif
 	BOOLEAN				 fgIsP2PRegistered;
 	BOOLEAN				 p2p_scan_report_all_bss; /* flag to report all networks in p2p scan */
 	ENUM_NET_REG_STATE_T rP2PNetRegState;
 	ENUM_P2P_REG_STATE_T rP2PRegState;
-	/* BOOLEAN             fgIsWlanLaunched; */
 	P_P2P_INFO_T prP2pInfo;
-#if CFG_SUPPORT_P2P_RSSI_QUERY
-	OS_SYSTIME		   rP2pLinkQualityUpdateTime;
-	BOOLEAN			   fgIsP2pLinkQualityValid;
-	EVENT_LINK_QUALITY rP2pLinkQuality;
-#endif
-#endif
 
 	/* Online Scan Option */
 	BOOLEAN fgEnOnlineScan;
@@ -1146,14 +1050,10 @@ struct _ADAPTER_T {
 	OS_SYSTIME		 rStatUpdateTime;
 	BOOLEAN			 fgIsStatValid;
 
-#if CFG_SUPPORT_MSP
 	EVENT_WLAN_INFO rEventWlanInfo;
-#endif
 
-#if CFG_SUPPORT_LAST_SEC_MCS_INFO
 	TIMER_T rRxMcsInfoTimer;
 	BOOLEAN fgIsMcsInfoValid;
-#endif
 
 	EVENT_LINK_QUALITY rLinkQuality;
 	OS_SYSTIME		   rLinkQualityUpdateTime;
@@ -1223,16 +1123,10 @@ struct _ADAPTER_T {
 	BOOLEAN fgIsEfuseValid;
 	BOOLEAN fgIsEmbbededMacAddrValid;
 
-#if CFG_SUPPORT_PWR_LIMIT_COUNTRY
 	BOOLEAN fgIsPowerLimitTableValid;
-#endif
 
 	/* Packet Forwarding Tracking */
 	INT_32 i4PendingFwdFrameCount;
-
-#if CFG_SUPPORT_RDD_TEST_MODE
-	UINT_8 ucRddStatus;
-#endif
 
 	BOOL fgDisStaAgingTimeoutDetection;
 
@@ -1241,15 +1135,12 @@ struct _ADAPTER_T {
 	UINT_32 u4FwFeatureFlag0;
 	UINT_32 u4FwFeatureFlag1;
 
-#if CFG_SUPPORT_CFG_FILE
 	P_WLAN_CFG_T prWlanCfg;
 	WLAN_CFG_T	 rWlanCfg;
 
 	P_WLAN_CFG_REC_T prWlanCfgRec;
 	WLAN_CFG_REC_T	 rWlanCfgRec;
-#endif
 
-#if CFG_ASSERT_DUMP
 	TIMER_T rN9CorDumpTimer;
 	TIMER_T rCr4CorDumpTimer;
 	BOOLEAN fgN9CorDumpFileOpend;
@@ -1257,7 +1148,6 @@ struct _ADAPTER_T {
 	BOOLEAN fgN9AssertDumpOngoing;
 	BOOLEAN fgCr4AssertDumpOngoing;
 	BOOLEAN fgKeepPrintCoreDump;
-#endif
 	/* Tx resource information */
 	BOOLEAN			  fgIsNicTxReousrceValid;
 	NIC_TX_RESOURCE_T nicTxReousrce;
@@ -1269,14 +1159,10 @@ struct _ADAPTER_T {
 	/* COEX feature */
 	UINT_32 u4FddMode;
 
-#if (CFG_EFUSE_BUFFER_MODE_DELAY_CAL == 1)
 	/* MAC address Efuse Offset */
 	UINT_32 u4EfuseMacAddrOffset;
-#endif
 
-#if CFG_WOW_SUPPORT
 	WOW_CTRL_T rWowCtrl;
-#endif
 	BOOLEAN fgIsCfg80211SuspendCalled;
 
 	/*#if (CFG_EEPROM_PAGE_ACCESS == 1)*/
@@ -1295,7 +1181,6 @@ struct _ADAPTER_T {
 	BOOLEAN fgIsSupportGetTxPower;
 	BOOLEAN fgIsEnableLpdvt;
 
-#ifdef CFG_SUPPORT_MULTICAST_ENHANCEMENT
 	BOOLEAN fgIsFixedMRate;
 	UINT_8	ucDupMcastPacketNum;
 	UINT_32 u4TXOPPeriod;
@@ -1305,24 +1190,11 @@ struct _ADAPTER_T {
 	UINT_8	ucUnicastBurstTimeout; // the default time is 10 ms
 	/* Specific AudioTos */
 	UINT_8 ucAudioTOS;
-#ifdef CFG_SUPPORT_MULTICAST_ENHANCEMENT_LOOKBACK
-	BOOLEAN fgIsLookBackMode;
-	UINT_16 ucRxLBList[5];
-	UINT_8	ucRxLBSize;
-	UINT_8	ucRxLBIndex;
-#endif
-#endif
 
 	/* SER related info */
 	UINT_8 ucSerState;
 
-#if CFG_SUPPORT_BFER
-	BOOLEAN fgIsHwSupportBfer;
-#endif
-
-#if (CFG_HW_WMM_BY_BSS == 1)
 	UINT_8 ucHwWmmEnBit;
-#endif
 	WIFI_FEM_CFG_T	  rWifiFemCfg;
 	struct CSI_DATA_T rCsiData;
 

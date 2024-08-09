@@ -57,7 +57,6 @@ static PUINT_8 apucDebugMsg[] = { (PUINT_8)DISP_STRING("MID_MNY_CNM_CH_REQ"),
 	(PUINT_8)DISP_STRING("MID_AIS_SAA_FSM_START"), (PUINT_8)DISP_STRING("MID_AIS_SAA_FSM_ABORT"),
 	(PUINT_8)DISP_STRING("MID_SAA_AIS_JOIN_COMPLETE"),
 
-#if CFG_ENABLE_WIFI_DIRECT
 	(PUINT_8)DISP_STRING("MID_P2P_SAA_FSM_START"), (PUINT_8)DISP_STRING("MID_P2P_SAA_FSM_ABORT"),
 	(PUINT_8)DISP_STRING("MID_SAA_P2P_JOIN_COMPLETE"),
 
@@ -68,26 +67,12 @@ static PUINT_8 apucDebugMsg[] = { (PUINT_8)DISP_STRING("MID_MNY_CNM_CH_REQ"),
 	(PUINT_8)DISP_STRING("MID_MNY_P2P_MGMT_TX"), (PUINT_8)DISP_STRING("MID_MNY_P2P_GROUP_DISSOLVE"),
 	(PUINT_8)DISP_STRING("MID_MNY_P2P_MGMT_FRAME_REGISTER"), (PUINT_8)DISP_STRING("MID_MNY_P2P_NET_DEV_REGISTER"),
 	(PUINT_8)DISP_STRING("MID_MNY_P2P_START_AP"), (PUINT_8)DISP_STRING("MID_MNY_P2P_UPDATE_IE_BUF"),
-#if (CFG_SUPPORT_DFS_MASTER == 1)
 	(PUINT_8)DISP_STRING("MID_CNM_P2P_RADAR_DETECT"), (PUINT_8)DISP_STRING("MID_CNM_P2P_CSA_DONE"),
 	(PUINT_8)DISP_STRING("MID_MNY_P2P_DFS_CAC"), (PUINT_8)DISP_STRING("MID_MNY_P2P_SET_NEW_CHANNEL"),
-#endif
-
-#endif
-
-#if CFG_SUPPORT_ADHOC
-	/* (PUINT_8)DISP_STRING("MID_AIS_CNM_CREATE_IBSS_REQ"), */
-	/* (PUINT_8)DISP_STRING("MID_CNM_AIS_CREATE_IBSS_GRANT"), */
-	/* (PUINT_8)DISP_STRING("MID_AIS_CNM_MERGE_IBSS_REQ"), */
-	/* (PUINT_8)DISP_STRING("MID_CNM_AIS_MERGE_IBSS_GRANT"), */
 	(PUINT_8)DISP_STRING("MID_SCN_AIS_FOUND_IBSS"),
-#endif /* CFG_SUPPORT_ADHOC */
 
 	(PUINT_8)DISP_STRING("MID_SAA_AIS_FSM_ABORT"), (PUINT_8)DISP_STRING("MID_MNY_AIS_REMAIN_ON_CHANNEL"),
-	(PUINT_8)DISP_STRING("MID_MNY_AIS_CANCEL_REMAIN_ON_CHANNEL"),
-#if CFG_SUPPORT_802_11V_BSS_TRANSITION_MGT
-	(PUINT_8)DISP_STRING("MID_WNM_AIS_BSS_TRANSITION"),
-#endif
+	(PUINT_8)DISP_STRING("MID_MNY_AIS_CANCEL_REMAIN_ON_CHANNEL"), (PUINT_8)DISP_STRING("MID_WNM_AIS_BSS_TRANSITION"),
 	(PUINT_8)DISP_STRING("MID_MNY_AIS_MGMT_TX") };
 
 /*lint -restore */
@@ -98,49 +83,22 @@ static PUINT_8 apucDebugMsg[] = { (PUINT_8)DISP_STRING("MID_MNY_CNM_CH_REQ"),
  */
 static MSG_HNDL_ENTRY_T arMsgMapTable[] = { { MID_MNY_CNM_CH_REQ, cnmChMngrRequestPrivilege },
 	{ MID_MNY_CNM_CH_ABORT, cnmChMngrAbortPrivilege }, { MID_CNM_AIS_CH_GRANT, aisFsmRunEventChGrant },
-#if CFG_ENABLE_WIFI_DIRECT
 	{ MID_CNM_P2P_CH_GRANT, p2pFsmRunEventChGrant }, /*set in gl_p2p_init.c */
-#else
-	{ MID_CNM_P2P_CH_GRANT, mboxDummy },
-#endif
-
-#if (CFG_SUPPORT_DFS_MASTER == 1)
 	{ MID_CNM_P2P_RADAR_DETECT, p2pRoleFsmRunEventRadarDet }, { MID_CNM_P2P_CSA_DONE, p2pRoleFsmRunEventCsaDone },
-#endif
-
-	{ MID_CNM_BOW_CH_GRANT, mboxDummy },
-
-	/*--------------------------------------------------*/
-	/* SCN Module Mailbox Messages                      */
-	/*--------------------------------------------------*/
-	{ MID_AIS_SCN_SCAN_REQ, scnFsmMsgStart }, { MID_AIS_SCN_SCAN_REQ_V2, scnFsmMsgStart },
-	{ MID_AIS_SCN_SCAN_CANCEL, scnFsmMsgAbort }, { MID_P2P_SCN_SCAN_REQ, scnFsmMsgStart },
-	{ MID_P2P_SCN_SCAN_REQ_V2, scnFsmMsgStart }, { MID_P2P_SCN_SCAN_CANCEL, scnFsmMsgAbort },
-	{ MID_BOW_SCN_SCAN_REQ, scnFsmMsgStart }, { MID_BOW_SCN_SCAN_REQ_V2, scnFsmMsgStart },
-	{ MID_BOW_SCN_SCAN_CANCEL, scnFsmMsgAbort }, { MID_RLM_SCN_SCAN_REQ, scnFsmMsgStart },
-	{ MID_RLM_SCN_SCAN_REQ_V2, scnFsmMsgStart }, { MID_RLM_SCN_SCAN_CANCEL, scnFsmMsgAbort },
-	{ MID_SCN_AIS_SCAN_DONE, aisFsmRunEventScanDone },
-#if CFG_ENABLE_WIFI_DIRECT
+	{ MID_CNM_BOW_CH_GRANT, mboxDummy }, { MID_AIS_SCN_SCAN_REQ, scnFsmMsgStart },
+	{ MID_AIS_SCN_SCAN_REQ_V2, scnFsmMsgStart }, { MID_AIS_SCN_SCAN_CANCEL, scnFsmMsgAbort },
+	{ MID_P2P_SCN_SCAN_REQ, scnFsmMsgStart }, { MID_P2P_SCN_SCAN_REQ_V2, scnFsmMsgStart },
+	{ MID_P2P_SCN_SCAN_CANCEL, scnFsmMsgAbort }, { MID_BOW_SCN_SCAN_REQ, scnFsmMsgStart },
+	{ MID_BOW_SCN_SCAN_REQ_V2, scnFsmMsgStart }, { MID_BOW_SCN_SCAN_CANCEL, scnFsmMsgAbort },
+	{ MID_RLM_SCN_SCAN_REQ, scnFsmMsgStart }, { MID_RLM_SCN_SCAN_REQ_V2, scnFsmMsgStart },
+	{ MID_RLM_SCN_SCAN_CANCEL, scnFsmMsgAbort }, { MID_SCN_AIS_SCAN_DONE, aisFsmRunEventScanDone },
 	{ MID_SCN_P2P_SCAN_DONE, p2pFsmRunEventScanDone }, /*set in gl_p2p_init.c */
-#else
-	{ MID_SCN_P2P_SCAN_DONE, mboxDummy },
-#endif
-
-	{ MID_SCN_BOW_SCAN_DONE, mboxDummy },
-
-	{ MID_SCN_RLM_SCAN_DONE, rlmObssScanDone },
-
-	/*--------------------------------------------------*/
-	/* AIS Module Mailbox Messages                      */
-	/*--------------------------------------------------*/
+	{ MID_SCN_BOW_SCAN_DONE, mboxDummy }, { MID_SCN_RLM_SCAN_DONE, rlmObssScanDone },
 	{ MID_OID_AIS_FSM_JOIN_REQ, aisFsmRunEventAbort }, { MID_OID_AIS_FSM_ABORT, aisFsmRunEventAbort },
 	{ MID_AIS_SAA_FSM_START, saaFsmRunEventStart }, { MID_AIS_SAA_FSM_ABORT, saaFsmRunEventAbort },
-	{ MID_SAA_AIS_JOIN_COMPLETE, aisFsmRunEventJoinComplete },
-
-#if CFG_ENABLE_WIFI_DIRECT /*set in gl_p2p_init.c */
-	{ MID_P2P_SAA_FSM_START, saaFsmRunEventStart }, { MID_P2P_SAA_FSM_ABORT, saaFsmRunEventAbort },
-	{ MID_SAA_P2P_JOIN_COMPLETE, p2pRoleFsmRunEventJoinComplete }, /* V */
-
+	{ MID_SAA_AIS_JOIN_COMPLETE, aisFsmRunEventJoinComplete }, { MID_P2P_SAA_FSM_START, saaFsmRunEventStart },
+	{ MID_P2P_SAA_FSM_ABORT, saaFsmRunEventAbort }, { MID_SAA_P2P_JOIN_COMPLETE, p2pRoleFsmRunEventJoinComplete }, /* V
+																													*/
 	{ MID_MNY_P2P_FUN_SWITCH, p2pRoleFsmRunEventSwitchOPMode },
 	{ MID_MNY_P2P_DEVICE_DISCOVERY, p2pFsmRunEventScanRequest }, /* V */
 	{ MID_MNY_P2P_CONNECTION_REQ, p2pRoleFsmRunEventConnectionRequest },
@@ -153,27 +111,13 @@ static MSG_HNDL_ENTRY_T arMsgMapTable[] = { { MID_MNY_CNM_CH_REQ, cnmChMngrReque
 	{ MID_MNY_P2P_MGMT_FRAME_REGISTER, p2pDevFsmRunEventMgmtFrameRegister },
 	{ MID_MNY_P2P_NET_DEV_REGISTER, p2pFsmRunEventNetDeviceRegister },
 	{ MID_MNY_P2P_START_AP, p2pRoleFsmRunEventStartAP }, { MID_MNY_P2P_DEL_IFACE, p2pRoleFsmRunEventDelIface },
-	{ MID_MNY_P2P_MGMT_FRAME_UPDATE, p2pFsmRunEventUpdateMgmtFrame },
-#if (CFG_SUPPORT_DFS_MASTER == 1)
-	{ MID_MNY_P2P_DFS_CAC, p2pRoleFsmRunEventDfsCac }, { MID_MNY_P2P_SET_NEW_CHANNEL, p2pRoleFsmRunEventSetNewChannel },
-#endif
-#if CFG_SUPPORT_WFD
+	{ MID_MNY_P2P_MGMT_FRAME_UPDATE, p2pFsmRunEventUpdateMgmtFrame }, { MID_MNY_P2P_DFS_CAC, p2pRoleFsmRunEventDfsCac },
+	{ MID_MNY_P2P_SET_NEW_CHANNEL, p2pRoleFsmRunEventSetNewChannel },
 	{ MID_MNY_P2P_WFD_CFG_UPDATE, p2pFsmRunEventWfdSettingUpdate },
-#endif
-	{ MID_MNY_P2P_ACTIVE_BSS, p2pDevFsmRunEventActiveDevBss },
-#endif
-
-#if CFG_SUPPORT_ADHOC
-	{ MID_SCN_AIS_FOUND_IBSS, aisFsmRunEventFoundIBSSPeer },
-#endif /* CFG_SUPPORT_ADHOC */
-
+	{ MID_MNY_P2P_ACTIVE_BSS, p2pDevFsmRunEventActiveDevBss }, { MID_SCN_AIS_FOUND_IBSS, aisFsmRunEventFoundIBSSPeer },
 	{ MID_SAA_AIS_FSM_ABORT, aisFsmRunEventAbort }, { MID_MNY_AIS_REMAIN_ON_CHANNEL, aisFsmRunEventRemainOnChannel },
 	{ MID_MNY_AIS_CANCEL_REMAIN_ON_CHANNEL, aisFsmRunEventCancelRemainOnChannel },
-
-#if CFG_SUPPORT_802_11V_BSS_TRANSITION_MGT
-	{ MID_WNM_AIS_BSS_TRANSITION, aisFsmRunEventBssTransition },
-#endif
-	{ MID_MNY_AIS_MGMT_TX, aisFsmRunEventMgmtFrameTx } };
+	{ MID_WNM_AIS_BSS_TRANSITION, aisFsmRunEventBssTransition }, { MID_MNY_AIS_MGMT_TX, aisFsmRunEventMgmtFrameTx } };
 
 /*******************************************************************************
  *                                 M A C R O S

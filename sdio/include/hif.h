@@ -106,11 +106,7 @@
 #define SER_SDIO_HOST_N9_RECOVERY_DONE_ACK BIT(21)
 
 /* HIF SDIO WMM Tx resource flow control */
-#if CFG_TX_WMM_ENHANCE
 #define HIF_TX_RSRC_WMM_ENHANCE 1
-#else
-#define HIF_TX_RSRC_WMM_ENHANCE 0
-#endif
 
 /*******************************************************************************
  *                             D A T A   T Y P E S

@@ -289,17 +289,12 @@ typedef struct _RX_BA_ENTRY_T {
 	UINT_16 u2FirstBubbleSn;
 	BOOLEAN fgHasBubble;
 
-	/* UINT_8                  ucTxBufferSize; */
-	/* BOOL                    fgIsAcConstrain; */
-	/* BOOL                    fgIsBaEnabled; */
-#if CFG_SUPPORT_RX_AMSDU
 	/* RX reorder for one MSDU in AMSDU issue */
-	/* P_SW_RFB_T prMpduSwRfb; */
 	UINT_32 u4SeqNo;			  /* for statistic */
 	BOOL	fgAmsduNeedLastFrame; /* for statistic */
 	UINT_8	u8LastAmsduSubIdx;
 	BOOL	fgIsAmsduDuplicated;
-#endif
+
 	BOOLEAN fgFirstSnToWinStart;
 } RX_BA_ENTRY_T, *P_RX_BA_ENTRY_T;
 
@@ -784,10 +779,8 @@ VOID mqmGenerateWmmInfoIE(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo)
 
 VOID mqmGenerateWmmParamIE(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo);
 
-#if CFG_SUPPORT_TDLS
-
 UINT_32 mqmGenerateWmmParamIEByParam(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo, PUINT_8 pOutBuf);
-#endif
+
 
 ENUM_FRAME_ACTION_T qmGetFrameAction(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex, IN UINT_8 ucStaRecIdx,
 		IN P_MSDU_INFO_T prMsduInfo, IN ENUM_FRAME_TYPE_IN_CMD_Q_T eFrameType, IN UINT_16 u2FrameLength);
@@ -811,28 +804,18 @@ UINT_32 qmDumpQueueStatus(IN P_ADAPTER_T prAdapter, IN PUINT_8 pucBuf, IN UINT_3
 
 VOID qmResetTcControlResource(IN P_ADAPTER_T prAdapter);
 
-#if (CFG_SUPPORT_REPLAY_DETECTION || CFG_SUPPORT_FRAG_ATTACK_DETECTION)
 #define CCMPTSCPNNUM 6
 UINT_8 qmRxPNtoU64(uint8_t *pucPN, uint8_t uPNNum, uint64_t *pu64Rets);
-#endif
 
-#if CFG_SUPPORT_REPLAY_DETECTION
 BOOLEAN qmHandleRxReplay(P_ADAPTER_T prAdapter, P_SW_RFB_T prSwRfb);
 BOOLEAN qmRxDetectReplay(PUINT_8 pucPNS, PUINT_8 pucPNT);
-#endif
 
-#if CFG_SUPPORT_FAKE_EAPOL_DETECTION
 UINT_8 qmDetectRxInvalidEAPOL(P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb);
-#endif /* CFG_SUPPORT_FAKE_EAPOL_DETECTION */
 
-#if CFG_SUPPORT_AMSDU_ATTACK_DETECTION
 UINT_8 qmAmsduAttackDetection(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb);
-#endif /* CFG_SUPPORT_AMSDU_ATTACK_DETECTION */
 
-#ifdef CFG_SUPPORT_MULTICAST_ENHANCEMENT
 void   qmFuncChangeBmcTcIdx(UINT_8 ucTc);
 UINT_8 qmFuncGetBmcTcIdx(UINT_8 ucWmmIdx);
-#endif
 
 /*******************************************************************************
  *                              F U N C T I O N S

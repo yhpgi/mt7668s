@@ -653,11 +653,9 @@
 #define STATUS_CODE_ASSOC_DENIED_NO_SHORT_SLOT_TIME 25
 /* Assoc denied due to requesting STA not supporting DSSS-OFDM */
 #define STATUS_CODE_ASSOC_DENIED_NO_DSSS_OFDM 26
-#if CFG_SUPPORT_802_11W
 #define STATUS_CODE_ASSOC_REJECTED_TEMPORARILY 30 /*  IEEE 802.11w, Assoc denied due to the SA query */
 /* IEEE 802.11w, Assoc denied due to the MFP select policy */
 #define STATUS_CODE_ROBUST_MGMT_FRAME_POLICY_VIOLATION 31
-#endif
 #define STATUS_CODE_UNSPECIFIED_QOS_FAILURE 32 /* Unspecified, QoS-related failure */
 /* Assoc denied due to insufficient bandwidth to handle another QSTA */
 #define STATUS_CODE_ASSOC_DENIED_BANDWIDTH 33
@@ -710,19 +708,18 @@
 #define CATEGORY_PUBLIC_ACTION 4	/* Public action */
 #define CATEGORY_RM_ACTION 5		/* Radio measurement action */
 #define CATEGORY_HT_ACTION 7
-#if CFG_SUPPORT_802_11W
+
 #define CATEGORY_SA_QUERY_ACTION 8
 #define CATEGORY_PROTECTED_DUAL_OF_PUBLIC_ACTION 9
-#endif
+
 #define CATEGORY_WNM_ACTION 10			   /* 802.11v Wireless Network Management */
 #define CATEGORY_UNPROTECTED_WNM_ACTION 11 /* 802.11v Wireless Network Management */
 #define CATEGORY_WME_MGT_NOTIFICATION 17   /* WME management notification */
 
 #define CATEGORY_VHT_ACTION 21 /* VHT action */
 
-#if CFG_SUPPORT_802_11W
 #define CATEGORY_VENDOR_SPECIFIC_ACTION_PROTECTED 126
-#endif
+
 #define CATEGORY_VENDOR_SPECIFIC_ACTION 127
 
 /* 7.3.1.14 Block Ack Parameter Set field */
@@ -776,9 +773,9 @@
 #define ELEM_ID_RSN 48				  /* RSN IE */
 #define ELEM_ID_EXTENDED_SUP_RATES 50 /* Extended supported rates */
 #define ELEM_ID_NEIGHBOR_REPORT 52	  /* Neighbor Report */
-#if CFG_SUPPORT_802_11W
+
 #define ELEM_ID_TIMEOUT_INTERVAL 56 /* 802.11w SA Timeout interval */
-#endif
+
 #define ELEM_ID_SUP_OPERATING_CLASS 59 /* Supported Operating Classes */
 
 #define ELEM_ID_HT_OP 61						/* HT Operation */
@@ -895,10 +892,8 @@
 /* length of one PMKID */
 #define RSN_PMKID_LEN 16
 
-#if CFG_SUPPORT_802_11W
 #define ELEM_WPA_CAP_MFPR BIT(6)
 #define ELEM_WPA_CAP_MFPC BIT(7)
-#endif
 
 /* 7.3.2.27 Extended Capabilities information element */
 #define ELEM_EXT_CAP_20_40_COEXIST_SUPPORT BIT(0)
@@ -1291,7 +1286,6 @@
 /* 20/40 BSS coexistence */
 #define ACTION_PUBLIC_VENDOR_SPECIFIC 9
 
-#if CFG_SUPPORT_802_11W
 /* SA Query Action frame (IEEE 802.11w/D8.0, 7.4.9) */
 #define ACTION_SA_QUERY_REQUEST 0
 #define ACTION_SA_QUERY_RESPONSE 1
@@ -1302,7 +1296,6 @@
 #define ACTION_SA_TIMEOUT_REASSOC_DEADLINE 1
 #define ACTION_SA_TIMEOUT_KEY_LIFETIME 2
 #define ACTION_SA_TIMEOUT_ASSOC_COMEBACK 3
-#endif
 
 /* 7.4.10.1 HT action frame details */
 #define ACTION_HT_NOTIFY_CHANNEL_WIDTH 0	/* Notify Channel Width */
@@ -1740,7 +1733,6 @@ typedef struct _IE_CHALLENGE_TEXT_T {
 } __KAL_ATTRIB_PACKED__ IE_CHALLENGE_TEXT_T, *P_IE_CHALLENGE_TEXT_T;
 
 /* 7.3.2.9 Country information element */
-#if CFG_SUPPORT_802_11D
 /*! \brief COUNTRY_INFO_TRIPLET is defined for the COUNTRY_INFO_ELEM structure. */
 typedef struct _COUNTRY_INFO_TRIPLET_T {
 	UINT_8 ucParam1; /*!< If param1 >= 201, this triplet is referred to as */
@@ -1769,7 +1761,6 @@ typedef struct _IE_COUNTRY_T {
 	UINT_8						   aucCountryStr[3];
 	COUNTRY_INFO_SUBBAND_TRIPLET_T arCountryStr[1];
 } __KAL_ATTRIB_PACKED__ IE_COUNTRY_T, *P_IE_COUNTRY_T;
-#endif /* CFG_SUPPORT_802_11D */
 
 /* 7.3.2.13 ERP element */
 typedef struct _IE_ERP_T {
@@ -2246,14 +2237,12 @@ typedef struct _IE_20_40_COEXIST_T {
 	UINT_8 ucData;
 } __KAL_ATTRIB_PACKED__ IE_20_40_COEXIST_T, *P_IE_20_40_COEXIST_T;
 
-#if CFG_SUPPORT_802_11V
 typedef struct _IE_MAX_IDLE_PERIOD_T {
 	UINT_8	ucId;
 	UINT_8	ucLength;
 	UINT_16 u2MaxIdlePeriod;
 	UINT_8	ucOption;
 } __KAL_ATTRIB_PACKED__ IE_MAX_IDLE_PERIOD_T, *P_IE_MAX_IDLE_PERIOD_T;
-#endif
 
 /* 3 7.4 Action Frame. */
 /* 7.4 Action frame format */
@@ -2508,7 +2497,6 @@ typedef struct _ACTION_20_40_COEXIST_FRAME {
 
 } __KAL_ATTRIB_PACKED__ ACTION_20_40_COEXIST_FRAME, *P_ACTION_20_40_COEXIST_FRAME;
 
-#if CFG_SUPPORT_802_11W
 /* 7.4.9 SA Query Management frame format */
 typedef struct _ACTION_SA_QUERY_FRAME {
 	/* MAC header */
@@ -2525,7 +2513,6 @@ typedef struct _ACTION_SA_QUERY_FRAME {
 	UINT_8 ucTransId[ACTION_SA_QUERY_TR_ID_LEN]; /* Transaction id */
 
 } __KAL_ATTRIB_PACKED__ ACTION_SA_QUERY_FRAME, *P_ACTION_SA_QUERY_FRAME;
-#endif
 
 /* 7.4.10 Notify Channel Width Management frame format */
 typedef struct _ACTION_NOTIFY_CHNL_WIDTH_FRAME {
@@ -2714,9 +2701,7 @@ typedef struct _SUB_IE_BSS_TERM_DURATION_T {
 
 #define WFA_IE(fp) ((P_IE_WFA_T)fp)
 
-#if CFG_SUPPORT_802_11D
 #define COUNTRY_IE(fp) ((P_IE_COUNTRY_T)fp)
-#endif
 
 #define EXT_CAP_IE(fp) ((P_EXT_CAP_T)fp)
 
@@ -2744,9 +2729,7 @@ typedef struct _SUB_IE_BSS_TERM_DURATION_T {
 
 #define CSA_IE(fp) ((P_IE_CHANNEL_SWITCH_T)fp)
 
-#if CFG_SUPPORT_802_11V
 #define MAX_IDLE_PERIOD_IE(fp) ((P_IE_MAX_IDLE_PERIOD_T)fp)
-#endif
 
 #define SUPPORTED_CHANNELS_IE(fp) ((P_IE_SUPPORTED_CHANNELS_T)fp)
 #define TIMEOUT_INTERVAL_IE(fp) ((IE_TIMEOUT_INTERVAL_T *)fp)

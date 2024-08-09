@@ -68,7 +68,6 @@ extern struct delayed_work wdev_lock_workq;
 
 #define GLUE_FLAG_RX_PROCESS (GLUE_FLAG_HALT | GLUE_FLAG_RX_TO_OS)
 
-#if CFG_SUPPORT_SNIFFER
 #define RADIOTAP_FIELD_TSFT BIT(0)
 #define RADIOTAP_FIELD_FLAGS BIT(1)
 #define RADIOTAP_FIELD_RATE BIT(2)
@@ -97,7 +96,6 @@ extern struct delayed_work wdev_lock_workq;
 #define RADIOTAP_FIELDS_LEGACY \
 	(RADIOTAP_FIELD_TSFT | RADIOTAP_FIELD_FLAGS | RADIOTAP_FIELD_RATE | RADIOTAP_FIELD_CHANNEL | \
 			RADIOTAP_FIELD_ANT_SIGNAL | RADIOTAP_FIELD_ANT_NOISE | RADIOTAP_FIELD_ANT | RADIOTAP_FIELD_VENDOR)
-#endif
 
 /*******************************************************************************
  *                             D A T A   T Y P E S
@@ -149,10 +147,6 @@ typedef enum _ENUM_SPIN_LOCK_CATEGORY_E {
 	SPIN_LOCK_EHPI_BUS, /* only for EHPI */
 	SPIN_LOCK_NET_DEV,
 	SPIN_LOCK_CHIP_RST,
-#ifdef CFG_SUPPORT_MULTICAST_ENHANCEMENT_LOOKBACK
-	SPIN_LOCK_TX_LB_QUE,
-	SPIN_LOCK_RX_LB_QUE,
-#endif
 	SPIN_LOCK_NUM
 } ENUM_SPIN_LOCK_CATEGORY_E;
 
@@ -174,10 +168,7 @@ typedef struct _EVENT_ASSOC_INFO {
 
 typedef enum _ENUM_KAL_NETWORK_TYPE_INDEX_T {
 	KAL_NETWORK_TYPE_AIS_INDEX = 0,
-#if CFG_ENABLE_WIFI_DIRECT
 	KAL_NETWORK_TYPE_P2P_INDEX,
-#endif
-
 	KAL_NETWORK_TYPE_INDEX_NUM
 } ENUM_KAL_NETWORK_TYPE_INDEX_T;
 
@@ -203,7 +194,6 @@ typedef enum _ENUM_AGPS_EVENT {
 } ENUM_CCX_EVENT;
 BOOLEAN kalIndicateAgpsNotify(P_ADAPTER_T prAdapter, UINT_8 cmd, PUINT_8 data, UINT_16 dataLen);
 
-#if CFG_SUPPORT_SNIFFER
 /* Vendor Namespace
  * Bit Number 30
  * Required Alignment 2 bytes
@@ -297,7 +287,6 @@ typedef struct _MONITOR_RADIOTAP_T {
 	/* extension space */
 	UINT_8 aucReserve[12];
 } __packed MONITOR_RADIOTAP_T, *P_MONITOR_RADIOTAP_T;
-#endif
 
 /*******************************************************************************
  *                            P U B L I C   D A T A
@@ -362,10 +351,8 @@ typedef struct _MONITOR_RADIOTAP_T {
  *
  * Translates cfg80211 band into internal band definition
  */
-#if CFG_SCAN_CHANNEL_SPECIFIED
 #define kalCfg80211ToMtkBand(cfg80211_band) \
 	(cfg80211_band == NL80211_BAND_2GHZ ? BAND_2G4 : cfg80211_band == NL80211_BAND_5GHZ ? BAND_5G : BAND_NULL)
-#endif
 
 /**
  * kalCfg80211ScanDone - abstraction of cfg80211_scan_done
@@ -688,19 +675,15 @@ VOID kalUpdateReAssocReqInfo(
 
 VOID kalUpdateReAssocRspInfo(IN P_GLUE_INFO_T prGlueInfo, IN PUINT_8 pucFrameBody, IN UINT_32 u4FrameBodyLen);
 
-#if CFG_TX_FRAGMENT
 BOOLEAN
 kalQueryTxPacketHeader(
 		IN P_GLUE_INFO_T prGlueInfo, IN PVOID pvPacket, OUT PUINT_16 pu2EtherTypeLen, OUT PUINT_8 pucEthDestAddr);
-#endif /* CFG_TX_FRAGMENT */
 
 VOID kalSendCompleteAndAwakeQueue(IN P_GLUE_INFO_T prGlueInfo, IN PVOID pvPacket);
 
-#if CFG_TCP_IP_CHKSUM_OFFLOAD
 VOID kalQueryTxChksumOffloadParam(IN PVOID pvPacket, OUT PUINT_8 pucFlag);
 
 VOID kalUpdateRxCSUMOffloadParam(IN PVOID pvPacket, IN ENUM_CSUM_RESULT_T eCSUM[]);
-#endif /* CFG_TCP_IP_CHKSUM_OFFLOAD */
 
 BOOLEAN kalRetrieveNetworkAddress(IN P_GLUE_INFO_T prGlueInfo, IN OUT PARAM_MAC_ADDRESS *prMacAddr);
 
@@ -710,9 +693,7 @@ VOID kalReadyOnChannel(IN P_GLUE_INFO_T prGlueInfo, IN UINT_64 u8Cookie, IN ENUM
 VOID kalRemainOnChannelExpired(IN P_GLUE_INFO_T prGlueInfo, IN UINT_64 u8Cookie, IN ENUM_BAND_T eBand,
 		IN ENUM_CHNL_EXT_T eSco, IN UINT_8 ucChannelNum);
 
-#if CFG_SUPPORT_DFS
 VOID kalIndicateChannelSwitch(IN P_GLUE_INFO_T prGlueInfo, IN ENUM_CHNL_EXT_T eSco, IN UINT_8 ucChannelNum);
-#endif
 
 VOID kalIndicateMgmtTxStatus(IN P_GLUE_INFO_T prGlueInfo, IN UINT_64 u8Cookie, IN BOOLEAN fgIsAck,
 		IN PUINT_8 pucFrameBuf, IN UINT_32 u4FrameLen);
@@ -745,10 +726,6 @@ VOID kalDevReadIntStatus(IN P_ADAPTER_T prAdapter, OUT PUINT_32 pu4IntStatus);
 
 BOOL kalDevWriteWithSdioCmd52(IN P_GLUE_INFO_T prGlueInfo, IN UINT_32 u4Addr, IN UINT_8 ucData);
 
-#if CFG_SUPPORT_EXT_CONFIG
-UINT_32 kalReadExtCfg(IN P_GLUE_INFO_T prGlueInfo);
-#endif
-
 BOOLEAN
 kalQoSFrameClassifierAndPacketInfo(
 		IN P_GLUE_INFO_T prGlueInfo, IN P_NATIVE_PACKET prPacket, OUT P_TX_PACKET_INFO prTxPktInfo);
@@ -769,7 +746,6 @@ kalIoctlTimeout(IN P_GLUE_INFO_T prGlueInfo, IN PFN_OID_HANDLER_FUNC pfnOidHandl
 
 VOID kalHandleAssocInfo(IN P_GLUE_INFO_T prGlueInfo, IN P_EVENT_ASSOC_INFO prAssocInfo);
 
-#if CFG_ENABLE_FW_DOWNLOAD
 WLAN_STATUS kalFirmwareOpen(IN P_GLUE_INFO_T prGlueInfo, IN PPUINT_8 apucNameTable);
 WLAN_STATUS kalFirmwareClose(IN P_GLUE_INFO_T prGlueInfo);
 WLAN_STATUS kalFirmwareLoad(IN P_GLUE_INFO_T prGlueInfo, OUT PVOID prBuf, IN UINT_32 u4Offset, OUT PUINT_32 pu4Size);
@@ -779,7 +755,6 @@ VOID		kalConstructDefaultFirmwarePrio(
 PVOID kalFirmwareImageMapping(
 		IN P_GLUE_INFO_T prGlueInfo, OUT PPVOID ppvMapFileBuf, OUT PUINT_32 pu4FileLength, IN ENUM_IMG_DL_IDX_T eDlIdx);
 VOID kalFirmwareImageUnmapping(IN P_GLUE_INFO_T prGlueInfo, IN PVOID prFwHandle, IN PVOID pvMapFileBuf);
-#endif
 
 /*----------------------------------------------------------------------------*/
 /* Card Removal Check                                                         */
@@ -892,13 +867,11 @@ VOID kalGetChannelList(IN P_GLUE_INFO_T prGlueInfo, IN ENUM_BAND_T eSpecificBand
 
 BOOL kalIsAPmode(IN P_GLUE_INFO_T prGlueInfo);
 
-#if CFG_SUPPORT_802_11W
 /*----------------------------------------------------------------------------*/
 /* 802.11W                                                                    */
 /*----------------------------------------------------------------------------*/
 UINT_32 kalGetMfpSetting(IN P_GLUE_INFO_T prGlueInfo);
 UINT_8	kalGetRsnIeMfpCap(IN P_GLUE_INFO_T prGlueInfo);
-#endif
 
 /*----------------------------------------------------------------------------*/
 /* file opetation                                                             */
@@ -955,20 +928,16 @@ PVOID kalGetStats(IN struct net_device *prDev);
 
 VOID kalResetPacket(IN P_GLUE_INFO_T prGlueInfo, IN P_NATIVE_PACKET prPacket);
 
-#if CFG_SUPPORT_QA_TOOL
 struct file *kalFileOpen(const char *path, int flags, int rights);
 
 VOID kalFileClose(struct file *file);
 
 UINT_32 kalFileRead(struct file *file, unsigned long long offset, unsigned char *data, unsigned int size);
-#endif
 
-#if CFG_SUPPORT_SDIO_READ_WRITE_PATTERN
 /*----------------------------------------------------------------------------*/
 /* SDIO Read/Write Pattern Support                                            */
 /*----------------------------------------------------------------------------*/
 BOOLEAN kalSetSdioTestPattern(IN P_GLUE_INFO_T prGlueInfo, IN BOOLEAN fgEn, IN BOOLEAN fgRead);
-#endif
 
 /*----------------------------------------------------------------------------*/
 /* PNO Support                                                                */
@@ -981,8 +950,6 @@ VOID kalWDevLockThread(IN P_GLUE_INFO_T prGlueInfo, IN struct net_device *pDev, 
 		IN PUINT_8 pFrameBuf, IN size_t frameLen, IN struct cfg80211_bss *pBss, IN INT_32 uapsd_queues,
 		const u8 *req_ies, size_t req_ies_len, IN BOOLEAN fgIsInterruptContext);
 
-#if CFG_MULTI_ECOVER_SUPPORT
-
 typedef enum _ENUM_WMTCHIN_TYPE_T {
 	WMTCHIN_CHIPID		 = 0x0,
 	WMTCHIN_HWVER		 = WMTCHIN_CHIPID + 1,
@@ -994,24 +961,19 @@ typedef enum _ENUM_WMTCHIN_TYPE_T {
 
 UINT_32 mtk_wcn_wmt_ic_info_get(ENUM_WMT_CHIPINFO_TYPE_T type);
 
-#endif
-
 VOID kalSetFwOwnEvent2Hif(P_GLUE_INFO_T pr);
-#if CFG_ASSERT_DUMP
 /* Core Dump out put file */
 WLAN_STATUS kalOpenCorDumpFile(BOOLEAN fgIsN9);
 WLAN_STATUS kalWriteCorDumpFile(PUINT_8 pucBuffer, UINT_16 u2Size, BOOLEAN fgIsN9);
 WLAN_STATUS kalCloseCorDumpFile(BOOLEAN fgIsN9);
-#endif
+
 /*******************************************************************************
  *                              F U N C T I O N S
  ********************************************************************************
  */
 
-#if CFG_WOW_SUPPORT
 VOID kalWowInit(IN P_GLUE_INFO_T prGlueInfo);
 VOID kalWowProcess(IN P_GLUE_INFO_T prGlueInfo, UINT_8 enable);
-#endif
 
 int main_thread(void *data);
 int hif_thread(void *data);

@@ -8,8 +8,6 @@
 #include "precomp.h"
 
 #define P2P_OFF_CHNL_TX_DEFAULT_TIME_MS 1000
-
-#if (CFG_SUPPORT_DFS_MASTER == 1)
 extern struct P2P_RADAR_INFO g_rP2pRadarInfo;
 
 enum _ENUM_DFS_STATE_T {
@@ -19,7 +17,6 @@ enum _ENUM_DFS_STATE_T {
 	DFS_STATE_DETECTED,
 	DFS_STATE_NUM
 };
-#endif
 
 /*******************************************************************************
  *                                 M A C R O S
@@ -99,7 +96,6 @@ VOID p2pFuncSwitchOPMode(
 
 VOID p2pFuncReleaseCh(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIdx, IN P_P2P_CHNL_REQ_INFO_T prChnlReqInfo);
 
-#if (CFG_SUPPORT_DFS_MASTER == 1)
 VOID p2pFuncStartRdd(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIdx);
 
 VOID p2pFuncStopRdd(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIdx);
@@ -139,7 +135,6 @@ PUINT_8 p2pFuncShowDfsState(VOID);
 VOID p2pFuncRecordCacStartBootTime(VOID);
 
 UINT_32 p2pFuncGetCacRemainingTime(VOID);
-#endif
 
 VOID p2pFuncSetChannel(IN P_ADAPTER_T prAdapter, IN UINT_8 ucRoleIdx, IN P_RF_CHANNEL_INFO_T prRfChannelInfo);
 
@@ -242,18 +237,12 @@ p2pFuncGetSpecAttri(IN P_ADAPTER_T prAdapter, IN UINT_8 ucOuiType, IN PUINT_8 pu
 		IN UINT_8 ucAttriID);
 
 UINT_32 wfdFuncCalculateWfdIELenForAssocRsp(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex, IN P_STA_RECORD_T prStaRec);
-
 VOID wfdFuncGenerateWfdIEForAssocRsp(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo);
-
 UINT_32 p2pFuncCalculateP2P_IE_NoA(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIdx, IN P_STA_RECORD_T prStaRec);
-
 VOID p2pFuncGenerateP2P_IE_NoA(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo);
-
 VOID p2pFuncClassifyAction(IN P_SW_RFB_T prSwRfb);
 
-#if CFG_SUPPORT_DBDC_TC6
 VOID	p2pFuncModifyChandef(IN P_ADAPTER_T prAdapter, IN P_GL_P2P_INFO_T prGlueP2pInfo, IN P_BSS_INFO_T prBssInfo);
 BOOLEAN p2pFuncSwitchSapChannel(IN P_ADAPTER_T prAdapter);
-#endif
 
 #endif

@@ -39,10 +39,8 @@ typedef enum _ENUM_MSG_ID_T {
 	MID_CNM_P2P_CH_GRANT, /* CNM notify P2P for indicating channel granted */
 	MID_CNM_BOW_CH_GRANT, /* CNM notify BOW for indicating channel granted */
 
-#if (CFG_SUPPORT_DFS_MASTER == 1)
 	MID_CNM_P2P_RADAR_DETECT,
 	MID_CNM_P2P_CSA_DONE,
-#endif
 	/*--------------------------------------------------*/
 	/* SCN Module Mailbox Messages                      */
 	/*--------------------------------------------------*/
@@ -72,7 +70,6 @@ typedef enum _ENUM_MSG_ID_T {
 	MID_AIS_SAA_FSM_ABORT,	   /* AIS notify SAA for Aborting authentication/association fsm */
 	MID_SAA_AIS_JOIN_COMPLETE, /* SAA notify AIS for indicating join complete */
 
-#if CFG_ENABLE_WIFI_DIRECT
 	/*--------------------------------------------------*/
 	/* P2P Module Mailbox Messages                      */
 	/*--------------------------------------------------*/
@@ -95,20 +92,11 @@ typedef enum _ENUM_MSG_ID_T {
 	MID_MNY_P2P_START_AP,
 	MID_MNY_P2P_DEL_IFACE,
 	MID_MNY_P2P_MGMT_FRAME_UPDATE,
-#if (CFG_SUPPORT_DFS_MASTER == 1)
 	MID_MNY_P2P_DFS_CAC,
 	MID_MNY_P2P_SET_NEW_CHANNEL,
-#endif
-#if CFG_SUPPORT_WFD
 	MID_MNY_P2P_WFD_CFG_UPDATE,
-#endif
 	MID_MNY_P2P_ACTIVE_BSS,
-#endif
-
-#if CFG_SUPPORT_ADHOC
 	MID_SCN_AIS_FOUND_IBSS, /* SCN notify AIS that an IBSS Peer has been found and can merge into */
-#endif						/* CFG_SUPPORT_ADHOC */
-
 	MID_SAA_AIS_FSM_ABORT, /* SAA notify AIS for indicating deauthentication/disassociation */
 
 	/*--------------------------------------------------*/
@@ -117,9 +105,7 @@ typedef enum _ENUM_MSG_ID_T {
 	MID_MNY_AIS_REMAIN_ON_CHANNEL,
 	MID_MNY_AIS_CANCEL_REMAIN_ON_CHANNEL,
 	MID_MNY_AIS_MGMT_TX,
-#if CFG_SUPPORT_802_11V_BSS_TRANSITION_MGT
 	MID_WNM_AIS_BSS_TRANSITION,
-#endif
 	MID_TOTAL_NUM
 } ENUM_MSG_ID_T,
 		*P_ENUM_MSG_ID_T;

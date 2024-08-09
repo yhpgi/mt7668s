@@ -42,7 +42,6 @@ const PUINT_8 apucNetworkType[NETWORK_TYPE_NUM] = { (PUINT_8) "AIS", (PUINT_8) "
 const PUINT_8 apucNetworkOpMode[] = { (PUINT_8) "INFRASTRUCTURE", (PUINT_8) "IBSS", (PUINT_8) "ACCESS_POINT",
 	(PUINT_8) "P2P_DEVICE", (PUINT_8) "BOW" };
 
-#if (CFG_SUPPORT_ADHOC) || (CFG_SUPPORT_AAA)
 APPEND_VAR_IE_ENTRY_T txBcnIETable[] = {
 	{ (ELEM_HDR_LEN + (RATE_NUM_SW - ELEM_MAX_LEN_SUP_RATES)), NULL, bssGenerateExtSuppRate_IE } /* 50 */
 	,
@@ -51,17 +50,14 @@ APPEND_VAR_IE_ENTRY_T txBcnIETable[] = {
 	{ (ELEM_HDR_LEN + ELEM_MAX_LEN_HT_CAP), NULL, rlmRspGenerateHtCapIE } /* 45 */
 	,
 	{ (ELEM_HDR_LEN + ELEM_MAX_LEN_HT_OP), NULL, rlmRspGenerateHtOpIE } /* 61 */
-#if CFG_ENABLE_WIFI_DIRECT
 	,
 	{ (ELEM_HDR_LEN + ELEM_MAX_LEN_OBSS_SCAN), NULL, rlmRspGenerateObssScanIE } /* 74 */
-#endif
 	,
 	{ (ELEM_HDR_LEN + ELEM_MAX_LEN_EXT_CAP), NULL, rlmRspGenerateExtCapIE } /* 127 */
 	,
 	{ (ELEM_HDR_LEN + ELEM_MAX_LEN_WPA), NULL, rsnGenerateWpaNoneIE } /* 221 */
 	,
 	{ (ELEM_HDR_LEN + ELEM_MAX_LEN_WMM_PARAM), NULL, mqmGenerateWmmParamIE } /* 221 */
-#if CFG_ENABLE_WIFI_DIRECT
 	,
 	{ (ELEM_HDR_LEN + ELEM_MAX_LEN_WPA), NULL, rsnGenerateWPAIE } /* 221 */
 	,
@@ -72,24 +68,18 @@ APPEND_VAR_IE_ENTRY_T txBcnIETable[] = {
 	{ 0, p2pFuncCalculateWSC_IELenForBeacon, p2pFuncGenerateWSC_IEForBeacon } /* 221 */
 	,
 	{ 0, p2pFuncCalculateP2P_IE_NoA, p2pFuncGenerateP2P_IE_NoA } /* 221 */
-#endif															 /* CFG_ENABLE_WIFI_DIRECT */
-#if CFG_SUPPORT_802_11AC
 	,
 	{ (ELEM_HDR_LEN + ELEM_MAX_LEN_VHT_CAP), NULL, rlmRspGenerateVhtCapIE } /*191 */
 	,
 	{ (ELEM_HDR_LEN + ELEM_MAX_LEN_VHT_OP), NULL, rlmRspGenerateVhtOpIE } /*192 */
 	,
 	{ (ELEM_HDR_LEN + ELEM_MAX_LEN_VHT_OP_MODE_NOTIFICATION), NULL, rlmRspGenerateVhtOpNotificationIE } /*199 */
-#endif
 #if CFG_SUPPORT_MTK_SYNERGY
 	,
 	{ (ELEM_HDR_LEN + ELEM_MIN_LEN_MTK_OUI), NULL, rlmGenerateMTKOuiIE } /* 221 */
 #endif
-#if (CFG_SUPPORT_DFS_MASTER == 1)
 	,
 	{ (ELEM_HDR_LEN + ELEM_MIN_LEN_CSA), NULL, rlmGenerateCsaIE } /* 37 */
-#endif
-
 };
 
 APPEND_VAR_IE_ENTRY_T txProbRspIETable[] = {
@@ -100,34 +90,28 @@ APPEND_VAR_IE_ENTRY_T txProbRspIETable[] = {
 	{ (ELEM_HDR_LEN + ELEM_MAX_LEN_HT_CAP), NULL, rlmRspGenerateHtCapIE } /* 45 */
 	,
 	{ (ELEM_HDR_LEN + ELEM_MAX_LEN_HT_OP), NULL, rlmRspGenerateHtOpIE } /* 61 */
-#if CFG_ENABLE_WIFI_DIRECT
 	,
 	{ (ELEM_HDR_LEN + ELEM_MAX_LEN_RSN), NULL, rsnGenerateRSNIE } /* 48 */
 	,
 	{ (ELEM_HDR_LEN + ELEM_MAX_LEN_OBSS_SCAN), NULL, rlmRspGenerateObssScanIE } /* 74 */
-#endif
 	,
 	{ (ELEM_HDR_LEN + ELEM_MAX_LEN_EXT_CAP), NULL, rlmRspGenerateExtCapIE } /* 127 */
 	,
 	{ (ELEM_HDR_LEN + ELEM_MAX_LEN_WPA), NULL, rsnGenerateWpaNoneIE } /* 221 */
 	,
 	{ (ELEM_HDR_LEN + ELEM_MAX_LEN_WMM_PARAM), NULL, mqmGenerateWmmParamIE } /* 221 */
-#if CFG_SUPPORT_802_11AC
 	,
 	{ (ELEM_HDR_LEN + ELEM_MAX_LEN_VHT_CAP), NULL, rlmRspGenerateVhtCapIE } /*191 */
 	,
 	{ (ELEM_HDR_LEN + ELEM_MAX_LEN_VHT_OP), NULL, rlmRspGenerateVhtOpIE } /*192 */
 	,
 	{ (ELEM_HDR_LEN + ELEM_MAX_LEN_VHT_OP_MODE_NOTIFICATION), NULL, rlmRspGenerateVhtOpNotificationIE } /*199 */
-#endif
 #if CFG_SUPPORT_MTK_SYNERGY
 	,
 	{ (ELEM_HDR_LEN + ELEM_MIN_LEN_MTK_OUI), NULL, rlmGenerateMTKOuiIE } /* 221 */
 #endif
 
 };
-
-#endif /* CFG_SUPPORT_ADHOC || CFG_SUPPORT_AAA */
 
 /*******************************************************************************
  *                           P R I V A T E   D A T A
@@ -170,10 +154,8 @@ VOID bssDetermineStaRecPhyTypeSet(IN P_ADAPTER_T prAdapter, IN P_BSS_DESC_T prBs
 	UINT_8		 ucHtOption	 = FEATURE_ENABLED;
 	UINT_8		 ucVhtOption = FEATURE_ENABLED;
 
-	prStaRec->ucPhyTypeSet = prBssDesc->ucPhyTypeSet;
-#if CFG_SUPPORT_BFEE
+	prStaRec->ucPhyTypeSet					= prBssDesc->ucPhyTypeSet;
 	prStaRec->ucVhtCapNumSoundingDimensions = prBssDesc->ucVhtCapNumSoundingDimensions;
-#endif
 
 	/* Decide AIS PHY type set */
 	if (prStaRec->eStaType == STA_TYPE_LEGACY_AP) {
@@ -593,7 +575,6 @@ bssSendQoSNullFrame(
 
 } /* end of bssSendQoSNullFrame() */
 
-#if (CFG_SUPPORT_ADHOC) || (CFG_SUPPORT_AAA)
 /*----------------------------------------------------------------------------*/
 /* Routines for both IBSS(AdHoc) and BSS(AP)                                  */
 /*----------------------------------------------------------------------------*/
@@ -725,7 +706,6 @@ VOID bssBuildBeaconProbeRespFrameCommonIEs(
 	/* 4 <5> TIM element, ID: 5 */
 	if ((!pucDestAddr) && /* For Beacon only. */
 			(prBssInfo->eCurrentOPMode == OP_MODE_ACCESS_POINT)) {
-#if CFG_ENABLE_WIFI_DIRECT
 		/*no fgIsP2PRegistered protect */
 		if (prBssInfo->eNetworkType == NETWORK_TYPE_P2P) {
 			/* IEEE 802.11 2007 - 7.3.2.6 */
@@ -741,7 +721,7 @@ VOID bssBuildBeaconProbeRespFrameCommonIEs(
 			prMsduInfo->u2FrameLength += IE_SIZE(pucBuffer);
 
 		} else
-#endif /* CFG_ENABLE_WIFI_DIRECT */
+
 		{
 			/* NOTE(Kevin): 1. AIS - Didn't Support AP Mode.
 			 *              2. BOW - Didn't Support BCAST and PS.
@@ -949,16 +929,14 @@ bssSendBeaconProbeResponse(
 
 	/* 4 <2> Compose Beacon/Probe Response frame header and fixed fields in MSDU_INfO_T. */
 	/* Compose Header and Fixed Field */
-#if CFG_ENABLE_WIFI_DIRECT
+
 	if (u4ControlFlags & BSS_PROBE_RESP_USE_P2P_DEV_ADDR) {
 		if (prAdapter->fgIsP2PRegistered) {
 			bssComposeBeaconProbeRespFrameHeaderAndFF((PUINT_8)((ULONG)(prMsduInfo->prPacket) + MAC_TX_RESERVED_FIELD),
 					pucDestAddr, prAdapter->rWifiVar.aucDeviceAddress, prAdapter->rWifiVar.aucDeviceAddress,
 					DOT11_BEACON_PERIOD_DEFAULT, (prBssInfo->u2CapInfo & ~(CAP_INFO_ESS | CAP_INFO_IBSS)));
 		}
-	} else
-#endif /* CFG_ENABLE_WIFI_DIRECT */
-	{
+	} else {
 		bssComposeBeaconProbeRespFrameHeaderAndFF((PUINT_8)((ULONG)(prMsduInfo->prPacket) + MAC_TX_RESERVED_FIELD),
 				pucDestAddr, prBssInfo->aucOwnMacAddr, prBssInfo->aucBSSID, prBssInfo->u2BeaconInterval,
 				prBssInfo->u2CapInfo);
@@ -1050,17 +1028,11 @@ WLAN_STATUS bssProcessProbeRequest(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwR
 		fgReplyProbeResp = FALSE;
 
 		if (prBssInfo->eNetworkType == NETWORK_TYPE_AIS) {
-#if CFG_SUPPORT_ADHOC
 			fgReplyProbeResp = aisValidateProbeReq(prAdapter, prSwRfb, &u4CtrlFlagsForProbeResp);
-#endif
-		}
-#if CFG_ENABLE_WIFI_DIRECT
-		else if ((prAdapter->fgIsP2PRegistered) && (prBssInfo->eNetworkType == NETWORK_TYPE_P2P)) {
-
+		} else if ((prAdapter->fgIsP2PRegistered) && (prBssInfo->eNetworkType == NETWORK_TYPE_P2P)) {
 			fgReplyProbeResp = p2pFuncValidateProbeReq(prAdapter, prSwRfb, &u4CtrlFlagsForProbeResp,
 					(prBssInfo->ucBssIndex == P2P_DEV_BSS_INDEX), (UINT_8)prBssInfo->u4PrivateData);
 		}
-#endif
 
 		if (fgReplyProbeResp) {
 			if (nicTxGetFreeCmdCount(prAdapter) > (CFG_TX_MAX_CMD_PKT_NUM / 2)) {
@@ -1322,9 +1294,6 @@ VOID bssCheckClientList(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prBssInfo)
 		bssDumpClientList(prAdapter, prBssInfo);
 }
 
-#endif /* CFG_SUPPORT_ADHOC || CFG_SUPPORT_AAA */
-
-#if CFG_SUPPORT_ADHOC
 /*----------------------------------------------------------------------------*/
 /* Routines for IBSS(AdHoc) only                                              */
 /*----------------------------------------------------------------------------*/
@@ -1633,10 +1602,6 @@ VOID ibssInitForAdHoc(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prBssInfo)
 	nicTxUpdateBssDefaultRate(prBssInfo);
 } /* end of ibssInitForAdHoc() */
 
-#endif /* CFG_SUPPORT_ADHOC */
-
-#if CFG_SUPPORT_AAA
-
 /*----------------------------------------------------------------------------*/
 /* Routines for BSS(AP) only                                                  */
 /*----------------------------------------------------------------------------*/
@@ -1756,8 +1721,6 @@ VOID bssInitForAP(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prBssInfo, IN BOOLEA
 	/* Note: In E2, only 4 HW queues. The the Edca parameters should be folow by AIS network */
 	/* Note: In E3, 8 HW queues.  the Wmm parameters should be updated to right queues  according to BSS */
 } /* end of bssInitForAP() */
-
-#endif /* CFG_SUPPORT_AAA */
 
 VOID bssDumpBssInfo(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex)
 {

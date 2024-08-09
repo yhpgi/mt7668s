@@ -81,18 +81,14 @@
 #define CIPHER_FLAG_CCMP 0x00000008	  /* BIT 4 */
 #define CIPHER_FLAG_WEP104 0x00000010 /* BIT 5 */
 #define CIPHER_FLAG_WEP128 0x00000020 /* BIT 6 */
-#if CFG_SUPPORT_SUITB
 #define CIPHER_FLAG_GCMP256 0x00000080 /* BIT 7 */
-#endif
 
 #define WAIT_TIME_IND_PMKID_CANDICATE_SEC 6 /* seconds */
 #define TKIP_COUNTERMEASURE_SEC 60			/* seconds */
 
-#if CFG_SUPPORT_802_11W
 #define RSN_AUTH_MFP_DISABLED 0 /* MFP disabled */
 #define RSN_AUTH_MFP_OPTIONAL 1 /* MFP optional */
 #define RSN_AUTH_MFP_REQUIRED 2 /* MFP required */
-#endif
 
 #define GTK_REKEY_CMD_MODE_OFFLOAD_ON 0
 #define GTK_REKEY_CMD_MODE_OFLOAD_OFF 1
@@ -160,10 +156,8 @@ BOOLEAN
 rsnParseCheckForWFAInfoElem(
 		IN P_ADAPTER_T prAdapter, IN PUINT_8 pucBuf, OUT PUINT_8 pucOuiType, OUT PUINT_16 pu2SubTypeVersion);
 
-#if CFG_SUPPORT_AAA
 void rsnParserCheckForRSNCCMPPSK(
 		P_ADAPTER_T prAdapter, P_RSN_INFO_ELEM_T prIe, P_STA_RECORD_T prStaRec, PUINT_16 pu2StatusCode);
-#endif
 
 VOID rsnTkipHandleMICFailure(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prSta, IN BOOLEAN fgErrorKeyType);
 
@@ -180,11 +174,9 @@ VOID rsnCheckPmkidCache(IN P_ADAPTER_T prAdapter, IN P_BSS_DESC_T prBss);
 VOID rsnGeneratePmkidIndication(IN P_ADAPTER_T prAdapter);
 
 VOID rsnIndicatePmkidCand(IN P_ADAPTER_T prAdapter, IN ULONG ulParamPtr);
-#if CFG_SUPPORT_WPS2
-VOID rsnGenerateWSCIE(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo);
-#endif
 
-#if CFG_SUPPORT_802_11W
+VOID rsnGenerateWSCIE(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo);
+
 UINT_32 rsnCheckBipKeyInstalled(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec);
 
 UINT_8 rsnCheckSaQueryTimeout(IN P_ADAPTER_T prAdapter);
@@ -207,21 +199,13 @@ void rsnApStartSaQuery(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec);
 
 void rsnApSaQueryAction(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb);
 
-#endif /* CFG_SUPPORT_802_11W */
-
-#if CFG_SUPPORT_AAA
 VOID rsnGenerateWSCIEForAssocRsp(P_ADAPTER_T prAdapter, P_MSDU_INFO_T prMsduInfo);
-#endif
 
-#if CFG_SUPPORT_OWE
 void	rsnGenerateOWEIE(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo);
 UINT_32 rsnCalOweIELen(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex, P_STA_RECORD_T prStaRec);
-#endif
 
-#if CFG_SUPPORT_H2E
 void	 rsnGenerateRSNXE(IN P_ADAPTER_T prAdapter, IN OUT P_MSDU_INFO_T prMsduInfo);
 uint32_t rsnCalRSNXELen(IN P_ADAPTER_T prAdapter, IN uint8_t ucBssIndex, P_STA_RECORD_T prStaRec);
-#endif
 
 /*******************************************************************************
  *                              F U N C T I O N S

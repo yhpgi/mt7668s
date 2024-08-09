@@ -41,15 +41,11 @@
  */
 
 #ifdef CONFIG_NL80211_TESTMODE
-#if CFG_SUPPORT_NFC_BEAM_PLUS
-
 typedef struct _NL80211_DRIVER_SET_NFC_PARAMS {
 	NL80211_DRIVER_TEST_MODE_PARAMS hdr;
 	UINT_32							NFC_Enable;
 
 } NL80211_DRIVER_SET_NFC_PARAMS, *P_NL80211_DRIVER_SET_NFC_PARAMS;
-
-#endif
 
 typedef struct _NL80211_DRIVER_GET_STA_STATISTICS_PARAMS {
 	NL80211_DRIVER_TEST_MODE_PARAMS hdr;
@@ -178,9 +174,7 @@ int mtk_cfg80211_testmode_cmd(struct wiphy *wiphy, struct wireless_dev *wdev, vo
 
 int mtk_cfg80211_testmode_sw_cmd(IN struct wiphy *wiphy, IN void *data, IN int len);
 
-#if CFG_SUPPORT_NFC_BEAM_PLUS
 int mtk_cfg80211_testmode_get_scan_done(IN struct wiphy *wiphy, IN void *data, IN int len, IN P_GLUE_INFO_T prGlueInfo);
-#endif
 #endif
 
 int mtk_cfg80211_sched_scan_start(

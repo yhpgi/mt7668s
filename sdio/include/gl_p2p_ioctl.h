@@ -22,10 +22,8 @@
 #include <linux/kernel.h>
 #include <linux/netdevice.h>
 #include <linux/wireless.h>
-#if CFG_ENABLE_WIFI_DIRECT_CFG_80211
 #include <linux/ieee80211.h>
 #include <net/cfg80211.h>
-#endif
 
 #include "wlan_oid.h"
 
@@ -251,7 +249,6 @@ typedef struct iw_p2p_version {
 /*----------------------------------------------------------------------------*/
 /* NL80211 TEST MODE                                                          */
 /*----------------------------------------------------------------------------*/
-#if CFG_AUTO_CHANNEL_SEL_SUPPORT
 typedef enum _ENUM_TESTMODE_AVAILABLE_CHAN_ATTR {
 	__NL80211_TESTMODE_AVAILABLE_CHAN_ATTR_INVALID,
 	NL80211_TESTMODE_AVAILABLE_CHAN_ATTR_2G_BASE_1,
@@ -262,7 +259,6 @@ typedef enum _ENUM_TESTMODE_AVAILABLE_CHAN_ATTR {
 	__NL80211_TESTMODE_AVAILABLE_CHAN_ATTR_AFTER_LAST,
 	NL80211_TESTMODE_AVAILABLE_CHAN_ATTR_MAX = __NL80211_TESTMODE_AVAILABLE_CHAN_ATTR_AFTER_LAST - 1
 } ENUM_TESTMODE_AVAILABLE_CHAN_ATTR;
-#endif
 
 /*******************************************************************************
  *                            P U B L I C   D A T A
@@ -287,8 +283,6 @@ extern const UINT_32 mtk_cipher_suites[5];
  *                  F U N C T I O N   D E C L A R A T I O N S
  ********************************************************************************
  */
-
-#if (CFG_ENABLE_WIFI_DIRECT_CFG_80211 != 0)
 
 #if KERNEL_VERSION(4, 12, 0) <= CFG80211_VERSION_CODE
 struct wireless_dev *mtk_p2p_cfg80211_add_iface(struct wiphy *wiphy, const char *name, unsigned char name_assign_type,
@@ -388,17 +382,11 @@ int mtk_p2p_cfg80211_testmode_p2p_sigma_pre_cmd(IN struct wiphy *wiphy, IN void 
 
 int mtk_p2p_cfg80211_testmode_p2p_sigma_cmd(IN struct wiphy *wiphy, IN void *data, IN int len);
 
-#if CFG_SUPPORT_WFD
 int mtk_p2p_cfg80211_testmode_wfd_update_cmd(IN struct wiphy *wiphy, IN void *data, IN int len);
-#endif
 
 int mtk_p2p_cfg80211_testmode_hotspot_block_list_cmd(IN struct wiphy *wiphy, IN void *data, IN int len);
 
-#if CFG_AUTO_CHANNEL_SEL_SUPPORT
 int mtk_p2p_cfg80211_testmode_get_best_channel(IN struct wiphy *wiphy, IN void *data, IN int len);
-#endif
-
-#endif
 
 #endif
 
@@ -491,13 +479,11 @@ int mtk_p2p_wext_send_service_discovery_response(IN struct net_device *prDev, IN
 int mtk_p2p_wext_terminate_service_discovery_phase(IN struct net_device *prDev, IN struct iw_request_info *info,
 		IN OUT union iwreq_data *wrqu, IN OUT char *extra);
 
-#if CFG_SUPPORT_ANTI_PIRACY
 int mtk_p2p_wext_set_sec_check_request(IN struct net_device *prDev, IN struct iw_request_info *info,
 		IN OUT union iwreq_data *wrqu, IN OUT char *extra);
 
 int mtk_p2p_wext_get_sec_check_response(IN struct net_device *prDev, IN struct iw_request_info *info,
 		IN OUT union iwreq_data *wrqu, IN OUT char *extra);
-#endif
 
 int mtk_p2p_wext_set_noa_param(IN struct net_device *prDev, IN struct iw_request_info *info,
 		IN OUT union iwreq_data *wrqu, IN OUT char *extra);
@@ -512,14 +498,6 @@ int mtk_p2p_wext_get_p2p_version(IN struct net_device *prDev, IN struct iw_reque
 		IN OUT union iwreq_data *wrqu, IN OUT char *extra);
 
 void mtk_p2p_wext_set_Multicastlist(IN P_GLUE_INFO_T prGlueInfo);
-
-#if CFG_SUPPORT_P2P_RSSI_QUERY
-int mtk_p2p_wext_get_rssi(IN struct net_device *prDev, IN struct iw_request_info *info, IN OUT union iwreq_data *wrqu,
-		IN OUT char *extra);
-
-struct iw_statistics *mtk_p2p_wext_get_wireless_stats(struct net_device *prDev);
-
-#endif
 
 int mtk_p2p_wext_set_txpow(IN struct net_device *prDev, IN struct iw_request_info *prIwrInfo,
 		IN OUT union iwreq_data *prTxPow, IN char *pcExtra);

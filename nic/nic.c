@@ -123,12 +123,10 @@ WLAN_STATUS nicAllocateAdapterMemory(IN P_ADAPTER_T prAdapter)
 
 	do {
 		/* 4 <0> Reset all Memory Handler */
-#if CFG_DBG_MGT_BUF
 		prAdapter->u4MemFreeDynamicCount  = 0;
 		prAdapter->u4MemAllocDynamicCount = 0;
-#endif
-		prAdapter->pucMgtBufCached = (PUINT_8)NULL;
-		prRxCtrl->pucRxCached	   = (PUINT_8)NULL;
+		prAdapter->pucMgtBufCached		  = (PUINT_8)NULL;
+		prRxCtrl->pucRxCached			  = (PUINT_8)NULL;
 
 		/* 4 <1> Memory for Management Memory Pool and CMD_INFO_T */
 		/* Allocate memory for the CMD_INFO_T and its MGMT memory pool. */
@@ -242,7 +240,6 @@ VOID nicReleaseAdapterMemory(IN P_ADAPTER_T prAdapter)
 	for (u4Idx = 0; u4Idx < CFG_STA_REC_NUM; u4Idx++)
 		nicTxFreeDescTemplate(prAdapter, &prAdapter->arStaRec[u4Idx]);
 
-#if CFG_DBG_MGT_BUF
 	do {
 		BOOLEAN		 fgUnfreedMem = FALSE;
 		P_BUF_INFO_T prBufInfo;
@@ -274,7 +271,6 @@ VOID nicReleaseAdapterMemory(IN P_ADAPTER_T prAdapter)
 			ASSERT(prAdapter->u4MemFreeDynamicCount == prAdapter->u4MemAllocDynamicCount);
 		}
 	} while (FALSE);
-#endif
 }
 
 /*----------------------------------------------------------------------------*/
@@ -789,11 +785,8 @@ nicMediaStateChange(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex, IN P_EVENT_C
 			}
 		}
 		break;
-
-#if CFG_ENABLE_WIFI_DIRECT
 	case NETWORK_TYPE_P2P:
 		break;
-#endif
 	default:
 		ASSERT(0);
 	}
@@ -1165,9 +1158,9 @@ WLAN_STATUS nicDeactivateNetwork(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex)
 		qmFreeAllByBssIdx(prAdapter, ucBssIndex);
 	nicFreePendingTxMsduInfoByBssIdx(prAdapter, ucBssIndex);
 	kalClearSecurityFramesByBssIdx(prAdapter->prGlueInfo, ucBssIndex);
-#if (CFG_HW_WMM_BY_BSS == 1)
+
 	cnmFreeWmmIndex(prAdapter, prBssInfo);
-#endif
+
 	return u4Status;
 }
 
@@ -1231,11 +1224,8 @@ WLAN_STATUS nicUpdateBss(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex)
 		rCmdSetBssInfo.ucBMCWlanIndex = prBssInfo->ucBMCWlanIndex;
 	DBGLOG(RSN, TRACE, "Update BSS BMC WlanIdx %u\n", rCmdSetBssInfo.ucBMCWlanIndex);
 
-#ifdef CFG_ENABLE_WIFI_DIRECT
 	rCmdSetBssInfo.ucHiddenSsidMode = prBssInfo->eHiddenSsidType;
-#endif
 	rlmFillSyncCmdParam(&rCmdSetBssInfo.rBssRlmParam, prBssInfo);
-
 	rCmdSetBssInfo.ucWapiMode = (UINT_8)FALSE;
 
 	if (rCmdSetBssInfo.ucBssIndex == prAdapter->prAisBssInfo->ucBssIndex) {
@@ -1248,15 +1238,11 @@ WLAN_STATUS nicUpdateBss(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex)
 	}
 
 	else {
-#if CFG_ENABLE_WIFI_DIRECT
 		if (prAdapter->fgIsP2PRegistered) {
-#if CFG_SUPPORT_SUITB
 			if (kalP2PGetGcmp256Cipher(prAdapter->prGlueInfo, (UINT_8)prBssInfo->u4PrivateData)) {
 				rCmdSetBssInfo.ucAuthMode  = (UINT_8)AUTH_MODE_WPA2_PSK;
 				rCmdSetBssInfo.ucEncStatus = (UINT_8)ENUM_ENCRYPTION4_ENABLED;
-			} else
-#endif
-					if (kalP2PGetCcmpCipher(prAdapter->prGlueInfo, (UINT_8)prBssInfo->u4PrivateData)) {
+			} else if (kalP2PGetCcmpCipher(prAdapter->prGlueInfo, (UINT_8)prBssInfo->u4PrivateData)) {
 				rCmdSetBssInfo.ucAuthMode  = (UINT_8)AUTH_MODE_WPA2_PSK;
 				rCmdSetBssInfo.ucEncStatus = (UINT_8)ENUM_ENCRYPTION3_ENABLED;
 			} else if (kalP2PGetTkipCipher(prAdapter->prGlueInfo, (UINT_8)prBssInfo->u4PrivateData)) {
@@ -1278,24 +1264,15 @@ WLAN_STATUS nicUpdateBss(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex)
 			else
 				rCmdSetBssInfo.ucDisconnectDetectTh = prWifiVar->ucP2pDisconnectDetectTh;
 		}
-#else
-		rCmdSetBssInfo.ucAuthMode		  = (UINT_8)AUTH_MODE_WPA2_PSK;
-		rCmdSetBssInfo.ucEncStatus		  = (UINT_8)ENUM_ENCRYPTION3_KEY_ABSENT;
-#endif
 	}
 
 	if (ucBssIndex == prAdapter->prAisBssInfo->ucBssIndex && prBssInfo->eCurrentOPMode == OP_MODE_INFRASTRUCTURE &&
 			prBssInfo->prStaRecOfAP != NULL) {
 		rCmdSetBssInfo.ucStaRecIdxOfAP = prBssInfo->prStaRecOfAP->ucIndex;
-	}
-#if CFG_ENABLE_WIFI_DIRECT
-	else if ((prAdapter->fgIsP2PRegistered) && (prBssInfo->eNetworkType == NETWORK_TYPE_P2P) &&
-			 (prBssInfo->eCurrentOPMode == OP_MODE_INFRASTRUCTURE) && (prBssInfo->prStaRecOfAP != NULL)) {
+	} else if ((prAdapter->fgIsP2PRegistered) && (prBssInfo->eNetworkType == NETWORK_TYPE_P2P) &&
+			   (prBssInfo->eCurrentOPMode == OP_MODE_INFRASTRUCTURE) && (prBssInfo->prStaRecOfAP != NULL)) {
 		rCmdSetBssInfo.ucStaRecIdxOfAP = prBssInfo->prStaRecOfAP->ucIndex;
-	}
-#endif
-
-	else
+	} else
 		rCmdSetBssInfo.ucStaRecIdxOfAP = STA_REC_INDEX_NOT_FOUND;
 
 	DBGLOG(BSS, INFO, "Update Bss[%u] ConnState[%u] OPmode[%u] BSSID[" MACSTR "] AuthMode[%u] EncStatus[%u]\n",
@@ -1321,9 +1298,7 @@ WLAN_STATUS nicUpdateBss(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex)
 			qmFreeAllByBssIdx(prAdapter, ucBssIndex);
 		kalClearSecurityFramesByBssIdx(prAdapter->prGlueInfo, ucBssIndex);
 
-#if CFG_SUPPORT_DBDC
 		cnmDbdcDisableDecision(prAdapter, ucBssIndex);
-#endif
 	}
 
 	return u4Status;
@@ -1398,12 +1373,9 @@ WLAN_STATUS nicPmIndicateBssConnected(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssI
 	/* rCmdIndicatePmBssConnected.ucBmpDeliveryAC, */
 	/* rCmdIndicatePmBssConnected.ucBmpTriggerAC); */
 
-	if ((GET_BSS_INFO_BY_INDEX(prAdapter, ucBssIndex)->eNetworkType == NETWORK_TYPE_AIS)
-#if CFG_ENABLE_WIFI_DIRECT
-			|| ((GET_BSS_INFO_BY_INDEX(prAdapter, ucBssIndex)->eNetworkType == NETWORK_TYPE_P2P) &&
-					   (prAdapter->fgIsP2PRegistered))
-#endif
-	) {
+	if ((GET_BSS_INFO_BY_INDEX(prAdapter, ucBssIndex)->eNetworkType == NETWORK_TYPE_AIS) ||
+			((GET_BSS_INFO_BY_INDEX(prAdapter, ucBssIndex)->eNetworkType == NETWORK_TYPE_P2P) &&
+					(prAdapter->fgIsP2PRegistered))) {
 		if (prBssInfo->eCurrentOPMode == OP_MODE_INFRASTRUCTURE) {
 			rCmdIndicatePmBssConnected.fgIsUapsdConnection = (UINT_8)prBssInfo->prStaRecOfAP->fgIsUapsdSupported;
 		} else {
@@ -1988,14 +1960,10 @@ VOID nicInitMGMT(IN P_ADAPTER_T prAdapter, IN P_REG_INFO_T prRegInfo)
 	aisFsmInit(prAdapter);
 	aisInitializeConnectionSettings(prAdapter, prRegInfo);
 
-#if CFG_SUPPORT_ROAMING
 	/* Roaming Module - intiailization */
 	roamingFsmInit(prAdapter);
-#endif /* CFG_SUPPORT_ROAMING */
 
-#if CFG_SUPPORT_SWCR
 	swCrDebugInit(prAdapter);
-#endif /* CFG_SUPPORT_SWCR */
 }
 
 /*----------------------------------------------------------------------------*/
@@ -2011,22 +1979,10 @@ VOID nicUninitMGMT(IN P_ADAPTER_T prAdapter)
 {
 	ASSERT(prAdapter);
 
-#if CFG_SUPPORT_SWCR
 	swCrDebugUninit(prAdapter);
-#endif /* CFG_SUPPORT_SWCR */
-
-#if CFG_SUPPORT_ROAMING
-	/* Roaming Module - unintiailization */
 	roamingFsmUninit(prAdapter);
-#endif /* CFG_SUPPORT_ROAMING */
-
-	/* AIS Module - unintiailization */
 	aisFsmUninit(prAdapter);
-
-	/* SCN Module - unintiailization */
 	scnUninit(prAdapter);
-
-	/* RLM Module - uninitialization */
 	rlmFsmEventUninit(prAdapter);
 }
 
@@ -3007,19 +2963,7 @@ VOID nicUpdateRSSI(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex, IN INT_8 cRss
 			kalUpdateRSSI(prAdapter->prGlueInfo, KAL_NETWORK_TYPE_AIS_INDEX, prAdapter->rLinkQuality.cRssi,
 					prAdapter->rLinkQuality.cLinkQuality);
 		}
-
 		break;
-#if CFG_ENABLE_WIFI_DIRECT && CFG_SUPPORT_P2P_RSSI_QUERY
-	case NETWORK_TYPE_P2P:
-		prAdapter->fgIsP2pLinkQualityValid	 = TRUE;
-		prAdapter->rP2pLinkQualityUpdateTime = kalGetTimeTick();
-
-		prAdapter->rP2pLinkQuality.cRssi		= cRssi;
-		prAdapter->rP2pLinkQuality.cLinkQuality = cLinkQuality;
-
-		kalUpdateRSSI(prAdapter->prGlueInfo, KAL_NETWORK_TYPE_P2P_INDEX, cRssi, cLinkQuality);
-		break;
-#endif
 	default:
 		break;
 	}
@@ -3059,20 +3003,6 @@ VOID nicUpdateLinkSpeed(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex, IN UINT_
 	}
 }
 
-#if CFG_SUPPORT_RDD_TEST_MODE
-WLAN_STATUS nicUpdateRddTestMode(IN P_ADAPTER_T prAdapter, IN P_CMD_RDD_CH_T prRddChParam)
-{
-	DEBUGFUNC("nicUpdateRddTestMode.\n");
-
-	ASSERT(prAdapter);
-
-	/* aisFsmScanRequest(prAdapter, NULL); */
-
-	return wlanSendSetQueryCmd(prAdapter, CMD_ID_SET_RDD_CH, TRUE, FALSE, FALSE, NULL, NULL, sizeof(CMD_RDD_CH_T),
-			(PUINT_8)prRddChParam, NULL, 0);
-}
-#endif
-
 /*----------------------------------------------------------------------------*/
 /*!
  * @brief This function is called to apply network address setting to
@@ -3100,7 +3030,6 @@ WLAN_STATUS nicApplyNetworkAddress(IN P_ADAPTER_T prAdapter)
 	COPY_MAC_ADDR(prAdapter->rWifiVar.aucInterfaceAddress, prAdapter->rMyMacAddr);
 	prAdapter->rWifiVar.aucInterfaceAddress[0] ^= MAC_ADDR_LOCAL_ADMIN;
 
-#if CFG_ENABLE_WIFI_DIRECT
 	if (prAdapter->fgIsP2PRegistered) {
 		for (i = 0; i < BSS_INFO_NUM; i++) {
 			if (prAdapter->rWifiVar.arBssInfoPool[i].eNetworkType == NETWORK_TYPE_P2P) {
@@ -3108,15 +3037,6 @@ WLAN_STATUS nicApplyNetworkAddress(IN P_ADAPTER_T prAdapter)
 			}
 		}
 	}
-#endif
-
-#if CFG_TEST_WIFI_DIRECT_GO
-	if (prAdapter->rWifiVar.prP2pFsmInfo->eCurrentState == P2P_STATE_IDLE) {
-		wlanEnableP2pFunction(prAdapter);
-
-		wlanEnableATGO(prAdapter);
-	}
-#endif
 
 	kalUpdateMACAddress(prAdapter->prGlueInfo, prAdapter->rWifiVar.aucMacAddress);
 

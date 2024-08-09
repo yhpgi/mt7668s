@@ -71,10 +71,7 @@ typedef struct _PM_PROFILE_SETUP_INFO_T {
  *                                 M A C R O S
  ********************************************************************************
  */
-#if !CFG_ENABLE_FULL_PM
-#define ACQUIRE_POWER_CONTROL_FROM_PM(_prAdapter)
-#define RECLAIM_POWER_CONTROL_TO_PM(_prAdapter, _fgEnableGINT_in_IST)
-#else
+
 #define ACQUIRE_POWER_CONTROL_FROM_PM(_prAdapter) \
 	{ \
 		nicpmSetDriverOwn(_prAdapter); \
@@ -84,7 +81,6 @@ typedef struct _PM_PROFILE_SETUP_INFO_T {
 	{ \
 		nicpmSetFWOwn(_prAdapter, _fgEnableGINT_in_IST); \
 	}
-#endif
 
 /*******************************************************************************
  *                   F U N C T I O N   D E C L A R A T I O N S

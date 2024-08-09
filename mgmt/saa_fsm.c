@@ -116,28 +116,18 @@ void saaSendAuthAssoc(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec)
 				DBGLOG(SAA, INFO, "[SAA]Get auth SN = %d from Conn Settings\n", u2AuthTransSN);
 			}
 
-#if CFG_SUPPORT_H2E
 			if (prAdapter->prGlueInfo->rWpaInfo.u4AuthAlg & AUTH_TYPE_SAE) {
 				kalMemCopy(&u2AuthStatusCode, &prConnSettings->aucAuthData[2], AUTH_STATUS_CODE_FIELD_LEN);
 				DBGLOG(SAA, INFO, "[SAA]Get auth StatusCode=%d from Conn Settings\n", u2AuthStatusCode);
 			}
-#endif
 
 			/* Update Station Record - Class 1 Flag */
 			if (prStaRec->ucStaState != STA_STATE_1) {
 				DBGLOG(SAA, WARN, "[SAA]Rx send auth CMD at unexpect state:%d\n", prStaRec->ucStaState);
 				cnmStaRecChangeState(prAdapter, prStaRec, STA_STATE_1);
 			}
-#if !CFG_SUPPORT_AAA
-			rStatus = authSendAuthFrame(prAdapter, prStaRec, u2AuthTransSN);
-#else
-			rStatus = authSendAuthFrame(prAdapter, prStaRec, prStaRec->ucBssIndex, NULL, u2AuthTransSN,
-#if CFG_SUPPORT_H2E
-					u2AuthStatusCode);
-#else
-					STATUS_CODE_RESERVED);
-#endif
-#endif /* CFG_SUPPORT_AAA */
+			rStatus =
+					authSendAuthFrame(prAdapter, prStaRec, prStaRec->ucBssIndex, NULL, u2AuthTransSN, u2AuthStatusCode);
 			prStaRec->eAuthAssocSent = u2AuthTransSN;
 		} else { /* Prepare to send association frame */
 			/* Fill Cipher/AKM before sending association request,
@@ -213,12 +203,8 @@ void saaSendAuthSeq3(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec)
 	} else {
 		prStaRec->ucTxAuthAssocRetryCount++;
 
-#if !CFG_SUPPORT_AAA
-		rStatus = authSendAuthFrame(prAdapter, prStaRec, AUTH_TRANSACTION_SEQ_3);
-#else
 		rStatus = authSendAuthFrame(
 				prAdapter, prStaRec, prStaRec->ucBssIndex, NULL, AUTH_TRANSACTION_SEQ_3, STATUS_CODE_RESERVED);
-#endif /* CFG_SUPPORT_AAA */
 
 		prStaRec->eAuthAssocSent = AA_SENT_AUTH3;
 
@@ -309,12 +295,8 @@ VOID saaFsmSteps(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec, IN ENUM_A
 				/* Update Station Record - Class 1 Flag */
 				cnmStaRecChangeState(prAdapter, prStaRec, STA_STATE_1);
 
-#if !CFG_SUPPORT_AAA
-				rStatus = authSendAuthFrame(prAdapter, prStaRec, AUTH_TRANSACTION_SEQ_1);
-#else
 				rStatus = authSendAuthFrame(
 						prAdapter, prStaRec, prStaRec->ucBssIndex, NULL, AUTH_TRANSACTION_SEQ_1, STATUS_CODE_RESERVED);
-#endif /* CFG_SUPPORT_AAA */
 				if (rStatus != WLAN_STATUS_SUCCESS) {
 					cnmTimerInitTimer(prAdapter, &prStaRec->rTxReqDoneOrRxRespTimer,
 							(PFN_MGMT_TIMEOUT_FUNC)saaFsmRunEventTxReqTimeOut, (ULONG)prStaRec);
@@ -341,12 +323,8 @@ VOID saaFsmSteps(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec, IN ENUM_A
 			} else {
 				prStaRec->ucTxAuthAssocRetryCount++;
 
-#if !CFG_SUPPORT_AAA
-				rStatus = authSendAuthFrame(prAdapter, prStaRec, AUTH_TRANSACTION_SEQ_3);
-#else
 				rStatus = authSendAuthFrame(
 						prAdapter, prStaRec, prStaRec->ucBssIndex, NULL, AUTH_TRANSACTION_SEQ_3, STATUS_CODE_RESERVED);
-#endif /* CFG_SUPPORT_AAA */
 				if (rStatus != WLAN_STATUS_SUCCESS) {
 					cnmTimerInitTimer(prAdapter, &prStaRec->rTxReqDoneOrRxRespTimer,
 							(PFN_MGMT_TIMEOUT_FUNC)saaFsmRunEventTxReqTimeOut, (ULONG)prStaRec);

@@ -26,10 +26,8 @@ extern VOID wlanUpdateChannelTable(P_GLUE_INFO_T prGlueInfo);
 extern BOOLEAN wextSrchDesiredWPAIE(
 		IN PUINT_8 pucIEStart, IN INT_32 i4TotalIeLen, IN UINT_8 ucDesiredElemId, OUT PUINT_8 *ppucDesiredIE);
 
-#if CFG_SUPPORT_WPS
 extern BOOLEAN wextSrchDesiredWPSIE(
 		IN PUINT_8 pucIEStart, IN INT_32 i4TotalIeLen, IN UINT_8 ucDesiredElemId, OUT PUINT_8 *ppucDesiredIE);
-#endif
 
 /*******************************************************************************
  *                              C O N S T A N T S
@@ -89,13 +87,11 @@ struct iw_mlme {
 #define IW_AUTH_RX_UNENCRYPTED_EAPOL 8
 #define IW_AUTH_ROAMING_CONTROL 9
 #define IW_AUTH_PRIVACY_INVOKED 10
-#if CFG_SUPPORT_802_11W
-#define IW_AUTH_MFP 12
 
+#define IW_AUTH_MFP 12
 #define IW_AUTH_MFP_DISABLED 0 /* MFP disabled */
 #define IW_AUTH_MFP_OPTIONAL 1 /* MFP optional */
 #define IW_AUTH_MFP_REQUIRED 2 /* MFP required */
-#endif
 
 /* IW_AUTH_WPA_VERSION values (bit field) */
 #define IW_AUTH_WPA_VERSION_DISABLED 0x00000001
@@ -132,9 +128,7 @@ struct iw_mlme {
 #define IW_ENCODE_ALG_WEP 1
 #define IW_ENCODE_ALG_TKIP 2
 #define IW_ENCODE_ALG_CCMP 3
-#if CFG_SUPPORT_802_11W
 #define IW_ENCODE_ALG_AES_CMAC 5
-#endif
 
 /* struct iw_encode_ext ->ext_flags */
 #define IW_ENCODE_EXT_TX_SEQ_VALID 0x00000001
@@ -237,10 +231,8 @@ enum {
 // #define IW_AUTH_KEY_MGMT_WAPI_CERT 4
 #define IW_AUTH_KEY_MGMT_WPS 5
 
-#if CFG_SUPPORT_802_11W
 #define IW_AUTH_KEY_MGMT_802_1X_SHA256 7
 #define IW_AUTH_KEY_MGMT_PSK_SHA256 8
-#endif
 
 /*******************************************************************************
  *                            P U B L I C   D A T A
@@ -277,11 +269,9 @@ BOOLEAN
 wextSrchDesiredWPAIE(
 		IN PUINT_8 pucIEStart, IN INT_32 i4TotalIeLen, IN UINT_8 ucDesiredElemId, OUT PUINT_8 *ppucDesiredIE);
 
-#if CFG_SUPPORT_WPS
 BOOLEAN
 wextSrchDesiredWPSIE(
 		IN PUINT_8 pucIEStart, IN INT_32 i4TotalIeLen, IN UINT_8 ucDesiredElemId, OUT PUINT_8 *ppucDesiredIE);
-#endif
 
 BOOLEAN wextSrchDesiredWAPIIE(IN PUINT_8 pucIEStart, IN INT_32 i4TotalIeLen, OUT PUINT_8 *ppucDesiredIE);
 
@@ -291,5 +281,4 @@ BOOLEAN wextSrchDesiredWAPIIE(IN PUINT_8 pucIEStart, IN INT_32 i4TotalIeLen, OUT
  */
 
 #endif /* WIRELESS_EXT */
-
 #endif /* _GL_WEXT_H */

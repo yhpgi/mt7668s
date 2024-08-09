@@ -112,7 +112,7 @@ typedef enum _ENUM_DBG_MODULE_T {
 	DBG_ROAMING_IDX,
 	/* 0x1B */ /* ROAMING */
 	DBG_TDLS_IDX,
-	/* 0x1C */ /* TDLS */ /* CFG_SUPPORT_TDLS */
+	/* 0x1C */ /* TDLS */
 	DBG_PF_IDX,
 	/* 0x1D */ /* PF */
 	DBG_OID_IDX,

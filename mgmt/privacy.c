@@ -228,14 +228,12 @@ VOID secSetCipherSuite(IN P_ADAPTER_T prAdapter, IN UINT_32 u4CipherSuitesFlags)
 		prEntry = &prMib->dot11RSNAConfigPairwiseCiphersTable[i];
 
 		switch (prEntry->dot11RSNAConfigPairwiseCipher) {
-#if CFG_SUPPORT_SUITB
 		case RSN_CIPHER_SUITE_GCMP_256:
 			if (u4CipherSuitesFlags & CIPHER_FLAG_GCMP256)
 				prEntry->dot11RSNAConfigPairwiseCipherEnabled = TRUE;
 			else
 				prEntry->dot11RSNAConfigPairwiseCipherEnabled = FALSE;
 			break;
-#endif
 		case WPA_CIPHER_SUITE_WEP40:
 		case RSN_CIPHER_SUITE_WEP40:
 			if (u4CipherSuitesFlags & CIPHER_FLAG_WEP40)
@@ -281,12 +279,10 @@ VOID secSetCipherSuite(IN P_ADAPTER_T prAdapter, IN UINT_32 u4CipherSuitesFlags)
 		prMib->dot11RSNAConfigGroupCipher = WPA_CIPHER_SUITE_WEP104;
 	else if (rsnSearchSupportedCipher(prAdapter, WPA_CIPHER_SUITE_WEP40, &i))
 		prMib->dot11RSNAConfigGroupCipher = WPA_CIPHER_SUITE_WEP40;
-#if CFG_SUPPORT_SUITB
 	else if (rsnSearchSupportedCipher(prAdapter, RSN_CIPHER_SUITE_GROUP_NOT_USED, &i))
 		prMib->dot11RSNAConfigGroupCipher = RSN_CIPHER_SUITE_GROUP_NOT_USED;
 	else if (rsnSearchSupportedCipher(prAdapter, RSN_CIPHER_SUITE_GCMP_256, &i))
 		prMib->dot11RSNAConfigGroupCipher = RSN_CIPHER_SUITE_GCMP_256;
-#endif
 	else
 		prMib->dot11RSNAConfigGroupCipher = WPA_CIPHER_SUITE_NONE;
 
@@ -332,11 +328,8 @@ BOOLEAN secEnabledInAis(IN P_ADAPTER_T prAdapter)
 
 	if ((prAdapter->rWifiVar.rConnSettings.eEncStatus == ENUM_ENCRYPTION1_ENABLED) ||
 			(prAdapter->rWifiVar.rConnSettings.eEncStatus == ENUM_ENCRYPTION2_ENABLED) ||
-			(prAdapter->rWifiVar.rConnSettings.eEncStatus == ENUM_ENCRYPTION3_ENABLED)
-#if CFG_SUPPORT_SUITB
-			|| (prAdapter->rWifiVar.rConnSettings.eEncStatus == ENUM_ENCRYPTION4_ENABLED)
-#endif
-	)
+			(prAdapter->rWifiVar.rConnSettings.eEncStatus == ENUM_ENCRYPTION3_ENABLED) ||
+			(prAdapter->rWifiVar.rConnSettings.eEncStatus == ENUM_ENCRYPTION4_ENABLED))
 		return TRUE;
 	else if ((prAdapter->rWifiVar.rConnSettings.eEncStatus == ENUM_ENCRYPTION_DISABLED))
 		DBGLOG(RSN, TRACE, "Unknown encryption setting %d\n", prAdapter->rWifiVar.rConnSettings.eEncStatus);
@@ -385,13 +378,10 @@ BOOLEAN secIsProtectedBss(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prBssInfo)
 {
 	ASSERT(prBssInfo);
 
-	if (prBssInfo->eNetworkType == NETWORK_TYPE_AIS) {
+	if (prBssInfo->eNetworkType == NETWORK_TYPE_AIS)
 		return secEnabledInAis(prAdapter);
-	}
-#if CFG_ENABLE_WIFI_DIRECT
 	else if (prBssInfo->eNetworkType == NETWORK_TYPE_P2P)
 		return kalP2PGetCipher(prAdapter->prGlueInfo, (UINT_8)prBssInfo->u4PrivateData);
-#endif
 	else if (prBssInfo->eNetworkType == NETWORK_TYPE_BOW)
 		return TRUE;
 
