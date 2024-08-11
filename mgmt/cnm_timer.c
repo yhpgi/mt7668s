@@ -10,48 +10,49 @@
 
 /*******************************************************************************
  *                         C O M P I L E R   F L A G S
- ********************************************************************************
+ *******************************************************************************
  */
 
 /*******************************************************************************
  *                    E X T E R N A L   R E F E R E N C E S
- ********************************************************************************
+ *******************************************************************************
  */
+
 #include "precomp.h"
 
 /*******************************************************************************
  *                              C O N S T A N T S
- ********************************************************************************
+ *******************************************************************************
  */
 
 /*******************************************************************************
  *                             D A T A   T Y P E S
- ********************************************************************************
+ *******************************************************************************
  */
 
 /*******************************************************************************
  *                            P U B L I C   D A T A
- ********************************************************************************
+ *******************************************************************************
  */
 
 /*******************************************************************************
  *                           P R I V A T E   D A T A
- ********************************************************************************
+ *******************************************************************************
  */
 
 /*******************************************************************************
  *                                 M A C R O S
- ********************************************************************************
+ *******************************************************************************
  */
 
 /*******************************************************************************
  *                   F U N C T I O N   D E C L A R A T I O N S
- ********************************************************************************
+ *******************************************************************************
  */
 
 /*******************************************************************************
  *                              F U N C T I O N S
- ********************************************************************************
+ *******************************************************************************
  */
 
 /*----------------------------------------------------------------------------*/
@@ -63,7 +64,7 @@
  * \return (none)
  */
 /*----------------------------------------------------------------------------*/
-VOID cnmTimerInitialize(IN P_ADAPTER_T prAdapter)
+void cnmTimerInitialize(IN P_ADAPTER_T prAdapter)
 {
 	P_ROOT_TIMER prRootTimer;
 
@@ -90,7 +91,7 @@ VOID cnmTimerInitialize(IN P_ADAPTER_T prAdapter)
  * \return (none)
  */
 /*----------------------------------------------------------------------------*/
-VOID cnmTimerDestroy(IN P_ADAPTER_T prAdapter)
+void cnmTimerDestroy(IN P_ADAPTER_T prAdapter)
 {
 	P_ROOT_TIMER prRootTimer;
 
@@ -118,8 +119,9 @@ VOID cnmTimerDestroy(IN P_ADAPTER_T prAdapter)
  * \return (none)
  */
 /*----------------------------------------------------------------------------*/
-VOID cnmTimerInitTimer(
-		IN P_ADAPTER_T prAdapter, IN P_TIMER_T prTimer, IN PFN_MGMT_TIMEOUT_FUNC pfFunc, IN ULONG ulDataPtr)
+void cnmTimerInitTimer(IN P_ADAPTER_T prAdapter, IN P_TIMER_T prTimer,
+		       IN PFN_MGMT_TIMEOUT_FUNC pfFunc,
+		       IN unsigned long ulDataPtr)
 {
 	ASSERT(prAdapter);
 
@@ -133,15 +135,15 @@ VOID cnmTimerInitTimer(
 
 	ASSERT(prAdapter->rRootTimer.rLinkHead.prNext);
 	{
-		P_LINK_T	   prTimerList;
+		P_LINK_T prTimerList;
 		P_LINK_ENTRY_T prLinkEntry;
-		P_TIMER_T	   prPendingTimer;
+		P_TIMER_T prPendingTimer;
 
 		prTimerList = &(prAdapter->rRootTimer.rLinkHead);
 
-		LINK_FOR_EACH(prLinkEntry, prTimerList)
-		{
-			prPendingTimer = LINK_ENTRY(prLinkEntry, TIMER_T, rLinkEntry);
+		LINK_FOR_EACH(prLinkEntry, prTimerList) {
+			prPendingTimer =
+				LINK_ENTRY(prLinkEntry, TIMER_T, rLinkEntry);
 			ASSERT(prPendingTimer);
 			ASSERT(prPendingTimer != prTimer);
 		}
@@ -150,7 +152,7 @@ VOID cnmTimerInitTimer(
 	LINK_ENTRY_INITIALIZE(&prTimer->rLinkEntry);
 
 	prTimer->pfMgmtTimeOutFunc = pfFunc;
-	prTimer->ulDataPtr		   = ulDataPtr;
+	prTimer->ulDataPtr = ulDataPtr;
 }
 
 /*----------------------------------------------------------------------------*/
@@ -162,7 +164,9 @@ VOID cnmTimerInitTimer(
  * \return (none)
  */
 /*----------------------------------------------------------------------------*/
-static VOID cnmTimerStopTimer_impl(IN P_ADAPTER_T prAdapter, IN P_TIMER_T prTimer, IN BOOLEAN fgAcquireSpinlock)
+static void cnmTimerStopTimer_impl(IN P_ADAPTER_T prAdapter,
+				   IN P_TIMER_T prTimer,
+				   IN u8 fgAcquireSpinlock)
 {
 	P_ROOT_TIMER prRootTimer;
 
@@ -177,11 +181,13 @@ static VOID cnmTimerStopTimer_impl(IN P_ADAPTER_T prAdapter, IN P_TIMER_T prTime
 		KAL_ACQUIRE_SPIN_LOCK(prAdapter, SPIN_LOCK_TIMER);
 
 	if (timerPendingTimer(prTimer)) {
-		LINK_REMOVE_KNOWN_ENTRY(&prRootTimer->rLinkHead, &prTimer->rLinkEntry);
+		LINK_REMOVE_KNOWN_ENTRY(&prRootTimer->rLinkHead,
+					&prTimer->rLinkEntry);
 
-		/* Reduce dummy timeout for power saving, especially HIF activity.
-		 * If two or more timers exist and being removed timer is smallest,
-		 * this dummy timeout will still happen, but it is OK.
+		/* Reduce dummy timeout for power saving, especially HIF
+		 * activity. If two or more timers exist and being removed timer
+		 * is smallest, this dummy timeout will still happen, but it is
+		 * OK.
 		 */
 		if (LINK_IS_EMPTY(&prRootTimer->rLinkHead)) {
 			kalCancelTimer(prAdapter->prGlueInfo);
@@ -201,12 +207,12 @@ static VOID cnmTimerStopTimer_impl(IN P_ADAPTER_T prAdapter, IN P_TIMER_T prTime
  * \return (none)
  */
 /*----------------------------------------------------------------------------*/
-VOID cnmTimerStopTimer(IN P_ADAPTER_T prAdapter, IN P_TIMER_T prTimer)
+void cnmTimerStopTimer(IN P_ADAPTER_T prAdapter, IN P_TIMER_T prTimer)
 {
 	ASSERT(prAdapter);
 	ASSERT(prTimer);
 
-	cnmTimerStopTimer_impl(prAdapter, prTimer, TRUE);
+	cnmTimerStopTimer_impl(prAdapter, prTimer, true);
 }
 
 /*----------------------------------------------------------------------------*/
@@ -220,11 +226,12 @@ VOID cnmTimerStopTimer(IN P_ADAPTER_T prAdapter, IN P_TIMER_T prTimer)
  * \return (none)
  */
 /*----------------------------------------------------------------------------*/
-VOID cnmTimerStartTimer(IN P_ADAPTER_T prAdapter, IN P_TIMER_T prTimer, IN UINT_32 u4TimeoutMs)
+void cnmTimerStartTimer(IN P_ADAPTER_T prAdapter, IN P_TIMER_T prTimer,
+			IN u32 u4TimeoutMs)
 {
 	P_ROOT_TIMER prRootTimer;
-	P_LINK_T	 prTimerList;
-	OS_SYSTIME	 rExpiredSysTime, rTimeoutSystime;
+	P_LINK_T prTimerList;
+	u32 rExpiredSysTime, rTimeoutSystime;
 
 	KAL_SPIN_LOCK_DECLARATION();
 
@@ -240,9 +247,9 @@ VOID cnmTimerStartTimer(IN P_ADAPTER_T prAdapter, IN P_TIMER_T prTimer, IN UINT_
 	 * to the timeout value first, then per minutue.
 	 */
 	if (u4TimeoutMs > MSEC_PER_MIN) {
-		ASSERT(u4TimeoutMs <= ((UINT_32)0xFFFF * MSEC_PER_MIN));
+		ASSERT(u4TimeoutMs <= ((u32)0xFFFF * MSEC_PER_MIN));
 
-		prTimer->u2Minutes = (UINT_16)(u4TimeoutMs / MSEC_PER_MIN);
+		prTimer->u2Minutes = (u16)(u4TimeoutMs / MSEC_PER_MIN);
 		u4TimeoutMs -= (prTimer->u2Minutes * MSEC_PER_MIN);
 		if (u4TimeoutMs == 0) {
 			u4TimeoutMs = MSEC_PER_MIN;
@@ -253,14 +260,15 @@ VOID cnmTimerStartTimer(IN P_ADAPTER_T prAdapter, IN P_TIMER_T prTimer, IN UINT_
 	}
 
 	/* The assertion check if MSEC_TO_SYSTIME() may be overflow. */
-	ASSERT(u4TimeoutMs < (((UINT_32)0x80000000 - MSEC_PER_SEC) / KAL_HZ));
+	ASSERT(u4TimeoutMs < (((u32)0x80000000 - MSEC_PER_SEC) / KAL_HZ));
 	rTimeoutSystime = MSEC_TO_SYSTIME(u4TimeoutMs);
 	if (rTimeoutSystime == 0)
 		rTimeoutSystime = 1;
 	rExpiredSysTime = kalGetTimeTick() + rTimeoutSystime;
 
 	/* If no timer pending or the fast time interval is used. */
-	if (LINK_IS_EMPTY(prTimerList) || TIME_BEFORE(rExpiredSysTime, prRootTimer->rNextExpiredSysTime)) {
+	if (LINK_IS_EMPTY(prTimerList) ||
+	    TIME_BEFORE(rExpiredSysTime, prRootTimer->rNextExpiredSysTime)) {
 		prRootTimer->rNextExpiredSysTime = rExpiredSysTime;
 	}
 
@@ -282,16 +290,16 @@ VOID cnmTimerStartTimer(IN P_ADAPTER_T prAdapter, IN P_TIMER_T prTimer, IN UINT_
  * \return (none)
  */
 /*----------------------------------------------------------------------------*/
-VOID cnmTimerDoTimeOutCheck(IN P_ADAPTER_T prAdapter)
+void cnmTimerDoTimeOutCheck(IN P_ADAPTER_T prAdapter)
 {
-	P_ROOT_TIMER		  prRootTimer;
-	P_LINK_T			  prTimerList;
-	P_LINK_ENTRY_T		  prLinkEntry;
-	P_TIMER_T			  prTimer;
-	OS_SYSTIME			  rCurSysTime;
+	P_ROOT_TIMER prRootTimer;
+	P_LINK_T prTimerList;
+	P_LINK_ENTRY_T prLinkEntry;
+	P_TIMER_T prTimer;
+	u32 rCurSysTime;
 	PFN_MGMT_TIMEOUT_FUNC pfMgmtTimeOutFunc;
-	ULONG				  ulTimeoutDataPtr;
-	BOOLEAN				  fgNeedWakeLock;
+	unsigned long ulTimeoutDataPtr;
+	u8 fgNeedWakeLock;
 
 	KAL_SPIN_LOCK_DECLARATION();
 
@@ -306,47 +314,58 @@ VOID cnmTimerDoTimeOutCheck(IN P_ADAPTER_T prAdapter)
 	rCurSysTime = kalGetTimeTick();
 
 	/* Set the permitted max timeout value for new one */
-	prRootTimer->rNextExpiredSysTime = rCurSysTime + MGMT_MAX_TIMEOUT_INTERVAL;
+	prRootTimer->rNextExpiredSysTime =
+		rCurSysTime + MGMT_MAX_TIMEOUT_INTERVAL;
 
-	LINK_FOR_EACH(prLinkEntry, prTimerList)
-	{
+	LINK_FOR_EACH(prLinkEntry, prTimerList) {
 		prTimer = LINK_ENTRY(prLinkEntry, TIMER_T, rLinkEntry);
 		ASSERT(prTimer);
 
 		/* Check if this entry is timeout. */
 		if (!TIME_BEFORE(rCurSysTime, prTimer->rExpiredSysTime)) {
-			cnmTimerStopTimer_impl(prAdapter, prTimer, FALSE);
+			cnmTimerStopTimer_impl(prAdapter, prTimer, false);
 
 			pfMgmtTimeOutFunc = prTimer->pfMgmtTimeOutFunc;
-			ulTimeoutDataPtr  = prTimer->ulDataPtr;
+			ulTimeoutDataPtr = prTimer->ulDataPtr;
 
 			if (prTimer->u2Minutes > 0) {
 				prTimer->u2Minutes--;
-				prTimer->rExpiredSysTime = rCurSysTime + MSEC_TO_SYSTIME(MSEC_PER_MIN);
-				LINK_INSERT_TAIL(prTimerList, &prTimer->rLinkEntry);
+				prTimer->rExpiredSysTime =
+					rCurSysTime +
+					MSEC_TO_SYSTIME(MSEC_PER_MIN);
+				LINK_INSERT_TAIL(prTimerList,
+						 &prTimer->rLinkEntry);
 			} else if (pfMgmtTimeOutFunc) {
-				KAL_RELEASE_SPIN_LOCK(prAdapter, SPIN_LOCK_TIMER);
-				(pfMgmtTimeOutFunc)(prAdapter, ulTimeoutDataPtr);
-				KAL_ACQUIRE_SPIN_LOCK(prAdapter, SPIN_LOCK_TIMER);
+				KAL_RELEASE_SPIN_LOCK(prAdapter,
+						      SPIN_LOCK_TIMER);
+				(pfMgmtTimeOutFunc)(prAdapter,
+						    ulTimeoutDataPtr);
+				KAL_ACQUIRE_SPIN_LOCK(prAdapter,
+						      SPIN_LOCK_TIMER);
 			}
 
-			/* Search entire list again because of nest del and add timers
-			 * and current MGMT_TIMER could be volatile after stopped
+			/* Search entire list again because of nest del and add
+			 * timers and current MGMT_TIMER could be volatile after
+			 * stopped
 			 */
 			prLinkEntry = (P_LINK_ENTRY_T)prTimerList;
 
-			prRootTimer->rNextExpiredSysTime = rCurSysTime + MGMT_MAX_TIMEOUT_INTERVAL;
-		} else if (TIME_BEFORE(prTimer->rExpiredSysTime, prRootTimer->rNextExpiredSysTime)) {
-			prRootTimer->rNextExpiredSysTime = prTimer->rExpiredSysTime;
+			prRootTimer->rNextExpiredSysTime =
+				rCurSysTime + MGMT_MAX_TIMEOUT_INTERVAL;
+		} else if (TIME_BEFORE(prTimer->rExpiredSysTime,
+				       prRootTimer->rNextExpiredSysTime)) {
+			prRootTimer->rNextExpiredSysTime =
+				prTimer->rExpiredSysTime;
 		}
 	} /* end of for loop */
 
 	/* Setup the prNext timeout event. It is possible the timer was already
 	 * set in the above timeout callback function.
 	 */
-	fgNeedWakeLock = FALSE;
+	fgNeedWakeLock = false;
 	if (!LINK_IS_EMPTY(prTimerList)) {
-		ASSERT(TIME_AFTER(prRootTimer->rNextExpiredSysTime, rCurSysTime));
+		ASSERT(TIME_AFTER(prRootTimer->rNextExpiredSysTime,
+				  rCurSysTime));
 	}
 
 	/* release spin lock */

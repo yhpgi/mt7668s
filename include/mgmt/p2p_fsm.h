@@ -12,18 +12,22 @@
 #ifndef _P2P_FSM_H
 #define _P2P_FSM_H
 
-VOID p2pFsmRunEventScanRequest(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMsgHdr);
+void p2pFsmRunEventScanRequest(IN P_ADAPTER_T prAdapter,
+			       IN P_MSG_HDR_T prMsgHdr);
 
-VOID p2pFsmRunEventChGrant(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMsgHdr);
+void p2pFsmRunEventChGrant(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMsgHdr);
 
-VOID p2pFsmRunEventNetDeviceRegister(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMsgHdr);
+void p2pFsmRunEventNetDeviceRegister(IN P_ADAPTER_T prAdapter,
+				     IN P_MSG_HDR_T prMsgHdr);
 
-VOID p2pFsmRunEventUpdateMgmtFrame(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMsgHdr);
+void p2pFsmRunEventUpdateMgmtFrame(IN P_ADAPTER_T prAdapter,
+				   IN P_MSG_HDR_T prMsgHdr);
 
 #if CFG_SUPPORT_WFD
-VOID p2pFsmRunEventWfdSettingUpdate(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMsgHdr);
+void p2pFsmRunEventWfdSettingUpdate(IN P_ADAPTER_T prAdapter,
+				    IN P_MSG_HDR_T prMsgHdr);
 #endif
 
-VOID p2pFsmRunEventScanDone(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMsgHdr);
+void p2pFsmRunEventScanDone(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMsgHdr);
 
-#endif /* _P2P_FSM_H */
+#endif

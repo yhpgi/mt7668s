@@ -4,60 +4,61 @@
  */
 
 /*! \file   "nic_pwr_mgt.c"
- *    \brief  In this file we define the STATE and EVENT for Power Management FSM.
+ *    \brief  In this file we define the STATE and EVENT for Power Management
+ * FSM.
  *
- *    The SCAN FSM is responsible for performing SCAN behavior when the Arbiter enter
- *    ARB_STATE_SCAN. The STATE and EVENT for SCAN FSM are defined here with detail
- *    description.
+ *    The SCAN FSM is responsible for performing SCAN behavior when the Arbiter
+ * enter ARB_STATE_SCAN. The STATE and EVENT for SCAN FSM are defined here with
+ * detail description.
  */
 
 /*******************************************************************************
  *                         C O M P I L E R   F L A G S
- ********************************************************************************
+ *******************************************************************************
  */
 
 /*******************************************************************************
  *                    E X T E R N A L   R E F E R E N C E S
- ********************************************************************************
+ *******************************************************************************
  */
+
 #include "precomp.h"
 
 /*******************************************************************************
  *                              C O N S T A N T S
- ********************************************************************************
+ *******************************************************************************
  */
 
 /*******************************************************************************
  *                             D A T A   T Y P E S
- ********************************************************************************
+ *******************************************************************************
  */
 
 /*******************************************************************************
  *                            P U B L I C   D A T A
- ********************************************************************************
+ *******************************************************************************
  */
 
 /*******************************************************************************
  *                           P R I V A T E   D A T A
- ********************************************************************************
+ *******************************************************************************
  */
 
 /*******************************************************************************
  *                                 M A C R O S
- ********************************************************************************
+ *******************************************************************************
  */
 
 /*******************************************************************************
  *                   F U N C T I O N   D E C L A R A T I O N S
- ********************************************************************************
+ *******************************************************************************
  */
 
 /*******************************************************************************
  *                              F U N C T I O N S
- ********************************************************************************
+ *******************************************************************************
  */
-
-VOID nicpmWakeUpWiFi(IN P_ADAPTER_T prAdapter)
+void nicpmWakeUpWiFi(IN P_ADAPTER_T prAdapter)
 {
 	if (!nicVerifyChipID(prAdapter)) {
 		DBGLOG(INIT, ERROR, "Chip id verify error!\n");
@@ -75,7 +76,7 @@ VOID nicpmWakeUpWiFi(IN P_ADAPTER_T prAdapter)
  * \return (none)
  */
 /*----------------------------------------------------------------------------*/
-VOID nicpmSetFWOwn(IN P_ADAPTER_T prAdapter, IN BOOLEAN fgEnableGlobalInt)
+void nicpmSetFWOwn(IN P_ADAPTER_T prAdapter, IN u8 fgEnableGlobalInt)
 {
 	halSetFWOwn(prAdapter, fgEnableGlobalInt);
 }
@@ -89,7 +90,7 @@ VOID nicpmSetFWOwn(IN P_ADAPTER_T prAdapter, IN BOOLEAN fgEnableGlobalInt)
  * \return (none)
  */
 /*----------------------------------------------------------------------------*/
-BOOLEAN nicpmSetDriverOwn(IN P_ADAPTER_T prAdapter)
+u8 nicpmSetDriverOwn(IN P_ADAPTER_T prAdapter)
 {
 	return halSetDriverOwn(prAdapter);
 }
@@ -103,9 +104,9 @@ BOOLEAN nicpmSetDriverOwn(IN P_ADAPTER_T prAdapter)
  * \return (none)
  */
 /*----------------------------------------------------------------------------*/
-BOOLEAN nicpmSetAcpiPowerD0(IN P_ADAPTER_T prAdapter)
+u8 nicpmSetAcpiPowerD0(IN P_ADAPTER_T prAdapter)
 {
-	return TRUE;
+	return true;
 }
 
 /*----------------------------------------------------------------------------*/
@@ -117,9 +118,9 @@ BOOLEAN nicpmSetAcpiPowerD0(IN P_ADAPTER_T prAdapter)
  * @return (none)
  */
 /*----------------------------------------------------------------------------*/
-BOOLEAN nicpmSetAcpiPowerD3(IN P_ADAPTER_T prAdapter)
+u8 nicpmSetAcpiPowerD3(IN P_ADAPTER_T prAdapter)
 {
 	ASSERT(prAdapter);
 
-	return TRUE;
+	return true;
 }

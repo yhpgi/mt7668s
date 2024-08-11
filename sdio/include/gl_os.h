@@ -6,10 +6,10 @@
 /*! \file   gl_os.h
  *    \brief  List the external reference to OS for GLUE Layer.
  *
- *    In this file we define the data structure - GLUE_INFO_T to store those objects
- *    we acquired from OS - e.g. TIMER, SPINLOCK, NET DEVICE ... . And all the
- *    external reference (header file, extern func() ..) to OS for GLUE Layer should
- *    also list down here.
+ *    In this file we define the data structure - GLUE_INFO_T to store those
+ * objects we acquired from OS - e.g. TIMER, SPINLOCK, NET DEVICE ... . And all
+ * the external reference (header file, extern func() ..) to OS for GLUE Layer
+ * should also list down here.
  */
 
 #ifndef _GL_OS_H
@@ -17,63 +17,69 @@
 
 /*******************************************************************************
  *                         C O M P I L E R   F L A G S
- ********************************************************************************
+ *******************************************************************************
  */
+
 /*------------------------------------------------------------------------------
  * Flags for LINUX(OS) dependent
  *------------------------------------------------------------------------------
  */
-#define CFG_MAX_WLAN_DEVICES 1 /* number of wlan card will coexist */
+#define CFG_MAX_WLAN_DEVICES			  1 /* number of wlan card will coexist */
 
-#define CFG_MAX_TXQ_NUM 4 /* number of tx queue for support multi-queue h/w  */
+#define CFG_MAX_TXQ_NUM				  4 /* number of tx queue for support multi-queue h/w */
 
 /* 1: Enable use of SPIN LOCK Bottom Half for LINUX */
 /* 0: Disable - use SPIN LOCK IRQ SAVE instead */
-#define CFG_USE_SPIN_LOCK_BOTTOM_HALF 0
+#define CFG_USE_SPIN_LOCK_BOTTOM_HALF		  0
 
 /* 1: Enable - Drop ethernet packet if it < 14 bytes.
  * And pad ethernet packet with dummy 0 if it < 60 bytes.
  * 0: Disable
  */
-#define CFG_TX_PADDING_SMALL_ETH_PACKET 0
+#define CFG_TX_PADDING_SMALL_ETH_PACKET		  0
 
-#define CFG_TX_STOP_NETIF_QUEUE_THRESHOLD 256 /* packets */
+#define CFG_TX_STOP_NETIF_QUEUE_THRESHOLD	  256 /* packets */
 
-#define CFG_TX_STOP_NETIF_PER_QUEUE_THRESHOLD 512  /* packets */
-#define CFG_TX_START_NETIF_PER_QUEUE_THRESHOLD 128 /* packets */
+#define CFG_TX_STOP_NETIF_PER_QUEUE_THRESHOLD	  512 /* packets */
+#define CFG_TX_START_NETIF_PER_QUEUE_THRESHOLD	  128 /* packets */
 
 /* WMM Certification Related */
-#define CFG_CERT_WMM_MAX_TX_PENDING 20
-#define CFG_CERT_WMM_MAX_RX_NUM 10
-#define CFG_CERT_WMM_HIGH_STOP_TX_WITH_RX (CFG_TX_STOP_NETIF_PER_QUEUE_THRESHOLD * 3)
-#define CFG_CERT_WMM_HIGH_STOP_TX_WO_RX (CFG_TX_STOP_NETIF_PER_QUEUE_THRESHOLD * 2)
-#define CFG_CERT_WMM_LOW_STOP_TX_WITH_RX (CFG_TX_STOP_NETIF_PER_QUEUE_THRESHOLD >> 4)
-#define CFG_CERT_WMM_LOW_STOP_TX_WO_RX (CFG_TX_STOP_NETIF_PER_QUEUE_THRESHOLD >> 3)
+#define CFG_CERT_WMM_MAX_TX_PENDING		  20
+#define CFG_CERT_WMM_MAX_RX_NUM			  10
+#define CFG_CERT_WMM_HIGH_STOP_TX_WITH_RX \
+	(CFG_TX_STOP_NETIF_PER_QUEUE_THRESHOLD * 3)
+#define CFG_CERT_WMM_HIGH_STOP_TX_WO_RX	\
+	(CFG_TX_STOP_NETIF_PER_QUEUE_THRESHOLD * 2)
+#define CFG_CERT_WMM_LOW_STOP_TX_WITH_RX \
+	(CFG_TX_STOP_NETIF_PER_QUEUE_THRESHOLD >> 4)
+#define CFG_CERT_WMM_LOW_STOP_TX_WO_RX \
+	(CFG_TX_STOP_NETIF_PER_QUEUE_THRESHOLD >> 3)
 
-#define CHIP_NAME "MT6632"
+#define CHIP_NAME				  "MT6632"
 
-#define DRV_NAME "[" CHIP_NAME "]: "
+#define DRV_NAME				  "[" CHIP_NAME "]: "
 
 /* for CFG80211 IE buffering mechanism */
-#define CFG_CFG80211_IE_BUF_LEN (512)
+#define CFG_CFG80211_IE_BUF_LEN			  (512)
 
 /*******************************************************************************
  *                    E X T E R N A L   R E F E R E N C E S
- ********************************************************************************
+ *******************************************************************************
  */
+
 #include <linux/version.h> /* constant of kernel version */
 
 #include <linux/kernel.h> /* bitops.h */
 
-#include <linux/timer.h>   /* struct timer_list */
+#include <linux/timer.h> /* struct timer_list */
 #include <linux/jiffies.h> /* jiffies */
-#include <linux/delay.h>   /* udelay and mdelay macro */
+#include <linux/delay.h> /* udelay and mdelay macro */
 
 #include <linux/irq.h> /* IRQT_FALLING */
 
-#include <linux/netdevice.h>   /* struct net_device, struct net_device_stats */
+#include <linux/netdevice.h> /* struct net_device, struct net_device_stats */
 #include <linux/etherdevice.h> /* for eth_type_trans() function */
-#include <linux/wireless.h>	   /* struct iw_statistics */
+#include <linux/wireless.h> /* struct iw_statistics */
 #include <linux/if_arp.h>
 #include <linux/inetdevice.h> /* struct in_device */
 
@@ -85,13 +91,13 @@
 #include <linux/proc_fs.h> /* The proc filesystem constants/structures */
 
 #include <linux/rtnetlink.h> /* for rtnl_lock() and rtnl_unlock() */
-#include <linux/kthread.h>	 /* kthread_should_stop(), kthread_run() */
-#include <linux/uaccess.h>	 /* for copy_from_user() */
-#include <linux/fs.h>		 /* for firmware download */
+#include <linux/kthread.h> /* kthread_should_stop(), kthread_run() */
+#include <linux/uaccess.h> /* for copy_from_user() */
+#include <linux/fs.h> /* for firmware download */
 #include <linux/vmalloc.h>
 
 #include <linux/kfifo.h> /* for kfifo interface */
-#include <linux/cdev.h>	 /* for cdev interface */
+#include <linux/cdev.h> /* for cdev interface */
 
 #include <linux/firmware.h> /* for firmware download */
 #include <linux/ctype.h>
@@ -110,9 +116,9 @@
 #endif
 
 #ifdef CFG_CFG80211_VERSION
-#define CFG80211_VERSION_CODE CFG_CFG80211_VERSION
+#define CFG80211_VERSION_CODE	 CFG_CFG80211_VERSION
 #else
-#define CFG80211_VERSION_CODE LINUX_VERSION_CODE
+#define CFG80211_VERSION_CODE	 LINUX_VERSION_CODE
 #endif
 
 #include "version.h"
@@ -158,110 +164,112 @@
 #include <uapi/linux/sched/types.h>
 #endif
 
-extern BOOLEAN									 fgIsBusAccessFailed;
+extern u8 fgIsBusAccessFailed;
 extern const struct ieee80211_iface_combination *p_mtk_iface_combinations_sta;
-extern const INT_32								 mtk_iface_combinations_sta_num;
+extern const s32 mtk_iface_combinations_sta_num;
 
 /*******************************************************************************
  *                              C O N S T A N T S
- ********************************************************************************
+ *******************************************************************************
  */
-#define GLUE_FLAG_HALT BIT(0)
-#define GLUE_FLAG_INT BIT(1)
-#define GLUE_FLAG_OID BIT(2)
-#define GLUE_FLAG_TIMEOUT BIT(3)
-#define GLUE_FLAG_TXREQ BIT(4)
-#define GLUE_FLAG_SUB_MOD_MULTICAST BIT(7)
-#define GLUE_FLAG_FRAME_FILTER BIT(8)
-#define GLUE_FLAG_FRAME_FILTER_AIS BIT(9)
 
-#define GLUE_FLAG_HALT_BIT (0)
-#define GLUE_FLAG_INT_BIT (1)
-#define GLUE_FLAG_OID_BIT (2)
-#define GLUE_FLAG_TIMEOUT_BIT (3)
-#define GLUE_FLAG_TXREQ_BIT (4)
-#define GLUE_FLAG_SUB_MOD_MULTICAST_BIT (7)
-#define GLUE_FLAG_FRAME_FILTER_BIT (8)
-#define GLUE_FLAG_FRAME_FILTER_AIS_BIT (9)
+#define GLUE_FLAG_HALT			      BIT(0)
+#define GLUE_FLAG_INT			      BIT(1)
+#define GLUE_FLAG_OID			      BIT(2)
+#define GLUE_FLAG_TIMEOUT		      BIT(3)
+#define GLUE_FLAG_TXREQ			      BIT(4)
+#define GLUE_FLAG_SUB_MOD_MULTICAST	      BIT(7)
+#define GLUE_FLAG_FRAME_FILTER		      BIT(8)
+#define GLUE_FLAG_FRAME_FILTER_AIS	      BIT(9)
 
-#define GLUE_FLAG_RX BIT(10)
-#define GLUE_FLAG_TX_CMD_DONE BIT(11)
-#define GLUE_FLAG_HIF_TX BIT(12)
-#define GLUE_FLAG_HIF_TX_CMD BIT(13)
-#define GLUE_FLAG_RX_TO_OS BIT(14)
-#define GLUE_FLAG_HIF_FW_OWN BIT(15)
-#define GLUE_FLAG_HIF_PRT_HIF_DBG_INFO BIT(16)
+#define GLUE_FLAG_HALT_BIT		      (0)
+#define GLUE_FLAG_INT_BIT		      (1)
+#define GLUE_FLAG_OID_BIT		      (2)
+#define GLUE_FLAG_TIMEOUT_BIT		      (3)
+#define GLUE_FLAG_TXREQ_BIT		      (4)
+#define GLUE_FLAG_SUB_MOD_MULTICAST_BIT	      (7)
+#define GLUE_FLAG_FRAME_FILTER_BIT	      (8)
+#define GLUE_FLAG_FRAME_FILTER_AIS_BIT	      (9)
 
-#define GLUE_FLAG_RX_BIT (10)
-#define GLUE_FLAG_TX_CMD_DONE_BIT (11)
-#define GLUE_FLAG_HIF_TX_BIT (12)
-#define GLUE_FLAG_HIF_TX_CMD_BIT (13)
-#define GLUE_FLAG_RX_TO_OS_BIT (14)
-#define GLUE_FLAG_HIF_FW_OWN_BIT (15)
-#define GLUE_FLAG_HIF_PRT_HIF_DBG_INFO_BIT (16)
-#define GLUE_FLAG_ADAPT_RDY BIT(17)
+#define GLUE_FLAG_RX			      BIT(10)
+#define GLUE_FLAG_TX_CMD_DONE		      BIT(11)
+#define GLUE_FLAG_HIF_TX		      BIT(12)
+#define GLUE_FLAG_HIF_TX_CMD		      BIT(13)
+#define GLUE_FLAG_RX_TO_OS		      BIT(14)
+#define GLUE_FLAG_HIF_FW_OWN		      BIT(15)
+#define GLUE_FLAG_HIF_PRT_HIF_DBG_INFO	      BIT(16)
 
-#define GLUE_FLAG_ADAPT_RDY_BIT (17)
+#define GLUE_FLAG_RX_BIT		      (10)
+#define GLUE_FLAG_TX_CMD_DONE_BIT	      (11)
+#define GLUE_FLAG_HIF_TX_BIT		      (12)
+#define GLUE_FLAG_HIF_TX_CMD_BIT	      (13)
+#define GLUE_FLAG_RX_TO_OS_BIT		      (14)
+#define GLUE_FLAG_HIF_FW_OWN_BIT	      (15)
+#define GLUE_FLAG_HIF_PRT_HIF_DBG_INFO_BIT    (16)
+#define GLUE_FLAG_ADAPT_RDY		      BIT(17)
 
-#define GLUE_BOW_KFIFO_DEPTH (1024)
-#define GLUE_BOW_DEVICE_NAME "ampc0"
+#define GLUE_FLAG_ADAPT_RDY_BIT		      (17)
 
-#define WAKE_LOCK_RX_TIMEOUT 300		   /* ms */
-#define WAKE_LOCK_THREAD_WAKEUP_TIMEOUT 50 /* ms */
+#define GLUE_BOW_KFIFO_DEPTH		      (1024)
+#define GLUE_BOW_DEVICE_NAME		      "ampc0"
+
+#define WAKE_LOCK_RX_TIMEOUT		      300 /* ms */
+#define WAKE_LOCK_THREAD_WAKEUP_TIMEOUT	      50 /* ms */
 
 /* EFUSE Auto Mode Support */
-#define LOAD_EFUSE 0
-#define LOAD_EEPROM_BIN 1
-#define LOAD_AUTO 2
-#define EFUSE_AUTO_CHEK 0x76
+#define LOAD_EFUSE			      0
+#define LOAD_EEPROM_BIN			      1
+#define LOAD_AUTO			      2
+#define EFUSE_AUTO_CHEK			      0x76
 
 #if KERNEL_VERSION(4, 12, 0) > CFG80211_VERSION_CODE
-#define WLAN_AKM_SUITE_8021X_SUITE_B 0x000FAC0B
-#define WLAN_AKM_SUITE_8021X_SUITE_B_192 0x000FAC0C
+#define WLAN_AKM_SUITE_8021X_SUITE_B	      0x000FAC0B
+#define WLAN_AKM_SUITE_8021X_SUITE_B_192      0x000FAC0C
 #endif
 
 #if CFG_SUPPORT_OWE
-#define WLAN_AKM_SUITE_OWE 0x000FAC12
+#define WLAN_AKM_SUITE_OWE		      0x000FAC12
 #endif
 
-#define IW_AUTH_CIPHER_GCMP256 0x00000080
+#define IW_AUTH_CIPHER_GCMP256		      0x00000080
 
 /*******************************************************************************
  *                             D A T A   T Y P E S
- ********************************************************************************
+ *******************************************************************************
  */
+
 typedef struct _GL_WPA_INFO_T {
-	UINT_32 u4WpaVersion;
-	UINT_32 u4KeyMgmt;
-	UINT_32 u4CipherGroup;
-	UINT_32 u4CipherPairwise;
-	UINT_32 u4AuthAlg;
-	BOOLEAN fgPrivacyInvoke;
+	u32 u4WpaVersion;
+	u32 u4KeyMgmt;
+	u32 u4CipherGroup;
+	u32 u4CipherPairwise;
+	u32 u4AuthAlg;
+	u8 fgPrivacyInvoke;
 #if CFG_SUPPORT_802_11W
-	UINT_32 u4CipherGroupMgmt;
-	UINT_32 u4Mfp;
-	UINT_8	ucRSNMfpCap;
+	u32 u4CipherGroupMgmt;
+	u32 u4Mfp;
+	u8 ucRSNMfpCap;
 #endif
-	UINT_8 ucRsneLen;
-	UINT_8 aucKek[NL80211_KEK_LEN];
-	UINT_8 aucKck[NL80211_KCK_LEN];
-	UINT_8 aucReplayCtr[NL80211_REPLAY_CTR_LEN];
+	u8 ucRsneLen;
+	u8 aucKek[NL80211_KEK_LEN];
+	u8 aucKck[NL80211_KCK_LEN];
+	u8 aucReplayCtr[NL80211_REPLAY_CTR_LEN];
 } GL_WPA_INFO_T, *P_GL_WPA_INFO_T;
 
 #if CFG_SUPPORT_REPLAY_DETECTION
 struct SEC_REPLEY_PN_INFO {
-	UINT_8	auPN[16];
-	BOOLEAN fgRekey;
-	BOOLEAN fgFirstPkt;
+	u8 auPN[16];
+	u8 fgRekey;
+	u8 fgFirstPkt;
 };
 struct SEC_DETECT_REPLAY_INFO {
-	UINT_8					  ucCurKeyId;
-	UINT_8					  ucKeyType;
+	u8 ucCurKeyId;
+	u8 ucKeyType;
 	struct SEC_REPLEY_PN_INFO arReplayPNInfo[4];
-	UINT_32					  u4KeyLength;
-	UINT_8					  aucKeyMaterial[32];
-	BOOLEAN					  fgPairwiseInstalled;
-	BOOLEAN					  fgKeyRscFresh;
+	u32 u4KeyLength;
+	u8 aucKeyMaterial[32];
+	u8 fgPairwiseInstalled;
+	u8 fgKeyRscFresh;
 };
 #endif
 
@@ -299,14 +307,14 @@ typedef enum _ENUM_P2P_REG_STATE_T {
 #endif
 
 typedef enum _ENUM_PKT_FLAG_T {
-	ENUM_PKT_802_11,		   /* 802.11 or non-802.11 */
-	ENUM_PKT_802_3,			   /* 802.3 or ethernetII */
-	ENUM_PKT_1X,			   /* 1x frame or not */
-	ENUM_PKT_PROTECTED_1X,	   /* protected 1x frame */
+	ENUM_PKT_802_11, /* 802.11 or non-802.11 */
+	ENUM_PKT_802_3, /* 802.3 or ethernetII */
+	ENUM_PKT_1X, /* 1x frame or not */
+	ENUM_PKT_PROTECTED_1X, /* protected 1x frame */
 	ENUM_PKT_NON_PROTECTED_1X, /* Non protected 1x frame */
-	ENUM_PKT_VLAN_EXIST,	   /* VLAN tag exist */
-	ENUM_PKT_DHCP,			   /* DHCP frame */
-	ENUM_PKT_ARP,			   /* ARP */
+	ENUM_PKT_VLAN_EXIST, /* VLAN tag exist */
+	ENUM_PKT_DHCP, /* DHCP frame */
+	ENUM_PKT_ARP, /* ARP */
 #ifdef CFG_SUPPORT_MULTICAST_ENHANCEMENT
 	ENUM_PKT_FIRST_DUP, /* The First Duplicate packet */
 #ifdef CFG_SUPPORT_MULTICAST_ENHANCEMENT_LOOKBACK
@@ -319,22 +327,22 @@ typedef enum _ENUM_PKT_FLAG_T {
 typedef struct _GL_IO_REQ_T {
 	QUE_ENTRY_T rQueEntry;
 	/* wait_queue_head_t       cmdwait_q; */
-	BOOL				 fgRead;
-	BOOL				 fgWaitResp;
-	P_ADAPTER_T			 prAdapter;
+	u8 fgRead;
+	u8 fgWaitResp;
+	P_ADAPTER_T prAdapter;
 	PFN_OID_HANDLER_FUNC pfnOidHandler;
-	PVOID				 pvInfoBuf;
-	UINT_32				 u4InfoBufLen;
-	PUINT_32			 pu4QryInfoLen;
-	WLAN_STATUS			 rStatus;
-	UINT_32				 u4Flag;
-	UINT_32				 u4Timeout;
+	void *pvInfoBuf;
+	u32 u4InfoBufLen;
+	u32 *pu4QryInfoLen;
+	WLAN_STATUS rStatus;
+	u32 u4Flag;
+	u32 u4Timeout;
 } GL_IO_REQ_T, *P_GL_IO_REQ_T;
 
 /*
  * type definition of pointer to p2p structure
  */
-typedef struct _GL_P2P_INFO_T	  GL_P2P_INFO_T, *P_GL_P2P_INFO_T;
+typedef struct _GL_P2P_INFO_T GL_P2P_INFO_T, *P_GL_P2P_INFO_T;
 typedef struct _GL_P2P_DEV_INFO_T GL_P2P_DEV_INFO_T, *P_GL_P2P_DEV_INFO_T;
 
 struct _GLUE_INFO_T {
@@ -345,7 +353,7 @@ struct _GLUE_INFO_T {
 	struct device *prDev;
 
 	/* Device Index(index of arWlanDevInfo[]) */
-	INT_32 i4DevIdx;
+	s32 i4DevIdx;
 
 	/* Device statistics */
 	/* struct net_device_stats rNetDevStats; */
@@ -362,15 +370,15 @@ struct _GLUE_INFO_T {
 	/* semaphore for ioctl */
 	struct semaphore ioctl_sem;
 
-	UINT_64 u8Cookie;
+	u64 u8Cookie;
 
-	volatile ULONG ulFlag; /* GLUE_FLAG_XXX */
-	UINT_32		   u4PendFlag;
-	/* UINT_32 u4TimeoutFlag; */
-	UINT_32 u4OidCompleteFlag;
-	UINT_32 u4ReadyFlag; /* check if card is ready */
+	volatile unsigned long ulFlag; /* GLUE_FLAG_XXX */
+	u32 u4PendFlag;
+	/* u32 u4TimeoutFlag; */
+	u32 u4OidCompleteFlag;
+	u32 u4ReadyFlag; /* check if card is ready */
 
-	UINT_32 u4OsMgmtFrameFilter;
+	u32 u4OsMgmtFrameFilter;
 
 	/* Number of pending frames, also used for debuging if any frame is
 	 * missing during the process of unloading Driver.
@@ -378,10 +386,10 @@ struct _GLUE_INFO_T {
 	 * NOTE(Kevin): In Linux, we also use this variable as the threshold
 	 * for manipulating the netif_stop(wake)_queue() func.
 	 */
-	INT_32 ai4TxPendingFrameNumPerQueue[HW_BSSID_NUM + 1][CFG_MAX_TXQ_NUM];
-	INT_32 i4TxPendingFrameNum;
-	INT_32 i4TxPendingSecurityFrameNum;
-	INT_32 i4TxPendingCmdNum;
+	s32 ai4TxPendingFrameNumPerQueue[HW_BSSID_NUM + 1][CFG_MAX_TXQ_NUM];
+	s32 i4TxPendingFrameNum;
+	s32 i4TxPendingSecurityFrameNum;
+	s32 i4TxPendingCmdNum;
 
 	/* Tx: for NetDev to BSS index mapping */
 	NET_INTERFACE_INFO_T arNetInterfaceInfo[HW_BSSID_NUM + 1];
@@ -405,12 +413,13 @@ struct _GLUE_INFO_T {
 	/*! \brief wext wpa related information */
 	GL_WPA_INFO_T rWpaInfo;
 
-	/* Pointer to ADAPTER_T - main data structure of internal protocol stack */
+	/* Pointer to ADAPTER_T - main data structure of internal protocol stack
+	 */
 	P_ADAPTER_T prAdapter;
 
 #if WLAN_INCLUDE_PROC
 	struct proc_dir_entry *pProcRoot;
-#endif /* WLAN_INCLUDE_PROC */
+#endif
 
 	/* Indicated media state */
 	ENUM_PARAM_MEDIA_STATE_T eParamMediaStateIndicated;
@@ -418,15 +427,15 @@ struct _GLUE_INFO_T {
 	/* Device power state D0~D3 */
 	PARAM_DEVICE_POWER_STATE ePowerState;
 
-	struct completion rScanComp;	/* indicate scan complete */
-	struct completion rHaltComp;	/* indicate main thread halt complete */
-	struct completion rPendComp;	/* indicate main thread halt complete */
+	struct completion rScanComp; /* indicate scan complete */
+	struct completion rHaltComp; /* indicate main thread halt complete */
+	struct completion rPendComp; /* indicate main thread halt complete */
 	struct completion rHifHaltComp; /* indicate hif_thread halt complete */
-	struct completion rRxHaltComp;	/* indicate hif_thread halt complete */
+	struct completion rRxHaltComp; /* indicate hif_thread halt complete */
 
-	UINT_32		u4TxThreadPid;
-	UINT_32		u4RxThreadPid;
-	UINT_32		u4HifThreadPid;
+	u32 u4TxThreadPid;
+	u32 u4RxThreadPid;
+	u32 u4HifThreadPid;
 	WLAN_STATUS rPendStatus;
 
 	QUE_T rTxQueue;
@@ -434,53 +443,53 @@ struct _GLUE_INFO_T {
 	/* OID related */
 	QUE_T rCmdQueue;
 
-	wait_queue_head_t	waitq;
+	wait_queue_head_t waitq;
 	struct task_struct *main_thread;
 
-	wait_queue_head_t	waitq_hif;
+	wait_queue_head_t waitq_hif;
 	struct task_struct *hif_thread;
 
-	wait_queue_head_t	waitq_rx;
+	wait_queue_head_t waitq_rx;
 	struct task_struct *rx_thread;
 
 	struct tasklet_struct rRxTask;
 	struct tasklet_struct rTxCompleteTask;
 
-	struct work_struct	rTxMsduFreeWork;
+	struct work_struct rTxMsduFreeWork;
 	struct delayed_work rRxPktDeAggWork;
 
 	struct timer_list tickfn;
 
 #if CFG_SUPPORT_EXT_CONFIG
-	UINT_16 au2ExtCfg[256]; /* NVRAM data buffer */
-	UINT_32 u4ExtCfgLength; /* 0 means data is NOT valid */
+	u16 au2ExtCfg[256]; /* NVRAM data buffer */
+	u32 u4ExtCfgLength; /* 0 means data is NOT valid */
 #endif
 
 	/* Should be large than the PARAM_WAPI_ASSOC_INFO_T */
-	UINT_8	aucWapiAssocInfoIEs[42];
-	UINT_16 u2WapiAssocInfoIESz;
+	u8 aucWapiAssocInfoIEs[42];
+	u16 u2WapiAssocInfoIESz;
 
 #if CFG_ENABLE_WIFI_DIRECT
 	P_GL_P2P_DEV_INFO_T prP2PDevInfo;
-	P_GL_P2P_INFO_T		prP2PInfo[KAL_P2P_NUM];
+	P_GL_P2P_INFO_T prP2PInfo[KAL_P2P_NUM];
 #if CFG_SUPPORT_P2P_RSSI_QUERY
 	/* Wireless statistics struct net_device */
 	struct iw_statistics rP2pIwStats;
 #endif
 #endif
-	BOOLEAN fgWpsActive;
-	UINT_8	aucWSCIE[500]; /*for probe req */
-	UINT_16 u2WSCIELen;
-	UINT_8	aucWSCAssocInfoIE[200]; /*for Assoc req */
-	UINT_16 u2WSCAssocInfoIELen;
+	u8 fgWpsActive;
+	u8 aucWSCIE[500]; /*for probe req */
+	u16 u2WSCIELen;
+	u8 aucWSCAssocInfoIE[200]; /*for Assoc req */
+	u16 u2WSCAssocInfoIELen;
 
 	/* NVRAM availability */
-	BOOLEAN fgNvramAvailable;
+	u8 fgNvramAvailable;
 
-	BOOLEAN fgMcrAccessAllowed;
+	u8 fgMcrAccessAllowed;
 
 	/* MAC Address Overridden by IOCTL */
-	BOOLEAN			  fgIsMacAddrOverride;
+	u8 fgIsMacAddrOverride;
 	PARAM_MAC_ADDRESS rMacAddrOverride;
 
 	SET_TXPWR_CTRL_T rTxPwr;
@@ -492,37 +501,37 @@ struct _GLUE_INFO_T {
 	struct cfg80211_sched_scan_request *prSchedScanRequest;
 
 	/* to indicate registered or not */
-	BOOLEAN fgIsRegistered;
+	u8 fgIsRegistered;
 
 	/* for cfg80211 connected indication */
-	UINT_32 u4RspIeLength;
-	UINT_8	aucRspIe[CFG_CFG80211_IE_BUF_LEN];
+	u32 u4RspIeLength;
+	u8 aucRspIe[CFG_CFG80211_IE_BUF_LEN];
 
-	UINT_32 u4ReqIeLength;
-	UINT_8	aucReqIe[CFG_CFG80211_IE_BUF_LEN];
+	u32 u4ReqIeLength;
+	u8 aucReqIe[CFG_CFG80211_IE_BUF_LEN];
 
 #if CFG_SUPPORT_SDIO_READ_WRITE_PATTERN
-	BOOLEAN fgEnSdioTestPattern;
-	BOOLEAN fgSdioReadWriteMode;
-	BOOLEAN fgIsSdioTestInitialized;
-	UINT_8	aucSdioTestBuffer[256];
+	u8 fgEnSdioTestPattern;
+	u8 fgSdioReadWriteMode;
+	u8 fgIsSdioTestInitialized;
+	u8 aucSdioTestBuffer[256];
 #endif
 
-	BOOLEAN fgIsInSuspendMode;
+	u8 fgIsInSuspendMode;
 
 #if CFG_MET_PACKET_TRACE_SUPPORT
-	BOOLEAN fgMetProfilingEn;
-	UINT_16 u2MetUdpPort;
+	u8 fgMetProfilingEn;
+	u16 u2MetUdpPort;
 #endif
 
 #if CFG_SUPPORT_SNIFFER
-	BOOLEAN			   fgIsEnableMon;
+	u8 fgIsEnableMon;
 	struct net_device *prMonDevHandler;
 	struct work_struct monWork;
 #endif
 
-	INT_32	i4RssiCache;
-	UINT_32 u4LinkSpeedCache;
+	s32 i4RssiCache;
+	u32 u4LinkSpeedCache;
 
 #ifdef CFG_SUPPORT_MULTICAST_ENHANCEMENT_LOOKBACK
 	QUE_T rTxLookBackQueue;
@@ -538,13 +547,13 @@ typedef void (*PFN_LINUX_TIMER_FUNC)(unsigned long);
  *   now, we only have one sub module, p2p
  */
 #if CFG_ENABLE_WIFI_DIRECT
-typedef BOOLEAN (*SUB_MODULE_INIT)(P_GLUE_INFO_T prGlueInfo);
-typedef BOOLEAN (*SUB_MODULE_EXIT)(P_GLUE_INFO_T prGlueInfo);
+typedef u8 (*SUB_MODULE_INIT)(P_GLUE_INFO_T prGlueInfo);
+typedef u8 (*SUB_MODULE_EXIT)(P_GLUE_INFO_T prGlueInfo);
 
 typedef struct _SUB_MODULE_HANDLER {
 	SUB_MODULE_INIT subModInit;
 	SUB_MODULE_EXIT subModExit;
-	BOOLEAN			fgIsInited;
+	u8 fgIsInited;
 } SUB_MODULE_HANDLER, *P_SUB_MODULE_HANDLER;
 
 #endif
@@ -552,186 +561,214 @@ typedef struct _SUB_MODULE_HANDLER {
 #ifdef CONFIG_NL80211_TESTMODE
 
 enum TestModeCmdType {
-	TESTMODE_CMD_ID_SW_CMD	= 1,
-	TESTMODE_CMD_ID_WAPI	= 2,
-	TESTMODE_CMD_ID_HS20	= 3,
+	TESTMODE_CMD_ID_SW_CMD = 1,
+	TESTMODE_CMD_ID_WAPI = 2,
+	TESTMODE_CMD_ID_HS20 = 3,
 	TESTMODE_CMD_ID_STR_CMD = 102,
 	NUM_OF_TESTMODE_CMD_ID
 };
 
 typedef struct _NL80211_DRIVER_TEST_MODE_PARAMS {
-	UINT_32 index;
-	UINT_32 buflen;
+	u32 index;
+	u32 buflen;
 } NL80211_DRIVER_TEST_MODE_PARAMS, *P_NL80211_DRIVER_TEST_MODE_PARAMS;
 
 /*SW CMD */
 typedef struct _NL80211_DRIVER_SW_CMD_PARAMS {
 	NL80211_DRIVER_TEST_MODE_PARAMS hdr;
-	UINT_8							set;
-	UINT_32							adr;
-	UINT_32							data;
+	u8 set;
+	u32 adr;
+	u32 data;
 } NL80211_DRIVER_SW_CMD_PARAMS, *P_NL80211_DRIVER_SW_CMD_PARAMS;
 
 struct iw_encode_exts {
-	__u32 ext_flags;					  /*!< IW_ENCODE_EXT_* */
-	__u8  tx_seq[IW_ENCODE_SEQ_MAX_SIZE]; /*!< LSB first */
-	__u8  rx_seq[IW_ENCODE_SEQ_MAX_SIZE]; /*!< LSB first */
+	__u32 ext_flags; /*!< IW_ENCODE_EXT_**/
+	__u8 tx_seq[IW_ENCODE_SEQ_MAX_SIZE]; /*!< LSB first */
+	__u8 rx_seq[IW_ENCODE_SEQ_MAX_SIZE]; /*!< LSB first */
 	/*!< ff:ff:ff:ff:ff:ff for broadcast/multicast
 	 *   (group) keys or unicast address for
 	 *   individual keys
 	 */
-	__u8  addr[MAC_ADDR_LEN];
-	__u16 alg; /*!< IW_ENCODE_ALG_* */
+	__u8 addr[MAC_ADDR_LEN];
+	__u16 alg; /*!< IW_ENCODE_ALG_**/
 	__u16 key_len;
-	__u8  key[32];
+	__u8 key[32];
 };
 
 /*SET KEY EXT */
 typedef struct _NL80211_DRIVER_SET_KEY_EXTS {
 	NL80211_DRIVER_TEST_MODE_PARAMS hdr;
-	UINT_8							key_index;
-	UINT_8							key_len;
-	struct iw_encode_exts			ext;
+	u8 key_index;
+	u8 key_len;
+	struct iw_encode_exts ext;
 } NL80211_DRIVER_SET_KEY_EXTS, *P_NL80211_DRIVER_SET_KEY_EXTS;
 
 #endif
 
 typedef struct _NETDEV_PRIVATE_GLUE_INFO {
 	P_GLUE_INFO_T prGlueInfo;
-	UINT_8		  ucBssIdx;
+	u8 ucBssIdx;
 } NETDEV_PRIVATE_GLUE_INFO, *P_NETDEV_PRIVATE_GLUE_INFO;
 
 typedef struct _PACKET_PRIVATE_DATA {
 	QUE_ENTRY_T rQueEntry;
-	UINT_16		u2Flag;
-	UINT_8		ucTid;
-	UINT_8		ucBssIdx;
+	u16 u2Flag;
+	u8 ucTid;
+	u8 ucBssIdx;
 
-	UINT_8	ucHeaderLen;
-	UINT_16 u2FrameLen;
+	u8 ucHeaderLen;
+	u16 u2FrameLen;
 
-	UINT_8	   ucProfilingFlag;
-	OS_SYSTIME rArrivalTime;
-	UINT_16	   u2IpId;
+	u8 ucProfilingFlag;
+	u32 rArrivalTime;
+	u16 u2IpId;
 } PACKET_PRIVATE_DATA, *P_PACKET_PRIVATE_DATA;
 
 /*******************************************************************************
  *                            P U B L I C   D A T A
- ********************************************************************************
+ *******************************************************************************
  */
 
 /*******************************************************************************
  *                           P R I V A T E   D A T A
- ********************************************************************************
+ *******************************************************************************
  */
 
 /*******************************************************************************
  *                                 M A C R O S
- ********************************************************************************
+ *******************************************************************************
  */
+
 /*----------------------------------------------------------------------------*/
 /* Macros of SPIN LOCK operations for using in Glue Layer                     */
 /*----------------------------------------------------------------------------*/
 #if CFG_USE_SPIN_LOCK_BOTTOM_HALF
 #define GLUE_SPIN_LOCK_DECLARATION()
-#define GLUE_ACQUIRE_SPIN_LOCK(prGlueInfo, rLockCategory) \
-	{ \
-		if (rLockCategory < SPIN_LOCK_NUM) \
-			spin_lock_bh(&(prGlueInfo->rSpinLock[rLockCategory])); \
+#define GLUE_ACQUIRE_SPIN_LOCK(prGlueInfo, rLockCategory)	       \
+	{							       \
+		if (rLockCategory < SPIN_LOCK_NUM)		       \
+		spin_lock_bh(&(prGlueInfo->rSpinLock[rLockCategory])); \
 	}
-#define GLUE_RELEASE_SPIN_LOCK(prGlueInfo, rLockCategory) \
-	{ \
-		if (rLockCategory < SPIN_LOCK_NUM) \
-			spin_unlock_bh(&(prGlueInfo->rSpinLock[rLockCategory])); \
+#define GLUE_RELEASE_SPIN_LOCK(prGlueInfo, rLockCategory)	  \
+	{							  \
+		if (rLockCategory < SPIN_LOCK_NUM)		  \
+		spin_unlock_bh(					  \
+			&(prGlueInfo->rSpinLock[rLockCategory])); \
 	}
 #else /* !CFG_USE_SPIN_LOCK_BOTTOM_HALF */
-#define GLUE_SPIN_LOCK_DECLARATION() ULONG __ulFlags = 0
-#define GLUE_ACQUIRE_SPIN_LOCK(prGlueInfo, rLockCategory) \
-	{ \
-		if (rLockCategory < SPIN_LOCK_NUM) \
-			spin_lock_irqsave(&(prGlueInfo)->rSpinLock[rLockCategory], __ulFlags); \
+#define GLUE_SPIN_LOCK_DECLARATION()    unsigned long __ulFlags = 0
+#define GLUE_ACQUIRE_SPIN_LOCK(prGlueInfo, rLockCategory)	 \
+	{							 \
+		if (rLockCategory < SPIN_LOCK_NUM)		 \
+		spin_lock_irqsave(				 \
+			&(prGlueInfo)->rSpinLock[rLockCategory], \
+			__ulFlags);				 \
 	}
-#define GLUE_RELEASE_SPIN_LOCK(prGlueInfo, rLockCategory) \
-	{ \
-		if (rLockCategory < SPIN_LOCK_NUM) \
-			spin_unlock_irqrestore(&(prGlueInfo->rSpinLock[rLockCategory]), __ulFlags); \
+#define GLUE_RELEASE_SPIN_LOCK(prGlueInfo, rLockCategory)	 \
+	{							 \
+		if (rLockCategory < SPIN_LOCK_NUM)		 \
+		spin_unlock_irqrestore(				 \
+			&(prGlueInfo->rSpinLock[rLockCategory]), \
+			__ulFlags);				 \
 	}
-#endif /* !CFG_USE_SPIN_LOCK_BOTTOM_HALF */
+#endif
 
 /*----------------------------------------------------------------------------*/
 /* Macros for accessing Reserved Fields of native packet                      */
 /*----------------------------------------------------------------------------*/
 
-#define GLUE_GET_PKT_PRIVATE_DATA(_p) ((P_PACKET_PRIVATE_DATA)(&(((struct sk_buff *)(_p))->cb[0])))
+#define GLUE_GET_PKT_PRIVATE_DATA(_p) \
+	((P_PACKET_PRIVATE_DATA)(&(((struct sk_buff *)(_p))->cb[0])))
 
-#define GLUE_GET_PKT_QUEUE_ENTRY(_p) (&(GLUE_GET_PKT_PRIVATE_DATA(_p)->rQueEntry))
+#define GLUE_GET_PKT_QUEUE_ENTRY(_p) \
+	(&(GLUE_GET_PKT_PRIVATE_DATA(_p)->rQueEntry))
 
-#define GLUE_GET_PKT_DESCRIPTOR(_prQueueEntry) \
-	((P_NATIVE_PACKET)(((ULONG)_prQueueEntry) - offsetof(struct sk_buff, cb[0])))
+#define GLUE_GET_PKT_DESCRIPTOR(_prQueueEntry)		    \
+	((P_NATIVE_PACKET)(((unsigned long)_prQueueEntry) - \
+			   offsetof(struct sk_buff, cb[0])))
 
-#define GLUE_SET_PKT_TID(_p, _tid) (GLUE_GET_PKT_PRIVATE_DATA(_p)->ucTid = (UINT_8)(_tid))
+#define GLUE_SET_PKT_TID(_p, _tid) \
+	(GLUE_GET_PKT_PRIVATE_DATA(_p)->ucTid = (u8)(_tid))
 
-#define GLUE_GET_PKT_TID(_p) (GLUE_GET_PKT_PRIVATE_DATA(_p)->ucTid)
+#define GLUE_GET_PKT_TID(_p)	       (GLUE_GET_PKT_PRIVATE_DATA(_p)->ucTid)
 
-#define GLUE_SET_PKT_FLAG(_p, _flag) (GLUE_GET_PKT_PRIVATE_DATA(_p)->u2Flag |= BIT(_flag))
+#define GLUE_SET_PKT_FLAG(_p, _flag) \
+	(GLUE_GET_PKT_PRIVATE_DATA(_p)->u2Flag |= BIT(_flag))
 
-#define GLUE_TEST_PKT_FLAG(_p, _flag) (GLUE_GET_PKT_PRIVATE_DATA(_p)->u2Flag & BIT(_flag))
+#define GLUE_TEST_PKT_FLAG(_p, _flag) \
+	(GLUE_GET_PKT_PRIVATE_DATA(_p)->u2Flag & BIT(_flag))
 
-#define GLUE_IS_PKT_FLAG_SET(_p) (GLUE_GET_PKT_PRIVATE_DATA(_p)->u2Flag)
+#define GLUE_IS_PKT_FLAG_SET(_p)       (GLUE_GET_PKT_PRIVATE_DATA(_p)->u2Flag)
 
-#define GLUE_SET_PKT_BSS_IDX(_p, _ucBssIndex) (GLUE_GET_PKT_PRIVATE_DATA(_p)->ucBssIdx = (UINT_8)(_ucBssIndex))
+#define GLUE_SET_PKT_BSS_IDX(_p, _ucBssIndex) \
+	(GLUE_GET_PKT_PRIVATE_DATA(_p)->ucBssIdx = (u8)(_ucBssIndex))
 
-#define GLUE_GET_PKT_BSS_IDX(_p) (GLUE_GET_PKT_PRIVATE_DATA(_p)->ucBssIdx)
+#define GLUE_GET_PKT_BSS_IDX(_p)       (GLUE_GET_PKT_PRIVATE_DATA(_p)->ucBssIdx)
 
 #define GLUE_SET_PKT_HEADER_LEN(_p, _ucMacHeaderLen) \
-	(GLUE_GET_PKT_PRIVATE_DATA(_p)->ucHeaderLen = (UINT_8)(_ucMacHeaderLen))
+	(GLUE_GET_PKT_PRIVATE_DATA(_p)->ucHeaderLen = (u8)(_ucMacHeaderLen))
 
-#define GLUE_GET_PKT_HEADER_LEN(_p) (GLUE_GET_PKT_PRIVATE_DATA(_p)->ucHeaderLen)
+#define GLUE_GET_PKT_HEADER_LEN(_p)    (GLUE_GET_PKT_PRIVATE_DATA( \
+						_p)->ucHeaderLen)
 
-#define GLUE_SET_PKT_FRAME_LEN(_p, _u2PayloadLen) (GLUE_GET_PKT_PRIVATE_DATA(_p)->u2FrameLen = (UINT_16)(_u2PayloadLen))
+#define GLUE_SET_PKT_FRAME_LEN(_p, _u2PayloadLen) \
+	(GLUE_GET_PKT_PRIVATE_DATA(_p)->u2FrameLen = (u16)(_u2PayloadLen))
 
-#define GLUE_GET_PKT_FRAME_LEN(_p) (GLUE_GET_PKT_PRIVATE_DATA(_p)->u2FrameLen)
+#define GLUE_GET_PKT_FRAME_LEN(_p)     (GLUE_GET_PKT_PRIVATE_DATA( \
+						_p)->u2FrameLen)
 
-#define GLUE_SET_PKT_ARRIVAL_TIME(_p, _rSysTime) (GLUE_GET_PKT_PRIVATE_DATA(_p)->rArrivalTime = (OS_SYSTIME)(_rSysTime))
+#define GLUE_SET_PKT_ARRIVAL_TIME(_p, _rSysTime) \
+	(GLUE_GET_PKT_PRIVATE_DATA(_p)->rArrivalTime = (u32)(_rSysTime))
 
-#define GLUE_GET_PKT_ARRIVAL_TIME(_p) (GLUE_GET_PKT_PRIVATE_DATA(_p)->rArrivalTime)
+#define GLUE_GET_PKT_ARRIVAL_TIME(_p) \
+	(GLUE_GET_PKT_PRIVATE_DATA(_p)->rArrivalTime)
 
-#define GLUE_SET_PKT_IP_ID(_p, _u2IpId) (GLUE_GET_PKT_PRIVATE_DATA(_p)->u2IpId = (UINT_16)(_u2IpId))
+#define GLUE_SET_PKT_IP_ID(_p, _u2IpId)	\
+	(GLUE_GET_PKT_PRIVATE_DATA(_p)->u2IpId = (u16)(_u2IpId))
 
-#define GLUE_GET_PKT_IP_ID(_p) (GLUE_GET_PKT_PRIVATE_DATA(_p)->u2IpId)
+#define GLUE_GET_PKT_IP_ID(_p)	       (GLUE_GET_PKT_PRIVATE_DATA(_p)->u2IpId)
 
-#define GLUE_SET_PKT_FLAG_PROF_MET(_p) (GLUE_GET_PKT_PRIVATE_DATA(_p)->ucProfilingFlag |= BIT(0))
+#define GLUE_SET_PKT_FLAG_PROF_MET(_p) \
+	(GLUE_GET_PKT_PRIVATE_DATA(_p)->ucProfilingFlag |= BIT(0))
 
-#define GLUE_GET_PKT_IS_PROF_MET(_p) (GLUE_GET_PKT_PRIVATE_DATA(_p)->ucProfilingFlag & BIT(0))
+#define GLUE_GET_PKT_IS_PROF_MET(_p) \
+	(GLUE_GET_PKT_PRIVATE_DATA(_p)->ucProfilingFlag & BIT(0))
 
-#define GLUE_GET_PKT_ETHER_DEST_ADDR(_p) ((PUINT_8) & (((struct sk_buff *)(_p))->data))
+#define GLUE_GET_PKT_ETHER_DEST_ADDR(_p) \
+	((u8 *)&(((struct sk_buff *)(_p))->data))
 
 /* Check validity of prDev, private data, and pointers */
-#define GLUE_CHK_DEV(prDev) ((prDev && *((P_GLUE_INFO_T *)netdev_priv(prDev))) ? TRUE : FALSE)
+#define GLUE_CHK_DEV(prDev) \
+	((prDev && *((P_GLUE_INFO_T *)netdev_priv(prDev))) ? true : false)
 
-#define GLUE_CHK_PR2(prDev, pr2) ((GLUE_CHK_DEV(prDev) && pr2) ? TRUE : FALSE)
+#define GLUE_CHK_PR2(prDev,					\
+		     pr2)	       ((GLUE_CHK_DEV(prDev) &&	\
+					 pr2) ? true : false)
 
-#define GLUE_CHK_PR3(prDev, pr2, pr3) ((GLUE_CHK_PR2(prDev, pr2) && pr3) ? TRUE : FALSE)
+#define GLUE_CHK_PR3(prDev, pr2, pr3) \
+	((GLUE_CHK_PR2(prDev, pr2) && pr3) ? true : false)
 
-#define GLUE_CHK_PR4(prDev, pr2, pr3, pr4) ((GLUE_CHK_PR3(prDev, pr2, pr3) && pr4) ? TRUE : FALSE)
+#define GLUE_CHK_PR4(prDev, pr2, pr3, pr4) \
+	((GLUE_CHK_PR3(prDev, pr2, pr3) && pr4) ? true : false)
 
-#define GLUE_SET_EVENT(pr) kalSetEvent(pr)
+#define GLUE_SET_EVENT(pr)	       kalSetEvent(pr)
 
-#define GLUE_INC_REF_CNT(_refCount) atomic_inc((atomic_t *)&(_refCount))
-#define GLUE_DEC_REF_CNT(_refCount) atomic_dec((atomic_t *)&(_refCount))
-#define GLUE_GET_REF_CNT(_refCount) atomic_read((atomic_t *)&(_refCount))
+#define GLUE_INC_REF_CNT(_refCount)    atomic_inc((atomic_t *)&(_refCount))
+#define GLUE_DEC_REF_CNT(_refCount)    atomic_dec((atomic_t *)&(_refCount))
+#define GLUE_GET_REF_CNT(_refCount)    atomic_read((atomic_t *)&(_refCount))
 
 #define DbgPrint(...)
 
 /*----------------------------------------------------------------------------*/
 /* Macros of Data Type Check                                                  */
 /*----------------------------------------------------------------------------*/
-/* Kevin: we don't have to call following function to inspect the data structure.
- * It will check automatically while at compile time.
+/* Kevin: we don't have to call following function to inspect the data
+ * structure. It will check automatically while at compile time.
  */
-static __KAL_INLINE__ VOID glPacketDataTypeCheck(VOID)
+static __KAL_INLINE__ void glPacketDataTypeCheck(void)
 {
-	DATA_STRUCT_INSPECTING_ASSERT(sizeof(PACKET_PRIVATE_DATA) <= sizeof(((struct sk_buff *)0)->cb));
+	DATA_STRUCT_INSPECTING_ASSERT(sizeof(PACKET_PRIVATE_DATA) <=
+				      sizeof(((struct sk_buff *)0)->cb));
 }
 
 static inline u16 mtk_wlan_ndev_select_queue(struct sk_buff *skb)
@@ -745,69 +782,81 @@ static inline u16 mtk_wlan_ndev_select_queue(struct sk_buff *skb)
 }
 
 #if KERNEL_VERSION(2, 6, 34) > LINUX_VERSION_CODE
-#define netdev_for_each_mc_addr(mclist, dev) for (mclist = dev->mc_list; mclist; mclist = mclist->next)
+#define netdev_for_each_mc_addr(mclist, dev) \
+	for (mclist = dev->mc_list; mclist; mclist = mclist->next)
 #endif
 
 #if KERNEL_VERSION(2, 6, 34) > LINUX_VERSION_CODE
-#define GET_ADDR(ha) (ha->da_addr)
+#define GET_ADDR(ha)	(ha->da_addr)
 #else
-#define GET_ADDR(ha) (ha->addr)
+#define GET_ADDR(ha)	(ha->addr)
 #endif
 
 #if KERNEL_VERSION(2, 6, 35) <= LINUX_VERSION_CODE
 #define LIST_FOR_EACH_IPV6_ADDR(_prIfa, _ip6_ptr) \
-	list_for_each_entry(_prIfa, &((struct inet6_dev *)_ip6_ptr)->addr_list, if_list)
+	list_for_each_entry(			  \
+		_prIfa, &((struct inet6_dev *)_ip6_ptr)->addr_list, if_list)
 #else
-#define LIST_FOR_EACH_IPV6_ADDR(_prIfa, _ip6_ptr) \
-	for (_prIfa = ((struct inet6_dev *)_ip6_ptr)->addr_list; _prIfa; _prIfa = _prIfa->if_next)
+#define LIST_FOR_EACH_IPV6_ADDR(_prIfa, _ip6_ptr)			 \
+	for (_prIfa = ((struct inet6_dev *)_ip6_ptr)->addr_list; _prIfa; \
+	     _prIfa = _prIfa->if_next)
 #endif
 
 /*******************************************************************************
  *                  F U N C T I O N   D E C L A R A T I O N S
- ********************************************************************************
+ *******************************************************************************
  */
+
 #if WLAN_INCLUDE_PROC
-INT_32 procCreateFsEntry(P_GLUE_INFO_T prGlueInfo);
-INT_32 procRemoveProcfs(VOID);
+s32 procCreateFsEntry(P_GLUE_INFO_T prGlueInfo);
+s32 procRemoveProcfs(void);
 
-INT_32 procInitFs(VOID);
-INT_32 procUninitProcFs(VOID);
+s32 procInitFs(void);
+s32 procUninitProcFs(void);
 
-INT_32 procInitProcfs(struct net_device *prDev, char *pucDevName);
-#endif /* WLAN_INCLUDE_PROC */
+s32 procInitProcfs(struct net_device *prDev, char *pucDevName);
+#endif
 
 #if CFG_ENABLE_WIFI_DIRECT
 void p2pSetMulticastListWorkQueueWrapper(P_GLUE_INFO_T prGlueInfo);
 #endif
 
-P_GLUE_INFO_T wlanGetGlueInfo(VOID);
+P_GLUE_INFO_T wlanGetGlueInfo(void);
 
 #if KERNEL_VERSION(5, 2, 0) <= LINUX_VERSION_CODE
-u16 wlanSelectQueue(struct net_device *dev, struct sk_buff *skb, struct net_device *sb_dev);
+u16 wlanSelectQueue(struct net_device *dev,
+		    struct sk_buff *skb,
+		    struct net_device *sb_dev);
 #elif KERNEL_VERSION(4, 19, 0) <= LINUX_VERSION_CODE
-u16 wlanSelectQueue(
-		struct net_device *dev, struct sk_buff *skb, struct net_device *sb_dev, select_queue_fallback_t fallback);
+u16 wlanSelectQueue(struct net_device *dev,
+		    struct sk_buff *skb,
+		    struct net_device *sb_dev,
+		    select_queue_fallback_t fallback);
 #else
-u16 wlanSelectQueue(struct net_device *dev, struct sk_buff *skb, void *accel_priv, select_queue_fallback_t fallback);
+u16 wlanSelectQueue(struct net_device *dev,
+		    struct sk_buff *skb,
+		    void *accel_priv,
+		    select_queue_fallback_t fallback);
 #endif
 
-VOID wlanDebugInit(VOID);
+void wlanDebugInit(void);
 
-WLAN_STATUS wlanSetDebugLevel(IN UINT_32 u4DbgIdx, IN UINT_32 u4DbgMask);
+WLAN_STATUS wlanSetDebugLevel(IN u32 u4DbgIdx, IN u32 u4DbgMask);
 
-WLAN_STATUS wlanGetDebugLevel(IN UINT_32 u4DbgIdx, OUT PUINT_32 pu4DbgMask);
+WLAN_STATUS wlanGetDebugLevel(IN u32 u4DbgIdx, OUT u32 *pu4DbgMask);
 
-VOID wlanSetSuspendMode(P_GLUE_INFO_T prGlueInfo, BOOLEAN fgEnable);
+void wlanSetSuspendMode(P_GLUE_INFO_T prGlueInfo, u8 fgEnable);
 
-VOID wlanGetConfig(P_ADAPTER_T prAdapter);
+void wlanGetConfig(P_ADAPTER_T prAdapter);
 
 WLAN_STATUS wlanExtractBufferBin(P_ADAPTER_T prAdapter);
 
 struct wireless_dev *wlanGetWirelessDevice(void);
 /*******************************************************************************
- *			 E X T E R N A L   F U N C T I O N S / V A R I A B L E
- ********************************************************************************
+ *  E X T E R N A L   F U N C T I O N S / V A R I A B L E
+ *******************************************************************************
  */
+
 extern struct net_device *gPrP2pDev[KAL_P2P_NUM];
 extern struct net_device *gPrDev;
 
@@ -815,7 +864,7 @@ extern struct net_device *gPrDev;
 extern char *gprifnameap;
 extern char *gprifnamep2p;
 extern char *gprifnamesta;
-#endif /* CFG_DRIVER_INF_NAME_CHANGE */
+#endif
 
 extern void wlanRegisterNotifier(void);
 extern void wlanUnregisterNotifier(void);
@@ -824,24 +873,28 @@ extern void wlanRegisterRebootNotifier(void);
 extern void wlanUnregisterRebootNotifier(void);
 
 #if CFG_ENABLE_EARLY_SUSPEND
-extern int glRegisterEarlySuspend(
-		struct early_suspend *prDesc, early_suspend_callback wlanSuspend, late_resume_callback wlanResume);
+extern int glRegisterEarlySuspend(struct early_suspend *prDesc,
+				  early_suspend_callback wlanSuspend,
+				  late_resume_callback wlanResume);
 
 extern int glUnregisterEarlySuspend(struct early_suspend *prDesc);
 #endif
 
 #if CFG_MET_PACKET_TRACE_SUPPORT
-VOID kalMetTagPacket(IN P_GLUE_INFO_T prGlueInfo, IN P_NATIVE_PACKET prPacket, IN ENUM_TX_PROFILING_TAG_T eTag);
+void kalMetTagPacket(IN P_GLUE_INFO_T prGlueInfo,
+		     IN P_NATIVE_PACKET prPacket,
+		     IN ENUM_TX_PROFILING_TAG_T eTag);
 
-VOID kalMetInit(IN P_GLUE_INFO_T prGlueInfo);
+void kalMetInit(IN P_GLUE_INFO_T prGlueInfo);
 #endif
 
-VOID wlanUpdateChannelTable(P_GLUE_INFO_T prGlueInfo);
+void wlanUpdateChannelTable(P_GLUE_INFO_T prGlueInfo);
 
 #if CFG_SUPPORT_SAP_DFS_CHANNEL
-void wlanUpdateDfsChannelTable(IN P_GLUE_INFO_T prGlueInfo, IN UINT_8 ucChannel);
+void wlanUpdateDfsChannelTable(IN P_GLUE_INFO_T prGlueInfo, IN u8 ucChannel);
 #endif
 
-int set_p2p_mode_handler(struct net_device *netdev, PARAM_CUSTOM_P2P_SET_STRUCT_T p2pmode);
+int set_p2p_mode_handler(struct net_device *netdev,
+			 PARAM_CUSTOM_P2P_SET_STRUCT_T p2pmode);
 
-#endif /* _GL_OS_H */
+#endif

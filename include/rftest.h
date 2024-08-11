@@ -13,112 +13,115 @@
 
 /*******************************************************************************
  *                         C O M P I L E R   F L A G S
- ********************************************************************************
+ *******************************************************************************
  */
 
 /*******************************************************************************
  *                    E X T E R N A L   R E F E R E N C E S
- ********************************************************************************
+ *******************************************************************************
  */
 
 /*******************************************************************************
  *                              C O N S T A N T S
- ********************************************************************************
+ *******************************************************************************
  */
+
 /* Table Version */
-#define RF_AUTO_TEST_FUNCTION_TABLE_VERSION 0x01000001
+#define RF_AUTO_TEST_FUNCTION_TABLE_VERSION	  0x01000001
 
 /* Power */
-#define RF_AT_PARAM_POWER_MASK BITS(0, 7)
-#define RF_AT_PARAM_POWER_MAX RF_AT_PARAM_POWER_MASK
+#define RF_AT_PARAM_POWER_MASK			  BITS(0, 7)
+#define RF_AT_PARAM_POWER_MAX			  RF_AT_PARAM_POWER_MASK
 
 /* Rate */
-#define RF_AT_PARAM_RATE_MCS_MASK BIT(31)
-#define RF_AT_PARAM_RATE_MASK BITS(0, 7)
-#define RF_AT_PARAM_RATE_CCK_MAX 3
-#define RF_AT_PARAM_RATE_1M 0
-#define RF_AT_PARAM_RATE_2M 1
-#define RF_AT_PARAM_RATE_5_5M 2
-#define RF_AT_PARAM_RATE_11M 3
-#define RF_AT_PARAM_RATE_6M 4
-#define RF_AT_PARAM_RATE_9M 5
-#define RF_AT_PARAM_RATE_12M 6
-#define RF_AT_PARAM_RATE_18M 7
-#define RF_AT_PARAM_RATE_24M 8
-#define RF_AT_PARAM_RATE_36M 9
-#define RF_AT_PARAM_RATE_48M 10
-#define RF_AT_PARAM_RATE_54M 11
+#define RF_AT_PARAM_RATE_MCS_MASK		  BIT(31)
+#define RF_AT_PARAM_RATE_MASK			  BITS(0, 7)
+#define RF_AT_PARAM_RATE_CCK_MAX		  3
+#define RF_AT_PARAM_RATE_1M			  0
+#define RF_AT_PARAM_RATE_2M			  1
+#define RF_AT_PARAM_RATE_5_5M			  2
+#define RF_AT_PARAM_RATE_11M			  3
+#define RF_AT_PARAM_RATE_6M			  4
+#define RF_AT_PARAM_RATE_9M			  5
+#define RF_AT_PARAM_RATE_12M			  6
+#define RF_AT_PARAM_RATE_18M			  7
+#define RF_AT_PARAM_RATE_24M			  8
+#define RF_AT_PARAM_RATE_36M			  9
+#define RF_AT_PARAM_RATE_48M			  10
+#define RF_AT_PARAM_RATE_54M			  11
 
 /* Antenna */
-#define RF_AT_PARAM_ANTENNA_ID_MASK BITS(0, 7)
-#define RF_AT_PARAM_ANTENNA_ID_MAX 1
+#define RF_AT_PARAM_ANTENNA_ID_MASK		  BITS(0, 7)
+#define RF_AT_PARAM_ANTENNA_ID_MAX		  1
 
 /* Packet Length */
-#define RF_AT_PARAM_TX_80211HDR_BYTE_MAX (32)
-#define RF_AT_PARAM_TX_80211PAYLOAD_BYTE_MAX (2048)
+#define RF_AT_PARAM_TX_80211HDR_BYTE_MAX	  (32)
+#define RF_AT_PARAM_TX_80211PAYLOAD_BYTE_MAX	  (2048)
 
-#define RF_AT_PARAM_TX_PKTLEN_BYTE_DEFAULT 1024
-#define RF_AT_PARAM_TX_PKTLEN_BYTE_MAX \
-	((UINT_16)(RF_AT_PARAM_TX_80211HDR_BYTE_MAX + RF_AT_PARAM_TX_80211PAYLOAD_BYTE_MAX))
+#define RF_AT_PARAM_TX_PKTLEN_BYTE_DEFAULT	  1024
+#define RF_AT_PARAM_TX_PKTLEN_BYTE_MAX		  \
+	((u16)(RF_AT_PARAM_TX_80211HDR_BYTE_MAX + \
+	       RF_AT_PARAM_TX_80211PAYLOAD_BYTE_MAX))
 
 /* Packet Count */
-#define RF_AT_PARAM_TX_PKTCNT_DEFAULT 1000
-#define RF_AT_PARAM_TX_PKTCNT_UNLIMITED 0
+#define RF_AT_PARAM_TX_PKTCNT_DEFAULT		  1000
+#define RF_AT_PARAM_TX_PKTCNT_UNLIMITED		  0
 
 /* Packet Interval */
-#define RF_AT_PARAM_TX_PKT_INTERVAL_US_DEFAULT 50
+#define RF_AT_PARAM_TX_PKT_INTERVAL_US_DEFAULT	  50
 
 /* ALC */
-#define RF_AT_PARAM_ALC_DISABLE 0
-#define RF_AT_PARAM_ALC_ENABLE 1
+#define RF_AT_PARAM_ALC_DISABLE			  0
+#define RF_AT_PARAM_ALC_ENABLE			  1
 
 /* TXOP */
-#define RF_AT_PARAM_TXOP_DEFAULT 0
-#define RF_AT_PARAM_TXOPQUE_QMASK BITS(16, 31)
-#define RF_AT_PARAM_TXOPQUE_TMASK BITS(0, 15)
-#define RF_AT_PARAM_TXOPQUE_AC0 (0 << 16)
-#define RF_AT_PARAM_TXOPQUE_AC1 (1 << 16)
-#define RF_AT_PARAM_TXOPQUE_AC2 (2 << 16)
-#define RF_AT_PARAM_TXOPQUE_AC3 (3 << 16)
-#define RF_AT_PARAM_TXOPQUE_AC4 (4 << 16)
-#define RF_AT_PARAM_TXOPQUE_QOFFSET 16
+#define RF_AT_PARAM_TXOP_DEFAULT		  0
+#define RF_AT_PARAM_TXOPQUE_QMASK		  BITS(16, 31)
+#define RF_AT_PARAM_TXOPQUE_TMASK		  BITS(0, 15)
+#define RF_AT_PARAM_TXOPQUE_AC0			  (0 << 16)
+#define RF_AT_PARAM_TXOPQUE_AC1			  (1 << 16)
+#define RF_AT_PARAM_TXOPQUE_AC2			  (2 << 16)
+#define RF_AT_PARAM_TXOPQUE_AC3			  (3 << 16)
+#define RF_AT_PARAM_TXOPQUE_AC4			  (4 << 16)
+#define RF_AT_PARAM_TXOPQUE_QOFFSET		  16
 
 /* Retry Limit */
-#define RF_AT_PARAM_TX_RETRY_DEFAULT 0
-#define RF_AT_PARAM_TX_RETRY_MAX 6
+#define RF_AT_PARAM_TX_RETRY_DEFAULT		  0
+#define RF_AT_PARAM_TX_RETRY_MAX		  6
 
 /* QoS Queue */
-#define RF_AT_PARAM_QOSQUE_AC0 0
-#define RF_AT_PARAM_QOSQUE_AC1 1
-#define RF_AT_PARAM_QOSQUE_AC2 2
-#define RF_AT_PARAM_QOSQUE_AC3 3
-#define RF_AT_PARAM_QOSQUE_AC4 4
-#define RF_AT_PARAM_QOSQUE_DEFAULT RF_AT_PARAM_QOSQUE_AC0
+#define RF_AT_PARAM_QOSQUE_AC0			  0
+#define RF_AT_PARAM_QOSQUE_AC1			  1
+#define RF_AT_PARAM_QOSQUE_AC2			  2
+#define RF_AT_PARAM_QOSQUE_AC3			  3
+#define RF_AT_PARAM_QOSQUE_AC4			  4
+#define RF_AT_PARAM_QOSQUE_DEFAULT		  RF_AT_PARAM_QOSQUE_AC0
 
 /* Bandwidth */
-#define RF_AT_PARAM_BANDWIDTH_20MHZ 0
-#define RF_AT_PARAM_BANDWIDTH_40MHZ 1
-#define RF_AT_PARAM_BANDWIDTH_U20_IN_40MHZ 2
-#define RF_AT_PARAM_BANDWIDTH_D20_IN_40MHZ 3
-#define RF_AT_PARAM_BANDWIDTH_DEFAULT RF_AT_PARAM_BANDWIDTH_20MHZ
+#define RF_AT_PARAM_BANDWIDTH_20MHZ		  0
+#define RF_AT_PARAM_BANDWIDTH_40MHZ		  1
+#define RF_AT_PARAM_BANDWIDTH_U20_IN_40MHZ	  2
+#define RF_AT_PARAM_BANDWIDTH_D20_IN_40MHZ	  3
+#define RF_AT_PARAM_BANDWIDTH_DEFAULT		  RF_AT_PARAM_BANDWIDTH_20MHZ
 
 /* GI (Guard Interval) */
-#define RF_AT_PARAM_GI_800NS 0
-#define RF_AT_PARAM_GI_400NS 1
-#define RF_AT_PARAM_GI_DEFAULT RF_AT_PARAM_GI_800NS
+#define RF_AT_PARAM_GI_800NS			  0
+#define RF_AT_PARAM_GI_400NS			  1
+#define RF_AT_PARAM_GI_DEFAULT			  RF_AT_PARAM_GI_800NS
 
 /* STBC */
-#define RF_AT_PARAM_STBC_DISABLE 0
-#define RF_AT_PARAM_STBC_ENABLE 1
+#define RF_AT_PARAM_STBC_DISABLE		  0
+#define RF_AT_PARAM_STBC_ENABLE			  1
 
 /* RIFS */
-#define RF_AT_PARAM_RIFS_DISABLE 0
-#define RF_AT_PARAM_RIFS_ENABLE 1
+#define RF_AT_PARAM_RIFS_DISABLE		  0
+#define RF_AT_PARAM_RIFS_ENABLE			  1
 
 /*******************************************************************************
  *                             D A T A   T Y P E S
- ********************************************************************************
+ *******************************************************************************
  */
+
 /* Function ID List */
 typedef enum _ENUM_RF_AT_FUNCID_T {
 	RF_AT_FUNCID_VERSION = 0,
@@ -213,17 +216,17 @@ typedef enum _ENUM_RF_AT_FUNCID_T {
 	RF_AT_FUNCID_RX_FILTER_PKT_LEN = 93,
 
 	/* Tone */
-	RF_AT_FUNCID_SET_TONE_RF_GAIN	   = 96,
+	RF_AT_FUNCID_SET_TONE_RF_GAIN = 96,
 	RF_AT_FUNCID_SET_TONE_DIGITAL_GAIN = 97,
-	RF_AT_FUNCID_SET_TONE_TYPE		   = 98,
-	RF_AT_FUNCID_SET_TONE_DC_OFFSET	   = 99,
-	RF_AT_FUNCID_SET_TONE_BW		   = 100,
+	RF_AT_FUNCID_SET_TONE_TYPE = 98,
+	RF_AT_FUNCID_SET_TONE_DC_OFFSET = 99,
+	RF_AT_FUNCID_SET_TONE_BW = 100,
 
 	/* MT6632 Add */
-	RF_AT_FUNCID_SET_MAC_HEADER		 = 101,
-	RF_AT_FUNCID_SET_SEQ_CTRL		 = 102,
-	RF_AT_FUNCID_SET_PAYLOAD		 = 103,
-	RF_AT_FUNCID_SET_DBDC_BAND_IDX	 = 104,
+	RF_AT_FUNCID_SET_MAC_HEADER = 101,
+	RF_AT_FUNCID_SET_SEQ_CTRL = 102,
+	RF_AT_FUNCID_SET_PAYLOAD = 103,
+	RF_AT_FUNCID_SET_DBDC_BAND_IDX = 104,
 	RF_AT_FUNCID_SET_BYPASS_CAL_STEP = 105,
 
 	/* Set RX Path */
@@ -257,10 +260,10 @@ typedef enum _ENUM_RF_AT_FUNCID_T {
 	RF_AT_FUNCID_SET_ANTMASK = 115,
 
 	/* TMR set command */
-	RF_AT_FUNCID_SET_TMR_ROLE	= 116,
+	RF_AT_FUNCID_SET_TMR_ROLE = 116,
 	RF_AT_FUNCID_SET_TMR_MODULE = 117,
-	RF_AT_FUNCID_SET_TMR_DBM	= 118,
-	RF_AT_FUNCID_SET_TMR_ITER	= 119,
+	RF_AT_FUNCID_SET_TMR_DBM = 118,
+	RF_AT_FUNCID_SET_TMR_ITER = 119,
 
 	/* Set ADC For IRR Feature */
 	RF_AT_FUNCID_SET_ADC = 120,
@@ -285,13 +288,13 @@ typedef enum _ENUM_RF_AT_FUNCID_T {
 	RF_AT_FUNCID_SET_EBF_ENABLE = 127,
 
 	/* Set MPS Setting */
-	RF_AT_FUNCID_SET_MPS_SIZE		 = 128,
-	RF_AT_FUNCID_SET_MPS_SEQ_DATA	 = 129,
+	RF_AT_FUNCID_SET_MPS_SIZE = 128,
+	RF_AT_FUNCID_SET_MPS_SEQ_DATA = 129,
 	RF_AT_FUNCID_SET_MPS_PAYLOAD_LEN = 130,
-	RF_AT_FUNCID_SET_MPS_PKT_CNT	 = 131,
-	RF_AT_FUNCID_SET_MPS_PWR_GAIN	 = 132,
-	RF_AT_FUNCID_SET_MPS_NSS		 = 133,
-	RF_AT_FUNCID_SET_MPS_PACKAGE_BW	 = 134
+	RF_AT_FUNCID_SET_MPS_PKT_CNT = 131,
+	RF_AT_FUNCID_SET_MPS_PWR_GAIN = 132,
+	RF_AT_FUNCID_SET_MPS_NSS = 133,
+	RF_AT_FUNCID_SET_MPS_PACKAGE_BW = 134
 #endif
 } ENUM_RF_AT_FUNCID_T;
 
@@ -301,8 +304,8 @@ typedef enum _ENUM_RF_AT_COMMAND_T {
 	RF_AT_COMMAND_STARTTX,
 	RF_AT_COMMAND_STARTRX,
 	RF_AT_COMMAND_RESET,
-	RF_AT_COMMAND_OUTPUT_POWER,	 /* Payload */
-	RF_AT_COMMAND_LO_LEAKAGE,	 /* Local freq is renamed to Local leakage */
+	RF_AT_COMMAND_OUTPUT_POWER, /* Payload */
+	RF_AT_COMMAND_LO_LEAKAGE, /* Local freq is renamed to Local leakage */
 	RF_AT_COMMAND_CARRIER_SUPPR, /* OFDM (LTF/STF), CCK (PI,PI/2) */
 	RF_AT_COMMAND_TRX_IQ_CAL,
 	RF_AT_COMMAND_TSSI_CAL,
@@ -349,30 +352,37 @@ typedef enum _ENUM_RF_AUTOTEST_STATE_T {
 
 /*******************************************************************************
  *                            P U B L I C   D A T A
- ********************************************************************************
+ *******************************************************************************
  */
 
 /*******************************************************************************
  *                           P R I V A T E   D A T A
- ********************************************************************************
+ *******************************************************************************
  */
 
 /*******************************************************************************
  *                                 M A C R O S
- ********************************************************************************
+ *******************************************************************************
  */
 
 /*******************************************************************************
  *                   F U N C T I O N   D E C L A R A T I O N S
- ********************************************************************************
+ *******************************************************************************
  */
 
-WLAN_STATUS rftestSetATInfo(IN P_ADAPTER_T prAdapter, UINT_32 u4FuncIndex, UINT_32 u4FuncData);
+WLAN_STATUS rftestSetATInfo(IN P_ADAPTER_T prAdapter,
+			    u32 u4FuncIndex,
+			    u32 u4FuncData);
 
 WLAN_STATUS
-rftestQueryATInfo(IN P_ADAPTER_T prAdapter, UINT_32 u4FuncIndex, UINT_32 u4FuncData, OUT PVOID pvQueryBuffer,
-		IN UINT_32 u4QueryBufferLen);
+rftestQueryATInfo(IN P_ADAPTER_T prAdapter,
+		  u32 u4FuncIndex,
+		  u32 u4FuncData,
+		  OUT void *pvQueryBuffer,
+		  IN u32 u4QueryBufferLen);
 
-WLAN_STATUS rftestSetFrequency(IN P_ADAPTER_T prAdapter, IN UINT_32 u4FreqInKHz, IN PUINT_32 pu4SetInfoLen);
+WLAN_STATUS rftestSetFrequency(IN P_ADAPTER_T prAdapter,
+			       IN u32 u4FreqInKHz,
+			       IN u32 *pu4SetInfoLen);
 
-#endif /* _RFTEST_H */
+#endif

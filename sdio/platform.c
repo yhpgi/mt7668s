@@ -14,13 +14,14 @@
 
 /*******************************************************************************
  *                         C O M P I L E R   F L A G S
- ********************************************************************************
+ *******************************************************************************
  */
 
 /*******************************************************************************
  *                    E X T E R N A L   R E F E R E N C E S
- ********************************************************************************
+ *******************************************************************************
  */
+
 #include <linux/version.h>
 #include <linux/init.h>
 #include <linux/types.h>
@@ -37,59 +38,63 @@
 
 /*******************************************************************************
  *                              C O N S T A N T S
- ********************************************************************************
+ *******************************************************************************
  */
-#define WIFI_NVRAM_FILE_NAME "/data/nvram/APCFG/APRDEB/WIFI"
-#define WIFI_NVRAM_CUSTOM_NAME "/data/nvram/APCFG/APRDEB/WIFI_CUSTOM"
+
+#define WIFI_NVRAM_FILE_NAME	  "/data/nvram/APCFG/APRDEB/WIFI"
+#define WIFI_NVRAM_CUSTOM_NAME	  "/data/nvram/APCFG/APRDEB/WIFI_CUSTOM"
 
 /*******************************************************************************
  *                             D A T A   T Y P E S
- ********************************************************************************
+ *******************************************************************************
  */
 
 /*******************************************************************************
  *                            P U B L I C   D A T A
- ********************************************************************************
+ *******************************************************************************
  */
 
 /*******************************************************************************
  *                           P R I V A T E   D A T A
- ********************************************************************************
+ *******************************************************************************
  */
 
 /*******************************************************************************
  *                                 M A C R O S
- ********************************************************************************
+ *******************************************************************************
  */
 
 /*******************************************************************************
  *                   F U N C T I O N   D E C L A R A T I O N S
- ********************************************************************************
+ *******************************************************************************
  */
 
 /*******************************************************************************
  *                              F U N C T I O N S
- ********************************************************************************
+ *******************************************************************************
  */
-
-static int netdev_event(struct notifier_block *nb, unsigned long notification, void *ptr)
+static int netdev_event(struct notifier_block *nb, unsigned long notification,
+			void *ptr)
 {
-	struct in_ifaddr	 *ifa		  = (struct in_ifaddr *)ptr;
-	struct net_device *prDev	  = ifa->ifa_dev->dev;
-	P_GLUE_INFO_T	   prGlueInfo = NULL;
+	struct in_ifaddr *ifa = (struct in_ifaddr *)ptr;
+	struct net_device *prDev = ifa->ifa_dev->dev;
+	P_GLUE_INFO_T prGlueInfo = NULL;
 
 	if (prDev == NULL) {
 		/* DBGLOG(REQ, INFO, ("netdev_event: device is empty.\n")); */
 		return NOTIFY_DONE;
 	}
 
-	if ((strncmp(prDev->name, "p2p", 3) != 0) && (strncmp(prDev->name, "wlan", 4) != 0)) {
+	if ((strncmp(prDev->name, "p2p", 3) != 0) &&
+	    (strncmp(prDev->name, "wlan", 4) != 0)) {
 		/* DBGLOG(REQ, INFO, ("netdev_event: xxx\n")); */
 		return NOTIFY_DONE;
 	}
 
-	if ((prDev != gPrDev) && (prDev != gPrP2pDev[0]) && (prDev != gPrP2pDev[1])) {
-		/* DBGLOG(REQ, INFO, ("netdev_event: device is not mine.\n")); */
+	if ((prDev != gPrDev) && (prDev != gPrP2pDev[0]) &&
+	    (prDev != gPrP2pDev[1])) {
+		/* DBGLOG(REQ, INFO, ("netdev_event: device is not mine.\n"));
+		 */
 		return NOTIFY_DONE;
 	}
 
@@ -102,7 +107,7 @@ static int netdev_event(struct notifier_block *nb, unsigned long notification, v
 #if CFG_GARP_KEEPALIVE
 	// garp keepalive needs IP address update when host is awake
 #else
-	if (prGlueInfo->fgIsInSuspendMode == FALSE) {
+	if (prGlueInfo->fgIsInSuspendMode == false) {
 		/* DBGLOG(REQ, INFO,
 		 *  ("netdev_event: PARAM_MEDIA_STATE_DISCONNECTED. (%d)\n",
 		 * prGlueInfo->eParamMediaStateIndicated));
@@ -111,7 +116,7 @@ static int netdev_event(struct notifier_block *nb, unsigned long notification, v
 	}
 #endif // CFG_GARP_KEEPALIVE
 
-	kalSetNetAddressFromInterface(prGlueInfo, prDev, TRUE);
+	kalSetNetAddressFromInterface(prGlueInfo, prDev, true);
 
 	return NOTIFY_DONE;
 }
@@ -146,21 +151,23 @@ void wlanUnregisterNotifier(void)
  */
 /*----------------------------------------------------------------------------*/
 
-int glRegisterEarlySuspend(
-		struct early_suspend *prDesc, early_suspend_callback wlanSuspend, late_resume_callback wlanResume)
+int glRegisterEarlySuspend(struct early_suspend *prDesc,
+			   early_suspend_callback wlanSuspend,
+			   late_resume_callback wlanResume)
 {
 	int ret = 0;
 
-	if (wlanSuspend != NULL)
+	if (wlanSuspend != NULL) {
 		prDesc->suspend = wlanSuspend;
-	else {
-		DBGLOG(REQ, INFO, "glRegisterEarlySuspend wlanSuspend ERROR.\n");
+	} else {
+		DBGLOG(REQ, INFO,
+		       "glRegisterEarlySuspend wlanSuspend ERROR.\n");
 		ret = -1;
 	}
 
-	if (wlanResume != NULL)
+	if (wlanResume != NULL) {
 		prDesc->resume = wlanResume;
-	else {
+	} else {
 		DBGLOG(REQ, INFO, "glRegisterEarlySuspend wlanResume ERROR.\n");
 		ret = -1;
 	}
@@ -184,7 +191,7 @@ int glUnregisterEarlySuspend(struct early_suspend *prDesc)
 	unregister_early_suspend(prDesc);
 
 	prDesc->suspend = NULL;
-	prDesc->resume	= NULL;
+	prDesc->resume = NULL;
 
 	return ret;
 }
@@ -208,7 +215,7 @@ static int nvram_read(char *filename, char *buf, ssize_t len, int offset)
 {
 #if CFG_SUPPORT_NVRAM
 	struct file *fd;
-	int			 retLen = -1;
+	int retLen = -1;
 
 	mm_segment_t old_fs = get_fs();
 
@@ -224,14 +231,17 @@ static int nvram_read(char *filename, char *buf, ssize_t len, int offset)
 
 	do {
 		if ((fd->f_op == NULL) || (fd->f_op->read == NULL)) {
-			DBGLOG(INIT, INFO, "[nvram_read] : file can not be read!!\n");
+			DBGLOG(INIT, INFO,
+			       "[nvram_read] : file can not be read!!\n");
 			break;
 		}
 
 		if (fd->f_pos != offset) {
 			if (fd->f_op->llseek) {
 				if (fd->f_op->llseek(fd, offset, 0) != offset) {
-					DBGLOG(INIT, INFO, "[nvram_read] : failed to seek!!\n");
+					DBGLOG(INIT,
+					       INFO,
+					       "[nvram_read] : failed to seek!!\n");
 					break;
 				}
 			} else {
@@ -240,8 +250,7 @@ static int nvram_read(char *filename, char *buf, ssize_t len, int offset)
 		}
 
 		retLen = fd->f_op->read(fd, buf, len, &fd->f_pos);
-
-	} while (FALSE);
+	} while (false);
 
 	filp_close(fd, NULL);
 
@@ -250,7 +259,6 @@ static int nvram_read(char *filename, char *buf, ssize_t len, int offset)
 	return retLen;
 
 #else /* !CFG_SUPPORT_NVRAM */
-
 	return -EIO;
 
 #endif
@@ -273,7 +281,7 @@ static int nvram_write(char *filename, char *buf, ssize_t len, int offset)
 {
 #if CFG_SUPPORT_NVRAM
 	struct file *fd;
-	int			 retLen = -1;
+	int retLen = -1;
 
 	mm_segment_t old_fs = get_fs();
 
@@ -289,14 +297,17 @@ static int nvram_write(char *filename, char *buf, ssize_t len, int offset)
 
 	do {
 		if ((fd->f_op == NULL) || (fd->f_op->write == NULL)) {
-			DBGLOG(INIT, INFO, "[nvram_write] : file can not be write!!\n");
+			DBGLOG(INIT, INFO,
+			       "[nvram_write] : file can not be write!!\n");
 			break;
 		}
 		/* End of if */
 		if (fd->f_pos != offset) {
 			if (fd->f_op->llseek) {
 				if (fd->f_op->llseek(fd, offset, 0) != offset) {
-					DBGLOG(INIT, INFO, "[nvram_write] : failed to seek!!\n");
+					DBGLOG(INIT,
+					       INFO,
+					       "[nvram_write] : failed to seek!!\n");
 					break;
 				}
 			} else {
@@ -305,8 +316,7 @@ static int nvram_write(char *filename, char *buf, ssize_t len, int offset)
 		}
 
 		retLen = fd->f_op->write(fd, buf, len, &fd->f_pos);
-
-	} while (FALSE);
+	} while (false);
 
 	filp_close(fd, NULL);
 
@@ -315,7 +325,6 @@ static int nvram_write(char *filename, char *buf, ssize_t len, int offset)
 	return retLen;
 
 #else /* !CFG_SUPPORT_NVRAMS */
-
 	return -EIO;
 
 #endif
@@ -331,19 +340,22 @@ static int nvram_write(char *filename, char *buf, ssize_t len, int offset)
  * \param[out]
  *           pu2Data
  * \return
- *           TRUE
- *           FALSE
+ *           true
+ *           false
  */
 /*----------------------------------------------------------------------------*/
-BOOLEAN kalCfgDataRead16(IN P_GLUE_INFO_T prGlueInfo, IN UINT_32 u4Offset, OUT PUINT_16 pu2Data)
+u8 kalCfgDataRead16(IN P_GLUE_INFO_T prGlueInfo, IN u32 u4Offset,
+		    OUT u16 *pu2Data)
 {
 	if (pu2Data == NULL)
-		return FALSE;
+		return false;
 
-	if (nvram_read(WIFI_NVRAM_FILE_NAME, (char *)pu2Data, sizeof(unsigned short), u4Offset) != sizeof(unsigned short)) {
-		return FALSE;
+	if (nvram_read(WIFI_NVRAM_FILE_NAME, (char *)pu2Data,
+		       sizeof(unsigned short),
+		       u4Offset) != sizeof(unsigned short)) {
+		return false;
 	} else {
-		return TRUE;
+		return true;
 	}
 }
 
@@ -356,16 +368,17 @@ BOOLEAN kalCfgDataRead16(IN P_GLUE_INFO_T prGlueInfo, IN UINT_32 u4Offset, OUT P
  *           u4Offset
  *           u2Data
  * \return
- *           TRUE
- *           FALSE
+ *           true
+ *           false
  */
 /*----------------------------------------------------------------------------*/
-BOOLEAN kalCfgDataWrite16(IN P_GLUE_INFO_T prGlueInfo, UINT_32 u4Offset, UINT_16 u2Data)
+u8 kalCfgDataWrite16(IN P_GLUE_INFO_T prGlueInfo, u32 u4Offset, u16 u2Data)
 {
-	if (nvram_write(WIFI_NVRAM_FILE_NAME, (char *)&u2Data, sizeof(unsigned short), u4Offset) !=
-			sizeof(unsigned short)) {
-		return FALSE;
+	if (nvram_write(WIFI_NVRAM_FILE_NAME, (char *)&u2Data,
+			sizeof(unsigned short),
+			u4Offset) != sizeof(unsigned short)) {
+		return false;
 	} else {
-		return TRUE;
+		return true;
 	}
 }

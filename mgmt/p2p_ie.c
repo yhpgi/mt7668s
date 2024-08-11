@@ -4,19 +4,22 @@
  */
 #include "precomp.h"
 
-UINT_32 p2pCalculate_IEForAssocReq(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex, IN P_STA_RECORD_T prStaRec)
+u32 p2pCalculate_IEForAssocReq(IN P_ADAPTER_T prAdapter, IN u8 ucBssIndex,
+			       IN P_STA_RECORD_T prStaRec)
 {
-	P_P2P_ROLE_FSM_INFO_T		prP2pRoleFsmInfo = (P_P2P_ROLE_FSM_INFO_T)NULL;
-	P_BSS_INFO_T				prP2pBssInfo	 = (P_BSS_INFO_T)NULL;
-	P_P2P_CONNECTION_REQ_INFO_T prConnReqInfo	 = (P_P2P_CONNECTION_REQ_INFO_T)NULL;
-	UINT_32						u4RetValue		 = 0;
+	P_P2P_ROLE_FSM_INFO_T prP2pRoleFsmInfo = (P_P2P_ROLE_FSM_INFO_T)NULL;
+	P_BSS_INFO_T prP2pBssInfo = (P_BSS_INFO_T)NULL;
+	P_P2P_CONNECTION_REQ_INFO_T prConnReqInfo =
+		(P_P2P_CONNECTION_REQ_INFO_T)NULL;
+	u32 u4RetValue = 0;
 
 	do {
 		ASSERT_BREAK((prStaRec != NULL) && (prAdapter != NULL));
 
 		prP2pBssInfo = GET_BSS_INFO_BY_INDEX(prAdapter, ucBssIndex);
 
-		prP2pRoleFsmInfo = P2P_ROLE_INDEX_2_ROLE_FSM_INFO(prAdapter, (UINT_8)prP2pBssInfo->u4PrivateData);
+		prP2pRoleFsmInfo = P2P_ROLE_INDEX_2_ROLE_FSM_INFO(
+			prAdapter, (u8)prP2pBssInfo->u4PrivateData);
 
 		prConnReqInfo = &(prP2pRoleFsmInfo->rConnReqInfo);
 
@@ -26,14 +29,16 @@ UINT_32 p2pCalculate_IEForAssocReq(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssInde
 		u4RetValue += (ELEM_HDR_LEN + ELEM_MAX_LEN_WMM_INFO);
 
 		/* ADD HT Capability */
-		if ((prAdapter->rWifiVar.ucAvailablePhyTypeSet & PHY_TYPE_SET_802_11N) &&
-				(prStaRec->ucPhyTypeSet & PHY_TYPE_SET_802_11N)) {
+		if ((prAdapter->rWifiVar.ucAvailablePhyTypeSet &
+		     PHY_TYPE_SET_802_11N) &&
+		    (prStaRec->ucPhyTypeSet & PHY_TYPE_SET_802_11N)) {
 			u4RetValue += (ELEM_HDR_LEN + ELEM_MAX_LEN_HT_CAP);
 		}
 #if CFG_SUPPORT_802_11AC
 		/* ADD VHT Capability */
-		if ((prAdapter->rWifiVar.ucAvailablePhyTypeSet & PHY_TYPE_SET_802_11AC) &&
-				(prStaRec->ucPhyTypeSet & PHY_TYPE_SET_802_11AC)) {
+		if ((prAdapter->rWifiVar.ucAvailablePhyTypeSet &
+		     PHY_TYPE_SET_802_11AC) &&
+		    (prStaRec->ucPhyTypeSet & PHY_TYPE_SET_802_11AC)) {
 			u4RetValue += (ELEM_HDR_LEN + ELEM_MAX_LEN_VHT_CAP);
 		}
 #endif
@@ -42,10 +47,10 @@ UINT_32 p2pCalculate_IEForAssocReq(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssInde
 		if (prAdapter->rWifiVar.ucMtkOui == FEATURE_ENABLED)
 			u4RetValue += (ELEM_HDR_LEN + ELEM_MIN_LEN_MTK_OUI);
 #endif
-	} while (FALSE);
+	} while (false);
 
 	return u4RetValue;
-} /* p2pCalculate_IEForAssocReq */
+}
 
 /*----------------------------------------------------------------------------*/
 /*!
@@ -56,25 +61,31 @@ UINT_32 p2pCalculate_IEForAssocReq(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssInde
  * @return none
  */
 /*----------------------------------------------------------------------------*/
-VOID p2pGenerate_IEForAssocReq(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo)
+void p2pGenerate_IEForAssocReq(IN P_ADAPTER_T prAdapter,
+			       IN P_MSDU_INFO_T prMsduInfo)
 {
-	P_BSS_INFO_T				prBssInfo		 = (P_BSS_INFO_T)NULL;
-	P_P2P_ROLE_FSM_INFO_T		prP2pRoleFsmInfo = (P_P2P_ROLE_FSM_INFO_T)NULL;
-	P_P2P_CONNECTION_REQ_INFO_T prConnReqInfo	 = (P_P2P_CONNECTION_REQ_INFO_T)NULL;
-	PUINT_8						pucIEBuf		 = (PUINT_8)NULL;
+	P_BSS_INFO_T prBssInfo = (P_BSS_INFO_T)NULL;
+	P_P2P_ROLE_FSM_INFO_T prP2pRoleFsmInfo = (P_P2P_ROLE_FSM_INFO_T)NULL;
+	P_P2P_CONNECTION_REQ_INFO_T prConnReqInfo =
+		(P_P2P_CONNECTION_REQ_INFO_T)NULL;
+	u8 *pucIEBuf = (u8 *)NULL;
 
 	do {
 		ASSERT_BREAK((prAdapter != NULL) && (prMsduInfo != NULL));
 
-		prBssInfo = GET_BSS_INFO_BY_INDEX(prAdapter, prMsduInfo->ucBssIndex);
+		prBssInfo = GET_BSS_INFO_BY_INDEX(prAdapter,
+						  prMsduInfo->ucBssIndex);
 
-		prP2pRoleFsmInfo = P2P_ROLE_INDEX_2_ROLE_FSM_INFO(prAdapter, (UINT_8)prBssInfo->u4PrivateData);
+		prP2pRoleFsmInfo = P2P_ROLE_INDEX_2_ROLE_FSM_INFO(
+			prAdapter, (u8)prBssInfo->u4PrivateData);
 
 		prConnReqInfo = &(prP2pRoleFsmInfo->rConnReqInfo);
 
-		pucIEBuf = (PUINT_8)((ULONG)prMsduInfo->prPacket + (ULONG)prMsduInfo->u2FrameLength);
+		pucIEBuf = (u8 *)((unsigned long)prMsduInfo->prPacket +
+				  (unsigned long)prMsduInfo->u2FrameLength);
 
-		kalMemCopy(pucIEBuf, prConnReqInfo->aucIEBuf, prConnReqInfo->u4BufLength);
+		kalMemCopy(pucIEBuf, prConnReqInfo->aucIEBuf,
+			   prConnReqInfo->u4BufLength);
 
 		prMsduInfo->u2FrameLength += prConnReqInfo->u4BufLength;
 
@@ -93,33 +104,37 @@ VOID p2pGenerate_IEForAssocReq(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsdu
 #if CFG_SUPPORT_MTK_SYNERGY
 		rlmGenerateMTKOuiIE(prAdapter, prMsduInfo);
 #endif
-	} while (FALSE);
+	} while (false);
 
 	return;
+}
 
-} /* p2pGenerate_IEForAssocReq */
-
-UINT_32
-wfdFuncAppendAttriDevInfo(IN P_ADAPTER_T prAdapter, IN BOOLEAN fgIsAssocFrame, IN PUINT_16 pu2Offset, IN PUINT_8 pucBuf,
-		IN UINT_16 u2BufSize)
+u32 wfdFuncAppendAttriDevInfo(IN P_ADAPTER_T prAdapter, IN u8 fgIsAssocFrame,
+			      IN u16 *pu2Offset, IN u8 *pucBuf,
+			      IN u16 u2BufSize)
 {
-	UINT_32						  u4AttriLen	   = 0;
-	PUINT_8						  pucBuffer		   = NULL;
-	P_WFD_DEVICE_INFORMATION_IE_T prWfdDevInfo	   = (P_WFD_DEVICE_INFORMATION_IE_T)NULL;
-	P_WFD_CFG_SETTINGS_T		  prWfdCfgSettings = (P_WFD_CFG_SETTINGS_T)NULL;
+	u32 u4AttriLen = 0;
+	u8 *pucBuffer = NULL;
+	P_WFD_DEVICE_INFORMATION_IE_T prWfdDevInfo =
+		(P_WFD_DEVICE_INFORMATION_IE_T)NULL;
+	P_WFD_CFG_SETTINGS_T prWfdCfgSettings = (P_WFD_CFG_SETTINGS_T)NULL;
 
 	do {
-		ASSERT_BREAK((prAdapter != NULL) && (pucBuf != NULL) && (pu2Offset != NULL));
+		ASSERT_BREAK((prAdapter != NULL) && (pucBuf != NULL) &&
+			     (pu2Offset != NULL));
 
 		prWfdCfgSettings = &(prAdapter->rWifiVar.rWfdConfigureSettings);
 
 		ASSERT_BREAK((prWfdCfgSettings != NULL));
 
-		if ((prWfdCfgSettings->ucWfdEnable == 0) || ((prWfdCfgSettings->u4WfdFlag & WFD_FLAGS_DEV_INFO_VALID) == 0)) {
+		if ((prWfdCfgSettings->ucWfdEnable == 0) ||
+		    ((prWfdCfgSettings->u4WfdFlag & WFD_FLAGS_DEV_INFO_VALID) ==
+		     0)) {
 			break;
 		}
 
-		pucBuffer = (PUINT_8)((ULONG)pucBuf + (ULONG)(*pu2Offset));
+		pucBuffer = (u8 *)((unsigned long)pucBuf +
+				   (unsigned long)(*pu2Offset));
 
 		ASSERT_BREAK(pucBuffer != NULL);
 
@@ -127,19 +142,22 @@ wfdFuncAppendAttriDevInfo(IN P_ADAPTER_T prAdapter, IN BOOLEAN fgIsAssocFrame, I
 
 		prWfdDevInfo->ucElemID = WFD_ATTRI_ID_DEV_INFO;
 
-		WLAN_SET_FIELD_BE16(&prWfdDevInfo->u2WfdDevInfo, prWfdCfgSettings->u2WfdDevInfo);
+		WLAN_SET_FIELD_BE16(&prWfdDevInfo->u2WfdDevInfo,
+				    prWfdCfgSettings->u2WfdDevInfo);
 
-		WLAN_SET_FIELD_BE16(&prWfdDevInfo->u2SessionMgmtCtrlPort, prWfdCfgSettings->u2WfdControlPort);
+		WLAN_SET_FIELD_BE16(&prWfdDevInfo->u2SessionMgmtCtrlPort,
+				    prWfdCfgSettings->u2WfdControlPort);
 
-		WLAN_SET_FIELD_BE16(&prWfdDevInfo->u2WfdDevMaxSpeed, prWfdCfgSettings->u2WfdMaximumTp);
+		WLAN_SET_FIELD_BE16(&prWfdDevInfo->u2WfdDevMaxSpeed,
+				    prWfdCfgSettings->u2WfdMaximumTp);
 
-		WLAN_SET_FIELD_BE16(&prWfdDevInfo->u2Length, WFD_ATTRI_MAX_LEN_DEV_INFO);
+		WLAN_SET_FIELD_BE16(&prWfdDevInfo->u2Length,
+				    WFD_ATTRI_MAX_LEN_DEV_INFO);
 
 		u4AttriLen = WFD_ATTRI_MAX_LEN_DEV_INFO + WFD_ATTRI_HDR_LEN;
+	} while (false);
 
-	} while (FALSE);
-
-	(*pu2Offset) += (UINT_16)u4AttriLen;
+	(*pu2Offset) += (u16)u4AttriLen;
 
 	return u4AttriLen;
 }

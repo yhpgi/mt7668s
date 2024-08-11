@@ -6,7 +6,7 @@
 /*! \file   "cmd_buf.h"
  *   \brief  In this file we define the structure for Command Packet.
  *
- *		In this file we define the structure for Command Packet and the control unit
+ * In this file we define the structure for Command Packet and the control unit
  *   of MGMT Memory Pool.
  */
 
@@ -15,22 +15,22 @@
 
 /*******************************************************************************
  *                         C O M P I L E R   F L A G S
- ********************************************************************************
+ *******************************************************************************
  */
 
 /*******************************************************************************
  *                    E X T E R N A L   R E F E R E N C E S
- ********************************************************************************
+ *******************************************************************************
  */
 
 /*******************************************************************************
  *                              C O N S T A N T S
- ********************************************************************************
+ *******************************************************************************
  */
 
 /*******************************************************************************
  *                             D A T A   T Y P E S
- ********************************************************************************
+ *******************************************************************************
  */
 
 typedef enum _COMMAND_TYPE {
@@ -40,93 +40,117 @@ typedef enum _COMMAND_TYPE {
 	COMMAND_TYPE_MANAGEMENT_FRAME,
 	COMMAND_TYPE_NUM
 } COMMAND_TYPE,
-		*P_COMMAND_TYPE;
+*P_COMMAND_TYPE;
 
-typedef VOID (*PFN_CMD_DONE_HANDLER)(
-		IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo, IN PUINT_8 pucEventBuf, IN UINT_32 u4EventBufLen);
+typedef void (*PFN_CMD_DONE_HANDLER)(IN P_ADAPTER_T prAdapter,
+				     IN P_CMD_INFO_T prCmdInfo,
+				     IN u8 *pucEventBuf,
+				     IN u32 u4EventBufLen);
 
-typedef VOID (*PFN_CMD_TIMEOUT_HANDLER)(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo);
+typedef void (*PFN_CMD_TIMEOUT_HANDLER)(IN P_ADAPTER_T prAdapter,
+					IN P_CMD_INFO_T prCmdInfo);
 
-typedef VOID (*PFN_HIF_TX_CMD_DONE_CB)(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo);
+typedef void (*PFN_HIF_TX_CMD_DONE_CB)(IN P_ADAPTER_T prAdapter,
+				       IN P_CMD_INFO_T prCmdInfo);
 
 struct _CMD_INFO_T {
 	QUE_ENTRY_T rQueEntry;
 
 	COMMAND_TYPE eCmdType;
 
-	UINT_16			u2InfoBufLen;  /* This is actual CMD buffer length */
-	PUINT_8			pucInfoBuffer; /* May pointer to structure in prAdapter */
-	P_MSDU_INFO_T	prMsduInfo;	   /* only valid when it's a security/MGMT frame */
-	P_NATIVE_PACKET prPacket;	   /* only valid when it's a security frame */
+	u16 u2InfoBufLen; /* This is actual CMD buffer length */
+	u8 *pucInfoBuffer; /* May pointer to structure in prAdapter */
+	P_MSDU_INFO_T prMsduInfo; /* only valid when it's a security/MGMT frame
+	                           */
+	P_NATIVE_PACKET prPacket; /* only valid when it's a security frame */
 
-	PFN_CMD_DONE_HANDLER	pfCmdDoneHandler;
+	PFN_CMD_DONE_HANDLER pfCmdDoneHandler;
 	PFN_CMD_TIMEOUT_HANDLER pfCmdTimeoutHandler;
-	PFN_HIF_TX_CMD_DONE_CB	pfHifTxCmdDoneCb;
+	PFN_HIF_TX_CMD_DONE_CB pfHifTxCmdDoneCb;
 
-	BOOLEAN fgIsOid; /* Used to check if we need indicate */
+	u8 fgIsOid; /* Used to check if we need indicate */
 
-	UINT_8	ucCID;
-	BOOLEAN fgSetQuery;
-	BOOLEAN fgNeedResp;
-	UINT_8	ucCmdSeqNum;
-	UINT_32 u4SetInfoLen; /* Indicate how many byte we read for Set OID */
+	u8 ucCID;
+	u8 fgSetQuery;
+	u8 fgNeedResp;
+	u8 ucCmdSeqNum;
+	u32 u4SetInfoLen; /* Indicate how many byte we read for Set OID */
 
 	/* information indicating by OID/ioctl */
-	PVOID	pvInformationBuffer;
-	UINT_32 u4InformationBufferLength;
+	void *pvInformationBuffer;
+	u32 u4InformationBufferLength;
 
 	/* private data */
-	UINT_32 u4PrivateData;
+	u32 u4PrivateData;
 
 	/* TXD/TXP pointer/len for hif tx copy */
-	UINT_32 u4TxdLen;
-	UINT_32 u4TxpLen;
-	PUINT_8 pucTxd;
-	PUINT_8 pucTxp;
+	u32 u4TxdLen;
+	u32 u4TxpLen;
+	u8 *pucTxd;
+	u8 *pucTxp;
 };
 
 /*******************************************************************************
  *                            P U B L I C   D A T A
- ********************************************************************************
+ *******************************************************************************
  */
 
 /*******************************************************************************
  *                           P R I V A T E   D A T A
- ********************************************************************************
+ *******************************************************************************
  */
 
 /*******************************************************************************
  *                                 M A C R O S
- ********************************************************************************
+ *******************************************************************************
  */
 
 /*******************************************************************************
  *                   F U N C T I O N   D E C L A R A T I O N S
- ********************************************************************************
+ *******************************************************************************
  */
-VOID cmdBufInitialize(IN P_ADAPTER_T prAdapter);
 
-P_CMD_INFO_T cmdBufAllocateCmdInfo(IN P_ADAPTER_T prAdapter, IN UINT_32 u4Length);
+void cmdBufInitialize(IN P_ADAPTER_T prAdapter);
 
-VOID cmdBufFreeCmdInfo(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo);
+P_CMD_INFO_T cmdBufAllocateCmdInfo(IN P_ADAPTER_T prAdapter, IN u32 u4Length);
+
+void cmdBufFreeCmdInfo(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo);
 
 /*----------------------------------------------------------------------------*/
 /* Routines for CMDs                                                          */
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS
-wlanSendSetQueryCmd(IN P_ADAPTER_T prAdapter, UINT_8 ucCID, BOOLEAN fgSetQuery, BOOLEAN fgNeedResp, BOOLEAN fgIsOid,
-		PFN_CMD_DONE_HANDLER pfCmdDoneHandler, PFN_CMD_TIMEOUT_HANDLER pfCmdTimeoutHandler, UINT_32 u4SetQueryInfoLen,
-		PUINT_8 pucInfoBuffer, OUT PVOID pvSetQueryBuffer, IN UINT_32 u4SetQueryBufferLen);
+wlanSendSetQueryCmd(IN P_ADAPTER_T prAdapter,
+		    u8 ucCID,
+		    u8 fgSetQuery,
+		    u8 fgNeedResp,
+		    u8 fgIsOid,
+		    PFN_CMD_DONE_HANDLER pfCmdDoneHandler,
+		    PFN_CMD_TIMEOUT_HANDLER pfCmdTimeoutHandler,
+		    u32 u4SetQueryInfoLen,
+		    u8 *pucInfoBuffer,
+		    OUT void *pvSetQueryBuffer,
+		    IN u32 u4SetQueryBufferLen);
 
 #if CFG_SUPPORT_TX_BF
 WLAN_STATUS
-wlanSendSetQueryExtCmd(IN P_ADAPTER_T prAdapter, UINT_8 ucCID, UINT_8 ucExtCID, BOOLEAN fgSetQuery, BOOLEAN fgNeedResp,
-		BOOLEAN fgIsOid, PFN_CMD_DONE_HANDLER pfCmdDoneHandler, PFN_CMD_TIMEOUT_HANDLER pfCmdTimeoutHandler,
-		UINT_32 u4SetQueryInfoLen, PUINT_8 pucInfoBuffer, OUT PVOID pvSetQueryBuffer, IN UINT_32 u4SetQueryBufferLen);
+wlanSendSetQueryExtCmd(IN P_ADAPTER_T prAdapter,
+		       u8 ucCID,
+		       u8 ucExtCID,
+		       u8 fgSetQuery,
+		       u8 fgNeedResp,
+		       u8 fgIsOid,
+		       PFN_CMD_DONE_HANDLER pfCmdDoneHandler,
+		       PFN_CMD_TIMEOUT_HANDLER pfCmdTimeoutHandler,
+		       u32 u4SetQueryInfoLen,
+		       u8 *pucInfoBuffer,
+		       OUT void *pvSetQueryBuffer,
+		       IN u32 u4SetQueryBufferLen);
 #endif
 
 /*******************************************************************************
  *                              F U N C T I O N S
- ********************************************************************************
+ *******************************************************************************
  */
-#endif /* _CMD_BUF_H */
+
+#endif

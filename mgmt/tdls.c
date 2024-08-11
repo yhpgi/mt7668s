@@ -8,14 +8,15 @@
  */
 
 /*******************************************************************************
- *						C O M P I L E R	 F L A G S
- ********************************************************************************
+ *                         C O M P I L E R   F L A G S
+ *******************************************************************************
  */
 
 /*******************************************************************************
- *						E X T E R N A L	R E F E R E N C E S
- ********************************************************************************
+ *                    E X T E R N A L   R E F E R E N C E S
+ *******************************************************************************
  */
+
 #include "precomp.h"
 
 #if CFG_SUPPORT_TDLS
@@ -24,41 +25,42 @@
 #include "queue.h"
 
 /*******************************************************************************
- *						C O N S T A N T S
- ********************************************************************************
+ *                              C O N S T A N T S
+ *******************************************************************************
  */
+
 /* The list of valid data rates. */
 /* The list of valid data rates. */
 
 /*******************************************************************************
- *						F U N C T I O N   D E C L A R A T I O N S
- ********************************************************************************
+ *                  F U N C T I O N   D E C L A R A T I O N S
+ *******************************************************************************
  */
 
 /*******************************************************************************
- *						P R I V A T E   D A T A
- ********************************************************************************
+ * P R I V A T E   D A T A
+ *******************************************************************************
  */
 
-static BOOLEAN fgIsPtiTimeoutSkip = FALSE;
+static u8 fgIsPtiTimeoutSkip = false;
 
 /*******************************************************************************
- *						P R I V A T E  F U N C T I O N S
- ********************************************************************************
+ * P R I V A T E  F U N C T I O N S
+ *******************************************************************************
  */
 
-#define ELEM_ID_LINK_IDENTIFIER_LENGTH 16
+#define ELEM_ID_LINK_IDENTIFIER_LENGTH		 16
 
-#define TDLS_KEY_TIMEOUT_INTERVAL 43200
+#define TDLS_KEY_TIMEOUT_INTERVAL		 43200
 
-#define UNREACH_ABLE 25
-#define TDLS_REASON_CODE_UNREACHABLE 25
-#define TDLS_REASON_CODE_UNSPECIFIED 26
+#define UNREACH_ABLE				 25
+#define TDLS_REASON_CODE_UNREACHABLE		 25
+#define TDLS_REASON_CODE_UNSPECIFIED		 26
 
-#define WLAN_REASON_TDLS_TEARDOWN_UNREACHABLE 25
-#define WLAN_REASON_TDLS_TEARDOWN_UNSPECIFIED 26
+#define WLAN_REASON_TDLS_TEARDOWN_UNREACHABLE	 25
+#define WLAN_REASON_TDLS_TEARDOWN_UNSPECIFIED	 26
 
-UINT_8 g_arTdlsLink[MAXNUM_TDLS_PEER] = { 0, 0, 0, 0 };
+u8 g_arTdlsLink[MAXNUM_TDLS_PEER] = { 0, 0, 0, 0 };
 
 /*----------------------------------------------------------------------------*/
 /*!
@@ -73,15 +75,16 @@ UINT_8 g_arTdlsLink[MAXNUM_TDLS_PEER] = { 0, 0, 0, 0 };
  * \retval WLAN_STATUS_INVALID_LENGTH
  */
 /*----------------------------------------------------------------------------*/
-UINT_32 TdlsexLinkMgt(P_ADAPTER_T prAdapter, PVOID pvSetBuffer, UINT_32 u4SetBufferLen, PUINT_32 pu4SetInfoLen)
+u32 TdlsexLinkMgt(P_ADAPTER_T prAdapter, void *pvSetBuffer, u32 u4SetBufferLen,
+		  u32 *pu4SetInfoLen)
 {
 	/* from supplicant -- wpa_supplicant_tdls_peer_addset() */
 
-	STA_RECORD_T		 *prStaRec;
-	P_BSS_INFO_T		 prBssInfo;
+	STA_RECORD_T *prStaRec;
+	P_BSS_INFO_T prBssInfo;
 	TDLS_CMD_LINK_MGT_T *prCmd;
 
-	prCmd	  = (TDLS_CMD_LINK_MGT_T *)pvSetBuffer;
+	prCmd = (TDLS_CMD_LINK_MGT_T *)pvSetBuffer;
 	prBssInfo = prAdapter->prAisBssInfo;
 
 	/* AIS only */
@@ -95,21 +98,28 @@ UINT_32 TdlsexLinkMgt(P_ADAPTER_T prAdapter, PVOID pvSetBuffer, UINT_32 u4SetBuf
 
 	switch (prCmd->ucActionCode) {
 	case TDLS_FRM_ACTION_DISCOVERY_REQ:
-		/* printk("\n\n\n  TDLS_FRM_ACTION_DISCOVERY_REQ\n\n\n"); */
-		if (TdlsDataFrameSend_DISCOVERY_REQ(prAdapter, prStaRec, prCmd->aucPeer, prCmd->ucActionCode,
-					prCmd->ucDialogToken, prCmd->u2StatusCode, (UINT_8 *)(prCmd->aucSecBuf),
-					prCmd->u4SecBufLen) != TDLS_STATUS_SUCCESS) {
+
+		if (TdlsDataFrameSend_DISCOVERY_REQ(
+			    prAdapter, prStaRec, prCmd->aucPeer,
+			    prCmd->ucActionCode, prCmd->ucDialogToken,
+			    prCmd->u2StatusCode, (u8 *)(prCmd->aucSecBuf),
+			    prCmd->u4SecBufLen) != TDLS_STATUS_SUCCESS) {
 			return -1;
 		}
 
 		break;
 
 	case TDLS_FRM_ACTION_SETUP_REQ:
-		/* printk("\n\n\n  TDLS_FRM_ACTION_SETUP_REQ\n\n\n"); */
-		prStaRec = cnmGetTdlsPeerByAddress(prAdapter, prAdapter->prAisBssInfo->ucBssIndex, prCmd->aucPeer);
+
+		prStaRec = cnmGetTdlsPeerByAddress(
+			prAdapter, prAdapter->prAisBssInfo->ucBssIndex,
+			prCmd->aucPeer);
 		g_arTdlsLink[prStaRec->ucTdlsIndex] = 0;
-		if (TdlsDataFrameSend_SETUP_REQ(prAdapter, prStaRec, prCmd->aucPeer, prCmd->ucActionCode, prCmd->ucDialogToken,
-					prCmd->u2StatusCode, (UINT_8 *)(prCmd->aucSecBuf), prCmd->u4SecBufLen) != TDLS_STATUS_SUCCESS) {
+		if (TdlsDataFrameSend_SETUP_REQ(
+			    prAdapter, prStaRec, prCmd->aucPeer,
+			    prCmd->ucActionCode, prCmd->ucDialogToken,
+			    prCmd->u2StatusCode, (u8 *)(prCmd->aucSecBuf),
+			    prCmd->u4SecBufLen) != TDLS_STATUS_SUCCESS) {
 			return -1;
 		}
 
@@ -124,49 +134,59 @@ UINT_32 TdlsexLinkMgt(P_ADAPTER_T prAdapter, PVOID pvSetBuffer, UINT_32 u4SetBuf
 		if (prBssInfo->fgTdlsIsProhibited)
 			return 0;
 
-		/* printk("\n\n\n  TDLS_FRM_ACTION_SETUP_RSP\n\n\n"); */
-		if (TdlsDataFrameSend_SETUP_RSP(prAdapter, prStaRec, prCmd->aucPeer, prCmd->ucActionCode, prCmd->ucDialogToken,
-					prCmd->u2StatusCode, (UINT_8 *)(prCmd->aucSecBuf), prCmd->u4SecBufLen) != TDLS_STATUS_SUCCESS) {
+		if (TdlsDataFrameSend_SETUP_RSP(
+			    prAdapter, prStaRec, prCmd->aucPeer,
+			    prCmd->ucActionCode, prCmd->ucDialogToken,
+			    prCmd->u2StatusCode, (u8 *)(prCmd->aucSecBuf),
+			    prCmd->u4SecBufLen) != TDLS_STATUS_SUCCESS) {
 			return -1;
 		}
 
 		break;
 
 	case TDLS_FRM_ACTION_DISCOVERY_RSP:
-		/* printk("\n\n\n  TDLS_FRM_ACTION_DISCOVERY_RSP\n\n\n"); */
-		if (TdlsDataFrameSend_DISCOVERY_RSP(prAdapter, prStaRec, prCmd->aucPeer, prCmd->ucActionCode,
-					prCmd->ucDialogToken, prCmd->u2StatusCode, (UINT_8 *)(prCmd->aucSecBuf),
-					prCmd->u4SecBufLen) != TDLS_STATUS_SUCCESS) {
+
+		if (TdlsDataFrameSend_DISCOVERY_RSP(
+			    prAdapter, prStaRec, prCmd->aucPeer,
+			    prCmd->ucActionCode, prCmd->ucDialogToken,
+			    prCmd->u2StatusCode, (u8 *)(prCmd->aucSecBuf),
+			    prCmd->u4SecBufLen) != TDLS_STATUS_SUCCESS) {
 			return -1;
 		}
 
 		break;
 
 	case TDLS_FRM_ACTION_CONFIRM:
-		/* printk("\n\n\n  TDLS_FRM_ACTION_CONFIRM\n\n\n"); */
-		if (TdlsDataFrameSend_CONFIRM(prAdapter, prStaRec, prCmd->aucPeer, prCmd->ucActionCode, prCmd->ucDialogToken,
-					prCmd->u2StatusCode, (UINT_8 *)(prCmd->aucSecBuf), prCmd->u4SecBufLen) != TDLS_STATUS_SUCCESS) {
+
+		if (TdlsDataFrameSend_CONFIRM(
+			    prAdapter, prStaRec, prCmd->aucPeer,
+			    prCmd->ucActionCode, prCmd->ucDialogToken,
+			    prCmd->u2StatusCode, (u8 *)(prCmd->aucSecBuf),
+			    prCmd->u4SecBufLen) != TDLS_STATUS_SUCCESS) {
 			return -1;
 		}
 		break;
 
 	case TDLS_FRM_ACTION_TEARDOWN:
 
-		prStaRec = cnmGetTdlsPeerByAddress(prAdapter, prAdapter->prAisBssInfo->ucBssIndex, prCmd->aucPeer);
+		prStaRec = cnmGetTdlsPeerByAddress(
+			prAdapter, prAdapter->prAisBssInfo->ucBssIndex,
+			prCmd->aucPeer);
 		if (prCmd->u2StatusCode == TDLS_REASON_CODE_UNREACHABLE) {
-			/* printk("\n\n\n  u2StatusCode == TDLS_REASON_CODE_UNREACHABLE\n\n\n"); */
 			g_arTdlsLink[prStaRec->ucTdlsIndex] = 0;
 		}
-		/* printk("\n\n\n  TDLS_FRM_ACTION_TEARDOWN\n\n\n"); */
-		if (TdlsDataFrameSend_TearDown(prAdapter, prStaRec, prCmd->aucPeer, prCmd->ucActionCode, prCmd->ucDialogToken,
-					prCmd->u2StatusCode, (UINT_8 *)(prCmd->aucSecBuf), prCmd->u4SecBufLen) != TDLS_STATUS_SUCCESS) {
-			/* printk("\n teardown frrame  send failure\n"); */
+
+		if (TdlsDataFrameSend_TearDown(
+			    prAdapter, prStaRec, prCmd->aucPeer,
+			    prCmd->ucActionCode, prCmd->ucDialogToken,
+			    prCmd->u2StatusCode, (u8 *)(prCmd->aucSecBuf),
+			    prCmd->u4SecBufLen) != TDLS_STATUS_SUCCESS) {
 			return -1;
 		}
 		break;
 
 	default:
-		/* printk("\n\n\n  default\n\n\n"); */
+
 		return -EINVAL;
 	}
 
@@ -186,12 +206,11 @@ UINT_32 TdlsexLinkMgt(P_ADAPTER_T prAdapter, PVOID pvSetBuffer, UINT_32 u4SetBuf
  * \retval WLAN_STATUS_INVALID_LENGTH
  */
 /*----------------------------------------------------------------------------*/
-UINT_32 TdlsexLinkOper(P_ADAPTER_T prAdapter, PVOID pvSetBuffer, UINT_32 u4SetBufferLen, PUINT_32 pu4SetInfoLen)
+u32 TdlsexLinkOper(P_ADAPTER_T prAdapter, void *pvSetBuffer, u32 u4SetBufferLen,
+		   u32 *pu4SetInfoLen)
 {
-	/* printk("TdlsexLinkOper\n"); */
-
 	/* from supplicant -- wpa_supplicant_tdls_peer_addset() */
-	UINT_16		  i;
+	u16 i;
 	STA_RECORD_T *prStaRec;
 
 	TDLS_CMD_LINK_OPER_T *prCmd;
@@ -204,24 +223,29 @@ UINT_32 TdlsexLinkOper(P_ADAPTER_T prAdapter, PVOID pvSetBuffer, UINT_32 u4SetBu
 		for (i = 0; i < MAXNUM_TDLS_PEER; i++) {
 			if (!g_arTdlsLink[i]) {
 				g_arTdlsLink[i] = 1;
-				prStaRec = cnmGetTdlsPeerByAddress(prAdapter, prAdapter->prAisBssInfo->ucBssIndex, prCmd->aucPeerMac);
+				prStaRec = cnmGetTdlsPeerByAddress(
+					prAdapter,
+					prAdapter->prAisBssInfo->ucBssIndex,
+					prCmd->aucPeerMac);
 				prStaRec->ucTdlsIndex = i;
 				break;
 			}
 		}
 
-		/* printk("TDLS_ENABLE_LINK %d\n", i); */
 		break;
+
 	case TDLS_DISABLE_LINK:
 
-		prStaRec = cnmGetTdlsPeerByAddress(prAdapter, prAdapter->prAisBssInfo->ucBssIndex, prCmd->aucPeerMac);
+		prStaRec = cnmGetTdlsPeerByAddress(
+			prAdapter, prAdapter->prAisBssInfo->ucBssIndex,
+			prCmd->aucPeerMac);
 
-		/* printk("TDLS_ENABLE_LINK %d\n", prStaRec->ucTdlsIndex); */
 		g_arTdlsLink[prStaRec->ucTdlsIndex] = 0;
 		if (IS_DLS_STA(prStaRec))
 			cnmStaRecFree(prAdapter, prStaRec);
 
 		break;
+
 	default:
 		return 0;
 	}
@@ -239,41 +263,47 @@ UINT_32 TdlsexLinkOper(P_ADAPTER_T prAdapter, PVOID pvSetBuffer, UINT_32 u4SetBu
  * \retval append length
  */
 /*----------------------------------------------------------------------------*/
-UINT_32 TdlsFrameGeneralIeAppend(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec, UINT_8 *pPkt)
+u32 TdlsFrameGeneralIeAppend(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec,
+			     u8 *pPkt)
 {
-	GLUE_INFO_T				*prGlueInfo;
-	BSS_INFO_T			   *prBssInfo;
+	GLUE_INFO_T *prGlueInfo;
+	BSS_INFO_T *prBssInfo;
 	PM_PROFILE_SETUP_INFO_T *prPmProfSetupInfo;
-	UINT_32					 u4NonHTPhyType;
-	UINT_16					 u2SupportedRateSet;
-	UINT_8					 aucAllSupportedRates[RATE_NUM_SW] = { 0 }; /* 6628 RATE_NUM -> 6630 RATE_NUM_SW */
-	UINT_8					 ucAllSupportedRatesLen;
-	UINT_8					 ucSupRatesLen;
-	UINT_8					 ucExtSupRatesLen;
-	UINT_32					 u4PktLen, u4IeLen;
+	u32 u4NonHTPhyType;
+	u16 u2SupportedRateSet;
+	u8 aucAllSupportedRates[RATE_NUM_SW] = { 0 }; /* 6628 RATE_NUM -> 6630
+	                                               * RATE_NUM_SW */
+	u8 ucAllSupportedRatesLen;
+	u8 ucSupRatesLen;
+	u8 ucExtSupRatesLen;
+	u32 u4PktLen, u4IeLen;
 
 	/* init */
 	prGlueInfo = (GLUE_INFO_T *)prAdapter->prGlueInfo;
-	prBssInfo  = prAdapter->prAisBssInfo; /* AIS only */
+	prBssInfo = prAdapter->prAisBssInfo; /* AIS only */
 
 	prPmProfSetupInfo = &prBssInfo->rPmProfSetupInfo;
-	u4PktLen		  = 0;
+	u4PktLen = 0;
 
 	/* 3. Frame Formation - (5) Supported Rates element */
 	/* use all sup rate we can support */
-	u4NonHTPhyType	   = prStaRec->ucNonHTBasicPhyType;
-	u2SupportedRateSet = rNonHTPhyAttributes[u4NonHTPhyType].u2SupportedRateSet;
-	rateGetDataRatesFromRateSet(u2SupportedRateSet, 0, aucAllSupportedRates, &ucAllSupportedRatesLen);
+	u4NonHTPhyType = prStaRec->ucNonHTBasicPhyType;
+	u2SupportedRateSet =
+		rNonHTPhyAttributes[u4NonHTPhyType].u2SupportedRateSet;
+	rateGetDataRatesFromRateSet(u2SupportedRateSet, 0, aucAllSupportedRates,
+				    &ucAllSupportedRatesLen);
 
-	ucSupRatesLen =
-			((ucAllSupportedRatesLen > ELEM_MAX_LEN_SUP_RATES) ? ELEM_MAX_LEN_SUP_RATES : ucAllSupportedRatesLen);
+	ucSupRatesLen = ((ucAllSupportedRatesLen > ELEM_MAX_LEN_SUP_RATES) ?
+			 ELEM_MAX_LEN_SUP_RATES :
+			 ucAllSupportedRatesLen);
 
 	ucExtSupRatesLen = ucAllSupportedRatesLen - ucSupRatesLen;
 
 	if (ucSupRatesLen) {
-		SUP_RATES_IE(pPkt)->ucId	 = ELEM_ID_SUP_RATES;
+		SUP_RATES_IE(pPkt)->ucId = ELEM_ID_SUP_RATES;
 		SUP_RATES_IE(pPkt)->ucLength = ucSupRatesLen;
-		kalMemCopy(SUP_RATES_IE(pPkt)->aucSupportedRates, aucAllSupportedRates, ucSupRatesLen);
+		kalMemCopy(SUP_RATES_IE(pPkt)->aucSupportedRates,
+			   aucAllSupportedRates, ucSupRatesLen);
 
 		u4IeLen = IE_SIZE(pPkt);
 		pPkt += u4IeLen;
@@ -282,11 +312,12 @@ UINT_32 TdlsFrameGeneralIeAppend(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec, U
 
 	/* 3. Frame Formation - (7) Extended sup rates element */
 	if (ucExtSupRatesLen) {
-		EXT_SUP_RATES_IE(pPkt)->ucId	 = ELEM_ID_EXTENDED_SUP_RATES;
+		EXT_SUP_RATES_IE(pPkt)->ucId = ELEM_ID_EXTENDED_SUP_RATES;
 		EXT_SUP_RATES_IE(pPkt)->ucLength = ucExtSupRatesLen;
 
-		kalMemCopy(
-				EXT_SUP_RATES_IE(pPkt)->aucExtSupportedRates, &aucAllSupportedRates[ucSupRatesLen], ucExtSupRatesLen);
+		kalMemCopy(EXT_SUP_RATES_IE(pPkt)->aucExtSupportedRates,
+			   &aucAllSupportedRates[ucSupRatesLen],
+			   ucExtSupRatesLen);
 
 		u4IeLen = IE_SIZE(pPkt);
 		pPkt += u4IeLen;
@@ -294,13 +325,13 @@ UINT_32 TdlsFrameGeneralIeAppend(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec, U
 	}
 
 	/* 3. Frame Formation - (8) Supported channels element */
-	SUPPORTED_CHANNELS_IE(pPkt)->ucId			 = ELEM_ID_SUP_CHS;
-	SUPPORTED_CHANNELS_IE(pPkt)->ucLength		 = 2;
+	SUPPORTED_CHANNELS_IE(pPkt)->ucId = ELEM_ID_SUP_CHS;
+	SUPPORTED_CHANNELS_IE(pPkt)->ucLength = 2;
 	SUPPORTED_CHANNELS_IE(pPkt)->ucChannelNum[0] = 1;
 	SUPPORTED_CHANNELS_IE(pPkt)->ucChannelNum[1] = 13;
 
-	if (prAdapter->fgEnable5GBand == TRUE) {
-		SUPPORTED_CHANNELS_IE(pPkt)->ucLength		 = 10;
+	if (prAdapter->fgEnable5GBand == true) {
+		SUPPORTED_CHANNELS_IE(pPkt)->ucLength = 10;
 		SUPPORTED_CHANNELS_IE(pPkt)->ucChannelNum[2] = 36;
 		SUPPORTED_CHANNELS_IE(pPkt)->ucChannelNum[3] = 4;
 		SUPPORTED_CHANNELS_IE(pPkt)->ucChannelNum[4] = 52;
@@ -319,8 +350,8 @@ UINT_32 TdlsFrameGeneralIeAppend(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec, U
 }
 
 /*******************************************************************************
- *						 P U B L I C  F U N C T I O N S
- ********************************************************************************
+ *  P U B L I C  F U N C T I O N S
+ *******************************************************************************
  */
 
 /*!
@@ -336,23 +367,24 @@ UINT_32 TdlsFrameGeneralIeAppend(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec, U
  */
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS
-TdlsDataFrameSend_TearDown(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec, UINT_8 *pPeerMac, UINT_8 ucActionCode,
-		UINT_8 ucDialogToken, UINT_16 u2StatusCode, UINT_8 *pAppendIe, UINT_32 AppendIeLen)
+TdlsDataFrameSend_TearDown(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec,
+			   u8 *pPeerMac, u8 ucActionCode, u8 ucDialogToken,
+			   u16 u2StatusCode, u8 *pAppendIe, u32 AppendIeLen)
 {
-	GLUE_INFO_T				*prGlueInfo;
-	BSS_INFO_T			   *prBssInfo;
+	GLUE_INFO_T *prGlueInfo;
+	BSS_INFO_T *prBssInfo;
 	PM_PROFILE_SETUP_INFO_T *prPmProfSetupInfo;
-	struct sk_buff		   *prMsduInfo;
-	UINT_8				  *pPkt;
-	UINT_32					 u4PktLen, u4IeLen;
-	UINT_16					 ReasonCode;
+	struct sk_buff *prMsduInfo;
+	u8 *pPkt;
+	u32 u4PktLen, u4IeLen;
+	u16 ReasonCode;
 
 	/* allocate/init packet */
 	prGlueInfo = (GLUE_INFO_T *)prAdapter->prGlueInfo;
-	prBssInfo  = prAdapter->prAisBssInfo; /* AIS only */
+	prBssInfo = prAdapter->prAisBssInfo; /* AIS only */
 
 	prPmProfSetupInfo = &prBssInfo->rPmProfSetupInfo;
-	u4PktLen		  = 0;
+	u4PktLen = 0;
 
 	prMsduInfo = kalPacketAlloc(prGlueInfo, 512, &pPkt);
 	if (prMsduInfo == NULL)
@@ -370,7 +402,7 @@ TdlsDataFrameSend_TearDown(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec, UINT_8 
 	pPkt += TDLS_FME_MAC_ADDR_LEN;
 	kalMemCopy(pPkt, prAdapter->rMyMacAddr, TDLS_FME_MAC_ADDR_LEN);
 	pPkt += TDLS_FME_MAC_ADDR_LEN;
-	*(UINT_16 *)pPkt = htons(TDLS_FRM_PROT_TYPE);
+	*(u16 *)pPkt = htons(TDLS_FRM_PROT_TYPE);
 	pPkt += 2;
 	u4PktLen += TDLS_FME_MAC_ADDR_LEN * 2 + 2;
 
@@ -393,15 +425,14 @@ TdlsDataFrameSend_TearDown(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec, UINT_8 
 
 	ReasonCode = u2StatusCode;
 
-	/* printk("\n\n ReasonCode = %u\n\n",ReasonCode ); */
-
 	kalMemCopy(pPkt, &ReasonCode, 2);
-	pPkt	 = pPkt + 2;
+	pPkt = pPkt + 2;
 	u4PktLen = u4PktLen + 2;
 
 	if (pAppendIe != NULL) {
 		if ((ucActionCode != TDLS_FRM_ACTION_TEARDOWN) ||
-				((ucActionCode == TDLS_FRM_ACTION_TEARDOWN) && (prStaRec != NULL))) {
+		    ((ucActionCode == TDLS_FRM_ACTION_TEARDOWN) &&
+		     (prStaRec != NULL))) {
 			kalMemCopy(pPkt, pAppendIe, AppendIeLen);
 			LR_TDLS_FME_FIELD_FILL(AppendIeLen);
 		}
@@ -409,17 +440,20 @@ TdlsDataFrameSend_TearDown(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec, UINT_8 
 
 	/* 7. Append Supported Operating Classes IE */
 	if (ucActionCode != TDLS_FRM_ACTION_TEARDOWN) {
-		/* Note: if we do not put the IE, Marvell STA will decline our TDLS setup request */
+		/* Note: if we do not put the IE, Marvell STA will decline our
+		 * TDLS setup request */
 		u4IeLen = rlmDomainSupOperatingClassIeFill(pPkt);
 		LR_TDLS_FME_FIELD_FILL(u4IeLen);
 	}
 
 	/* 3. Frame Formation - (16) Link identifier element */
-	TDLS_LINK_IDENTIFIER_IE(pPkt)->ucId		= ELEM_ID_LINK_IDENTIFIER;
+	TDLS_LINK_IDENTIFIER_IE(pPkt)->ucId = ELEM_ID_LINK_IDENTIFIER;
 	TDLS_LINK_IDENTIFIER_IE(pPkt)->ucLength = 18;
 
-	kalMemCopy(TDLS_LINK_IDENTIFIER_IE(pPkt)->aBSSID, prBssInfo->aucBSSID, 6);
-	kalMemCopy(TDLS_LINK_IDENTIFIER_IE(pPkt)->aInitiator, prAdapter->rMyMacAddr, 6);
+	kalMemCopy(TDLS_LINK_IDENTIFIER_IE(pPkt)->aBSSID, prBssInfo->aucBSSID,
+		   6);
+	kalMemCopy(TDLS_LINK_IDENTIFIER_IE(pPkt)->aInitiator,
+		   prAdapter->rMyMacAddr, 6);
 	kalMemCopy(TDLS_LINK_IDENTIFIER_IE(pPkt)->aResponder, pPeerMac, 6);
 
 	u4IeLen = IE_SIZE(pPkt);
@@ -430,10 +464,8 @@ TdlsDataFrameSend_TearDown(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec, UINT_8 
 	prMsduInfo->len = u4PktLen;
 
 	/* if(u2StatusCode == UNREACH_ABLE ){ */
-	/* g_arTdlsLink[prStaRec->ucTdlsIndex] = FALSE; */
+	/* g_arTdlsLink[prStaRec->ucTdlsIndex] = false; */
 	/* } */
-
-	/* printk(" TdlsDataFrameSend_TearDown !!\n"); */
 
 	/* 5. send the data frame */
 	wlanHardStartXmit(prMsduInfo, prMsduInfo->dev);
@@ -454,24 +486,25 @@ TdlsDataFrameSend_TearDown(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec, UINT_8 
  */
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS /* TDLS_STATUS */
-TdlsDataFrameSend_SETUP_REQ(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec, UINT_8 *pPeerMac, UINT_8 ucActionCode,
-		UINT_8 ucDialogToken, UINT_16 u2StatusCode, UINT_8 *pAppendIe, UINT_32 AppendIeLen)
+TdlsDataFrameSend_SETUP_REQ(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec,
+			    u8 *pPeerMac, u8 ucActionCode, u8 ucDialogToken,
+			    u16 u2StatusCode, u8 *pAppendIe, u32 AppendIeLen)
 {
-	GLUE_INFO_T				*prGlueInfo;
-	BSS_INFO_T			   *prBssInfo;
+	GLUE_INFO_T *prGlueInfo;
+	BSS_INFO_T *prBssInfo;
 	PM_PROFILE_SETUP_INFO_T *prPmProfSetupInfo;
-	struct sk_buff		   *prMsduInfo;
-	UINT_8				  *pPkt;
-	UINT_32					 u4PktLen, u4IeLen;
-	BOOLEAN					 fg40mAllowed;
-	UINT_16					 u2CapInfo;
+	struct sk_buff *prMsduInfo;
+	u8 *pPkt;
+	u32 u4PktLen, u4IeLen;
+	u8 fg40mAllowed;
+	u16 u2CapInfo;
 
 	/* allocate/init packet */
 	prGlueInfo = (GLUE_INFO_T *)prAdapter->prGlueInfo;
-	prBssInfo  = prAdapter->prAisBssInfo; /* AIS only */
+	prBssInfo = prAdapter->prAisBssInfo; /* AIS only */
 
 	prPmProfSetupInfo = &prBssInfo->rPmProfSetupInfo;
-	u4PktLen		  = 0;
+	u4PktLen = 0;
 
 	prMsduInfo = kalPacketAlloc(prGlueInfo, 512, &pPkt);
 	if (prMsduInfo == NULL)
@@ -489,7 +522,7 @@ TdlsDataFrameSend_SETUP_REQ(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec, UINT_8
 	pPkt += TDLS_FME_MAC_ADDR_LEN;
 	kalMemCopy(pPkt, prAdapter->rMyMacAddr, TDLS_FME_MAC_ADDR_LEN);
 	pPkt += TDLS_FME_MAC_ADDR_LEN;
-	*(UINT_16 *)pPkt = htons(TDLS_FRM_PROT_TYPE);
+	*(u16 *)pPkt = htons(TDLS_FRM_PROT_TYPE);
 	pPkt += 2;
 	u4PktLen += TDLS_FME_MAC_ADDR_LEN * 2 + 2;
 
@@ -516,7 +549,7 @@ TdlsDataFrameSend_SETUP_REQ(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec, UINT_8
 	/* 3. Frame Formation - (4) Capability */
 	u2CapInfo = assocBuildCapabilityInfo(prAdapter, prStaRec);
 	WLAN_SET_FIELD_16(pPkt, u2CapInfo);
-	pPkt	 = pPkt + 2;
+	pPkt = pPkt + 2;
 	u4PktLen = u4PktLen + 2;
 
 	/* 4. Append general IEs */
@@ -530,7 +563,7 @@ TdlsDataFrameSend_SETUP_REQ(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec, UINT_8
 	u4PktLen += AppendIeLen;
 
 	/* 3. Frame Formation - (10) Extended capabilities element */
-	EXT_CAP_IE(pPkt)->ucId	   = ELEM_ID_EXTENDED_CAP;
+	EXT_CAP_IE(pPkt)->ucId = ELEM_ID_EXTENDED_CAP;
 	EXT_CAP_IE(pPkt)->ucLength = 5;
 	/* 0320 !! */
 	EXT_CAP_IE(pPkt)->aucCapabilities[0] = 0x00; /* bit0 ~ bit7 */
@@ -550,16 +583,17 @@ TdlsDataFrameSend_SETUP_REQ(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec, UINT_8
 	u4PktLen += u4IeLen;
 
 	/* HT capability IE append 0122 */
-	HT_CAP_IE(pPkt)->ucId	  = ELEM_ID_HT_CAP;
+	HT_CAP_IE(pPkt)->ucId = ELEM_ID_HT_CAP;
 	HT_CAP_IE(pPkt)->ucLength = 26;
 
 	/* 3. Frame Formation - (14) HT capabilities element */
-	if ((prAdapter->rWifiVar.ucAvailablePhyTypeSet & PHY_TYPE_SET_802_11N)) {
+	if ((prAdapter->rWifiVar.ucAvailablePhyTypeSet &
+	     PHY_TYPE_SET_802_11N)) {
 		/* TODO: prAdapter->rWifiVar.rConnSettings.uc5GBandwidthMode */
 		if (cnmBss40mBwPermitted(prAdapter, prBssInfo->ucBssIndex))
-			fg40mAllowed = TRUE;
+			fg40mAllowed = true;
 		else
-			fg40mAllowed = FALSE;
+			fg40mAllowed = false;
 
 		/* Add HT IE */ /* try to reuse p2p path */
 		u4IeLen = rlmFillHtCapIEByAdapter(prAdapter, prBssInfo, pPkt);
@@ -569,12 +603,17 @@ TdlsDataFrameSend_SETUP_REQ(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec, UINT_8
 	}
 	/* check */
 
-	/* 3. Frame Formation - (12) Timeout interval element (TPK Key Lifetime) */
-	TIMEOUT_INTERVAL_IE(pPkt)->ucId		= ELEM_ID_TIMEOUT_INTERVAL;
+	/* 3. Frame Formation - (12) Timeout interval element (TPK Key Lifetime)
+	 */
+	TIMEOUT_INTERVAL_IE(pPkt)->ucId = ELEM_ID_TIMEOUT_INTERVAL;
 	TIMEOUT_INTERVAL_IE(pPkt)->ucLength = 5;
 
-	TIMEOUT_INTERVAL_IE(pPkt)->ucType  = 2;							/* IE_TIMEOUT_INTERVAL_TYPE_KEY_LIFETIME; */
-	TIMEOUT_INTERVAL_IE(pPkt)->u4Value = TDLS_KEY_TIMEOUT_INTERVAL; /* htonl(prCmd->u4Timeout); */
+	TIMEOUT_INTERVAL_IE(pPkt)->ucType =
+		2; /* IE_TIMEOUT_INTERVAL_TYPE_KEY_LIFETIME;
+	            */
+	TIMEOUT_INTERVAL_IE(pPkt)->u4Value =
+		TDLS_KEY_TIMEOUT_INTERVAL; /* htonl(prCmd->u4Timeout);
+	                                    */
 
 	u4IeLen = IE_SIZE(pPkt);
 	pPkt += u4IeLen;
@@ -582,19 +621,21 @@ TdlsDataFrameSend_SETUP_REQ(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec, UINT_8
 
 	if (ucActionCode != TDLS_FRM_ACTION_TEARDOWN) {
 		/*
-		 *  bit0 = 1: The Information Request field is used to indicate that a
-		 *  transmitting STA is requesting the recipient to transmit a 20/40 BSS
-		 *  Coexistence Management frame with the transmitting STA as the
-		 *  recipient.
-		 *  bit1 = 0: The Forty MHz Intolerant field is set to 1 to prohibit an AP
-		 *  that receives this information or reports of this information from
+		 *  bit0 = 1: The Information Request field is used to indicate
+		 * that a transmitting STA is requesting the recipient to
+		 * transmit a 20/40 BSS Coexistence Management frame with the
+		 * transmitting STA as the recipient. bit1 = 0: The Forty MHz
+		 * Intolerant field is set to 1 to prohibit an AP that receives
+		 * this information or reports of this information from
 		 *  operating a 20/40 MHz BSS.
-		 *  bit2 = 0: The 20 MHz BSS Width Request field is set to 1 to prohibit
-		 *  a receiving AP from operating its BSS as a 20/40 MHz BSS.
+		 *  bit2 = 0: The 20 MHz BSS Width Request field is set to 1 to
+		 * prohibit a receiving AP from operating its BSS as a 20/40 MHz
+		 * BSS.
 		 */
-		BSS_20_40_COEXIST_IE(pPkt)->ucId	 = ELEM_ID_20_40_BSS_COEXISTENCE;
+		BSS_20_40_COEXIST_IE(pPkt)->ucId =
+			ELEM_ID_20_40_BSS_COEXISTENCE;
 		BSS_20_40_COEXIST_IE(pPkt)->ucLength = 1;
-		BSS_20_40_COEXIST_IE(pPkt)->ucData	 = 0x01;
+		BSS_20_40_COEXIST_IE(pPkt)->ucData = 0x01;
 		LR_TDLS_FME_FIELD_FILL(3);
 	}
 
@@ -605,17 +646,20 @@ TdlsDataFrameSend_SETUP_REQ(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec, UINT_8
 
 	/* 7. Append Supported Operating Classes IE */
 	if (ucActionCode != TDLS_FRM_ACTION_TEARDOWN) {
-		/* Note: if we do not put the IE, Marvell STA will decline our TDLS setup request */
+		/* Note: if we do not put the IE, Marvell STA will decline our
+		 * TDLS setup request */
 		u4IeLen = rlmDomainSupOperatingClassIeFill(pPkt);
 		LR_TDLS_FME_FIELD_FILL(u4IeLen);
 	}
 
 	/* 3. Frame Formation - (16) Link identifier element */
-	TDLS_LINK_IDENTIFIER_IE(pPkt)->ucId		= ELEM_ID_LINK_IDENTIFIER;
+	TDLS_LINK_IDENTIFIER_IE(pPkt)->ucId = ELEM_ID_LINK_IDENTIFIER;
 	TDLS_LINK_IDENTIFIER_IE(pPkt)->ucLength = 18;
 
-	kalMemCopy(TDLS_LINK_IDENTIFIER_IE(pPkt)->aBSSID, prBssInfo->aucBSSID, 6);
-	kalMemCopy(TDLS_LINK_IDENTIFIER_IE(pPkt)->aInitiator, prAdapter->rMyMacAddr, 6);
+	kalMemCopy(TDLS_LINK_IDENTIFIER_IE(pPkt)->aBSSID, prBssInfo->aucBSSID,
+		   6);
+	kalMemCopy(TDLS_LINK_IDENTIFIER_IE(pPkt)->aInitiator,
+		   prAdapter->rMyMacAddr, 6);
 	kalMemCopy(TDLS_LINK_IDENTIFIER_IE(pPkt)->aResponder, pPeerMac, 6);
 
 	u4IeLen = IE_SIZE(pPkt);
@@ -627,13 +671,15 @@ TdlsDataFrameSend_SETUP_REQ(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec, UINT_8
 	/* HT WMM IE append */
 	if (IS_FEATURE_ENABLED(prAdapter->rWifiVar.ucQoS)) {
 		/* Add WMM IE */ /* try to reuse p2p path */
-		u4IeLen = mqmGenerateWmmInfoIEByStaRec(prAdapter, prBssInfo, prStaRec, pPkt);
+		u4IeLen = mqmGenerateWmmInfoIEByStaRec(prAdapter, prBssInfo,
+						       prStaRec, pPkt);
 		pPkt += u4IeLen;
 		u4PktLen += u4IeLen;
 	}
 
 	if (IS_FEATURE_ENABLED(prAdapter->rWifiVar.ucQoS)) {
-		u4IeLen = mqmGenerateWmmParamIEByParam(prAdapter, prBssInfo, pPkt);
+		u4IeLen = mqmGenerateWmmParamIEByParam(prAdapter, prBssInfo,
+						       pPkt);
 
 		LR_TDLS_FME_FIELD_FILL(u4IeLen);
 	}
@@ -658,24 +704,25 @@ TdlsDataFrameSend_SETUP_REQ(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec, UINT_8
 }
 
 WLAN_STATUS
-TdlsDataFrameSend_SETUP_RSP(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec, UINT_8 *pPeerMac, UINT_8 ucActionCode,
-		UINT_8 ucDialogToken, UINT_16 u2StatusCode, UINT_8 *pAppendIe, UINT_32 AppendIeLen)
+TdlsDataFrameSend_SETUP_RSP(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec,
+			    u8 *pPeerMac, u8 ucActionCode, u8 ucDialogToken,
+			    u16 u2StatusCode, u8 *pAppendIe, u32 AppendIeLen)
 {
-	GLUE_INFO_T				*prGlueInfo;
-	BSS_INFO_T			   *prBssInfo;
+	GLUE_INFO_T *prGlueInfo;
+	BSS_INFO_T *prBssInfo;
 	PM_PROFILE_SETUP_INFO_T *prPmProfSetupInfo;
-	struct sk_buff		   *prMsduInfo;
-	UINT_8				  *pPkt;
-	UINT_32					 u4PktLen, u4IeLen;
-	UINT_16					 u2CapInfo;
-	UINT_16					 StatusCode;
-	BOOLEAN					 fg40mAllowed;
+	struct sk_buff *prMsduInfo;
+	u8 *pPkt;
+	u32 u4PktLen, u4IeLen;
+	u16 u2CapInfo;
+	u16 StatusCode;
+	u8 fg40mAllowed;
 
 	/* allocate/init packet */
-	prGlueInfo		  = (GLUE_INFO_T *)prAdapter->prGlueInfo;
-	prBssInfo		  = prAdapter->prAisBssInfo; /* AIS only */
+	prGlueInfo = (GLUE_INFO_T *)prAdapter->prGlueInfo;
+	prBssInfo = prAdapter->prAisBssInfo; /* AIS only */
 	prPmProfSetupInfo = &prBssInfo->rPmProfSetupInfo;
-	u4PktLen		  = 0;
+	u4PktLen = 0;
 
 	prMsduInfo = kalPacketAlloc(prGlueInfo, 512, &pPkt);
 	if (prMsduInfo == NULL)
@@ -693,7 +740,7 @@ TdlsDataFrameSend_SETUP_RSP(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec, UINT_8
 	pPkt += TDLS_FME_MAC_ADDR_LEN;
 	kalMemCopy(pPkt, prAdapter->rMyMacAddr, TDLS_FME_MAC_ADDR_LEN);
 	pPkt += TDLS_FME_MAC_ADDR_LEN;
-	*(UINT_16 *)pPkt = htons(TDLS_FRM_PROT_TYPE);
+	*(u16 *)pPkt = htons(TDLS_FRM_PROT_TYPE);
 	pPkt += 2;
 	u4PktLen += TDLS_FME_MAC_ADDR_LEN * 2 + 2;
 
@@ -715,7 +762,7 @@ TdlsDataFrameSend_SETUP_RSP(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec, UINT_8
 	/* 3. Frame Formation - status code */
 	StatusCode = u2StatusCode;
 	kalMemCopy(pPkt, &StatusCode, 2);
-	pPkt	 = pPkt + 2;
+	pPkt = pPkt + 2;
 	u4PktLen = u4PktLen + 2;
 
 	/* 3. Frame Formation - (3) Dialog token */
@@ -726,7 +773,7 @@ TdlsDataFrameSend_SETUP_RSP(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec, UINT_8
 	/* 3. Frame Formation - (4) Capability */
 	u2CapInfo = assocBuildCapabilityInfo(prAdapter, prStaRec);
 	WLAN_SET_FIELD_16(pPkt, u2CapInfo);
-	pPkt	 = pPkt + 2;
+	pPkt = pPkt + 2;
 	u4PktLen = u4PktLen + 2;
 
 	/* 4. Append general IEs */
@@ -740,7 +787,7 @@ TdlsDataFrameSend_SETUP_RSP(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec, UINT_8
 	u4PktLen += AppendIeLen;
 
 	/* 3. Frame Formation - (10) Extended capabilities element */
-	EXT_CAP_IE(pPkt)->ucId	   = ELEM_ID_EXTENDED_CAP;
+	EXT_CAP_IE(pPkt)->ucId = ELEM_ID_EXTENDED_CAP;
 	EXT_CAP_IE(pPkt)->ucLength = 5;
 
 	EXT_CAP_IE(pPkt)->aucCapabilities[0] = 0x00; /* bit0 ~ bit7 */
@@ -759,16 +806,17 @@ TdlsDataFrameSend_SETUP_RSP(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec, UINT_8
 	u4PktLen += u4IeLen;
 
 	/* HT capability IE append */
-	HT_CAP_IE(pPkt)->ucId	  = ELEM_ID_HT_CAP;
+	HT_CAP_IE(pPkt)->ucId = ELEM_ID_HT_CAP;
 	HT_CAP_IE(pPkt)->ucLength = 26;
 
 	/* 3. Frame Formation - (14) HT capabilities element */
-	if ((prAdapter->rWifiVar.ucAvailablePhyTypeSet & PHY_TYPE_SET_802_11N)) {
+	if ((prAdapter->rWifiVar.ucAvailablePhyTypeSet &
+	     PHY_TYPE_SET_802_11N)) {
 		/* TODO: prAdapter->rWifiVar.rConnSettings.uc5GBandwidthMode */
 		if (cnmBss40mBwPermitted(prAdapter, prBssInfo->ucBssIndex))
-			fg40mAllowed = TRUE;
+			fg40mAllowed = true;
 		else
-			fg40mAllowed = FALSE;
+			fg40mAllowed = false;
 
 		/* Add HT IE */ /* try to reuse p2p path */
 		u4IeLen = rlmFillHtCapIEByAdapter(prAdapter, prBssInfo, pPkt);
@@ -776,11 +824,16 @@ TdlsDataFrameSend_SETUP_RSP(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec, UINT_8
 		u4PktLen += u4IeLen;
 	}
 
-	/* 3. Frame Formation - (12) Timeout interval element (TPK Key Lifetime) */
-	TIMEOUT_INTERVAL_IE(pPkt)->ucId		= ELEM_ID_TIMEOUT_INTERVAL;
+	/* 3. Frame Formation - (12) Timeout interval element (TPK Key Lifetime)
+	 */
+	TIMEOUT_INTERVAL_IE(pPkt)->ucId = ELEM_ID_TIMEOUT_INTERVAL;
 	TIMEOUT_INTERVAL_IE(pPkt)->ucLength = 5;
-	TIMEOUT_INTERVAL_IE(pPkt)->ucType	= 2;						 /* IE_TIMEOUT_INTERVAL_TYPE_KEY_LIFETIME; */
-	TIMEOUT_INTERVAL_IE(pPkt)->u4Value	= TDLS_KEY_TIMEOUT_INTERVAL; /* htonl(prCmd->u4Timeout); */
+	TIMEOUT_INTERVAL_IE(pPkt)->ucType =
+		2; /* IE_TIMEOUT_INTERVAL_TYPE_KEY_LIFETIME;
+	            */
+	TIMEOUT_INTERVAL_IE(pPkt)->u4Value =
+		TDLS_KEY_TIMEOUT_INTERVAL; /* htonl(prCmd->u4Timeout);
+	                                    */
 
 	u4IeLen = IE_SIZE(pPkt);
 	pPkt += u4IeLen;
@@ -788,24 +841,27 @@ TdlsDataFrameSend_SETUP_RSP(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec, UINT_8
 
 	if (ucActionCode != TDLS_FRM_ACTION_TEARDOWN) {
 		/*
-		 *  bit0 = 1: The Information Request field is used to indicate that a
-		 *  transmitting STA is requesting the recipient to transmit a 20/40 BSS
-		 *  Coexistence Management frame with the transmitting STA as the
-		 *  recipient.
-		 *  bit1 = 0: The Forty MHz Intolerant field is set to 1 to prohibit an AP
-		 *  that receives this information or reports of this information from
+		 *  bit0 = 1: The Information Request field is used to indicate
+		 * that a transmitting STA is requesting the recipient to
+		 * transmit a 20/40 BSS Coexistence Management frame with the
+		 * transmitting STA as the recipient. bit1 = 0: The Forty MHz
+		 * Intolerant field is set to 1 to prohibit an AP that receives
+		 * this information or reports of this information from
 		 *  operating a 20/40 MHz BSS.
-		 *  bit2 = 0: The 20 MHz BSS Width Request field is set to 1 to prohibit
-		 *  a receiving AP from operating its BSS as a 20/40 MHz BSS.
+		 *  bit2 = 0: The 20 MHz BSS Width Request field is set to 1 to
+		 * prohibit a receiving AP from operating its BSS as a 20/40 MHz
+		 * BSS.
 		 */
-		BSS_20_40_COEXIST_IE(pPkt)->ucId	 = ELEM_ID_20_40_BSS_COEXISTENCE;
+		BSS_20_40_COEXIST_IE(pPkt)->ucId =
+			ELEM_ID_20_40_BSS_COEXISTENCE;
 		BSS_20_40_COEXIST_IE(pPkt)->ucLength = 1;
-		BSS_20_40_COEXIST_IE(pPkt)->ucData	 = 0x01;
+		BSS_20_40_COEXIST_IE(pPkt)->ucData = 0x01;
 		LR_TDLS_FME_FIELD_FILL(3);
 	}
 
 	if (pAppendIe != NULL) {
-		if ((ucActionCode != TDLS_FRM_ACTION_TEARDOWN) || ((ucActionCode == TDLS_FRM_ACTION_TEARDOWN))) {
+		if ((ucActionCode != TDLS_FRM_ACTION_TEARDOWN) ||
+		    ((ucActionCode == TDLS_FRM_ACTION_TEARDOWN))) {
 			kalMemCopy(pPkt, pAppendIe, AppendIeLen);
 			LR_TDLS_FME_FIELD_FILL(AppendIeLen);
 		}
@@ -813,18 +869,22 @@ TdlsDataFrameSend_SETUP_RSP(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec, UINT_8
 
 	/* 7. Append Supported Operating Classes IE */
 	if (ucActionCode != TDLS_FRM_ACTION_TEARDOWN) {
-		/* Note: if we do not put the IE, Marvell STA will decline our TDLS setup request */
+		/* Note: if we do not put the IE, Marvell STA will decline our
+		 * TDLS setup request */
 		u4IeLen = rlmDomainSupOperatingClassIeFill(pPkt);
 		LR_TDLS_FME_FIELD_FILL(u4IeLen);
 	}
 
 	/* 3. Frame Formation - (16) Link identifier element */
-	TDLS_LINK_IDENTIFIER_IE(pPkt)->ucId		= ELEM_ID_LINK_IDENTIFIER;
+	TDLS_LINK_IDENTIFIER_IE(pPkt)->ucId = ELEM_ID_LINK_IDENTIFIER;
 	TDLS_LINK_IDENTIFIER_IE(pPkt)->ucLength = 18;
 
-	kalMemCopy(TDLS_LINK_IDENTIFIER_IE(pPkt)->aBSSID, prBssInfo->aucBSSID, 6);
-	kalMemCopy(TDLS_LINK_IDENTIFIER_IE(pPkt)->aInitiator, pPeerMac, 6);				 /* prAdapter->rMyMacAddr */
-	kalMemCopy(TDLS_LINK_IDENTIFIER_IE(pPkt)->aResponder, prAdapter->rMyMacAddr, 6); /* pPeerMac */
+	kalMemCopy(TDLS_LINK_IDENTIFIER_IE(pPkt)->aBSSID, prBssInfo->aucBSSID,
+		   6);
+	kalMemCopy(TDLS_LINK_IDENTIFIER_IE(pPkt)->aInitiator, pPeerMac,
+		   6); /* prAdapter->rMyMacAddr */
+	kalMemCopy(TDLS_LINK_IDENTIFIER_IE(pPkt)->aResponder,
+		   prAdapter->rMyMacAddr, 6); /* pPeerMac */
 
 	u4IeLen = IE_SIZE(pPkt);
 	pPkt += u4IeLen;
@@ -834,13 +894,15 @@ TdlsDataFrameSend_SETUP_RSP(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec, UINT_8
 	/* HT WMM IE append */
 	if (IS_FEATURE_ENABLED(prAdapter->rWifiVar.ucQoS)) {
 		/* Add WMM IE */ /* try to reuse p2p path */
-		u4IeLen = mqmGenerateWmmInfoIEByStaRec(prAdapter, prBssInfo, prStaRec, pPkt);
+		u4IeLen = mqmGenerateWmmInfoIEByStaRec(prAdapter, prBssInfo,
+						       prStaRec, pPkt);
 		pPkt += u4IeLen;
 		u4PktLen += u4IeLen;
 	}
 
 	if (IS_FEATURE_ENABLED(prAdapter->rWifiVar.ucQoS)) {
-		u4IeLen = mqmGenerateWmmParamIEByParam(prAdapter, prBssInfo, pPkt);
+		u4IeLen = mqmGenerateWmmParamIEByParam(prAdapter, prBssInfo,
+						       pPkt);
 
 		LR_TDLS_FME_FIELD_FILL(u4IeLen);
 	}
@@ -863,23 +925,24 @@ TdlsDataFrameSend_SETUP_RSP(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec, UINT_8
 }
 
 WLAN_STATUS
-TdlsDataFrameSend_CONFIRM(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec, UINT_8 *pPeerMac, UINT_8 ucActionCode,
-		UINT_8 ucDialogToken, UINT_16 u2StatusCode, UINT_8 *pAppendIe, UINT_32 AppendIeLen)
+TdlsDataFrameSend_CONFIRM(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec,
+			  u8 *pPeerMac, u8 ucActionCode, u8 ucDialogToken,
+			  u16 u2StatusCode, u8 *pAppendIe, u32 AppendIeLen)
 {
-	GLUE_INFO_T				*prGlueInfo;
-	BSS_INFO_T			   *prBssInfo;
+	GLUE_INFO_T *prGlueInfo;
+	BSS_INFO_T *prBssInfo;
 	PM_PROFILE_SETUP_INFO_T *prPmProfSetupInfo;
-	struct sk_buff		   *prMsduInfo;
-	UINT_8				  *pPkt;
-	UINT_32					 u4PktLen, u4IeLen;
-	UINT_16					 StatusCode;
+	struct sk_buff *prMsduInfo;
+	u8 *pPkt;
+	u32 u4PktLen, u4IeLen;
+	u16 StatusCode;
 
 	/* allocate/init packet */
 	prGlueInfo = (GLUE_INFO_T *)prAdapter->prGlueInfo;
-	prBssInfo  = prAdapter->prAisBssInfo; /* AIS only */
+	prBssInfo = prAdapter->prAisBssInfo; /* AIS only */
 
 	prPmProfSetupInfo = &prBssInfo->rPmProfSetupInfo;
-	u4PktLen		  = 0;
+	u4PktLen = 0;
 
 	prMsduInfo = kalPacketAlloc(prGlueInfo, 512, &pPkt);
 	if (prMsduInfo == NULL)
@@ -897,7 +960,7 @@ TdlsDataFrameSend_CONFIRM(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec, UINT_8 *
 	pPkt += TDLS_FME_MAC_ADDR_LEN;
 	kalMemCopy(pPkt, prAdapter->rMyMacAddr, TDLS_FME_MAC_ADDR_LEN);
 	pPkt += TDLS_FME_MAC_ADDR_LEN;
-	*(UINT_16 *)pPkt = htons(TDLS_FRM_PROT_TYPE);
+	*(u16 *)pPkt = htons(TDLS_FRM_PROT_TYPE);
 	pPkt += 2;
 	u4PktLen += TDLS_FME_MAC_ADDR_LEN * 2 + 2;
 
@@ -920,7 +983,7 @@ TdlsDataFrameSend_CONFIRM(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec, UINT_8 *
 
 	StatusCode = u2StatusCode; /* 0;  //u2StatusCode;  //ahiu 0224 */
 	kalMemCopy(pPkt, &StatusCode, 2);
-	pPkt	 = pPkt + 2;
+	pPkt = pPkt + 2;
 	u4PktLen = u4PktLen + 2;
 
 	/* 3. Frame Formation - (3) Dialog token */
@@ -933,12 +996,15 @@ TdlsDataFrameSend_CONFIRM(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec, UINT_8 *
 	pPkt += AppendIeLen;
 	u4PktLen += AppendIeLen;
 
-	/* 3. Frame Formation - (12) Timeout interval element (TPK Key Lifetime) */
-	TIMEOUT_INTERVAL_IE(pPkt)->ucId		= ELEM_ID_TIMEOUT_INTERVAL;
+	/* 3. Frame Formation - (12) Timeout interval element (TPK Key Lifetime)
+	 */
+	TIMEOUT_INTERVAL_IE(pPkt)->ucId = ELEM_ID_TIMEOUT_INTERVAL;
 	TIMEOUT_INTERVAL_IE(pPkt)->ucLength = 5;
 
-	TIMEOUT_INTERVAL_IE(pPkt)->ucType  = 2;
-	TIMEOUT_INTERVAL_IE(pPkt)->u4Value = TDLS_KEY_TIMEOUT_INTERVAL; /* htonl(prCmd->u4Timeout); */
+	TIMEOUT_INTERVAL_IE(pPkt)->ucType = 2;
+	TIMEOUT_INTERVAL_IE(pPkt)->u4Value =
+		TDLS_KEY_TIMEOUT_INTERVAL; /* htonl(prCmd->u4Timeout);
+	                                    */
 
 	u4IeLen = IE_SIZE(pPkt);
 	pPkt += u4IeLen;
@@ -946,25 +1012,28 @@ TdlsDataFrameSend_CONFIRM(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec, UINT_8 *
 
 	if (ucActionCode != TDLS_FRM_ACTION_TEARDOWN) {
 		/*
-		 *  bit0 = 1: The Information Request field is used to indicate that a
-		 *  transmitting STA is requesting the recipient to transmit a 20/40 BSS
-		 *  Coexistence Management frame with the transmitting STA as the
-		 *  recipient.
-		 *  bit1 = 0: The Forty MHz Intolerant field is set to 1 to prohibit an AP
-		 *  that receives this information or reports of this information from
+		 *  bit0 = 1: The Information Request field is used to indicate
+		 * that a transmitting STA is requesting the recipient to
+		 * transmit a 20/40 BSS Coexistence Management frame with the
+		 * transmitting STA as the recipient. bit1 = 0: The Forty MHz
+		 * Intolerant field is set to 1 to prohibit an AP that receives
+		 * this information or reports of this information from
 		 *  operating a 20/40 MHz BSS.
-		 *  bit2 = 0: The 20 MHz BSS Width Request field is set to 1 to prohibit
-		 *  a receiving AP from operating its BSS as a 20/40 MHz BSS.
+		 *  bit2 = 0: The 20 MHz BSS Width Request field is set to 1 to
+		 * prohibit a receiving AP from operating its BSS as a 20/40 MHz
+		 * BSS.
 		 */
-		BSS_20_40_COEXIST_IE(pPkt)->ucId	 = ELEM_ID_20_40_BSS_COEXISTENCE;
+		BSS_20_40_COEXIST_IE(pPkt)->ucId =
+			ELEM_ID_20_40_BSS_COEXISTENCE;
 		BSS_20_40_COEXIST_IE(pPkt)->ucLength = 1;
-		BSS_20_40_COEXIST_IE(pPkt)->ucData	 = 0x01;
+		BSS_20_40_COEXIST_IE(pPkt)->ucData = 0x01;
 		LR_TDLS_FME_FIELD_FILL(3);
 	}
 
 	if (pAppendIe != NULL) {
 		if ((ucActionCode != TDLS_FRM_ACTION_TEARDOWN) ||
-				((ucActionCode == TDLS_FRM_ACTION_TEARDOWN) && (prStaRec != NULL))) {
+		    ((ucActionCode == TDLS_FRM_ACTION_TEARDOWN) &&
+		     (prStaRec != NULL))) {
 			kalMemCopy(pPkt, pAppendIe, AppendIeLen);
 			LR_TDLS_FME_FIELD_FILL(AppendIeLen);
 		}
@@ -972,17 +1041,20 @@ TdlsDataFrameSend_CONFIRM(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec, UINT_8 *
 
 	/* 7. Append Supported Operating Classes IE */
 	if (ucActionCode != TDLS_FRM_ACTION_TEARDOWN) {
-		/* Note: if we do not put the IE, Marvell STA will decline our TDLS setup request */
+		/* Note: if we do not put the IE, Marvell STA will decline our
+		 * TDLS setup request */
 		u4IeLen = rlmDomainSupOperatingClassIeFill(pPkt);
 		LR_TDLS_FME_FIELD_FILL(u4IeLen);
 	}
 
 	/* 3. Frame Formation - (16) Link identifier element */
-	TDLS_LINK_IDENTIFIER_IE(pPkt)->ucId		= ELEM_ID_LINK_IDENTIFIER;
+	TDLS_LINK_IDENTIFIER_IE(pPkt)->ucId = ELEM_ID_LINK_IDENTIFIER;
 	TDLS_LINK_IDENTIFIER_IE(pPkt)->ucLength = 18;
 
-	kalMemCopy(TDLS_LINK_IDENTIFIER_IE(pPkt)->aBSSID, prBssInfo->aucBSSID, 6);
-	kalMemCopy(TDLS_LINK_IDENTIFIER_IE(pPkt)->aInitiator, prAdapter->rMyMacAddr, 6);
+	kalMemCopy(TDLS_LINK_IDENTIFIER_IE(pPkt)->aBSSID, prBssInfo->aucBSSID,
+		   6);
+	kalMemCopy(TDLS_LINK_IDENTIFIER_IE(pPkt)->aInitiator,
+		   prAdapter->rMyMacAddr, 6);
 	kalMemCopy(TDLS_LINK_IDENTIFIER_IE(pPkt)->aResponder, pPeerMac, 6);
 
 	u4IeLen = IE_SIZE(pPkt);
@@ -992,13 +1064,15 @@ TdlsDataFrameSend_CONFIRM(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec, UINT_8 *
 	/* HT WMM IE append */
 	if (IS_FEATURE_ENABLED(prAdapter->rWifiVar.ucQoS)) {
 		/* Add WMM IE */ /* try to reuse p2p path */
-		u4IeLen = mqmGenerateWmmInfoIEByStaRec(prAdapter, prBssInfo, prStaRec, pPkt);
+		u4IeLen = mqmGenerateWmmInfoIEByStaRec(prAdapter, prBssInfo,
+						       prStaRec, pPkt);
 		pPkt += u4IeLen;
 		u4PktLen += u4IeLen;
 	}
 
 	if (IS_FEATURE_ENABLED(prAdapter->rWifiVar.ucQoS)) {
-		u4IeLen = mqmGenerateWmmParamIEByParam(prAdapter, prBssInfo, pPkt);
+		u4IeLen = mqmGenerateWmmParamIEByParam(prAdapter, prBssInfo,
+						       pPkt);
 
 		LR_TDLS_FME_FIELD_FILL(u4IeLen);
 	}
@@ -1025,17 +1099,19 @@ TdlsDataFrameSend_CONFIRM(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec, UINT_8 *
  */
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS /* TDLS_STATUS */
-TdlsDataFrameSend_DISCOVERY_REQ(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec, UINT_8 *pPeerMac, UINT_8 ucActionCode,
-		UINT_8 ucDialogToken, UINT_16 u2StatusCode, UINT_8 *pAppendIe, UINT_32 AppendIeLen)
+TdlsDataFrameSend_DISCOVERY_REQ(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec,
+				u8 *pPeerMac, u8 ucActionCode, u8 ucDialogToken,
+				u16 u2StatusCode, u8 *pAppendIe,
+				u32 AppendIeLen)
 {
-	GLUE_INFO_T				*prGlueInfo;
-	BSS_INFO_T			   *prBssInfo;
+	GLUE_INFO_T *prGlueInfo;
+	BSS_INFO_T *prBssInfo;
 	PM_PROFILE_SETUP_INFO_T *prPmProfSetupInfo;
-	struct sk_buff		   *prMsduInfo;
-	MSDU_INFO_T				*prMsduInfoMgmt;
-	UINT_8				  *pPkt, *pucInitiator, *pucResponder;
-	UINT_32					 u4PktLen, u4IeLen;
-	UINT_16					 u2CapInfo;
+	struct sk_buff *prMsduInfo;
+	MSDU_INFO_T *prMsduInfoMgmt;
+	u8 *pPkt, *pucInitiator, *pucResponder;
+	u32 u4PktLen, u4IeLen;
+	u16 u2CapInfo;
 
 	prGlueInfo = (GLUE_INFO_T *)prAdapter->prGlueInfo;
 
@@ -1046,9 +1122,9 @@ TdlsDataFrameSend_DISCOVERY_REQ(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec, UI
 
 	/* allocate/init packet */
 	prPmProfSetupInfo = &prBssInfo->rPmProfSetupInfo;
-	u4PktLen		  = 0;
-	prMsduInfo		  = NULL;
-	prMsduInfoMgmt	  = NULL;
+	u4PktLen = 0;
+	prMsduInfo = NULL;
+	prMsduInfoMgmt = NULL;
 
 	/* make up frame content */
 	if (ucActionCode != TDLS_FRM_ACTION_DISCOVERY_RSP) {
@@ -1066,9 +1142,10 @@ TdlsDataFrameSend_DISCOVERY_REQ(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec, UI
 		/* 1. 802.3 header */
 		kalMemCopy(pPkt, pPeerMac, TDLS_FME_MAC_ADDR_LEN);
 		LR_TDLS_FME_FIELD_FILL(TDLS_FME_MAC_ADDR_LEN);
-		kalMemCopy(pPkt, prBssInfo->aucOwnMacAddr, TDLS_FME_MAC_ADDR_LEN);
+		kalMemCopy(pPkt, prBssInfo->aucOwnMacAddr,
+			   TDLS_FME_MAC_ADDR_LEN);
 		LR_TDLS_FME_FIELD_FILL(TDLS_FME_MAC_ADDR_LEN);
-		*(UINT_16 *)pPkt = htons(TDLS_FRM_PROT_TYPE);
+		*(u16 *)pPkt = htons(TDLS_FRM_PROT_TYPE);
 		LR_TDLS_FME_FIELD_FILL(2);
 
 		/* 2. payload type */
@@ -1081,19 +1158,22 @@ TdlsDataFrameSend_DISCOVERY_REQ(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec, UI
 	} else {
 		WLAN_MAC_HEADER_T *prHdr;
 
-		prMsduInfoMgmt = (MSDU_INFO_T *)cnmMgtPktAlloc(prAdapter, PUBLIC_ACTION_MAX_LEN);
+		prMsduInfoMgmt = (MSDU_INFO_T *)cnmMgtPktAlloc(
+			prAdapter, PUBLIC_ACTION_MAX_LEN);
 		if (prMsduInfoMgmt == NULL)
 			return TDLS_STATUS_RESOURCES;
 
-		pPkt  = (UINT_8 *)prMsduInfoMgmt->prPacket;
+		pPkt = (u8 *)prMsduInfoMgmt->prPacket;
 		prHdr = (WLAN_MAC_HEADER_T *)pPkt;
 
 		/* 1. 802.11 header */
-		prHdr->u2FrameCtrl	= MAC_FRAME_ACTION;
+		prHdr->u2FrameCtrl = MAC_FRAME_ACTION;
 		prHdr->u2DurationID = 0;
 		kalMemCopy(prHdr->aucAddr1, pPeerMac, TDLS_FME_MAC_ADDR_LEN);
-		kalMemCopy(prHdr->aucAddr2, prBssInfo->aucOwnMacAddr, TDLS_FME_MAC_ADDR_LEN);
-		kalMemCopy(prHdr->aucAddr3, prBssInfo->aucBSSID, TDLS_FME_MAC_ADDR_LEN);
+		kalMemCopy(prHdr->aucAddr2, prBssInfo->aucOwnMacAddr,
+			   TDLS_FME_MAC_ADDR_LEN);
+		kalMemCopy(prHdr->aucAddr3, prBssInfo->aucBSSID,
+			   TDLS_FME_MAC_ADDR_LEN);
 		prHdr->u2SeqCtrl = 0;
 		LR_TDLS_FME_FIELD_FILL(sizeof(WLAN_MAC_HEADER_T));
 
@@ -1138,9 +1218,12 @@ TdlsDataFrameSend_DISCOVERY_REQ(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec, UI
 		 *  Timeout Interval
 		 */
 
-		if (ucActionCode != TDLS_FRM_ACTION_CONFIRM && ucActionCode != TDLS_FRM_ACTION_DISCOVERY_REQ) {
-			/* 3. Frame Formation - (4) Capability: 0x31 0x04, privacy bit will be set */
-			u2CapInfo = assocBuildCapabilityInfo(prAdapter, prStaRec);
+		if (ucActionCode != TDLS_FRM_ACTION_CONFIRM &&
+		    ucActionCode != TDLS_FRM_ACTION_DISCOVERY_REQ) {
+			/* 3. Frame Formation - (4) Capability: 0x31 0x04,
+			 * privacy bit will be set */
+			u2CapInfo =
+				assocBuildCapabilityInfo(prAdapter, prStaRec);
 			WLAN_SET_FIELD_16(pPkt, u2CapInfo);
 			LR_TDLS_FME_FIELD_FILL(2);
 		}
@@ -1148,23 +1231,30 @@ TdlsDataFrameSend_DISCOVERY_REQ(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec, UI
 		if (ucActionCode != TDLS_FRM_ACTION_CONFIRM) {
 			/* 4. Append general IEs */
 			/*
-			 *  TODO check HT: prAdapter->rWifiVar.rConnSettings.uc2G4BandwidthMode
+			 *  TODO check HT:
+			 * prAdapter->rWifiVar.rConnSettings.uc2G4BandwidthMode
 			 *  must be CONFIG_BW_20_40M.
-			 *  TODO check HT: HT_CAP_INFO_40M_INTOLERANT must be clear if
-			 *  Tdls 20/40 is enabled.
+			 *  TODO check HT: HT_CAP_INFO_40M_INTOLERANT must be
+			 * clear if Tdls 20/40 is enabled.
 			 */
-			u4IeLen = TdlsFrameGeneralIeAppend(prAdapter, prStaRec, pPkt);
+			u4IeLen = TdlsFrameGeneralIeAppend(prAdapter, prStaRec,
+							   pPkt);
 			LR_TDLS_FME_FIELD_FILL(u4IeLen);
 
 			/* 5. Frame Formation - Extended capabilities element */
-			EXT_CAP_IE(pPkt)->ucId	   = ELEM_ID_EXTENDED_CAP;
+			EXT_CAP_IE(pPkt)->ucId = ELEM_ID_EXTENDED_CAP;
 			EXT_CAP_IE(pPkt)->ucLength = 5;
 
-			EXT_CAP_IE(pPkt)->aucCapabilities[0] = 0x00; /* bit0 ~ bit7 */
-			EXT_CAP_IE(pPkt)->aucCapabilities[1] = 0x00; /* bit8 ~ bit15 */
-			EXT_CAP_IE(pPkt)->aucCapabilities[2] = 0x00; /* bit16 ~ bit23 */
-			EXT_CAP_IE(pPkt)->aucCapabilities[3] = 0x00; /* bit24 ~ bit31 */
-			EXT_CAP_IE(pPkt)->aucCapabilities[4] = 0x00; /* bit32 ~ bit39 */
+			EXT_CAP_IE(pPkt)->aucCapabilities[0] = 0x00; /* bit0 ~
+			                                             * bit7 */
+			EXT_CAP_IE(pPkt)->aucCapabilities[1] = 0x00; /* bit8 ~
+			                                              * bit15 */
+			EXT_CAP_IE(pPkt)->aucCapabilities[2] = 0x00; /* bit16 ~
+			                                             * bit23 */
+			EXT_CAP_IE(pPkt)->aucCapabilities[3] = 0x00; /* bit24 ~
+			                                             * bit31 */
+			EXT_CAP_IE(pPkt)->aucCapabilities[4] = 0x00; /* bit32 ~
+			                                             * bit39 */
 
 			/* if (prCmd->ucExCap & TDLS_EX_CAP_PEER_UAPSD) */
 			EXT_CAP_IE(pPkt)->aucCapabilities[3] |= BIT((28 - 24));
@@ -1179,7 +1269,8 @@ TdlsDataFrameSend_DISCOVERY_REQ(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec, UI
 			/* 5. Frame Formation - WMM Information element */
 			if (IS_FEATURE_ENABLED(prAdapter->rWifiVar.ucQoS)) {
 				/* Add WMM IE */ /* try to reuse p2p path */
-				u4IeLen = mqmGenerateWmmInfoIEByStaRec(prAdapter, prBssInfo, prStaRec, pPkt);
+				u4IeLen = mqmGenerateWmmInfoIEByStaRec(
+					prAdapter, prBssInfo, prStaRec, pPkt);
 				pPkt += u4IeLen;
 				u4PktLen += u4IeLen;
 			}
@@ -1191,11 +1282,13 @@ TdlsDataFrameSend_DISCOVERY_REQ(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec, UI
 	/* LR_TDLS_FME_FIELD_FILL(u4IeLen); */
 
 	/* 7. Frame Formation - Link identifier element */
-	/* Note: Link ID sequence must be correct; Or the calculated MIC will be error */
-	TDLS_LINK_IDENTIFIER_IE(pPkt)->ucId		= ELEM_ID_LINK_IDENTIFIER;
+	/* Note: Link ID sequence must be correct; Or the calculated MIC will be
+	 * error */
+	TDLS_LINK_IDENTIFIER_IE(pPkt)->ucId = ELEM_ID_LINK_IDENTIFIER;
 	TDLS_LINK_IDENTIFIER_IE(pPkt)->ucLength = 18;
 
-	kalMemCopy(TDLS_LINK_IDENTIFIER_IE(pPkt)->aBSSID, prBssInfo->aucBSSID, 6);
+	kalMemCopy(TDLS_LINK_IDENTIFIER_IE(pPkt)->aBSSID, prBssInfo->aucBSSID,
+		   6);
 
 	switch (ucActionCode) {
 	case TDLS_FRM_ACTION_SETUP_REQ:
@@ -1203,20 +1296,20 @@ TdlsDataFrameSend_DISCOVERY_REQ(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec, UI
 	case TDLS_FRM_ACTION_DISCOVERY_RSP:
 	default:
 		/* we are initiator */
-		pucInitiator				 = prBssInfo->aucOwnMacAddr;
-		pucResponder				 = pPeerMac;
-		prStaRec->flgTdlsIsInitiator = TRUE;
+		pucInitiator = prBssInfo->aucOwnMacAddr;
+		pucResponder = pPeerMac;
+		prStaRec->flgTdlsIsInitiator = true;
 		break;
 
 	case TDLS_FRM_ACTION_SETUP_RSP:
 		/* peer is initiator */
-		pucInitiator				 = pPeerMac;
-		pucResponder				 = prBssInfo->aucOwnMacAddr;
-		prStaRec->flgTdlsIsInitiator = FALSE;
+		pucInitiator = pPeerMac;
+		pucResponder = prBssInfo->aucOwnMacAddr;
+		prStaRec->flgTdlsIsInitiator = false;
 		break;
 
 	case TDLS_FRM_ACTION_TEARDOWN:
-		if (prStaRec->flgTdlsIsInitiator == TRUE) {
+		if (prStaRec->flgTdlsIsInitiator == true) {
 			/* we are initiator */
 			pucInitiator = prBssInfo->aucOwnMacAddr;
 			pucResponder = pPeerMac;
@@ -1247,15 +1340,16 @@ TdlsDataFrameSend_DISCOVERY_REQ(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec, UI
 
 		wlanHardStartXmit(prMsduInfo, prMsduInfo->dev);
 	} else {
-		prMsduInfoMgmt->ucPacketType	  = TX_PACKET_TYPE_MGMT;
-		prMsduInfoMgmt->ucStaRecIndex	  = prBssInfo->prStaRecOfAP->ucIndex;
-		prMsduInfoMgmt->ucBssIndex		  = prBssInfo->ucBssIndex;
+		prMsduInfoMgmt->ucPacketType = TX_PACKET_TYPE_MGMT;
+		prMsduInfoMgmt->ucStaRecIndex =
+			prBssInfo->prStaRecOfAP->ucIndex;
+		prMsduInfoMgmt->ucBssIndex = prBssInfo->ucBssIndex;
 		prMsduInfoMgmt->ucMacHeaderLength = WLAN_MAC_MGMT_HEADER_LEN;
-		prMsduInfoMgmt->fgIs802_1x		  = FALSE;
-		prMsduInfoMgmt->fgIs802_11		  = TRUE;
-		prMsduInfoMgmt->u2FrameLength	  = u4PktLen;
-		prMsduInfoMgmt->ucTxSeqNum		  = nicIncreaseTxSeqNum(prAdapter);
-		prMsduInfoMgmt->pfTxDoneHandler	  = NULL;
+		prMsduInfoMgmt->fgIs802_1x = false;
+		prMsduInfoMgmt->fgIs802_11 = true;
+		prMsduInfoMgmt->u2FrameLength = u4PktLen;
+		prMsduInfoMgmt->ucTxSeqNum = nicIncreaseTxSeqNum(prAdapter);
+		prMsduInfoMgmt->pfTxDoneHandler = NULL;
 
 		/* Send them to HW queue */
 		nicTxEnqueueMsdu(prAdapter, prMsduInfoMgmt);
@@ -1265,18 +1359,20 @@ TdlsDataFrameSend_DISCOVERY_REQ(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec, UI
 }
 
 WLAN_STATUS
-TdlsDataFrameSend_DISCOVERY_RSP(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec, UINT_8 *pPeerMac, UINT_8 ucActionCode,
-		UINT_8 ucDialogToken, UINT_16 u2StatusCode, UINT_8 *pAppendIe, UINT_32 AppendIeLen)
+TdlsDataFrameSend_DISCOVERY_RSP(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec,
+				u8 *pPeerMac, u8 ucActionCode, u8 ucDialogToken,
+				u16 u2StatusCode, u8 *pAppendIe,
+				u32 AppendIeLen)
 {
-	GLUE_INFO_T				*prGlueInfo;
-	BSS_INFO_T			   *prBssInfo;
+	GLUE_INFO_T *prGlueInfo;
+	BSS_INFO_T *prBssInfo;
 	PM_PROFILE_SETUP_INFO_T *prPmProfSetupInfo;
-	struct sk_buff		   *prMsduInfo;
-	MSDU_INFO_T				*prMsduInfoMgmt;
-	UINT_8				  *pPkt, *pucInitiator, *pucResponder;
-	UINT_32					 u4PktLen, u4IeLen;
-	UINT_16					 u2CapInfo;
-	WLAN_MAC_HEADER_T		  *prHdr;
+	struct sk_buff *prMsduInfo;
+	MSDU_INFO_T *prMsduInfoMgmt;
+	u8 *pPkt, *pucInitiator, *pucResponder;
+	u32 u4PktLen, u4IeLen;
+	u16 u2CapInfo;
+	WLAN_MAC_HEADER_T *prHdr;
 
 	prGlueInfo = (GLUE_INFO_T *)prAdapter->prGlueInfo;
 
@@ -1288,25 +1384,28 @@ TdlsDataFrameSend_DISCOVERY_RSP(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec, UI
 
 	/* allocate/init packet */
 	prPmProfSetupInfo = &prBssInfo->rPmProfSetupInfo;
-	u4PktLen		  = 0;
-	prMsduInfo		  = NULL;
-	prMsduInfoMgmt	  = NULL;
+	u4PktLen = 0;
+	prMsduInfo = NULL;
+	prMsduInfoMgmt = NULL;
 
 	/* make up frame content */
-	prMsduInfoMgmt = (MSDU_INFO_T *)cnmMgtPktAlloc(prAdapter, PUBLIC_ACTION_MAX_LEN);
+	prMsduInfoMgmt =
+		(MSDU_INFO_T *)cnmMgtPktAlloc(prAdapter, PUBLIC_ACTION_MAX_LEN);
 	if (prMsduInfoMgmt == NULL) {
-		DBGLOG(TDLS, ERROR, "cnmMgtPktAlloc for prMsduInfoMgmt failed!\n");
+		DBGLOG(TDLS, ERROR,
+		       "cnmMgtPktAlloc for prMsduInfoMgmt failed!\n");
 		return TDLS_STATUS_RESOURCES;
 	}
 
-	pPkt  = (UINT_8 *)prMsduInfoMgmt->prPacket;
+	pPkt = (u8 *)prMsduInfoMgmt->prPacket;
 	prHdr = (WLAN_MAC_HEADER_T *)pPkt;
 
 	/* 1. 802.11 header */
-	prHdr->u2FrameCtrl	= MAC_FRAME_ACTION;
+	prHdr->u2FrameCtrl = MAC_FRAME_ACTION;
 	prHdr->u2DurationID = 0;
 	kalMemCopy(prHdr->aucAddr1, pPeerMac, TDLS_FME_MAC_ADDR_LEN);
-	kalMemCopy(prHdr->aucAddr2, prBssInfo->aucOwnMacAddr, TDLS_FME_MAC_ADDR_LEN);
+	kalMemCopy(prHdr->aucAddr2, prBssInfo->aucOwnMacAddr,
+		   TDLS_FME_MAC_ADDR_LEN);
 	kalMemCopy(prHdr->aucAddr3, prBssInfo->aucBSSID, TDLS_FME_MAC_ADDR_LEN);
 	prHdr->u2SeqCtrl = 0;
 	LR_TDLS_FME_FIELD_FILL(sizeof(WLAN_MAC_HEADER_T));
@@ -1337,7 +1436,8 @@ TdlsDataFrameSend_DISCOVERY_RSP(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec, UI
 	 *  FTIE
 	 *  Timeout Interval
 	 */
-	/* 3. Frame Formation - (4) Capability: 0x31 0x04, privacy bit will be set */
+	/* 3. Frame Formation - (4) Capability: 0x31 0x04, privacy bit will be
+	 * set */
 	u2CapInfo = assocBuildCapabilityInfo(prAdapter, prStaRec);
 	WLAN_SET_FIELD_16(pPkt, u2CapInfo);
 	LR_TDLS_FME_FIELD_FILL(2);
@@ -1353,7 +1453,7 @@ TdlsDataFrameSend_DISCOVERY_RSP(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec, UI
 	LR_TDLS_FME_FIELD_FILL(u4IeLen);
 
 	/* 5. Frame Formation - Extended capabilities element */
-	EXT_CAP_IE(pPkt)->ucId	   = ELEM_ID_EXTENDED_CAP;
+	EXT_CAP_IE(pPkt)->ucId = ELEM_ID_EXTENDED_CAP;
 	EXT_CAP_IE(pPkt)->ucLength = 5;
 
 	EXT_CAP_IE(pPkt)->aucCapabilities[0] = 0x00; /* bit0 ~ bit7 */
@@ -1377,24 +1477,31 @@ TdlsDataFrameSend_DISCOVERY_RSP(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec, UI
 	/* LR_TDLS_FME_FIELD_FILL(u4IeLen); */
 
 	/* 7. Frame Formation - Link identifier element */
-	/* Note: Link ID sequence must be correct; Or the calculated MIC will be error */
-	TDLS_LINK_IDENTIFIER_IE(pPkt)->ucId		= ELEM_ID_LINK_IDENTIFIER;
+	/* Note: Link ID sequence must be correct; Or the calculated MIC will be
+	 * error */
+	TDLS_LINK_IDENTIFIER_IE(pPkt)->ucId = ELEM_ID_LINK_IDENTIFIER;
 	TDLS_LINK_IDENTIFIER_IE(pPkt)->ucLength = 18;
 
-	kalMemCopy(TDLS_LINK_IDENTIFIER_IE(pPkt)->aBSSID, prBssInfo->aucBSSID, 6);
+	kalMemCopy(TDLS_LINK_IDENTIFIER_IE(pPkt)->aBSSID, prBssInfo->aucBSSID,
+		   6);
 
 	/* peer is initiator */
 	pucInitiator = pPeerMac;
 	pucResponder = prBssInfo->aucOwnMacAddr;
 
 	if (prStaRec != NULL)
-		prStaRec->flgTdlsIsInitiator = FALSE;
+		prStaRec->flgTdlsIsInitiator = false;
 
-	/* 3. Frame Formation - (12) Timeout interval element (TPK Key Lifetime) */
-	TIMEOUT_INTERVAL_IE(pPkt)->ucId		= ELEM_ID_TIMEOUT_INTERVAL;
+	/* 3. Frame Formation - (12) Timeout interval element (TPK Key Lifetime)
+	 */
+	TIMEOUT_INTERVAL_IE(pPkt)->ucId = ELEM_ID_TIMEOUT_INTERVAL;
 	TIMEOUT_INTERVAL_IE(pPkt)->ucLength = 5;
-	TIMEOUT_INTERVAL_IE(pPkt)->ucType	= 2;						 /* IE_TIMEOUT_INTERVAL_TYPE_KEY_LIFETIME; */
-	TIMEOUT_INTERVAL_IE(pPkt)->u4Value	= TDLS_KEY_TIMEOUT_INTERVAL; /* htonl(prCmd->u4Timeout); */
+	TIMEOUT_INTERVAL_IE(pPkt)->ucType =
+		2; /* IE_TIMEOUT_INTERVAL_TYPE_KEY_LIFETIME;
+	            */
+	TIMEOUT_INTERVAL_IE(pPkt)->u4Value =
+		TDLS_KEY_TIMEOUT_INTERVAL; /* htonl(prCmd->u4Timeout);
+	                                    */
 
 	u4IeLen = IE_SIZE(pPkt);
 	pPkt += u4IeLen;
@@ -1405,15 +1512,15 @@ TdlsDataFrameSend_DISCOVERY_RSP(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec, UI
 	 *  transmitting STA is requesting the recipient to transmit a 20/40 BSS
 	 *  Coexistence Management frame with the transmitting STA as the
 	 *  recipient.
-	 *  bit1 = 0: The Forty MHz Intolerant field is set to 1 to prohibit an AP
-	 *  that receives this information or reports of this information from
+	 *  bit1 = 0: The Forty MHz Intolerant field is set to 1 to prohibit an
+	 * AP that receives this information or reports of this information from
 	 *  operating a 20/40 MHz BSS.
 	 *  bit2 = 0: The 20 MHz BSS Width Request field is set to 1 to prohibit
 	 *  a receiving AP from operating its BSS as a 20/40 MHz BSS.
 	 */
-	BSS_20_40_COEXIST_IE(pPkt)->ucId	 = ELEM_ID_20_40_BSS_COEXISTENCE;
+	BSS_20_40_COEXIST_IE(pPkt)->ucId = ELEM_ID_20_40_BSS_COEXISTENCE;
 	BSS_20_40_COEXIST_IE(pPkt)->ucLength = 1;
-	BSS_20_40_COEXIST_IE(pPkt)->ucData	 = 0x01;
+	BSS_20_40_COEXIST_IE(pPkt)->ucData = 0x01;
 	LR_TDLS_FME_FIELD_FILL(3);
 
 	if (pAppendIe != NULL) {
@@ -1422,17 +1529,21 @@ TdlsDataFrameSend_DISCOVERY_RSP(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec, UI
 	}
 
 	/* 7. Append Supported Operating Classes IE */
-	/* Note: if we do not put the IE, Marvell STA will decline our TDLS setup request */
+	/* Note: if we do not put the IE, Marvell STA will decline our TDLS
+	 * setup request */
 	u4IeLen = rlmDomainSupOperatingClassIeFill(pPkt);
 	LR_TDLS_FME_FIELD_FILL(u4IeLen);
 
 	/* 3. Frame Formation - (16) Link identifier element */
-	TDLS_LINK_IDENTIFIER_IE(pPkt)->ucId		= ELEM_ID_LINK_IDENTIFIER;
+	TDLS_LINK_IDENTIFIER_IE(pPkt)->ucId = ELEM_ID_LINK_IDENTIFIER;
 	TDLS_LINK_IDENTIFIER_IE(pPkt)->ucLength = 18;
 
-	kalMemCopy(TDLS_LINK_IDENTIFIER_IE(pPkt)->aBSSID, prBssInfo->aucBSSID, 6);
-	kalMemCopy(TDLS_LINK_IDENTIFIER_IE(pPkt)->aInitiator, pPeerMac, 6);				 /* prAdapter->rMyMacAddr */
-	kalMemCopy(TDLS_LINK_IDENTIFIER_IE(pPkt)->aResponder, prAdapter->rMyMacAddr, 6); /* pPeerMac */
+	kalMemCopy(TDLS_LINK_IDENTIFIER_IE(pPkt)->aBSSID, prBssInfo->aucBSSID,
+		   6);
+	kalMemCopy(TDLS_LINK_IDENTIFIER_IE(pPkt)->aInitiator, pPeerMac,
+		   6); /* prAdapter->rMyMacAddr */
+	kalMemCopy(TDLS_LINK_IDENTIFIER_IE(pPkt)->aResponder,
+		   prAdapter->rMyMacAddr, 6); /* pPeerMac */
 
 	u4IeLen = IE_SIZE(pPkt);
 	pPkt += u4IeLen;
@@ -1442,13 +1553,15 @@ TdlsDataFrameSend_DISCOVERY_RSP(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec, UI
 	/* HT WMM IE append */
 	if (IS_FEATURE_ENABLED(prAdapter->rWifiVar.ucQoS)) {
 		/* Add WMM IE */ /* try to reuse p2p path */
-		u4IeLen = mqmGenerateWmmInfoIEByStaRec(prAdapter, prBssInfo, prStaRec, pPkt);
+		u4IeLen = mqmGenerateWmmInfoIEByStaRec(prAdapter, prBssInfo,
+						       prStaRec, pPkt);
 		pPkt += u4IeLen;
 		u4PktLen += u4IeLen;
 	}
 
 	if (IS_FEATURE_ENABLED(prAdapter->rWifiVar.ucQoS)) {
-		u4IeLen = mqmGenerateWmmParamIEByParam(prAdapter, prBssInfo, pPkt);
+		u4IeLen = mqmGenerateWmmParamIEByParam(prAdapter, prBssInfo,
+						       pPkt);
 
 		LR_TDLS_FME_FIELD_FILL(u4IeLen);
 	}
@@ -1467,15 +1580,15 @@ TdlsDataFrameSend_DISCOVERY_RSP(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec, UI
 		LR_TDLS_FME_FIELD_FILL(AppendIeLen);
 	}
 
-	prMsduInfoMgmt->ucPacketType	  = TX_PACKET_TYPE_MGMT;
-	prMsduInfoMgmt->ucStaRecIndex	  = prBssInfo->prStaRecOfAP->ucIndex;
-	prMsduInfoMgmt->ucBssIndex		  = prBssInfo->ucBssIndex;
+	prMsduInfoMgmt->ucPacketType = TX_PACKET_TYPE_MGMT;
+	prMsduInfoMgmt->ucStaRecIndex = prBssInfo->prStaRecOfAP->ucIndex;
+	prMsduInfoMgmt->ucBssIndex = prBssInfo->ucBssIndex;
 	prMsduInfoMgmt->ucMacHeaderLength = WLAN_MAC_MGMT_HEADER_LEN;
-	prMsduInfoMgmt->fgIs802_1x		  = FALSE;
-	prMsduInfoMgmt->fgIs802_11		  = TRUE;
-	prMsduInfoMgmt->u2FrameLength	  = u4PktLen;
-	prMsduInfoMgmt->ucTxSeqNum		  = nicIncreaseTxSeqNum(prAdapter);
-	prMsduInfoMgmt->pfTxDoneHandler	  = NULL;
+	prMsduInfoMgmt->fgIs802_1x = false;
+	prMsduInfoMgmt->fgIs802_11 = true;
+	prMsduInfoMgmt->u2FrameLength = u4PktLen;
+	prMsduInfoMgmt->ucTxSeqNum = nicIncreaseTxSeqNum(prAdapter);
+	prMsduInfoMgmt->pfTxDoneHandler = NULL;
 
 	/* Send them to HW queue */
 	nicTxEnqueueMsdu(prAdapter, prMsduInfoMgmt);
@@ -1486,17 +1599,17 @@ TdlsDataFrameSend_DISCOVERY_RSP(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec, UI
 /*----------------------------------------------------------------------------*/
 /*! \brief  This routine is called to send a command to TDLS module.
  *
- * \param[in] prGlueInfo		Pointer to the Adapter structure
- * \param[in] prInBuf		A pointer to the command string buffer
- * \param[in] u4InBufLen	The length of the buffer
+ * \param[in] prGlueInfo Pointer to the Adapter structure
+ * \param[in] prInBuf A pointer to the command string buffer
+ * \param[in] u4InBufLen The length of the buffer
  * \param[out] None
  *
  * \retval None
  */
 /*----------------------------------------------------------------------------*/
-VOID TdlsexEventHandle(GLUE_INFO_T *prGlueInfo, UINT_8 *prInBuf, UINT_32 u4InBufLen)
+void TdlsexEventHandle(GLUE_INFO_T *prGlueInfo, u8 *prInBuf, u32 u4InBufLen)
 {
-	UINT_32 u4EventId;
+	u32 u4EventId;
 
 	DBGLOG(TDLS, INFO, "TdlsexEventHandle\n");
 
@@ -1505,7 +1618,7 @@ VOID TdlsexEventHandle(GLUE_INFO_T *prGlueInfo, UINT_8 *prInBuf, UINT_32 u4InBuf
 		return; /* shall not be here */
 
 	/* handle */
-	u4EventId = *(UINT_32 *)prInBuf;
+	u4EventId = *(u32 *)prInBuf;
 	u4InBufLen -= 4;
 
 	switch (u4EventId) {
@@ -1523,24 +1636,24 @@ VOID TdlsexEventHandle(GLUE_INFO_T *prGlueInfo, UINT_8 *prInBuf, UINT_32 u4InBuf
 /*----------------------------------------------------------------------------*/
 /*! \brief  This routine is called to do tear down.
  *
- * \param[in] prGlueInfo		Pointer to the Adapter structure
- * \param[in] prInBuf		A pointer to the command string buffer, from u4EventSubId
- * \param[in] u4InBufLen	The length of the buffer
+ * \param[in] prGlueInfo Pointer to the Adapter structure
+ * \param[in] prInBuf A pointer to the command string buffer, from u4EventSubId
+ * \param[in] u4InBufLen The length of the buffer
  * \param[out] None
  *
  * \retval None
  *
  */
 /*----------------------------------------------------------------------------*/
-VOID TdlsEventTearDown(GLUE_INFO_T *prGlueInfo, UINT_8 *prInBuf, UINT_32 u4InBufLen)
+void TdlsEventTearDown(GLUE_INFO_T *prGlueInfo, u8 *prInBuf, u32 u4InBufLen)
 {
 	STA_RECORD_T *prStaRec;
-	UINT_16		  u2ReasonCode;
-	UINT_32		  u4TearDownSubId;
-	UINT_8	   *pMac, aucZeroMac[6];
+	u16 u2ReasonCode;
+	u32 u4TearDownSubId;
+	u8 *pMac, aucZeroMac[6];
 
 	/* init */
-	u4TearDownSubId = *(UINT_32 *)prInBuf;
+	u4TearDownSubId = *(u32 *)prInBuf;
 	kalMemZero(aucZeroMac, sizeof(aucZeroMac));
 	pMac = aucZeroMac;
 
@@ -1554,39 +1667,50 @@ VOID TdlsEventTearDown(GLUE_INFO_T *prGlueInfo, UINT_8 *prInBuf, UINT_32 u4InBuf
 	if (prStaRec == NULL)
 		return;
 
-	if (fgIsPtiTimeoutSkip == TRUE) {
+	if (fgIsPtiTimeoutSkip == true) {
 		/* skip PTI timeout event */
 		if (u4TearDownSubId == TDLS_HOST_EVENT_TD_PTI_TIMEOUT)
 			return;
 	}
 
 	if (u4TearDownSubId == TDLS_HOST_EVENT_TD_PTI_TIMEOUT) {
-		DBGLOG(TDLS, INFO, "TDLS_HOST_EVENT_TD_PTI_TIMEOUT TDLS_REASON_CODE_UNSPECIFIED\n");
+		DBGLOG(TDLS,
+		       INFO,
+		       "TDLS_HOST_EVENT_TD_PTI_TIMEOUT TDLS_REASON_CODE_UNSPECIFIED\n");
 		u2ReasonCode = TDLS_REASON_CODE_UNSPECIFIED;
 
-		cfg80211_tdls_oper_request(prGlueInfo->prDevHandler, prStaRec->aucMacAddr, NL80211_TDLS_TEARDOWN,
-				WLAN_REASON_TDLS_TEARDOWN_UNREACHABLE, GFP_ATOMIC);
+		cfg80211_tdls_oper_request(
+			prGlueInfo->prDevHandler, prStaRec->aucMacAddr,
+			NL80211_TDLS_TEARDOWN,
+			WLAN_REASON_TDLS_TEARDOWN_UNREACHABLE, GFP_ATOMIC);
 	}
 
 	if (u4TearDownSubId == TDLS_HOST_EVENT_TD_AGE_TIMEOUT) {
-		DBGLOG(TDLS, INFO, "TDLS_HOST_EVENT_TD_AGE_TIMEOUT TDLS_REASON_CODE_UNREACHABLE\n");
+		DBGLOG(TDLS,
+		       INFO,
+		       "TDLS_HOST_EVENT_TD_AGE_TIMEOUT TDLS_REASON_CODE_UNREACHABLE\n");
 		u2ReasonCode = TDLS_REASON_CODE_UNREACHABLE;
 
-		cfg80211_tdls_oper_request(prGlueInfo->prDevHandler, prStaRec->aucMacAddr, NL80211_TDLS_TEARDOWN,
-				WLAN_REASON_TDLS_TEARDOWN_UNREACHABLE, GFP_ATOMIC);
+		cfg80211_tdls_oper_request(
+			prGlueInfo->prDevHandler, prStaRec->aucMacAddr,
+			NL80211_TDLS_TEARDOWN,
+			WLAN_REASON_TDLS_TEARDOWN_UNREACHABLE, GFP_ATOMIC);
 	}
 
 	/*
-	 *  modify the value when supplicant sends tear down to us in TdlsexMgmtCtrl(), not here
-	 *  we want to send tear down to AP (not peer) if PTI timeout or AGE timeout.
+	 *  modify the value when supplicant sends tear down to us in
+	 * TdlsexMgmtCtrl(), not here we want to send tear down to AP (not peer)
+	 * if PTI timeout or AGE timeout.
 	 */
 
-	/* 16 Nov 21:49 2012 http://permalink.gmane.org/gmane.linux.kernel.wireless.general/99712 */
+	/* 16 Nov 21:49 2012
+	 * http://permalink.gmane.org/gmane.linux.kernel.wireless.general/99712
+	 */
 }
 
-VOID TdlsBssExtCapParse(P_STA_RECORD_T prStaRec, P_UINT_8 pucIE)
+void TdlsBssExtCapParse(P_STA_RECORD_T prStaRec, u8 *pucIE)
 {
-	UINT_8 *pucIeExtCap;
+	u8 *pucIeExtCap;
 
 	/* sanity check */
 	if ((prStaRec == NULL) || (pucIE == NULL))
@@ -1598,25 +1722,25 @@ VOID TdlsBssExtCapParse(P_STA_RECORD_T prStaRec, P_UINT_8 pucIE)
 	/*
 	 *  from bit0 ~
 	 *  bit 38: TDLS Prohibited
-	 *  The TDLS Prohibited subfield indicates whether the use of TDLS is prohibited. The
-	 *  field is set to 1 to indicate that TDLS is prohibited and to 0 to indicate that TDLS is
-	 *  allowed.
+	 *  The TDLS Prohibited subfield indicates whether the use of TDLS is
+	 * prohibited. The field is set to 1 to indicate that TDLS is prohibited
+	 * and to 0 to indicate that TDLS is allowed.
 	 */
 	if (IE_LEN(pucIE) < 5)
 		return; /* we need 39/8 = 5 bytes */
 
 	/* init */
-	prStaRec->fgTdlsIsProhibited	 = FALSE;
-	prStaRec->fgTdlsIsChSwProhibited = FALSE;
+	prStaRec->fgTdlsIsProhibited = false;
+	prStaRec->fgTdlsIsChSwProhibited = false;
 
 	/* parse */
 	pucIeExtCap = pucIE + 2;
 	pucIeExtCap += 4; /* shift to the byte we care about */
 
 	if ((*pucIeExtCap) & BIT(38 - 32))
-		prStaRec->fgTdlsIsProhibited = TRUE;
+		prStaRec->fgTdlsIsProhibited = true;
 	if ((*pucIeExtCap) & BIT(39 - 32))
-		prStaRec->fgTdlsIsChSwProhibited = TRUE;
+		prStaRec->fgTdlsIsChSwProhibited = true;
 }
 
 /*----------------------------------------------------------------------------*/
@@ -1629,7 +1753,8 @@ VOID TdlsBssExtCapParse(P_STA_RECORD_T prStaRec, P_UINT_8 pucIE)
  */
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS
-TdlsSendChSwControlCmd(P_ADAPTER_T prAdapter, PVOID pvSetBuffer, UINT_32 u4SetBufferLen, PUINT_32 pu4SetInfoLen)
+TdlsSendChSwControlCmd(P_ADAPTER_T prAdapter, void *pvSetBuffer,
+		       u32 u4SetBufferLen, u32 *pu4SetInfoLen)
 {
 	CMD_TDLS_CH_SW_T rCmdTdlsChSwCtrl;
 
@@ -1638,17 +1763,19 @@ TdlsSendChSwControlCmd(P_ADAPTER_T prAdapter, PVOID pvSetBuffer, UINT_32 u4SetBu
 	/* send command packet for scan */
 	kalMemZero(&rCmdTdlsChSwCtrl, sizeof(CMD_TDLS_CH_SW_T));
 
-	rCmdTdlsChSwCtrl.fgIsTDLSChSwProhibit = prAdapter->prAisBssInfo->fgTdlsIsChSwProhibited;
+	rCmdTdlsChSwCtrl.fgIsTDLSChSwProhibit =
+		prAdapter->prAisBssInfo->fgTdlsIsChSwProhibited;
 
-	wlanSendSetQueryCmd(prAdapter, CMD_ID_SET_TDLS_CH_SW, TRUE, FALSE, FALSE, NULL, NULL, sizeof(CMD_TDLS_CH_SW_T),
-			(PUINT_8)&rCmdTdlsChSwCtrl, NULL, 0);
+	wlanSendSetQueryCmd(prAdapter, CMD_ID_SET_TDLS_CH_SW, true, false,
+			    false, NULL, NULL, sizeof(CMD_TDLS_CH_SW_T),
+			    (u8 *)&rCmdTdlsChSwCtrl, NULL, 0);
 	return TDLS_STATUS_SUCCESS;
 }
 
 WLAN_STATUS
-TdlsTxCtrl(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo, BOOLEAN fgEnable)
+TdlsTxCtrl(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo, u8 fgEnable)
 {
-	int			   i;
+	int i;
 	P_STA_RECORD_T prStaRec;
 
 	for (i = 0; i < CFG_STA_REC_NUM; i++) {
@@ -1657,14 +1784,16 @@ TdlsTxCtrl(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo, BOOLEAN fgEnable)
 		if (prStaRec->eStaType != STA_TYPE_DLS_PEER)
 			continue;
 
-		if (prStaRec->fgIsInUse && prStaRec->ucBssIndex == prBssInfo->ucBssIndex) {
+		if (prStaRec->fgIsInUse &&
+		    prStaRec->ucBssIndex == prBssInfo->ucBssIndex) {
 			qmSetStaRecTxAllowed(prAdapter, prStaRec, fgEnable);
-			DBGLOG(TDLS, EVENT, "TDLS STA[%d], TX ctrl=%d\n", i, fgEnable);
+			DBGLOG(TDLS, EVENT, "TDLS STA[%d], TX ctrl=%d\n", i,
+			       fgEnable);
 		}
 	}
 
 	return TDLS_STATUS_SUCCESS;
 }
-#endif /* CFG_SUPPORT_TDLS */
+#endif
 
 /* End of tdls.c */

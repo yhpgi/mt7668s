@@ -6,64 +6,68 @@
 /*! \file   "scan_fsm.c"
  *    \brief  This file defines the state transition function for SCAN FSM.
  *
- *    The SCAN FSM is part of SCAN MODULE and responsible for performing basic SCAN
- *    behavior as metioned in IEEE 802.11 2007 11.1.3.1 & 11.1.3.2 .
+ *    The SCAN FSM is part of SCAN MODULE and responsible for performing basic
+ * SCAN behavior as metioned in IEEE 802.11 2007 11.1.3.1 & 11.1.3.2 .
  */
 
 /*******************************************************************************
  *                         C O M P I L E R   F L A G S
- ********************************************************************************
+ *******************************************************************************
  */
 
 /*******************************************************************************
  *                    E X T E R N A L   R E F E R E N C E S
- ********************************************************************************
+ *******************************************************************************
  */
+
 #include "precomp.h"
 
 /*******************************************************************************
  *                              C O N S T A N T S
- ********************************************************************************
+ *******************************************************************************
  */
 
 /*******************************************************************************
  *                             D A T A   T Y P E S
- ********************************************************************************
+ *******************************************************************************
  */
 
 /*******************************************************************************
  *                            P U B L I C   D A T A
- ********************************************************************************
+ *******************************************************************************
  */
-UINT_8 g_aucScanChannelNum[SCN_SCAN_DONE_PRINT_BUFFER_LENGTH];
-UINT_8 g_aucScanChannelIdleTime[SCN_SCAN_DONE_PRINT_BUFFER_LENGTH];
-UINT_8 g_aucScanChannelMDRDY[SCN_SCAN_DONE_PRINT_BUFFER_LENGTH];
+
+u8 g_aucScanChannelNum[SCN_SCAN_DONE_PRINT_BUFFER_LENGTH];
+u8 g_aucScanChannelIdleTime[SCN_SCAN_DONE_PRINT_BUFFER_LENGTH];
+u8 g_aucScanChannelMDRDY[SCN_SCAN_DONE_PRINT_BUFFER_LENGTH];
 
 /*******************************************************************************
  *                           P R I V A T E   D A T A
- ********************************************************************************
+ *******************************************************************************
  */
+
 #if !DBG_DISABLE_ALL_LOG
-static PUINT_8 apucDebugScanState[SCAN_STATE_NUM] = {
-	(PUINT_8)DISP_STRING("IDLE"),
-	(PUINT_8)DISP_STRING("SCANNING"),
+static u8 *apucDebugScanState[SCAN_STATE_NUM] = {
+	(u8 *)DISP_STRING("IDLE"),
+	(u8 *)DISP_STRING("SCANNING"),
 };
 #endif
 
 /*******************************************************************************
  *                                 M A C R O S
- ********************************************************************************
+ *******************************************************************************
  */
 
 /*******************************************************************************
  *                   F U N C T I O N   D E C L A R A T I O N S
- ********************************************************************************
+ *******************************************************************************
  */
 
 /*******************************************************************************
  *                              F U N C T I O N S
- ********************************************************************************
+ *******************************************************************************
  */
+
 /*----------------------------------------------------------------------------*/
 /*!
  * \brief
@@ -73,45 +77,61 @@ static PUINT_8 apucDebugScanState[SCAN_STATE_NUM] = {
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-VOID scnFsmSteps(IN P_ADAPTER_T prAdapter, IN ENUM_SCAN_STATE_T eNextState)
+void scnFsmSteps(IN P_ADAPTER_T prAdapter, IN ENUM_SCAN_STATE_T eNextState)
 {
-	P_SCAN_INFO_T  prScanInfo;
+	P_SCAN_INFO_T prScanInfo;
 	P_SCAN_PARAM_T prScanParam;
-	P_MSG_HDR_T	   prMsgHdr;
+	P_MSG_HDR_T prMsgHdr;
 
-	BOOLEAN fgIsTransition = (BOOLEAN)FALSE;
+	u8 fgIsTransition = (u8) false;
 
-	prScanInfo	= &(prAdapter->rWifiVar.rScanInfo);
+	prScanInfo = &(prAdapter->rWifiVar.rScanInfo);
 	prScanParam = &prScanInfo->rScanParam;
 
 	do {
-		DBGLOG(SCN, STATE, "[SCAN]TRANSITION: [%s] -> [%s]\n", apucDebugScanState[prScanInfo->eCurrentState],
-				apucDebugScanState[eNextState]);
+		DBGLOG(SCN, STATE, "[SCAN]TRANSITION: [%s] -> [%s]\n",
+		       apucDebugScanState[prScanInfo->eCurrentState],
+		       apucDebugScanState[eNextState]);
 
-		/* NOTE(Kevin): This is the only place to change the eCurrentState(except initial) */
+		/* NOTE(Kevin): This is the only place to change the
+		 * eCurrentState(except initial) */
 		prScanInfo->eCurrentState = eNextState;
 
-		fgIsTransition = (BOOLEAN)FALSE;
+		fgIsTransition = (u8) false;
 
 		switch (prScanInfo->eCurrentState) {
 		case SCAN_STATE_IDLE:
 			/* check for pending scanning requests */
 			if (!LINK_IS_EMPTY(&(prScanInfo->rPendingMsgList))) {
-				/* load next message from pending list as scan parameters */
-				LINK_REMOVE_HEAD(&(prScanInfo->rPendingMsgList), prMsgHdr, P_MSG_HDR_T);
+				/* load next message from pending list as scan
+				 * parameters */
+				LINK_REMOVE_HEAD(&(prScanInfo->rPendingMsgList),
+						 prMsgHdr, P_MSG_HDR_T);
 
-				if (prMsgHdr->eMsgId == MID_AIS_SCN_SCAN_REQ || prMsgHdr->eMsgId == MID_BOW_SCN_SCAN_REQ ||
-						prMsgHdr->eMsgId == MID_P2P_SCN_SCAN_REQ || prMsgHdr->eMsgId == MID_RLM_SCN_SCAN_REQ) {
-					scnFsmHandleScanMsg(prAdapter, (P_MSG_SCN_SCAN_REQ)prMsgHdr);
+				if (prMsgHdr->eMsgId == MID_AIS_SCN_SCAN_REQ ||
+				    prMsgHdr->eMsgId == MID_BOW_SCN_SCAN_REQ ||
+				    prMsgHdr->eMsgId == MID_P2P_SCN_SCAN_REQ ||
+				    prMsgHdr->eMsgId == MID_RLM_SCN_SCAN_REQ) {
+					scnFsmHandleScanMsg(
+						prAdapter,
+						(P_MSG_SCN_SCAN_REQ)prMsgHdr);
 
-					eNextState	   = SCAN_STATE_SCANNING;
-					fgIsTransition = TRUE;
-				} else if (prMsgHdr->eMsgId == MID_AIS_SCN_SCAN_REQ_V2 || prMsgHdr->eMsgId == MID_BOW_SCN_SCAN_REQ_V2 ||
-						   prMsgHdr->eMsgId == MID_P2P_SCN_SCAN_REQ_V2 || prMsgHdr->eMsgId == MID_RLM_SCN_SCAN_REQ_V2) {
-					scnFsmHandleScanMsgV2(prAdapter, (P_MSG_SCN_SCAN_REQ_V2)prMsgHdr);
+					eNextState = SCAN_STATE_SCANNING;
+					fgIsTransition = true;
+				} else if (prMsgHdr->eMsgId ==
+					   MID_AIS_SCN_SCAN_REQ_V2 ||
+					   prMsgHdr->eMsgId ==
+					   MID_BOW_SCN_SCAN_REQ_V2 ||
+					   prMsgHdr->eMsgId ==
+					   MID_P2P_SCN_SCAN_REQ_V2 ||
+					   prMsgHdr->eMsgId ==
+					   MID_RLM_SCN_SCAN_REQ_V2) {
+					scnFsmHandleScanMsgV2(
+						prAdapter,
+						(P_MSG_SCN_SCAN_REQ_V2)prMsgHdr);
 
-					eNextState	   = SCAN_STATE_SCANNING;
-					fgIsTransition = TRUE;
+					eNextState = SCAN_STATE_SCANNING;
+					fgIsTransition = true;
 				} else {
 					/* should not happen */
 					ASSERT(0);
@@ -123,7 +143,7 @@ VOID scnFsmSteps(IN P_ADAPTER_T prAdapter, IN ENUM_SCAN_STATE_T eNextState)
 			break;
 
 		case SCAN_STATE_SCANNING:
-			if (prScanParam->fgIsScanV2 == FALSE)
+			if (prScanParam->fgIsScanV2 == false)
 				scnSendScanReq(prAdapter);
 			else
 				scnSendScanReqV2(prAdapter);
@@ -145,60 +165,68 @@ VOID scnFsmSteps(IN P_ADAPTER_T prAdapter, IN ENUM_SCAN_STATE_T eNextState)
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-VOID scnSendScanReq(IN P_ADAPTER_T prAdapter)
+void scnSendScanReq(IN P_ADAPTER_T prAdapter)
 {
-	P_SCAN_INFO_T  prScanInfo;
+	P_SCAN_INFO_T prScanInfo;
 	P_SCAN_PARAM_T prScanParam;
-	CMD_SCAN_REQ   rCmdScanReq;
-	UINT_32		   i;
+	CMD_SCAN_REQ rCmdScanReq;
+	u32 i;
 
 	ASSERT(prAdapter);
 
-	prScanInfo	= &(prAdapter->rWifiVar.rScanInfo);
+	prScanInfo = &(prAdapter->rWifiVar.rScanInfo);
 	prScanParam = &prScanInfo->rScanParam;
 
 	/* send command packet for scan */
 	kalMemZero(&rCmdScanReq, sizeof(CMD_SCAN_REQ));
 
-	rCmdScanReq.ucSeqNum   = prScanParam->ucSeqNum;
+	rCmdScanReq.ucSeqNum = prScanParam->ucSeqNum;
 	rCmdScanReq.ucBssIndex = prScanParam->ucBssIndex;
-	rCmdScanReq.ucScanType = (UINT_8)prScanParam->eScanType;
+	rCmdScanReq.ucScanType = (u8)prScanParam->eScanType;
 	rCmdScanReq.ucSSIDType = prScanParam->ucSSIDType;
 
 	if (prScanParam->ucSSIDNum == 1) {
-		COPY_SSID(rCmdScanReq.aucSSID, rCmdScanReq.ucSSIDLength, prScanParam->aucSpecifiedSSID[0],
-				prScanParam->ucSpecifiedSSIDLen[0]);
+		COPY_SSID(rCmdScanReq.aucSSID, rCmdScanReq.ucSSIDLength,
+			  prScanParam->aucSpecifiedSSID[0],
+			  prScanParam->ucSpecifiedSSIDLen[0]);
 	}
 
-	rCmdScanReq.ucChannelType = (UINT_8)prScanParam->eScanChannel;
+	rCmdScanReq.ucChannelType = (u8)prScanParam->eScanChannel;
 
 	if (prScanParam->eScanChannel == SCAN_CHANNEL_SPECIFIED) {
 		/* P2P would use:
 		 * 1. Specified Listen Channel of passive scan for LISTEN state.
-		 * 2. Specified Listen Channel of Target Device of active scan for SEARCH state. (Target != NULL)
+		 * 2. Specified Listen Channel of Target Device of active scan
+		 * for SEARCH state. (Target != NULL)
 		 */
 		rCmdScanReq.ucChannelListNum = prScanParam->ucChannelListNum;
 
 		for (i = 0; i < rCmdScanReq.ucChannelListNum; i++) {
-			rCmdScanReq.arChannelList[i].ucBand = (UINT_8)prScanParam->arChnlInfoList[i].eBand;
+			rCmdScanReq.arChannelList[i].ucBand =
+				(u8)prScanParam->arChnlInfoList[i].eBand;
 
-			rCmdScanReq.arChannelList[i].ucChannelNum = (UINT_8)prScanParam->arChnlInfoList[i].ucChannelNum;
+			rCmdScanReq.arChannelList[i].ucChannelNum =
+				(u8)prScanParam->arChnlInfoList[i].ucChannelNum;
 		}
 	}
 
 	rCmdScanReq.u2ChannelDwellTime = prScanParam->u2ChannelDwellTime;
-	rCmdScanReq.u2TimeoutValue	   = prScanParam->u2TimeoutValue;
+	rCmdScanReq.u2TimeoutValue = prScanParam->u2TimeoutValue;
 
 	if (prScanParam->u2IELen <= MAX_IE_LENGTH)
 		rCmdScanReq.u2IELen = prScanParam->u2IELen;
 	else
 		rCmdScanReq.u2IELen = MAX_IE_LENGTH;
 
-	if (prScanParam->u2IELen)
-		kalMemCopy(rCmdScanReq.aucIE, prScanParam->aucIE, sizeof(UINT_8) * rCmdScanReq.u2IELen);
+	if (prScanParam->u2IELen) {
+		kalMemCopy(rCmdScanReq.aucIE, prScanParam->aucIE,
+			   sizeof(u8) * rCmdScanReq.u2IELen);
+	}
 
-	wlanSendSetQueryCmd(prAdapter, CMD_ID_SCAN_REQ, TRUE, FALSE, FALSE, NULL, NULL,
-			OFFSET_OF(CMD_SCAN_REQ, aucIE) + rCmdScanReq.u2IELen, (PUINT_8)&rCmdScanReq, NULL, 0);
+	wlanSendSetQueryCmd(
+		prAdapter, CMD_ID_SCAN_REQ, true, false, false, NULL, NULL,
+		OFFSET_OF(CMD_SCAN_REQ, aucIE) + rCmdScanReq.u2IELen,
+		(u8 *)&rCmdScanReq, NULL, 0);
 }
 
 /*----------------------------------------------------------------------------*/
@@ -210,62 +238,71 @@ VOID scnSendScanReq(IN P_ADAPTER_T prAdapter)
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-VOID scnSendScanReqV2(IN P_ADAPTER_T prAdapter)
+void scnSendScanReqV2(IN P_ADAPTER_T prAdapter)
 {
-	P_SCAN_INFO_T	prScanInfo;
-	P_SCAN_PARAM_T	prScanParam;
+	P_SCAN_INFO_T prScanInfo;
+	P_SCAN_PARAM_T prScanParam;
 	CMD_SCAN_REQ_V2 rCmdScanReq;
-	UINT_32			i;
+	u32 i;
 
 	ASSERT(prAdapter);
 
-	prScanInfo	= &(prAdapter->rWifiVar.rScanInfo);
+	prScanInfo = &(prAdapter->rWifiVar.rScanInfo);
 	prScanParam = &prScanInfo->rScanParam;
 
 	/* send command packet for scan */
 	kalMemZero(&rCmdScanReq, sizeof(CMD_SCAN_REQ_V2));
 
-	rCmdScanReq.ucSeqNum   = prScanParam->ucSeqNum;
+	rCmdScanReq.ucSeqNum = prScanParam->ucSeqNum;
 	rCmdScanReq.ucBssIndex = prScanParam->ucBssIndex;
-	rCmdScanReq.ucScanType = (UINT_8)prScanParam->eScanType;
+	rCmdScanReq.ucScanType = (u8)prScanParam->eScanType;
 	rCmdScanReq.ucSSIDType = prScanParam->ucSSIDType;
-	rCmdScanReq.ucSSIDNum  = prScanParam->ucSSIDNum;
+	rCmdScanReq.ucSSIDNum = prScanParam->ucSSIDNum;
 
 	for (i = 0; i < prScanParam->ucSSIDNum; i++) {
-		COPY_SSID(rCmdScanReq.arSSID[i].aucSsid, rCmdScanReq.arSSID[i].u4SsidLen, prScanParam->aucSpecifiedSSID[i],
-				prScanParam->ucSpecifiedSSIDLen[i]);
+		COPY_SSID(rCmdScanReq.arSSID[i].aucSsid,
+			  rCmdScanReq.arSSID[i].u4SsidLen,
+			  prScanParam->aucSpecifiedSSID[i],
+			  prScanParam->ucSpecifiedSSIDLen[i]);
 	}
 
-	rCmdScanReq.u2ProbeDelayTime = (UINT_8)prScanParam->u2ProbeDelayTime;
-	rCmdScanReq.ucChannelType	 = (UINT_8)prScanParam->eScanChannel;
+	rCmdScanReq.u2ProbeDelayTime = (u8)prScanParam->u2ProbeDelayTime;
+	rCmdScanReq.ucChannelType = (u8)prScanParam->eScanChannel;
 
 	if (prScanParam->eScanChannel == SCAN_CHANNEL_SPECIFIED) {
 		/* P2P would use:
 		 * 1. Specified Listen Channel of passive scan for LISTEN state.
-		 * 2. Specified Listen Channel of Target Device of active scan for SEARCH state. (Target != NULL)
+		 * 2. Specified Listen Channel of Target Device of active scan
+		 * for SEARCH state. (Target != NULL)
 		 */
 		rCmdScanReq.ucChannelListNum = prScanParam->ucChannelListNum;
 
 		for (i = 0; i < rCmdScanReq.ucChannelListNum; i++) {
-			rCmdScanReq.arChannelList[i].ucBand = (UINT_8)prScanParam->arChnlInfoList[i].eBand;
+			rCmdScanReq.arChannelList[i].ucBand =
+				(u8)prScanParam->arChnlInfoList[i].eBand;
 
-			rCmdScanReq.arChannelList[i].ucChannelNum = (UINT_8)prScanParam->arChnlInfoList[i].ucChannelNum;
+			rCmdScanReq.arChannelList[i].ucChannelNum =
+				(u8)prScanParam->arChnlInfoList[i].ucChannelNum;
 		}
 	}
 
 	rCmdScanReq.u2ChannelDwellTime = prScanParam->u2ChannelDwellTime;
-	rCmdScanReq.u2TimeoutValue	   = prScanParam->u2TimeoutValue;
+	rCmdScanReq.u2TimeoutValue = prScanParam->u2TimeoutValue;
 
 	if (prScanParam->u2IELen <= MAX_IE_LENGTH)
 		rCmdScanReq.u2IELen = prScanParam->u2IELen;
 	else
 		rCmdScanReq.u2IELen = MAX_IE_LENGTH;
 
-	if (prScanParam->u2IELen)
-		kalMemCopy(rCmdScanReq.aucIE, prScanParam->aucIE, sizeof(UINT_8) * rCmdScanReq.u2IELen);
+	if (prScanParam->u2IELen) {
+		kalMemCopy(rCmdScanReq.aucIE, prScanParam->aucIE,
+			   sizeof(u8) * rCmdScanReq.u2IELen);
+	}
 
-	wlanSendSetQueryCmd(prAdapter, CMD_ID_SCAN_REQ_V2, TRUE, FALSE, FALSE, NULL, NULL,
-			OFFSET_OF(CMD_SCAN_REQ_V2, aucIE) + rCmdScanReq.u2IELen, (PUINT_8)&rCmdScanReq, NULL, 0);
+	wlanSendSetQueryCmd(
+		prAdapter, CMD_ID_SCAN_REQ_V2, true, false, false, NULL, NULL,
+		OFFSET_OF(CMD_SCAN_REQ_V2, aucIE) + rCmdScanReq.u2IELen,
+		(u8 *)&rCmdScanReq, NULL, 0);
 }
 
 /*----------------------------------------------------------------------------*/
@@ -277,23 +314,29 @@ VOID scnSendScanReqV2(IN P_ADAPTER_T prAdapter)
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-VOID scnFsmMsgStart(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMsgHdr)
+void scnFsmMsgStart(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMsgHdr)
 {
-	P_SCAN_INFO_T  prScanInfo;
+	P_SCAN_INFO_T prScanInfo;
 	P_SCAN_PARAM_T prScanParam;
 
 	ASSERT(prMsgHdr);
 
-	prScanInfo	= &(prAdapter->rWifiVar.rScanInfo);
+	prScanInfo = &(prAdapter->rWifiVar.rScanInfo);
 	prScanParam = &prScanInfo->rScanParam;
 
 	if (prScanInfo->eCurrentState == SCAN_STATE_IDLE) {
-		if (prMsgHdr->eMsgId == MID_AIS_SCN_SCAN_REQ || prMsgHdr->eMsgId == MID_BOW_SCN_SCAN_REQ ||
-				prMsgHdr->eMsgId == MID_P2P_SCN_SCAN_REQ || prMsgHdr->eMsgId == MID_RLM_SCN_SCAN_REQ) {
-			scnFsmHandleScanMsg(prAdapter, (P_MSG_SCN_SCAN_REQ)prMsgHdr);
-		} else if (prMsgHdr->eMsgId == MID_AIS_SCN_SCAN_REQ_V2 || prMsgHdr->eMsgId == MID_BOW_SCN_SCAN_REQ_V2 ||
-				   prMsgHdr->eMsgId == MID_P2P_SCN_SCAN_REQ_V2 || prMsgHdr->eMsgId == MID_RLM_SCN_SCAN_REQ_V2) {
-			scnFsmHandleScanMsgV2(prAdapter, (P_MSG_SCN_SCAN_REQ_V2)prMsgHdr);
+		if (prMsgHdr->eMsgId == MID_AIS_SCN_SCAN_REQ ||
+		    prMsgHdr->eMsgId == MID_BOW_SCN_SCAN_REQ ||
+		    prMsgHdr->eMsgId == MID_P2P_SCN_SCAN_REQ ||
+		    prMsgHdr->eMsgId == MID_RLM_SCN_SCAN_REQ) {
+			scnFsmHandleScanMsg(prAdapter,
+					    (P_MSG_SCN_SCAN_REQ)prMsgHdr);
+		} else if (prMsgHdr->eMsgId == MID_AIS_SCN_SCAN_REQ_V2 ||
+			   prMsgHdr->eMsgId == MID_BOW_SCN_SCAN_REQ_V2 ||
+			   prMsgHdr->eMsgId == MID_P2P_SCN_SCAN_REQ_V2 ||
+			   prMsgHdr->eMsgId == MID_RLM_SCN_SCAN_REQ_V2) {
+			scnFsmHandleScanMsgV2(prAdapter,
+					      (P_MSG_SCN_SCAN_REQ_V2)prMsgHdr);
 		} else {
 			/* should not deliver to this function */
 			ASSERT(0);
@@ -302,7 +345,8 @@ VOID scnFsmMsgStart(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMsgHdr)
 		cnmMemFree(prAdapter, prMsgHdr);
 		scnFsmSteps(prAdapter, SCAN_STATE_SCANNING);
 	} else {
-		LINK_INSERT_TAIL(&prScanInfo->rPendingMsgList, &prMsgHdr->rLinkEntry);
+		LINK_INSERT_TAIL(&prScanInfo->rPendingMsgList,
+				 &prMsgHdr->rLinkEntry);
 	}
 }
 
@@ -315,41 +359,50 @@ VOID scnFsmMsgStart(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMsgHdr)
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-VOID scnFsmMsgAbort(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMsgHdr)
+void scnFsmMsgAbort(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMsgHdr)
 {
 	P_MSG_SCN_SCAN_CANCEL prScanCancel;
-	P_SCAN_INFO_T		  prScanInfo;
-	P_SCAN_PARAM_T		  prScanParam;
-	CMD_SCAN_CANCEL		  rCmdScanCancel;
+	P_SCAN_INFO_T prScanInfo;
+	P_SCAN_PARAM_T prScanParam;
+	CMD_SCAN_CANCEL rCmdScanCancel;
 
 	kalMemZero(&rCmdScanCancel, sizeof(CMD_SCAN_CANCEL));
 	ASSERT(prMsgHdr);
 
 	prScanCancel = (P_MSG_SCN_SCAN_CANCEL)prMsgHdr;
-	prScanInfo	 = &(prAdapter->rWifiVar.rScanInfo);
-	prScanParam	 = &prScanInfo->rScanParam;
+	prScanInfo = &(prAdapter->rWifiVar.rScanInfo);
+	prScanParam = &prScanInfo->rScanParam;
 
 	if (prScanInfo->eCurrentState != SCAN_STATE_IDLE) {
-		if (prScanCancel->ucSeqNum == prScanParam->ucSeqNum && prScanCancel->ucBssIndex == prScanParam->ucBssIndex) {
+		if (prScanCancel->ucSeqNum == prScanParam->ucSeqNum &&
+		    prScanCancel->ucBssIndex == prScanParam->ucBssIndex) {
 			ENUM_SCAN_STATUS eStatus = SCAN_STATUS_DONE;
 			/* send cancel message to firmware domain */
-			rCmdScanCancel.ucSeqNum		  = prScanParam->ucSeqNum;
-			rCmdScanCancel.ucIsExtChannel = (UINT_8)prScanCancel->fgIsChannelExt;
+			rCmdScanCancel.ucSeqNum = prScanParam->ucSeqNum;
+			rCmdScanCancel.ucIsExtChannel =
+				(u8)prScanCancel->fgIsChannelExt;
 
-			wlanSendSetQueryCmd(prAdapter, CMD_ID_SCAN_CANCEL, TRUE, FALSE, FALSE, NULL, NULL, sizeof(CMD_SCAN_CANCEL),
-					(PUINT_8)&rCmdScanCancel, NULL, 0);
+			wlanSendSetQueryCmd(prAdapter, CMD_ID_SCAN_CANCEL, true,
+					    false, false, NULL, NULL,
+					    sizeof(CMD_SCAN_CANCEL),
+					    (u8 *)&rCmdScanCancel, NULL, 0);
 
 			/* generate scan-done event for caller */
 			if (prScanCancel->fgIsOidRequest)
 				eStatus = SCAN_STATUS_CANCELLED;
 			else
 				eStatus = SCAN_STATUS_DONE;
-			scnFsmGenerateScanDoneMsg(prAdapter, prScanParam->ucSeqNum, prScanParam->ucBssIndex, eStatus);
+			scnFsmGenerateScanDoneMsg(prAdapter,
+						  prScanParam->ucSeqNum,
+						  prScanParam->ucBssIndex,
+						  eStatus);
 
 			/* switch to next pending scan */
 			scnFsmSteps(prAdapter, SCAN_STATE_IDLE);
 		} else {
-			scnFsmRemovePendingMsg(prAdapter, prScanCancel->ucSeqNum, prScanCancel->ucBssIndex);
+			scnFsmRemovePendingMsg(prAdapter,
+					       prScanCancel->ucSeqNum,
+					       prScanCancel->ucBssIndex);
 		}
 	}
 
@@ -365,26 +418,29 @@ VOID scnFsmMsgAbort(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMsgHdr)
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-VOID scnFsmHandleScanMsg(IN P_ADAPTER_T prAdapter, IN P_MSG_SCN_SCAN_REQ prScanReqMsg)
+void scnFsmHandleScanMsg(IN P_ADAPTER_T prAdapter,
+			 IN P_MSG_SCN_SCAN_REQ prScanReqMsg)
 {
-	P_SCAN_INFO_T  prScanInfo;
+	P_SCAN_INFO_T prScanInfo;
 	P_SCAN_PARAM_T prScanParam;
-	UINT_32		   i;
+	u32 i;
 
 	ASSERT(prAdapter);
 	ASSERT(prScanReqMsg);
 
-	prScanInfo	= &(prAdapter->rWifiVar.rScanInfo);
+	prScanInfo = &(prAdapter->rWifiVar.rScanInfo);
 	prScanParam = &prScanInfo->rScanParam;
 
-	prScanParam->eScanType	= prScanReqMsg->eScanType;
+	prScanParam->eScanType = prScanReqMsg->eScanType;
 	prScanParam->ucBssIndex = prScanReqMsg->ucBssIndex;
 	prScanParam->ucSSIDType = prScanReqMsg->ucSSIDType;
-	if (prScanParam->ucSSIDType & (SCAN_REQ_SSID_SPECIFIED | SCAN_REQ_SSID_P2P_WILDCARD)) {
+	if (prScanParam->ucSSIDType &
+	    (SCAN_REQ_SSID_SPECIFIED | SCAN_REQ_SSID_P2P_WILDCARD)) {
 		prScanParam->ucSSIDNum = 1;
 
-		COPY_SSID(prScanParam->aucSpecifiedSSID[0], prScanParam->ucSpecifiedSSIDLen[0], prScanReqMsg->aucSSID,
-				prScanReqMsg->ucSSIDLength);
+		COPY_SSID(prScanParam->aucSpecifiedSSID[0],
+			  prScanParam->ucSpecifiedSSIDLen[0],
+			  prScanReqMsg->aucSSID, prScanReqMsg->ucSSIDLength);
 
 		/* reset SSID length to zero for rest array entries */
 		for (i = 1; i < SCN_SSID_MAX_NUM; i++)
@@ -397,15 +453,21 @@ VOID scnFsmHandleScanMsg(IN P_ADAPTER_T prAdapter, IN P_MSG_SCN_SCAN_REQ prScanR
 	}
 
 	prScanParam->u2ProbeDelayTime = 0;
-	prScanParam->eScanChannel	  = prScanReqMsg->eScanChannel;
+	prScanParam->eScanChannel = prScanReqMsg->eScanChannel;
 	if (prScanParam->eScanChannel == SCAN_CHANNEL_SPECIFIED) {
-		if (prScanReqMsg->ucChannelListNum <= MAXIMUM_OPERATION_CHANNEL_LIST)
-			prScanParam->ucChannelListNum = prScanReqMsg->ucChannelListNum;
-		else
-			prScanParam->ucChannelListNum = MAXIMUM_OPERATION_CHANNEL_LIST;
+		if (prScanReqMsg->ucChannelListNum <=
+		    MAXIMUM_OPERATION_CHANNEL_LIST) {
+			prScanParam->ucChannelListNum =
+				prScanReqMsg->ucChannelListNum;
+		} else {
+			prScanParam->ucChannelListNum =
+				MAXIMUM_OPERATION_CHANNEL_LIST;
+		}
 
-		kalMemCopy(prScanParam->arChnlInfoList, prScanReqMsg->arChnlInfoList,
-				sizeof(RF_CHANNEL_INFO_T) * prScanParam->ucChannelListNum);
+		kalMemCopy(prScanParam->arChnlInfoList,
+			   prScanReqMsg->arChnlInfoList,
+			   sizeof(RF_CHANNEL_INFO_T) *
+			   prScanParam->ucChannelListNum);
 	}
 
 	if (prScanReqMsg->u2IELen <= MAX_IE_LENGTH)
@@ -413,19 +475,21 @@ VOID scnFsmHandleScanMsg(IN P_ADAPTER_T prAdapter, IN P_MSG_SCN_SCAN_REQ prScanR
 	else
 		prScanParam->u2IELen = MAX_IE_LENGTH;
 
-	if (prScanParam->u2IELen)
-		kalMemCopy(prScanParam->aucIE, prScanReqMsg->aucIE, prScanParam->u2IELen);
+	if (prScanParam->u2IELen) {
+		kalMemCopy(prScanParam->aucIE, prScanReqMsg->aucIE,
+			   prScanParam->u2IELen);
+	}
 
 	prScanParam->u2ChannelDwellTime = prScanReqMsg->u2ChannelDwellTime;
-	prScanParam->u2TimeoutValue		= prScanReqMsg->u2TimeoutValue;
-	prScanParam->ucSeqNum			= prScanReqMsg->ucSeqNum;
+	prScanParam->u2TimeoutValue = prScanReqMsg->u2TimeoutValue;
+	prScanParam->ucSeqNum = prScanReqMsg->ucSeqNum;
 
 	if (prScanReqMsg->rMsgHdr.eMsgId == MID_RLM_SCN_SCAN_REQ)
-		prScanParam->fgIsObssScan = TRUE;
+		prScanParam->fgIsObssScan = true;
 	else
-		prScanParam->fgIsObssScan = FALSE;
+		prScanParam->fgIsObssScan = false;
 
-	prScanParam->fgIsScanV2 = FALSE;
+	prScanParam->fgIsScanV2 = false;
 }
 
 /*----------------------------------------------------------------------------*/
@@ -437,39 +501,48 @@ VOID scnFsmHandleScanMsg(IN P_ADAPTER_T prAdapter, IN P_MSG_SCN_SCAN_REQ prScanR
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-VOID scnFsmHandleScanMsgV2(IN P_ADAPTER_T prAdapter, IN P_MSG_SCN_SCAN_REQ_V2 prScanReqMsg)
+void scnFsmHandleScanMsgV2(IN P_ADAPTER_T prAdapter,
+			   IN P_MSG_SCN_SCAN_REQ_V2 prScanReqMsg)
 {
-	P_SCAN_INFO_T  prScanInfo;
+	P_SCAN_INFO_T prScanInfo;
 	P_SCAN_PARAM_T prScanParam;
-	UINT_32		   i;
+	u32 i;
 
 	ASSERT(prAdapter);
 	ASSERT(prScanReqMsg);
 	ASSERT(prScanReqMsg->ucSSIDNum <= SCN_SSID_MAX_NUM);
 
-	prScanInfo	= &(prAdapter->rWifiVar.rScanInfo);
+	prScanInfo = &(prAdapter->rWifiVar.rScanInfo);
 	prScanParam = &prScanInfo->rScanParam;
 
-	prScanParam->eScanType	= prScanReqMsg->eScanType;
+	prScanParam->eScanType = prScanReqMsg->eScanType;
 	prScanParam->ucBssIndex = prScanReqMsg->ucBssIndex;
 	prScanParam->ucSSIDType = prScanReqMsg->ucSSIDType;
-	prScanParam->ucSSIDNum	= prScanReqMsg->ucSSIDNum;
+	prScanParam->ucSSIDNum = prScanReqMsg->ucSSIDNum;
 
 	for (i = 0; i < prScanReqMsg->ucSSIDNum; i++) {
-		COPY_SSID(prScanParam->aucSpecifiedSSID[i], prScanParam->ucSpecifiedSSIDLen[i], prScanReqMsg->prSsid[i].aucSsid,
-				(UINT_8)prScanReqMsg->prSsid[i].u4SsidLen);
+		COPY_SSID(prScanParam->aucSpecifiedSSID[i],
+			  prScanParam->ucSpecifiedSSIDLen[i],
+			  prScanReqMsg->prSsid[i].aucSsid,
+			  (u8)prScanReqMsg->prSsid[i].u4SsidLen);
 	}
 
 	prScanParam->u2ProbeDelayTime = prScanReqMsg->u2ProbeDelay;
-	prScanParam->eScanChannel	  = prScanReqMsg->eScanChannel;
+	prScanParam->eScanChannel = prScanReqMsg->eScanChannel;
 	if (prScanParam->eScanChannel == SCAN_CHANNEL_SPECIFIED) {
-		if (prScanReqMsg->ucChannelListNum <= MAXIMUM_OPERATION_CHANNEL_LIST)
-			prScanParam->ucChannelListNum = prScanReqMsg->ucChannelListNum;
-		else
-			prScanParam->ucChannelListNum = MAXIMUM_OPERATION_CHANNEL_LIST;
+		if (prScanReqMsg->ucChannelListNum <=
+		    MAXIMUM_OPERATION_CHANNEL_LIST) {
+			prScanParam->ucChannelListNum =
+				prScanReqMsg->ucChannelListNum;
+		} else {
+			prScanParam->ucChannelListNum =
+				MAXIMUM_OPERATION_CHANNEL_LIST;
+		}
 
-		kalMemCopy(prScanParam->arChnlInfoList, prScanReqMsg->arChnlInfoList,
-				sizeof(RF_CHANNEL_INFO_T) * prScanParam->ucChannelListNum);
+		kalMemCopy(prScanParam->arChnlInfoList,
+			   prScanReqMsg->arChnlInfoList,
+			   sizeof(RF_CHANNEL_INFO_T) *
+			   prScanParam->ucChannelListNum);
 	}
 
 	if (prScanReqMsg->u2IELen <= MAX_IE_LENGTH)
@@ -477,19 +550,21 @@ VOID scnFsmHandleScanMsgV2(IN P_ADAPTER_T prAdapter, IN P_MSG_SCN_SCAN_REQ_V2 pr
 	else
 		prScanParam->u2IELen = MAX_IE_LENGTH;
 
-	if (prScanParam->u2IELen)
-		kalMemCopy(prScanParam->aucIE, prScanReqMsg->aucIE, prScanParam->u2IELen);
+	if (prScanParam->u2IELen) {
+		kalMemCopy(prScanParam->aucIE, prScanReqMsg->aucIE,
+			   prScanParam->u2IELen);
+	}
 
 	prScanParam->u2ChannelDwellTime = prScanReqMsg->u2ChannelDwellTime;
-	prScanParam->u2TimeoutValue		= prScanReqMsg->u2TimeoutValue;
-	prScanParam->ucSeqNum			= prScanReqMsg->ucSeqNum;
+	prScanParam->u2TimeoutValue = prScanReqMsg->u2TimeoutValue;
+	prScanParam->ucSeqNum = prScanReqMsg->ucSeqNum;
 
 	if (prScanReqMsg->rMsgHdr.eMsgId == MID_RLM_SCN_SCAN_REQ)
-		prScanParam->fgIsObssScan = TRUE;
+		prScanParam->fgIsObssScan = true;
 	else
-		prScanParam->fgIsObssScan = FALSE;
+		prScanParam->fgIsObssScan = false;
 
-	prScanParam->fgIsScanV2 = TRUE;
+	prScanParam->fgIsScanV2 = true;
 }
 
 /*----------------------------------------------------------------------------*/
@@ -501,53 +576,65 @@ VOID scnFsmHandleScanMsgV2(IN P_ADAPTER_T prAdapter, IN P_MSG_SCN_SCAN_REQ_V2 pr
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-VOID scnFsmRemovePendingMsg(IN P_ADAPTER_T prAdapter, IN UINT_8 ucSeqNum, IN UINT_8 ucBssIndex)
+void scnFsmRemovePendingMsg(IN P_ADAPTER_T prAdapter, IN u8 ucSeqNum,
+			    IN u8 ucBssIndex)
 {
-	P_SCAN_INFO_T  prScanInfo;
+	P_SCAN_INFO_T prScanInfo;
 	P_SCAN_PARAM_T prScanParam;
-	P_MSG_HDR_T	   prPendingMsgHdr, prPendingMsgHdrNext, prRemoveMsgHdr = NULL;
+	P_MSG_HDR_T prPendingMsgHdr, prPendingMsgHdrNext, prRemoveMsgHdr = NULL;
 	P_LINK_ENTRY_T prRemoveLinkEntry = NULL;
-	BOOLEAN		   fgIsRemovingScan	 = FALSE;
+	u8 fgIsRemovingScan = false;
 
 	ASSERT(prAdapter);
 
-	prScanInfo	= &(prAdapter->rWifiVar.rScanInfo);
+	prScanInfo = &(prAdapter->rWifiVar.rScanInfo);
 	prScanParam = &prScanInfo->rScanParam;
 
 	/* traverse through rPendingMsgList for removal */
-	LINK_FOR_EACH_ENTRY_SAFE(
-			prPendingMsgHdr, prPendingMsgHdrNext, &(prScanInfo->rPendingMsgList), rLinkEntry, MSG_HDR_T)
-	{
-		if (prPendingMsgHdr->eMsgId == MID_AIS_SCN_SCAN_REQ || prPendingMsgHdr->eMsgId == MID_BOW_SCN_SCAN_REQ ||
-				prPendingMsgHdr->eMsgId == MID_P2P_SCN_SCAN_REQ || prPendingMsgHdr->eMsgId == MID_RLM_SCN_SCAN_REQ) {
-			P_MSG_SCN_SCAN_REQ prScanReqMsg = (P_MSG_SCN_SCAN_REQ)prPendingMsgHdr;
+	LINK_FOR_EACH_ENTRY_SAFE(prPendingMsgHdr, prPendingMsgHdrNext,
+				 &(prScanInfo->rPendingMsgList), rLinkEntry,
+				 MSG_HDR_T) {
+		if (prPendingMsgHdr->eMsgId == MID_AIS_SCN_SCAN_REQ ||
+		    prPendingMsgHdr->eMsgId == MID_BOW_SCN_SCAN_REQ ||
+		    prPendingMsgHdr->eMsgId == MID_P2P_SCN_SCAN_REQ ||
+		    prPendingMsgHdr->eMsgId == MID_RLM_SCN_SCAN_REQ) {
+			P_MSG_SCN_SCAN_REQ prScanReqMsg =
+				(P_MSG_SCN_SCAN_REQ)prPendingMsgHdr;
 
-			if (ucSeqNum == prScanReqMsg->ucSeqNum && ucBssIndex == prScanReqMsg->ucBssIndex) {
-				prRemoveLinkEntry = &(prScanReqMsg->rMsgHdr.rLinkEntry);
-				prRemoveMsgHdr	  = prPendingMsgHdr;
-				fgIsRemovingScan  = TRUE;
+			if (ucSeqNum == prScanReqMsg->ucSeqNum &&
+			    ucBssIndex == prScanReqMsg->ucBssIndex) {
+				prRemoveLinkEntry =
+					&(prScanReqMsg->rMsgHdr.rLinkEntry);
+				prRemoveMsgHdr = prPendingMsgHdr;
+				fgIsRemovingScan = true;
 			}
 		} else if (prPendingMsgHdr->eMsgId == MID_AIS_SCN_SCAN_REQ_V2 ||
-				   prPendingMsgHdr->eMsgId == MID_BOW_SCN_SCAN_REQ_V2 ||
-				   prPendingMsgHdr->eMsgId == MID_P2P_SCN_SCAN_REQ_V2 ||
-				   prPendingMsgHdr->eMsgId == MID_RLM_SCN_SCAN_REQ_V2) {
-			P_MSG_SCN_SCAN_REQ_V2 prScanReqMsgV2 = (P_MSG_SCN_SCAN_REQ_V2)prPendingMsgHdr;
+			   prPendingMsgHdr->eMsgId == MID_BOW_SCN_SCAN_REQ_V2 ||
+			   prPendingMsgHdr->eMsgId == MID_P2P_SCN_SCAN_REQ_V2 ||
+			   prPendingMsgHdr->eMsgId == MID_RLM_SCN_SCAN_REQ_V2) {
+			P_MSG_SCN_SCAN_REQ_V2 prScanReqMsgV2 =
+				(P_MSG_SCN_SCAN_REQ_V2)prPendingMsgHdr;
 
-			if (ucSeqNum == prScanReqMsgV2->ucSeqNum && ucBssIndex == prScanReqMsgV2->ucBssIndex) {
-				prRemoveLinkEntry = &(prScanReqMsgV2->rMsgHdr.rLinkEntry);
-				prRemoveMsgHdr	  = prPendingMsgHdr;
-				fgIsRemovingScan  = TRUE;
+			if (ucSeqNum == prScanReqMsgV2->ucSeqNum &&
+			    ucBssIndex == prScanReqMsgV2->ucBssIndex) {
+				prRemoveLinkEntry =
+					&(prScanReqMsgV2->rMsgHdr.rLinkEntry);
+				prRemoveMsgHdr = prPendingMsgHdr;
+				fgIsRemovingScan = true;
 			}
 		}
 
 		if (prRemoveLinkEntry) {
-			if (fgIsRemovingScan == TRUE) {
+			if (fgIsRemovingScan == true) {
 				/* generate scan-done event for caller */
-				scnFsmGenerateScanDoneMsg(prAdapter, ucSeqNum, ucBssIndex, SCAN_STATUS_CANCELLED);
+				scnFsmGenerateScanDoneMsg(
+					prAdapter, ucSeqNum, ucBssIndex,
+					SCAN_STATUS_CANCELLED);
 			}
 
 			/* remove from pending list */
-			LINK_REMOVE_KNOWN_ENTRY(&(prScanInfo->rPendingMsgList), prRemoveLinkEntry);
+			LINK_REMOVE_KNOWN_ENTRY(&(prScanInfo->rPendingMsgList),
+						prRemoveLinkEntry);
 			cnmMemFree(prAdapter, prRemoveMsgHdr);
 
 			break;
@@ -564,14 +651,15 @@ VOID scnFsmRemovePendingMsg(IN P_ADAPTER_T prAdapter, IN UINT_8 ucSeqNum, IN UIN
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-VOID scnEventScanDone(IN P_ADAPTER_T prAdapter, IN P_EVENT_SCAN_DONE prScanDone, BOOLEAN fgIsNewVersion)
+void scnEventScanDone(IN P_ADAPTER_T prAdapter, IN P_EVENT_SCAN_DONE prScanDone,
+		      u8 fgIsNewVersion)
 {
-	P_SCAN_INFO_T  prScanInfo;
+	P_SCAN_INFO_T prScanInfo;
 	P_SCAN_PARAM_T prScanParam;
-	UINT_32		   u4ChCnt;
-	UINT_32		   u4PrintfIdx = 0;
+	u32 u4ChCnt;
+	u32 u4PrintfIdx = 0;
 
-	prScanInfo	= &(prAdapter->rWifiVar.rScanInfo);
+	prScanInfo = &(prAdapter->rWifiVar.rScanInfo);
 	prScanParam = &prScanInfo->rScanParam;
 
 	kalMemZero(g_aucScanChannelNum, SCN_SCAN_DONE_PRINT_BUFFER_LENGTH);
@@ -579,80 +667,132 @@ VOID scnEventScanDone(IN P_ADAPTER_T prAdapter, IN P_EVENT_SCAN_DONE prScanDone,
 	kalMemZero(g_aucScanChannelMDRDY, SCN_SCAN_DONE_PRINT_BUFFER_LENGTH);
 
 	if (fgIsNewVersion) {
-		DBGLOG(SCN, INFO,
-				"scnEventScanDone Version%d!size of ScanDone%d,ucCompleteChanCount[%d],ucCurrentState%d, u4ScanDurBcnCnt[%lu]\n",
-				prScanDone->ucScanDoneVersion, sizeof(EVENT_SCAN_DONE), prScanDone->ucCompleteChanCount,
-				prScanDone->ucCurrentState, prScanDone->u4ScanDurBcnCnt);
+		DBGLOG(SCN,
+		       INFO,
+		       "scnEventScanDone Version%d!size of ScanDone%d,ucCompleteChanCount[%d],ucCurrentState%d, u4ScanDurBcnCnt[%lu]\n",
+		       prScanDone->ucScanDoneVersion,
+		       sizeof(EVENT_SCAN_DONE),
+		       prScanDone->ucCompleteChanCount,
+		       prScanDone->ucCurrentState,
+		       prScanDone->u4ScanDurBcnCnt);
 
 		if (prScanDone->ucCurrentState != FW_SCAN_STATE_SCAN_DONE) {
-			DBGLOG(SCN, INFO,
-					"FW Scan timeout!generate ScanDone event at State%d complete chan count%d ucChannelListNum%d\n",
-					prScanDone->ucCurrentState, prScanDone->ucCompleteChanCount, prScanParam->ucChannelListNum);
-
+			DBGLOG(SCN,
+			       INFO,
+			       "FW Scan timeout!generate ScanDone event at State%d complete chan count%d ucChannelListNum%d\n",
+			       prScanDone->ucCurrentState,
+			       prScanDone->ucCompleteChanCount,
+			       prScanParam->ucChannelListNum);
 		} else {
-			DBGLOG(SCN, INFO, " scnEventScanDone at FW_SCAN_STATE_SCAN_DONE state\n");
+			DBGLOG(SCN,
+			       INFO,
+			       " scnEventScanDone at FW_SCAN_STATE_SCAN_DONE state\n");
 		}
 	} else {
 		DBGLOG(SCN, INFO, "Old scnEventScanDone Version\n");
 	}
 
 	/* buffer empty channel information */
-	if (prScanParam->eScanChannel == SCAN_CHANNEL_FULL || prScanParam->eScanChannel == SCAN_CHANNEL_2G4) {
+	if (prScanParam->eScanChannel == SCAN_CHANNEL_FULL ||
+	    prScanParam->eScanChannel == SCAN_CHANNEL_2G4) {
 		if (prScanDone->ucSparseChannelValid) {
-			prScanInfo->fgIsSparseChannelValid		 = TRUE;
-			prScanInfo->rSparseChannel.eBand		 = (ENUM_BAND_T)prScanDone->rSparseChannel.ucBand;
-			prScanInfo->rSparseChannel.ucChannelNum	 = prScanDone->rSparseChannel.ucChannelNum;
-			prScanInfo->ucSparseChannelArrayValidNum = prScanDone->ucSparseChannelArrayValidNum;
-			DBGLOG(SCN, INFO, "Detected_Channel_Num = %d\n", prScanInfo->ucSparseChannelArrayValidNum);
+			prScanInfo->fgIsSparseChannelValid = true;
+			prScanInfo->rSparseChannel.eBand =
+				(ENUM_BAND_T)prScanDone->rSparseChannel.ucBand;
+			prScanInfo->rSparseChannel.ucChannelNum =
+				prScanDone->rSparseChannel.ucChannelNum;
+			prScanInfo->ucSparseChannelArrayValidNum =
+				prScanDone->ucSparseChannelArrayValidNum;
+			DBGLOG(SCN, INFO, "Detected_Channel_Num = %d\n",
+			       prScanInfo->ucSparseChannelArrayValidNum);
 			if (prScanInfo->ucSparseChannelArrayValidNum > 64) {
-				DBGLOG(SCN, ERROR, "%s ucSparseChannelArrayValidNum max. out of bound: %u > 64\n", __func__,
-						prScanInfo->ucSparseChannelArrayValidNum);
+				DBGLOG(SCN,
+				       ERROR,
+				       "%s ucSparseChannelArrayValidNum max. out of bound: %u > 64\n",
+				       __func__,
+				       prScanInfo->ucSparseChannelArrayValidNum);
 				return;
 			}
 
-			for (u4ChCnt = 0; u4ChCnt < prScanInfo->ucSparseChannelArrayValidNum; u4ChCnt++) {
-				prScanInfo->aucChannelNum[u4ChCnt]		= prScanDone->aucChannelNum[u4ChCnt];
-				prScanInfo->au2ChannelIdleTime[u4ChCnt] = prScanDone->au2ChannelIdleTime[u4ChCnt];
-				prScanInfo->aucChannelMDRDYCnt[u4ChCnt] = prScanDone->aucChannelMDRDYCnt[u4ChCnt];
+			for (u4ChCnt = 0;
+			     u4ChCnt < prScanInfo->ucSparseChannelArrayValidNum;
+			     u4ChCnt++) {
+				prScanInfo->aucChannelNum[u4ChCnt] =
+					prScanDone->aucChannelNum[u4ChCnt];
+				prScanInfo->au2ChannelIdleTime[u4ChCnt] =
+					prScanDone->au2ChannelIdleTime[u4ChCnt];
+				prScanInfo->aucChannelMDRDYCnt[u4ChCnt] =
+					prScanDone->aucChannelMDRDYCnt[u4ChCnt];
 
 				if (u4PrintfIdx % 10 == 0 && u4PrintfIdx != 0) {
-					DBGLOG(SCN, INFO, "Channel  : %s\n", g_aucScanChannelNum);
-					DBGLOG(SCN, INFO, "IdleTime : %s\n", g_aucScanChannelIdleTime);
-					DBGLOG(SCN, INFO, "MdrdyCnt : %s\n", g_aucScanChannelMDRDY);
-					DBGLOG(SCN, INFO,
-							"==================================================================================\n");
-					kalMemZero(g_aucScanChannelNum, SCN_SCAN_DONE_PRINT_BUFFER_LENGTH);
-					kalMemZero(g_aucScanChannelIdleTime, SCN_SCAN_DONE_PRINT_BUFFER_LENGTH);
-					kalMemZero(g_aucScanChannelMDRDY, SCN_SCAN_DONE_PRINT_BUFFER_LENGTH);
+					DBGLOG(SCN, INFO, "Channel  : %s\n",
+					       g_aucScanChannelNum);
+					DBGLOG(SCN, INFO, "IdleTime : %s\n",
+					       g_aucScanChannelIdleTime);
+					DBGLOG(SCN, INFO, "MdrdyCnt : %s\n",
+					       g_aucScanChannelMDRDY);
+					DBGLOG(SCN,
+					       INFO,
+					       "==================================================================================\n");
+					kalMemZero(
+						g_aucScanChannelNum,
+						SCN_SCAN_DONE_PRINT_BUFFER_LENGTH);
+					kalMemZero(
+						g_aucScanChannelIdleTime,
+						SCN_SCAN_DONE_PRINT_BUFFER_LENGTH);
+					kalMemZero(
+						g_aucScanChannelMDRDY,
+						SCN_SCAN_DONE_PRINT_BUFFER_LENGTH);
 					u4PrintfIdx = 0;
 				}
-				kalSnprintf(g_aucScanChannelNum + u4PrintfIdx * 7, sizeof(g_aucScanChannelNum) - u4PrintfIdx * 7, "%7d",
-						prScanInfo->aucChannelNum[u4ChCnt]);
-				kalSnprintf(g_aucScanChannelIdleTime + u4PrintfIdx * 7,
-						sizeof(g_aucScanChannelIdleTime) - u4PrintfIdx * 7, "%7d",
-						prScanInfo->au2ChannelIdleTime[u4ChCnt]);
-				kalSnprintf(g_aucScanChannelMDRDY + u4PrintfIdx * 7, sizeof(g_aucScanChannelMDRDY) - u4PrintfIdx * 7,
-						"%7d", prScanInfo->aucChannelMDRDYCnt[u4ChCnt]);
+				kalSnprintf(g_aucScanChannelNum +
+					    u4PrintfIdx * 7,
+					    sizeof(g_aucScanChannelNum) -
+					    u4PrintfIdx * 7,
+					    "%7d",
+					    prScanInfo->aucChannelNum[u4ChCnt]);
+				kalSnprintf(
+					g_aucScanChannelIdleTime +
+					u4PrintfIdx * 7,
+					sizeof(g_aucScanChannelIdleTime) -
+					u4PrintfIdx * 7,
+					"%7d",
+					prScanInfo->au2ChannelIdleTime[u4ChCnt]);
+				kalSnprintf(
+					g_aucScanChannelMDRDY + u4PrintfIdx * 7,
+					sizeof(g_aucScanChannelMDRDY) -
+					u4PrintfIdx * 7,
+					"%7d",
+					prScanInfo->aucChannelMDRDYCnt[u4ChCnt]);
 				u4PrintfIdx++;
 			}
 
-			DBGLOG(SCN, INFO, "Channel  : %s\n", g_aucScanChannelNum);
-			DBGLOG(SCN, INFO, "IdleTime : %s\n", g_aucScanChannelIdleTime);
-			DBGLOG(SCN, INFO, "MdrdyCnt : %s\n", g_aucScanChannelMDRDY);
+			DBGLOG(SCN, INFO, "Channel  : %s\n",
+			       g_aucScanChannelNum);
+			DBGLOG(SCN, INFO, "IdleTime : %s\n",
+			       g_aucScanChannelIdleTime);
+			DBGLOG(SCN, INFO, "MdrdyCnt : %s\n",
+			       g_aucScanChannelMDRDY);
 		} else {
-			prScanInfo->fgIsSparseChannelValid = FALSE;
+			prScanInfo->fgIsSparseChannelValid = false;
 		}
 	}
 
-	if (prScanInfo->eCurrentState == SCAN_STATE_SCANNING && prScanDone->ucSeqNum == prScanParam->ucSeqNum) {
+	if (prScanInfo->eCurrentState == SCAN_STATE_SCANNING &&
+	    prScanDone->ucSeqNum == prScanParam->ucSeqNum) {
 		/* generate scan-done event for caller */
-		scnFsmGenerateScanDoneMsg(prAdapter, prScanParam->ucSeqNum, prScanParam->ucBssIndex, SCAN_STATUS_DONE);
+		scnFsmGenerateScanDoneMsg(prAdapter, prScanParam->ucSeqNum,
+					  prScanParam->ucBssIndex,
+					  SCAN_STATUS_DONE);
 
 		/* switch to next pending scan */
 		scnFsmSteps(prAdapter, SCAN_STATE_IDLE);
 	} else {
-		DBGLOG(SCN, INFO, "Unexpected SCAN-DONE event: SeqNum = %d, Current State = %d\n", prScanDone->ucSeqNum,
-				prScanInfo->eCurrentState);
+		DBGLOG(SCN,
+		       INFO,
+		       "Unexpected SCAN-DONE event: SeqNum = %d, Current State = %d\n",
+		       prScanDone->ucSeqNum,
+		       prScanInfo->eCurrentState);
 	}
 } /* end of scnEventScanDone */
 
@@ -665,28 +805,31 @@ VOID scnEventScanDone(IN P_ADAPTER_T prAdapter, IN P_EVENT_SCAN_DONE prScanDone,
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-VOID scnFsmGenerateScanDoneMsg(
-		IN P_ADAPTER_T prAdapter, IN UINT_8 ucSeqNum, IN UINT_8 ucBssIndex, IN ENUM_SCAN_STATUS eScanStatus)
+void scnFsmGenerateScanDoneMsg(IN P_ADAPTER_T prAdapter, IN u8 ucSeqNum,
+			       IN u8 ucBssIndex,
+			       IN ENUM_SCAN_STATUS eScanStatus)
 {
-	P_SCAN_INFO_T		prScanInfo;
-	P_SCAN_PARAM_T		prScanParam;
+	P_SCAN_INFO_T prScanInfo;
+	P_SCAN_PARAM_T prScanParam;
 	P_MSG_SCN_SCAN_DONE prScanDoneMsg;
 
 	ASSERT(prAdapter);
 
-	prScanInfo	= &(prAdapter->rWifiVar.rScanInfo);
+	prScanInfo = &(prAdapter->rWifiVar.rScanInfo);
 	prScanParam = &prScanInfo->rScanParam;
 
-	prScanDoneMsg = (P_MSG_SCN_SCAN_DONE)cnmMemAlloc(prAdapter, RAM_TYPE_MSG, sizeof(MSG_SCN_SCAN_DONE));
+	prScanDoneMsg = (P_MSG_SCN_SCAN_DONE)cnmMemAlloc(
+		prAdapter, RAM_TYPE_MSG, sizeof(MSG_SCN_SCAN_DONE));
 	if (!prScanDoneMsg) {
 		ASSERT(0); /* Can't indicate SCAN FSM Complete */
 		return;
 	}
 
-	if (prScanParam->fgIsObssScan == TRUE) {
+	if (prScanParam->fgIsObssScan == true) {
 		prScanDoneMsg->rMsgHdr.eMsgId = MID_SCN_RLM_SCAN_DONE;
 	} else {
-		switch (GET_BSS_INFO_BY_INDEX(prAdapter, ucBssIndex)->eNetworkType) {
+		switch (GET_BSS_INFO_BY_INDEX(prAdapter, ucBssIndex)
+			->eNetworkType) {
 		case NETWORK_TYPE_AIS:
 			prScanDoneMsg->rMsgHdr.eMsgId = MID_SCN_AIS_SCAN_DONE;
 			break;
@@ -701,19 +844,20 @@ VOID scnFsmGenerateScanDoneMsg(
 
 		default:
 			DBGLOG(SCN, LOUD, "Unexpected Network Type: %d\n",
-					GET_BSS_INFO_BY_INDEX(prAdapter, ucBssIndex)->eNetworkType);
+			       GET_BSS_INFO_BY_INDEX(prAdapter, ucBssIndex)
+			       ->eNetworkType);
 			ASSERT(0);
 			break;
 		}
 	}
 
-	prScanDoneMsg->ucSeqNum	   = ucSeqNum;
-	prScanDoneMsg->ucBssIndex  = ucBssIndex;
+	prScanDoneMsg->ucSeqNum = ucSeqNum;
+	prScanDoneMsg->ucBssIndex = ucBssIndex;
 	prScanDoneMsg->eScanStatus = eScanStatus;
 
-	mboxSendMsg(prAdapter, MBOX_ID_0, (P_MSG_HDR_T)prScanDoneMsg, MSG_SEND_METHOD_BUF);
-
-} /* end of scnFsmGenerateScanDoneMsg() */
+	mboxSendMsg(prAdapter, MBOX_ID_0, (P_MSG_HDR_T)prScanDoneMsg,
+		    MSG_SEND_METHOD_BUF);
+}
 
 /*----------------------------------------------------------------------------*/
 /*!
@@ -724,7 +868,8 @@ VOID scnFsmGenerateScanDoneMsg(
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-BOOLEAN scnQuerySparseChannel(IN P_ADAPTER_T prAdapter, P_ENUM_BAND_T prSparseBand, PUINT_8 pucSparseChannel)
+u8 scnQuerySparseChannel(IN P_ADAPTER_T prAdapter, P_ENUM_BAND_T prSparseBand,
+			 u8 *pucSparseChannel)
 {
 	P_SCAN_INFO_T prScanInfo;
 
@@ -732,16 +877,18 @@ BOOLEAN scnQuerySparseChannel(IN P_ADAPTER_T prAdapter, P_ENUM_BAND_T prSparseBa
 
 	prScanInfo = &(prAdapter->rWifiVar.rScanInfo);
 
-	if (prScanInfo->fgIsSparseChannelValid == TRUE) {
+	if (prScanInfo->fgIsSparseChannelValid == true) {
 		if (prSparseBand)
 			*prSparseBand = prScanInfo->rSparseChannel.eBand;
 
-		if (pucSparseChannel)
-			*pucSparseChannel = prScanInfo->rSparseChannel.ucChannelNum;
+		if (pucSparseChannel) {
+			*pucSparseChannel =
+				prScanInfo->rSparseChannel.ucChannelNum;
+		}
 
-		return TRUE;
+		return true;
 	} else {
-		return FALSE;
+		return false;
 	}
 }
 
@@ -754,26 +901,30 @@ BOOLEAN scnQuerySparseChannel(IN P_ADAPTER_T prAdapter, P_ENUM_BAND_T prSparseBa
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-VOID scnEventNloDone(IN P_ADAPTER_T prAdapter, IN P_EVENT_NLO_DONE_T prNloDone)
+void scnEventNloDone(IN P_ADAPTER_T prAdapter, IN P_EVENT_NLO_DONE_T prNloDone)
 {
-	P_SCAN_INFO_T  prScanInfo;
-	P_NLO_PARAM_T  prNloParam;
+	P_SCAN_INFO_T prScanInfo;
+	P_NLO_PARAM_T prNloParam;
 	P_SCAN_PARAM_T prScanParam;
 
-	prScanInfo	= &(prAdapter->rWifiVar.rScanInfo);
-	prNloParam	= &prScanInfo->rNloParam;
+	prScanInfo = &(prAdapter->rWifiVar.rScanInfo);
+	prNloParam = &prScanInfo->rNloParam;
 	prScanParam = &prNloParam->rScanParam;
 
-	if (prScanInfo->fgNloScanning == TRUE && prNloDone->ucSeqNum == prScanParam->ucSeqNum) {
+	if (prScanInfo->fgNloScanning == true &&
+	    prNloDone->ucSeqNum == prScanParam->ucSeqNum) {
 		DBGLOG(SCN, INFO, "scnEventNloDone reporting to uplayer\n");
 
 		kalSchedScanResults(prAdapter->prGlueInfo);
 
-		if (prNloParam->fgStopAfterIndication == TRUE)
-			prScanInfo->fgNloScanning = FALSE;
+		if (prNloParam->fgStopAfterIndication == true)
+			prScanInfo->fgNloScanning = false;
 	} else {
-		DBGLOG(SCN, INFO, "Unexpected NLO-DONE event: SeqNum = %d, Current State = %d\n", prNloDone->ucSeqNum,
-				prScanInfo->eCurrentState);
+		DBGLOG(SCN,
+		       INFO,
+		       "Unexpected NLO-DONE event: SeqNum = %d, Current State = %d\n",
+		       prNloDone->ucSeqNum,
+		       prScanInfo->eCurrentState);
 	}
 }
 
@@ -786,50 +937,53 @@ VOID scnEventNloDone(IN P_ADAPTER_T prAdapter, IN P_EVENT_NLO_DONE_T prNloDone)
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-BOOLEAN
-scnFsmSchedScanRequest(IN P_ADAPTER_T prAdapter, IN UINT_8 ucSsidNum, IN P_PARAM_SSID_T prSsid, IN UINT_32 u4IeLength,
-		IN PUINT_8 pucIe, IN UINT_16 u2Interval)
+u8 scnFsmSchedScanRequest(IN P_ADAPTER_T prAdapter, IN u8 ucSsidNum,
+			  IN P_PARAM_SSID_T prSsid, IN u32 u4IeLength,
+			  IN u8 *pucIe, IN u16 u2Interval)
 {
-	P_SCAN_INFO_T  prScanInfo;
-	P_NLO_PARAM_T  prNloParam;
+	P_SCAN_INFO_T prScanInfo;
+	P_NLO_PARAM_T prNloParam;
 	P_SCAN_PARAM_T prScanParam;
-	P_CMD_NLO_REQ  prCmdNloReq;
-	UINT_32		   i, j;
+	P_CMD_NLO_REQ prCmdNloReq;
+	u32 i, j;
 
 	ASSERT(prAdapter);
 
 	DBGLOG(SCN, INFO, "scnFsmSchedScanRequest\n");
 
-	prScanInfo	= &(prAdapter->rWifiVar.rScanInfo);
-	prNloParam	= &prScanInfo->rNloParam;
+	prScanInfo = &(prAdapter->rWifiVar.rScanInfo);
+	prNloParam = &prScanInfo->rNloParam;
 	prScanParam = &prNloParam->rScanParam;
 
-	/* ASSERT(prScanInfo->fgNloScanning == FALSE); */
+	/* ASSERT(prScanInfo->fgNloScanning == false); */
 	if (prScanInfo->fgNloScanning) {
-		DBGLOG(SCN, INFO, "prScanInfo->fgNloScanning == FALSE  already scanning\n");
-		return TRUE;
+		DBGLOG(SCN, INFO,
+		       "prScanInfo->fgNloScanning == false  already scanning\n");
+		return true;
 	}
 
-	prScanInfo->fgNloScanning = TRUE;
+	prScanInfo->fgNloScanning = true;
 
 	/* 1. load parameters */
 	prScanParam->ucSeqNum++;
-	prScanParam->ucBssIndex			  = prAdapter->prAisBssInfo->ucBssIndex;
-	prNloParam->fgStopAfterIndication = FALSE;
-	prNloParam->ucFastScanIteration	  = 0;
+	prScanParam->ucBssIndex = prAdapter->prAisBssInfo->ucBssIndex;
+	prNloParam->fgStopAfterIndication = false;
+	prNloParam->ucFastScanIteration = 0;
 
 	if (u2Interval < SCAN_NLO_DEFAULT_INTERVAL) {
 		u2Interval = SCAN_NLO_DEFAULT_INTERVAL;
-		DBGLOG(SCN, INFO, "force interval to SCAN_NLO_DEFAULT_INTERVAL\n");
+		DBGLOG(SCN, INFO,
+		       "force interval to SCAN_NLO_DEFAULT_INTERVAL\n");
 	}
-	prAdapter->prAisBssInfo->fgIsPNOEnable = TRUE;
+	prAdapter->prAisBssInfo->fgIsPNOEnable = true;
 
 	if (!IS_NET_ACTIVE(prAdapter, prAdapter->prAisBssInfo->ucBssIndex)) {
 		SET_NET_ACTIVE(prAdapter, prAdapter->prAisBssInfo->ucBssIndex);
 
 		DBGLOG(SCN, INFO, "ACTIVE AIS from INACTIVE to enable PNO\n");
 		/* sync with firmware */
-		nicActivateNetwork(prAdapter, prAdapter->prAisBssInfo->ucBssIndex);
+		nicActivateNetwork(prAdapter,
+				   prAdapter->prAisBssInfo->ucBssIndex);
 	}
 	prNloParam->u2FastScanPeriod = u2Interval;
 	prNloParam->u2SlowScanPeriod = u2Interval;
@@ -846,58 +1000,71 @@ scnFsmSchedScanRequest(IN P_ADAPTER_T prAdapter, IN UINT_8 ucSsidNum, IN P_PARAM
 
 	for (i = 0; i < prNloParam->ucMatchSSIDNum; i++) {
 		if (i < CFG_SCAN_SSID_MAX_NUM) {
-			COPY_SSID(prScanParam->aucSpecifiedSSID[i], prScanParam->ucSpecifiedSSIDLen[i], prSsid[i].aucSsid,
-					(UINT_8)prSsid[i].u4SsidLen);
+			COPY_SSID(prScanParam->aucSpecifiedSSID[i],
+				  prScanParam->ucSpecifiedSSIDLen[i],
+				  prSsid[i].aucSsid, (u8)prSsid[i].u4SsidLen);
 		}
 
-		COPY_SSID(prNloParam->aucMatchSSID[i], prNloParam->ucMatchSSIDLen[i], prSsid[i].aucSsid,
-				(UINT_8)prSsid[i].u4SsidLen);
+		COPY_SSID(prNloParam->aucMatchSSID[i],
+			  prNloParam->ucMatchSSIDLen[i], prSsid[i].aucSsid,
+			  (u8)prSsid[i].u4SsidLen);
 
 		/*  for linux the Ciper,Auth Algo will be zero  */
 		prNloParam->aucCipherAlgo[i] = 0;
-		prNloParam->au2AuthAlgo[i]	 = 0;
+		prNloParam->au2AuthAlgo[i] = 0;
 
 		for (j = 0; j < SCN_NLO_NETWORK_CHANNEL_NUM; j++)
 			prNloParam->aucChannelHint[i][j] = 0;
 	}
 
 	/* 2. prepare command for sending */
-	prCmdNloReq = (P_CMD_NLO_REQ)cnmMemAlloc(prAdapter, RAM_TYPE_BUF, sizeof(CMD_NLO_REQ) + u4IeLength);
+	prCmdNloReq = (P_CMD_NLO_REQ)cnmMemAlloc(
+		prAdapter, RAM_TYPE_BUF, sizeof(CMD_NLO_REQ) + u4IeLength);
 
 	if (!prCmdNloReq) {
 		ASSERT(0); /* Can't initiate NLO operation */
-		return FALSE;
+		return false;
 	}
 
 	/* 3. send command packet for NLO operation */
 	kalMemZero(prCmdNloReq, sizeof(CMD_NLO_REQ));
 
-	prCmdNloReq->ucSeqNum			   = prScanParam->ucSeqNum;
-	prCmdNloReq->ucBssIndex			   = prScanParam->ucBssIndex;
+	prCmdNloReq->ucSeqNum = prScanParam->ucSeqNum;
+	prCmdNloReq->ucBssIndex = prScanParam->ucBssIndex;
 	prCmdNloReq->fgStopAfterIndication = prNloParam->fgStopAfterIndication;
-	prCmdNloReq->ucFastScanIteration   = prNloParam->ucFastScanIteration;
-	prCmdNloReq->u2FastScanPeriod	   = prNloParam->u2FastScanPeriod;
-	prCmdNloReq->u2SlowScanPeriod	   = prNloParam->u2SlowScanPeriod;
-	prCmdNloReq->ucEntryNum			   = prNloParam->ucMatchSSIDNum;
+	prCmdNloReq->ucFastScanIteration = prNloParam->ucFastScanIteration;
+	prCmdNloReq->u2FastScanPeriod = prNloParam->u2FastScanPeriod;
+	prCmdNloReq->u2SlowScanPeriod = prNloParam->u2SlowScanPeriod;
+	prCmdNloReq->ucEntryNum = prNloParam->ucMatchSSIDNum;
 
 	prCmdNloReq->ucFlag = SCAN_NLO_CHECK_SSID_ONLY;
 	DBGLOG(SCN, INFO, "LINUX only check SSID for PNO SCAN\n");
 
 	for (i = 0; i < prNloParam->ucMatchSSIDNum; i++) {
-		COPY_SSID(prCmdNloReq->arNetworkList[i].aucSSID, prCmdNloReq->arNetworkList[i].ucSSIDLength,
-				prNloParam->aucMatchSSID[i], prNloParam->ucMatchSSIDLen[i]);
+		COPY_SSID(prCmdNloReq->arNetworkList[i].aucSSID,
+			  prCmdNloReq->arNetworkList[i].ucSSIDLength,
+			  prNloParam->aucMatchSSID[i],
+			  prNloParam->ucMatchSSIDLen[i]);
 
-		prCmdNloReq->arNetworkList[i].ucCipherAlgo = prNloParam->aucCipherAlgo[i];
-		prCmdNloReq->arNetworkList[i].u2AuthAlgo   = prNloParam->au2AuthAlgo[i];
-		DBGLOG(SCN, INFO, "prCmdNloReq->arNetworkList[i].aucSSID %s\n", prCmdNloReq->arNetworkList[i].aucSSID);
-		DBGLOG(SCN, INFO, "prCmdNloReq->arNetworkList[i].ucSSIDLength %d\n",
-				prCmdNloReq->arNetworkList[i].ucSSIDLength);
-		DBGLOG(SCN, INFO, "prCmdNloReq->arNetworkList[i].ucCipherAlgo %d\n",
-				prCmdNloReq->arNetworkList[i].ucCipherAlgo);
-		DBGLOG(SCN, INFO, "prCmdNloReq->arNetworkList[i].u2AuthAlgo %d\n", prCmdNloReq->arNetworkList[i].u2AuthAlgo);
+		prCmdNloReq->arNetworkList[i].ucCipherAlgo =
+			prNloParam->aucCipherAlgo[i];
+		prCmdNloReq->arNetworkList[i].u2AuthAlgo =
+			prNloParam->au2AuthAlgo[i];
+		DBGLOG(SCN, INFO, "prCmdNloReq->arNetworkList[i].aucSSID %s\n",
+		       prCmdNloReq->arNetworkList[i].aucSSID);
+		DBGLOG(SCN, INFO,
+		       "prCmdNloReq->arNetworkList[i].ucSSIDLength %d\n",
+		       prCmdNloReq->arNetworkList[i].ucSSIDLength);
+		DBGLOG(SCN, INFO,
+		       "prCmdNloReq->arNetworkList[i].ucCipherAlgo %d\n",
+		       prCmdNloReq->arNetworkList[i].ucCipherAlgo);
+		DBGLOG(SCN, INFO,
+		       "prCmdNloReq->arNetworkList[i].u2AuthAlgo %d\n",
+		       prCmdNloReq->arNetworkList[i].u2AuthAlgo);
 
 		for (j = 0; j < SCN_NLO_NETWORK_CHANNEL_NUM; j++)
-			prCmdNloReq->arNetworkList[i].ucNumChannelHint[j] = prNloParam->aucChannelHint[i][j];
+			prCmdNloReq->arNetworkList[i].ucNumChannelHint[j] =
+				prNloParam->aucChannelHint[i][j];
 	}
 
 	if (u4IeLength <= MAX_IE_LENGTH)
@@ -910,12 +1077,14 @@ scnFsmSchedScanRequest(IN P_ADAPTER_T prAdapter, IN UINT_8 ucSsidNum, IN P_PARAM
 		kalMemCopy(prCmdNloReq->aucIE, pucIe, prCmdNloReq->u2IELen);
 	}
 
-	wlanSendSetQueryCmd(prAdapter, CMD_ID_SET_NLO_REQ, TRUE, FALSE, TRUE, nicCmdEventSetCommon, nicOidCmdTimeoutCommon,
-			sizeof(CMD_NLO_REQ) + prCmdNloReq->u2IELen, (PUINT_8)prCmdNloReq, NULL, 0);
+	wlanSendSetQueryCmd(prAdapter, CMD_ID_SET_NLO_REQ, true, false, true,
+			    nicCmdEventSetCommon, nicOidCmdTimeoutCommon,
+			    sizeof(CMD_NLO_REQ) + prCmdNloReq->u2IELen,
+			    (u8 *)prCmdNloReq, NULL, 0);
 
-	cnmMemFree(prAdapter, (PVOID)prCmdNloReq);
+	cnmMemFree(prAdapter, (void *)prCmdNloReq);
 
-	return TRUE;
+	return true;
 }
 
 /*----------------------------------------------------------------------------*/
@@ -927,54 +1096,63 @@ scnFsmSchedScanRequest(IN P_ADAPTER_T prAdapter, IN UINT_8 ucSsidNum, IN P_PARAM
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-BOOLEAN scnFsmSchedScanStopRequest(IN P_ADAPTER_T prAdapter)
+u8 scnFsmSchedScanStopRequest(IN P_ADAPTER_T prAdapter)
 {
-	P_SCAN_INFO_T  prScanInfo;
-	P_NLO_PARAM_T  prNloParam;
+	P_SCAN_INFO_T prScanInfo;
+	P_NLO_PARAM_T prNloParam;
 	P_SCAN_PARAM_T prScanParam;
 	CMD_NLO_CANCEL rCmdNloCancel;
-	WLAN_STATUS	   rStatus;
+	WLAN_STATUS rStatus;
 
 	kalMemZero(&rCmdNloCancel, sizeof(CMD_NLO_CANCEL));
 	ASSERT(prAdapter);
 	DBGLOG(SCN, INFO, "scnFsmSchedScanStopRequest\n");
 
-	prScanInfo	= &(prAdapter->rWifiVar.rScanInfo);
-	prNloParam	= &prScanInfo->rNloParam;
+	prScanInfo = &(prAdapter->rWifiVar.rScanInfo);
+	prNloParam = &prScanInfo->rNloParam;
 	prScanParam = &prNloParam->rScanParam;
 
-	if (prAdapter->prAisBssInfo->fgIsNetRequestInActive && prAdapter->prAisBssInfo->fgIsPNOEnable) {
-		UNSET_NET_ACTIVE(prAdapter, prAdapter->prAisBssInfo->ucBssIndex);
+	if (prAdapter->prAisBssInfo->fgIsNetRequestInActive &&
+	    prAdapter->prAisBssInfo->fgIsPNOEnable) {
+		UNSET_NET_ACTIVE(prAdapter,
+				 prAdapter->prAisBssInfo->ucBssIndex);
 
 		DBGLOG(SCN, INFO, "INACTIVE  AIS from ACTIVE to DISABLE PNO\n");
 		/* sync with firmware */
-		nicDeactivateNetwork(prAdapter, prAdapter->prAisBssInfo->ucBssIndex);
+		nicDeactivateNetwork(prAdapter,
+				     prAdapter->prAisBssInfo->ucBssIndex);
 	} else {
-		DBGLOG(SCN, INFO, "fgIsNetRequestInActive %d, fgIsPNOEnable %d\n",
-				prAdapter->prAisBssInfo->fgIsNetRequestInActive, prAdapter->prAisBssInfo->fgIsPNOEnable);
+		DBGLOG(SCN, INFO,
+		       "fgIsNetRequestInActive %d, fgIsPNOEnable %d\n",
+		       prAdapter->prAisBssInfo->fgIsNetRequestInActive,
+		       prAdapter->prAisBssInfo->fgIsPNOEnable);
 	}
 
-	prAdapter->prAisBssInfo->fgIsPNOEnable = FALSE;
+	prAdapter->prAisBssInfo->fgIsPNOEnable = false;
 
 	/* send cancel message to firmware domain */
 	rCmdNloCancel.ucSeqNum = prScanParam->ucSeqNum;
 
-	rStatus = wlanSendSetQueryCmd(prAdapter, CMD_ID_SET_NLO_CANCEL, TRUE, FALSE, TRUE, nicCmdEventSetStopSchedScan,
-			/* nicCmdEventSetCommon, */
-			nicOidCmdTimeoutCommon, sizeof(CMD_NLO_CANCEL), (PUINT_8)&rCmdNloCancel, NULL, 0);
+	rStatus = wlanSendSetQueryCmd(prAdapter, CMD_ID_SET_NLO_CANCEL, true,
+				      false, true, nicCmdEventSetStopSchedScan,
+	                              /* nicCmdEventSetCommon, */
+				      nicOidCmdTimeoutCommon,
+				      sizeof(CMD_NLO_CANCEL),
+				      (u8 *)&rCmdNloCancel, NULL, 0);
 
-	prScanInfo->fgNloScanning = FALSE;
+	prScanInfo->fgNloScanning = false;
 	if (rStatus != WLAN_STATUS_FAILURE)
-		return TRUE;
+		return true;
 	else
-		return FALSE;
+		return false;
 }
 
-BOOLEAN scnFsmIsScanning(IN P_ADAPTER_T prAdapter)
+u8 scnFsmIsScanning(IN P_ADAPTER_T prAdapter)
 {
 	P_SCAN_INFO_T prScanInfo;
 
 	prScanInfo = &(prAdapter->rWifiVar.rScanInfo);
 
-	return (prScanInfo->eCurrentState == SCAN_STATE_SCANNING) ? TRUE : FALSE;
+	return (prScanInfo->eCurrentState == SCAN_STATE_SCANNING) ? true :
+	       false;
 }

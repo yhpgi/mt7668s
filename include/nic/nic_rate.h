@@ -5,7 +5,7 @@
 
 /*! \file  nic_rate.h
  *    \brief This file contains the rate utility function of
- *	   IEEE 802.11 family for MediaTek 802.11 Wireless LAN Adapters.
+ *    IEEE 802.11 family for MediaTek 802.11 Wireless LAN Adapters.
  */
 
 #ifndef _NIC_RATE_H
@@ -13,68 +13,73 @@
 
 /*******************************************************************************
  *                         C O M P I L E R   F L A G S
- ********************************************************************************
+ *******************************************************************************
  */
 
 /*******************************************************************************
  *                    E X T E R N A L   R E F E R E N C E S
- ********************************************************************************
+ *******************************************************************************
  */
 
 /*******************************************************************************
  *                              C O N S T A N T S
- ********************************************************************************
+ *******************************************************************************
  */
 
 /*******************************************************************************
  *                         D A T A   T Y P E S
- ********************************************************************************
+ *******************************************************************************
  */
 
 /*******************************************************************************
  *                            P U B L I C   D A T A
- ********************************************************************************
+ *******************************************************************************
  */
 
 /*******************************************************************************
  *                           P R I V A T E   D A T A
- ********************************************************************************
+ *******************************************************************************
  */
 
 /*******************************************************************************
  *                                 M A C R O S
- ********************************************************************************
+ *******************************************************************************
  */
 
 /*******************************************************************************
  *                  F U N C T I O N   D E C L A R A T I O N S
- ********************************************************************************
+ *******************************************************************************
  */
-UINT_32
-nicGetPhyRateByMcsRate(IN UINT_8 ucIdx, IN UINT_8 ucBw, IN UINT_8 ucGI);
 
-UINT_32
-nicGetHwRateByPhyRate(IN UINT_8 ucIdx);
+u32 nicGetPhyRateByMcsRate(IN u8 ucIdx, IN u8 ucBw, IN u8 ucGI);
 
-WLAN_STATUS
-nicSwIndex2RateIndex(IN UINT_8 ucRateSwIndex, OUT PUINT_8 pucRateIndex, OUT PUINT_8 pucPreambleOption);
+u32 nicGetHwRateByPhyRate(IN u8 ucIdx);
 
 WLAN_STATUS
-nicRateIndex2RateCode(IN UINT_8 ucPreambleOption, IN UINT_8 ucRateIndex, OUT PUINT_16 pu2RateCode);
+nicSwIndex2RateIndex(IN u8 ucRateSwIndex,
+		     OUT u8 *pucRateIndex,
+		     OUT u8 *pucPreambleOption);
 
-UINT_32
-nicRateCode2PhyRate(IN UINT_16 u2RateCode, IN UINT_8 ucBandwidth, IN UINT_8 ucGI, IN UINT_8 ucRateNss);
+WLAN_STATUS
+nicRateIndex2RateCode(IN u8 ucPreambleOption,
+		      IN u8 ucRateIndex,
+		      OUT u16 *pu2RateCode);
 
-UINT_32
-nicRateCode2DataRate(IN UINT_16 u2RateCode, IN UINT_8 ucBandwidth, IN UINT_8 ucGI);
+u32 nicRateCode2PhyRate(IN u16 u2RateCode,
+			IN u8 ucBandwidth,
+			IN u8 ucGI,
+			IN u8 ucRateNss);
 
-BOOLEAN
-nicGetRateIndexFromRateSetWithLimit(
-		IN UINT_16 u2RateSet, IN UINT_32 u4PhyRateLimit, IN BOOLEAN fgGetLowest, OUT PUINT_8 pucRateSwIndex);
+u32 nicRateCode2DataRate(IN u16 u2RateCode, IN u8 ucBandwidth, IN u8 ucGI);
+
+u8 nicGetRateIndexFromRateSetWithLimit(IN u16 u2RateSet,
+				       IN u32 u4PhyRateLimit,
+				       IN u8 fgGetLowest,
+				       OUT u8 *pucRateSwIndex);
 
 /*******************************************************************************
  *                              F U N C T I O N S
- ********************************************************************************
+ *******************************************************************************
  */
 
-#endif /* _NIC_RATE_H */
+#endif
