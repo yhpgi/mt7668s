@@ -1513,7 +1513,7 @@ WLAN_STATUS saaFsmRunEventRxDeauth(IN P_ADAPTER_T prAdapter,
 	P_STA_RECORD_T prStaRec;
 	P_WLAN_DEAUTH_FRAME_T prDeauthFrame;
 	u8 ucWlanIdx;
-	uint8_t ucRoleIdx = 0;
+	u8 ucRoleIdx = 0;
 	u8 *pFrameBuf = NULL;
 	P_BSS_INFO_T prBssInfo = NULL;
 	u8 fgIsInterruptContext = false;

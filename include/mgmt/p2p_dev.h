@@ -201,3 +201,5 @@ void p2pDevFsmRunEventMgmtFrameRegister(IN P_ADAPTER_T prAdapter,
 
 void p2pDevFsmRunEventActiveDevBss(IN P_ADAPTER_T prAdapter,
 				   IN P_MSG_HDR_T prMsgHdr);
+
+void p2pDevFsmRunEventScanAbort(IN P_ADAPTER_T prAdapter, IN u8 ucBssIdx);

@@ -25,10 +25,6 @@ static u8 *apucDebugP2pRoleState[P2P_ROLE_STATE_NUM] = {
 /*lint -restore */
 #endif
 
-void p2pRoleFsmStateTransition(IN P_ADAPTER_T prAdapter,
-			       IN P_P2P_ROLE_FSM_INFO_T prP2pRoleFsmInfo,
-			       IN ENUM_P2P_ROLE_STATE_T eNextState);
-
 u8 p2pRoleFsmInit(IN P_ADAPTER_T prAdapter, IN u8 ucRoleIdx)
 {
 	P_P2P_ROLE_FSM_INFO_T prP2pRoleFsmInfo = (P_P2P_ROLE_FSM_INFO_T)NULL;

@@ -1064,7 +1064,7 @@ WLAN_STATUS assocSendDisAssocFrame(IN P_ADAPTER_T prAdapter,
 	u16 u2EstimatedFrameLen;
 	u8 ucRoleIdx = 0;
 	P_BSS_INFO_T prBssInfo = NULL;
-	uint8_t *pFrameBuf;
+	u8 *pFrameBuf;
 	u8 fgIsInterruptContext = false;
 
 	ASSERT(prStaRec);

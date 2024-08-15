@@ -11178,9 +11178,9 @@ wlanoidGetTxPwrTbl(IN P_ADAPTER_T prAdapter, IN void *pvQueryBuffer,
 }
 #endif
 
-uint32_t wlanGetSupportedFeatureSet(IN P_GLUE_INFO_T prGlueInfo)
+u32 wlanGetSupportedFeatureSet(IN P_GLUE_INFO_T prGlueInfo)
 {
-	uint32_t u4FeatureSet = WIFI_HAL_FEATURE_SET;
+	u32 u4FeatureSet = WIFI_HAL_FEATURE_SET;
 	P_REG_INFO_T prRegInfo;
 
 	prRegInfo = kalGetConfiguration(prGlueInfo);
@@ -11443,3 +11443,39 @@ WLAN_STATUS wlanoidPktProcessIT(IN P_ADAPTER_T prAdapter, IN void *pvBuffer,
 	return WLAN_STATUS_SUCCESS;
 }
 #endif
+
+u32 wlanoidIndicateBssInfo(IN P_ADAPTER_T prAdapter, IN void *pvSetBuffer,
+			   IN u32 u4SetBufferLen, OUT u32 *pu4SetInfoLen)
+{
+	P_GLUE_INFO_T prGlueInfo;
+	P_BSS_DESC_T *pprBssDesc = NULL;
+	u32 rStatus = WLAN_STATUS_SUCCESS;
+	u8 i = 0;
+
+	DEBUGFUNC("wlanoidIndicateBssInfo");
+
+	ASSERT(prAdapter);
+
+	prGlueInfo = prAdapter->prGlueInfo;
+	pprBssDesc = &prAdapter->rWifiVar.rScanInfo.rSchedScanParam
+		     .aprPendingBssDescToInd[0];
+
+	for (; i < SCN_SSID_MATCH_MAX_NUM; i++) {
+		if (pprBssDesc[i] == NULL)
+			break;
+		if (pprBssDesc[i]->u2RawLength == 0)
+			continue;
+		kalIndicateBssInfo(prGlueInfo, (u8 *)pprBssDesc[i]->aucRawBuf,
+				   pprBssDesc[i]->u2RawLength,
+				   pprBssDesc[i]->ucChannelNum,
+				   RCPI_TO_dBm(pprBssDesc[i]->ucRCPI));
+	}
+
+	if (i > 0) {
+		DBGLOG(SCN, INFO, "pending %d sched scan results\n", i);
+		kalMemZero(&pprBssDesc[0], i * sizeof(struct BSS_DESC *));
+	} else
+		DBGLOG(SCN, TRACE, "pending %d sched scan results\n", i);
+
+	return rStatus;
+}

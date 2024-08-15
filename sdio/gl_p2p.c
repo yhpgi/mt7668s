@@ -75,12 +75,14 @@ struct wireless_dev *gprP2pRoleWdev[KAL_P2P_NUM];
 struct net_device *gPrP2pDev[KAL_P2P_NUM];
 
 #if CFG_ENABLE_WIFI_DIRECT_CFG_80211
+
 static struct cfg80211_ops mtk_p2p_ops = {
 	.add_virtual_intf = mtk_p2p_cfg80211_add_iface,
 	.change_virtual_intf = mtk_p2p_cfg80211_change_iface, /* 1 st */
 	.del_virtual_intf = mtk_p2p_cfg80211_del_iface,
 	.change_bss = mtk_p2p_cfg80211_change_bss,
 	.scan = mtk_p2p_cfg80211_scan,
+	.abort_scan = mtk_p2p_cfg80211_abort_scan,
 	.remain_on_channel = mtk_p2p_cfg80211_remain_on_channel,
 	.cancel_remain_on_channel = mtk_p2p_cfg80211_cancel_remain_on_channel,
 	.mgmt_tx = mtk_p2p_cfg80211_mgmt_tx,
@@ -357,17 +359,23 @@ u8 p2PAllocInfo(IN P_GLUE_INFO_T prGlueInfo, IN u8 ucIdex)
 					kalMemAlloc(sizeof(P2P_DEV_FSM_INFO_T),
 						    VIR_MEM_TYPE);
 			}
+
 			prWifiVar->prP2PConnSettings[ucIdex] =
 				kalMemAlloc(sizeof(P2P_CONNECTION_SETTINGS_T),
 					    VIR_MEM_TYPE);
 			prWifiVar->prP2pSpecificBssInfo[ucIdex] = kalMemAlloc(
 				sizeof(P2P_SPECIFIC_BSS_INFO_T), VIR_MEM_TYPE);
+
+			prWifiVar->prP2pQueryStaStatistics[ucIdex] =
+				kalMemAlloc(sizeof(PARAM_GET_STA_STATISTICS),
+					    VIR_MEM_TYPE);
 		} else {
 			ASSERT(prAdapter->prP2pInfo != NULL);
 			ASSERT(prWifiVar->prP2PConnSettings[ucIdex] != NULL);
 			/* ASSERT(prWifiVar->prP2pFsmInfo != NULL); */
 			ASSERT(prWifiVar->prP2pSpecificBssInfo[ucIdex] != NULL);
 		}
+
 		/*MUST set memory to 0 */
 		kalMemZero(prGlueInfo->prP2PInfo[ucIdex],
 			   sizeof(GL_P2P_INFO_T));
@@ -384,6 +392,10 @@ u8 p2PAllocInfo(IN P_GLUE_INFO_T prGlueInfo, IN u8 ucIdex)
 		 */
 		kalMemZero(prWifiVar->prP2pSpecificBssInfo[ucIdex],
 			   sizeof(P2P_SPECIFIC_BSS_INFO_T));
+
+		if (prWifiVar->prP2pQueryStaStatistics[ucIdex])
+			kalMemZero(prWifiVar->prP2pQueryStaStatistics[ucIdex],
+				   sizeof(PARAM_GET_STA_STATISTICS));
 	} while (false);
 
 	if (!prGlueInfo->prP2PDevInfo)
@@ -411,12 +423,21 @@ u8 p2PAllocInfo(IN P_GLUE_INFO_T prGlueInfo, IN u8 ucIdex)
 
 		prWifiVar->prP2pSpecificBssInfo[ucIdex] = NULL;
 	}
+
+	if (prWifiVar->prP2pQueryStaStatistics[ucIdex]) {
+		kalMemFree(prWifiVar->prP2pQueryStaStatistics[ucIdex],
+			   VIR_MEM_TYPE, sizeof(P_PARAM_GET_STA_STATISTICS));
+
+		prWifiVar->prP2pQueryStaStatistics[ucIdex] = NULL;
+	}
+
 	/* if (prWifiVar->prP2pFsmInfo) { */
 	/* kalMemFree(prWifiVar->prP2pFsmInfo, VIR_MEM_TYPE,
 	 * sizeof(P2P_FSM_INFO_T)); */
 
 	/* prWifiVar->prP2pFsmInfo = NULL; */
 	/* } */
+
 	if (prWifiVar->prP2PConnSettings[ucIdex]) {
 		kalMemFree(prWifiVar->prP2PConnSettings[ucIdex], VIR_MEM_TYPE,
 			   sizeof(P2P_CONNECTION_SETTINGS_T));
@@ -444,10 +465,25 @@ u8 p2PAllocInfo(IN P_GLUE_INFO_T prGlueInfo, IN u8 ucIdex)
 	return false;
 }
 
+static void p2pFreeMemSafe(P_GLUE_INFO_T prGlueInfo, void **pprMemInfo,
+			   u32 size)
+{
+	void *prTmpMemInfo = NULL;
+
+	GLUE_SPIN_LOCK_DECLARATION();
+
+	GLUE_ACQUIRE_SPIN_LOCK(prGlueInfo, SPIN_LOCK_NET_DEV);
+	prTmpMemInfo = *pprMemInfo;
+	*pprMemInfo = NULL;
+	GLUE_RELEASE_SPIN_LOCK(prGlueInfo, SPIN_LOCK_NET_DEV);
+
+	kalMemFree(prTmpMemInfo, VIR_MEM_TYPE, size);
+}
+
 /*----------------------------------------------------------------------------*/
 /*!
  * \brief Free memory for P2P_INFO, GL_P2P_INFO, P2P_CONNECTION_SETTINGS
- *                                          P2P_SPECIFIC_BSS_INFO, P2P_FSM_INFO
+ *        P2P_SPECIFIC_BSS_INFO, P2P_FSM_INFO
  *
  * \param[in] prGlueInfo      Pointer to glue info
  *
@@ -513,25 +549,16 @@ u8 p2PFreeInfo(P_GLUE_INFO_T prGlueInfo)
 					sizeof(P2P_DEV_FSM_INFO_T));
 			}
 
+			p2pFreeMemSafe(
+				prGlueInfo,
+				(void **)&prWifiVar->prP2pQueryStaStatistics,
+				sizeof(P2P_CONNECTION_SETTINGS_T));
+
 			scanRemoveAllP2pBssDesc(prAdapter);
 		}
 	}
 
 	return true;
-}
-
-void p2pFreeMemSafe(P_GLUE_INFO_T prGlueInfo, void **pprMemInfo, u32 size)
-{
-	void *prTmpMemInfo = NULL;
-
-	GLUE_SPIN_LOCK_DECLARATION();
-
-	GLUE_ACQUIRE_SPIN_LOCK(prGlueInfo, SPIN_LOCK_NET_DEV);
-	prTmpMemInfo = *pprMemInfo;
-	*pprMemInfo = NULL;
-	GLUE_RELEASE_SPIN_LOCK(prGlueInfo, SPIN_LOCK_NET_DEV);
-
-	kalMemFree(prTmpMemInfo, VIR_MEM_TYPE, size);
 }
 
 u8 p2pNetRegister(P_GLUE_INFO_T prGlueInfo, u8 fgIsRtnlLockAcquired)
@@ -755,7 +782,7 @@ u8 p2pNetUnregister(P_GLUE_INFO_T prGlueInfo, u8 fgIsRtnlLockAcquired)
 	return true;
 }
 
-/*----------------------------------------------------------------------------*/
+/*---------------------------------------------------------------------------*/
 /*!
  * \brief Register for cfg80211 for Wi-Fi Direct
  *
@@ -764,7 +791,7 @@ u8 p2pNetUnregister(P_GLUE_INFO_T prGlueInfo, u8 fgIsRtnlLockAcquired)
  * \return   true
  *           false
  */
-/*----------------------------------------------------------------------------*/
+/*---------------------------------------------------------------------------*/
 u8 glRegisterP2P(P_GLUE_INFO_T prGlueInfo, const char *prDevName,
 		 const char *prDevName2, u8 ucApMode)
 {
@@ -796,20 +823,13 @@ u8 glRegisterP2P(P_GLUE_INFO_T prGlueInfo, const char *prDevName,
 		if ((ucApMode == RUNNING_DUAL_AP_MODE) ||
 		    (ucApMode == RUNNING_P2P_AP_MODE)) {
 			ucRegisterNum = 2;
-			if (gprP2pRoleWdev[1] == NULL) { /* Create device only
-				                          * when not created
-				                          * before. */
+			if (gprP2pRoleWdev[1] == NULL) {
+				/* Create device only when not created before. */
 				DBGLOG(P2P,
 				       ERROR,
 				       "Might encounter deadlock creating wireless device here\n");
-				glP2pCreateWirelessDevice(prGlueInfo); /* There
-				                                        * would
-				                                        * be
-				                                        * risk
-				                                        * encouter
-				                                        * deadlock
-				                                        * here.
-				                                        */
+				glP2pCreateWirelessDevice(prGlueInfo);
+				/* There would be risk encouter deadlock here. */
 			}
 		}
 	}

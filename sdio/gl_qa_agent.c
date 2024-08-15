@@ -2241,7 +2241,7 @@ static s32 HQA_ReadBulkEEPROM(struct net_device *prNetDev,
 	PARAM_CUSTOM_ACCESS_EFUSE_T rAccessEfuseInfo;
 	u32 u4BufLen = 0;
 	u8 u4Loop = 0;
-	uint32_t u4TotalOffset = 0;
+	u32 u4TotalOffset = 0;
 
 	u16 Buffer;
 	P_GLUE_INFO_T prGlueInfo = NULL;

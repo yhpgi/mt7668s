@@ -992,7 +992,6 @@ u8 kalDevPortWrite(IN P_GLUE_INFO_T prGlueInfo, IN u16 u2Port, IN u32 u4Len,
 		/* ENE workaround */
 		{
 			int tmp;
-
 			sdio_writel(prSdioFunc, 0x0,
 				    SDIO_X86_WORKAROUND_WRITE_MCR, &tmp);
 		}

@@ -481,7 +481,7 @@ int mtk_cfg80211_get_station(struct wiphy *wiphy, struct net_device *ndev,
 	PARAM_MAC_ADDRESS arBssid;
 	u32 u4BufLen, u4Rate;
 	s32 i4Rssi;
-	PARAM_GET_STA_STA_STATISTICS rQueryStaStatistics;
+	PARAM_GET_STA_STATISTICS rQueryStaStatistics;
 	u32 u4TotalError;
 	struct net_device_stats *prDevStats;
 
@@ -627,7 +627,7 @@ int mtk_cfg80211_get_link_statistics(struct wiphy *wiphy,
 	PARAM_MAC_ADDRESS arBssid;
 	u32 u4BufLen;
 	s32 i4Rssi;
-	PARAM_GET_STA_STA_STATISTICS rQueryStaStatistics;
+	PARAM_GET_STA_STATISTICS rQueryStaStatistics;
 	PARAM_GET_BSS_STATISTICS rQueryBssStatistics;
 	struct net_device_stats *prDevStats;
 	P_NETDEV_PRIVATE_GLUE_INFO prNetDevPrivate =
@@ -1042,11 +1042,11 @@ int mtk_cfg80211_auth(struct wiphy *wiphy, struct net_device *ndev,
 		rNewSsid.u4SsidLen = SSID_IE(req->bss->ies->data)->ucLength;
 	}
 #endif
-	/* rNewSsid.pucSsid = (uint8_t *)sme->ssid;*/
+	/* rNewSsid.pucSsid = (u8 *)sme->ssid;*/
 	/* rNewSsid.u4SsidLen = sme->ssid_len;*/
 
 	DBGLOG(REQ, STATE, "auth to  BSS [" MACSTR "],UpperReq [" MACSTR "]\n",
-	       MAC2STR(rNewSsid.pucBssid), MAC2STR((uint8_t *)req->bss->bssid));
+	       MAC2STR(rNewSsid.pucBssid), MAC2STR((u8 *)req->bss->bssid));
 
 	prConnSettings->fgIsSendAssoc = false;
 	if (!prConnSettings->fgIsConnInitialized || fgNewAuthParam) {
@@ -2445,7 +2445,7 @@ int mtk_cfg80211_testmode_get_sta_statistics(IN struct wiphy *wiphy,
 	u32 u4TxTotalCount;
 
 	P_NL80211_DRIVER_GET_STA_STATISTICS_PARAMS prParams = NULL;
-	PARAM_GET_STA_STA_STATISTICS rQueryStaStatistics;
+	PARAM_GET_STA_STATISTICS rQueryStaStatistics;
 	struct sk_buff *skb;
 
 	ASSERT(wiphy);
@@ -2465,7 +2465,7 @@ int mtk_cfg80211_testmode_get_sta_statistics(IN struct wiphy *wiphy,
 	}
 
 	skb = cfg80211_testmode_alloc_reply_skb(
-		wiphy, sizeof(PARAM_GET_STA_STA_STATISTICS) + 1);
+		wiphy, sizeof(PARAM_GET_STA_STATISTICS) + 1);
 
 	if (!skb) {
 		DBGLOG(QM, ERROR, "%s allocate skb failed:%lx\n", __func__,
@@ -2870,7 +2870,7 @@ int mtk_cfg80211_sched_scan_start(IN struct wiphy *wiphy,
 }
 
 int mtk_cfg80211_sched_scan_stop(IN struct wiphy *wiphy,
-				 IN struct net_device *ndev)
+				 IN struct net_device *ndev, IN u64 reqid)
 {
 	P_GLUE_INFO_T prGlueInfo = NULL;
 	WLAN_STATUS rStatus;
@@ -3261,7 +3261,7 @@ int mtk_cfg80211_assoc(struct wiphy *wiphy, struct net_device *ndev,
 	if (req->ie && req->ie_len > 0) {
 		pucIEStart = (u8 *)req->ie;
 		if (wextSrchDesiredWPSIE(pucIEStart, req->ie_len, 0xDD,
-					 (uint8_t **)&prDesiredIE)) {
+					 (u8 **)&prDesiredIE)) {
 			prGlueInfo->fgWpsActive = true;
 			fgCarryWPSIE = true;
 			rStatus = kalIoctl(prGlueInfo, wlanoidSetWSCAssocInfo,
@@ -3336,7 +3336,7 @@ int mtk_cfg80211_assoc(struct wiphy *wiphy, struct net_device *ndev,
 
 		/* Gen RSNXE */
 		if (wextSrchDesiredWPAIE(pucIEStart, req->ie_len, 0xf4,
-					 (uint8_t **)&prDesiredIE)) {
+					 (u8 **)&prDesiredIE)) {
 			u16 u2Length = (*(prDesiredIE + 1) + 2);
 
 			if (u2Length <= sizeof(prConnSettings->rRsnXE)) {
@@ -4209,5 +4209,39 @@ int mtk_cfg80211_suspend(struct wiphy *wiphy, struct cfg80211_wowlan *wow)
 		DBGLOG(REQ, WARN, "cfg 80211 suspend fail!\n");
 		return -EINVAL;
 	}
+
+	return 0;
+}
+
+/*----------------------------------------------------------------------------*/
+/*!
+ * @brief cfg80211 resume callback, will be invoked in wiphy_resume.
+ *
+ * @param wiphy: pointer to wiphy
+ *
+ * @retval 0:       successful
+ *         others:  failure
+ */
+/*----------------------------------------------------------------------------*/
+int mtk_cfg80211_resume(struct wiphy *wiphy)
+{
+	P_GLUE_INFO_T prGlueInfo = NULL;
+	P_ADAPTER_T prAdapter = NULL;
+	u32 rStatus, u4InfoLen;
+
+	DBGLOG(REQ, TRACE, "mtk_cfg80211_resume\n");
+
+	WIPHY_PRIV(wiphy, prGlueInfo);
+	if (prGlueInfo)
+		prAdapter = prGlueInfo->prAdapter;
+	if (prAdapter == NULL)
+		goto end;
+
+	rStatus = kalIoctl(prGlueInfo, wlanoidIndicateBssInfo, (void *)NULL, 0,
+			   false, false, false, &u4InfoLen);
+
+	if (rStatus != WLAN_STATUS_SUCCESS)
+		DBGLOG(REQ, WARN, "ScanResultLog error:%x\n", rStatus);
+end:
 	return 0;
 }

@@ -422,4 +422,10 @@ void p2pProcessEvent_UpdateNOAParam(IN P_ADAPTER_T prAdapter,
 				    IN P_EVENT_UPDATE_NOA_PARAMS_T
 				    prEventUpdateNoaParam);
 
+void p2pRoleFsmRunEventScanAbort(IN P_ADAPTER_T prAdapter, IN u8 ucBssIdx);
+
+void p2pRoleFsmStateTransition(IN P_ADAPTER_T prAdapter,
+			       IN P_P2P_ROLE_FSM_INFO_T prP2pRoleFsmInfo,
+			       IN ENUM_P2P_ROLE_STATE_T eNextState);
+
 #endif

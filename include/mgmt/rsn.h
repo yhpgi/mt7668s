@@ -249,9 +249,9 @@ u32 rsnCalOweIELen(IN P_ADAPTER_T prAdapter,
 
 #if CFG_SUPPORT_H2E
 void rsnGenerateRSNXE(IN P_ADAPTER_T prAdapter,IN OUT P_MSDU_INFO_T prMsduInfo);
-uint32_t rsnCalRSNXELen(IN P_ADAPTER_T prAdapter,
-			IN uint8_t ucBssIndex,
-			P_STA_RECORD_T prStaRec);
+u32 rsnCalRSNXELen(IN P_ADAPTER_T prAdapter,
+		   IN u8 ucBssIndex,
+		   P_STA_RECORD_T prStaRec);
 #endif
 
 /*******************************************************************************

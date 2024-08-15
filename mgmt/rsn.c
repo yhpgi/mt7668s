@@ -240,8 +240,8 @@ u8 rsnParseRsnIE(IN P_ADAPTER_T prAdapter, IN P_RSN_INFO_ELEM_T prInfoElem,
 		}
 
 		/* Parse PMKID List field */
-		i = (uint32_t)u2DesiredPmkidCnt * RSN_PMKID_LEN;
-		if (u4RemainRsnIeLen < (int32_t)i) {
+		i = (u32)u2DesiredPmkidCnt * RSN_PMKID_LEN;
+		if (u4RemainRsnIeLen < (s32)i) {
 			DBGLOG(RSN,
 			       TRACE,
 			       "Fail to parse RSN IE in pairwise cipher suite list (IE len: %d)\n",
@@ -258,8 +258,7 @@ u8 rsnParseRsnIE(IN P_ADAPTER_T prAdapter, IN P_RSN_INFO_ELEM_T prInfoElem,
 				    (u2SupportedPmkidCnt * RSN_PMKID_LEN));
 		}
 		cp += u2DesiredPmkidCnt * RSN_PMKID_LEN;
-		u4RemainRsnIeLen -=
-			(int32_t)(u2DesiredPmkidCnt * RSN_PMKID_LEN);
+		u4RemainRsnIeLen -= (s32)(u2DesiredPmkidCnt * RSN_PMKID_LEN);
 
 		if (u4RemainRsnIeLen == 0)
 			break;
@@ -3323,8 +3322,8 @@ void rsnApSaQueryAction(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb)
 /*----------------------------------------------------------------------------*/
 void rsnGenerateRSNXE(IN P_ADAPTER_T prAdapter, IN OUT P_MSDU_INFO_T prMsduInfo)
 {
-	uint8_t *pucBuffer;
-	uint8_t ucLength;
+	u8 *pucBuffer;
+	u8 ucLength;
 	P_CONNECTION_SETTINGS_T prConnSettings;
 
 	prConnSettings = &(prAdapter->rWifiVar.rConnSettings);
@@ -3338,8 +3337,8 @@ void rsnGenerateRSNXE(IN P_ADAPTER_T prAdapter, IN OUT P_MSDU_INFO_T prMsduInfo)
 
 	ASSERT(prMsduInfo);
 
-	pucBuffer = (uint8_t *)((unsigned long)prMsduInfo->prPacket +
-				(unsigned long)prMsduInfo->u2FrameLength);
+	pucBuffer = (u8 *)((unsigned long)prMsduInfo->prPacket +
+			   (unsigned long)prMsduInfo->u2FrameLength);
 
 	ASSERT(pucBuffer);
 
@@ -3370,8 +3369,8 @@ void rsnGenerateRSNXE(IN P_ADAPTER_T prAdapter, IN OUT P_MSDU_INFO_T prMsduInfo)
  *      Called by: AIS module, Associate request
  */
 /*----------------------------------------------------------------------------*/
-uint32_t rsnCalRSNXELen(IN P_ADAPTER_T prAdapter, IN uint8_t ucBssIndex,
-			P_STA_RECORD_T prStaRec)
+u32 rsnCalRSNXELen(IN P_ADAPTER_T prAdapter, IN u8 ucBssIndex,
+		   P_STA_RECORD_T prStaRec)
 {
 	P_CONNECTION_SETTINGS_T prConnSettings;
 

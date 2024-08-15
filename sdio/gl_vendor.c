@@ -273,8 +273,8 @@ int mtk_cfg80211_vendor_get_version(struct wiphy *wiphy,
 	struct sk_buff *skb = NULL;
 	struct nlattr *attrlist = NULL;
 	char aucVersionBuf[256];
-	uint16_t u2CopySize = 0;
-	uint16_t u2Len = 0;
+	u16 u2CopySize = 0;
+	u16 u2Len = 0;
 	P_WIFI_VER_INFO_T prVerInfo;
 
 	ASSERT(wiphy);
@@ -284,7 +284,7 @@ int mtk_cfg80211_vendor_get_version(struct wiphy *wiphy,
 		return -ENOMEM;
 
 	kalMemZero(aucVersionBuf, 256);
-	attrlist = (struct nlattr *)((uint8_t *)data);
+	attrlist = (struct nlattr *)((u8 *)data);
 	if (attrlist->nla_type == LOGGER_ATTRIBUTE_DRIVER_VER) {
 		char aucDriverVersionStr[] = NIC_DRIVER_VERSION_STRING
 					     "_2024062603000003";
@@ -338,7 +338,7 @@ int mtk_cfg80211_vendor_get_supported_feature_set(struct wiphy *wiphy,
 						  const void *data,
 						  int data_len)
 {
-	uint32_t u4FeatureSet;
+	u32 u4FeatureSet;
 	P_GLUE_INFO_T prGlueInfo;
 	struct sk_buff *skb;
 

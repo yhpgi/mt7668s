@@ -393,20 +393,12 @@ typedef struct _MONITOR_RADIOTAP_T {
  * Since linux-4.8.y the 2nd parameter is changed from bool to
  * struct cfg80211_scan_info, but we don't use all fields yet.
  */
-#if KERNEL_VERSION(4, 8, 0) <= CFG80211_VERSION_CODE
 static inline void kalCfg80211ScanDone(struct cfg80211_scan_request *request,
 				       bool aborted)
 {
 	struct cfg80211_scan_info info = { .aborted = aborted };
 	cfg80211_scan_done(request, &info);
 }
-#else
-static inline void kalCfg80211ScanDone(struct cfg80211_scan_request *request,
-				       bool aborted)
-{
-	cfg80211_scan_done(request, aborted);
-}
-#endif
 
 /* Consider on some Android platform, using request_firmware_direct()
  * may cause system failed to load firmware. So we still use
@@ -674,6 +666,22 @@ extern int __printk_ratelimit(const char *func);
 	}
 
 #define KAL_GET_HOST_CLOCK()		   local_clock()
+
+/*----------------------------------------------------------------------------*/
+/* Macros of wiphy operations for using in Driver Layer                       */
+/*----------------------------------------------------------------------------*/
+#define WIPHY_PRIV(_wiphy, _priv) \
+	(_priv = *((P_GLUE_INFO_T *)wiphy_priv(_wiphy)))
+
+/*----------------------------------------------------------------------------*/
+/* Macros of show stack operations for using in Driver Layer                  */
+/*----------------------------------------------------------------------------*/
+#define kal_show_stack(_adapter, _task, _sp)				\
+	{								\
+		if (_adapter->chip_info->showTaskStack) {		\
+			_adapter->chip_info->showTaskStack(_task, _sp);	\
+		}							\
+	}
 
 /*******************************************************************************
  *                  F U N C T I O N   D E C L A R A T I O N S

@@ -2978,7 +2978,7 @@ wlanoidGetTxPwrTbl(IN P_ADAPTER_T prAdapter,
 		   OUT u32 *pu4QueryInfoLen);
 #endif
 
-uint32_t wlanGetSupportedFeatureSet(IN P_GLUE_INFO_T prGlueInfo);
+u32 wlanGetSupportedFeatureSet(IN P_GLUE_INFO_T prGlueInfo);
 
 WLAN_STATUS wlanSuspendLinkDown(IN P_GLUE_INFO_T prGlueInfo);
 
@@ -3003,6 +3003,11 @@ wlanoidPktProcessIT(IN P_ADAPTER_T prAdapter,
 		    u32 u4BufferLen,
 		    u32 *pu4InfoLen);
 #endif
+
+u32 wlanoidIndicateBssInfo(IN P_ADAPTER_T prAdapter,
+			   IN void *pvSetBuffer,
+			   IN u32 u4SetBufferLen,
+			   OUT u32 *pu4SetInfoLen);
 
 /*******************************************************************************
  *                              F U N C T I O N S

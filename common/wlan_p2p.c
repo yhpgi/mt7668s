@@ -1128,3 +1128,20 @@ wlanoidQueryP2pRssi(IN P_ADAPTER_T prAdapter, IN void *pvQueryBuffer,
 				   u4QueryBufferLen);
 }
 #endif
+
+u32 wlanoidAbortP2pScan(IN P_ADAPTER_T prAdapter, OUT void *pvQueryBuffer,
+			IN u32 u4QueryBufferLen, OUT u32 *pu4QueryInfoLen)
+{
+	u8 ucBssIdx;
+
+	ASSERT(prAdapter);
+
+	ucBssIdx = *((u8 *)pvQueryBuffer);
+
+	if (ucBssIdx == prAdapter->ucP2PDevBssIdx)
+		p2pDevFsmRunEventScanAbort(prAdapter, ucBssIdx);
+	else
+		p2pRoleFsmRunEventScanAbort(prAdapter, ucBssIdx);
+
+	return WLAN_STATUS_SUCCESS;
+}

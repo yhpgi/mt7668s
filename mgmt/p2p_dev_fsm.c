@@ -428,6 +428,29 @@ void p2pDevFsmRunEventScanRequest(IN P_ADAPTER_T prAdapter,
 		cnmMemFree(prAdapter, prMsgHdr);
 }
 
+void p2pDevFsmRunEventScanAbort(IN P_ADAPTER_T prAdapter, IN u8 ucBssIdx)
+{
+	P_P2P_DEV_FSM_INFO_T prP2pDevFsmInfo = (P_P2P_DEV_FSM_INFO_T)NULL;
+
+	do {
+		ASSERT_BREAK(prAdapter != NULL);
+
+		DBGLOG(P2P, TRACE, "p2pDevFsmRunEventScanAbort\n");
+
+		prP2pDevFsmInfo = prAdapter->rWifiVar.prP2pDevFsmInfo;
+
+		if (prP2pDevFsmInfo->eCurrentState == P2P_DEV_STATE_SCAN) {
+			P_P2P_SCAN_REQ_INFO_T prScanReqInfo =
+				&(prP2pDevFsmInfo->rScanReqInfo);
+
+			prScanReqInfo->fgIsAbort = true;
+
+			p2pDevFsmStateTransition(prAdapter, prP2pDevFsmInfo,
+						 P2P_DEV_STATE_IDLE);
+		}
+	} while (false);
+}
+
 void p2pDevFsmRunEventScanDone(IN P_ADAPTER_T prAdapter,
 			       IN P_MSG_HDR_T prMsgHdr,
 			       IN P_P2P_DEV_FSM_INFO_T prP2pDevFsmInfo)
@@ -841,3 +864,29 @@ void p2pDevFsmRunEventActiveDevBss(IN P_ADAPTER_T prAdapter,
 }
 
 #endif
+
+void p2pRoleFsmRunEventScanAbort(IN P_ADAPTER_T prAdapter, IN u8 ucBssIdx)
+{
+	P_P2P_ROLE_FSM_INFO_T prP2pRoleFsmInfo = NULL;
+	P_BSS_INFO_T prP2pBssInfo = NULL;
+
+	do {
+		ASSERT_BREAK(prAdapter != NULL);
+
+		DBGLOG(P2P, TRACE, "p2pRoleFsmRunEventScanAbort\n");
+
+		prP2pBssInfo = prAdapter->aprBssInfo[ucBssIdx];
+		prP2pRoleFsmInfo = P2P_ROLE_INDEX_2_ROLE_FSM_INFO(
+			prAdapter, prP2pBssInfo->u4PrivateData);
+
+		if (prP2pRoleFsmInfo->eCurrentState == P2P_ROLE_STATE_SCAN) {
+			P_P2P_SCAN_REQ_INFO_T prScanReqInfo =
+				&(prP2pRoleFsmInfo->rScanReqInfo);
+
+			prScanReqInfo->fgIsAbort = true;
+
+			p2pRoleFsmStateTransition(prAdapter, prP2pRoleFsmInfo,
+						  P2P_ROLE_STATE_IDLE);
+		}
+	} while (false);
+}

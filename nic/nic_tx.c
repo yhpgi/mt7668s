@@ -2068,7 +2068,7 @@ WLAN_STATUS nicTxCmd(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo,
 	P_TX_CTRL_T prTxCtrl;
 	struct sk_buff *skb;
 #if CFG_MESON_G12A_PATCH
-	uint32_t ret = WLAN_STATUS_SUCCESS;
+	u32 ret = WLAN_STATUS_SUCCESS;
 #endif
 
 	KAL_SPIN_LOCK_DECLARATION();

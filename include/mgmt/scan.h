@@ -303,6 +303,14 @@ struct _ROAM_BSS_DESC_T {
 };
 #endif
 
+typedef struct _SCHED_SCAN_PARAM { /* Used by SCAN FSM */
+	u8 ucSeqNum;
+	u8 ucBssIndex; /* Network Type */
+	u8 fgStopAfterIndication; /* always FALSE */
+	u8 ucMatchSSIDNum; /* Match SSID */
+	P_BSS_DESC_T aprPendingBssDescToInd[SCN_SSID_MATCH_MAX_NUM];
+} SCHED_SCAN_PARAM_T, *P_SCHED_SCAN_PARAM_T;
+
 typedef struct _SCAN_PARAM_T { /* Used by SCAN FSM */
 	/* Active or Passive */
 	ENUM_SCAN_TYPE_T eScanType;
@@ -407,6 +415,8 @@ typedef struct _SCAN_INFO_T {
 	u16 au2ChannelIdleTime[64];
 	u8 aucChannelFlag[64];
 	u8 aucChannelMDRDYCnt[64];
+
+	SCHED_SCAN_PARAM_T rSchedScanParam;
 } SCAN_INFO_T, *P_SCAN_INFO_T;
 
 /* Incoming Mailbox Messages */

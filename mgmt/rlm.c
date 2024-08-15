@@ -3537,7 +3537,7 @@ u32 rlmFillVhtCapIEByAdapter(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo,
 		prVhtCap->u4VhtCapInfo |= VHT_CAP_INFO_RX_LDPC;
 
 	if (IS_FEATURE_ENABLED(prAdapter->rWifiVar.ucRxStbc)) {
-		uint8_t tempRxStbcNss = prAdapter->rWifiVar.ucRxStbcNss;
+		u8 tempRxStbcNss = prAdapter->rWifiVar.ucRxStbcNss;
 
 		if (tempRxStbcNss > supportNss) {
 			DBGLOG(TDLS, WARN,
@@ -3706,7 +3706,7 @@ u32 rlmFillHtCapIEByAdapter(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo,
 	}
 
 	if (IS_FEATURE_ENABLED(prAdapter->rWifiVar.ucRxStbc)) {
-		uint8_t tempRxStbcNss = prAdapter->rWifiVar.ucRxStbcNss;
+		u8 tempRxStbcNss = prAdapter->rWifiVar.ucRxStbcNss;
 
 		if (tempRxStbcNss > supportNss) {
 			DBGLOG(TDLS, WARN,

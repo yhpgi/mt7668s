@@ -2424,7 +2424,7 @@ static int wext_set_encode_ext(IN struct net_device *prNetDev,
 	u8 wepBuf[48];
 	P_PARAM_WEP_T prWepKey = (P_PARAM_WEP_T)wepBuf;
 
-	uint8_t *keyStructBuf;
+	u8 *keyStructBuf;
 	P_PARAM_REMOVE_KEY_T prRemoveKey;
 	P_PARAM_KEY_T prKey;
 

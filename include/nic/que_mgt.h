@@ -931,7 +931,7 @@ void qmResetTcControlResource(IN P_ADAPTER_T prAdapter);
 
 #if (CFG_SUPPORT_REPLAY_DETECTION || CFG_SUPPORT_FRAG_ATTACK_DETECTION)
 #define CCMPTSCPNNUM    6
-u8 qmRxPNtoU64(uint8_t *pucPN, uint8_t uPNNum, uint64_t *pu64Rets);
+u8 qmRxPNtoU64(u8 *pucPN, u8 uPNNum, u64 *pu64Rets);
 #endif
 
 #if CFG_SUPPORT_REPLAY_DETECTION

@@ -248,7 +248,7 @@
 #if CFG_MESON_G12A_PATCH
 #define HAL_WRITE_TX_CMD(_prAdapter, _prCmdInfo, _ucTC)			    \
 	({								    \
-		uint32_t retval;					    \
+		u32 retval;						    \
 		if (_prAdapter->rAcpiState == ACPI_STATE_D3) {		    \
 			ASSERT(0);					    \
 		}							    \
@@ -638,4 +638,7 @@ u8 halIsTxResourceControlEn(IN P_ADAPTER_T prAdapter);
 void halTxResourceResetHwTQCounter(IN P_ADAPTER_T prAdapter);
 
 void halWpdmaSetup(P_GLUE_INFO_T prGlueInfo, u8 enable);
+
+bool halIsHifStateReady(IN P_ADAPTER_T prAdapter, u8 *pucState);
+
 #endif

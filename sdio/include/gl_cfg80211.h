@@ -264,7 +264,8 @@ int mtk_cfg80211_sched_scan_start(IN struct wiphy *wiphy,
 				  IN struct cfg80211_sched_scan_request *request);
 
 int mtk_cfg80211_sched_scan_stop(IN struct wiphy *wiphy,
-				 IN struct net_device *ndev);
+				 IN struct net_device *ndev,
+				 IN u64 reqid);
 
 int mtk_cfg80211_assoc(struct wiphy *wiphy,
 		       struct net_device *ndev,
@@ -309,6 +310,8 @@ void cfg80211_regd_set_wiphy(IN struct wiphy *pWiphy);
 void mtk_cfg80211_set_wakeup(struct wiphy *wiphy, bool enabled);
 
 int mtk_cfg80211_suspend(struct wiphy *wiphy, struct cfg80211_wowlan *wow);
+
+int mtk_cfg80211_resume(struct wiphy *wiphy);
 
 /*******************************************************************************
  *                              F U N C T I O N S

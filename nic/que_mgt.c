@@ -3471,17 +3471,17 @@ P_SW_RFB_T qmHandleRxPackets(IN P_ADAPTER_T prAdapter,
 /*----------------------------------------------------------------------------*/
 u8 qmDetectRxInvalidEAPOL(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb)
 {
-	uint8_t *pucPkt = NULL;
-	uint8_t ucBssIndex;
+	u8 *pucPkt = NULL;
+	u8 ucBssIndex;
 	BSS_INFO_T *prBssInfo;
-	uint16_t u2EtherType = 0;
-	u_int8_t fgDrop = false;
+	u16 u2EtherType = 0;
+	u8 fgDrop = false;
 	P_STA_RECORD_T prStaRec;
-	uint8_t *pucPaylod = NULL;
-	uint16_t u2FrameCtrl;
+	u8 *pucPaylod = NULL;
+	u16 u2FrameCtrl;
 	WLAN_MAC_HEADER_T *prWlanHeader = NULL;
-	uint8_t *pucDaAddr = NULL;
-	uint8_t jj, fgFound = false;
+	u8 *pucDaAddr = NULL;
+	u8 jj, fgFound = false;
 	P_STA_RECORD_T prTmpStaRec;
 
 	if (!prSwRfb) {
@@ -3640,18 +3640,18 @@ u8 qmDetectRxInvalidEAPOL(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb)
 /*----------------------------------------------------------------------------*/
 u8 qmAmsduAttackDetection(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb)
 {
-	u_int8_t fgDrop = false;
-	uint8_t aucTaAddr[MAC_ADDR_LEN];
-	uint8_t *pucTaAddr = NULL, *pucRaAddr = NULL;
-	uint8_t *pucSaAddr = NULL, *pucDaAddr = NULL;
-	uint8_t *pucAmsduAddr = NULL, *pucCmpAddr = NULL;
-	uint8_t ucBssIndex = 0;
+	u8 fgDrop = false;
+	u8 aucTaAddr[MAC_ADDR_LEN];
+	u8 *pucTaAddr = NULL, *pucRaAddr = NULL;
+	u8 *pucSaAddr = NULL, *pucDaAddr = NULL;
+	u8 *pucAmsduAddr = NULL, *pucCmpAddr = NULL;
+	u8 ucBssIndex = 0;
 	BSS_INFO_T *prBssInfo = NULL;
 	STA_RECORD_T *prStaRec = NULL;
-	uint16_t u2FrameCtrl, u2SSN;
+	u16 u2FrameCtrl, u2SSN;
 	WLAN_MAC_HEADER_T *prWlanHeader = NULL;
-	uint8_t ucTid;
-	uint8_t *pucPaylod = NULL;
+	u8 ucTid;
+	u8 *pucPaylod = NULL;
 
 	DEBUGFUNC("qmAmsduAttackDetection");
 

@@ -366,6 +366,8 @@ int mtk_p2p_cfg80211_get_station(struct wiphy *wiphy,
 int mtk_p2p_cfg80211_scan(struct wiphy *wiphy,
 			  struct cfg80211_scan_request *request);
 
+void mtk_p2p_cfg80211_abort_scan(struct wiphy *wiphy,struct wireless_dev *wdev);
+
 int mtk_p2p_cfg80211_set_wiphy_params(struct wiphy *wiphy, u32 changed);
 
 int mtk_p2p_cfg80211_connect(struct wiphy *wiphy,
@@ -418,6 +420,14 @@ int mtk_p2p_cfg80211_channel_switch(struct wiphy *wiphy,
 int mtk_p2p_cfg80211_change_bss(struct wiphy *wiphy,
 				struct net_device *dev,
 				struct bss_parameters *params);
+
+int mtk_p2p_cfg80211_auth(struct wiphy *wiphy,
+			  struct net_device *ndev,
+			  struct cfg80211_auth_request *req);
+
+int mtk_p2p_cfg80211_assoc(struct wiphy *wiphy,
+			   struct net_device *ndev,
+			   struct cfg80211_assoc_request *req);
 
 int mtk_p2p_cfg80211_deauth(struct wiphy *wiphy,
 			    struct net_device *dev,

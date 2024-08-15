@@ -6289,15 +6289,15 @@ wlanoidQueryStaStatistics(IN P_ADAPTER_T prAdapter, IN void *pvQueryBuffer,
 		if ((u4QueryBufferLen) && (pvQueryBuffer == NULL))
 			break;
 
-		if (u4QueryBufferLen < sizeof(PARAM_GET_STA_STA_STATISTICS)) {
-			*pu4QueryInfoLen = sizeof(PARAM_GET_STA_STA_STATISTICS);
+		if (u4QueryBufferLen < sizeof(PARAM_GET_STA_STATISTICS)) {
+			*pu4QueryInfoLen = sizeof(PARAM_GET_STA_STATISTICS);
 			rResult = WLAN_STATUS_BUFFER_TOO_SHORT;
 			break;
 		}
 
 		prQueryStaStatistics =
 			(P_PARAM_GET_STA_STATISTICS)pvQueryBuffer;
-		*pu4QueryInfoLen = sizeof(PARAM_GET_STA_STA_STATISTICS);
+		*pu4QueryInfoLen = sizeof(PARAM_GET_STA_STATISTICS);
 
 		/* 4 5. Get driver global QM counter */
 #if QM_ADAPTIVE_TC_RESOURCE_CTRL
@@ -6980,14 +6980,10 @@ void wlanInitFeatureOption(IN P_ADAPTER_T prAdapter)
 
 	prWifiVar->ucNSS = (u8)wlanCfgGetUint32(prAdapter, "Nss", 2);
 
-	prWifiVar->ucAp5gNSS =
-		(uint8_t)wlanCfgGetUint32(prAdapter, "Ap5gNss", 2);
-	prWifiVar->ucAp2gNSS =
-		(uint8_t)wlanCfgGetUint32(prAdapter, "Ap2gNss", 2);
-	prWifiVar->ucGo5gNSS =
-		(uint8_t)wlanCfgGetUint32(prAdapter, "Go5gNss", 2);
-	prWifiVar->ucGo2gNSS =
-		(uint8_t)wlanCfgGetUint32(prAdapter, "Go2gNss", 2);
+	prWifiVar->ucAp5gNSS = (u8)wlanCfgGetUint32(prAdapter, "Ap5gNss", 2);
+	prWifiVar->ucAp2gNSS = (u8)wlanCfgGetUint32(prAdapter, "Ap2gNss", 2);
+	prWifiVar->ucGo5gNSS = (u8)wlanCfgGetUint32(prAdapter, "Go5gNss", 2);
+	prWifiVar->ucGo2gNSS = (u8)wlanCfgGetUint32(prAdapter, "Go2gNss", 2);
 
 	/* Max Rx MPDU length setting
 	 * 0: 3k
@@ -7221,16 +7217,16 @@ void wlanInitFeatureOption(IN P_ADAPTER_T prAdapter)
 	prWifiVar->ucWlanSetCamDuringAct = (u8)wlanCfgGetUint32(
 		prAdapter, "WlanSetCamDuringAct", FEATURE_DISABLED);
 #ifdef SUPPORT_PERIODIC_PS
-	prWifiVar->ucPspCAMInt = (uint8_t)wlanCfgGetUint32(
-		prAdapter, "WowPspCAMInt", PSP_CAM_INT_DEFAULT);
-	prWifiVar->ucAwakePspCAMInt = (uint8_t)wlanCfgGetUint32(
+	prWifiVar->ucPspCAMInt = (u8)wlanCfgGetUint32(prAdapter, "WowPspCAMInt",
+						      PSP_CAM_INT_DEFAULT);
+	prWifiVar->ucAwakePspCAMInt = (u8)wlanCfgGetUint32(
 		prAdapter, "AwakePspCAMInt", AWAKE_PSP_CAM_INT_DEFAULT);
-	prWifiVar->ucPspPSInt = (uint8_t)wlanCfgGetUint32(
-		prAdapter, "WowPspPSInt", PSP_PS_INT_DEFAULT);
-	prWifiVar->ucAwakePspPSInt = (uint8_t)wlanCfgGetUint32(
+	prWifiVar->ucPspPSInt = (u8)wlanCfgGetUint32(prAdapter, "WowPspPSInt",
+						     PSP_PS_INT_DEFAULT);
+	prWifiVar->ucAwakePspPSInt = (u8)wlanCfgGetUint32(
 		prAdapter, "AwakePspPSInt", AWAKE_PSP_PS_INT_DEFAULT);
 #endif
-	prWifiVar->ucWaitConnect = (uint8_t)wlanCfgGetUint32(
+	prWifiVar->ucWaitConnect = (u8)wlanCfgGetUint32(
 		prAdapter, "WaitConnect", WAIT_CONNECT_DEFAULT);
 	prWifiVar->ucListenDtimInterval =
 		(u8)wlanCfgGetUint32(prAdapter, "ListenDtimInt",
@@ -10123,7 +10119,7 @@ u8 wlanGetSpeIdx(IN P_ADAPTER_T prAdapter, IN u8 ucBssIndex,
 u8 wlanGetSupportNss(IN P_ADAPTER_T prAdapter, IN u8 ucBssIndex)
 {
 	P_BSS_INFO_T prBssInfo;
-	uint8_t ucRetValNss = prAdapter->rWifiVar.ucNSS;
+	u8 ucRetValNss = prAdapter->rWifiVar.ucNSS;
 
 	if (ucBssIndex > MAX_BSS_INDEX) {
 		DBGLOG(SW4, ERROR, "Invalid BssInfo index[%u], skip dump!\n",

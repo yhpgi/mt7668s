@@ -732,7 +732,7 @@ typedef struct _PARAM_GET_STA_STATISTICS {
 
 	/* Reserved fields */
 	u8 au4Reserved[20];
-} PARAM_GET_STA_STA_STATISTICS, *P_PARAM_GET_STA_STATISTICS;
+} PARAM_GET_STA_STATISTICS, *P_PARAM_GET_STA_STATISTICS;
 
 typedef struct _PARAM_GET_BSS_STATISTICS {
 	/* Per-STA statistic */

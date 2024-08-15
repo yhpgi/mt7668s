@@ -100,13 +100,13 @@ static s32 g_i4NextDriverReadLen;
 static ssize_t procDbgLevelRead(struct file *filp, char __user *buf,
 				size_t count, loff_t *f_pos)
 {
-	uint8_t *pucProcBuf = kalMemZAlloc(PROC_MAX_BUF_SIZE, VIR_MEM_TYPE);
-	uint8_t *temp = pucProcBuf;
+	u8 *pucProcBuf = kalMemZAlloc(PROC_MAX_BUF_SIZE, VIR_MEM_TYPE);
+	u8 *temp = pucProcBuf;
 	u32 u4CopySize = 0;
 	u16 i;
 	u16 u2ModuleNum = 0;
 	s32 i4Pos = 0;
-	int32_t i4Ret = 0;
+	s32 i4Ret = 0;
 
 	/* if *f_ops>0, we should return 0 to make cat command exit */
 	if (*f_pos > 0 || buf == NULL || pucProcBuf == NULL) {
@@ -242,12 +242,12 @@ static int procEfuseDumpOpen(struct inode *inode, struct file *file)
 static ssize_t procCfgRead(struct file *filp, char __user *buf, size_t count,
 			   loff_t *f_pos)
 {
-	uint8_t *pucProcBuf = kalMemZAlloc(PROC_MAX_BUF_SIZE, VIR_MEM_TYPE);
-	uint8_t *temp = pucProcBuf;
+	u8 *pucProcBuf = kalMemZAlloc(PROC_MAX_BUF_SIZE, VIR_MEM_TYPE);
+	u8 *temp = pucProcBuf;
 	u32 u4CopySize = 0;
 	u16 i;
 	s32 i4Pos = 0;
-	int32_t i4Ret = 0;
+	s32 i4Ret = 0;
 
 #define BUFFER_RESERVE_BYTE    50
 
@@ -332,12 +332,12 @@ freeBuf:
 static ssize_t procCfgWrite(struct file *file, const char __user *buffer,
 			    size_t count, loff_t *data)
 {
-	uint8_t *pucProcBuf = kalMemZAlloc(PROC_MAX_BUF_SIZE, VIR_MEM_TYPE);
+	u8 *pucProcBuf = kalMemZAlloc(PROC_MAX_BUF_SIZE, VIR_MEM_TYPE);
 	s32 u4CopySize = PROC_MAX_BUF_SIZE;
 	P_GLUE_INFO_T prGlueInfo;
 	u8 *pucTmp;
 	s32 i4Pos = 0;
-	int32_t i4Ret = 0;
+	s32 i4Ret = 0;
 
 	if (count <= 0) {
 		DBGLOG(INIT, ERROR, "Wrong buffer size\n");
@@ -388,10 +388,10 @@ static ssize_t procDriverCmdRead(struct file *filp, char __user *buf,
 static ssize_t procDriverCmdWrite(struct file *file, const char __user *buffer,
 				  size_t count, loff_t *data)
 {
-	uint8_t *pucProcBuf = kalMemZAlloc(PROC_MAX_BUF_SIZE, VIR_MEM_TYPE);
-	uint32_t u4CopySize = PROC_MAX_BUF_SIZE;
+	u8 *pucProcBuf = kalMemZAlloc(PROC_MAX_BUF_SIZE, VIR_MEM_TYPE);
+	u32 u4CopySize = PROC_MAX_BUF_SIZE;
 	P_GLUE_INFO_T prGlueInfo = g_prGlueInfo_proc;
-	int32_t i4Ret = 0;
+	s32 i4Ret = 0;
 
 	if (buffer == NULL || pucProcBuf == NULL || prGlueInfo == NULL) {
 		i4Ret = 0;
@@ -426,10 +426,10 @@ static ssize_t procDbgLevelWrite(struct file *file, const char __user *buffer,
 				 size_t count, loff_t *data)
 {
 	u32 u4NewDbgModule, u4NewDbgLevel;
-	uint8_t *pucProcBuf = kalMemZAlloc(PROC_MAX_BUF_SIZE, VIR_MEM_TYPE);
-	uint8_t *temp = NULL;
+	u8 *pucProcBuf = kalMemZAlloc(PROC_MAX_BUF_SIZE, VIR_MEM_TYPE);
+	u8 *temp = NULL;
 	u32 u4CopySize = PROC_MAX_BUF_SIZE;
-	int32_t i4Ret = 0;
+	s32 i4Ret = 0;
 
 	if (buffer == NULL || pucProcBuf == NULL) {
 		i4Ret = 0;
@@ -911,14 +911,14 @@ static const struct file_operations get_txpwr_tbl_ops = {
 static ssize_t procMCRRead(struct file *filp, char __user *buf, size_t count,
 			   loff_t *f_pos)
 {
-	uint8_t *pucProcBuf = kalMemZAlloc(PROC_MAX_BUF_SIZE, VIR_MEM_TYPE);
+	u8 *pucProcBuf = kalMemZAlloc(PROC_MAX_BUF_SIZE, VIR_MEM_TYPE);
 	P_GLUE_INFO_T prGlueInfo;
 	PARAM_CUSTOM_MCR_RW_STRUCT_T rMcrInfo;
 	u32 u4BufLen;
-	uint32_t u4CopySize = 0;
+	u32 u4CopySize = 0;
 	u8 *temp = NULL;
 	WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
-	int32_t i4Ret = 0;
+	s32 i4Ret = 0;
 
 	/*if *f_ops>0, we should return 0 to make cat command exit*/
 	if (*f_pos > 0 || buf == NULL || pucProcBuf == NULL) {
@@ -978,7 +978,7 @@ static ssize_t procMCRWrite(struct file *file, const char __user *buffer,
 {
 	P_GLUE_INFO_T prGlueInfo;
 	char acBuf[PROC_MCR_ACCESS_MAX_USER_INPUT_LEN + 1]; /* + 1 for "\0" */
-	uint32_t u4CopySize = 0;
+	u32 u4CopySize = 0;
 	PARAM_CUSTOM_MCR_RW_STRUCT_T rMcrInfo;
 	u32 u4BufLen;
 	WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
@@ -1044,10 +1044,10 @@ static const struct file_operations mcr_ops = {
 static ssize_t procCountryRead(struct file *filp, char __user *buf,
 			       size_t count, loff_t *f_pos)
 {
-	uint8_t *pucProcBuf = kalMemZAlloc(PROC_MAX_BUF_SIZE, VIR_MEM_TYPE);
+	u8 *pucProcBuf = kalMemZAlloc(PROC_MAX_BUF_SIZE, VIR_MEM_TYPE);
 	u32 u4CopySize;
 	u32 country = 0;
-	int32_t i4Ret = 0;
+	s32 i4Ret = 0;
 
 	/* if *f_pos > 0, it means has read successed last time, don't try again
 	 */

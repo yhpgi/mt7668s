@@ -644,6 +644,8 @@ typedef struct _WIFI_VAR_T {
 
 	/* Currently we only support 2 p2p interface. */
 	P_P2P_ROLE_FSM_INFO_T aprP2pRoleFsmInfo[BSS_P2P_NUM];
+
+	P_PARAM_GET_STA_STATISTICS prP2pQueryStaStatistics[BSS_P2P_NUM];
 #endif
 
 	WLAN_TABLE_T arWtbl[WTBL_SIZE];
@@ -754,10 +756,10 @@ typedef struct _WIFI_VAR_T {
 
 	u8 ucNSS;
 
-	uint8_t ucAp5gNSS; /* Less or euqal than ucNss */
-	uint8_t ucAp2gNSS; /* Less or euqal than ucNss */
-	uint8_t ucGo5gNSS; /* Less or euqal than ucNss */
-	uint8_t ucGo2gNSS; /* Less or euqal than ucNss */
+	u8 ucAp5gNSS; /* Less or euqal than ucNss */
+	u8 ucAp2gNSS; /* Less or euqal than ucNss */
+	u8 ucGo5gNSS; /* Less or euqal than ucNss */
+	u8 ucGo2gNSS; /* Less or euqal than ucNss */
 
 	u8 ucRxMaxMpduLen;
 	u32 u4TxMaxAmsduInAmpduLen;
@@ -1050,6 +1052,12 @@ struct _ADAPTER_T {
 
 	P_BSS_INFO_T aprBssInfo[HW_BSSID_NUM + 1];
 	P_BSS_INFO_T prAisBssInfo;
+
+	u8 ucHwBssIdNum;
+	u8 ucWmmSetNum;
+	u8 ucWtblEntryNum;
+	u8 ucTxDefaultWlanIndex;
+	u8 ucP2PDevBssIdx;
 
 #if CFG_TCP_IP_CHKSUM_OFFLOAD
 	u8 fgIsSupportCsumOffload; /* Does FW support Checksum Offload feature
@@ -1409,6 +1417,10 @@ struct _ADAPTER_T {
  *                                 M A C R O S
  *******************************************************************************
  */
+
+/* TODO */
+#define SUSPEND_FLAG_FOR_WAKEUP_REASON	  (0)
+#define SUSPEND_FLAG_CLEAR_WHEN_RESUME	  (1)
 
 /* Macros for argument _BssIndex */
 #define IS_NET_ACTIVE(_prAdapter, _BssIndex) \

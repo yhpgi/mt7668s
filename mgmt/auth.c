@@ -876,7 +876,7 @@ authSendDeauthFrame(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prBssInfo,
 	u16 u2EstimatedFrameLen;
 	u8 ucRoleIdx = 0;
 	u8 fgIsInterruptContext = false;
-	uint8_t *pFrameBuf;
+	u8 *pFrameBuf;
 	P_DEAUTH_INFO_T prDeauthInfo;
 	u32 rCurrentTime;
 	s32 i4NewEntryIndex, i;

@@ -116,18 +116,6 @@ struct delayed_work sched_workq;
 static u8 *apucEepromName[] = { (u8 *)CFG_EEPRM_FILENAME "_MT", NULL };
 #endif
 
-int CFG80211_Suspend(struct wiphy *wiphy, struct cfg80211_wowlan *wow)
-{
-	DBGLOG(INIT, INFO, "CFG80211 suspend CB\n");
-	return 0;
-}
-
-int CFG80211_Resume(struct wiphy *wiphy)
-{
-	DBGLOG(INIT, INFO, "CFG80211 resume CB\n");
-	return 0;
-}
-
 /*******************************************************************************
  *                           P R I V A T E   D A T A
  *******************************************************************************
@@ -285,7 +273,7 @@ static struct cfg80211_ops mtk_wlan_ops = {
 	.set_rekey_data = mtk_cfg80211_set_rekey_data,
 	.set_wakeup = mtk_cfg80211_set_wakeup,
 	.suspend = mtk_cfg80211_suspend,
-	.resume = CFG80211_Resume,
+	.resume = mtk_cfg80211_resume,
 	.auth = mtk_cfg80211_auth,
 	.assoc = mtk_cfg80211_assoc,
 	.remain_on_channel = mtk_cfg80211_remain_on_channel,
@@ -441,8 +429,8 @@ u16 wlanSelectQueue(struct net_device *dev, struct sk_buff *skb,
 /*!
  * \brief Load NVRAM data and translate it into REG_INFO_T
  *
- * \param[in]  prGlueInfo Pointer to struct GLUE_INFO_T
- * \param[out] prRegInfo  Pointer to struct REG_INFO_T
+ * \param[in]  prGlueInfo Pointer to P_GLUE_INFO_T
+ * \param[out] prRegInfo  Pointer to P_REG_INFO_T
  *
  * \return (none)
  */
@@ -738,7 +726,7 @@ int wlanDoIOCTL(struct net_device *prDev, struct ifreq *prIfReq, int i4Cmd)
 /*!
  * \brief Export wlan GLUE_INFO_T pointer to p2p module
  *
- * \param[in]  prGlueInfo Pointer to struct GLUE_INFO_T
+ * \param[in]  prGlueInfo Pointer to P_GLUE_INFO_T
  *
  * \return true: get GlueInfo pointer successfully
  *            false: wlan is not started yet
@@ -1574,6 +1562,7 @@ static s32 wlanNetRegister(struct wireless_dev *prWdev)
 		ASSERT(prNetDevPrivate->prGlueInfo == prGlueInfo);
 		prNetDevPrivate->ucBssIdx =
 			prGlueInfo->prAdapter->prAisBssInfo->ucBssIndex;
+
 		wlanBindBssIdxToNetInterface(
 			prGlueInfo,
 			prGlueInfo->prAdapter->prAisBssInfo->ucBssIndex,
@@ -1647,6 +1636,7 @@ static void wlanCreateWirelessDevice(void)
 	}
 	/* 4 <1.2> Create wiphy */
 	prWiphy = wiphy_new(&mtk_wlan_ops, sizeof(GLUE_INFO_T));
+
 	if (!prWiphy) {
 		DBGLOG(INIT, ERROR,
 		       "Allocating memory to wiphy device failed\n");
@@ -1662,9 +1652,6 @@ static void wlanCreateWirelessDevice(void)
 				   BIT(NL80211_IFTYPE_P2P_CLIENT) |
 				   BIT(NL80211_IFTYPE_ADHOC);
 	prWiphy->bands[NL80211_BAND_2GHZ] = &mtk_band_2ghz;
-	/* always assign 5Ghz bands here, if the chip is not support 5Ghz,
-	 *  bands[NL80211_BAND_5GHZ] will be assign to NULL
-	 */
 	prWiphy->bands[NL80211_BAND_5GHZ] = &mtk_band_5ghz;
 	prWiphy->signal_type = CFG80211_SIGNAL_TYPE_MBM;
 	prWiphy->cipher_suites = (const u32 *)mtk_cipher_suites;
@@ -1767,7 +1754,6 @@ static struct wireless_dev *wlanNetCreate(void *pvData, void *pvDriverData)
 	struct device *prDev;
 	P_NETDEV_PRIVATE_GLUE_INFO prNetDevPrivate =
 		(P_NETDEV_PRIVATE_GLUE_INFO)NULL;
-
 	u8 *prInfName = NULL;
 
 	if (prWdev == NULL) {
@@ -2468,19 +2454,31 @@ label_exit:
 /*----------------------------------------------------------------------------*/
 s32 wlanProbe(void *pvData, void *pvDriverData)
 {
+	enum ENUM_PROBE_FAIL_REASON {
+		BUS_INIT_FAIL,
+		NET_CREATE_FAIL,
+		BUS_SET_IRQ_FAIL,
+		ADAPTER_START_FAIL,
+		NET_REGISTER_FAIL,
+		PROC_INIT_FAIL,
+		FAIL_MET_INIT_PROCFS,
+		FAIL_REASON_NUM
+	} eFailReason;
+
 	struct wireless_dev *prWdev = NULL;
 	P_WLANDEV_INFO_T prWlandevInfo = NULL;
 	s32 i4DevIdx = 0;
 	P_GLUE_INFO_T prGlueInfo = NULL;
 	P_ADAPTER_T prAdapter = NULL;
 	s32 i4Status = 0;
-	u8 bRet = false;
+	u8 i, bRet = false;
 	P_REG_INFO_T prRegInfo;
 
 #if CFG_SUPPORT_REPLAY_DETECTION
 	u8 ucRpyDetectOffload;
 #endif
 
+	eFailReason = FAIL_REASON_NUM;
 	do {
 		/* 4 <1> Initialize the IO port of the interface */
 		/* GeorgeKuo: pData has different meaning for _HIF_XXX:
@@ -2495,8 +2493,10 @@ s32 wlanProbe(void *pvData, void *pvDriverData)
 		if (bRet == false) {
 			DBGLOG(INIT, ERROR, "wlanProbe: glBusInit() fail\n");
 			i4Status = -EIO;
+			eFailReason = BUS_INIT_FAIL;
 			break;
 		}
+
 		/* 4 <2> Create network device, Adapter, KalInfo,
 		 * prDevHandler(netdev) */
 		prWdev = wlanNetCreate(pvData, pvDriverData);
@@ -2504,9 +2504,12 @@ s32 wlanProbe(void *pvData, void *pvDriverData)
 			DBGLOG(INIT, ERROR,
 			       "wlanProbe: No memory for dev and its private\n");
 			i4Status = -ENOMEM;
+			eFailReason = NET_CREATE_FAIL;
 			break;
 		}
+
 		DBGLOG(INIT, STATE, "wlanNetCreate done\n");
+
 		/* 4 <2.5> Set the ioaddr to HIF Info */
 		prGlueInfo = (P_GLUE_INFO_T)wiphy_priv(prWdev->wiphy);
 		if (prGlueInfo == NULL) {
@@ -2524,6 +2527,7 @@ s32 wlanProbe(void *pvData, void *pvDriverData)
 
 		if (i4Status != WLAN_STATUS_SUCCESS) {
 			DBGLOG(INIT, ERROR, "wlanProbe: Set IRQ error\n");
+			eFailReason = BUS_SET_IRQ_FAIL;
 			return -1;
 		}
 
@@ -2576,10 +2580,10 @@ s32 wlanProbe(void *pvData, void *pvDriverData)
 		prGlueInfo->rWpaInfo.u4CipherGroup = IW_AUTH_CIPHER_NONE;
 		prGlueInfo->rWpaInfo.u4CipherPairwise = IW_AUTH_CIPHER_NONE;
 
-		tasklet_init(&prGlueInfo->rRxTask, NULL,
-			     (unsigned long)prGlueInfo);
-		tasklet_init(&prGlueInfo->rTxCompleteTask, NULL,
-			     (unsigned long)prGlueInfo);
+		/* tasklet_init(&prGlueInfo->rRxTask, NULL,
+		 *           (unsigned long)prGlueInfo);
+		 * tasklet_init(&prGlueInfo->rTxCompleteTask, NULL,
+		 *           (unsigned long)prGlueInfo); */
 
 		DBGLOG(INIT, STATE, "wlanAdapterStart\n");
 		if (wlanAdapterStart(prAdapter, prRegInfo) !=
@@ -2619,6 +2623,10 @@ s32 wlanProbe(void *pvData, void *pvDriverData)
 		}
 
 		/* kfree(prRegInfo); */
+		if (i4Status < 0) {
+			eFailReason = ADAPTER_START_FAIL;
+			break;
+		}
 
 		DBGLOG(INIT, STATE, "starting wlan threads ...\n");
 		INIT_WORK(&prGlueInfo->rTxMsduFreeWork, kalFreeTxMsduWorker);
@@ -2763,6 +2771,7 @@ s32 wlanProbe(void *pvData, void *pvDriverData)
 		i4DevIdx = wlanNetRegister(prWdev);
 		if (i4DevIdx < 0) {
 			i4Status = -ENXIO;
+			eFailReason = NET_REGISTER_FAIL;
 			DBGLOG(INIT,
 			       ERROR,
 			       "wlanProbe: Cannot register the net_device context to the kernel\n");
@@ -2817,6 +2826,27 @@ s32 wlanProbe(void *pvData, void *pvDriverData)
 			}
 		}
 #endif
+
+		/* Configure 5G band for registered wiphy */
+		if (prAdapter->fgEnable5GBand)
+			prWdev->wiphy->bands[NL80211_BAND_5GHZ] =
+				&mtk_band_5ghz;
+		else
+			prWdev->wiphy->bands[NL80211_BAND_5GHZ] = NULL;
+
+		for (i = 0; i < KAL_P2P_NUM; i++) {
+			if (gprP2pRoleWdev[i] == NULL)
+				continue;
+
+			if (prAdapter->fgEnable5GBand)
+				gprP2pRoleWdev[i]
+				->wiphy->bands[NL80211_BAND_5GHZ] =
+					&mtk_band_5ghz;
+			else
+				gprP2pRoleWdev[i]
+				->wiphy->bands[NL80211_BAND_5GHZ] =
+					NULL;
+		}
 	} while (false);
 
 	if (i4Status == 0) {
@@ -2871,12 +2901,48 @@ s32 wlanProbe(void *pvData, void *pvDriverData)
 #endif
 		DBGLOG(INIT, STATE, "wlanProbe: probe success\n");
 		set_bit(GLUE_FLAG_ADAPT_RDY_BIT, &prGlueInfo->ulFlag);
-	} else {
-		if (prGlueInfo == NULL)
-			return -1;
 
-		glBusFreeIrq(prGlueInfo->prDevHandler, prGlueInfo);
-		DBGLOG(INIT, ERROR, "wlanProbe: probe failed\n");
+		/* card is ready */
+		prGlueInfo->u4ReadyFlag = 1;
+	} else {
+		DBGLOG(INIT, ERROR, "wlanProbe: probe failed, reason:%d\n",
+		       eFailReason);
+		switch (eFailReason) {
+		case FAIL_MET_INIT_PROCFS:
+			kalMetRemoveProcfs(prGlueInfo);
+		/* FALLTHRU */
+		case PROC_INIT_FAIL:
+			wlanNetUnregister(prWdev);
+		/* FALLTHRU */
+		case NET_REGISTER_FAIL:
+			set_bit(GLUE_FLAG_HALT_BIT, &prGlueInfo->ulFlag);
+			/* wake up main thread */
+			wake_up_interruptible(&prGlueInfo->waitq);
+			/* wait main thread stops */
+			wait_for_completion_interruptible(
+				&prGlueInfo->rHaltComp);
+			wlanAdapterStop(prAdapter);
+		/* fallthrough */
+		case ADAPTER_START_FAIL:
+			glBusFreeIrq(prWdev->netdev,
+				     *((struct GLUE_INFO **)netdev_priv(
+					       prWdev->netdev)));
+		/* fallthrough */
+		case BUS_SET_IRQ_FAIL:
+			wlanNetDestroy(prWdev);
+			/* prGlueInfo->prAdapter is released in
+			 * wlanNetDestroy
+			 */
+			/* Set NULL value for local prAdapter as well */
+			prAdapter = NULL;
+			break;
+		case NET_CREATE_FAIL:
+			break;
+		case BUS_INIT_FAIL:
+			break;
+		default:
+			break;
+		}
 	}
 
 	if (prWaitForResetComp) {
@@ -2909,7 +2975,7 @@ void wlanRemove(void)
 	 * init_completion() and all the subsequent calls will use
 	 * reinit_completion() to reinit
 	 */
-	static u_int8_t waitForResetCompInit = 0;
+	static u8 waitForResetCompInit = 0;
 
 	DBGLOG(INIT, STATE, "Remove wlan!\n");
 
@@ -2947,6 +3013,7 @@ void wlanRemove(void)
 		return;
 	}
 
+	prGlueInfo->u4ReadyFlag = 0;
 	prAdapter = prGlueInfo->prAdapter;
 
 	if (prGlueInfo->eParamMediaStateIndicated ==
@@ -2970,8 +3037,6 @@ void wlanRemove(void)
 	g_u4HaltFlag = 1;
 	up(&g_halt_sem);
 
-	/* 4 <2> Mark HALT, notify main thread to stop, and clean up queued
-	 * requests */
 	set_bit(GLUE_FLAG_HALT_BIT, &prGlueInfo->ulFlag);
 
 	DBGLOG(INIT, STATE, "wlan thread stopping\n");
@@ -3054,8 +3119,8 @@ void wlanRemove(void)
 	wlanNetDestroy(prDev->ieee80211_ptr);
 	prDev = NULL;
 
-	tasklet_kill(&prGlueInfo->rTxCompleteTask);
-	tasklet_kill(&prGlueInfo->rRxTask);
+	/* tasklet_kill(&prGlueInfo->rTxCompleteTask);
+	 * tasklet_kill(&prGlueInfo->rRxTask); */
 
 	/* 4 <8> Unregister early suspend callback */
 #if CFG_ENABLE_EARLY_SUSPEND
@@ -3127,7 +3192,7 @@ static void mt76x8_wireless_exit(void)
 
 struct mt76x8_wifi_priv {
 	int reset_gpio;
-	uint32_t reset_delay_ms;
+	u32 reset_delay_ms;
 };
 
 static int mt76x8_reset_chip(struct mt76x8_wifi_priv *wifi)

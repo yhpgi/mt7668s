@@ -2442,7 +2442,7 @@ void nicCmdEventQueryStaStatistics(IN P_ADAPTER_T prAdapter,
 		prStaStatistics = (P_PARAM_GET_STA_STATISTICS)
 				  prCmdInfo->pvInformationBuffer;
 
-		u4QueryInfoLen = sizeof(PARAM_GET_STA_STA_STATISTICS);
+		u4QueryInfoLen = sizeof(PARAM_GET_STA_STATISTICS);
 
 		/* Statistics from FW is valid */
 		if (prEvent->u4Flags & BIT(0)) {
