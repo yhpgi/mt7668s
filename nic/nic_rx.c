@@ -1963,8 +1963,11 @@ void nicRxProcessEventPacket(IN P_ADAPTER_T prAdapter,
 
 	prEvent = (P_WIFI_EVENT_T)prSwRfb->pucRecvBuff;
 
-	if (prEvent->ucEID != EVENT_ID_DEBUG_MSG &&
-	    prEvent->ucEID != EVENT_ID_ASSERT_DUMP) {
+	if (prEvent->ucEID != EVENT_ID_DEBUG_MSG
+#if CFG_ASSERT_DUMP
+	    && prEvent->ucEID != EVENT_ID_ASSERT_DUMP
+#endif
+	    ) {
 		DBGLOG(NIC, INFO, "RX EVENT: ID[0x%02X] SEQ[%u] LEN[%u]\n",
 		       prEvent->ucEID, prEvent->ucSeqNum,
 		       prEvent->u2PacketLength);

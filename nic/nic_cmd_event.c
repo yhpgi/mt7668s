@@ -3898,6 +3898,7 @@ void nicEventDumpMem(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent,
 void nicEventAssertDump(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent,
 			IN u32 u4EventBufLen)
 {
+#if CFG_ASSERT_DUMP
 	if (wlanIsChipRstRecEnabled(prAdapter))
 		wlanChipRstPreAct(prAdapter);
 
@@ -3988,6 +3989,7 @@ void nicEventAssertDump(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent,
 			wlanCorDumpTimerReset(prAdapter, false);
 		}
 	}
+#endif
 }
 
 void nicEventRddSendPulse(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent,

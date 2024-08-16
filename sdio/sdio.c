@@ -167,8 +167,6 @@ int mtk_sdio_probe(struct sdio_func *func, const struct sdio_device_id *id)
 {
 	int ret;
 
-	dev_info(&func->dev, "Mediatek MT7668S Probe Start\n");
-
 	ASSERT(func);
 	ASSERT(id);
 
@@ -188,7 +186,6 @@ int mtk_sdio_probe(struct sdio_func *func, const struct sdio_device_id *id)
 		return -1;
 	}
 
-	dev_info(&func->dev, "Mediatek MT7668S Probe Success\n");
 	return WLAN_STATUS_SUCCESS;
 }
 
