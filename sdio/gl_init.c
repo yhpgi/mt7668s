@@ -30,7 +30,6 @@
 #include "gl_cfg80211.h"
 #include "precomp.h"
 #include "gl_kal.h"
-#include "gl_vendor.h"
 
 /*******************************************************************************
  *                              C O N S T A N T S
@@ -285,41 +284,6 @@ static struct cfg80211_ops mtk_wlan_ops = {
 #ifdef CONFIG_NL80211_TESTMODE
 	.testmode_cmd = mtk_cfg80211_testmode_cmd,
 #endif
-};
-
-static const struct wiphy_vendor_command mtk_wlan_vendor_ops[] = {
-	{ { .vendor_id = GOOGLE_OUI, .subcmd = WIFI_SUBCMD_GET_CHANNEL_LIST },
-	  .flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
-	  .doit = mtk_cfg80211_vendor_get_channel_list,
-	  VENDOR_OPS_SET_POLICY(VENDOR_CMD_RAW_DATA) },
-	{ { .vendor_id = GOOGLE_OUI, .subcmd = WIFI_SUBCMD_SET_COUNTRY_CODE },
-	  .flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
-	  .doit = mtk_cfg80211_vendor_set_country_code,
-	  VENDOR_OPS_SET_POLICY(VENDOR_CMD_RAW_DATA) },
-
-	/* Get Driver Version or Firmware Version */
-	{ { .vendor_id = GOOGLE_OUI, .subcmd = LOGGER_GET_VER },
-	  .flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
-	  .doit = mtk_cfg80211_vendor_get_version,
-	  VENDOR_OPS_SET_POLICY(VENDOR_CMD_RAW_DATA) },
-	/* Get Supported Feature Set */
-	{ { .vendor_id = GOOGLE_OUI, .subcmd = WIFI_SUBCMD_GET_FEATURE_SET },
-	  .flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
-	  .doit = mtk_cfg80211_vendor_get_supported_feature_set,
-	  VENDOR_OPS_SET_POLICY(VENDOR_CMD_RAW_DATA) },
-};
-
-static const struct nl80211_vendor_cmd_info mtk_wlan_vendor_events[] = {
-	{ .vendor_id = GOOGLE_OUI,
-	  .subcmd = GSCAN_EVENT_SIGNIFICANT_CHANGE_RESULTS },
-	{ .vendor_id = GOOGLE_OUI,
-	  .subcmd = GSCAN_EVENT_HOTLIST_RESULTS_FOUND },
-	{ .vendor_id = GOOGLE_OUI,
-	  .subcmd = GSCAN_EVENT_SCAN_RESULTS_AVAILABLE },
-	{ .vendor_id = GOOGLE_OUI, .subcmd = GSCAN_EVENT_FULL_SCAN_RESULTS },
-	{ .vendor_id = GOOGLE_OUI, .subcmd = RTT_EVENT_COMPLETE },
-	{ .vendor_id = GOOGLE_OUI, .subcmd = GSCAN_EVENT_COMPLETE_SCAN },
-	{ .vendor_id = GOOGLE_OUI, .subcmd = GSCAN_EVENT_HOTLIST_RESULTS_LOST },
 };
 
 /* There isn't a lot of sense in it, but you can transmit anything you like */
@@ -1110,10 +1074,10 @@ void wlanDebugInit(void)
 	for (i = 0; i < DBG_MODULE_NUM; i++)
 		aucDebugModule[i] = CFG_DEFAULT_DBG_LEVEL;
 
-	aucDebugModule[DBG_QM_IDX] &=
-		~(DBG_CLASS_EVENT | DBG_CLASS_INFO | DBG_CLASS_WARN);
-	aucDebugModule[DBG_RSN_IDX] &=
-		~(DBG_CLASS_EVENT | DBG_CLASS_INFO | DBG_CLASS_WARN);
+	/* aucDebugModule[DBG_QM_IDX] &=
+	 * ~(DBG_CLASS_EVENT | DBG_CLASS_INFO | DBG_CLASS_WARN);
+	 * aucDebugModule[DBG_RSN_IDX] &=
+	 * ~(DBG_CLASS_EVENT | DBG_CLASS_INFO | DBG_CLASS_WARN); */
 
 #else
 	for (i = 0; i < DBG_MODULE_NUM; i++) {
@@ -1681,11 +1645,6 @@ static void wlanCreateWirelessDevice(void)
 #endif
 	prWiphy->max_remain_on_channel_duration = 5000;
 	prWiphy->mgmt_stypes = mtk_cfg80211_ais_default_mgmt_stypes;
-	prWiphy->vendor_commands = mtk_wlan_vendor_ops;
-	prWiphy->n_vendor_commands = sizeof(mtk_wlan_vendor_ops) /
-				     sizeof(struct wiphy_vendor_command);
-	prWiphy->vendor_events = mtk_wlan_vendor_events;
-	prWiphy->n_vendor_events = ARRAY_SIZE(mtk_wlan_vendor_events);
 
 	/* 4 <1.4> wowlan support */
 #ifdef CONFIG_PM
@@ -3188,136 +3147,6 @@ static void mt76x8_wireless_exit(void)
 	wlanUnregisterRebootNotifier();
 }
 
-#ifdef CFG_SUPPORT_MT76X8_WIFI_PLATFORM_DRIVER
-
-struct mt76x8_wifi_priv {
-	int reset_gpio;
-	u32 reset_delay_ms;
-};
-
-static int mt76x8_reset_chip(struct mt76x8_wifi_priv *wifi)
-{
-	if (!gpio_is_valid(wifi->reset_gpio))
-		return -EINVAL;
-
-	DBGLOG(INIT, STATE, "Resetting wifi chip\n");
-
-	gpio_direction_output(wifi->reset_gpio, 0);
-	mdelay(wifi->reset_delay_ms);
-	gpio_direction_output(wifi->reset_gpio, 1);
-
-	return 0;
-}
-
-static int mt76x8_wifi_probe(struct platform_device *pdev)
-{
-	struct mt76x8_wifi_priv *wifi;
-	struct device *dev = &pdev->dev;
-	struct device_node *np = pdev->dev.of_node;
-	int gpio, ret = 0;
-	const char *pwr_limit_file;
-
-	wifi = devm_kzalloc(dev, sizeof(struct mt76x8_wifi_priv), GFP_KERNEL);
-	if (!wifi)
-		return -ENOMEM;
-
-	platform_set_drvdata(pdev, wifi);
-
-	if (np) {
-		gpio = of_get_named_gpio(np, "reset-gpio", 0);
-
-		if (gpio_is_valid(gpio)) {
-			wifi->reset_gpio = gpio;
-
-			ret = of_property_read_u32(np, "reset-delay-ms",
-						   &wifi->reset_delay_ms);
-			if (ret) {
-				DBGLOG(INIT,
-				       WARN,
-				       "No defined reset delay value in dt, use default value\n");
-				wifi->reset_delay_ms =
-					MT76X8_WIFI_RESET_DEFAULT_DELAY_MS;
-			}
-
-			ret = mt76x8_reset_chip(wifi);
-		} else {
-			DBGLOG(INIT,
-			       WARN,
-			       "no reset gpio provided in dt, will not HW reset device\n");
-		}
-
-		/* overriding default power limit file if specified */
-		if (!of_property_read_string(np, "tx_pwr_limit_file_override",
-					     &pwr_limit_file)) {
-			rlmDomainOverridePwrLimitFileName(pwr_limit_file);
-		}
-
-		ret = mt76x8_wireless_init();
-	}
-
-	return ret;
-}
-
-static int mt76x8_wifi_remove(struct platform_device *pdev)
-{
-	DBGLOG(INIT, INFO, "remove wifi driver\n");
-
-	mt76x8_wireless_exit();
-
-	return 0;
-}
-
-static const struct of_device_id mt76x8_wifi_ids[] = {
-	{
-		.compatible = "mediatek,mt76x8_wifi_sdio",
-	},
-	{ /* end of table */ },
-};
-
-MODULE_DEVICE_TABLE(of, mt76x8_wifi_ids);
-
-static struct platform_driver mt76x8_wifi_driver = {
-	.driver =
-	{
-		.name = DRIVER_NAME,
-		.owner = THIS_MODULE,
-		.of_match_table = mt76x8_wifi_ids,
-	},
-	.probe = mt76x8_wifi_probe,
-	.remove = mt76x8_wifi_remove,
-};
-
-static int registerDriver(void)
-{
-	int ret = 0;
-
-	ret = platform_driver_register(&mt76x8_wifi_driver);
-	if (ret) {
-		DBGLOG(INIT, ERROR,
-		       "faild to register mt76x8_wifi_driver(%d)\n", ret);
-	}
-
-	return ret;
-}
-
-static void unregisterDriver(void)
-{
-	platform_driver_unregister(&mt76x8_wifi_driver);
-}
-
-#else
-static int registerDriver(void)
-{
-	return mt76x8_wireless_init();
-}
-
-static void unregisterDriver(void)
-{
-	mt76x8_wireless_exit();
-}
-
-#endif
-
 /*----------------------------------------------------------------------------*/
 /*!
  * \brief Driver entry point when the driver is configured as a Linux Module,
@@ -3343,11 +3172,9 @@ static int initWlan(void)
 #endif
 
 	wlanDebugInit();
-
 	DBGLOG(INIT, STATE, "initWlan..\n");
 
-	registerDriver();
-
+	mt76x8_wireless_init();
 	DBGLOG(INIT, STATE, "initWlan end\n");
 
 	return ret;
@@ -3372,7 +3199,7 @@ static void exitWlan(void)
 							  SEC_TO_SYSTIME(5));
 	}
 
-	unregisterDriver();
+	mt76x8_wireless_exit();
 	DBGLOG(INIT, STATE, "exitWlan end\n");
 }
 

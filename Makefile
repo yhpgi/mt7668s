@@ -69,7 +69,6 @@ mt7668s-objs := \
     sdio/gl_p2p_init.o \
     sdio/gl_p2p_kal.o \
     sdio/gl_proc.o \
-    sdio/gl_vendor.o \
     sdio/gl_wext.o \
     sdio/gl_wext_priv.o \
     sdio/hal_api.o \

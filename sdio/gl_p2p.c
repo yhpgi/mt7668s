@@ -33,7 +33,6 @@
 #include "gl_p2p_ioctl.h"
 
 #include "precomp.h"
-#include "gl_vendor.h"
 #include "gl_cfg80211.h"
 
 /*******************************************************************************
@@ -114,17 +113,6 @@ static struct cfg80211_ops mtk_p2p_ops = {
 #ifdef CONFIG_NL80211_TESTMODE
 	.testmode_cmd = mtk_p2p_cfg80211_testmode_cmd,
 #endif
-};
-
-static const struct wiphy_vendor_command mtk_p2p_vendor_ops[] = {
-	{ { .vendor_id = GOOGLE_OUI, .subcmd = WIFI_SUBCMD_GET_CHANNEL_LIST },
-	  .flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
-	  .doit = mtk_cfg80211_vendor_get_channel_list,
-	  VENDOR_OPS_SET_POLICY(VENDOR_CMD_RAW_DATA) },
-	{ { .vendor_id = GOOGLE_OUI, .subcmd = WIFI_SUBCMD_SET_COUNTRY_CODE },
-	  .flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
-	  .doit = mtk_cfg80211_vendor_set_country_code,
-	  VENDOR_OPS_SET_POLICY(VENDOR_CMD_RAW_DATA) },
 };
 
 /* There isn't a lot of sense in it, but you can transmit anything you like */
@@ -1087,9 +1075,6 @@ u8 glP2pCreateWirelessDevice(P_GLUE_INFO_T prGlueInfo)
 	prWiphy->max_scan_ssids = MAX_SCAN_LIST_NUM;
 	prWiphy->max_scan_ie_len = MAX_SCAN_IE_LEN;
 	prWiphy->signal_type = CFG80211_SIGNAL_TYPE_MBM;
-	prWiphy->vendor_commands = mtk_p2p_vendor_ops;
-	prWiphy->n_vendor_commands = sizeof(mtk_p2p_vendor_ops) /
-				     sizeof(struct wiphy_vendor_command);
 	prWiphy->iface_combinations = p2p_iface_comb_mcc;
 	prWiphy->n_iface_combinations = ARRAY_SIZE(p2p_iface_comb_mcc);
 	prWiphy->max_num_csa_counters = 2;
