@@ -306,7 +306,7 @@ struct _ROAM_BSS_DESC_T {
 typedef struct _SCHED_SCAN_PARAM { /* Used by SCAN FSM */
 	u8 ucSeqNum;
 	u8 ucBssIndex; /* Network Type */
-	u8 fgStopAfterIndication; /* always FALSE */
+	u8 fgStopAfterIndication; /* always false */
 	u8 ucMatchSSIDNum; /* Match SSID */
 	P_BSS_DESC_T aprPendingBssDescToInd[SCN_SSID_MATCH_MAX_NUM];
 } SCHED_SCAN_PARAM_T, *P_SCHED_SCAN_PARAM_T;
