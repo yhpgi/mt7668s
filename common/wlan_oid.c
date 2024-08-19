@@ -4564,35 +4564,24 @@ wlanoidSetEfusBufferMode(IN P_ADAPTER_T prAdapter, IN void *pvSetBuffer,
 	prCmdSetEfuseBufModeInfo->ucReserved =
 		prSetEfuseBufModeInfo->ucReserved;
 
-	/* decide content size and SetQuery / NeedResp flag */
-	if (prAdapter->fgIsSupportBufferBinSize16Byte == true) {
-		u4EfuseContentSize = sizeof(BIN_CONTENT_T) * EFUSE_CONTENT_SIZE;
-		pfCmdDoneHandler = nicCmdEventSetCommon;
-		fgSetQuery = true;
-		fgNeedResp = false;
-	} else {
 #if (CFG_FW_Report_Efuse_Address == 1)
-		DBGLOG(INIT, STATE,
-		       "u4EfuseEndAddress %x u4EfuseStartAddress %x\n",
-		       prAdapter->u4EfuseEndAddress,
-		       prAdapter->u4EfuseStartAddress);
+	DBGLOG(INIT, STATE, "u4EfuseEndAddress %x u4EfuseStartAddress %x\n",
+	       prAdapter->u4EfuseEndAddress, prAdapter->u4EfuseStartAddress);
 
-		if (prAdapter->u4EfuseEndAddress <
-		    prAdapter->u4EfuseStartAddress) {
-			DBGLOG(INIT, ERROR, "invalid u4EfuseAddress!!\n");
-			kalMemFree(prCmdSetEfuseBufModeInfo, VIR_MEM_TYPE,
-				   sizeof(CMD_EFUSE_BUFFER_MODE_T));
-			return WLAN_STATUS_INVALID_LENGTH;
-		}
-		u4EfuseContentSize = (prAdapter->u4EfuseEndAddress) -
-				     (prAdapter->u4EfuseStartAddress) + 1;
-#else
-		u4EfuseContentSize = EFUSE_CONTENT_BUFFER_SIZE;
-#endif
-		pfCmdDoneHandler = NULL;
-		fgSetQuery = false;
-		fgNeedResp = true;
+	if (prAdapter->u4EfuseEndAddress < prAdapter->u4EfuseStartAddress) {
+		DBGLOG(INIT, ERROR, "invalid u4EfuseAddress!!\n");
+		kalMemFree(prCmdSetEfuseBufModeInfo, VIR_MEM_TYPE,
+			   sizeof(CMD_EFUSE_BUFFER_MODE_T));
+		return WLAN_STATUS_INVALID_LENGTH;
 	}
+	u4EfuseContentSize = (prAdapter->u4EfuseEndAddress) -
+			     (prAdapter->u4EfuseStartAddress) + 1;
+#else
+	u4EfuseContentSize = EFUSE_CONTENT_BUFFER_SIZE;
+#endif
+	pfCmdDoneHandler = NULL;
+	fgSetQuery = false;
+	fgNeedResp = true;
 
 	u4QueryInfoLen = OFFSET_OF(CMD_EFUSE_BUFFER_MODE_T, aBinContent) +
 			 u4EfuseContentSize;

@@ -3382,9 +3382,8 @@ u8 kalRetrieveNetworkAddress(IN P_GLUE_INFO_T prGlueInfo,
 
 #if (CFG_EFUSE_BUFFER_MODE_DELAY_CAL == 1)
 		/* retrieve buffer mode efuse */
-		if ((prAdapter->fgIsSupportPowerOnSendBufferModeCMD == true) &&
-		    (prAdapter->rWifiVar.ucEfuseBufferModeCal ==
-		     LOAD_EEPROM_BIN)) {
+		if (prAdapter->rWifiVar.ucEfuseBufferModeCal ==
+		    LOAD_EEPROM_BIN) {
 			if (wlanExtractBufferBin(prAdapter) ==
 			    WLAN_STATUS_SUCCESS) {
 				u32 u4BinOffset =

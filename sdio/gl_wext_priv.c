@@ -11579,13 +11579,6 @@ static int priv_driver_efuse_ops(IN struct net_device *prNetDev,
 	} else if (ucOpMode == EFUSE_FREE) {
 		PARAM_CUSTOM_EFUSE_FREE_BLOCK_T rEfuseFreeBlock = {};
 
-		if (prGlueInfo->prAdapter->fgIsSupportGetFreeEfuseBlockCount ==
-		    false) {
-			u4Offset += snprintf(pcCommand + u4Offset,
-					     i4TotalLen - u4Offset,
-					     "Cannot read free block size\n");
-			return (s32)u4Offset;
-		}
 		rStatus = kalIoctl(prGlueInfo, wlanoidQueryEfuseFreeBlock,
 				   &rEfuseFreeBlock,
 				   sizeof(PARAM_CUSTOM_EFUSE_FREE_BLOCK_T),

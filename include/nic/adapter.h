@@ -1358,13 +1358,13 @@ struct _ADAPTER_T {
 	/*#endif*/
 	u8 fgIsCr4FwDownloaded;
 	u8 fgIsFwDownloaded;
-	u8 fgIsSupportBufferBinSize16Byte;
-	u8 fgIsSupportDelayCal;
-	u8 fgIsSupportGetFreeEfuseBlockCount;
-	u8 fgIsSupportQAAccessEfuse;
-	u8 fgIsSupportPowerOnSendBufferModeCMD;
+	/* u8 fgIsSupportBufferBinSize16Byte; */
+	/* u8 fgIsSupportDelayCal; */
+	/* u8 fgIsSupportGetFreeEfuseBlockCount; */
+	/* u8 fgIsSupportQAAccessEfuse; */
+	/* u8 fgIsSupportPowerOnSendBufferModeCMD; */
 	u8 fgIsBufferBinExtract;
-	u8 fgIsSupportGetTxPower;
+	/* u8 fgIsSupportGetTxPower; */
 	u8 fgIsEnableLpdvt;
 
 #ifdef CFG_SUPPORT_MULTICAST_ENHANCEMENT

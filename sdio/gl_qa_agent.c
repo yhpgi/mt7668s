@@ -2286,8 +2286,7 @@ static s32 HQA_ReadBulkEEPROM(struct net_device *prNetDev,
 	       "MT6632 : QA_AGENT HQA_ReadBulkEEPROM Address : %d\n",
 	       rAccessEfuseInfo.u4Address);
 
-	if ((g_ucEepromCurrentMode == EFUSE_MODE) &&
-	    (prGlueInfo->prAdapter->fgIsSupportQAAccessEfuse == true)) {
+	if (g_ucEepromCurrentMode == EFUSE_MODE) {
 		/* Read from Efuse */
 		DBGLOG(INIT, INFO,
 		       "MT6632 : QA_AGENT HQA_ReadBulkEEPROM Efuse Mode\n");
@@ -2398,9 +2397,6 @@ static s32 HQA_WriteBulkEEPROM(struct net_device *prNetDev,
 	P_GLUE_INFO_T prGlueInfo = NULL;
 	WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
 	u8 u4Loop = 0, u4Index = 0;
-	u16 ucTemp2;
-	u16 i = 0;
-	u32 u4TotalOffset = 0;
 
 	prGlueInfo = *((P_GLUE_INFO_T *)netdev_priv(prNetDev));
 	prAdapter = prGlueInfo->prAdapter;
@@ -2435,202 +2431,102 @@ static s32 HQA_WriteBulkEEPROM(struct net_device *prNetDev,
 	       Len);
 
 	/* Support Delay Calibraiton */
-	if (prGlueInfo->prAdapter->fgIsSupportQAAccessEfuse == true) {
-		Buffer = kmalloc(sizeof(u8) * (EFUSE_BLOCK_SIZE), GFP_KERNEL);
-		if (!Buffer)
-			return -ENOMEM;
+	Buffer = kmalloc(sizeof(u8) * (EFUSE_BLOCK_SIZE), GFP_KERNEL);
+	if (!Buffer)
+		return -ENOMEM;
 
-		kalMemSet(Buffer, 0, sizeof(u8) * (EFUSE_BLOCK_SIZE));
+	kalMemSet(Buffer, 0, sizeof(u8) * (EFUSE_BLOCK_SIZE));
 
-		kalMemCopy((u8 *)Buffer, (u8 *)HqaCmdFrame->Data + 4, Len);
+	kalMemCopy((u8 *)Buffer, (u8 *)HqaCmdFrame->Data + 4, Len);
 
-		if (g_ucEepromCurrentMode == BUFFER_BIN_MODE) {
-			/* EEPROM */
-			DBGLOG(INIT, INFO,
-			       "Direct EEPROM buffer, offset=%x, len=%x\n",
-			       Offset, Len);
+	if (g_ucEepromCurrentMode == BUFFER_BIN_MODE) {
+		/* EEPROM */
+		DBGLOG(INIT, INFO, "Direct EEPROM buffer, offset=%x, len=%x\n",
+		       Offset, Len);
 
-			if (Len > 2) {
-				for (u4Loop = 0; u4Loop < EFUSE_BLOCK_SIZE / 2;
-				     u4Loop++) {
-					Buffer[u4Loop] = ntohs(Buffer[u4Loop]);
-					uacEEPROMImage[Offset] =
-						Buffer[u4Loop] & 0xff;
-					uacEEPROMImage[Offset + 1] =
-						Buffer[u4Loop] >> 8 & 0xff;
-					Offset += 2;
-				}
-			} else {
-				*Buffer = ntohs(*Buffer);
-				uacEEPROMImage[Offset] = *Buffer & 0xff;
-				uacEEPROMImage[Offset + 1] = *Buffer >> 8 &
-							     0xff;
-			}
-		} else if (g_ucEepromCurrentMode == EFUSE_MODE) {
-			/* EFUSE */
-			/* Read */
-			DBGLOG(INIT, INFO,
-			       "MT6632 : QA_AGENT HQA_WriteBulkEEPROM  Read\n");
-			kalMemSet(&rAccessEfuseInfoRead, 0,
-				  sizeof(PARAM_CUSTOM_ACCESS_EFUSE_T));
-			rAccessEfuseInfoRead.u4Address =
-				(Offset / EFUSE_BLOCK_SIZE) * EFUSE_BLOCK_SIZE;
-			rStatus = kalIoctl(prGlueInfo,
-					   wlanoidQueryProcessAccessEfuseRead,
-					   &rAccessEfuseInfoRead,
-					   sizeof(PARAM_CUSTOM_ACCESS_EFUSE_T),
-					   true, true, true, &u4BufLen);
-
-			/* Write */
-			kalMemSet(&rAccessEfuseInfoWrite, 0,
-				  sizeof(PARAM_CUSTOM_ACCESS_EFUSE_T));
-
-			if (Len > 2) {
-				for (u4Loop = 0; u4Loop < 8; u4Loop++)
-					Buffer[u4Loop] = ntohs(Buffer[u4Loop]);
-				memcpy(rAccessEfuseInfoWrite.aucData, Buffer,
-				       16);
-			} else {
-				u4Index = Offset % EFUSE_BLOCK_SIZE;
-				DBGLOG(INIT,
-				       INFO,
-				       "MT6632:QA_AGENT HQA_WriteBulkEEPROM Wr,u4Index=%x\n",
-				       u4Index);
-
-				if (u4Index >= EFUSE_BLOCK_SIZE - 1) {
-					DBGLOG(INIT, ERROR,
-					       "MT6632 : efuse Offset error\n");
-					i4Ret = -EINVAL;
-					goto exit;
-				}
-
-				*Buffer = ntohs(*Buffer);
-				DBGLOG(INIT,
-				       INFO,
-				       "MT6632 : Buffer[0]=%x, Buffer[0]&0xff=%x\n",
-				       Buffer[0],
-				       Buffer[0] & 0xff);
-				DBGLOG(INIT, INFO,
-				       "MT6632 : Buffer[0] >> 8 & 0xff=%x\n",
-				       Buffer[0] >> 8 & 0xff);
-
-				prGlueInfo->prAdapter->aucEepromVaule[u4Index] =
-					*Buffer & 0xff;
-				prGlueInfo->prAdapter
-				->aucEepromVaule[u4Index + 1] =
-					*Buffer >> 8 & 0xff;
-				kalMemCopy(
-					rAccessEfuseInfoWrite.aucData,
-					prGlueInfo->prAdapter->aucEepromVaule,
-					16);
-			}
-
-			rAccessEfuseInfoWrite.u4Address =
-				(Offset / EFUSE_BLOCK_SIZE) * EFUSE_BLOCK_SIZE;
-			for (u4Loop = 0; u4Loop < (EFUSE_BLOCK_SIZE);
+		if (Len > 2) {
+			for (u4Loop = 0; u4Loop < EFUSE_BLOCK_SIZE / 2;
 			     u4Loop++) {
-				DBGLOG(INIT, INFO,
-				       "MT6632 :  Loop=%d  aucData=%x\n",
-				       u4Loop,
-				       rAccessEfuseInfoWrite.aucData[u4Loop]);
+				Buffer[u4Loop] = ntohs(Buffer[u4Loop]);
+				uacEEPROMImage[Offset] = Buffer[u4Loop] & 0xff;
+				uacEEPROMImage[Offset + 1] =
+					Buffer[u4Loop] >> 8 & 0xff;
+				Offset += 2;
+			}
+		} else {
+			*Buffer = ntohs(*Buffer);
+			uacEEPROMImage[Offset] = *Buffer & 0xff;
+			uacEEPROMImage[Offset + 1] = *Buffer >> 8 & 0xff;
+		}
+	} else if (g_ucEepromCurrentMode == EFUSE_MODE) {
+		/* EFUSE */
+		/* Read */
+		DBGLOG(INIT, INFO,
+		       "MT6632 : QA_AGENT HQA_WriteBulkEEPROM  Read\n");
+		kalMemSet(&rAccessEfuseInfoRead, 0,
+			  sizeof(PARAM_CUSTOM_ACCESS_EFUSE_T));
+		rAccessEfuseInfoRead.u4Address =
+			(Offset / EFUSE_BLOCK_SIZE) * EFUSE_BLOCK_SIZE;
+		rStatus = kalIoctl(prGlueInfo,
+				   wlanoidQueryProcessAccessEfuseRead,
+				   &rAccessEfuseInfoRead,
+				   sizeof(PARAM_CUSTOM_ACCESS_EFUSE_T), true,
+				   true, true, &u4BufLen);
+
+		/* Write */
+		kalMemSet(&rAccessEfuseInfoWrite, 0,
+			  sizeof(PARAM_CUSTOM_ACCESS_EFUSE_T));
+
+		if (Len > 2) {
+			for (u4Loop = 0; u4Loop < 8; u4Loop++)
+				Buffer[u4Loop] = ntohs(Buffer[u4Loop]);
+			memcpy(rAccessEfuseInfoWrite.aucData, Buffer, 16);
+		} else {
+			u4Index = Offset % EFUSE_BLOCK_SIZE;
+			DBGLOG(INIT,
+			       INFO,
+			       "MT6632:QA_AGENT HQA_WriteBulkEEPROM Wr,u4Index=%x\n",
+			       u4Index);
+
+			if (u4Index >= EFUSE_BLOCK_SIZE - 1) {
+				DBGLOG(INIT, ERROR,
+				       "MT6632 : efuse Offset error\n");
+				i4Ret = -EINVAL;
+				goto exit;
 			}
 
-			DBGLOG(INIT, INFO, "Going for e-Fuse\n");
+			*Buffer = ntohs(*Buffer);
+			DBGLOG(INIT, INFO,
+			       "MT6632 : Buffer[0]=%x, Buffer[0]&0xff=%x\n",
+			       Buffer[0], Buffer[0] & 0xff);
+			DBGLOG(INIT, INFO,
+			       "MT6632 : Buffer[0] >> 8 & 0xff=%x\n",
+			       Buffer[0] >> 8 & 0xff);
 
-			rStatus = kalIoctl(prGlueInfo,
-					   wlanoidQueryProcessAccessEfuseWrite,
-					   &rAccessEfuseInfoWrite,
-					   sizeof(PARAM_CUSTOM_ACCESS_EFUSE_T),
-					   false, true, true, &u4BufLen);
-		} else {
-			DBGLOG(INIT, INFO, "Invalid ID!!\n");
+			prGlueInfo->prAdapter->aucEepromVaule[u4Index] =
+				*Buffer & 0xff;
+			prGlueInfo->prAdapter->aucEepromVaule[u4Index + 1] =
+				*Buffer >> 8 & 0xff;
+			kalMemCopy(rAccessEfuseInfoWrite.aucData,
+				   prGlueInfo->prAdapter->aucEepromVaule, 16);
 		}
+
+		rAccessEfuseInfoWrite.u4Address =
+			(Offset / EFUSE_BLOCK_SIZE) * EFUSE_BLOCK_SIZE;
+		for (u4Loop = 0; u4Loop < (EFUSE_BLOCK_SIZE); u4Loop++) {
+			DBGLOG(INIT, INFO, "MT6632 :  Loop=%d  aucData=%x\n",
+			       u4Loop, rAccessEfuseInfoWrite.aucData[u4Loop]);
+		}
+
+		DBGLOG(INIT, INFO, "Going for e-Fuse\n");
+
+		rStatus = kalIoctl(prGlueInfo,
+				   wlanoidQueryProcessAccessEfuseWrite,
+				   &rAccessEfuseInfoWrite,
+				   sizeof(PARAM_CUSTOM_ACCESS_EFUSE_T), false,
+				   true, true, &u4BufLen);
 	} else {
-		if (Len == 2) {
-			memcpy(&ucTemp2, HqaCmdFrame->Data + 2 * 2, 2);
-			ucTemp2 = ntohs(ucTemp2);
-			memcpy(uacEEPROMImage + Offset,
-			       &ucTemp2,
-			       Len);
-		} else {
-			for (i = 0; i < 8; i++) {
-				/* Fix coverity issue: CID10708595 */
-				u4TotalOffset = Offset + 2 * i;
-				if (u4TotalOffset >
-				    MAX_EEPROM_BUFFER_SIZE - 1) {
-					DBGLOG(INIT,
-					       ERROR,
-					       "%s u4TotalOffset : %d not supported\n",
-					       __func__,
-					       u4TotalOffset);
-					return WLAN_STATUS_FAILURE;
-				}
-				memcpy(&ucTemp2,
-				       HqaCmdFrame->Data + 2 * 2 + 2 * i, 2);
-				ucTemp2 = ntohs(ucTemp2);
-				memcpy(uacEEPROMImage + u4TotalOffset, &ucTemp2,
-				       2);
-			}
-
-			if (!g_BufferDownload) {
-				u16 u2InitAddr = Offset;
-				u32 j = 0;
-				u32 u4BufLen = 0;
-				WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
-				P_GLUE_INFO_T prGlueInfo = NULL;
-				PARAM_CUSTOM_EFUSE_BUFFER_MODE_T
-				*prSetEfuseBufModeInfo = NULL;
-				BIN_CONTENT_T *pBinContent;
-
-				prSetEfuseBufModeInfo =
-					(PARAM_CUSTOM_EFUSE_BUFFER_MODE_T
-					 *)
-					kalMemAlloc(
-						sizeof(
-							PARAM_CUSTOM_EFUSE_BUFFER_MODE_T),
-						VIR_MEM_TYPE);
-				if (prSetEfuseBufModeInfo == NULL)
-					return 0;
-
-				kalMemZero(
-					prSetEfuseBufModeInfo,
-					sizeof(PARAM_CUSTOM_EFUSE_BUFFER_MODE_T));
-
-				prGlueInfo = *(
-					(P_GLUE_INFO_T *)netdev_priv(prNetDev));
-				pBinContent =
-					(BIN_CONTENT_T *)prSetEfuseBufModeInfo
-					->aBinContent;
-
-				for (j = 0; j < 16; j++) {
-					pBinContent->u2Addr = u2InitAddr;
-					pBinContent->ucValue =
-						uacEEPROMImage[u2InitAddr];
-
-					pBinContent++;
-				}
-
-				prSetEfuseBufModeInfo->ucSourceMode = 1;
-				prSetEfuseBufModeInfo->ucCount =
-					EFUSE_CONTENT_SIZE;
-				rStatus = kalIoctl(
-					prGlueInfo,
-					wlanoidSetEfusBufferMode,
-					(void *)prSetEfuseBufModeInfo,
-					sizeof(PARAM_CUSTOM_EFUSE_BUFFER_MODE_T),
-					false,
-					false,
-					true,
-					&u4BufLen);
-
-				kalMemFree(
-					prSetEfuseBufModeInfo, VIR_MEM_TYPE,
-					sizeof(PARAM_CUSTOM_EFUSE_BUFFER_MODE_T));
-
-				if (Offset == 0x4A0)
-					g_BufferDownload = true;
-			}
-		}
+		DBGLOG(INIT, INFO, "Invalid ID!!\n");
 	}
 
 	ResponseToQA(HqaCmdFrame, prIwReqData, 2 + Len, i4Ret);
@@ -2701,19 +2597,16 @@ static s32 HQA_GetFreeEfuseBlock(struct net_device *prNetDev,
 	DBGLOG(INIT, INFO, "MT6632 : QA_AGENT HQA_GetFreeEfuseBlock\n");
 
 #if (CFG_EEPROM_PAGE_ACCESS == 1)
-	if (prGlueInfo->prAdapter->fgIsSupportGetFreeEfuseBlockCount == true) {
-		kalMemSet(&rEfuseFreeBlock, 0,
-			  sizeof(PARAM_CUSTOM_EFUSE_FREE_BLOCK_T));
+	kalMemSet(&rEfuseFreeBlock, 0, sizeof(PARAM_CUSTOM_EFUSE_FREE_BLOCK_T));
 
-		rStatus = kalIoctl(prGlueInfo, wlanoidQueryEfuseFreeBlock,
-				   &rEfuseFreeBlock,
-				   sizeof(PARAM_CUSTOM_EFUSE_FREE_BLOCK_T),
-				   true, true, true, &u4BufLen);
+	rStatus = kalIoctl(prGlueInfo, wlanoidQueryEfuseFreeBlock,
+			   &rEfuseFreeBlock,
+			   sizeof(PARAM_CUSTOM_EFUSE_FREE_BLOCK_T), true, true,
+			   true, &u4BufLen);
 
-		u4FreeBlockCount = prGlueInfo->prAdapter->u4FreeBlockNum;
-		u4FreeBlockCount = ntohl(u4FreeBlockCount);
-		kalMemCopy(HqaCmdFrame->Data + 2, &u4FreeBlockCount, 4);
-	}
+	u4FreeBlockCount = prGlueInfo->prAdapter->u4FreeBlockNum;
+	u4FreeBlockCount = ntohl(u4FreeBlockCount);
+	kalMemCopy(HqaCmdFrame->Data + 2, &u4FreeBlockCount, 4);
 #endif
 
 	ResponseToQA(HqaCmdFrame, prIwReqData, 6, i4Ret);
@@ -2814,22 +2707,20 @@ static s32 HQA_GetTxPower(struct net_device *prNetDev,
 
 	prGlueInfo = *((P_GLUE_INFO_T *)netdev_priv(prNetDev));
 
-	if (prGlueInfo->prAdapter->fgIsSupportGetTxPower == true) {
-		kalMemSet(&rGetTxPower, 0, sizeof(PARAM_CUSTOM_GET_TX_POWER_T));
+	kalMemSet(&rGetTxPower, 0, sizeof(PARAM_CUSTOM_GET_TX_POWER_T));
 
-		rGetTxPower.ucCenterChannel = u4Channel;
-		rGetTxPower.ucBand = u4Band;
-		rGetTxPower.ucDbdcIdx = u4Ch_Band;
+	rGetTxPower.ucCenterChannel = u4Channel;
+	rGetTxPower.ucBand = u4Band;
+	rGetTxPower.ucDbdcIdx = u4Ch_Band;
 
-		rStatus = kalIoctl(prGlueInfo, wlanoidQueryGetTxPower,
-				   &rGetTxPower,
-				   sizeof(PARAM_CUSTOM_GET_TX_POWER_T), true,
-				   true, true, &u4BufLen);
+	rStatus = kalIoctl(prGlueInfo, wlanoidQueryGetTxPower, &rGetTxPower,
+			   sizeof(PARAM_CUSTOM_GET_TX_POWER_T), true, true,
+			   true, &u4BufLen);
 
-		u4TxTargetPower = prGlueInfo->prAdapter->u4GetTxPower;
-		u4TxTargetPower = ntohl(u4TxTargetPower);
-		kalMemCopy(HqaCmdFrame->Data + 6, &u4TxTargetPower, 4);
-	}
+	u4TxTargetPower = prGlueInfo->prAdapter->u4GetTxPower;
+	u4TxTargetPower = ntohl(u4TxTargetPower);
+	kalMemCopy(HqaCmdFrame->Data + 6, &u4TxTargetPower, 4);
+
 	ResponseToQA(HqaCmdFrame, prIwReqData, 10, i4Ret);
 
 	return i4Ret;

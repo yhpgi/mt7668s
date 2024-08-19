@@ -3455,8 +3455,7 @@ WLAN_STATUS wlanConfigWifiFunc(IN P_ADAPTER_T prAdapter, IN u8 fgEnable,
 
 	/* 5G cal until send efuse buffer mode CMD */
 #if (CFG_EFUSE_BUFFER_MODE_DELAY_CAL == 1)
-	if (prAdapter->fgIsSupportDelayCal == true)
-		prInitCmdWifiStart->u4Override |= START_DELAY_CALIBRATION;
+	prInitCmdWifiStart->u4Override |= START_DELAY_CALIBRATION;
 #endif
 
 	if (ucPDA == PDA_CR4)
@@ -3562,8 +3561,7 @@ wlanCompressedFWConfigWifiFunc(
 
 	/* 5G cal until send efuse buffer mode CMD */
 #if (CFG_EFUSE_BUFFER_MODE_DELAY_CAL == 1)
-	if (prAdapter->fgIsSupportDelayCal == true)
-		prInitCmdWifiStart->u4Override |= START_DELAY_CALIBRATION;
+	prInitCmdWifiStart->u4Override |= START_DELAY_CALIBRATION;
 #endif
 	if (ucPDA == PDA_CR4)
 		prInitCmdWifiStart->u4Override |= START_WORKING_PDA_OPTION;
@@ -6602,22 +6600,22 @@ WLAN_STATUS wlanQueryNicCapabilityV2(IN P_ADAPTER_T prAdapter)
 	}
 
 	/* Fill capability for different Chip version */
-	if (chip_id == HQA_CHIP_ID_6632) {
-		/* 6632 only */
-		prAdapter->fgIsSupportBufferBinSize16Byte = true;
-		prAdapter->fgIsSupportDelayCal = false;
-		prAdapter->fgIsSupportGetFreeEfuseBlockCount = false;
-		prAdapter->fgIsSupportQAAccessEfuse = false;
-		prAdapter->fgIsSupportPowerOnSendBufferModeCMD = false;
-		prAdapter->fgIsSupportGetTxPower = false;
-	} else {
-		prAdapter->fgIsSupportBufferBinSize16Byte = false;
-		prAdapter->fgIsSupportDelayCal = true;
-		prAdapter->fgIsSupportGetFreeEfuseBlockCount = true;
-		prAdapter->fgIsSupportQAAccessEfuse = true;
-		prAdapter->fgIsSupportPowerOnSendBufferModeCMD = true;
-		prAdapter->fgIsSupportGetTxPower = true;
-	}
+	/* if (chip_id == HQA_CHIP_ID_6632) { */
+	/* 6632 only */
+	/* 	prAdapter->fgIsSupportBufferBinSize16Byte = true; */
+	/* 	prAdapter->fgIsSupportDelayCal = false; */
+	/* 	prAdapter->fgIsSupportGetFreeEfuseBlockCount = false; */
+	/* 	prAdapter->fgIsSupportQAAccessEfuse = false; */
+	/* 	prAdapter->fgIsSupportPowerOnSendBufferModeCMD = false; */
+	/* 	prAdapter->fgIsSupportGetTxPower = false; */
+	/* } else { */
+	/* 	prAdapter->fgIsSupportBufferBinSize16Byte = false; */
+	/* 	prAdapter->fgIsSupportDelayCal = true; */
+	/* 	prAdapter->fgIsSupportGetFreeEfuseBlockCount = true; */
+	/* 	prAdapter->fgIsSupportQAAccessEfuse = true; */
+	/* 	prAdapter->fgIsSupportPowerOnSendBufferModeCMD = true; */
+	/* 	prAdapter->fgIsSupportGetTxPower = true; */
+	/* } */
 
 	return WLAN_STATUS_SUCCESS;
 }
