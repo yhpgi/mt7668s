@@ -29,6 +29,7 @@ config MT7668S_WIFI_MESON_G12A_PATCH
 	bool "MT7668S WiFi Meson G12A workaround"
 	depends on MT7668S_WIFI
 	depends on PINCTRL_MESON_G12A
+	default y
 	help
 	  Enable this option to apply a workaround specific to the
 	  Meson G12A platform. Due to buffer length constraints on

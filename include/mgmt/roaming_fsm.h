@@ -28,9 +28,9 @@
  */
 
 /* Roaming Discovery interval, SCAN result need to be updated */
-#define ROAMING_DISCOVERY_TIMEOUT_SEC	 5 /* Seconds. */
+#define ROAMING_DISCOVERY_TIMEOUT_SEC    5  /* Seconds. */
 #if CFG_SUPPORT_ROAMING_SKIP_ONE_AP
-#define ROAMING_ONE_AP_SKIP_TIMES	 3
+#define ROAMING_ONE_AP_SKIP_TIMES    3
 #endif
 
 /* #define ROAMING_NO_SWING_RCPI_STEP                  5 //rcpi */
@@ -40,73 +40,73 @@
  */
 
 typedef enum _ENUM_ROAMING_FAIL_REASON_T {
-	ROAMING_FAIL_REASON_CONNLIMIT = 0,
-	ROAMING_FAIL_REASON_NOCANDIDATE,
-	ROAMING_FAIL_REASON_NUM
+    ROAMING_FAIL_REASON_CONNLIMIT = 0,
+    ROAMING_FAIL_REASON_NOCANDIDATE,
+    ROAMING_FAIL_REASON_NUM
 } ENUM_ROAMING_FAIL_REASON_T;
 
 /* events of roaming between driver and firmware */
 typedef enum _ENUM_ROAMING_EVENT_T {
-	ROAMING_EVENT_START = 0,
-	ROAMING_EVENT_DISCOVERY,
-	ROAMING_EVENT_ROAM,
-	ROAMING_EVENT_FAIL,
-	ROAMING_EVENT_ABORT,
-	ROAMING_EVENT_NUM
+    ROAMING_EVENT_START = 0,
+    ROAMING_EVENT_DISCOVERY,
+    ROAMING_EVENT_ROAM,
+    ROAMING_EVENT_FAIL,
+    ROAMING_EVENT_ABORT,
+    ROAMING_EVENT_NUM
 } ENUM_ROAMING_EVENT_T;
 
 typedef enum _ENUM_ROAMING_REASON_T {
-	ROAMING_REASON_POOR_RCPI = 0,
-	ROAMING_REASON_TX_ERR, /*Lowest rate, high PER*/
-	ROAMING_REASON_RETRY,
-	ROAMING_REASON_NUM
+    ROAMING_REASON_POOR_RCPI = 0,
+    ROAMING_REASON_TX_ERR,  /*Lowest rate, high PER*/
+    ROAMING_REASON_RETRY,
+    ROAMING_REASON_NUM
 } ENUM_ROAMING_REASON_T;
 
 typedef struct _CMD_ROAMING_TRANSIT_T {
-	u16 u2Event;
-	u16 u2Data;
-	u16 u2RcpiLowThreshold;
-	u8 ucIsSupport11B;
-	u8 aucReserved[1];
-	ENUM_ROAMING_REASON_T eReason;
-	u32 u4RoamingTriggerTime; /*sec in mcu*/
-	u8 aucReserved2[8];
+    u16 u2Event;
+    u16 u2Data;
+    u16 u2RcpiLowThreshold;
+    u8 ucIsSupport11B;
+    u8 aucReserved[1];
+    ENUM_ROAMING_REASON_T eReason;
+    u32 u4RoamingTriggerTime;  /*sec in mcu*/
+    u8 aucReserved2[8];
 } CMD_ROAMING_TRANSIT_T, *P_CMD_ROAMING_TRANSIT_T;
 
 typedef struct _CMD_ROAMING_CTRL_T {
-	u8 fgEnable;
-	u8 ucRcpiAdjustStep;
-	u16 u2RcpiLowThr;
-	u8 ucRoamingRetryLimit;
-	u8 ucRoamingStableTimeout;
-	u8 aucReserved[2];
+    u8 fgEnable;
+    u8 ucRcpiAdjustStep;
+    u16 u2RcpiLowThr;
+    u8 ucRoamingRetryLimit;
+    u8 ucRoamingStableTimeout;
+    u8 aucReserved[2];
 } CMD_ROAMING_CTRL_T, *P_CMD_ROAMING_CTRL_T;
 
 #if CFG_SUPPORT_ROAMING_SKIP_ONE_AP
 typedef struct _CMD_ROAMING_SKIP_ONE_AP_T {
-	u8 fgIsRoamingSkipOneAP;
-	u8 aucReserved[3];
-	u8 aucReserved2[8];
+    u8 fgIsRoamingSkipOneAP;
+    u8 aucReserved[3];
+    u8 aucReserved2[8];
 } CMD_ROAMING_SKIP_ONE_AP_T, *P_CMD_ROAMING_SKIP_ONE_AP_T;
 #endif
 
 /**/ typedef enum _ENUM_ROAMING_STATE_T {
-	ROAMING_STATE_IDLE = 0,
-	ROAMING_STATE_DECISION,
-	ROAMING_STATE_DISCOVERY,
+    ROAMING_STATE_IDLE = 0,
+    ROAMING_STATE_DECISION,
+    ROAMING_STATE_DISCOVERY,
 #if CFG_SUPPORT_802_11V_BSS_TRANSITION_MGT
-	ROAMING_STATE_REQ_CAND_LIST,
+    ROAMING_STATE_REQ_CAND_LIST,
 #endif
-	ROAMING_STATE_ROAM,
-	ROAMING_STATE_NUM
+    ROAMING_STATE_ROAM,
+    ROAMING_STATE_NUM
 } ENUM_ROAMING_STATE_T;
 
 typedef struct _ROAMING_INFO_T {
-	u8 fgIsEnableRoaming;
+    u8 fgIsEnableRoaming;
 
-	ENUM_ROAMING_STATE_T eCurrentState;
+    ENUM_ROAMING_STATE_T eCurrentState;
 
-	u32 rRoamingDiscoveryUpdateTime;
+    u32 rRoamingDiscoveryUpdateTime;
 } ROAMING_INFO_T, *P_ROAMING_INFO_T;
 
 /*******************************************************************************
@@ -126,7 +126,7 @@ typedef struct _ROAMING_INFO_T {
 
 #if CFG_SUPPORT_ROAMING
 #define IS_ROAMING_ACTIVE(prAdapter) \
-	(prAdapter->rWifiVar.rRoamingInfo.eCurrentState == ROAMING_STATE_ROAM)
+    (prAdapter->rWifiVar.rRoamingInfo.eCurrentState == ROAMING_STATE_ROAM)
 #else
 #define IS_ROAMING_ACTIVE(prAdapter)    false
 #endif
@@ -141,17 +141,17 @@ void roamingFsmInit(IN P_ADAPTER_T prAdapter);
 void roamingFsmUninit(IN P_ADAPTER_T prAdapter);
 
 void roamingFsmSendCmd(IN P_ADAPTER_T prAdapter,
-		       IN P_CMD_ROAMING_TRANSIT_T prTransit);
+                       IN P_CMD_ROAMING_TRANSIT_T prTransit);
 
 void roamingFsmScanResultsUpdate(IN P_ADAPTER_T prAdapter);
 
 void roamingFsmSteps(IN P_ADAPTER_T prAdapter,
-		     IN ENUM_ROAMING_STATE_T eNextState);
+                     IN ENUM_ROAMING_STATE_T eNextState);
 
 void roamingFsmRunEventStart(IN P_ADAPTER_T prAdapter);
 
 void roamingFsmRunEventDiscovery(IN P_ADAPTER_T prAdapter,
-				 IN P_CMD_ROAMING_TRANSIT_T prTransit);
+                                 IN P_CMD_ROAMING_TRANSIT_T prTransit);
 
 void roamingFsmRunEventRoam(IN P_ADAPTER_T prAdapter);
 
@@ -160,7 +160,7 @@ void roamingFsmRunEventFail(IN P_ADAPTER_T prAdapter, IN u32 u4Reason);
 void roamingFsmRunEventAbort(IN P_ADAPTER_T prAdapter);
 
 WLAN_STATUS roamingFsmProcessEvent(IN P_ADAPTER_T prAdapter,
-				   IN P_CMD_ROAMING_TRANSIT_T prTransit);
+                                   IN P_CMD_ROAMING_TRANSIT_T prTransit);
 
 /*******************************************************************************
  *                              F U N C T I O N S

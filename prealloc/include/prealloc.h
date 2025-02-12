@@ -31,13 +31,13 @@
  */
 
 enum ENUM_MEM_ID {
-	MEM_ID_NIC_ADAPTER,
-	MEM_ID_IO_BUFFER,
+    MEM_ID_NIC_ADAPTER,
+    MEM_ID_IO_BUFFER,
 
-	MEM_ID_IO_CTRL,
-	MEM_ID_RX_DATA,
+    MEM_ID_IO_CTRL,
+    MEM_ID_RX_DATA,
 
-	MEM_ID_NUM, /* END, Do not modify */
+    MEM_ID_NUM,  /* END, Do not modify */
 };
 
 /*******************************************************************************
@@ -56,9 +56,9 @@ enum ENUM_MEM_ID {
  */
 
 #define PreLog(level, ...)    printk(level "[wlan][MemPrealloc] " __VA_ARGS__)
-#define MP_Dbg(...)	      PreLog(KERN_DEBUG, __VA_ARGS__)
-#define MP_Info(...)	      PreLog(KERN_INFO, __VA_ARGS__)
-#define MP_Err(...)	      PreLog(KERN_ERR, __VA_ARGS__)
+#define MP_Dbg(...)       PreLog(KERN_DEBUG, __VA_ARGS__)
+#define MP_Info(...)          PreLog(KERN_INFO, __VA_ARGS__)
+#define MP_Err(...)       PreLog(KERN_ERR, __VA_ARGS__)
 
 /*******************************************************************************
  *                   F U N C T I O N   D E C L A R A T I O N S

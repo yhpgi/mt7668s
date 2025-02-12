@@ -41,8 +41,8 @@
  *******************************************************************************
  */
 
-#define WIFI_NVRAM_FILE_NAME	  "/data/nvram/APCFG/APRDEB/WIFI"
-#define WIFI_NVRAM_CUSTOM_NAME	  "/data/nvram/APCFG/APRDEB/WIFI_CUSTOM"
+#define WIFI_NVRAM_FILE_NAME      "/data/nvram/APCFG/APRDEB/WIFI"
+#define WIFI_NVRAM_CUSTOM_NAME    "/data/nvram/APCFG/APRDEB/WIFI_CUSTOM"
 
 /*******************************************************************************
  *                             D A T A   T Y P E S
@@ -74,68 +74,65 @@
  *******************************************************************************
  */
 static int netdev_event(struct notifier_block *nb, unsigned long notification,
-			void *ptr)
-{
-	struct in_ifaddr *ifa = (struct in_ifaddr *)ptr;
-	struct net_device *prDev = ifa->ifa_dev->dev;
-	P_GLUE_INFO_T prGlueInfo = NULL;
+                        void *ptr){
+    struct in_ifaddr *ifa = (struct in_ifaddr *)ptr;
+    struct net_device *prDev = ifa->ifa_dev->dev;
+    P_GLUE_INFO_T prGlueInfo = NULL;
 
-	if (prDev == NULL) {
-		/* DBGLOG(REQ, INFO, ("netdev_event: device is empty.\n")); */
-		return NOTIFY_DONE;
-	}
+    if (prDev == NULL) {
+        /* DBGLOG(REQ, INFO, ("netdev_event: device is empty.\n")); */
+        return NOTIFY_DONE;
+    }
 
-	if ((strncmp(prDev->name, "p2p", 3) != 0) &&
-	    (strncmp(prDev->name, "wlan", 4) != 0)) {
-		/* DBGLOG(REQ, INFO, ("netdev_event: xxx\n")); */
-		return NOTIFY_DONE;
-	}
+    if ((strncmp(prDev->name, "p2p", 3) != 0) &&
+        (strncmp(prDev->name, "wlan", 4) != 0)) {
+        /* DBGLOG(REQ, INFO, ("netdev_event: xxx\n")); */
+        return NOTIFY_DONE;
+    }
 
-	if ((prDev != gPrDev) && (prDev != gPrP2pDev[0]) &&
-	    (prDev != gPrP2pDev[1])) {
-		/* DBGLOG(REQ, INFO, ("netdev_event: device is not mine.\n"));
-		 */
-		return NOTIFY_DONE;
-	}
+    if ((prDev != gPrDev) && (prDev != gPrP2pDev[0]) &&
+        (prDev != gPrP2pDev[1])) {
+        /* DBGLOG(REQ, INFO, ("netdev_event: device is not mine.\n"));
+         */
+        return NOTIFY_DONE;
+    }
 
-	prGlueInfo = *((P_GLUE_INFO_T *)netdev_priv(prDev));
-	if (prGlueInfo == NULL) {
-		DBGLOG(REQ, INFO, "netdev_event: prGlueInfo is empty.\n");
-		return NOTIFY_DONE;
-	}
+    prGlueInfo = *((P_GLUE_INFO_T *)netdev_priv(prDev));
+    if (prGlueInfo == NULL) {
+        DBGLOG(REQ, INFO, "netdev_event: prGlueInfo is empty.\n");
+        return NOTIFY_DONE;
+    }
 
 #if CFG_GARP_KEEPALIVE
-	// garp keepalive needs IP address update when host is awake
+    // garp keepalive needs IP address update when host is awake
 #else
-	if (prGlueInfo->fgIsInSuspendMode == false) {
-		/* DBGLOG(REQ, INFO,
-		 *  ("netdev_event: PARAM_MEDIA_STATE_DISCONNECTED. (%d)\n",
-		 * prGlueInfo->eParamMediaStateIndicated));
-		 */
-		return NOTIFY_DONE;
-	}
-#endif // CFG_GARP_KEEPALIVE
+    if (prGlueInfo->fgIsInSuspendMode == false) {
+        /* DBGLOG(REQ, INFO,
+         *  ("netdev_event: PARAM_MEDIA_STATE_DISCONNECTED. (%d)\n",
+         * prGlueInfo->eParamMediaStateIndicated));
+         */
+        return NOTIFY_DONE;
+    }
+#endif  // CFG_GARP_KEEPALIVE
 
-	kalSetNetAddressFromInterface(prGlueInfo, prDev, true);
+    kalSetNetAddressFromInterface(prGlueInfo, prDev, true);
 
-	return NOTIFY_DONE;
+    return NOTIFY_DONE;
 }
 
 static struct notifier_block inetaddr_notifier = {
-	.notifier_call = netdev_event,
+    .notifier_call = netdev_event,
 };
 
-void wlanRegisterNotifier(void)
-{
+void wlanRegisterNotifier(void){
 #if CFG_ENABLE_NET_DEV_NOTIFY
-	register_inetaddr_notifier(&inetaddr_notifier);
+    register_inetaddr_notifier(&inetaddr_notifier);
 #endif
 }
 
-void wlanUnregisterNotifier(void)
-{
+void wlanUnregisterNotifier(void){
 #if CFG_ENABLE_NET_DEV_NOTIFY
-	unregister_inetaddr_notifier(&inetaddr_notifier);
+    unregister_inetaddr_notifier(&inetaddr_notifier);
 #endif
 }
 
@@ -152,28 +149,27 @@ void wlanUnregisterNotifier(void)
 /*----------------------------------------------------------------------------*/
 
 int glRegisterEarlySuspend(struct early_suspend *prDesc,
-			   early_suspend_callback wlanSuspend,
-			   late_resume_callback wlanResume)
-{
-	int ret = 0;
+                           early_suspend_callback wlanSuspend,
+                           late_resume_callback wlanResume){
+    int ret = 0;
 
-	if (wlanSuspend != NULL) {
-		prDesc->suspend = wlanSuspend;
-	} else {
-		DBGLOG(REQ, INFO,
-		       "glRegisterEarlySuspend wlanSuspend ERROR.\n");
-		ret = -1;
-	}
+    if (wlanSuspend != NULL) {
+        prDesc->suspend = wlanSuspend;
+    } else {
+        DBGLOG(REQ, INFO,
+               "glRegisterEarlySuspend wlanSuspend ERROR.\n");
+        ret = -1;
+    }
 
-	if (wlanResume != NULL) {
-		prDesc->resume = wlanResume;
-	} else {
-		DBGLOG(REQ, INFO, "glRegisterEarlySuspend wlanResume ERROR.\n");
-		ret = -1;
-	}
+    if (wlanResume != NULL) {
+        prDesc->resume = wlanResume;
+    } else {
+        DBGLOG(REQ, INFO, "glRegisterEarlySuspend wlanResume ERROR.\n");
+        ret = -1;
+    }
 
-	register_early_suspend(prDesc);
-	return ret;
+    register_early_suspend(prDesc);
+    return ret;
 }
 
 /*----------------------------------------------------------------------------*/
@@ -184,16 +180,15 @@ int glRegisterEarlySuspend(struct early_suspend *prDesc,
  */
 /*----------------------------------------------------------------------------*/
 
-int glUnregisterEarlySuspend(struct early_suspend *prDesc)
-{
-	int ret = 0;
+int glUnregisterEarlySuspend(struct early_suspend *prDesc){
+    int ret = 0;
 
-	unregister_early_suspend(prDesc);
+    unregister_early_suspend(prDesc);
 
-	prDesc->suspend = NULL;
-	prDesc->resume = NULL;
+    prDesc->suspend = NULL;
+    prDesc->resume = NULL;
 
-	return ret;
+    return ret;
 }
 #endif
 
@@ -211,55 +206,60 @@ int glUnregisterEarlySuspend(struct early_suspend *prDesc)
  *           actual length of data being read
  */
 /*----------------------------------------------------------------------------*/
-static int nvram_read(char *filename, char *buf, ssize_t len, int offset)
-{
+static int nvram_read(char *filename, char *buf, ssize_t len, int offset){
 #if CFG_SUPPORT_NVRAM
-	struct file *fd;
-	int retLen = -1;
+    struct file *fd;
+    int retLen = -1;
 
-	mm_segment_t old_fs = get_fs();
+#ifdef set_fs
+    mm_segment_t old_fs = get_fs();
 
-	set_fs(KERNEL_DS);
+    set_fs(KERNEL_DS);
+#endif
 
-	fd = filp_open(filename, O_RDONLY, 0644);
+    fd = filp_open(filename, O_RDONLY, 0644);
 
-	if (IS_ERR(fd)) {
-		DBGLOG(INIT, INFO, "[nvram_read] : failed to open!!\n");
-		set_fs(old_fs);
-		return -1;
-	}
+    if (IS_ERR(fd)) {
+        DBGLOG(INIT, INFO, "[nvram_read] : failed to open!!\n");
+#ifdef set_fs
+        set_fs(old_fs);
+#endif
+        return -1;
+    }
 
-	do {
-		if ((fd->f_op == NULL) || (fd->f_op->read == NULL)) {
-			DBGLOG(INIT, INFO,
-			       "[nvram_read] : file can not be read!!\n");
-			break;
-		}
+    do {
+        if ((fd->f_op == NULL) || (fd->f_op->read == NULL)) {
+            DBGLOG(INIT, INFO,
+                   "[nvram_read] : file can not be read!!\n");
+            break;
+        }
 
-		if (fd->f_pos != offset) {
-			if (fd->f_op->llseek) {
-				if (fd->f_op->llseek(fd, offset, 0) != offset) {
-					DBGLOG(INIT,
-					       INFO,
-					       "[nvram_read] : failed to seek!!\n");
-					break;
-				}
-			} else {
-				fd->f_pos = offset;
-			}
-		}
+        if (fd->f_pos != offset) {
+            if (fd->f_op->llseek) {
+                if (fd->f_op->llseek(fd, offset, 0) != offset) {
+                    DBGLOG(INIT,
+                           INFO,
+                           "[nvram_read] : failed to seek!!\n");
+                    break;
+                }
+            } else {
+                fd->f_pos = offset;
+            }
+        }
 
-		retLen = fd->f_op->read(fd, buf, len, &fd->f_pos);
-	} while (false);
+        retLen = fd->f_op->read(fd, buf, len, &fd->f_pos);
+    } while (false);
 
-	filp_close(fd, NULL);
+    filp_close(fd, NULL);
 
-	set_fs(old_fs);
+#ifdef set_fs
+    set_fs(old_fs);
+#endif
 
-	return retLen;
+    return retLen;
 
-#else /* !CFG_SUPPORT_NVRAM */
-	return -EIO;
+#else  /* !CFG_SUPPORT_NVRAM */
+    return -EIO;
 
 #endif
 }
@@ -277,55 +277,60 @@ static int nvram_read(char *filename, char *buf, ssize_t len, int offset)
  *           actual length of data being written
  */
 /*----------------------------------------------------------------------------*/
-static int nvram_write(char *filename, char *buf, ssize_t len, int offset)
-{
+static int nvram_write(char *filename, char *buf, ssize_t len, int offset){
 #if CFG_SUPPORT_NVRAM
-	struct file *fd;
-	int retLen = -1;
+    struct file *fd;
+    int retLen = -1;
 
-	mm_segment_t old_fs = get_fs();
+#ifdef set_fs
+    mm_segment_t old_fs = get_fs();
 
-	set_fs(KERNEL_DS);
+    set_fs(KERNEL_DS);
+#endif
 
-	fd = filp_open(filename, O_WRONLY | O_CREAT, 0644);
+    fd = filp_open(filename, O_WRONLY | O_CREAT, 0644);
 
-	if (IS_ERR(fd)) {
-		DBGLOG(INIT, INFO, "[nvram_write] : failed to open!!\n");
-		set_fs(old_fs);
-		return -1;
-	}
+    if (IS_ERR(fd)) {
+        DBGLOG(INIT, INFO, "[nvram_write] : failed to open!!\n");
+#ifdef set_fs
+        set_fs(old_fs);
+#endif
+        return -1;
+    }
 
-	do {
-		if ((fd->f_op == NULL) || (fd->f_op->write == NULL)) {
-			DBGLOG(INIT, INFO,
-			       "[nvram_write] : file can not be write!!\n");
-			break;
-		}
-		/* End of if */
-		if (fd->f_pos != offset) {
-			if (fd->f_op->llseek) {
-				if (fd->f_op->llseek(fd, offset, 0) != offset) {
-					DBGLOG(INIT,
-					       INFO,
-					       "[nvram_write] : failed to seek!!\n");
-					break;
-				}
-			} else {
-				fd->f_pos = offset;
-			}
-		}
+    do {
+        if ((fd->f_op == NULL) || (fd->f_op->write == NULL)) {
+            DBGLOG(INIT, INFO,
+                   "[nvram_write] : file can not be write!!\n");
+            break;
+        }
+        /* End of if */
+        if (fd->f_pos != offset) {
+            if (fd->f_op->llseek) {
+                if (fd->f_op->llseek(fd, offset, 0) != offset) {
+                    DBGLOG(INIT,
+                           INFO,
+                           "[nvram_write] : failed to seek!!\n");
+                    break;
+                }
+            } else {
+                fd->f_pos = offset;
+            }
+        }
 
-		retLen = fd->f_op->write(fd, buf, len, &fd->f_pos);
-	} while (false);
+        retLen = fd->f_op->write(fd, buf, len, &fd->f_pos);
+    } while (false);
 
-	filp_close(fd, NULL);
+    filp_close(fd, NULL);
 
-	set_fs(old_fs);
+#ifdef set_fs
+    set_fs(old_fs);
+#endif
 
-	return retLen;
+    return retLen;
 
-#else /* !CFG_SUPPORT_NVRAMS */
-	return -EIO;
+#else  /* !CFG_SUPPORT_NVRAMS */
+    return -EIO;
 
 #endif
 }
@@ -345,18 +350,18 @@ static int nvram_write(char *filename, char *buf, ssize_t len, int offset)
  */
 /*----------------------------------------------------------------------------*/
 u8 kalCfgDataRead16(IN P_GLUE_INFO_T prGlueInfo, IN u32 u4Offset,
-		    OUT u16 *pu2Data)
-{
-	if (pu2Data == NULL)
-		return false;
+                    OUT u16 *pu2Data){
+    if (pu2Data == NULL) {
+        return false;
+    }
 
-	if (nvram_read(WIFI_NVRAM_FILE_NAME, (char *)pu2Data,
-		       sizeof(unsigned short),
-		       u4Offset) != sizeof(unsigned short)) {
-		return false;
-	} else {
-		return true;
-	}
+    if (nvram_read(WIFI_NVRAM_FILE_NAME, (char *)pu2Data,
+                   sizeof(unsigned short),
+                   u4Offset) != sizeof(unsigned short)) {
+        return false;
+    } else {
+        return true;
+    }
 }
 
 /*----------------------------------------------------------------------------*/
@@ -372,13 +377,12 @@ u8 kalCfgDataRead16(IN P_GLUE_INFO_T prGlueInfo, IN u32 u4Offset,
  *           false
  */
 /*----------------------------------------------------------------------------*/
-u8 kalCfgDataWrite16(IN P_GLUE_INFO_T prGlueInfo, u32 u4Offset, u16 u2Data)
-{
-	if (nvram_write(WIFI_NVRAM_FILE_NAME, (char *)&u2Data,
-			sizeof(unsigned short),
-			u4Offset) != sizeof(unsigned short)) {
-		return false;
-	} else {
-		return true;
-	}
+u8 kalCfgDataWrite16(IN P_GLUE_INFO_T prGlueInfo, u32 u4Offset, u16 u2Data){
+    if (nvram_write(WIFI_NVRAM_FILE_NAME, (char *)&u2Data,
+                    sizeof(unsigned short),
+                    u4Offset) != sizeof(unsigned short)) {
+        return false;
+    } else {
+        return true;
+    }
 }

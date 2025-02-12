@@ -55,15 +55,15 @@ void rlmRspGenerateObssScanIE(P_ADAPTER_T prAdapter, P_MSDU_INFO_T prMsduInfo);
 void rlmProcessPublicAction(P_ADAPTER_T prAdapter, P_SW_RFB_T prSwRfb);
 
 void rlmHandleObssStatusEventPkt(P_ADAPTER_T prAdapter,
-				 P_EVENT_AP_OBSS_STATUS_T prObssStatus);
+                                 P_EVENT_AP_OBSS_STATUS_T prObssStatus);
 
 u8 rlmObssChnlLevel(P_BSS_INFO_T prBssInfo,
-		    ENUM_BAND_T eBand,
-		    u8 ucPriChannel,
-		    ENUM_CHNL_EXT_T eExtend);
+                    ENUM_BAND_T eBand,
+                    u8 ucPriChannel,
+                    ENUM_CHNL_EXT_T eExtend);
 
 void rlmObssScanExemptionRsp(P_ADAPTER_T prAdapter,
-			     P_BSS_INFO_T prBssInfo,
-			     P_SW_RFB_T prSwRfb);
+                             P_BSS_INFO_T prBssInfo,
+                             P_SW_RFB_T prSwRfb);
 
 #endif

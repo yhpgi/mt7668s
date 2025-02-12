@@ -26,23 +26,23 @@
  *******************************************************************************
  */
 
-#define SCN_CHANNEL_DWELL_TIME_MIN_MSEC		 12
-#define SCN_CHANNEL_DWELL_TIME_EXT_MSEC		 98
+#define SCN_CHANNEL_DWELL_TIME_MIN_MSEC      12
+#define SCN_CHANNEL_DWELL_TIME_EXT_MSEC      98
 
-#define SCN_TOTAL_PROBEREQ_NUM_FOR_FULL		 3
-#define SCN_SPECIFIC_PROBEREQ_NUM_FOR_FULL	 1
+#define SCN_TOTAL_PROBEREQ_NUM_FOR_FULL      3
+#define SCN_SPECIFIC_PROBEREQ_NUM_FOR_FULL   1
 
-#define SCN_TOTAL_PROBEREQ_NUM_FOR_PARTIAL	 2
-#define SCN_SPECIFIC_PROBEREQ_NUM_FOR_PARTIAL	 1
+#define SCN_TOTAL_PROBEREQ_NUM_FOR_PARTIAL   2
+#define SCN_SPECIFIC_PROBEREQ_NUM_FOR_PARTIAL    1
 
-#define SCN_INTERLACED_CHANNEL_GROUPS_NUM	 3 /* Used by partial scan */
+#define SCN_INTERLACED_CHANNEL_GROUPS_NUM    3  /* Used by partial scan */
 
-#define SCN_PARTIAL_SCAN_NUM			 3
+#define SCN_PARTIAL_SCAN_NUM             3
 
-#define SCN_PARTIAL_SCAN_IDLE_MSEC		 100
+#define SCN_PARTIAL_SCAN_IDLE_MSEC       100
 
-#define MAXIMUM_OPERATION_CHANNEL_LIST		 32
-#define SCN_P2P_FULL_SCAN_PARAM			 0
+#define MAXIMUM_OPERATION_CHANNEL_LIST       32
+#define SCN_P2P_FULL_SCAN_PARAM          0
 
 /*******************************************************************************
  *                             D A T A   T Y P E S
@@ -51,20 +51,20 @@
 
 /* The type of Scan Source */
 typedef enum _ENUM_SCN_REQ_SOURCE_T {
-	SCN_REQ_SOURCE_HEM = 0,
-	SCN_REQ_SOURCE_NET_FSM,
-	SCN_REQ_SOURCE_ROAMING, /* ROAMING Module is independent of AIS FSM */
-	SCN_REQ_SOURCE_OBSS, /* 2.4G OBSS scan */
-	SCN_REQ_SOURCE_NUM
+    SCN_REQ_SOURCE_HEM = 0,
+    SCN_REQ_SOURCE_NET_FSM,
+    SCN_REQ_SOURCE_ROAMING,  /* ROAMING Module is independent of AIS FSM */
+    SCN_REQ_SOURCE_OBSS,  /* 2.4G OBSS scan */
+    SCN_REQ_SOURCE_NUM
 } ENUM_SCN_REQ_SOURCE_T,
 *P_ENUM_SCN_REQ_SOURCE_T;
 
 typedef enum _ENUM_SCAN_PROFILE_T {
-	SCAN_PROFILE_FULL = 0,
-	SCAN_PROFILE_PARTIAL,
-	SCAN_PROFILE_VOIP,
-	SCAN_PROFILE_FULL_2G4,
-	SCAN_PROFILE_NUM
+    SCAN_PROFILE_FULL = 0,
+    SCAN_PROFILE_PARTIAL,
+    SCAN_PROFILE_VOIP,
+    SCAN_PROFILE_FULL_2G4,
+    SCAN_PROFILE_NUM
 } ENUM_SCAN_PROFILE_T,
 *P_ENUM_SCAN_PROFILE_T;
 

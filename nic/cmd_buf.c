@@ -74,20 +74,19 @@
  * @return (none)
  */
 /*----------------------------------------------------------------------------*/
-void cmdBufInitialize(IN P_ADAPTER_T prAdapter)
-{
-	P_CMD_INFO_T prCmdInfo;
-	u32 i;
+void cmdBufInitialize(IN P_ADAPTER_T prAdapter){
+    P_CMD_INFO_T prCmdInfo;
+    u32 i;
 
-	ASSERT(prAdapter);
+    ASSERT(prAdapter);
 
-	QUEUE_INITIALIZE(&prAdapter->rFreeCmdList);
+    QUEUE_INITIALIZE(&prAdapter->rFreeCmdList);
 
-	for (i = 0; i < CFG_TX_MAX_CMD_PKT_NUM; i++) {
-		prCmdInfo = &prAdapter->arHifCmdDesc[i];
-		QUEUE_INSERT_TAIL(&prAdapter->rFreeCmdList,
-				  &prCmdInfo->rQueEntry);
-	}
+    for (i = 0; i < CFG_TX_MAX_CMD_PKT_NUM; i++) {
+        prCmdInfo = &prAdapter->arHifCmdDesc[i];
+        QUEUE_INSERT_TAIL(&prAdapter->rFreeCmdList,
+                          &prCmdInfo->rQueEntry);
+    }
 }
 
 /*----------------------------------------------------------------------------*/
@@ -101,59 +100,58 @@ void cmdBufInitialize(IN P_ADAPTER_T prAdapter)
  * @retval !NULL     Fail to allocat CMD Packet
  */
 /*----------------------------------------------------------------------------*/
-P_CMD_INFO_T cmdBufAllocateCmdInfo(IN P_ADAPTER_T prAdapter, IN u32 u4Length)
-{
-	P_CMD_INFO_T prCmdInfo;
+P_CMD_INFO_T cmdBufAllocateCmdInfo(IN P_ADAPTER_T prAdapter, IN u32 u4Length){
+    P_CMD_INFO_T prCmdInfo;
 
-	KAL_SPIN_LOCK_DECLARATION();
+    KAL_SPIN_LOCK_DECLARATION();
 
-	DEBUGFUNC("cmdBufAllocateCmdInfo");
+    DEBUGFUNC("cmdBufAllocateCmdInfo");
 
-	ASSERT(prAdapter);
+    ASSERT(prAdapter);
 
-	KAL_ACQUIRE_SPIN_LOCK(prAdapter, SPIN_LOCK_CMD_RESOURCE);
-	QUEUE_REMOVE_HEAD(&prAdapter->rFreeCmdList, prCmdInfo, P_CMD_INFO_T);
-	KAL_RELEASE_SPIN_LOCK(prAdapter, SPIN_LOCK_CMD_RESOURCE);
+    KAL_ACQUIRE_SPIN_LOCK(prAdapter, SPIN_LOCK_CMD_RESOURCE);
+    QUEUE_REMOVE_HEAD(&prAdapter->rFreeCmdList, prCmdInfo, P_CMD_INFO_T);
+    KAL_RELEASE_SPIN_LOCK(prAdapter, SPIN_LOCK_CMD_RESOURCE);
 
-	if (prCmdInfo) {
-		/* Setup initial value in CMD_INFO_T */
-		prCmdInfo->u2InfoBufLen = 0;
-		prCmdInfo->fgIsOid = false;
+    if (prCmdInfo) {
+        /* Setup initial value in CMD_INFO_T */
+        prCmdInfo->u2InfoBufLen = 0;
+        prCmdInfo->fgIsOid = false;
 
-		if (u4Length) {
-			/* Start address of allocated memory */
-			u4Length = TFCB_FRAME_PAD_TO_DW(u4Length);
+        if (u4Length) {
+            /* Start address of allocated memory */
+            u4Length = TFCB_FRAME_PAD_TO_DW(u4Length);
 
-			prCmdInfo->pucInfoBuffer =
-				cnmMemAlloc(prAdapter, RAM_TYPE_BUF, u4Length);
+            prCmdInfo->pucInfoBuffer =
+                cnmMemAlloc(prAdapter, RAM_TYPE_BUF, u4Length);
 
-			if (prCmdInfo->pucInfoBuffer == NULL) {
-				KAL_ACQUIRE_SPIN_LOCK(prAdapter,
-						      SPIN_LOCK_CMD_RESOURCE);
-				QUEUE_INSERT_TAIL(&prAdapter->rFreeCmdList,
-						  &prCmdInfo->rQueEntry);
-				KAL_RELEASE_SPIN_LOCK(prAdapter,
-						      SPIN_LOCK_CMD_RESOURCE);
+            if (prCmdInfo->pucInfoBuffer == NULL) {
+                KAL_ACQUIRE_SPIN_LOCK(prAdapter,
+                                      SPIN_LOCK_CMD_RESOURCE);
+                QUEUE_INSERT_TAIL(&prAdapter->rFreeCmdList,
+                                  &prCmdInfo->rQueEntry);
+                KAL_RELEASE_SPIN_LOCK(prAdapter,
+                                      SPIN_LOCK_CMD_RESOURCE);
 
-				prCmdInfo = NULL;
-			} else {
-				kalMemZero(prCmdInfo->pucInfoBuffer, u4Length);
-			}
-		} else {
-			prCmdInfo->pucInfoBuffer = NULL;
-		}
-	}
+                prCmdInfo = NULL;
+            } else {
+                kalMemZero(prCmdInfo->pucInfoBuffer, u4Length);
+            }
+        } else {
+            prCmdInfo->pucInfoBuffer = NULL;
+        }
+    }
 
-	if (prCmdInfo) {
-		DBGLOG(MEM, LOUD, "CMD[0x%p] allocated! LEN[%04u], Rest[%u]\n",
-		       prCmdInfo, u4Length, prAdapter->rFreeCmdList.u4NumElem);
-	} else {
-		DBGLOG(MEM, WARN,
-		       "CMD allocation failed! LEN[%04u], Rest[%u]\n", u4Length,
-		       prAdapter->rFreeCmdList.u4NumElem);
-	}
+    if (prCmdInfo) {
+        DBGLOG(MEM, LOUD, "CMD[0x%p] allocated! LEN[%04u], Rest[%u]\n",
+               prCmdInfo, u4Length, prAdapter->rFreeCmdList.u4NumElem);
+    } else {
+        DBGLOG(MEM, WARN,
+               "CMD allocation failed! LEN[%04u], Rest[%u]\n", u4Length,
+               prAdapter->rFreeCmdList.u4NumElem);
+    }
 
-	return prCmdInfo;
+    return prCmdInfo;
 }
 
 /*----------------------------------------------------------------------------*/
@@ -166,30 +164,29 @@ P_CMD_INFO_T cmdBufAllocateCmdInfo(IN P_ADAPTER_T prAdapter, IN u32 u4Length)
  * @return (none)
  */
 /*----------------------------------------------------------------------------*/
-void cmdBufFreeCmdInfo(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo)
-{
-	KAL_SPIN_LOCK_DECLARATION();
+void cmdBufFreeCmdInfo(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo){
+    KAL_SPIN_LOCK_DECLARATION();
 
-	DEBUGFUNC("cmdBufFreeCmdInfo");
+    DEBUGFUNC("cmdBufFreeCmdInfo");
 
-	ASSERT(prAdapter);
+    ASSERT(prAdapter);
 
-	if (prCmdInfo) {
-		if (prCmdInfo->pucInfoBuffer) {
-			cnmMemFree(prAdapter, prCmdInfo->pucInfoBuffer);
-			prCmdInfo->pucInfoBuffer = NULL;
-		}
+    if (prCmdInfo) {
+        if (prCmdInfo->pucInfoBuffer) {
+            cnmMemFree(prAdapter, prCmdInfo->pucInfoBuffer);
+            prCmdInfo->pucInfoBuffer = NULL;
+        }
 
-		KAL_ACQUIRE_SPIN_LOCK(prAdapter, SPIN_LOCK_CMD_RESOURCE);
-		QUEUE_INSERT_TAIL(&prAdapter->rFreeCmdList,
-				  &prCmdInfo->rQueEntry);
-		KAL_RELEASE_SPIN_LOCK(prAdapter, SPIN_LOCK_CMD_RESOURCE);
-	}
+        KAL_ACQUIRE_SPIN_LOCK(prAdapter, SPIN_LOCK_CMD_RESOURCE);
+        QUEUE_INSERT_TAIL(&prAdapter->rFreeCmdList,
+                          &prCmdInfo->rQueEntry);
+        KAL_RELEASE_SPIN_LOCK(prAdapter, SPIN_LOCK_CMD_RESOURCE);
+    }
 
-	if (prCmdInfo) {
-		DBGLOG(MEM, LOUD, "CMD[0x%p] freed! Rest[%u]\n", prCmdInfo,
-		       prAdapter->rFreeCmdList.u4NumElem);
-	}
+    if (prCmdInfo) {
+        DBGLOG(MEM, LOUD, "CMD[0x%p] freed! Rest[%u]\n", prCmdInfo,
+               prAdapter->rFreeCmdList.u4NumElem);
+    }
 
-	return;
+    return;
 }

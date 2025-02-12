@@ -55,38 +55,38 @@
 /* Routines in assoc.c                                                        */
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS assocSendReAssocReqFrame(IN P_ADAPTER_T prAdapter,
-				     IN P_STA_RECORD_T prStaRec);
+                                     IN P_STA_RECORD_T prStaRec);
 
 WLAN_STATUS assocCheckTxReAssocReqFrame(IN P_ADAPTER_T prAdapter,
-					IN P_MSDU_INFO_T prMsduInfo);
+                                        IN P_MSDU_INFO_T prMsduInfo);
 
 WLAN_STATUS assocCheckTxReAssocRespFrame(IN P_ADAPTER_T prAdapter,
-					 IN P_MSDU_INFO_T prMsduInfo);
+                                         IN P_MSDU_INFO_T prMsduInfo);
 
 WLAN_STATUS
 assocCheckRxReAssocRspFrameStatus(IN P_ADAPTER_T prAdapter,
-				  IN P_SW_RFB_T prSwRfb,
-				  OUT u16 *pu2StatusCode);
+                                  IN P_SW_RFB_T prSwRfb,
+                                  OUT u16 *pu2StatusCode);
 
 WLAN_STATUS assocSendDisAssocFrame(IN P_ADAPTER_T prAdapter,
-				   IN P_STA_RECORD_T prStaRec,
-				   IN u16 u2ReasonCode);
+                                   IN P_STA_RECORD_T prStaRec,
+                                   IN u16 u2ReasonCode);
 
 WLAN_STATUS
 assocProcessRxDisassocFrame(IN P_ADAPTER_T prAdapter,
-			    IN P_SW_RFB_T prSwRfb,
-			    IN u8 aucBSSID[],
-			    OUT u16 *pu2ReasonCode);
+                            IN P_SW_RFB_T prSwRfb,
+                            IN u8 aucBSSID[],
+                            OUT u16 *pu2ReasonCode);
 
 WLAN_STATUS assocProcessRxAssocReqFrame(IN P_ADAPTER_T prAdapter,
-					IN P_SW_RFB_T prSwRfb,
-					OUT u16 *pu2StatusCode);
+                                        IN P_SW_RFB_T prSwRfb,
+                                        OUT u16 *pu2StatusCode);
 
 WLAN_STATUS assocSendReAssocRespFrame(IN P_ADAPTER_T prAdapter,
-				      IN P_STA_RECORD_T prStaRec);
+                                      IN P_STA_RECORD_T prStaRec);
 
 u16 assocBuildCapabilityInfo(IN P_ADAPTER_T prAdapter,
-			     IN P_STA_RECORD_T prStaRec);
+                             IN P_STA_RECORD_T prStaRec);
 
 /*******************************************************************************
  *                              F U N C T I O N S

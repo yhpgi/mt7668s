@@ -55,21 +55,21 @@
 /* Routines in rate.c                                                         */
 /*----------------------------------------------------------------------------*/
 void rateGetRateSetFromIEs(IN P_IE_SUPPORTED_RATE_IOT_T prIeSupportedRate,
-			   IN P_IE_EXT_SUPPORTED_RATE_T prIeExtSupportedRate,
-			   OUT u16 *pu2OperationalRateSet,
-			   OUT u16 *pu2BSSBasicRateSet,
-			   OUT u8 *pfgIsUnknownBSSBasicRate);
+                           IN P_IE_EXT_SUPPORTED_RATE_T prIeExtSupportedRate,
+                           OUT u16 *pu2OperationalRateSet,
+                           OUT u16 *pu2BSSBasicRateSet,
+                           OUT u8 *pfgIsUnknownBSSBasicRate);
 
 void rateGetDataRatesFromRateSet(IN u16 u2OperationalRateSet,
-				 IN u16 u2BSSBasicRateSet,
-				 OUT u8 *pucDataRates,
-				 OUT u8 *pucDataRatesLen);
+                                 IN u16 u2BSSBasicRateSet,
+                                 OUT u8 *pucDataRates,
+                                 OUT u8 *pucDataRatesLen);
 
 u8 rateGetHighestRateIndexFromRateSet(IN u16 u2RateSet,
-				      OUT u8 *pucHighestRateIndex);
+                                      OUT u8 *pucHighestRateIndex);
 
 u8 rateGetLowestRateIndexFromRateSet(IN u16 u2RateSet,
-				     OUT u8 *pucLowestRateIndex);
+                                     OUT u8 *pucLowestRateIndex);
 
 /*******************************************************************************
  *                              F U N C T I O N S

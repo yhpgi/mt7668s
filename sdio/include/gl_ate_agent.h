@@ -45,23 +45,23 @@ extern u8 g_bCaptureDone;
  */
 
 typedef struct _STA_REC_BF_UPD_ARGUMENT {
-	u32 u4WlanId;
-	u32 u4BssId;
-	u32 u4PfmuId;
-	u32 u4SuMu;
-	u32 u4eTxBfCap;
-	u32 u4NdpaRate;
-	u32 u4NdpRate;
-	u32 u4ReptPollRate;
-	u32 u4TxMode;
-	u32 u4Nc;
-	u32 u4Nr;
-	u32 u4Bw;
-	u32 u4SpeIdx;
-	u32 u4TotalMemReq;
-	u32 u4MemReq20M;
-	u32 au4MemRow[4];
-	u32 au4MemCol[4];
+    u32 u4WlanId;
+    u32 u4BssId;
+    u32 u4PfmuId;
+    u32 u4SuMu;
+    u32 u4eTxBfCap;
+    u32 u4NdpaRate;
+    u32 u4NdpRate;
+    u32 u4ReptPollRate;
+    u32 u4TxMode;
+    u32 u4Nc;
+    u32 u4Nr;
+    u32 u4Bw;
+    u32 u4SpeIdx;
+    u32 u4TotalMemReq;
+    u32 u4MemReq20M;
+    u32 au4MemRow[4];
+    u32 au4MemCol[4];
 } STA_REC_BF_UPD_ARGUMENT, *P_STA_REC_BF_UPD_ARGUMENT;
 
 /*******************************************************************************

@@ -26,27 +26,27 @@
  *******************************************************************************
  */
 
-#define BTM_REQ_MODE_CAND_INCLUDED_BIT			  BIT(0)
-#define BTM_REQ_MODE_ABRIDGED				  BIT(1)
-#define BTM_REQ_MODE_DISC_IMM				  BIT(2)
-#define BTM_REQ_MODE_BSS_TERM_INCLUDE			  BIT(3)
-#define BTM_REQ_MODE_ESS_DISC_IMM			  BIT(4)
+#define BTM_REQ_MODE_CAND_INCLUDED_BIT            BIT(0)
+#define BTM_REQ_MODE_ABRIDGED                 BIT(1)
+#define BTM_REQ_MODE_DISC_IMM                 BIT(2)
+#define BTM_REQ_MODE_BSS_TERM_INCLUDE             BIT(3)
+#define BTM_REQ_MODE_ESS_DISC_IMM             BIT(4)
 
-#define BSS_TRANSITION_MGT_STATUS_ACCEPT		  0
-#define BSS_TRANSITION_MGT_STATUS_UNSPECIFIED		  1
-#define BSS_TRANSITION_MGT_STATUS_NEED_SCAN		  2
-#define BSS_TRANSITION_MGT_STATUS_CAND_NO_CAPACITY	  3
-#define BSS_TRANSITION_MGT_STATUS_TERM_UNDESIRED	  4
-#define BSS_TRANSITION_MGT_STATUS_TERM_DELAY_REQUESTED	  5
-#define BSS_TRANSITION_MGT_STATUS_CAND_LIST_PROVIDED	  6
-#define BSS_TRANSITION_MGT_STATUS_CAND_NO_CANDIDATES	  7
-#define BSS_TRANSITION_MGT_STATUS_LEAVING_ESS		  8
+#define BSS_TRANSITION_MGT_STATUS_ACCEPT          0
+#define BSS_TRANSITION_MGT_STATUS_UNSPECIFIED         1
+#define BSS_TRANSITION_MGT_STATUS_NEED_SCAN       2
+#define BSS_TRANSITION_MGT_STATUS_CAND_NO_CAPACITY    3
+#define BSS_TRANSITION_MGT_STATUS_TERM_UNDESIRED      4
+#define BSS_TRANSITION_MGT_STATUS_TERM_DELAY_REQUESTED    5
+#define BSS_TRANSITION_MGT_STATUS_CAND_LIST_PROVIDED      6
+#define BSS_TRANSITION_MGT_STATUS_CAND_NO_CANDIDATES      7
+#define BSS_TRANSITION_MGT_STATUS_LEAVING_ESS         8
 
 /* 802.11v: define Transtion and Transition Query reasons */
-#define BSS_TRANSITION_BETTER_AP_FOUND			  6
-#define BSS_TRANSITION_LOW_RSSI				  16
-#define BSS_TRANSITION_INCLUDE_PREFER_CAND_LIST		  19
-#define BSS_TRANSITION_LEAVING_ESS			  20
+#define BSS_TRANSITION_BETTER_AP_FOUND            6
+#define BSS_TRANSITION_LOW_RSSI               16
+#define BSS_TRANSITION_INCLUDE_PREFER_CAND_LIST       19
+#define BSS_TRANSITION_LEAVING_ESS            20
 
 /*******************************************************************************
  *                         D A T A   T Y P E S
@@ -54,34 +54,34 @@
  */
 
 typedef struct _TIMINGMSMT_PARAM_T {
-	u8 fgInitiator;
-	u8 ucTrigger;
-	u8 ucDialogToken; /* Dialog Token */
-	u8 ucFollowUpDialogToken; /* Follow Up Dialog Token */
-	u32 u4ToD; /* Timestamp of Departure [10ns] */
-	u32 u4ToA; /* Timestamp of Arrival [10ns] */
+    u8 fgInitiator;
+    u8 ucTrigger;
+    u8 ucDialogToken;  /* Dialog Token */
+    u8 ucFollowUpDialogToken;  /* Follow Up Dialog Token */
+    u32 u4ToD;  /* Timestamp of Departure [10ns] */
+    u32 u4ToA;  /* Timestamp of Arrival [10ns] */
 } TIMINGMSMT_PARAM_T, *P_TIMINGMSMT_PARAM_T;
 
 typedef struct _BSS_TRANSITION_MGT_PARAM_T {
-	/* for Query */
-	u8 ucDialogToken;
-	u8 ucQueryReason;
-	/* for Request */
-	u8 ucRequestMode;
-	u16 u2DisassocTimer;
-	u16 u2TermDuration;
-	u8 aucTermTsf[8];
-	u8 ucSessionURLLen;
-	u8 aucSessionURL[255];
-	/* for Respone */
-	u8 fgPendingResponse : 1;
-	u8 fgUnsolicitedReq : 1;
-	u8 fgReserved : 6;
-	u8 ucStatusCode;
-	u8 ucTermDelay;
-	u8 aucTargetBssid[MAC_ADDR_LEN];
-	u8 *pucOurNeighborBss;
-	u16 u2OurNeighborBssLen;
+    /* for Query */
+    u8 ucDialogToken;
+    u8 ucQueryReason;
+    /* for Request */
+    u8 ucRequestMode;
+    u16 u2DisassocTimer;
+    u16 u2TermDuration;
+    u8 aucTermTsf[8];
+    u8 ucSessionURLLen;
+    u8 aucSessionURL[255];
+    /* for Respone */
+    u8 fgPendingResponse : 1;
+    u8 fgUnsolicitedReq : 1;
+    u8 fgReserved : 6;
+    u8 ucStatusCode;
+    u8 ucTermDelay;
+    u8 aucTargetBssid[MAC_ADDR_LEN];
+    u8 *pucOurNeighborBss;
+    u16 u2OurNeighborBssLen;
 } BSS_TRANSITION_MGT_PARAM_T, *P_BSS_TRANSITION_MGT_PARAM_T;
 
 /*******************************************************************************
@@ -107,9 +107,9 @@ typedef struct _BSS_TRANSITION_MGT_PARAM_T {
 void wnmWNMAction(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb);
 
 void wnmReportTimingMeas(IN P_ADAPTER_T prAdapter,
-			 IN u8 ucStaRecIndex,
-			 IN u32 u4ToD,
-			 IN u32 u4ToA);
+                         IN u8 ucStaRecIndex,
+                         IN u32 u4ToD,
+                         IN u32 u4ToA);
 
 #define WNM_UNIT_TEST    1
 
@@ -122,7 +122,7 @@ u8 wnmGetBtmToken(void);
 void wnmSendBTMQueryFrame(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec);
 
 void wnmSendBTMResponseFrame(IN P_ADAPTER_T prAdapter,
-			     IN P_STA_RECORD_T prStaRec);
+                             IN P_STA_RECORD_T prStaRec);
 
 void wnmRecvBTMRequest(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb);
 

@@ -26,39 +26,39 @@
  */
 
 #ifndef NIC_AUTHOR
-#define NIC_AUTHOR		     "NIC_AUTHOR"
+#define NIC_AUTHOR           "NIC_AUTHOR"
 #endif
 #ifndef NIC_DESC
-#define NIC_DESC		     "NIC_DESC"
+#define NIC_DESC             "NIC_DESC"
 #endif
 
 #ifndef NIC_NAME
-#define NIC_NAME		     "MT6632"
-#define NIC_DEVICE_ID		     "MT6632"
-#define NIC_DEVICE_ID_LOW	     "mt6632"
+#define NIC_NAME             "MT6632"
+#define NIC_DEVICE_ID            "MT6632"
+#define NIC_DEVICE_ID_LOW        "mt6632"
 #endif
 
 /* NIC driver information */
-#define NIC_VENDOR		     "MediaTek Inc."
-#define NIC_VENDOR_OUI		 \
-	{			 \
-		0x00, 0x0C, 0xE7 \
-	}
+#define NIC_VENDOR           "MediaTek Inc."
+#define NIC_VENDOR_OUI   \
+    {                    \
+        0x00, 0x0C, 0xE7 \
+    }
 
-#define NIC_PRODUCT_NAME	     "MediaTek Inc. Wireless LAN Adapter"
-#define NIC_DRIVER_NAME		     "MediaTek Inc. Wireless LAN Adapter Driver"
+#define NIC_PRODUCT_NAME         "MediaTek Inc. Wireless LAN Adapter"
+#define NIC_DRIVER_NAME          "MediaTek Inc. Wireless LAN Adapter Driver"
 
 /* Define our driver version */
 #define NIC_DRIVER_MAJOR_VERSION     1
 #define NIC_DRIVER_MINOR_VERSION     1
 #define NIC_DRIVER_SERIAL_VERSION    0
-#define NIC_DRIVER_VERSION				     \
-	(NIC_DRIVER_MAJOR_VERSION, NIC_DRIVER_MINOR_VERSION, \
-	 NIC_DRIVER_SERIAL_VERSION)
+#define NIC_DRIVER_VERSION                               \
+    (NIC_DRIVER_MAJOR_VERSION, NIC_DRIVER_MINOR_VERSION, \
+     NIC_DRIVER_SERIAL_VERSION)
 
-#define STR(s)		    #s
-#define XSTR(x)		    STR(x)
-#define NDV(v)		    XSTR(NIC_DRIVER_ ## v ## _VERSION)
+#define STR(s)          #s
+#define XSTR(x)         STR(x)
+#define NDV(v)          XSTR(NIC_DRIVER_ ## v ## _VERSION)
 #define NDV_STR(a, i, s)    NDV(a) "." NDV(i) "." NDV(s)
 #define NIC_DRIVER_VERSION_STRING    NDV_STR(MAJOR, MINOR, SERIAL)
 

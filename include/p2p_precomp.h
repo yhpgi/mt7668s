@@ -24,7 +24,7 @@
  *******************************************************************************
  */
 
-#include "gl_os.h" /* Include "config.h" */
+#include "gl_os.h"  /* Include "config.h" */
 
 #include "gl_p2p_os.h"
 

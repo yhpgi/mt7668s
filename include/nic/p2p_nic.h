@@ -53,12 +53,12 @@
  */
 
 void nicP2pMediaStateChange(IN P_ADAPTER_T prAdapter,
-			    IN u8 ucBssIndex,
-			    IN P_EVENT_CONNECTION_STATUS prConnectionStatus);
+                            IN u8 ucBssIndex,
+                            IN P_EVENT_CONNECTION_STATUS prConnectionStatus);
 
 void nicRxAddP2pDevice(IN P_ADAPTER_T prAdapter,
-		       IN P_EVENT_P2P_DEV_DISCOVER_RESULT_T prP2pResult,
-		       IN u8 *pucRxIEBuf,
-		       IN u16 u2RxIELength);
+                       IN P_EVENT_P2P_DEV_DISCOVER_RESULT_T prP2pResult,
+                       IN u8 *pucRxIEBuf,
+                       IN u16 u2RxIELength);
 
 #endif

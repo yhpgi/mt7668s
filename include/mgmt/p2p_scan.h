@@ -56,14 +56,14 @@ void scnEventReturnChannel(IN P_ADAPTER_T prAdapter, IN u8 ucScnSeqNum);
 u8 scanUpdateP2pDeviceDesc(IN P_ADAPTER_T prAdapter, IN P_BSS_DESC_T prBssDesc);
 
 void scanP2pProcessBeaconAndProbeResp(IN P_ADAPTER_T prAdapter,
-				      IN P_SW_RFB_T prSwRfb,
-				      IN P_WLAN_STATUS prStatus,
-				      IN P_BSS_DESC_T prBssDesc,
-				      IN P_WLAN_BEACON_FRAME_T prWlanBeaconFrame);
+                                      IN P_SW_RFB_T prSwRfb,
+                                      IN P_WLAN_STATUS prStatus,
+                                      IN P_BSS_DESC_T prBssDesc,
+                                      IN P_WLAN_BEACON_FRAME_T prWlanBeaconFrame);
 
 void scanRemoveAllP2pBssDesc(P_ADAPTER_T prAdapter);
 
 P_BSS_DESC_T scanP2pSearchDesc(IN P_ADAPTER_T prAdapter,
-			       IN P_P2P_CONNECTION_REQ_INFO_T prConnReqInfo);
+                               IN P_P2P_CONNECTION_REQ_INFO_T prConnReqInfo);
 
 #endif

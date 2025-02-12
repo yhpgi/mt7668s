@@ -1,0 +1,4 @@
+#!/bin/bash
+
+# Find all C/C++ source files and format them using uncrustify in parallel
+find . -name '*.c' -o -name '*.cpp' -o -name '*.h' | xargs -n 1 -P $(nproc) -I {} uncrustify -c uncrustify.cfg --replace --no-backup "{}"

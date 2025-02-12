@@ -52,7 +52,7 @@
  */
 
 u8 *p2pBuildReAssocReqFrameCommonIEs(IN P_ADAPTER_T prAdapter,
-				     IN P_MSDU_INFO_T prMsduInfo,
-				     IN u8 *pucBuffer);
+                                     IN P_MSDU_INFO_T prMsduInfo,
+                                     IN u8 *pucBuffer);
 
 #endif

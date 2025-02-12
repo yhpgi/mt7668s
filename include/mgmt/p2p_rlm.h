@@ -57,24 +57,25 @@ void rlmBssInitForAP(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo);
 u8 rlmUpdateBwByChListForAP(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo);
 
 void rlmUpdateParamsForAP(P_ADAPTER_T prAdapter,
-			  P_BSS_INFO_T prBssInfo,
-			  u8 fgUpdateBeacon);
+                          P_BSS_INFO_T prBssInfo,
+                          u8 fgUpdateBeacon);
 
 void rlmFuncInitialChannelList(IN P_ADAPTER_T prAdapter);
 
 void rlmFuncCommonChannelList(IN P_ADAPTER_T prAdapter,
-			      IN P_CHANNEL_ENTRY_FIELD_T prChannelEntryII,
-			      IN u8 ucChannelListSize);
+                              IN P_CHANNEL_ENTRY_FIELD_T prChannelEntryII,
+                              IN u8 ucChannelListSize);
 
 u8 rlmFuncFindOperatingClass(IN P_ADAPTER_T prAdapter, IN u8 ucChannelNum);
 
 u8 rlmFuncFindAvailableChannel(IN P_ADAPTER_T prAdapter,
-			       IN u8 ucCheckChnl,
-			       IN u8 *pucSuggestChannel,
-			       IN u8 fgIsSocialChannel,
-			       IN u8 fgIsDefaultChannel);
+                               IN u8 ucCheckChnl,
+                               IN u8 *pucSuggestChannel,
+                               IN u8 fgIsSocialChannel,
+                               IN u8 fgIsDefaultChannel);
 
-ENUM_CHNL_EXT_T rlmDecideScoForAP(P_ADAPTER_T prAdapter,P_BSS_INFO_T prBssInfo);
+ENUM_CHNL_EXT_T rlmDecideScoForAP(P_ADAPTER_T prAdapter,
+                                  P_BSS_INFO_T prBssInfo);
 
 ENUM_CHNL_EXT_T rlmGetScoForAP(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo);
 

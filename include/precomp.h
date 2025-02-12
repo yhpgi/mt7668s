@@ -23,6 +23,14 @@
 #ifdef __GNUC__
 #if (DBG == 0)
 #pragma GCC diagnostic ignored "-Wformat"
+#pragma GCC diagnostic ignored "-Wdiscarded-qualifiers"
+#pragma GCC diagnostic ignored "-Wdeclaration-after-statement"
+#pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
+#pragma GCC diagnostic ignored "-Wcast-function-type"
+#pragma GCC diagnostic ignored "-Wstringop-overread"
+#pragma GCC diagnostic ignored "-Wenum-conversion"
+#pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#pragma GCC diagnostic ignored "-Wempty-body"
 #endif
 #endif
 
@@ -31,7 +39,7 @@
  *******************************************************************************
  */
 
-#include "gl_os.h" /* Include "config.h" */
+#include "gl_os.h"  /* Include "config.h" */
 
 #if CFG_ENABLE_WIFI_DIRECT
 #include "gl_p2p_os.h"
@@ -234,7 +242,7 @@
  */
 
 extern int mtk_sdio_probe(struct sdio_func *func,
-			  const struct sdio_device_id *id);
+                          const struct sdio_device_id *id);
 extern void mtk_sdio_remove(struct sdio_func *func);
 
 #endif

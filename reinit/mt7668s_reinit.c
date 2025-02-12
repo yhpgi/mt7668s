@@ -16,21 +16,19 @@ MODULE_DESCRIPTION("MT7668S rescan module");
 extern void extern_wifi_set_enable(int);
 extern void sdio_reinit(void);
 
-static int __init mt7668s_reinit(void)
-{
-	pr_info("Triggered SDIO WiFi power on and bus rescan.\n");
-	// wifi_setup_dt();
-	// msleep(300);
-	extern_wifi_set_enable(0);
-	msleep(300);
-	extern_wifi_set_enable(1);
-	sdio_reinit();
-	return 0;
+static int __init mt7668s_reinit(void){
+    pr_info("Triggered SDIO WiFi power on and bus rescan.\n");
+    // wifi_setup_dt();
+    // msleep(300);
+    extern_wifi_set_enable(0);
+    msleep(300);
+    extern_wifi_set_enable(1);
+    sdio_reinit();
+    return 0;
 }
 
-static void __exit mt7668s_cleanup(void)
-{
-	pr_info("Cleaning up module.\n");
+static void __exit mt7668s_cleanup(void){
+    pr_info("Cleaning up module.\n");
 }
 
 module_init(mt7668s_reinit);

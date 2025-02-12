@@ -31,11 +31,11 @@
  */
 
 ECO_INFO_T mt7668_eco_table[] = {
-	/* HW version, ROM version, Factory version, Eco version */
-	{ 0x00, 0x00, 0xA, 0x1 }, /* E1 */
-	{ 0x10, 0x01, 0xB, 0x2 }, /* E2 */
-	{ 0x11, 0x01, 0xB, 0x2 }, /* E2 */
-	{ 0x00, 0x00, 0x0, 0x0 } /* End of table */
+    /* HW version, ROM version, Factory version, Eco version */
+    { 0x00, 0x00, 0xA, 0x1 },  /* E1 */
+    { 0x10, 0x01, 0xB, 0x2 },  /* E2 */
+    { 0x11, 0x01, 0xB, 0x2 },  /* E2 */
+    { 0x00, 0x00, 0x0, 0x0 }  /* End of table */
 };
 
 /*******************************************************************************
@@ -43,61 +43,61 @@ ECO_INFO_T mt7668_eco_table[] = {
  *******************************************************************************
  */
 void mt7668ConstructFirmwarePrio(P_GLUE_INFO_T prGlueInfo, u8 **apucNameTable,
-				 u8 **apucName, u8 *pucNameIdx, u8 ucMaxNameIdx)
-{
-	struct chip_info *prChipInfo = prGlueInfo->prAdapter->chip_info;
-	u32 chip_id = prChipInfo->chip_id;
-	u8 sub_idx = 0;
+                                 u8 **apucName, u8 *pucNameIdx,
+                                 u8 ucMaxNameIdx){
+    struct chip_info *prChipInfo = prGlueInfo->prAdapter->chip_info;
+    u32 chip_id = prChipInfo->chip_id;
+    u8 sub_idx = 0;
 
-	for (sub_idx = 0; apucNameTable[sub_idx]; sub_idx++) {
-		if (((*pucNameIdx) + 3) < ucMaxNameIdx) {
-			/* Type 1. WIFI_RAM_CODE_MTxxxx.bin */
-			snprintf(*(apucName + (*pucNameIdx)),
-				 CFG_FW_NAME_MAX_LEN, "%s%x.bin",
-				 apucNameTable[sub_idx], chip_id);
-			(*pucNameIdx) += 1;
+    for (sub_idx = 0; apucNameTable[sub_idx]; sub_idx++) {
+        if (((*pucNameIdx) + 3) < ucMaxNameIdx) {
+            /* Type 1. WIFI_RAM_CODE_MTxxxx.bin */
+            snprintf(*(apucName + (*pucNameIdx)),
+                     CFG_FW_NAME_MAX_LEN, "%s%x.bin",
+                     apucNameTable[sub_idx], chip_id);
+            (*pucNameIdx) += 1;
 
-			/* Type 2. WIFI_RAM_CODE_MTxxxx */
-			snprintf(*(apucName + (*pucNameIdx)),
-				 CFG_FW_NAME_MAX_LEN, "%s%x",
-				 apucNameTable[sub_idx], chip_id);
-			(*pucNameIdx) += 1;
+            /* Type 2. WIFI_RAM_CODE_MTxxxx */
+            snprintf(*(apucName + (*pucNameIdx)),
+                     CFG_FW_NAME_MAX_LEN, "%s%x",
+                     apucNameTable[sub_idx], chip_id);
+            (*pucNameIdx) += 1;
 
-			/* Type 3. WIFI_RAM_CODE_MTxxxx_Ex.bin */
-			snprintf(*(apucName + (*pucNameIdx)),
-				 CFG_FW_NAME_MAX_LEN, "%s%x_E%u.bin",
-				 apucNameTable[sub_idx], chip_id,
-				 wlanGetEcoVersion(prGlueInfo->prAdapter));
-			(*pucNameIdx) += 1;
+            /* Type 3. WIFI_RAM_CODE_MTxxxx_Ex.bin */
+            snprintf(*(apucName + (*pucNameIdx)),
+                     CFG_FW_NAME_MAX_LEN, "%s%x_E%u.bin",
+                     apucNameTable[sub_idx], chip_id,
+                     wlanGetEcoVersion(prGlueInfo->prAdapter));
+            (*pucNameIdx) += 1;
 
-			/* Type 4. WIFI_RAM_CODE_MTxxxx_Ex */
-			snprintf(*(apucName + (*pucNameIdx)),
-				 CFG_FW_NAME_MAX_LEN, "%s%x_E%u",
-				 apucNameTable[sub_idx], chip_id,
-				 wlanGetEcoVersion(prGlueInfo->prAdapter));
-			(*pucNameIdx) += 1;
-		} else {
-			/* the table is not large enough */
-			DBGLOG(INIT,
-			       ERROR,
-			       "kalFirmwareImageMapping >> file name array is not enough.\n");
-			ASSERT(0);
-		}
-	}
+            /* Type 4. WIFI_RAM_CODE_MTxxxx_Ex */
+            snprintf(*(apucName + (*pucNameIdx)),
+                     CFG_FW_NAME_MAX_LEN, "%s%x_E%u",
+                     apucNameTable[sub_idx], chip_id,
+                     wlanGetEcoVersion(prGlueInfo->prAdapter));
+            (*pucNameIdx) += 1;
+        } else {
+            /* the table is not large enough */
+            DBGLOG(INIT,
+                   ERROR,
+                   "kalFirmwareImageMapping >> file name array is not enough.\n");
+            ASSERT(0);
+        }
+    }
 }
 
 /* Litien code refine to support multi chip */
 struct chip_info chip_info_mt7668 = {
-	.chip_id = MT7668_CHIP_ID,
-	.sw_sync0 = MT7668_SW_SYNC0,
-	.sw_ready_bit_offset = MT7668_SW_SYNC0_RDY_OFFSET,
-	.patch_addr = MT7668_PATCH_START_ADDR,
-	.is_pcie_32dw_read = MT7668_IS_PCIE_32DW_READ, /* Litien */
-	.eco_info = mt7668_eco_table,
-	.constructFirmwarePrio = mt7668ConstructFirmwarePrio,
-	.features = 0,
+    .chip_id = MT7668_CHIP_ID,
+    .sw_sync0 = MT7668_SW_SYNC0,
+    .sw_ready_bit_offset = MT7668_SW_SYNC0_RDY_OFFSET,
+    .patch_addr = MT7668_PATCH_START_ADDR,
+    .is_pcie_32dw_read = MT7668_IS_PCIE_32DW_READ,  /* Litien */
+    .eco_info = mt7668_eco_table,
+    .constructFirmwarePrio = mt7668ConstructFirmwarePrio,
+    .features = 0,
 };
 
 struct hif_driver_data driver_data_mt7668 = {
-	.chip_info = &chip_info_mt7668,
+    .chip_info = &chip_info_mt7668,
 };

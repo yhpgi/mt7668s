@@ -29,23 +29,23 @@
  *******************************************************************************
  */
 
-#define PM_UAPSD_AC0			       (BIT(0))
-#define PM_UAPSD_AC1			       (BIT(1))
-#define PM_UAPSD_AC2			       (BIT(2))
-#define PM_UAPSD_AC3			       (BIT(3))
+#define PM_UAPSD_AC0                   (BIT(0))
+#define PM_UAPSD_AC1                   (BIT(1))
+#define PM_UAPSD_AC2                   (BIT(2))
+#define PM_UAPSD_AC3                   (BIT(3))
 
-#define PM_UAPSD_ALL			       (PM_UAPSD_AC0 | PM_UAPSD_AC1 | \
-						PM_UAPSD_AC2 | PM_UAPSD_AC3)
-#define PM_UAPSD_NONE			       0
+#define PM_UAPSD_ALL                   (PM_UAPSD_AC0 | PM_UAPSD_AC1 | \
+                                        PM_UAPSD_AC2 | PM_UAPSD_AC3)
+#define PM_UAPSD_NONE                  0
 
-#define LP_OWN_BACK_TOTAL_DELAY_MS	       2048 /* exponential of 2 */
-#define LP_OWN_BACK_LOOP_DELAY_MS	       1 /* exponential of 2 */
-#define LP_OWN_BACK_CLR_OWN_ITERATION	       256 /* exponential of 2 */
-#define LP_OWN_BACK_FAILED_RETRY_CNT	       5
-#define LP_OWN_BACK_FAILED_LOG_SKIP_MS	       2000
-#define LP_OWN_BACK_FAILED_RESET_CNT	       5
+#define LP_OWN_BACK_TOTAL_DELAY_MS         2048  /* exponential of 2 */
+#define LP_OWN_BACK_LOOP_DELAY_MS          1  /* exponential of 2 */
+#define LP_OWN_BACK_CLR_OWN_ITERATION          256  /* exponential of 2 */
+#define LP_OWN_BACK_FAILED_RETRY_CNT           5
+#define LP_OWN_BACK_FAILED_LOG_SKIP_MS         2000
+#define LP_OWN_BACK_FAILED_RESET_CNT           5
 #define LP_OWN_BACK_FAILED_DBGCR_POLL_ROUND    5
-#define LP_DBGCR_POLL_ROUND		       1
+#define LP_DBGCR_POLL_ROUND            1
 
 /*******************************************************************************
  *                             D A T A   T Y P E S
@@ -53,11 +53,11 @@
  */
 
 typedef struct _PM_PROFILE_SETUP_INFO_T {
-	/* Profile setup */
-	u8 ucBmpDeliveryAC; /* 0: AC_BE, 1: AC_BK, 2: AC_VI, 3: AC_VO */
-	u8 ucBmpTriggerAC; /* 0: AC_BE, 1: AC_BK, 2: AC_VI, 3: AC_VO */
+    /* Profile setup */
+    u8 ucBmpDeliveryAC;  /* 0: AC_BE, 1: AC_BK, 2: AC_VI, 3: AC_VO */
+    u8 ucBmpTriggerAC;  /* 0: AC_BE, 1: AC_BK, 2: AC_VI, 3: AC_VO */
 
-	u8 ucUapsdSp; /* Number of triggered packets in UAPSD */
+    u8 ucUapsdSp;  /* Number of triggered packets in UAPSD */
 } PM_PROFILE_SETUP_INFO_T, *P_PM_PROFILE_SETUP_INFO_T;
 
 /*******************************************************************************
@@ -80,14 +80,14 @@ typedef struct _PM_PROFILE_SETUP_INFO_T {
 #define RECLAIM_POWER_CONTROL_TO_PM(_prAdapter, _fgEnableGINT_in_IST)
 #else
 #define ACQUIRE_POWER_CONTROL_FROM_PM(_prAdapter) \
-	{					  \
-		nicpmSetDriverOwn(_prAdapter);	  \
-	}
+    {                                             \
+        nicpmSetDriverOwn(_prAdapter);            \
+    }
 
 #define RECLAIM_POWER_CONTROL_TO_PM(_prAdapter, _fgEnableGINT_in_IST) \
-	{							      \
-		nicpmSetFWOwn(_prAdapter, _fgEnableGINT_in_IST);      \
-	}
+    {                                                                 \
+        nicpmSetFWOwn(_prAdapter, _fgEnableGINT_in_IST);              \
+    }
 #endif
 
 /*******************************************************************************

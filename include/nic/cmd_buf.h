@@ -34,60 +34,60 @@
  */
 
 typedef enum _COMMAND_TYPE {
-	COMMAND_TYPE_GENERAL_IOCTL,
-	COMMAND_TYPE_NETWORK_IOCTL,
-	COMMAND_TYPE_SECURITY_FRAME,
-	COMMAND_TYPE_MANAGEMENT_FRAME,
-	COMMAND_TYPE_NUM
+    COMMAND_TYPE_GENERAL_IOCTL,
+    COMMAND_TYPE_NETWORK_IOCTL,
+    COMMAND_TYPE_SECURITY_FRAME,
+    COMMAND_TYPE_MANAGEMENT_FRAME,
+    COMMAND_TYPE_NUM
 } COMMAND_TYPE,
 *P_COMMAND_TYPE;
 
 typedef void (*PFN_CMD_DONE_HANDLER)(IN P_ADAPTER_T prAdapter,
-				     IN P_CMD_INFO_T prCmdInfo,
-				     IN u8 *pucEventBuf,
-				     IN u32 u4EventBufLen);
+                                     IN P_CMD_INFO_T prCmdInfo,
+                                     IN u8 *pucEventBuf,
+                                     IN u32 u4EventBufLen);
 
 typedef void (*PFN_CMD_TIMEOUT_HANDLER)(IN P_ADAPTER_T prAdapter,
-					IN P_CMD_INFO_T prCmdInfo);
+                                        IN P_CMD_INFO_T prCmdInfo);
 
 typedef void (*PFN_HIF_TX_CMD_DONE_CB)(IN P_ADAPTER_T prAdapter,
-				       IN P_CMD_INFO_T prCmdInfo);
+                                       IN P_CMD_INFO_T prCmdInfo);
 
 struct _CMD_INFO_T {
-	QUE_ENTRY_T rQueEntry;
+    QUE_ENTRY_T rQueEntry;
 
-	COMMAND_TYPE eCmdType;
+    COMMAND_TYPE eCmdType;
 
-	u16 u2InfoBufLen; /* This is actual CMD buffer length */
-	u8 *pucInfoBuffer; /* May pointer to structure in prAdapter */
-	P_MSDU_INFO_T prMsduInfo; /* only valid when it's a security/MGMT frame
-	                           */
-	P_NATIVE_PACKET prPacket; /* only valid when it's a security frame */
+    u16 u2InfoBufLen;  /* This is actual CMD buffer length */
+    u8 *pucInfoBuffer;  /* May pointer to structure in prAdapter */
+    P_MSDU_INFO_T prMsduInfo;  /* only valid when it's a security/MGMT frame
+                                */
+    P_NATIVE_PACKET prPacket;  /* only valid when it's a security frame */
 
-	PFN_CMD_DONE_HANDLER pfCmdDoneHandler;
-	PFN_CMD_TIMEOUT_HANDLER pfCmdTimeoutHandler;
-	PFN_HIF_TX_CMD_DONE_CB pfHifTxCmdDoneCb;
+    PFN_CMD_DONE_HANDLER pfCmdDoneHandler;
+    PFN_CMD_TIMEOUT_HANDLER pfCmdTimeoutHandler;
+    PFN_HIF_TX_CMD_DONE_CB pfHifTxCmdDoneCb;
 
-	u8 fgIsOid; /* Used to check if we need indicate */
+    u8 fgIsOid;  /* Used to check if we need indicate */
 
-	u8 ucCID;
-	u8 fgSetQuery;
-	u8 fgNeedResp;
-	u8 ucCmdSeqNum;
-	u32 u4SetInfoLen; /* Indicate how many byte we read for Set OID */
+    u8 ucCID;
+    u8 fgSetQuery;
+    u8 fgNeedResp;
+    u8 ucCmdSeqNum;
+    u32 u4SetInfoLen;  /* Indicate how many byte we read for Set OID */
 
-	/* information indicating by OID/ioctl */
-	void *pvInformationBuffer;
-	u32 u4InformationBufferLength;
+    /* information indicating by OID/ioctl */
+    void *pvInformationBuffer;
+    u32 u4InformationBufferLength;
 
-	/* private data */
-	u32 u4PrivateData;
+    /* private data */
+    u32 u4PrivateData;
 
-	/* TXD/TXP pointer/len for hif tx copy */
-	u32 u4TxdLen;
-	u32 u4TxpLen;
-	u8 *pucTxd;
-	u8 *pucTxp;
+    /* TXD/TXP pointer/len for hif tx copy */
+    u32 u4TxdLen;
+    u32 u4TxpLen;
+    u8 *pucTxd;
+    u8 *pucTxp;
 };
 
 /*******************************************************************************
@@ -121,31 +121,31 @@ void cmdBufFreeCmdInfo(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo);
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS
 wlanSendSetQueryCmd(IN P_ADAPTER_T prAdapter,
-		    u8 ucCID,
-		    u8 fgSetQuery,
-		    u8 fgNeedResp,
-		    u8 fgIsOid,
-		    PFN_CMD_DONE_HANDLER pfCmdDoneHandler,
-		    PFN_CMD_TIMEOUT_HANDLER pfCmdTimeoutHandler,
-		    u32 u4SetQueryInfoLen,
-		    u8 *pucInfoBuffer,
-		    OUT void *pvSetQueryBuffer,
-		    IN u32 u4SetQueryBufferLen);
+                    u8 ucCID,
+                    u8 fgSetQuery,
+                    u8 fgNeedResp,
+                    u8 fgIsOid,
+                    PFN_CMD_DONE_HANDLER pfCmdDoneHandler,
+                    PFN_CMD_TIMEOUT_HANDLER pfCmdTimeoutHandler,
+                    u32 u4SetQueryInfoLen,
+                    u8 *pucInfoBuffer,
+                    OUT void *pvSetQueryBuffer,
+                    IN u32 u4SetQueryBufferLen);
 
 #if CFG_SUPPORT_TX_BF
 WLAN_STATUS
 wlanSendSetQueryExtCmd(IN P_ADAPTER_T prAdapter,
-		       u8 ucCID,
-		       u8 ucExtCID,
-		       u8 fgSetQuery,
-		       u8 fgNeedResp,
-		       u8 fgIsOid,
-		       PFN_CMD_DONE_HANDLER pfCmdDoneHandler,
-		       PFN_CMD_TIMEOUT_HANDLER pfCmdTimeoutHandler,
-		       u32 u4SetQueryInfoLen,
-		       u8 *pucInfoBuffer,
-		       OUT void *pvSetQueryBuffer,
-		       IN u32 u4SetQueryBufferLen);
+                       u8 ucCID,
+                       u8 ucExtCID,
+                       u8 fgSetQuery,
+                       u8 fgNeedResp,
+                       u8 fgIsOid,
+                       PFN_CMD_DONE_HANDLER pfCmdDoneHandler,
+                       PFN_CMD_TIMEOUT_HANDLER pfCmdTimeoutHandler,
+                       u32 u4SetQueryInfoLen,
+                       u8 *pucInfoBuffer,
+                       OUT void *pvSetQueryBuffer,
+                       IN u32 u4SetQueryBufferLen);
 #endif
 
 /*******************************************************************************

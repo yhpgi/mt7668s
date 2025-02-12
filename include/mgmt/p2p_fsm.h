@@ -13,19 +13,19 @@
 #define _P2P_FSM_H
 
 void p2pFsmRunEventScanRequest(IN P_ADAPTER_T prAdapter,
-			       IN P_MSG_HDR_T prMsgHdr);
+                               IN P_MSG_HDR_T prMsgHdr);
 
 void p2pFsmRunEventChGrant(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMsgHdr);
 
 void p2pFsmRunEventNetDeviceRegister(IN P_ADAPTER_T prAdapter,
-				     IN P_MSG_HDR_T prMsgHdr);
+                                     IN P_MSG_HDR_T prMsgHdr);
 
 void p2pFsmRunEventUpdateMgmtFrame(IN P_ADAPTER_T prAdapter,
-				   IN P_MSG_HDR_T prMsgHdr);
+                                   IN P_MSG_HDR_T prMsgHdr);
 
 #if CFG_SUPPORT_WFD
 void p2pFsmRunEventWfdSettingUpdate(IN P_ADAPTER_T prAdapter,
-				    IN P_MSG_HDR_T prMsgHdr);
+                                    IN P_MSG_HDR_T prMsgHdr);
 #endif
 
 void p2pFsmRunEventScanDone(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMsgHdr);

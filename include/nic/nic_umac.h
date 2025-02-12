@@ -46,29 +46,29 @@
  *******************************************************************************
  */
 
-#define UMAC_FID_MASK				0xFFF
+#define UMAC_FID_MASK               0xFFF
 
-#define UMAC_FID_FAULT				0xFFF
+#define UMAC_FID_FAULT              0xFFF
 
-#define UMAC_PLE_CFG_POOL_INDEX			0
-#define UMAC_PSE_CFG_POOL_INDEX			1
+#define UMAC_PLE_CFG_POOL_INDEX         0
+#define UMAC_PSE_CFG_POOL_INDEX         1
 
-#define UMAC_PG_HIF0_GROUP_0			0
-#define UMAC_PG_HIF1_GROUP_1			1
-#define UMAC_PG_CPU_GROUP_2			2
-#define UMAC_PG_LMAC0_GROUP_3			3
-#define UMAC_PG_LMAC1_GROUP_4			4
-#define UMAC_PG_LMAC2_GROUP_5			5
-#define UMAC_PG_PLE_GROUP_6			6
+#define UMAC_PG_HIF0_GROUP_0            0
+#define UMAC_PG_HIF1_GROUP_1            1
+#define UMAC_PG_CPU_GROUP_2         2
+#define UMAC_PG_LMAC0_GROUP_3           3
+#define UMAC_PG_LMAC1_GROUP_4           4
+#define UMAC_PG_LMAC2_GROUP_5           5
+#define UMAC_PG_PLE_GROUP_6         6
 
-#define UMAC_PBUF_CTRL_TOTAL_PAGE_NUM_MASK	BITS(0, 11)
-#define UMAC_PBUF_CTRL_TOTAL_PAGE_NUM_OFFSET	0
+#define UMAC_PBUF_CTRL_TOTAL_PAGE_NUM_MASK  BITS(0, 11)
+#define UMAC_PBUF_CTRL_TOTAL_PAGE_NUM_OFFSET    0
 
-#define UMAC_FREEPG_CNT_FREEPAGE_CNT_MASK	BITS(0, 11)
-#define UMAC_FREEPG_CNT_FREEPAGE_CNT_OFFSET	0
+#define UMAC_FREEPG_CNT_FREEPAGE_CNT_MASK   BITS(0, 11)
+#define UMAC_FREEPG_CNT_FREEPAGE_CNT_OFFSET 0
 
-#define UMAC_FREEPG_CNT_FFA_CNT_MASK		BITS(16, 27)
-#define UMAC_FREEPG_CNT_FFA_CNT_OFFSET		16
+#define UMAC_FREEPG_CNT_FFA_CNT_MASK        BITS(16, 27)
+#define UMAC_FREEPG_CNT_FFA_CNT_OFFSET      16
 
 /*******************************************************************************
  *                   F U N C T I O N   D E C L A R A T I O N S
@@ -76,6 +76,6 @@
  */
 
 OUT u8 halUmacInfoGetMiscStatus(IN P_ADAPTER_T prAdapter,
-				IN P_UMAC_STAT2_GET_T pUmacStat2Get);
+                                IN P_UMAC_STAT2_GET_T pUmacStat2Get);
 
 #endif

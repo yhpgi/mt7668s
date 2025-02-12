@@ -58,16 +58,16 @@
 /*--------------------------------------------------------------*/
 WLAN_STATUS
 wlanoidSendSetQueryP2PCmd(IN P_ADAPTER_T prAdapter,
-			  IN u8 ucCID,
-			  IN u8 ucBssIdx,
-			  IN u8 fgSetQuery,
-			  IN u8 fgNeedResp,
-			  IN u8 fgIsOid,
-			  IN PFN_CMD_DONE_HANDLER pfCmdDoneHandler,
-			  IN PFN_CMD_TIMEOUT_HANDLER pfCmdTimeoutHandler,
-			  IN u32 u4SetQueryInfoLen,
-			  IN u8 *pucInfoBuffer,
-			  OUT void *pvSetQueryBuffer,
-			  IN u32 u4SetQueryBufferLen);
+                          IN u8 ucCID,
+                          IN u8 ucBssIdx,
+                          IN u8 fgSetQuery,
+                          IN u8 fgNeedResp,
+                          IN u8 fgIsOid,
+                          IN PFN_CMD_DONE_HANDLER pfCmdDoneHandler,
+                          IN PFN_CMD_TIMEOUT_HANDLER pfCmdTimeoutHandler,
+                          IN u32 u4SetQueryInfoLen,
+                          IN u8 *pucInfoBuffer,
+                          OUT void *pvSetQueryBuffer,
+                          IN u32 u4SetQueryBufferLen);
 
 #endif

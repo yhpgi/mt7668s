@@ -40,7 +40,7 @@ extern int allocatedMemSize;
 #endif
 
 u8 kalP2pFuncGetChannelType(IN ENUM_CHNL_EXT_T rChnlSco,
-			    OUT enum nl80211_channel_type *channel_type);
+                            OUT enum nl80211_channel_type *channel_type);
 
 /*******************************************************************************
  *                              C O N S T A N T S
@@ -74,16 +74,16 @@ u8 kalP2pFuncGetChannelType(IN ENUM_CHNL_EXT_T rChnlSco,
 
 /* Service Discovery */
 void kalP2PIndicateSDRequest(IN P_GLUE_INFO_T prGlueInfo,
-			     IN PARAM_MAC_ADDRESS rPeerAddr,
-			     IN u8 ucSeqNum);
+                             IN PARAM_MAC_ADDRESS rPeerAddr,
+                             IN u8 ucSeqNum);
 
 void kalP2PIndicateSDResponse(IN P_GLUE_INFO_T prGlueInfo,
-			      IN PARAM_MAC_ADDRESS rPeerAddr,
-			      IN u8 ucSeqNum);
+                              IN PARAM_MAC_ADDRESS rPeerAddr,
+                              IN u8 ucSeqNum);
 
 void kalP2PIndicateTXDone(IN P_GLUE_INFO_T prGlueInfo,
-			  IN u8 ucSeqNum,
-			  IN u8 ucStatus);
+                          IN u8 ucSeqNum,
+                          IN u8 ucStatus);
 
 /*----------------------------------------------------------------------------*/
 /* Wi-Fi Direct handling                                                      */
@@ -97,24 +97,24 @@ void kalP2PIndicateTXDone(IN P_GLUE_INFO_T prGlueInfo,
  */
 
 void kalP2PUpdateAssocInfo(IN P_GLUE_INFO_T prGlueInfo,
-			   IN u8 *pucFrameBody,
-			   IN u32 u4FrameBodyLen,
-			   IN u8 fgReassocRequest,
-			   IN u8 ucBssIndex);
+                           IN u8 *pucFrameBody,
+                           IN u32 u4FrameBodyLen,
+                           IN u8 fgReassocRequest,
+                           IN u8 ucBssIndex);
 
 /*u32 kalP2PGetFreqInKHz(IN P_GLUE_INFO_T prGlueInfo);*/
 
 s32 mtk_Netdev_To_RoleIdx(P_GLUE_INFO_T prGlueInfo,
-			  struct net_device *ndev,
-			  u8 *pucRoleIdx);
+                          struct net_device *ndev,
+                          u8 *pucRoleIdx);
 
 u8 kalP2PGetRole(IN P_GLUE_INFO_T prGlueInfo, IN u8 ucRoleIdx);
 
 void kalP2PSetRole(IN P_GLUE_INFO_T prGlueInfo, IN u8 ucRole, IN u8 ucRoleIdx);
 
 void kalP2PSetCipher(IN P_GLUE_INFO_T prGlueInfo,
-		     IN u32 u4Cipher,
-		     IN u8 ucRoleIdx);
+                     IN u32 u4Cipher,
+                     IN u8 ucRoleIdx);
 
 u8 kalP2PGetCipher(IN P_GLUE_INFO_T prGlueInfo, IN u8 ucRoleIdx);
 
@@ -133,53 +133,53 @@ void kalP2PSetWscMode(IN P_GLUE_INFO_T prGlueInfo, IN u8 ucWscMode);
 u8 kalP2PGetWscMode(IN P_GLUE_INFO_T prGlueInfo);
 
 u16 kalP2PCalWSC_IELen(IN P_GLUE_INFO_T prGlueInfo, IN u8 ucType,
-		       IN u8 ucRoleIdx);
+                       IN u8 ucRoleIdx);
 
 void kalP2PGenWSC_IE(IN P_GLUE_INFO_T prGlueInfo,
-		     IN u8 ucType,
-		     IN u8 *pucBuffer,
-		     IN u8 ucRoleIdx);
+                     IN u8 ucType,
+                     IN u8 *pucBuffer,
+                     IN u8 ucRoleIdx);
 
 void kalP2PUpdateWSC_IE(IN P_GLUE_INFO_T prGlueInfo,
-			IN u8 ucType,
-			IN u8 *pucBuffer,
-			IN u16 u2BufferLength,
-			IN u8 ucRoleIdx);
+                        IN u8 ucType,
+                        IN u8 *pucBuffer,
+                        IN u16 u2BufferLength,
+                        IN u8 ucRoleIdx);
 
 u8 kalP2PIndicateFound(IN P_GLUE_INFO_T prGlueInfo);
 
 void kalP2PIndicateConnReq(IN P_GLUE_INFO_T prGlueInfo,
-			   IN u8 *pucDevName,
-			   IN s32 u4NameLength,
-			   IN PARAM_MAC_ADDRESS rPeerAddr,
-			   IN u8 ucDevType,
+                           IN u8 *pucDevName,
+                           IN s32 u4NameLength,
+                           IN PARAM_MAC_ADDRESS rPeerAddr,
+                           IN u8 ucDevType,
                            /* 0: P2P Device / 1: GC / 2: GO */
-			   IN s32 i4ConfigMethod,
-			   IN s32 i4ActiveConfigMethod);
+                           IN s32 i4ConfigMethod,
+                           IN s32 i4ActiveConfigMethod);
 
 /*void kalP2PInvitationStatus(IN P_GLUE_INFO_T prGlueInfo, IN u32
  * u4InvStatus);*/
 
 void kalP2PInvitationIndication(IN P_GLUE_INFO_T prGlueInfo,
-				IN P_P2P_DEVICE_DESC_T prP2pDevDesc,
-				IN u8 *pucSsid,
-				IN u8 ucSsidLen,
-				IN u8 ucOperatingChnl,
-				IN u8 ucInvitationType,
-				IN u8 *pucGroupBssid);
+                                IN P_P2P_DEVICE_DESC_T prP2pDevDesc,
+                                IN u8 *pucSsid,
+                                IN u8 ucSsidLen,
+                                IN u8 ucOperatingChnl,
+                                IN u8 ucInvitationType,
+                                IN u8 *pucGroupBssid);
 
 struct net_device *kalP2PGetDevHdlr(P_GLUE_INFO_T prGlueInfo);
 
 void kalGetChnlList(IN P_GLUE_INFO_T prGlueInfo,
-		    IN ENUM_BAND_T eSpecificBand,
-		    IN u8 ucMaxChannelNum,
-		    IN u8 *pucNumOfChannel,
-		    IN P_RF_CHANNEL_INFO_T paucChannelList);
+                    IN ENUM_BAND_T eSpecificBand,
+                    IN u8 ucMaxChannelNum,
+                    IN u8 *pucNumOfChannel,
+                    IN P_RF_CHANNEL_INFO_T paucChannelList);
 
 #if CFG_SUPPORT_ANTI_PIRACY
 void kalP2PIndicateSecCheckRsp(IN P_GLUE_INFO_T prGlueInfo,
-			       IN u8 *pucRsp,
-			       IN u16 u2RspLen);
+                               IN u8 *pucRsp,
+                               IN u16 u2RspLen);
 #endif
 
 /*******************************************************************************
@@ -188,50 +188,50 @@ void kalP2PIndicateSecCheckRsp(IN P_GLUE_INFO_T prGlueInfo,
  */
 
 void kalP2PIndicateChannelReady(IN P_GLUE_INFO_T prGlueInfo,
-				IN u64 u8SeqNum,
-				IN u32 u4ChannelNum,
-				IN ENUM_BAND_T eBand,
-				IN ENUM_CHNL_EXT_T eSco,
-				IN u32 u4Duration);
+                                IN u64 u8SeqNum,
+                                IN u32 u4ChannelNum,
+                                IN ENUM_BAND_T eBand,
+                                IN ENUM_CHNL_EXT_T eSco,
+                                IN u32 u4Duration);
 
 void kalP2PIndicateScanDone(IN P_GLUE_INFO_T prGlueInfo,
-			    IN u8 ucRoleIndex,
-			    IN u8 fgIsAbort);
+                            IN u8 ucRoleIndex,
+                            IN u8 fgIsAbort);
 
 void kalP2PIndicateBssInfo(IN P_GLUE_INFO_T prGlueInfo,
-			   IN u8 *pucFrameBuf,
-			   IN u32 u4BufLen,
-			   IN P_RF_CHANNEL_INFO_T prChannelInfo,
-			   IN s32 i4SignalStrength);
+                           IN u8 *pucFrameBuf,
+                           IN u32 u4BufLen,
+                           IN P_RF_CHANNEL_INFO_T prChannelInfo,
+                           IN s32 i4SignalStrength);
 
 void kalP2PIndicateRxMgmtFrame(IN P_GLUE_INFO_T prGlueInfo,
-			       IN P_SW_RFB_T prSwRfb,
-			       IN u8 fgIsDevInterface,
-			       IN u8 ucRoleIdx);
+                               IN P_SW_RFB_T prSwRfb,
+                               IN u8 fgIsDevInterface,
+                               IN u8 ucRoleIdx);
 
 void kalP2PIndicateMgmtTxStatus(IN P_GLUE_INFO_T prGlueInfo,
-				IN P_MSDU_INFO_T prMsduInfo,
-				IN u8 fgIsAck);
+                                IN P_MSDU_INFO_T prMsduInfo,
+                                IN u8 fgIsAck);
 
 void kalP2PIndicateChannelExpired(IN P_GLUE_INFO_T prGlueInfo,
-				  IN u64 u8SeqNum,
-				  IN u32 u4ChannelNum,
-				  IN ENUM_BAND_T eBand,
-				  IN ENUM_CHNL_EXT_T eSco);
+                                  IN u64 u8SeqNum,
+                                  IN u32 u4ChannelNum,
+                                  IN ENUM_BAND_T eBand,
+                                  IN ENUM_CHNL_EXT_T eSco);
 
 void kalP2PGCIndicateConnectionStatus(IN P_GLUE_INFO_T prGlueInfo,
-				      IN u8 ucRoleIndex,
-				      IN P_P2P_CONNECTION_REQ_INFO_T
-				      prP2pConnInfo,
-				      IN u8 *pucRxIEBuf,
-				      IN u16 u2RxIELen,
-				      IN u16 u2StatusReason,
-				      IN WLAN_STATUS eStatus);
+                                      IN u8 ucRoleIndex,
+                                      IN P_P2P_CONNECTION_REQ_INFO_T
+                                      prP2pConnInfo,
+                                      IN u8 *pucRxIEBuf,
+                                      IN u16 u2RxIELen,
+                                      IN u16 u2StatusReason,
+                                      IN WLAN_STATUS eStatus);
 
 void kalP2PGOStationUpdate(IN P_GLUE_INFO_T prGlueInfo,
-			   IN u8 ucRoleIndex,
-			   IN P_STA_RECORD_T prCliStaRec,
-			   IN u8 fgIsNew);
+                           IN u8 ucRoleIndex,
+                           IN P_STA_RECORD_T prCliStaRec,
+                           IN u8 fgIsNew);
 
 #if (CFG_SUPPORT_DFS_MASTER == 1)
 void kalP2PRddDetectUpdate(IN P_GLUE_INFO_T prGlueInfo, IN u8 ucRoleIndex);
@@ -242,21 +242,21 @@ void kalP2PCacFinishedUpdate(IN P_GLUE_INFO_T prGlueInfo, IN u8 ucRoleIndex);
 #if CFG_SUPPORT_HOTSPOT_WPS_MANAGER
 
 u8 kalP2PSetBlackList(IN P_GLUE_INFO_T prGlueInfo,
-		      IN PARAM_MAC_ADDRESS rbssid,
-		      IN u8 fgIsblock,
-		      IN u8 ucRoleIndex);
+                      IN PARAM_MAC_ADDRESS rbssid,
+                      IN u8 fgIsblock,
+                      IN u8 ucRoleIndex);
 
 u8 kalP2PCmpBlackList(IN P_GLUE_INFO_T prGlueInfo,
-		      IN PARAM_MAC_ADDRESS rbssid,
-		      IN u8 ucRoleIndex);
+                      IN PARAM_MAC_ADDRESS rbssid,
+                      IN u8 ucRoleIndex);
 
 void kalP2PSetMaxClients(IN P_GLUE_INFO_T prGlueInfo,
-			 IN u32 u4MaxClient,
-			 IN u8 ucRoleIndex);
+                         IN u32 u4MaxClient,
+                         IN u8 ucRoleIndex);
 
 u8 kalP2PMaxClients(IN P_GLUE_INFO_T prGlueInfo,
-		    IN u32 u4NumClient,
-		    IN u8 ucRoleIndex);
+                    IN u32 u4NumClient,
+                    IN u8 ucRoleIndex);
 
 #endif
 

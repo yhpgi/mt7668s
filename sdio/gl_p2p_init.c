@@ -27,8 +27,8 @@
  *******************************************************************************
  */
 
-#define P2P_INF_NAME	"p2p%d"
-#define AP_INF_NAME	"ap%d"
+#define P2P_INF_NAME    "p2p%d"
+#define AP_INF_NAME "ap%d"
 
 /*******************************************************************************
  *                             D A T A   T Y P E S
@@ -63,29 +63,29 @@ static u16 mode = RUNNING_P2P_MODE;
  *                              F U N C T I O N S
  *******************************************************************************
  */
-void p2pSetSuspendMode(P_GLUE_INFO_T prGlueInfo, u8 fgEnable)
-{
-	struct net_device *prDev = NULL;
+void p2pSetSuspendMode(P_GLUE_INFO_T prGlueInfo, u8 fgEnable){
+    struct net_device *prDev = NULL;
 
-	if (!prGlueInfo)
-		return;
+    if (!prGlueInfo) {
+        return;
+    }
 
-	if (!prGlueInfo->prAdapter->fgIsP2PRegistered ||
-	    (prGlueInfo->prAdapter->rP2PNetRegState !=
-	     ENUM_NET_REG_STATE_REGISTERED)) {
-		DBGLOG(INIT, INFO, "%s: P2P is not enabled, SKIP!\n", __func__);
-		return;
-	}
+    if (!prGlueInfo->prAdapter->fgIsP2PRegistered ||
+        (prGlueInfo->prAdapter->rP2PNetRegState !=
+         ENUM_NET_REG_STATE_REGISTERED)) {
+        DBGLOG(INIT, INFO, "%s: P2P is not enabled, SKIP!\n", __func__);
+        return;
+    }
 
-	prDev = prGlueInfo->prP2PInfo[0]->prDevHandler;
-	if (!prDev) {
-		DBGLOG(INIT, INFO, "%s: P2P dev is not available, SKIP!\n",
-		       __func__);
-		return;
-	}
+    prDev = prGlueInfo->prP2PInfo[0]->prDevHandler;
+    if (!prDev) {
+        DBGLOG(INIT, INFO, "%s: P2P dev is not available, SKIP!\n",
+               __func__);
+        return;
+    }
 
-	kalSetNetAddressFromInterface(prGlueInfo, prDev, fgEnable);
-	wlanNotifyFwSuspend(prGlueInfo, prDev, fgEnable);
+    kalSetNetAddressFromInterface(prGlueInfo, prDev, fgEnable);
+    wlanNotifyFwSuspend(prGlueInfo, prDev, fgEnable);
 }
 
 /*----------------------------------------------------------------------------*/
@@ -96,84 +96,82 @@ void p2pSetSuspendMode(P_GLUE_INFO_T prGlueInfo, u8 fgEnable)
  * \retval 1     Success
  */
 /*----------------------------------------------------------------------------*/
-u8 p2pLaunch(P_GLUE_INFO_T prGlueInfo)
-{
-	P_ADAPTER_T prAdapter = NULL;
+u8 p2pLaunch(P_GLUE_INFO_T prGlueInfo){
+    P_ADAPTER_T prAdapter = NULL;
 
-	GLUE_SPIN_LOCK_DECLARATION();
+    GLUE_SPIN_LOCK_DECLARATION();
 
-	prAdapter = prGlueInfo->prAdapter;
+    prAdapter = prGlueInfo->prAdapter;
 
-	ASSERT(prGlueInfo);
-	ASSERT(prAdapter);
+    ASSERT(prGlueInfo);
+    ASSERT(prAdapter);
 
-	GLUE_ACQUIRE_SPIN_LOCK(prGlueInfo, SPIN_LOCK_NET_DEV);
-	if (prAdapter->rP2PRegState != ENUM_P2P_REG_STATE_UNREGISTERED) {
-		DBGLOG(P2P, INFO, "skip launch, p2p_state=%d, net_state=%d\n",
-		       prAdapter->rP2PRegState, prAdapter->rP2PNetRegState);
-		GLUE_RELEASE_SPIN_LOCK(prGlueInfo, SPIN_LOCK_NET_DEV);
-		return false;
-	}
+    GLUE_ACQUIRE_SPIN_LOCK(prGlueInfo, SPIN_LOCK_NET_DEV);
+    if (prAdapter->rP2PRegState != ENUM_P2P_REG_STATE_UNREGISTERED) {
+        DBGLOG(P2P, INFO, "skip launch, p2p_state=%d, net_state=%d\n",
+               prAdapter->rP2PRegState, prAdapter->rP2PNetRegState);
+        GLUE_RELEASE_SPIN_LOCK(prGlueInfo, SPIN_LOCK_NET_DEV);
+        return false;
+    }
 
-	prAdapter->rP2PRegState = ENUM_P2P_REG_STATE_REGISTERING;
-	GLUE_RELEASE_SPIN_LOCK(prGlueInfo, SPIN_LOCK_NET_DEV);
+    prAdapter->rP2PRegState = ENUM_P2P_REG_STATE_REGISTERING;
+    GLUE_RELEASE_SPIN_LOCK(prGlueInfo, SPIN_LOCK_NET_DEV);
 
-	if (!glRegisterP2P(prGlueInfo, ifname, ifname2, mode)) {
-		DBGLOG(P2P, ERROR, "Launch failed\n");
-		prAdapter->rP2PRegState = ENUM_P2P_REG_STATE_UNREGISTERED;
-		return false;
-	}
+    if (!glRegisterP2P(prGlueInfo, ifname, ifname2, mode)) {
+        DBGLOG(P2P, ERROR, "Launch failed\n");
+        prAdapter->rP2PRegState = ENUM_P2P_REG_STATE_UNREGISTERED;
+        return false;
+    }
 
-	GLUE_ACQUIRE_SPIN_LOCK(prGlueInfo, SPIN_LOCK_NET_DEV);
-	prAdapter->fgIsP2PRegistered = true;
-	prAdapter->p2p_scan_report_all_bss = CFG_P2P_SCAN_REPORT_ALL_BSS;
-	prAdapter->rP2PRegState = ENUM_P2P_REG_STATE_REGISTERED;
-	DBGLOG(P2P, INFO, "Launch success, fgIsP2PRegistered true\n");
-	GLUE_RELEASE_SPIN_LOCK(prGlueInfo, SPIN_LOCK_NET_DEV);
-	return true;
+    GLUE_ACQUIRE_SPIN_LOCK(prGlueInfo, SPIN_LOCK_NET_DEV);
+    prAdapter->fgIsP2PRegistered = true;
+    prAdapter->p2p_scan_report_all_bss = CFG_P2P_SCAN_REPORT_ALL_BSS;
+    prAdapter->rP2PRegState = ENUM_P2P_REG_STATE_REGISTERED;
+    DBGLOG(P2P, INFO, "Launch success, fgIsP2PRegistered true\n");
+    GLUE_RELEASE_SPIN_LOCK(prGlueInfo, SPIN_LOCK_NET_DEV);
+    return true;
 }
 
-void p2pSetMode(IN u8 ucAPMode)
-{
-	u8 *prAPInfName = AP_INF_NAME;
-	u8 *prP2PInfName = P2P_INF_NAME;
+void p2pSetMode(IN u8 ucAPMode){
+    u8 *prAPInfName = AP_INF_NAME;
+    u8 *prP2PInfName = P2P_INF_NAME;
 
 #ifdef CFG_DRIVER_INF_NAME_CHANGE
-	if (kalStrLen(gprifnamep2p) > 0) {
-		prP2PInfName = kalStrCat(gprifnamep2p, "%d");
-		DBGLOG(INIT, WARN, "P2P ifname customized, use %s\n",
-		       prP2PInfName);
-	}
+    if (kalStrLen(gprifnamep2p) > 0) {
+        prP2PInfName = kalStrCat(gprifnamep2p, "%d");
+        DBGLOG(INIT, WARN, "P2P ifname customized, use %s\n",
+               prP2PInfName);
+    }
 
-	if (kalStrLen(gprifnameap) > 0) {
-		prAPInfName = kalStrCat(gprifnameap, "%d");
-		DBGLOG(INIT, WARN, "AP ifname customized, use %s\n",
-		       prAPInfName);
-	}
+    if (kalStrLen(gprifnameap) > 0) {
+        prAPInfName = kalStrCat(gprifnameap, "%d");
+        DBGLOG(INIT, WARN, "AP ifname customized, use %s\n",
+               prAPInfName);
+    }
 #endif
 
-	switch (ucAPMode) {
-	case 0:
-		mode = RUNNING_P2P_MODE;
-		ifname = prP2PInfName;
-		break;
+    switch (ucAPMode) {
+    case 0:
+        mode = RUNNING_P2P_MODE;
+        ifname = prP2PInfName;
+        break;
 
-	case 1:
-		mode = RUNNING_AP_MODE;
-		ifname = prAPInfName;
-		break;
+    case 1:
+        mode = RUNNING_AP_MODE;
+        ifname = prAPInfName;
+        break;
 
-	case 2:
-		mode = RUNNING_DUAL_AP_MODE;
-		ifname = prAPInfName;
-		break;
+    case 2:
+        mode = RUNNING_DUAL_AP_MODE;
+        ifname = prAPInfName;
+        break;
 
-	case 3:
-		mode = RUNNING_P2P_AP_MODE;
-		ifname = prP2PInfName;
-		ifname2 = prAPInfName;
-		break;
-	}
+    case 3:
+        mode = RUNNING_P2P_AP_MODE;
+        ifname = prP2PInfName;
+        ifname2 = prAPInfName;
+        break;
+    }
 }
 
 /*----------------------------------------------------------------------------*/
@@ -184,36 +182,35 @@ void p2pSetMode(IN u8 ucAPMode)
  * \retval 1     Success
  */
 /*----------------------------------------------------------------------------*/
-u8 p2pRemove(P_GLUE_INFO_T prGlueInfo)
-{
-	P_ADAPTER_T prAdapter = NULL;
+u8 p2pRemove(P_GLUE_INFO_T prGlueInfo){
+    P_ADAPTER_T prAdapter = NULL;
 
-	GLUE_SPIN_LOCK_DECLARATION();
+    GLUE_SPIN_LOCK_DECLARATION();
 
-	prAdapter = prGlueInfo->prAdapter;
+    prAdapter = prGlueInfo->prAdapter;
 
-	ASSERT(prGlueInfo);
-	ASSERT(prAdapter);
+    ASSERT(prGlueInfo);
+    ASSERT(prAdapter);
 
-	GLUE_ACQUIRE_SPIN_LOCK(prGlueInfo, SPIN_LOCK_NET_DEV);
-	g_P2pPrDev = NULL;
+    GLUE_ACQUIRE_SPIN_LOCK(prGlueInfo, SPIN_LOCK_NET_DEV);
+    g_P2pPrDev = NULL;
 
-	if (prAdapter->rP2PRegState != ENUM_P2P_REG_STATE_REGISTERED ||
-	    prAdapter->rP2PNetRegState != ENUM_NET_REG_STATE_UNREGISTERED) {
-		DBGLOG(P2P, INFO, "skip remove, p2p_state=%d, net_state=%d\n",
-		       prAdapter->rP2PRegState, prAdapter->rP2PNetRegState);
-		return false;
-	}
+    if (prAdapter->rP2PRegState != ENUM_P2P_REG_STATE_REGISTERED ||
+        prAdapter->rP2PNetRegState != ENUM_NET_REG_STATE_UNREGISTERED) {
+        DBGLOG(P2P, INFO, "skip remove, p2p_state=%d, net_state=%d\n",
+               prAdapter->rP2PRegState, prAdapter->rP2PNetRegState);
+        return false;
+    }
 
-	prAdapter->rP2PRegState = ENUM_P2P_REG_STATE_UNREGISTERING;
-	prAdapter->p2p_scan_report_all_bss = false;
-	GLUE_RELEASE_SPIN_LOCK(prGlueInfo, SPIN_LOCK_NET_DEV);
+    prAdapter->rP2PRegState = ENUM_P2P_REG_STATE_UNREGISTERING;
+    prAdapter->p2p_scan_report_all_bss = false;
+    GLUE_RELEASE_SPIN_LOCK(prGlueInfo, SPIN_LOCK_NET_DEV);
 
-	glUnregisterP2P(prGlueInfo);
+    glUnregisterP2P(prGlueInfo);
 
-	GLUE_ACQUIRE_SPIN_LOCK(prGlueInfo, SPIN_LOCK_NET_DEV);
-	prAdapter->rP2PRegState = ENUM_P2P_REG_STATE_UNREGISTERED;
-	prAdapter->fgIsP2PRegistered = false;
-	GLUE_RELEASE_SPIN_LOCK(prGlueInfo, SPIN_LOCK_NET_DEV);
-	return true;
+    GLUE_ACQUIRE_SPIN_LOCK(prGlueInfo, SPIN_LOCK_NET_DEV);
+    prAdapter->rP2PRegState = ENUM_P2P_REG_STATE_UNREGISTERED;
+    prAdapter->fgIsP2PRegistered = false;
+    GLUE_RELEASE_SPIN_LOCK(prGlueInfo, SPIN_LOCK_NET_DEV);
+    return true;
 }

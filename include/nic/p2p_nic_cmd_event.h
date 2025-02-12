@@ -51,22 +51,22 @@
  */
 
 typedef struct _EVENT_P2P_DEV_DISCOVER_RESULT_T {
-	/* u8                          aucCommunicateAddr[MAC_ADDR_LEN];  //
-	 * Deprecated. */
-	u8 aucDeviceAddr[MAC_ADDR_LEN]; /* Device Address. */
-	u8 aucInterfaceAddr[MAC_ADDR_LEN]; /* Device Address. */
-	u8 ucDeviceCapabilityBitmap;
-	u8 ucGroupCapabilityBitmap;
-	u16 u2ConfigMethod; /* Configure Method. */
-	P2P_DEVICE_TYPE_T rPriDevType;
-	u8 ucSecDevTypeNum;
-	P2P_DEVICE_TYPE_T arSecDevType[2];
-	u16 u2NameLength;
-	u8 aucName[32];
-	u8 *pucIeBuf;
-	u16 u2IELength;
-	u8 aucBSSID[MAC_ADDR_LEN];
-	/* TODO: Service Information or PasswordID valid? */
+    /* u8                          aucCommunicateAddr[MAC_ADDR_LEN];  //
+     * Deprecated. */
+    u8 aucDeviceAddr[MAC_ADDR_LEN];  /* Device Address. */
+    u8 aucInterfaceAddr[MAC_ADDR_LEN];  /* Device Address. */
+    u8 ucDeviceCapabilityBitmap;
+    u8 ucGroupCapabilityBitmap;
+    u16 u2ConfigMethod;  /* Configure Method. */
+    P2P_DEVICE_TYPE_T rPriDevType;
+    u8 ucSecDevTypeNum;
+    P2P_DEVICE_TYPE_T arSecDevType[2];
+    u16 u2NameLength;
+    u8 aucName[32];
+    u8 *pucIeBuf;
+    u16 u2IELength;
+    u8 aucBSSID[MAC_ADDR_LEN];
+    /* TODO: Service Information or PasswordID valid? */
 } EVENT_P2P_DEV_DISCOVER_RESULT_T, *P_EVENT_P2P_DEV_DISCOVER_RESULT_T;
 
 #endif

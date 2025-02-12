@@ -25,31 +25,31 @@
  *******************************************************************************
  */
 
-#define CHNL_LIST_SZ_2G				     14
-#define CHNL_LIST_SZ_5G				     14
+#define CHNL_LIST_SZ_2G                  14
+#define CHNL_LIST_SZ_5G                  14
 
-#define CHNL_LEVEL0				     0
-#define CHNL_LEVEL1				     1
-#define CHNL_LEVEL2				     2
+#define CHNL_LEVEL0                  0
+#define CHNL_LEVEL1                  1
+#define CHNL_LEVEL2                  2
 
-#define AFFECTED_CHNL_OFFSET			     5
+#define AFFECTED_CHNL_OFFSET                 5
 
-#define OBSS_SCAN_MIN_INTERVAL			     10 /* In unit of sec */
+#define OBSS_SCAN_MIN_INTERVAL               10  /* In unit of sec */
 
-#define PUBLIC_ACTION_MAX_LEN			     200 /* In unit of byte */
+#define PUBLIC_ACTION_MAX_LEN                200  /* In unit of byte */
 
 /* P2P GO only */
 /* Define default OBSS Scan parameters (from MIB in spec.) */
-#define dot11OBSSScanPassiveDwell		     20
-#define dot11OBSSScanActiveDwell		     10
-#define dot11OBSSScanPassiveTotalPerChannel	     200
-#define dot11OBSSScanActiveTotalPerChannel	     20
-#define dot11BSSWidthTriggerScanInterval	     300 /* Unit: sec */
+#define dot11OBSSScanPassiveDwell            20
+#define dot11OBSSScanActiveDwell             10
+#define dot11OBSSScanPassiveTotalPerChannel      200
+#define dot11OBSSScanActiveTotalPerChannel       20
+#define dot11BSSWidthTriggerScanInterval         300  /* Unit: sec */
 #define dot11BSSWidthChannelTransitionDelayFactor    5
-#define dot11OBSSScanActivityThreshold		     25
+#define dot11OBSSScanActivityThreshold           25
 
-#define OBSS_20_40M_TIMEOUT			     ( \
-		dot11BSSWidthTriggerScanInterval + 10)
+#define OBSS_20_40M_TIMEOUT              ( \
+        dot11BSSWidthTriggerScanInterval + 10)
 
 /*******************************************************************************
  *                             D A T A   T Y P E S
@@ -58,9 +58,9 @@
 
 /* Control MAC PCO function */
 typedef enum _ENUM_SYS_PCO_PHASE_T {
-	SYS_PCO_PHASE_DISABLED = 0,
-	SYS_PCO_PHASE_20M,
-	SYS_PCO_PHASE_40M
+    SYS_PCO_PHASE_DISABLED = 0,
+    SYS_PCO_PHASE_20M,
+    SYS_PCO_PHASE_40M
 } ENUM_SYS_PCO_PHASE_T,
 *P_ENUM_SYS_PCO_PHASE_T;
 
