@@ -28,7 +28,7 @@
  */
 
 #define P2P_INF_NAME    "p2p%d"
-#define AP_INF_NAME "ap%d"
+#define AP_INF_NAME "phy0-ap%d"
 
 /*******************************************************************************
  *                             D A T A   T Y P E S

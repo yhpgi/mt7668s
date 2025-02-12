@@ -80,7 +80,7 @@ module_param_named(ap, gprifnameap, charp, 0);
 #endif
 
 /* NIC interface name */
-#define NIC_INF_NAME        "wlan%d"
+#define NIC_INF_NAME        "phy0-sta%d"
 
 #ifdef CFG_DRIVER_INF_NAME_CHANGE
 /* Kernel IFNAMESIZ is 16, we use 5 in case some protocol might auto gen

@@ -32,7 +32,7 @@
 #define BUILD_DBG_MSG               0
 #define BUILD_QA_DBG                0
 #define CFG_DEFAULT_DBG_LEVEL           0xF
-#define CFG_DRIVER_INITIAL_RUNNING_MODE     3
+
 #define CFG_DUMP_TXPOWR_TABLE
 #define CFG_ENABLE_1RPD_MMPS_CTRL       1
 #define CFG_ENABLE_DEWEIGHTING_CTRL     1
@@ -807,6 +807,7 @@
 #define RUNNING_P2P_AP_MODE             3
 #define RUNNING_P2P_MODE_NUM                4
 
+#define CFG_DRIVER_INITIAL_RUNNING_MODE     RUNNING_AP_MODE
 /*------------------------------------------------------------------------------
  * Flags of MSP SUPPORT
  *------------------------------------------------------------------------------
