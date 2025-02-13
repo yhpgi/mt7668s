@@ -640,4 +640,6 @@ void halWpdmaSetup(P_GLUE_INFO_T prGlueInfo, u8 enable);
 
 bool halIsHifStateReady(IN P_ADAPTER_T prAdapter, u8 *pucState);
 
+bool halIsHifStateSuspend(IN P_ADAPTER_T prAdapter);
+
 #endif

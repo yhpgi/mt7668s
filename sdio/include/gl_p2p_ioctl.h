@@ -428,10 +428,9 @@ int mtk_p2p_cfg80211_start_radar_detection(struct wiphy *wiphy,
                                            struct net_device *dev,
                                            struct cfg80211_chan_def *chandef,
                                            unsigned int cac_time_ms
-                                        #if LINUX_VERSION_CODE >= \
-                                           KERNEL_VERSION(6, 9, 0)
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 9, 0)
                                            , int link_id
-                                        #endif
+#endif
                                            );
 
 int mtk_p2p_cfg80211_channel_switch(struct wiphy *wiphy,
