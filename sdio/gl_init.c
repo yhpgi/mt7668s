@@ -290,42 +290,57 @@ static struct cfg80211_ops mtk_cfg_ops = {
     .add_key = mtk_cfg_add_key,
     .get_key = mtk_cfg_get_key,
     .del_key = mtk_cfg_del_key,
+    .set_default_mgmt_key = mtk_cfg_set_default_mgmt_key,
     .set_default_key = mtk_cfg_set_default_key,
     .get_station = mtk_cfg_get_station,
+#if CFG_SUPPORT_TDLS
     .change_station = mtk_cfg_change_station,
     .add_station = mtk_cfg_add_station,
     .tdls_oper = mtk_cfg_tdls_oper,
     .tdls_mgmt = mtk_cfg_tdls_mgmt,
+#endif
     .del_station = mtk_cfg_del_station,  /* AP/P2P use this function */
     .scan = mtk_cfg_scan,
     .abort_scan = mtk_cfg_abort_scan,
-    .connect = mtk_cfg_connect,
-    .disconnect = mtk_cfg_disconnect,
+
+    .sched_scan_start = mtk_cfg_sched_scan_start,
+    .sched_scan_stop = mtk_cfg_sched_scan_stop,
+
+#if 0  // !CFG_SUPPORT_CFG80211_AUTH
+    .connect = mtk_cfg80211_connect,
+    .disconnect = mtk_cfg80211_disconnect,
+#endif
+    .deauth = mtk_cfg_deauth,
     .join_ibss = mtk_cfg_join_ibss,
     .leave_ibss = mtk_cfg_leave_ibss,
     .set_power_mgmt = mtk_cfg_set_power_mgmt,
     .set_pmksa = mtk_cfg_set_pmksa,
     .del_pmksa = mtk_cfg_del_pmksa,
     .flush_pmksa = mtk_cfg_flush_pmksa,
+#if CONFIG_SUPPORT_GTK_REKEY
     .set_rekey_data = mtk_cfg_set_rekey_data,
+#endif
     .suspend = mtk_cfg_suspend,
     .resume = mtk_cfg_resume,
+    .auth = mtk_cfg_auth,
     .assoc = mtk_cfg_assoc,
+
     /* Action Frame TX/RX */
     .remain_on_channel = mtk_cfg_remain_on_channel,
     .cancel_remain_on_channel = mtk_cfg_cancel_remain_on_channel,
     .mgmt_tx = mtk_cfg_mgmt_tx,
     /* .mgmt_tx_cancel_wait        = mtk_cfg80211_mgmt_tx_cancel_wait, */
-    #if KERNEL_VERSION(5, 8, 0) >= CFG80211_VERSION_CODE
+#if KERNEL_VERSION(5, 8, 0) <= CFG80211_VERSION_CODE
+    .update_mgmt_frame_registrations = mtk_cfg_mgmt_frame_update,
+#else
     .mgmt_frame_register = mtk_cfg_mgmt_frame_register,
-    #endif
-#ifdef CONFIG_NL80211_TESTMODE
-    .testmode_cmd = mtk_cfg_testmode_cmd,
 #endif
-#if 0  /* Remove schedule_scan because we need more verification for NLO */
-    .sched_scan_start = mtk_cfg80211_sched_scan_start,
-    .sched_scan_stop = mtk_cfg80211_sched_scan_stop,
+
+#if (CFG_SUPPORT_DFS_MASTER == 1)
+    .start_radar_detection = mtk_cfg_start_radar_detection,
+    .channel_switch = mtk_cfg_channel_switch,
 #endif
+
 #if (CFG_ENABLE_WIFI_DIRECT_CFG_80211 != 0)
     .change_bss = mtk_cfg_change_bss,
     .mgmt_tx_cancel_wait = mtk_cfg_mgmt_tx_cancel_wait,
@@ -339,6 +354,7 @@ static struct cfg80211_ops mtk_cfg_ops = {
     .set_tx_power = mtk_cfg_set_txpower,
     .get_tx_power = mtk_cfg_get_txpower,
 #endif
+    // .update_ft_ies = mtk_cfg80211_update_ft_ies,
 };
 #endif  /* CFG_ENABLE_UNIFY_WIPHY */
 
@@ -2913,7 +2929,7 @@ s32 wlanProbe(struct sdio_func *pvData, void *pvDriverData){
         /* fallthrough */
         case ADAPTER_START_FAIL:
             glBusFreeIrq(prWdev->netdev,
-                         *((struct GLUE_INFO **)netdev_priv(prWdev->netdev)));
+                         *((P_GLUE_INFO_T *)netdev_priv(prWdev->netdev)));
         /* fallthrough */
         case BUS_SET_IRQ_FAIL:
             wlanNetDestroy(prWdev);
@@ -3237,7 +3253,18 @@ static int mt7668s_reboot_notify(struct notifier_block *nb, unsigned long event,
         DBGLOG(HAL, STATE,
                "Power down is detected. Cleaning MT7668S WiFi driver...\n");
 
-        mt76x8_wireless_exit();
+        glUnregisterBus(wlanRemove);
+        /* free pre-allocated memory */
+        kalUninitIOBuffer();
+           #if CFG_ENABLE_UNIFY_WIPHY
+        wlanDestroyAllWdev();
+           #else
+        wlanDestroyWirelessDevice();
+        glP2pDestroyWirelessDevice();
+           #endif
+           #if WLAN_INCLUDE_PROC
+        procUninitProcFs();
+           #endif
 
         DBGLOG(HAL, STATE, "Cleaning MT7668S WiFi driver Finish!\n");
     }

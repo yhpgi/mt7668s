@@ -1324,3 +1324,67 @@ u8 glWakeupSdio(P_GLUE_INFO_T prGlueInfo){
 
     return fgSuccess;
 }
+
+/*----------------------------------------------------------------------------*/
+/*!
+ * @brief Check if HIF state is READY for upper layer cfg80211
+ *
+ * @param prAdapter      Pointer to the Adapter structure.
+ *
+ * @return (TRUE: ready, FALSE: not ready)
+ */
+/*----------------------------------------------------------------------------*/
+bool halIsHifStateReady(IN P_ADAPTER_T prAdapter, u8 *pucState){
+    if (!prAdapter) {
+        return false;
+    }
+
+    if (!prAdapter->prGlueInfo) {
+        return false;
+    }
+
+    if (prAdapter->prGlueInfo->u4ReadyFlag == 0) {
+        return false;
+    }
+
+    // if (pucState) {
+    //     *pucState = prAdapter->prGlueInfo->rHifInfo.state;
+    // }
+
+    // if (prAdapter->prGlueInfo->rHifInfo.state != SDIO_STATE_READY) {
+    //     return FALSE;
+    // }
+
+    return true;
+}
+
+
+/*----------------------------------------------------------------------------*/
+/*!
+ * @brief Check if HIF state is during supend process
+ *
+ * @param prAdapter      Pointer to the Adapter structure.
+ *
+ * @return (TRUE: suspend, reject the caller action. FALSE: not suspend)
+ */
+/*----------------------------------------------------------------------------*/
+bool halIsHifStateSuspend(IN P_ADAPTER_T prAdapter){
+    // enum sdio_state state;
+
+    if (!prAdapter) {
+        return false;
+    }
+
+    if (!prAdapter->prGlueInfo) {
+        return false;
+    }
+
+    // state = prAdapter->prGlueInfo->rHifInfo.state;
+
+    // if (state == SDIO_STATE_SUSPEND) {
+    //     return TRUE;
+    // }
+
+    return false;
+}
+

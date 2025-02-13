@@ -1199,4 +1199,14 @@ WLAN_STATUS kalUpdateBssChannel(IN P_GLUE_INFO_T prGlueInfo,
                                 IN u8 aucBSSID[],
                                 IN u8 ucChannelNum);
 
+static inline void kal_eth_hw_addr_set(struct net_device *dev,
+                                       const u8 *addr){
+#if KERNEL_VERSION(5, 17, 0) <= LINUX_VERSION_CODE
+    // eth_hw_addr_set(dev, addr);
+    dev_addr_set(dev, addr);
+#else
+    kalMemCopy(dev->dev_addr, addr, ETH_ALEN);
+#endif
+}
+
 #endif
