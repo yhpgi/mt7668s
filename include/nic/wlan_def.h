@@ -859,8 +859,9 @@ typedef enum _ENUM_PARAM_AP_MODE_T {
 
 /* Macros for obtaining the Network Type or the Station Role, given the
  * ENUM_STA_TYPE_T */
-#define IS_STA_IN_AIS(_prStaRec) \
-    ((_prStaRec)->ucBssIndex == prAdapter->prAisBssInfo->ucBssIndex)
+#define IS_STA_IN_AIS(_prStaRec)        ((prAdapter->prAisBssInfo != NULL) && \
+                                         ((_prStaRec)->ucBssIndex ==          \
+                                          prAdapter->prAisBssInfo->ucBssIndex))
 #define IS_STA_IN_P2P(_prStaRec)                                     \
     (prAdapter->aprBssInfo[(_prStaRec)->ucBssIndex]->eNetworkType == \
      NETWORK_TYPE_P2P)

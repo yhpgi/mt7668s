@@ -235,8 +235,8 @@ enum {
     IEEE80211_FILTER_TYPE_AUTH       = 1 << 5,
     IEEE80211_FILTER_TYPE_DEAUTH     = 1 << 6,
     IEEE80211_FILTER_TYPE_DISASSOC   = 1 << 7,
-    IEEE80211_FILTER_TYPE_ALL        = 0xFF /* used to check the valid filter bits
-                                             */
+    IEEE80211_FILTER_TYPE_ALL        = 0xFF     /* used to check the valid filter bits
+                                                 */
 };
 
 // #define IW_AUTH_WAPI_ENABLED 0x20

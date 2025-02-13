@@ -27,7 +27,7 @@
  *******************************************************************************
  */
 
-#define P2P_INF_NAME    "p2p%d"
+#define P2P_INF_NAME "p2p%d"
 #define AP_INF_NAME "phy0-ap%d"
 
 /*******************************************************************************
@@ -79,8 +79,7 @@ void p2pSetSuspendMode(P_GLUE_INFO_T prGlueInfo, u8 fgEnable){
 
     prDev = prGlueInfo->prP2PInfo[0]->prDevHandler;
     if (!prDev) {
-        DBGLOG(INIT, INFO, "%s: P2P dev is not available, SKIP!\n",
-               __func__);
+        DBGLOG(INIT, INFO, "%s: P2P dev is not available, SKIP!\n", __func__);
         return;
     }
 
@@ -139,14 +138,12 @@ void p2pSetMode(IN u8 ucAPMode){
 #ifdef CFG_DRIVER_INF_NAME_CHANGE
     if (kalStrLen(gprifnamep2p) > 0) {
         prP2PInfName = kalStrCat(gprifnamep2p, "%d");
-        DBGLOG(INIT, WARN, "P2P ifname customized, use %s\n",
-               prP2PInfName);
+        DBGLOG(INIT, WARN, "P2P ifname customized, use %s\n", prP2PInfName);
     }
 
     if (kalStrLen(gprifnameap) > 0) {
         prAPInfName = kalStrCat(gprifnameap, "%d");
-        DBGLOG(INIT, WARN, "AP ifname customized, use %s\n",
-               prAPInfName);
+        DBGLOG(INIT, WARN, "AP ifname customized, use %s\n", prAPInfName);
     }
 #endif
 
@@ -206,7 +203,7 @@ u8 p2pRemove(P_GLUE_INFO_T prGlueInfo){
     prAdapter->p2p_scan_report_all_bss = false;
     GLUE_RELEASE_SPIN_LOCK(prGlueInfo, SPIN_LOCK_NET_DEV);
 
-    glUnregisterP2P(prGlueInfo);
+    glUnregisterP2P(prGlueInfo, 0xff);
 
     GLUE_ACQUIRE_SPIN_LOCK(prGlueInfo, SPIN_LOCK_NET_DEV);
     prAdapter->rP2PRegState = ENUM_P2P_REG_STATE_UNREGISTERED;

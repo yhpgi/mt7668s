@@ -40,18 +40,18 @@
  *******************************************************************************
  */
 
-#define ARGV_MAX_NUM         (4)
+#define ARGV_MAX_NUM (4)
 
 /*For CFG80211 - wiphy parameters*/
-#define MAX_SCAN_LIST_NUM    (1)
-#define MAX_SCAN_IE_LEN      (512)
+#define MAX_SCAN_LIST_NUM (1)
+#define MAX_SCAN_IE_LEN (512)
 
 #if (CFG_SUPPORT_DFS_MASTER == 1)
-#define MAX_CSA_COUNTER      10
+#define MAX_CSA_COUNTER 10
 #endif
 
 #ifdef CFG_SUPPORT_MULTICAST_ENHANCEMENT_LOOKBACK
-#define MAX_LOOK_BACK_NUN    (3)
+#define MAX_LOOK_BACK_NUN (3)
 #endif
 /*******************************************************************************
  *                             D A T A   T Y P E S
@@ -75,6 +75,7 @@ struct net_device *gPrP2pDev[KAL_P2P_NUM];
 
 #if CFG_ENABLE_WIFI_DIRECT_CFG_80211
 
+#if (CFG_ENABLE_UNIFY_WIPHY == 0)
 static struct cfg80211_ops mtk_p2p_ops = {
     .add_virtual_intf = mtk_p2p_cfg80211_add_iface,
     .change_virtual_intf = mtk_p2p_cfg80211_change_iface,  /* 1 st */
@@ -120,16 +121,19 @@ static struct cfg80211_ops mtk_p2p_ops = {
 /* There isn't a lot of sense in it, but you can transmit anything you like */
 static const struct ieee80211_txrx_stypes
     mtk_cfg80211_default_mgmt_stypes[NUM_NL80211_IFTYPES] = {
-    [NL80211_IFTYPE_ADHOC] = {  /**/
+    [NL80211_IFTYPE_ADHOC] =
+    {  /**/
         .tx = 0xffff,
         .rx = BIT(IEEE80211_STYPE_ACTION >> 4)
     },
-    [NL80211_IFTYPE_STATION] = {  /**/
+    [NL80211_IFTYPE_STATION] =
+    {  /**/
         .tx = 0xffff,
         .rx = BIT(IEEE80211_STYPE_ACTION >> 4) |
               BIT(IEEE80211_STYPE_PROBE_REQ >> 4)
     },
-    [NL80211_IFTYPE_AP] = {  /**/
+    [NL80211_IFTYPE_AP] =
+    {  /**/
         .tx = 0xffff,
         .rx = BIT(IEEE80211_STYPE_PROBE_REQ >> 4) |
               BIT(IEEE80211_STYPE_ACTION >> 4)
@@ -145,7 +149,8 @@ static const struct ieee80211_txrx_stypes
               BIT(IEEE80211_STYPE_DEAUTH >> 4) |
               BIT(IEEE80211_STYPE_ACTION >> 4)
     },
-    [NL80211_IFTYPE_P2P_CLIENT] = {  /**/
+    [NL80211_IFTYPE_P2P_CLIENT] =
+    {  /**/
         .tx = 0xffff,
         .rx = BIT(IEEE80211_STYPE_ACTION >> 4) |
               BIT(IEEE80211_STYPE_PROBE_REQ >> 4)
@@ -157,6 +162,7 @@ static const struct ieee80211_txrx_stypes
     }
 };
 
+#endif
 #endif
 
 static const struct iw_priv_args rP2PIwPrivTable[] = {
@@ -178,8 +184,7 @@ static const struct ieee80211_iface_limit mtk_p2p_sta_go_limits[] = {
 
     {
         .max = 1,
-        .types = BIT(NL80211_IFTYPE_P2P_GO) |
-                 BIT(NL80211_IFTYPE_P2P_CLIENT),
+        .types = BIT(NL80211_IFTYPE_P2P_GO) | BIT(NL80211_IFTYPE_P2P_CLIENT),
     },
 };
 
@@ -222,17 +227,15 @@ const s32 mtk_iface_combinations_p2p_num =
 #ifdef STA_P2P_MCC
 static const struct ieee80211_iface_limit p2p_iface_limits_mcc[] = {
     { .max = 2,
-      .types = (BIT(NL80211_IFTYPE_STATION) |
-                BIT(NL80211_IFTYPE_P2P_CLIENT) | BIT(NL80211_IFTYPE_AP) |
-                BIT(NL80211_IFTYPE_P2P_GO)) }
+      .types = (BIT(NL80211_IFTYPE_STATION) | BIT(NL80211_IFTYPE_P2P_CLIENT) |
+                BIT(NL80211_IFTYPE_AP) | BIT(NL80211_IFTYPE_P2P_GO)) }
 };
 
 static const struct ieee80211_iface_combination
     p2p_iface_comb_mcc[] = {  /**/
     {
         .limits = p2p_iface_limits_mcc,
-        .n_limits = ARRAY_SIZE(
-            p2p_iface_limits_mcc),
+        .n_limits = ARRAY_SIZE(p2p_iface_limits_mcc),
         .max_interfaces = 2,
         .num_different_channels = 2,
         .beacon_int_infra_match = false,
@@ -333,31 +336,59 @@ u8 p2PAllocInfo(IN P_GLUE_INFO_T prGlueInfo, IN u8 ucIdex){
     do {
         if (prGlueInfo->prP2PInfo[ucIdex] == NULL) {
             /*alloc memory for p2p info */
-            prGlueInfo->prP2PInfo[ucIdex] = kalMemAlloc(
-                sizeof(GL_P2P_INFO_T), VIR_MEM_TYPE);
+#if CFG_ENABLE_UNIFY_WIPHY
+            prGlueInfo->prP2PInfo[ucIdex] =
+                kalMemAlloc(sizeof(GL_P2P_INFO_T), VIR_MEM_TYPE);
+            if (prGlueInfo->prP2PDevInfo == NULL) {
+                prGlueInfo->prP2PDevInfo =
+                    kalMemAlloc(sizeof(GL_P2P_DEV_INFO_T), VIR_MEM_TYPE);
+                if (prGlueInfo->prP2PDevInfo) {
+                    kalMemZero(prGlueInfo->prP2PDevInfo,
+                               sizeof(GL_P2P_DEV_INFO_T));
+                }
+            }
+            if (prAdapter->prP2pInfo == NULL) {
+                prAdapter->prP2pInfo =
+                    kalMemAlloc(sizeof(P2P_INFO_T), VIR_MEM_TYPE);
+                if (prAdapter->prP2pInfo) {
+                    kalMemZero(prAdapter->prP2pInfo, sizeof(P2P_INFO_T));
+                }
+            }
+            if (prWifiVar->prP2pDevFsmInfo == NULL) {
+                /* Don't only create P2P device for ucIdex 0.
+                 * Avoid the exception that mtk_init_ap_role
+                 * called without p2p0.
+                 */
+                prWifiVar->prP2pDevFsmInfo =
+                    kalMemAlloc(sizeof(P2P_DEV_FSM_INFO_T), VIR_MEM_TYPE);
+                if (prWifiVar->prP2pDevFsmInfo) {
+                    kalMemZero(prWifiVar->prP2pDevFsmInfo,
+                               sizeof(P2P_DEV_FSM_INFO_T));
+                }
+            }
+#else  /* (CFG_ENABLE_UNIFY_WIPHY == 0) */
+            prGlueInfo->prP2PInfo[ucIdex] =
+                kalMemAlloc(sizeof(GL_P2P_INFO_T), VIR_MEM_TYPE);
 
             if (ucIdex == 0) {
                 /*printk("[CHECK!]p2PAllocInfo : Alloc Common
                  * part only first interface\n");*/
                 prGlueInfo->prP2PDevInfo =
-                    kalMemAlloc(sizeof(GL_P2P_DEV_INFO_T),
-                                VIR_MEM_TYPE);
-                prAdapter->prP2pInfo = kalMemAlloc(
-                    sizeof(P2P_INFO_T), VIR_MEM_TYPE);
+                    kalMemAlloc(sizeof(GL_P2P_DEV_INFO_T), VIR_MEM_TYPE);
+                prAdapter->prP2pInfo =
+                    kalMemAlloc(sizeof(P2P_INFO_T), VIR_MEM_TYPE);
                 prWifiVar->prP2pDevFsmInfo =
-                    kalMemAlloc(sizeof(P2P_DEV_FSM_INFO_T),
-                                VIR_MEM_TYPE);
+                    kalMemAlloc(sizeof(P2P_DEV_FSM_INFO_T), VIR_MEM_TYPE);
             }
+#endif  /* CFG_ENABLE_UNIFY_WIPHY */
 
             prWifiVar->prP2PConnSettings[ucIdex] =
-                kalMemAlloc(sizeof(P2P_CONNECTION_SETTINGS_T),
-                            VIR_MEM_TYPE);
-            prWifiVar->prP2pSpecificBssInfo[ucIdex] = kalMemAlloc(
-                sizeof(P2P_SPECIFIC_BSS_INFO_T), VIR_MEM_TYPE);
+                kalMemAlloc(sizeof(P2P_CONNECTION_SETTINGS_T), VIR_MEM_TYPE);
+            prWifiVar->prP2pSpecificBssInfo[ucIdex] =
+                kalMemAlloc(sizeof(P2P_SPECIFIC_BSS_INFO_T), VIR_MEM_TYPE);
 
             prWifiVar->prP2pQueryStaStatistics[ucIdex] =
-                kalMemAlloc(sizeof(PARAM_GET_STA_STATISTICS),
-                            VIR_MEM_TYPE);
+                kalMemAlloc(sizeof(PARAM_GET_STA_STATISTICS), VIR_MEM_TYPE);
         } else {
             ASSERT(prAdapter->prP2pInfo != NULL);
             ASSERT(prWifiVar->prP2PConnSettings[ucIdex] != NULL);
@@ -366,15 +397,14 @@ u8 p2PAllocInfo(IN P_GLUE_INFO_T prGlueInfo, IN u8 ucIdex){
         }
 
         /*MUST set memory to 0 */
-        kalMemZero(prGlueInfo->prP2PInfo[ucIdex],
-                   sizeof(GL_P2P_INFO_T));
+        kalMemZero(prGlueInfo->prP2PInfo[ucIdex], sizeof(GL_P2P_INFO_T));
+#if (CFG_ENABLE_UNIFY_WIPHY == 0)
         if (ucIdex == 0) {
-            kalMemZero(prGlueInfo->prP2PDevInfo,
-                       sizeof(GL_P2P_DEV_INFO_T));
+            kalMemZero(prGlueInfo->prP2PDevInfo, sizeof(GL_P2P_DEV_INFO_T));
             kalMemZero(prAdapter->prP2pInfo, sizeof(P2P_INFO_T));
-            kalMemZero(prWifiVar->prP2pDevFsmInfo,
-                       sizeof(P2P_DEV_FSM_INFO_T));
+            kalMemZero(prWifiVar->prP2pDevFsmInfo, sizeof(P2P_DEV_FSM_INFO_T));
         }
+#endif
         kalMemZero(prWifiVar->prP2PConnSettings[ucIdex],
                    sizeof(P2P_CONNECTION_SETTINGS_T));
         /* kalMemZero(prWifiVar->prP2pFsmInfo, sizeof(P2P_FSM_INFO_T));
@@ -390,13 +420,13 @@ u8 p2PAllocInfo(IN P_GLUE_INFO_T prGlueInfo, IN u8 ucIdex){
 
     if (!prGlueInfo->prP2PDevInfo) {
         DBGLOG(P2P, ERROR, "prP2PDevInfo error\n");
-    }else{
+    } else {
         DBGLOG(P2P, INFO, "prP2PDevInfo ok\n");
     }
 
     if (!prGlueInfo->prP2PInfo[ucIdex]) {
         DBGLOG(P2P, ERROR, "prP2PInfo error\n");
-    }else{
+    } else {
         DBGLOG(P2P, INFO, "prP2PInfo ok\n");
     }
 
@@ -411,15 +441,15 @@ u8 p2PAllocInfo(IN P_GLUE_INFO_T prGlueInfo, IN u8 ucIdex){
     DBGLOG(P2P, ERROR, "[fail!]p2PAllocInfo :fail\n");
 
     if (prWifiVar->prP2pSpecificBssInfo[ucIdex]) {
-        kalMemFree(prWifiVar->prP2pSpecificBssInfo[ucIdex],
-                   VIR_MEM_TYPE, sizeof(P2P_SPECIFIC_BSS_INFO_T));
+        kalMemFree(prWifiVar->prP2pSpecificBssInfo[ucIdex], VIR_MEM_TYPE,
+                   sizeof(P2P_SPECIFIC_BSS_INFO_T));
 
         prWifiVar->prP2pSpecificBssInfo[ucIdex] = NULL;
     }
 
     if (prWifiVar->prP2pQueryStaStatistics[ucIdex]) {
-        kalMemFree(prWifiVar->prP2pQueryStaStatistics[ucIdex],
-                   VIR_MEM_TYPE, sizeof(P_PARAM_GET_STA_STATISTICS));
+        kalMemFree(prWifiVar->prP2pQueryStaStatistics[ucIdex], VIR_MEM_TYPE,
+                   sizeof(P_PARAM_GET_STA_STATISTICS));
 
         prWifiVar->prP2pQueryStaStatistics[ucIdex] = NULL;
     }
@@ -450,8 +480,7 @@ u8 p2PAllocInfo(IN P_GLUE_INFO_T prGlueInfo, IN u8 ucIdex){
         prGlueInfo->prP2PInfo[ucIdex] = NULL;
     }
     if (prAdapter->prP2pInfo) {
-        kalMemFree(prAdapter->prP2pInfo, VIR_MEM_TYPE,
-                   sizeof(P2P_INFO_T));
+        kalMemFree(prAdapter->prP2pInfo, VIR_MEM_TYPE, sizeof(P2P_INFO_T));
 
         prAdapter->prP2pInfo = NULL;
     }
@@ -478,12 +507,61 @@ static void p2pFreeMemSafe(P_GLUE_INFO_T prGlueInfo, void **pprMemInfo,
  *        P2P_SPECIFIC_BSS_INFO, P2P_FSM_INFO
  *
  * \param[in] prGlueInfo      Pointer to glue info
- *
+ *	     [in] ucIdx	     The BSS with the idx will be freed.
+ *			             "ucIdx == 0xff" will free all BSSs.
+ *			             Only has meaning for "CFG_ENABLE_UNIFY_WIPHY == 1"
  * \return   true
  *           false
  */
 /*----------------------------------------------------------------------------*/
-u8 p2PFreeInfo(P_GLUE_INFO_T prGlueInfo){
+u8 p2PFreeInfo(P_GLUE_INFO_T prGlueInfo, u8 ucIdx)
+#if CFG_ENABLE_UNIFY_WIPHY
+{
+    P_ADAPTER_T prAdapter = prGlueInfo->prAdapter;
+    ASSERT(prGlueInfo);
+    ASSERT(prAdapter);
+    if (ucIdx >= KAL_P2P_NUM) {
+        DBGLOG(P2P, ERROR, "ucIdx=%d is invalid\n", ucIdx);
+        return false;
+    }
+    /* TODO: how can I sure that the specific P2P device can be freed?
+     * The original check is that prGlueInfo->prAdapter->fgIsP2PRegistered.
+     */
+    if (prGlueInfo->prP2PInfo[ucIdx] != NULL) {
+        kalMemFree(prAdapter->rWifiVar.prP2PConnSettings[ucIdx], VIR_MEM_TYPE,
+                   sizeof(P2P_CONNECTION_SETTINGS_T));
+        prAdapter->rWifiVar.prP2PConnSettings[ucIdx] = NULL;
+        kalMemFree(prAdapter->rWifiVar.prP2pSpecificBssInfo[ucIdx],
+                   VIR_MEM_TYPE, sizeof(P2P_SPECIFIC_BSS_INFO_T));
+        prAdapter->rWifiVar.prP2pSpecificBssInfo[ucIdx] = NULL;
+        kalMemFree(prGlueInfo->prP2PInfo[ucIdx], VIR_MEM_TYPE,
+                   sizeof(GL_P2P_INFO_T));
+        prGlueInfo->prP2PInfo[ucIdx] = NULL;
+        prAdapter->prP2pInfo->u4DeviceNum--;
+    }
+    if (prAdapter->prP2pInfo->u4DeviceNum == 0) {
+        /* all prP2PInfo are freed, and free the general part now */
+        if (prAdapter->prP2pInfo) {
+            kalMemFree(prAdapter->prP2pInfo, VIR_MEM_TYPE, sizeof(P2P_INFO_T));
+            prAdapter->prP2pInfo = NULL;
+        }
+        if (prGlueInfo->prP2PDevInfo) {
+            kalMemFree(prGlueInfo->prP2PDevInfo, VIR_MEM_TYPE,
+                       sizeof(GL_P2P_DEV_INFO_T));
+            prGlueInfo->prP2PDevInfo = NULL;
+        }
+        if (prAdapter->rWifiVar.prP2pDevFsmInfo) {
+            kalMemFree(prAdapter->rWifiVar.prP2pDevFsmInfo, VIR_MEM_TYPE,
+                       sizeof(P2P_DEV_FSM_INFO_T));
+            prAdapter->rWifiVar.prP2pDevFsmInfo = NULL;
+        }
+        /*Reomve p2p bss scan list */
+        scanRemoveAllP2pBssDesc(prAdapter);
+    }
+    return true;
+}
+#else  /* (CFG_ENABLE_UNIFY_WIPHY == 0) */
+{
     u8 i;
     P_ADAPTER_T prAdapter = prGlueInfo->prAdapter;
     P_WIFI_VAR_T prWifiVar;
@@ -506,44 +584,35 @@ u8 p2PFreeInfo(P_GLUE_INFO_T prGlueInfo){
      */
     for (i = 0; i < KAL_P2P_NUM; i++) {  /* clear all for now */
         if (prGlueInfo->prP2PInfo[i] != NULL) {
-            p2pFreeMemSafe(
-                prGlueInfo,
-                (void **)&prWifiVar->prP2PConnSettings[i],
-                sizeof(P2P_CONNECTION_SETTINGS_T));
-
-            p2pFreeMemSafe(
-                prGlueInfo,
-                (void **)&prWifiVar->prP2pSpecificBssInfo[i],
-                sizeof(P2P_SPECIFIC_BSS_INFO_T));
+            p2pFreeMemSafe(prGlueInfo,
+                           (void **)&prWifiVar->prP2PConnSettings[i],
+                           sizeof(P2P_CONNECTION_SETTINGS_T));
 
             p2pFreeMemSafe(prGlueInfo,
-                           (void **)&prGlueInfo->prP2PInfo[i],
+                           (void **)&prWifiVar->prP2pSpecificBssInfo[i],
+                           sizeof(P2P_SPECIFIC_BSS_INFO_T));
+
+            p2pFreeMemSafe(prGlueInfo, (void **)&prGlueInfo->prP2PInfo[i],
                            sizeof(GL_P2P_INFO_T));
             prAdapter->prP2pInfo->u4DeviceNum--;
         }
 
         if (prAdapter->prP2pInfo->u4DeviceNum == i) {
-            p2pFreeMemSafe(prGlueInfo,
-                           (void **)&prAdapter->prP2pInfo,
+            p2pFreeMemSafe(prGlueInfo, (void **)&prAdapter->prP2pInfo,
                            sizeof(P2P_INFO_T));
 
             if (prGlueInfo->prP2PDevInfo) {
-                p2pFreeMemSafe(
-                    prGlueInfo,
-                    (void **)&prGlueInfo->prP2PDevInfo,
-                    sizeof(GL_P2P_DEV_INFO_T));
+                p2pFreeMemSafe(prGlueInfo, (void **)&prGlueInfo->prP2PDevInfo,
+                               sizeof(GL_P2P_DEV_INFO_T));
             }
             if (prAdapter->rWifiVar.prP2pDevFsmInfo) {
-                p2pFreeMemSafe(
-                    prGlueInfo,
-                    (void **)&prWifiVar->prP2pDevFsmInfo,
-                    sizeof(P2P_DEV_FSM_INFO_T));
+                p2pFreeMemSafe(prGlueInfo, (void **)&prWifiVar->prP2pDevFsmInfo,
+                               sizeof(P2P_DEV_FSM_INFO_T));
             }
 
-            p2pFreeMemSafe(
-                prGlueInfo,
-                (void **)&prWifiVar->prP2pQueryStaStatistics,
-                sizeof(P2P_CONNECTION_SETTINGS_T));
+            p2pFreeMemSafe(prGlueInfo,
+                           (void **)&prWifiVar->prP2pQueryStaStatistics,
+                           sizeof(P2P_CONNECTION_SETTINGS_T));
 
             scanRemoveAllP2pBssDesc(prAdapter);
         }
@@ -551,6 +620,7 @@ u8 p2PFreeInfo(P_GLUE_INFO_T prGlueInfo){
 
     return true;
 }
+#endif
 
 u8 p2pNetRegister(P_GLUE_INFO_T prGlueInfo, u8 fgIsRtnlLockAcquired){
     u8 fgDoRegister = false;
@@ -602,24 +672,20 @@ u8 p2pNetRegister(P_GLUE_INFO_T prGlueInfo, u8 fgIsRtnlLockAcquired){
         ret = true;
     }
 
-    if (prAdapter->prP2pInfo->u4DeviceNum == RUNNING_DUAL_AP_MODE) {
+    if (prAdapter->prP2pInfo->u4DeviceNum == KAL_P2P_NUM) {
         /* net device initialize */
         netif_carrier_off(prGlueInfo->prP2PInfo[1]->prDevHandler);
-        netif_tx_stop_all_queues(
-            prGlueInfo->prP2PInfo[1]->prDevHandler);
+        netif_tx_stop_all_queues(prGlueInfo->prP2PInfo[1]->prDevHandler);
 
         /* register for net device */
-        if (register_netdev(prGlueInfo->prP2PInfo[1]->prDevHandler) <
-            0) {
-            DBGLOG(INIT, WARN,
-                   "unable to register netdevice for p2p[1]\n");
+        if (register_netdev(prGlueInfo->prP2PInfo[1]->prDevHandler) < 0) {
+            DBGLOG(INIT, WARN, "unable to register netdevice for p2p[1]\n");
 
             free_netdev(prGlueInfo->prP2PInfo[1]->prDevHandler);
 
             ret = false;
         } else {
-            prAdapter->rP2PNetRegState =
-                ENUM_NET_REG_STATE_REGISTERED;
+            prAdapter->rP2PNetRegState = ENUM_NET_REG_STATE_REGISTERED;
             gPrP2pDev[1] = prGlueInfo->prP2PInfo[1]->prDevHandler;
 #if 0
             DBGLOG(P2P, STATE, "P2P 2nd NetDev registered\n");
@@ -647,6 +713,9 @@ u8 p2pNetUnregister(P_GLUE_INFO_T prGlueInfo, u8 fgIsRtnlLockAcquired){
     P_BSS_INFO_T prP2pBssInfo = NULL;
     P_NETDEV_PRIVATE_GLUE_INFO prNetDevPriv = NULL;
     P_ADAPTER_T prAdapter = NULL;
+#if CFG_ENABLE_UNIFY_WIPHY
+    P_GL_P2P_INFO_T prP2PInfo = NULL;
+#endif
 
     GLUE_SPIN_LOCK_DECLARATION();
 
@@ -667,6 +736,68 @@ u8 p2pNetUnregister(P_GLUE_INFO_T prGlueInfo, u8 fgIsRtnlLockAcquired){
         return true;
     }
 
+#if CFG_ENABLE_UNIFY_WIPHY
+    if (fgIsRtnlLockAcquired && rtnl_is_locked()) {
+        fgRollbackRtnlLock = true;
+    }
+    for (ucRoleIdx = 0; ucRoleIdx < KAL_P2P_NUM; ucRoleIdx++) {
+        prP2PInfo = prGlueInfo->prP2PInfo[ucRoleIdx];
+        if (prP2PInfo == NULL) {
+            continue;
+        }
+        /* don't unregister the dev that share with the AIS */
+        if (prP2PInfo->prDevHandler == gprWdev->netdev) {
+            continue;
+        }
+        prRoleDev = prP2PInfo->aprRoleHandler;
+        if (prRoleDev != NULL) {
+            /* info cfg80211 disconnect */
+            prNetDevPriv = (P_NETDEV_PRIVATE_GLUE_INFO)netdev_priv(prRoleDev);
+            iftype = prRoleDev->ieee80211_ptr->iftype;
+            prP2pBssInfo =
+                GET_BSS_INFO_BY_INDEX(prAdapter, prNetDevPriv->ucBssIdx);
+            /* FIXME: The p2pRoleFsmUninit may call the
+             * cfg80211_disconnected.
+             * p2pRemove()->glUnregisterP2P->p2pRoleFsmUninit(),
+             * it may be too late.
+             */
+            if ((prP2pBssInfo != NULL) &&
+                (prP2pBssInfo->eConnectionState ==
+                 PARAM_MEDIA_STATE_CONNECTED) &&
+                ((iftype == NL80211_IFTYPE_P2P_CLIENT) ||
+                 (iftype == NL80211_IFTYPE_STATION))) {
+                cfg80211_disconnected(prRoleDev, 0, NULL, 0, true, GFP_KERNEL);
+            }
+            if (prRoleDev != prP2PInfo->prDevHandler) {
+                if (netif_carrier_ok(prRoleDev)) {
+                    netif_carrier_off(prRoleDev);
+                }
+                netif_tx_stop_all_queues(prRoleDev);
+            }
+        }
+        if (netif_carrier_ok(prP2PInfo->prDevHandler)) {
+            netif_carrier_off(prP2PInfo->prDevHandler);
+        }
+        netif_tx_stop_all_queues(prP2PInfo->prDevHandler);
+        if (fgRollbackRtnlLock) {
+            rtnl_unlock();
+        }
+        /* Here are functions which need rtnl_lock */
+        if ((prRoleDev) && (prP2PInfo->prDevHandler != prRoleDev)) {
+            DBGLOG(INIT, INFO, "unregister p2p[%d]\n", ucRoleIdx);
+            unregister_netdev(prRoleDev);
+            /* This ndev is created in mtk_p2p_cfg80211_add_iface(),
+             * and unregister_netdev will also free the ndev.
+             */
+        }
+        DBGLOG(INIT, INFO, "unregister p2pdev[%d]\n", ucRoleIdx);
+        unregister_netdev(prP2PInfo->prDevHandler);
+        if (fgRollbackRtnlLock) {
+            rtnl_lock();
+        }
+    }
+#else  /* CFG_ENABLE_UNIFY_WIPHY */
+
     /* prepare for removal */
     if (prGlueInfo->prP2PInfo[0]->prDevHandler !=
         prGlueInfo->prP2PInfo[0]->aprRoleHandler) {
@@ -674,11 +805,10 @@ u8 p2pNetUnregister(P_GLUE_INFO_T prGlueInfo, u8 fgIsRtnlLockAcquired){
 
         if (prRoleDev != NULL) {
             /* info cfg80211 disconnect */
-            prNetDevPriv = (NETDEV_PRIVATE_GLUE_INFO *)netdev_priv(
-                prRoleDev);
+            prNetDevPriv = (NETDEV_PRIVATE_GLUE_INFO *)netdev_priv(prRoleDev);
             iftype = prRoleDev->ieee80211_ptr->iftype;
-            prP2pBssInfo = GET_BSS_INFO_BY_INDEX(
-                prAdapter, prNetDevPriv->ucBssIdx);
+            prP2pBssInfo =
+                GET_BSS_INFO_BY_INDEX(prAdapter, prNetDevPriv->ucBssIdx);
 
             /* p2pRoleFsmUninit may call cfg80211_disconnected.
              * p2pRemove()->glUnregisterP2P->p2pRoleFsmUninit(),
@@ -691,19 +821,15 @@ u8 p2pNetUnregister(P_GLUE_INFO_T prGlueInfo, u8 fgIsRtnlLockAcquired){
                  PARAM_MEDIA_STATE_CONNECTED) &&
                 ((iftype == NL80211_IFTYPE_P2P_CLIENT) ||
                  (iftype == NL80211_IFTYPE_STATION))) {
-                cfg80211_disconnected(prRoleDev, 0, NULL, 0,
-                                      true, GFP_KERNEL);
+                cfg80211_disconnected(prRoleDev, 0, NULL, 0, true, GFP_KERNEL);
             }
         }
 
-        if (netif_carrier_ok(
-                prGlueInfo->prP2PInfo[0]->aprRoleHandler)) {
-            netif_carrier_off(
-                prGlueInfo->prP2PInfo[0]->aprRoleHandler);
+        if (netif_carrier_ok(prGlueInfo->prP2PInfo[0]->aprRoleHandler)) {
+            netif_carrier_off(prGlueInfo->prP2PInfo[0]->aprRoleHandler);
         }
 
-        netif_tx_stop_all_queues(
-            prGlueInfo->prP2PInfo[0]->aprRoleHandler);
+        netif_tx_stop_all_queues(prGlueInfo->prP2PInfo[0]->aprRoleHandler);
     }
 
     if (netif_carrier_ok(prGlueInfo->prP2PInfo[0]->prDevHandler)) {
@@ -736,11 +862,10 @@ u8 p2pNetUnregister(P_GLUE_INFO_T prGlueInfo, u8 fgIsRtnlLockAcquired){
     if (prAdapter->prP2pInfo->u4DeviceNum >= 2) {
         for (ucRoleIdx = 1; ucRoleIdx < BSS_P2P_NUM; ucRoleIdx++) {
             /* prepare for removal */
-            if (netif_carrier_ok(prGlueInfo->prP2PInfo[ucRoleIdx]
-                                 ->prDevHandler)) {
+            if (netif_carrier_ok(
+                    prGlueInfo->prP2PInfo[ucRoleIdx]->prDevHandler)) {
                 netif_carrier_off(
-                    prGlueInfo->prP2PInfo[ucRoleIdx]
-                    ->prDevHandler);
+                    prGlueInfo->prP2PInfo[ucRoleIdx]->prDevHandler);
             }
 
             netif_tx_stop_all_queues(
@@ -759,8 +884,7 @@ u8 p2pNetUnregister(P_GLUE_INFO_T prGlueInfo, u8 fgIsRtnlLockAcquired){
                 DBGLOG(INIT, INFO, "unregister p2pdev[%d]\n",
                        ucRoleIdx);
 #endif
-            unregister_netdev(
-                prGlueInfo->prP2PInfo[ucRoleIdx]->prDevHandler);
+            unregister_netdev(prGlueInfo->prP2PInfo[ucRoleIdx]->prDevHandler);
 #if 0
         }
 #endif
@@ -771,10 +895,128 @@ u8 p2pNetUnregister(P_GLUE_INFO_T prGlueInfo, u8 fgIsRtnlLockAcquired){
         rtnl_lock();
     }
 
+#endif  /* CFG_ENABLE_UNIFY_WIPHY */
+
     prAdapter->rP2PNetRegState = ENUM_NET_REG_STATE_UNREGISTERED;
 
     return true;
 }
+
+/*----------------------------------------------------------------------------*/
+/*!
+ * \brief Setup the P2P device information
+ *
+ * \param[in] prGlueInfo      Pointer to glue info
+ *       [in] prP2pWdev       Pointer to the wireless device
+ *       [in] prP2pDev        Pointer to the net device
+ *       [in] u4Idx           The P2P Role index (max : (KAL_P2P_NUM-1))
+ *       [in] fgIsApMode      Indicate that this device is AP Role or not
+ *
+ * \return    0	Success
+ *           -1	Failure
+ */
+/*----------------------------------------------------------------------------*/
+#if CFG_ENABLE_UNIFY_WIPHY
+int glSetupP2P(P_GLUE_INFO_T prGlueInfo, struct wireless_dev *prP2pWdev,
+               struct net_device *prP2pDev, int u4Idx, u8 fgIsApMode){
+    P_ADAPTER_T prAdapter = NULL;
+    P_GL_P2P_INFO_T prP2PInfo = NULL;
+    P_GL_HIF_INFO_T prHif = NULL;
+    P_NETDEV_PRIVATE_GLUE_INFO prNetDevPriv = NULL;
+    struct chip_info *prChipInfo = NULL;
+    DBGLOG(INIT, INFO, "setup the p2p dev\n");
+    prHif = &prGlueInfo->rHifInfo;
+    prAdapter = prGlueInfo->prAdapter;
+    if ((prGlueInfo == NULL) || (prAdapter == NULL) || (prHif == NULL) ||
+        (prP2pWdev == NULL) || (prP2pWdev->wiphy == NULL) ||
+        (prP2pDev == NULL)) {
+        DBGLOG(INIT, ERROR, "parameter is NULL!!\n");
+        return -1;
+    }
+    /* FIXME: check KAL_P2P_NUM in trunk? */
+    if (u4Idx >= KAL_P2P_NUM) {
+        DBGLOG(INIT, ERROR, "u4Idx(%d) is out of range!!\n", u4Idx);
+        return -1;
+    }
+    prChipInfo = prAdapter->chip_info;
+    /*0. allocate p2pinfo */
+    if (!p2PAllocInfo(prGlueInfo, u4Idx)) {
+        DBGLOG(INIT, WARN, "Allocate memory for p2p FAILED\n");
+        ASSERT(0);
+        return -1;
+    }
+    prP2PInfo = prGlueInfo->prP2PInfo[u4Idx];
+#if CFG_ENABLE_WIFI_DIRECT_CFG_80211
+    /* fill wiphy parameters */
+    prP2PInfo->prWdev = prP2pWdev;
+    if (!prAdapter->fgEnable5GBand) {
+        prP2pWdev->wiphy->bands[BAND_5G] = NULL;
+    }
+#endif  /* CFG_ENABLE_WIFI_DIRECT_CFG_80211 */
+        /* setup netdev */
+        /* Point to shared glue structure */
+    prNetDevPriv = (P_NETDEV_PRIVATE_GLUE_INFO)netdev_priv(prP2pDev);
+    prNetDevPriv->prGlueInfo = prGlueInfo;
+    /* set ucIsP2p for P2P function device */
+    if (fgIsApMode == true) {
+        prP2pWdev->iftype = NL80211_IFTYPE_AP;
+        prNetDevPriv->ucIsP2p = false;
+    } else {
+        prP2pWdev->iftype = NL80211_IFTYPE_P2P_CLIENT;
+        prNetDevPriv->ucIsP2p = true;
+    }
+    /* register callback functions */
+
+    prP2pDev->needed_headroom +=
+        NIC_TX_DESC_AND_PADDING_LENGTH +
+        44  /* yhpgi: prChipInfo->txd_append_size */;
+
+    prP2pDev->netdev_ops = &p2p_netdev_ops;
+#if 0
+    prP2PInfo->prDevHandler->wireless_handlers = &mtk_p2p_wext_handler_def;
+#endif
+    // #if defined(_HIF_SDIO)
+    // #if (MTK_WCN_HIF_SDIO == 0)
+    SET_NETDEV_DEV(prP2pDev, &(prHif->func->dev));
+// #endif
+// #endif
+#if CFG_ENABLE_WIFI_DIRECT_CFG_80211
+    prP2pDev->ieee80211_ptr = prP2pWdev;
+    prP2pWdev->netdev = prP2pDev;
+#endif
+#if CFG_TCP_IP_CHKSUM_OFFLOAD
+    /* set HW checksum offload */
+    if (prAdapter->fgIsSupportCsumOffload) {
+        prP2pDev->features = NETIF_F_IP_CSUM | NETIF_F_IPV6_CSUM |
+                             NETIF_F_RXCSUM;
+    }
+#endif  /* CFG_TCP_IP_CHKSUM_OFFLOAD */
+    kalResetStats(prP2pDev);
+    /* finish */
+    /* bind netdev pointer to netdev index */
+    prP2PInfo->prDevHandler = prP2pDev;
+    /* XXX: All the P2P/AP devices do p2pDevFsmInit in the original code */
+    wlanBindBssIdxToNetInterface(prGlueInfo, p2pDevFsmInit(prAdapter),
+                                 (void *)prP2PInfo->prDevHandler);
+    prP2PInfo->aprRoleHandler = prP2PInfo->prDevHandler;
+    DBGLOG(P2P, INFO, "check prDevHandler = %p\n", prP2PInfo->prDevHandler);
+    DBGLOG(P2P, INFO, "aprRoleHandler = %p\n", prP2PInfo->aprRoleHandler);
+    prNetDevPriv->ucBssIdx = p2pRoleFsmInit(prAdapter, u4Idx);
+    /* Currently wpasupplicant can't support create interface. */
+    /* so initial the corresponding data structure here. */
+    wlanBindBssIdxToNetInterface(prGlueInfo, prNetDevPriv->ucBssIdx,
+                                 (void *)prP2PInfo->aprRoleHandler);
+    /* bind netdev pointer to netdev index */
+#if 0
+    wlanBindNetInterface(prGlueInfo, NET_DEV_P2P_IDX,
+                         (void *)prGlueInfo->prP2PInfo->prDevHandler);
+#endif
+    /* setup running mode */
+    p2pFuncInitConnectionSettings(
+        prAdapter, prAdapter->rWifiVar.prP2PConnSettings[u4Idx], fgIsApMode);
+    return 0;
+}
+#endif  /* CFG_ENABLE_UNIFY_WIPHY */
 
 /*---------------------------------------------------------------------------*/
 /*!
@@ -789,15 +1031,19 @@ u8 p2pNetUnregister(P_GLUE_INFO_T prGlueInfo, u8 fgIsRtnlLockAcquired){
 u8 glRegisterP2P(P_GLUE_INFO_T prGlueInfo, const char *prDevName,
                  const char *prDevName2, u8 ucApMode){
     P_ADAPTER_T prAdapter = NULL;
-    P_GL_HIF_INFO_T prHif = NULL;
     PARAM_MAC_ADDRESS rMacAddr;
-    P_NETDEV_PRIVATE_GLUE_INFO prNetDevPriv =
-        (P_NETDEV_PRIVATE_GLUE_INFO)NULL;
     u8 fgIsApMode = false;
     u8 ucRegisterNum = 1, i = 0;
-    struct wireless_dev *prP2pWdev;
+    struct wireless_dev *prP2pWdev = NULL;
+#if CFG_ENABLE_UNIFY_WIPHY
+    struct net_device *prP2pDev = NULL;
+    struct wiphy *prWiphy = NULL;
+#else  /* (CFG_ENABLE_UNIFY_WIPHY == 0) */
+    P_GL_HIF_INFO_T prHif = NULL;
+    P_NETDEV_PRIVATE_GLUE_INFO prNetDevPriv = NULL;
 #if CFG_ENABLE_WIFI_DIRECT_CFG_80211
     struct device *prDev;
+#endif
 #endif
     const char *prSetDevName;
 
@@ -806,21 +1052,98 @@ u8 glRegisterP2P(P_GLUE_INFO_T prGlueInfo, const char *prDevName,
     prAdapter = prGlueInfo->prAdapter;
     ASSERT(prAdapter);
 
+#if CFG_ENABLE_UNIFY_WIPHY
+    if ((ucApMode == RUNNING_DUAL_AP_MODE) ||
+        (ucApMode == RUNNING_P2P_AP_MODE)) {
+        ucRegisterNum = 2;
+        glP2pCreateWirelessDevice(prGlueInfo);
+    }
+    do {
+        if (ucApMode == RUNNING_P2P_AP_MODE) {
+            if (i == 0) {
+                prSetDevName = prDevName;
+                fgIsApMode = false;
+            } else {
+                prSetDevName = prDevName2;
+                fgIsApMode = true;
+            }
+        } else {
+            /* RUNNING_AP_MODE
+             * RUNNING_DUAL_AP_MODE
+             * RUNNING_P2P_MODE
+             */
+            prSetDevName = prDevName;
+            if (ucApMode == RUNNING_P2P_MODE) {
+                fgIsApMode = false;
+            }else{
+                fgIsApMode = true;
+            }
+        }
+        if (!gprP2pRoleWdev[i]) {
+            DBGLOG(P2P, ERROR, "gprP2pRoleWdev[%d] is NULL\n", i);
+            return false;
+        }
+        prP2pWdev = gprP2pRoleWdev[i];
+        DBGLOG(INIT, INFO, "glRegisterP2P(%d)\n", i);
+        /* Reset prP2pWdev for the issue that the prP2pWdev doesn't
+         * reset when the usb unplug/plug.
+         */
+        prWiphy = prP2pWdev->wiphy;
+        memset(prP2pWdev, 0, sizeof(struct wireless_dev));
+        prP2pWdev->wiphy = prWiphy;
+        /* allocate netdev */
+
+        prP2pDev = alloc_netdev_mq(sizeof(NETDEV_PRIVATE_GLUE_INFO),
+                                   prSetDevName, NET_NAME_PREDICTABLE,
+                                   ether_setup, CFG_MAX_TXQ_NUM);
+
+        if (!prP2pDev) {
+            DBGLOG(INIT, WARN, "unable to allocate ndev for p2p\n");
+            goto err_alloc_netdev;
+        }
+        /* fill hardware address */
+        COPY_MAC_ADDR(rMacAddr, prAdapter->rMyMacAddr);
+        rMacAddr[0] |= 0x2;
+        /* change to local administrated address */
+        rMacAddr[0] ^= i << 2;
+
+#if CFG_MESON_G12A_PATCH
+        prP2pDev->mtu = 1408;
+#endif
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0)
+        dev_addr_set(prP2pDev, rMacAddr);
+#else
+        kalMemCopy(prP2pDev->dev_addr, rMacAddr, ETH_ALEN);
+#endif
+        kalMemCopy(prP2pDev->perm_addr, prP2pDev->dev_addr, ETH_ALEN);
+        if (glSetupP2P(prGlueInfo, prP2pWdev, prP2pDev, i, fgIsApMode) != 0) {
+            DBGLOG(INIT, WARN, "glSetupP2P FAILED\n");
+            free_netdev(prP2pDev);
+            return false;
+        }
+        i++;
+        /* prP2pInfo is alloc at glSetupP2P()->p2PAllocInfo() */
+        prAdapter->prP2pInfo->u4DeviceNum++;
+        /* set p2p net device register state */
+        /* p2pNetRegister() will check prAdapter->rP2PNetRegState. */
+        prAdapter->rP2PNetRegState = ENUM_NET_REG_STATE_UNREGISTERED;
+    } while (i < ucRegisterNum);
+#else  /* (CFG_ENABLE_UNIFY_WIPHY == 0) */
+
     prHif = &prGlueInfo->rHifInfo;
     ASSERT(prHif);
 
-    if ((ucApMode == RUNNING_AP_MODE) ||
-        (ucApMode == RUNNING_DUAL_AP_MODE ||
-         (ucApMode == RUNNING_P2P_AP_MODE))) {
+    if ((ucApMode == RUNNING_AP_MODE) || (ucApMode == RUNNING_DUAL_AP_MODE ||
+                                          (ucApMode == RUNNING_P2P_AP_MODE))) {
         fgIsApMode = true;
         if ((ucApMode == RUNNING_DUAL_AP_MODE) ||
             (ucApMode == RUNNING_P2P_AP_MODE)) {
             ucRegisterNum = 2;
             if (gprP2pRoleWdev[1] == NULL) {
                 /* Create device only when not created before. */
-                DBGLOG(P2P,
-                       ERROR,
-                       "Might encounter deadlock creating wireless device here\n");
+                DBGLOG(
+                    P2P, ERROR,
+                    "Might encounter deadlock creating wireless device here\n");
                 glP2pCreateWirelessDevice(prGlueInfo);
                 /* There would be risk encouter deadlock here. */
             }
@@ -838,8 +1161,7 @@ u8 glRegisterP2P(P_GLUE_INFO_T prGlueInfo, const char *prDevName,
         }
 #if CFG_ENABLE_WIFI_DIRECT_CFG_80211
         if (!gprP2pRoleWdev[i]) {
-            DBGLOG(P2P, ERROR,
-                   "gl_p2p, wireless device is not exist\n");
+            DBGLOG(P2P, ERROR, "gl_p2p, wireless device is not exist\n");
             return false;
         }
 #endif
@@ -856,14 +1178,14 @@ u8 glRegisterP2P(P_GLUE_INFO_T prGlueInfo, const char *prDevName,
         /* 1.1 fill wiphy parameters */
         glGetHifDev(prHif, &prDev);
         if (!prDev) {
-            DBGLOG(INIT, INFO,
-                   "unable to get struct dev for p2p\n");
+            DBGLOG(INIT, INFO, "unable to get struct dev for p2p\n");
         }
 
         prGlueInfo->prP2PInfo[i]->prWdev = prP2pWdev;
-        /*prGlueInfo->prP2PInfo[i]->prRoleWdev[0] = prP2pWdev;*/ /* TH3
-         *                                                          multiple
-         *                                                          P2P
+        /*prGlueInfo->prP2PInfo[i]->prRoleWdev[0] = prP2pWdev;*/
+        /* TH3
+         * multiple
+         * P2P
          */
 
         ASSERT(prP2pWdev);
@@ -880,19 +1202,18 @@ u8 glRegisterP2P(P_GLUE_INFO_T prGlueInfo, const char *prDevName,
         /* 2.2 wdev initialization */
         if (fgIsApMode) {
             prP2pWdev->iftype = NL80211_IFTYPE_AP;
-        }else{
+        } else {
             prP2pWdev->iftype = NL80211_IFTYPE_P2P_CLIENT;
         }
 #endif
 
         /* 3. allocate netdev */
-        prGlueInfo->prP2PInfo[i]->prDevHandler = alloc_netdev_mq(
-            sizeof(NETDEV_PRIVATE_GLUE_INFO), prSetDevName,
-            NET_NAME_PREDICTABLE, ether_setup, CFG_MAX_TXQ_NUM);
+        prGlueInfo->prP2PInfo[i]->prDevHandler =
+            alloc_netdev_mq(sizeof(NETDEV_PRIVATE_GLUE_INFO), prSetDevName,
+                            NET_NAME_PREDICTABLE, ether_setup, CFG_MAX_TXQ_NUM);
 
         if (!prGlueInfo->prP2PInfo[i]->prDevHandler) {
-            DBGLOG(INIT, WARN,
-                   "unable to allocate netdevice for p2p\n");
+            DBGLOG(INIT, WARN, "unable to allocate netdevice for p2p\n");
 
             goto err_alloc_netdev;
         }
@@ -912,16 +1233,14 @@ u8 glRegisterP2P(P_GLUE_INFO_T prGlueInfo, const char *prDevName,
         rMacAddr[0] ^= i << 2;  /* change to local administrated address
                                  */
 #if LINUX_VERSION_CODE < KERNEL_VERSION(5, 17, 0)
-        kalMemCopy(prGlueInfo->prP2PInfo[i]->prDevHandler->dev_addr,
-                   rMacAddr, ETH_ALEN);
+        kalMemCopy(prGlueInfo->prP2PInfo[i]->prDevHandler->dev_addr, rMacAddr,
+                   ETH_ALEN);
 #else
-        dev_addr_set(prGlueInfo->prP2PInfo[i]->prDevHandler,
-                     rMacAddr);
+        dev_addr_set(prGlueInfo->prP2PInfo[i]->prDevHandler, rMacAddr);
 #endif
 
         kalMemCopy(prGlueInfo->prP2PInfo[i]->prDevHandler->perm_addr,
-                   prGlueInfo->prP2PInfo[i]->prDevHandler->dev_addr,
-                   ETH_ALEN);
+                   prGlueInfo->prP2PInfo[i]->prDevHandler->dev_addr, ETH_ALEN);
 #if CFG_MESON_G12A_PATCH
         prGlueInfo->prP2PInfo[i]->prDevHandler->mtu = 1408;
 #endif
@@ -929,8 +1248,7 @@ u8 glRegisterP2P(P_GLUE_INFO_T prGlueInfo, const char *prDevName,
         /* 4.3 register callback functions */
         prGlueInfo->prP2PInfo[i]->prDevHandler->needed_headroom +=
             NIC_TX_HEAD_ROOM;
-        prGlueInfo->prP2PInfo[i]->prDevHandler->netdev_ops =
-            &p2p_netdev_ops;
+        prGlueInfo->prP2PInfo[i]->prDevHandler->netdev_ops = &p2p_netdev_ops;
         /* prGlueInfo->prP2PInfo->prDevHandler->wireless_handlers    =
          * &mtk_p2p_wext_handler_def; */
 
@@ -938,8 +1256,7 @@ u8 glRegisterP2P(P_GLUE_INFO_T prGlueInfo, const char *prDevName,
                        &(prHif->func->dev));
 
 #if CFG_ENABLE_WIFI_DIRECT_CFG_80211
-        prGlueInfo->prP2PInfo[i]->prDevHandler->ieee80211_ptr =
-            prP2pWdev;
+        prGlueInfo->prP2PInfo[i]->prDevHandler->ieee80211_ptr = prP2pWdev;
         prP2pWdev->netdev = prGlueInfo->prP2PInfo[i]->prDevHandler;
 #endif
 
@@ -947,8 +1264,7 @@ u8 glRegisterP2P(P_GLUE_INFO_T prGlueInfo, const char *prDevName,
         /* set HW checksum offload */
         if (prAdapter->fgIsSupportCsumOffload) {
             prGlueInfo->prP2PInfo[i]->prDevHandler->features =
-                NETIF_F_IP_CSUM | NETIF_F_IPV6_CSUM |
-                NETIF_F_RXCSUM;
+                NETIF_F_IP_CSUM | NETIF_F_IPV6_CSUM | NETIF_F_RXCSUM;
         }
 #endif
 
@@ -990,8 +1306,7 @@ u8 glRegisterP2P(P_GLUE_INFO_T prGlueInfo, const char *prDevName,
 
         /* 12. setup running mode */
         p2pFuncInitConnectionSettings(
-            prAdapter, prAdapter->rWifiVar.prP2PConnSettings[i],
-            fgIsApMode);
+            prAdapter, prAdapter->rWifiVar.prP2PConnSettings[i], fgIsApMode);
 
         /* Active network too early would cause HW not able to sleep.
          * Defer the network active time.
@@ -1004,16 +1319,52 @@ u8 glRegisterP2P(P_GLUE_INFO_T prGlueInfo, const char *prDevName,
     if ((ucApMode == RUNNING_DUAL_AP_MODE) ||
         (ucApMode == RUNNING_P2P_AP_MODE)) {
         prGlueInfo->prAdapter->prP2pInfo->u4DeviceNum = 2;
-    }else{
+    } else {
         prGlueInfo->prAdapter->prP2pInfo->u4DeviceNum = 1;
     }
 
+#endif  /* CFG_ENABLE_UNIFY_WIPHY */
     return true;
 
 err_alloc_netdev:
     return false;
 }
 
+#if CFG_ENABLE_UNIFY_WIPHY
+u8 glP2pCreateWirelessDevice(P_GLUE_INFO_T prGlueInfo){
+    struct wiphy *prWiphy = gprWdev->wiphy;
+    struct wireless_dev *prWdev = NULL;
+    u8 i = 0;
+
+#if CFG_ENABLE_WIFI_DIRECT_CFG_80211
+    if (!prWiphy) {
+        DBGLOG(P2P, ERROR, "unable to allocate wiphy for p2p\n");
+        return false;
+    }
+    for (i = 0; i < KAL_P2P_NUM; i++)
+        if (!gprP2pRoleWdev[i]) {
+            break;
+        }
+    if (i >= KAL_P2P_NUM) {
+        DBGLOG(INIT, WARN, "fail to register wiphy to driver\n");
+        return false;
+    }
+    prWdev = kzalloc(sizeof(struct wireless_dev), GFP_KERNEL);
+    if (!prWdev) {
+        DBGLOG(P2P, ERROR, "allocate p2p wdev fail, no memory\n");
+        return false;
+    }
+    /* set priv as pointer to glue structure */
+    prWdev->wiphy = prWiphy;
+    gprP2pRoleWdev[i] = prWdev;
+    DBGLOG(INIT, INFO, "glP2pCreateWirelessDevice (%x)\n",
+           gprP2pRoleWdev[i]->wiphy);
+    return true;
+#else
+    return false;
+#endif
+}
+#else  /* (CFG_ENABLE_UNIFY_WIPHY == 0) */
 u8 glP2pCreateWirelessDevice(P_GLUE_INFO_T prGlueInfo){
     struct wiphy *prWiphy = NULL;
     struct wireless_dev *prWdev = NULL;
@@ -1025,8 +1376,7 @@ u8 glP2pCreateWirelessDevice(P_GLUE_INFO_T prGlueInfo){
 #if CFG_ENABLE_WIFI_DIRECT_CFG_80211
     prWdev = kzalloc(sizeof(struct wireless_dev), GFP_KERNEL);
     if (!prWdev) {
-        DBGLOG(P2P, ERROR,
-               "allocate p2p wireless device fail, no memory\n");
+        DBGLOG(P2P, ERROR, "allocate p2p wireless device fail, no memory\n");
         return false;
     }
     /* 1. allocate WIPHY */
@@ -1081,8 +1431,8 @@ u8 glP2pCreateWirelessDevice(P_GLUE_INFO_T prGlueInfo){
     prWiphy->max_remain_on_channel_duration = 5000;
     prWiphy->n_cipher_suites = 5;
     prWiphy->cipher_suites = mtk_cipher_suites;
-    prWiphy->flags = WIPHY_FLAG_HAS_REMAIN_ON_CHANNEL |
-                     WIPHY_FLAG_HAVE_AP_SME | WIPHY_FLAG_HAS_CHANNEL_SWITCH;
+    prWiphy->flags = WIPHY_FLAG_HAS_REMAIN_ON_CHANNEL | WIPHY_FLAG_HAVE_AP_SME |
+                     WIPHY_FLAG_HAS_CHANNEL_SWITCH;
     prWiphy->max_num_csa_counters = MAX_CSA_COUNTER;
     prWiphy->regulatory_flags = REGULATORY_CUSTOM_REG;
     prWiphy->ap_sme_capa = 1;
@@ -1127,7 +1477,9 @@ free_wdev:
 #endif
     return false;
 }
+#endif  /* CFG_ENABLE_UNIFY_WIPHY */
 
+#if (CFG_ENABLE_UNIFY_WIPHY == 0)
 void glP2pDestroyWirelessDevice(void){
     int i = 0;
 
@@ -1158,18 +1510,106 @@ void glP2pDestroyWirelessDevice(void){
 
     gprP2pWdev = NULL;
 }
+#endif
 
 /*----------------------------------------------------------------------------*/
 /*!
  * \brief Unregister Net Device for Wi-Fi Direct
  *
  * \param[in] prGlueInfo      Pointer to glue info
+ *	[in] ucIdx	     The BSS with the idx will be freed.
+ *			     "ucIdx == 0xff" will free all BSSs.
+ *			     Only has meaning for "CFG_ENABLE_UNIFY_WIPHY == 1"
  *
  * \return   true
  *           false
  */
 /*----------------------------------------------------------------------------*/
-u8 glUnregisterP2P(P_GLUE_INFO_T prGlueInfo){
+u8 glUnregisterP2P(P_GLUE_INFO_T prGlueInfo, u8 ucIdx)
+#if CFG_ENABLE_UNIFY_WIPHY
+{
+    u8 ucRoleIdx;
+    P_ADAPTER_T prAdapter;
+    P_GL_P2P_INFO_T prP2PInfo = NULL;
+    int i4Start = 0, i4End = 0;
+    ASSERT(prGlueInfo);
+    if (ucIdx == 0xff) {
+        i4Start = 0;
+        i4End = BSS_P2P_NUM;
+    } else if (ucIdx < BSS_P2P_NUM) {
+        i4Start = ucIdx;
+        i4End = ucIdx + 1;
+    } else {
+        DBGLOG(INIT, WARN, "The ucIdx (%d) is a wrong value\n", ucIdx);
+        return false;
+    }
+    prAdapter = prGlueInfo->prAdapter;
+    /* 4 <1> Uninit P2P dev FSM */
+    /* Uninit P2P device FSM */
+    /* only do p2pDevFsmUninit, when unregister all P2P device */
+    if (ucIdx == 0xff) {
+        p2pDevFsmUninit(prAdapter);
+    }
+    /* 4 <2> Uninit P2P role FSM */
+    for (ucRoleIdx = i4Start; ucRoleIdx < i4End; ucRoleIdx++) {
+        if (P2P_ROLE_INDEX_2_ROLE_FSM_INFO(prAdapter, ucRoleIdx)) {
+            /* FIXME: The cfg80211_XXX() is following the
+             * p2pRoleFsmUninit() sub-progress.
+             * ex: The cfg80211_del_sta() is called in the
+             *     kalP2PGOStationUpdate().
+             * But the netdev had be unregistered at
+             * p2pNetUnregister(). EXCEPTION!!
+             */
+            p2pRoleFsmUninit(prGlueInfo->prAdapter, ucRoleIdx);
+        }
+    }
+    /* 4 <3> Free Wiphy & netdev */
+    for (ucRoleIdx = i4Start; ucRoleIdx < i4End; ucRoleIdx++) {
+        prP2PInfo = prGlueInfo->prP2PInfo[ucRoleIdx];
+        if (prP2PInfo == NULL) {
+            continue;
+        }
+        /* For P2P interfaces, prDevHandler points to the net_device of
+         * p2p0 interface. And aprRoleHandler points to the net_device
+         * of p2p virtual interface (i.e., p2p1) when it was created.
+         * And when p2p virtual interface is deleted, aprRoleHandler
+         * will change to point to prDevHandler. Hence, when
+         * aprRoleHandler & prDevHandler are pointing to different
+         * addresses, it means vif p2p1 exists. Otherwise it means p2p1
+         * was already deleted.
+         */
+        if ((prP2PInfo->aprRoleHandler != NULL) &&
+            (prP2PInfo->aprRoleHandler != prP2PInfo->prDevHandler)) {
+            /* This device is added by the P2P, and use
+             * ndev->destructor to free. The p2pDevFsmUninit() use
+             * prP2PInfo->aprRoleHandler to do some check.
+             */
+            prP2PInfo->aprRoleHandler = NULL;
+            DBGLOG(P2P, INFO, "aprRoleHandler idx %d set NULL\n", ucRoleIdx);
+            /* XXX: reference from mtk_p2p_cfg80211_del_iface */
+            gprP2pRoleWdev[ucRoleIdx] = gprP2pWdev;
+        }
+        if (prP2PInfo->prDevHandler) {
+            /* don't free the dev that share with the AIS */
+            if (prP2PInfo->prDevHandler == gprWdev->netdev) {
+                gprP2pRoleWdev[ucRoleIdx] = NULL;
+            }else{
+                free_netdev(prP2PInfo->prDevHandler);
+            }
+            prP2PInfo->prDevHandler = NULL;
+        }
+        /* 4 <4> Free P2P internal memory */
+        if (!p2PFreeInfo(prGlueInfo, ucRoleIdx)) {
+            /* false: (fgIsP2PRegistered!=false)||(ucRoleIdx err) */
+            DBGLOG(INIT, ERROR, "p2PFreeInfo FAILED\n");
+            ASSERT(0);
+            return false;
+        }
+    }
+    return true;
+}  /* end of glUnregisterP2P() */
+#else  /* (CFG_ENABLE_UNIFY_WIPHY == 0) */
+{
     u8 ucRoleIdx;
     P_ADAPTER_T prAdapter;
     P_GL_P2P_INFO_T prP2PInfo;
@@ -1211,8 +1651,7 @@ u8 glUnregisterP2P(P_GLUE_INFO_T prGlueInfo){
             /* This device is added by the P2P, and use
              * ndev->destructor to free. */
             prP2PInfo->aprRoleHandler = NULL;
-            DBGLOG(P2P, INFO, "aprRoleHandler idx %d set NULL\n",
-                   ucRoleIdx);
+            DBGLOG(P2P, INFO, "aprRoleHandler idx %d set NULL\n", ucRoleIdx);
         }
 
         if (prP2PInfo->prDevHandler) {
@@ -1222,7 +1661,7 @@ u8 glUnregisterP2P(P_GLUE_INFO_T prGlueInfo){
     }
 
     /* 4 <4> Free P2P internal memory */
-    if (!p2PFreeInfo(prGlueInfo)) {
+    if (!p2PFreeInfo(prGlueInfo, 0xff)) {
         DBGLOG(INIT, WARN, "Free memory for p2p FAILED\n");
         ASSERT(0);
         return false;
@@ -1230,6 +1669,7 @@ u8 glUnregisterP2P(P_GLUE_INFO_T prGlueInfo){
 
     return true;
 }
+#endif  /* CFG_ENABLE_UNIFY_WIPHY */
 
 /* Net Device Hooks */
 /*----------------------------------------------------------------------------*/
@@ -1274,8 +1714,10 @@ static int p2pStop(IN struct net_device *prDev){
     P_GLUE_INFO_T prGlueInfo = NULL;
     P_ADAPTER_T prAdapter = NULL;
     P_GL_P2P_DEV_INFO_T prP2pGlueDevInfo = (P_GL_P2P_DEV_INFO_T)NULL;
+#if (CFG_ENABLE_UNIFY_WIPHY == 0)
     u8 ucRoleIdx = 0;
     struct net_device *prTargetDev = NULL;
+#endif
     struct cfg80211_scan_request *prScanRequest = NULL;
     /* P_MSG_P2P_FUNCTION_SWITCH_T prFuncSwitch; */
 
@@ -1289,22 +1731,33 @@ static int p2pStop(IN struct net_device *prDev){
     prAdapter = prGlueInfo->prAdapter;
     ASSERT(prAdapter);
 
+    /* XXX: The p2pStop may be triggered after the wlanRemove.	*/
+    /*      And prGlueInfo->prP2PDevInfo is freed in p2PFreeInfo.	*/
+    if (!prAdapter->fgIsP2PRegistered) {
+        return -EFAULT;
+    }
+
     prP2pGlueDevInfo = prGlueInfo->prP2PDevInfo;
     ASSERT(prP2pGlueDevInfo);
 
     /* 0. Do the scan done and set parameter to abort if the scan pending */
+#if (CFG_ENABLE_UNIFY_WIPHY == 0)
     /* Default : P2P dev */
     prTargetDev = prGlueInfo->prP2PInfo[0]->prDevHandler;
     if (mtk_Netdev_To_RoleIdx(prGlueInfo, prDev, &ucRoleIdx) != 0) {
         prTargetDev = prGlueInfo->prP2PInfo[ucRoleIdx]->aprRoleHandler;
     }
-
+#endif
     /*DBGLOG(INIT, INFO, "p2pStop and ucRoleIdx = %u\n", ucRoleIdx);*/
 
     GLUE_ACQUIRE_SPIN_LOCK(prGlueInfo, SPIN_LOCK_NET_DEV);
     if ((prP2pGlueDevInfo->prScanRequest != NULL) &&
-        (prP2pGlueDevInfo->prScanRequest->wdev ==
-         prTargetDev->ieee80211_ptr)) {
+#if CFG_ENABLE_UNIFY_WIPHY
+        (prP2pGlueDevInfo->prScanRequest->wdev == prDev->ieee80211_ptr)
+#else
+        (prP2pGlueDevInfo->prScanRequest->wdev == prTargetDev->ieee80211_ptr)
+#endif
+        ) {
         prScanRequest = prP2pGlueDevInfo->prScanRequest;
         prP2pGlueDevInfo->prScanRequest = NULL;
     }
@@ -1319,7 +1772,10 @@ static int p2pStop(IN struct net_device *prDev){
     netif_tx_stop_all_queues(prDev);
 
     /* 3. stop queue and turn off carrier */
-    /*prGlueInfo->prP2PInfo[0]->eState = PARAM_MEDIA_STATE_DISCONNECTED;*/ /* TH3 multiple P2P */
+    /*prGlueInfo->prP2PInfo[0]->eState = PARAM_MEDIA_STATE_DISCONNECTED;*/ /* TH3
+                                                                            multiple
+                                                                            P2P
+     */
 
     netif_tx_stop_all_queues(prDev);
     if (netif_carrier_ok(prDev)) {
@@ -1357,8 +1813,8 @@ static void p2pSetMulticastList(IN struct net_device *prDev){
     ASSERT(prGlueInfo);
     if (!prDev || !prGlueInfo) {
         DBGLOG(INIT, WARN,
-               " abnormal dev or skb: prDev(0x%p), prGlueInfo(0x%p)\n",
-               prDev, prGlueInfo);
+               " abnormal dev or skb: prDev(0x%p), prGlueInfo(0x%p)\n", prDev,
+               prGlueInfo);
         return;
     }
 
@@ -1386,8 +1842,7 @@ void mtk_p2p_wext_set_Multicastlist(P_GLUE_INFO_T prGlueInfo){
 
     ASSERT(prGlueInfo);
     if (!prGlueInfo) {
-        DBGLOG(INIT, WARN, " abnormal skb: prGlueInfo(0x%p)\n",
-               prGlueInfo);
+        DBGLOG(INIT, WARN, " abnormal skb: prGlueInfo(0x%p)\n", prGlueInfo);
         return;
     }
 
@@ -1396,8 +1851,7 @@ void mtk_p2p_wext_set_Multicastlist(P_GLUE_INFO_T prGlueInfo){
 
     if (!prDev) {
         DBGLOG(INIT, WARN,
-               " abnormal dev: prDev(0x%p) or netdev has been freed\n",
-               prDev);
+               " abnormal dev: prDev(0x%p) or netdev has been freed\n", prDev);
         KAL_RELEASE_MUTEX(prGlueInfo->prAdapter, MUTEX_DEL_P2P_VIF);
         return;
     }
@@ -1414,8 +1868,7 @@ void mtk_p2p_wext_set_Multicastlist(P_GLUE_INFO_T prGlueInfo){
     u4McCount = netdev_mc_count(prDev);
 
     if (prDev->flags & IFF_MULTICAST) {
-        if ((prDev->flags & IFF_ALLMULTI) ||
-            (u4McCount > MAX_NUM_GROUP_ADDR)) {
+        if ((prDev->flags & IFF_ALLMULTI) || (u4McCount > MAX_NUM_GROUP_ADDR)) {
             prGlueInfo->prP2PDevInfo->u4PacketFilter |=
                 PARAM_PACKET_FILTER_ALL_MULTICAST;
         } else {
@@ -1432,8 +1885,7 @@ void mtk_p2p_wext_set_Multicastlist(P_GLUE_INFO_T prGlueInfo){
 
         netdev_for_each_mc_addr(ha, prDev) {
             if (i < MAX_NUM_GROUP_ADDR) {
-                COPY_MAC_ADDR(&(prGlueInfo->prP2PDevInfo
-                                ->aucMCAddrList[i]),
+                COPY_MAC_ADDR(&(prGlueInfo->prP2PDevInfo->aucMCAddrList[i]),
                               GET_ADDR(ha));
                 i++;
             }
@@ -1442,15 +1894,14 @@ void mtk_p2p_wext_set_Multicastlist(P_GLUE_INFO_T prGlueInfo){
         DBGLOG(P2P, TRACE, "SEt Multicast Address List\n");
 
         if (i >= MAX_NUM_GROUP_ADDR) {
-            KAL_RELEASE_MUTEX(prGlueInfo->prAdapter,
-                              MUTEX_DEL_P2P_VIF);
+            KAL_RELEASE_MUTEX(prGlueInfo->prAdapter, MUTEX_DEL_P2P_VIF);
             return;
         }
 
         wlanoidSetP2PMulticastList(
             prGlueInfo->prAdapter,
-            &(prGlueInfo->prP2PDevInfo->aucMCAddrList[0]),
-            (i * ETH_ALEN), &u4SetInfoLen);
+            &(prGlueInfo->prP2PDevInfo->aucMCAddrList[0]), (i * ETH_ALEN),
+            &u4SetInfoLen);
     }
 
     KAL_RELEASE_MUTEX(prGlueInfo->prAdapter, MUTEX_DEL_P2P_VIF);
@@ -1503,19 +1954,16 @@ int p2pHardStartXmit(IN struct sk_buff *prSkb, IN struct net_device *prDev){
         if (IS_BMCAST_MAC_ADDR(aucEthDestAddr)) {
             for (i = 0; i < prAdapter->ucDupMcastPacketNum; i++) {
                 prSkbDup = skb_copy(prSkb, GFP_ATOMIC);
-                kalResetPacket(prGlueInfo,
-                               (P_NATIVE_PACKET)prSkbDup);
+                kalResetPacket(prGlueInfo, (P_NATIVE_PACKET)prSkbDup);
 #ifdef CFG_SUPPORT_MULTICAST_ENHANCEMENT_LOOKBACK
                 if (i == 0) {
                     // Set first packet of duplicated packet
                     // flag
-                    GLUE_SET_PKT_FLAG(
-                        (P_NATIVE_PACKET)prSkbDup,
-                        ENUM_PKT_FIRST_DUP);
+                    GLUE_SET_PKT_FLAG((P_NATIVE_PACKET)prSkbDup,
+                                      ENUM_PKT_FIRST_DUP);
                 }
 #endif
-                kalHardStartXmit(prSkbDup, prDev, prGlueInfo,
-                                 ucBssIndex);
+                kalHardStartXmit(prSkbDup, prDev, prGlueInfo, ucBssIndex);
             }
         }
     }
@@ -1551,8 +1999,7 @@ int p2pHardStartXmit(IN struct sk_buff *prSkb, IN struct net_device *prDev){
 
         if (QUEUE_GET_SIZE(prTxLookBackQueue) == 1) {
             /* Not expect packet, just send and return */
-            DBGLOG(INIT, ERROR, "first packet, just send out %d\n",
-                   prSkbLb);
+            DBGLOG(INIT, ERROR, "first packet, just send out %d\n", prSkbLb);
             kalResetPacket(prGlueInfo, (P_NATIVE_PACKET)prSkb);
             kalHardStartXmit(prSkb, prDev, prGlueInfo, ucBssIndex);
             return NETDEV_TX_OK;
@@ -1560,11 +2007,9 @@ int p2pHardStartXmit(IN struct sk_buff *prSkb, IN struct net_device *prDev){
             prSkbkick = NULL;
             GLUE_ACQUIRE_SPIN_LOCK(prGlueInfo, SPIN_LOCK_TX_LB_QUE);
             /* get packet from look-back queue then kick */
-            QUEUE_REMOVE_HEAD(prTxLookBackQueue, prQueueEntry,
-                              P_QUE_ENTRY_T);
+            QUEUE_REMOVE_HEAD(prTxLookBackQueue, prQueueEntry, P_QUE_ENTRY_T);
             GLUE_RELEASE_SPIN_LOCK(prGlueInfo, SPIN_LOCK_TX_LB_QUE);
-            prSkbLb = (struct sk_buff *)GLUE_GET_PKT_DESCRIPTOR(
-                prQueueEntry);
+            prSkbLb = (struct sk_buff *)GLUE_GET_PKT_DESCRIPTOR(prQueueEntry);
             /* fill lookback sequence here */
             ip_header = (struct iphdr *)skb_network_header(prSkbLb);
             ip_header->tos |= BIT(1);
@@ -1576,32 +2021,25 @@ int p2pHardStartXmit(IN struct sk_buff *prSkb, IN struct net_device *prDev){
             /* proccess packet if Skbkick != NULL */
             if (prSkbkick) {
                 /* send the look-back packet */
-                kalResetPacket(prGlueInfo,
-                               (P_NATIVE_PACKET)prSkbkick);
-                kalHardStartXmit(prSkbkick, prDev, prGlueInfo,
-                                 ucBssIndex);
-                DBGLOG(INIT, LOUD, "[%d] LB kick/requeue: %p\n",
-                       i, prSkbLb);
+                kalResetPacket(prGlueInfo, (P_NATIVE_PACKET)prSkbkick);
+                kalHardStartXmit(prSkbkick, prDev, prGlueInfo, ucBssIndex);
+                DBGLOG(INIT, LOUD, "[%d] LB kick/requeue: %p\n", i, prSkbLb);
             }
             kalResetPacket(prGlueInfo, (P_NATIVE_PACKET)prSkb);
             kalHardStartXmit(prSkb, prDev, prGlueInfo, ucBssIndex);
             return NETDEV_TX_OK;
         } else if (QUEUE_GET_SIZE(prTxLookBackQueue) == 3) {
-            for (i = 0; i < QUEUE_GET_SIZE(prTxLookBackQueue);
-                 i++) {
+            for (i = 0; i < QUEUE_GET_SIZE(prTxLookBackQueue); i++) {
                 prSkbkick = NULL;
-                GLUE_ACQUIRE_SPIN_LOCK(prGlueInfo,
-                                       SPIN_LOCK_TX_LB_QUE);
+                GLUE_ACQUIRE_SPIN_LOCK(prGlueInfo, SPIN_LOCK_TX_LB_QUE);
                 /* get packet from look-back queue then kick */
-                QUEUE_REMOVE_HEAD(prTxLookBackQueue,
-                                  prQueueEntry, P_QUE_ENTRY_T);
-                GLUE_RELEASE_SPIN_LOCK(prGlueInfo,
-                                       SPIN_LOCK_TX_LB_QUE);
-                prSkbLb = (struct sk_buff *)
-                          GLUE_GET_PKT_DESCRIPTOR(prQueueEntry);
+                QUEUE_REMOVE_HEAD(prTxLookBackQueue, prQueueEntry,
+                                  P_QUE_ENTRY_T);
+                GLUE_RELEASE_SPIN_LOCK(prGlueInfo, SPIN_LOCK_TX_LB_QUE);
+                prSkbLb =
+                    (struct sk_buff *)GLUE_GET_PKT_DESCRIPTOR(prQueueEntry);
                 /* fill lookback sequence here */
-                ip_header = (struct iphdr *)skb_network_header(
-                    prSkbLb);
+                ip_header = (struct iphdr *)skb_network_header(prSkbLb);
                 /* switch tag to be 0xaa,0xbb,0xcc,0xdd */
                 /* Tagging packet number for our propritry usage
                  *  Rx side will recover the tag
@@ -1609,35 +2047,25 @@ int p2pHardStartXmit(IN struct sk_buff *prSkb, IN struct net_device *prDev){
                 switch (i) {
                 case 0:
                     ip_header->tos |= BIT(2);
-                    prSkbkick =
-                        skb_copy(prSkbLb, GFP_ATOMIC);
+                    prSkbkick = skb_copy(prSkbLb, GFP_ATOMIC);
                     break;
 
                 case 1:
                     ip_header->tos |= BIT(1);
-                    prSkbkick =
-                        skb_copy(prSkbLb, GFP_ATOMIC);
+                    prSkbkick = skb_copy(prSkbLb, GFP_ATOMIC);
                     break;
                 }
                 ;
                 /* re-queue the packet for next look-back */
-                GLUE_ACQUIRE_SPIN_LOCK(prGlueInfo,
-                                       SPIN_LOCK_TX_LB_QUE);
-                QUEUE_INSERT_TAIL(prTxLookBackQueue,
-                                  prQueueEntry);
-                GLUE_RELEASE_SPIN_LOCK(prGlueInfo,
-                                       SPIN_LOCK_TX_LB_QUE);
+                GLUE_ACQUIRE_SPIN_LOCK(prGlueInfo, SPIN_LOCK_TX_LB_QUE);
+                QUEUE_INSERT_TAIL(prTxLookBackQueue, prQueueEntry);
+                GLUE_RELEASE_SPIN_LOCK(prGlueInfo, SPIN_LOCK_TX_LB_QUE);
                 /* proccess packet if Skbkick != NULL */
                 if (prSkbkick) {
                     /* send the look-back packet */
-                    kalResetPacket(
-                        prGlueInfo,
-                        (P_NATIVE_PACKET)prSkbkick);
-                    kalHardStartXmit(prSkbkick, prDev,
-                                     prGlueInfo,
-                                     ucBssIndex);
-                    DBGLOG(INIT, LOUD,
-                           "[%d] LB kick/requeue: %p\n", i,
+                    kalResetPacket(prGlueInfo, (P_NATIVE_PACKET)prSkbkick);
+                    kalHardStartXmit(prSkbkick, prDev, prGlueInfo, ucBssIndex);
+                    DBGLOG(INIT, LOUD, "[%d] LB kick/requeue: %p\n", i,
                            prSkbLb);
                 }
             }
@@ -1651,11 +2079,9 @@ int p2pHardStartXmit(IN struct sk_buff *prSkb, IN struct net_device *prDev){
             prSkbkick = NULL;
             GLUE_ACQUIRE_SPIN_LOCK(prGlueInfo, SPIN_LOCK_TX_LB_QUE);
             /* get packet from look-back queue then kick */
-            QUEUE_REMOVE_HEAD(prTxLookBackQueue, prQueueEntry,
-                              P_QUE_ENTRY_T);
+            QUEUE_REMOVE_HEAD(prTxLookBackQueue, prQueueEntry, P_QUE_ENTRY_T);
             GLUE_RELEASE_SPIN_LOCK(prGlueInfo, SPIN_LOCK_TX_LB_QUE);
-            prSkbLb = (struct sk_buff *)GLUE_GET_PKT_DESCRIPTOR(
-                prQueueEntry);
+            prSkbLb = (struct sk_buff *)GLUE_GET_PKT_DESCRIPTOR(prQueueEntry);
             /* fill lookback sequence here */
             ip_header = (struct iphdr *)skb_network_header(prSkbLb);
             /* switch tag to be 0xaa,0xbb,0xcc,0xdd */
@@ -1692,49 +2118,37 @@ int p2pHardStartXmit(IN struct sk_buff *prSkb, IN struct net_device *prDev){
             /* proccess packet if Skbkick != NULL */
             if (prSkbkick) {
                 /* send the look-back packet */
-                kalResetPacket(prGlueInfo,
-                               (P_NATIVE_PACKET)prSkbkick);
-                ip_header = (struct iphdr *)skb_network_header(
-                    prSkbkick);
+                kalResetPacket(prGlueInfo, (P_NATIVE_PACKET)prSkbkick);
+                ip_header = (struct iphdr *)skb_network_header(prSkbkick);
                 if (i == 0) {
                     // Set first packet of duplicated packet
                     // flag for HIF Agg
-                    GLUE_SET_PKT_FLAG(
-                        (P_NATIVE_PACKET)prSkbkick,
-                        ENUM_PKT_FIRST_DUP);
-                    DBGLOG(INIT,
-                           LOUD,
+                    GLUE_SET_PKT_FLAG((P_NATIVE_PACKET)prSkbkick,
+                                      ENUM_PKT_FIRST_DUP);
+                    DBGLOG(INIT, LOUD,
                            "Flag before Set ENUM_PKT_FIRST_DUP %04x \n",
-                           GLUE_IS_PKT_FLAG_SET(
-                               (P_NATIVE_PACKET)
-                               prSkbkick));
+                           GLUE_IS_PKT_FLAG_SET((P_NATIVE_PACKET)prSkbkick));
                 }
-                kalHardStartXmit(prSkbkick, prDev, prGlueInfo,
-                                 ucBssIndex);
-                DBGLOG(INIT, LOUD, "[%d] LB kick/requeue: %p\n",
-                       i, prSkbLb);
+                kalHardStartXmit(prSkbkick, prDev, prGlueInfo, ucBssIndex);
+                DBGLOG(INIT, LOUD, "[%d] LB kick/requeue: %p\n", i, prSkbLb);
             }
-            DBGLOG(INIT, LOUD, "The TOS in queue is : %02x\n",
-                   ip_header->tos);
+            DBGLOG(INIT, LOUD, "The TOS in queue is : %02x\n", ip_header->tos);
         }
         /* check if too much packet in lookback queue */
         prQueueEntry = NULL;
         GLUE_ACQUIRE_SPIN_LOCK(prGlueInfo, SPIN_LOCK_TX_LB_QUE);
         if (QUEUE_GET_SIZE(prTxLookBackQueue) > MAX_LOOK_BACK_NUN) {
-            QUEUE_REMOVE_HEAD(prTxLookBackQueue, prQueueEntry,
-                              P_QUE_ENTRY_T);
+            QUEUE_REMOVE_HEAD(prTxLookBackQueue, prQueueEntry, P_QUE_ENTRY_T);
             DBGLOG(INIT, LOUD, "LB Remove: %p\n",
-                   (struct sk_buff *)GLUE_GET_PKT_DESCRIPTOR(
-                       prQueueEntry));
+                   (struct sk_buff *)GLUE_GET_PKT_DESCRIPTOR(prQueueEntry));
         }
         GLUE_RELEASE_SPIN_LOCK(prGlueInfo, SPIN_LOCK_TX_LB_QUE);
         if (prQueueEntry) {
-            dev_kfree_skb((struct sk_buff *)GLUE_GET_PKT_DESCRIPTOR(
-                              prQueueEntry));
+            dev_kfree_skb(
+                (struct sk_buff *)GLUE_GET_PKT_DESCRIPTOR(prQueueEntry));
         }
         ip_header = (struct iphdr *)skb_network_header(prSkb);
-        DBGLOG(INIT, LOUD, "The TOS in new packet is : %02x\n",
-               ip_header->tos);
+        DBGLOG(INIT, LOUD, "The TOS in new packet is : %02x\n", ip_header->tos);
     }
 #endif
 #endif
@@ -1791,8 +2205,7 @@ int p2pDoIOCTL(struct net_device *prDev, struct ifreq *prIfReq, int i4Cmd){
     if (i4Cmd == IOCTL_GET_DRIVER) {
         ret = priv_support_driver_cmd(prDev, prIfReq, i4Cmd);
     } else if (i4Cmd == SIOCGIWPRIV) {
-        ret = mtk_p2p_wext_get_priv(prDev, &rIwReqInfo, &(prIwReq->u),
-                                    NULL);
+        ret = mtk_p2p_wext_get_priv(prDev, &rIwReqInfo, &(prIwReq->u), NULL);
     }
 #ifdef CFG_ANDROID_AOSP_PRIV_CMD
     else if (i4Cmd == SIOCDEVPRIVATE + 1) {

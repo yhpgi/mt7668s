@@ -165,8 +165,7 @@ static int preallocAlloc(void){
             /* allocate u4Size memory */
             memory = kmalloc(block->u4Size, block->u4KmallocFlags);
             if (memory == NULL) {
-                MP_Err("allocate [%d][%d] memory failed\n", i,
-                       j);
+                MP_Err("allocate [%d][%d] memory failed\n", i, j);
                 goto fail;
             }
             MP_Dbg(" + [%d] memory 0x%p\n", j, memory);

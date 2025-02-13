@@ -99,9 +99,9 @@ int mtk_cfg80211_change_iface(struct wiphy *wiphy, struct net_device *ndev,
 
     if (type == NL80211_IFTYPE_STATION) {
         eOpMode = NET_TYPE_INFRA;
-    }else if (type == NL80211_IFTYPE_ADHOC) {
+    } else if (type == NL80211_IFTYPE_ADHOC) {
         eOpMode = NET_TYPE_IBSS;
-    }else{
+    } else {
         return -EINVAL;
     }
 
@@ -110,8 +110,7 @@ int mtk_cfg80211_change_iface(struct wiphy *wiphy, struct net_device *ndev,
                        sizeof(eOpMode), false, false, true, &u4BufLen);
 
     if (rStatus != WLAN_STATUS_SUCCESS) {
-        DBGLOG(REQ, WARN, "set infrastructure mode error:%lx\n",
-               rStatus);
+        DBGLOG(REQ, WARN, "set infrastructure mode error:%lx\n", rStatus);
     }
 #endif
 
@@ -126,6 +125,8 @@ int mtk_cfg80211_change_iface(struct wiphy *wiphy, struct net_device *ndev,
     prGlueInfo->rWpaInfo.ucRSNMfpCap = 0;
     prGlueInfo->rWpaInfo.u4CipherGroupMgmt = IW_AUTH_CIPHER_NONE;
 #endif
+
+    ndev->ieee80211_ptr->iftype = type;
 
     return 0;
 }
@@ -168,12 +169,11 @@ int mtk_cfg80211_add_key(struct wiphy *wiphy, struct net_device *ndev,
 #if DBG
     DBGLOG(RSN, INFO, "mtk_cfg80211_add_key\n");
     if (mac_addr) {
-        DBGLOG(RSN, INFO,
-               "keyIdx = %d pairwise = %d mac = " MACSTR "\n",
+        DBGLOG(RSN, INFO, "keyIdx = %d pairwise = %d mac = " MACSTR "\n",
                key_index, pairwise, MAC2STR(mac_addr));
     } else {
-        DBGLOG(RSN, INFO, "keyIdx = %d pairwise = %d null mac\n",
-               key_index, pairwise);
+        DBGLOG(RSN, INFO, "keyIdx = %d pairwise = %d null mac\n", key_index,
+               pairwise);
     }
     DBGLOG(RSN, INFO, "Cipher = %x\n", params->cipher);
     DBGLOG_MEM8(RSN, INFO, params->key, params->key_len);
@@ -223,15 +223,12 @@ int mtk_cfg80211_add_key(struct wiphy *wiphy, struct net_device *ndev,
         /* reset KCK, KEK, EAPOL Replay counter */
         kalMemZero(prGlueInfo->rWpaInfo.aucKek, NL80211_KEK_LEN);
         kalMemZero(prGlueInfo->rWpaInfo.aucKck, NL80211_KCK_LEN);
-        kalMemZero(prGlueInfo->rWpaInfo.aucReplayCtr,
-                   NL80211_REPLAY_CTR_LEN);
+        kalMemZero(prGlueInfo->rWpaInfo.aucReplayCtr, NL80211_REPLAY_CTR_LEN);
     } else {  /* Group key */
         COPY_MAC_ADDR(rKey.arBSSID, aucBCAddr);
 #if CFG_KEY_ERROR_STATISTIC_RECOVERY
-        RX_RESET_CNT(&prGlueInfo->prAdapter->rRxCtrl,
-                     RX_BMC_NO_KEY_COUNT);
-        RX_RESET_CNT(&prGlueInfo->prAdapter->rRxCtrl,
-                     RX_BMC_KEY_ERROR_COUNT);
+        RX_RESET_CNT(&prGlueInfo->prAdapter->rRxCtrl, RX_BMC_NO_KEY_COUNT);
+        RX_RESET_CNT(&prGlueInfo->prAdapter->rRxCtrl, RX_BMC_KEY_ERROR_COUNT);
         RX_RESET_CNT(&prGlueInfo->prAdapter->rRxCtrl, RX_BMC_PKT_COUNT);
 #endif
     }
@@ -270,8 +267,7 @@ int mtk_cfg80211_add_key(struct wiphy *wiphy, struct net_device *ndev,
 
 #if CFG_SUPPORT_REPLAY_DETECTION
     prBssInfo = GET_BSS_INFO_BY_INDEX(
-        prGlueInfo->prAdapter,
-        prGlueInfo->prAdapter->prAisBssInfo->ucBssIndex);
+        prGlueInfo->prAdapter, prGlueInfo->prAdapter->prAisBssInfo->ucBssIndex);
 
     prDetRplyInfo = &prBssInfo->rDetRplyInfo;
 
@@ -280,15 +276,12 @@ int mtk_cfg80211_add_key(struct wiphy *wiphy, struct net_device *ndev,
         if ((prDetRplyInfo->ucCurKeyId == key_index) &&
             (!kalMemCmp(prDetRplyInfo->aucKeyMaterial, params->key,
                         params->key_len))) {
+            DBGLOG(RSN, TRACE, "M3/G1, KeyID and KeyValue equal.\n");
             DBGLOG(RSN, TRACE,
-                   "M3/G1, KeyID and KeyValue equal.\n");
-            DBGLOG(RSN,
-                   TRACE,
                    "hit group key reinstall case, so no update BC/MC PN.\n");
         } else {
-            kalMemCopy(
-                prDetRplyInfo->arReplayPNInfo[key_index].auPN,
-                params->seq, params->seq_len);
+            kalMemCopy(prDetRplyInfo->arReplayPNInfo[key_index].auPN,
+                       params->seq, params->seq_len);
             prDetRplyInfo->ucCurKeyId = key_index;
             prDetRplyInfo->u4KeyLength = params->key_len;
             kalMemCopy(prDetRplyInfo->aucKeyMaterial, params->key,
@@ -368,12 +361,11 @@ int mtk_cfg80211_del_key(struct wiphy *wiphy, struct net_device *ndev,
 #if DBG
     DBGLOG(RSN, TRACE, "mtk_cfg80211_del_key\n");
     if (mac_addr) {
-        DBGLOG(RSN, TRACE,
-               "keyIdx = %d pairwise = %d mac = " MACSTR "\n",
+        DBGLOG(RSN, TRACE, "keyIdx = %d pairwise = %d mac = " MACSTR "\n",
                key_index, pairwise, MAC2STR(mac_addr));
     } else {
-        DBGLOG(RSN, TRACE, "keyIdx = %d pairwise = %d null mac\n",
-               key_index, pairwise);
+        DBGLOG(RSN, TRACE, "keyIdx = %d pairwise = %d null mac\n", key_index,
+               pairwise);
     }
 #endif
 
@@ -413,7 +405,7 @@ int mtk_cfg80211_del_key(struct wiphy *wiphy, struct net_device *ndev,
 
     if (rStatus != WLAN_STATUS_SUCCESS) {
         DBGLOG(RSN, WARN, "remove key error:%lx\n", rStatus);
-    }else{
+    } else {
         i4Rslt = 0;
     }
 
@@ -448,8 +440,8 @@ int mtk_cfg80211_set_default_key(struct wiphy *wiphy, struct net_device *ndev,
     /* For STA, should wep set the default key !! */
 #if DBG
     DBGLOG(RSN, INFO, "mtk_cfg80211_set_default_key\n");
-    DBGLOG(RSN, INFO, "keyIdx = %d unicast = %d multicast = %d\n",
-           key_index, unicast, multicast);
+    DBGLOG(RSN, INFO, "keyIdx = %d unicast = %d multicast = %d\n", key_index,
+           unicast, multicast);
 #endif
 
     rDefaultKey.ucKeyID = key_index;
@@ -505,32 +497,29 @@ int mtk_cfg80211_get_station(struct wiphy *wiphy, struct net_device *ndev,
     ASSERT(prGlueInfo);
 
     kalMemZero(arBssid, MAC_ADDR_LEN);
-    wlanQueryInformation(prGlueInfo->prAdapter, wlanoidQueryBssid,
-                         &arBssid[0], sizeof(arBssid), &u4BufLen);
+    wlanQueryInformation(prGlueInfo->prAdapter, wlanoidQueryBssid, &arBssid[0],
+                         sizeof(arBssid), &u4BufLen);
 
     /* 1. check input MAC address */
     /* On Android O, this might be wlan0 address */
     if (UNEQUAL_MAC_ADDR(arBssid, mac) &&
-        UNEQUAL_MAC_ADDR(prGlueInfo->prAdapter->rWifiVar.aucMacAddress,
-                         mac)) {
+        UNEQUAL_MAC_ADDR(prGlueInfo->prAdapter->rWifiVar.aucMacAddress, mac)) {
         /* wrong MAC address */
         DBGLOG(REQ, WARN,
-               "incorrect BSSID: [" MACSTR
-               "] currently connected BSSID[" MACSTR "]\n",
+               "incorrect BSSID: [" MACSTR "] currently connected BSSID[" MACSTR
+               "]\n",
                MAC2STR(mac), MAC2STR(arBssid));
 
         return -ENOENT;
     }
 
     /* 2. fill TX rate */
-    if (prGlueInfo->eParamMediaStateIndicated !=
-        PARAM_MEDIA_STATE_CONNECTED) {
+    if (prGlueInfo->eParamMediaStateIndicated != PARAM_MEDIA_STATE_CONNECTED) {
         /* not connected */
         DBGLOG(REQ, WARN, "not yet connected\n");
     } else {
         rStatus = kalIoctl(prGlueInfo, wlanoidQueryLinkSpeed, &u4Rate,
-                           sizeof(u4Rate), true, false, false,
-                           &u4BufLen);
+                           sizeof(u4Rate), true, false, false, &u4BufLen);
 
         sinfo->filled |= BIT(NL80211_STA_INFO_TX_BITRATE);
 
@@ -553,14 +542,12 @@ int mtk_cfg80211_get_station(struct wiphy *wiphy, struct net_device *ndev,
     }
 
     /* 3. fill RSSI */
-    if (prGlueInfo->eParamMediaStateIndicated !=
-        PARAM_MEDIA_STATE_CONNECTED) {
+    if (prGlueInfo->eParamMediaStateIndicated != PARAM_MEDIA_STATE_CONNECTED) {
         /* not connected */
         DBGLOG(REQ, WARN, "not yet connected\n");
     } else {
         rStatus = kalIoctl(prGlueInfo, wlanoidQueryRssi, &i4Rssi,
-                           sizeof(i4Rssi), true, false, false,
-                           &u4BufLen);
+                           sizeof(i4Rssi), true, false, false, &u4BufLen);
 
         sinfo->filled |= BIT(NL80211_STA_INFO_SIGNAL);
 
@@ -595,21 +582,16 @@ int mtk_cfg80211_get_station(struct wiphy *wiphy, struct net_device *ndev,
         rQueryStaStatistics.ucReadClear = true;
 
         rStatus = kalIoctl(prGlueInfo, wlanoidQueryStaStatistics,
-                           &rQueryStaStatistics,
-                           sizeof(rQueryStaStatistics), true, false,
-                           true, &u4BufLen);
+                           &rQueryStaStatistics, sizeof(rQueryStaStatistics),
+                           true, false, true, &u4BufLen);
 
         if (rStatus != WLAN_STATUS_SUCCESS) {
-            DBGLOG(REQ,
-                   WARN,
-                   "unable to retrieve link speed,status code = %d\n",
-                   rStatus);
+            DBGLOG(REQ, WARN,
+                   "unable to retrieve link speed,status code = %d\n", rStatus);
         } else {
             DBGLOG(REQ, INFO,
-                   "BSSID: [" MACSTR
-                   "] TxFailCount %d LifeTimeOut %d\n",
-                   MAC2STR(arBssid),
-                   rQueryStaStatistics.u4TxFailCount,
+                   "BSSID: [" MACSTR "] TxFailCount %d LifeTimeOut %d\n",
+                   MAC2STR(arBssid), rQueryStaStatistics.u4TxFailCount,
                    rQueryStaStatistics.u4TxLifeTimeoutCount);
 
             u4TotalError = rQueryStaStatistics.u4TxFailCount +
@@ -653,28 +635,26 @@ int mtk_cfg80211_get_link_statistics(struct wiphy *wiphy,
     ASSERT(prGlueInfo);
 
     kalMemZero(arBssid, MAC_ADDR_LEN);
-    wlanQueryInformation(prGlueInfo->prAdapter, wlanoidQueryBssid,
-                         &arBssid[0], sizeof(arBssid), &u4BufLen);
+    wlanQueryInformation(prGlueInfo->prAdapter, wlanoidQueryBssid, &arBssid[0],
+                         sizeof(arBssid), &u4BufLen);
 
     /* 1. check BSSID */
     if (UNEQUAL_MAC_ADDR(arBssid, mac)) {
         /* wrong MAC address */
         DBGLOG(REQ, WARN,
-               "incorrect BSSID: [" MACSTR
-               "] currently connected BSSID[" MACSTR "]\n",
+               "incorrect BSSID: [" MACSTR "] currently connected BSSID[" MACSTR
+               "]\n",
                MAC2STR(mac), MAC2STR(arBssid));
         return -ENOENT;
     }
 
     /* 2. fill RSSI */
-    if (prGlueInfo->eParamMediaStateIndicated !=
-        PARAM_MEDIA_STATE_CONNECTED) {
+    if (prGlueInfo->eParamMediaStateIndicated != PARAM_MEDIA_STATE_CONNECTED) {
         /* not connected */
         DBGLOG(REQ, WARN, "not yet connected\n");
     } else {
         rStatus = kalIoctl(prGlueInfo, wlanoidQueryRssi, &i4Rssi,
-                           sizeof(i4Rssi), true, false, false,
-                           &u4BufLen);
+                           sizeof(i4Rssi), true, false, false, &u4BufLen);
         if (rStatus != WLAN_STATUS_SUCCESS) {
             DBGLOG(REQ, WARN, "unable to retrieve rssi\n");
         }
@@ -693,34 +673,28 @@ int mtk_cfg80211_get_link_statistics(struct wiphy *wiphy,
                                                       */
 
         rStatus = kalIoctl(prGlueInfo, wlanoidQueryStaStatistics,
-                           &rQueryStaStatistics,
-                           sizeof(rQueryStaStatistics), true, false,
-                           true, &u4BufLen);
+                           &rQueryStaStatistics, sizeof(rQueryStaStatistics),
+                           true, false, true, &u4BufLen);
         if (rStatus != WLAN_STATUS_SUCCESS) {
-            DBGLOG(REQ, WARN,
-                   "unable to retrieve per-STA link statistics\n");
+            DBGLOG(REQ, WARN, "unable to retrieve per-STA link statistics\n");
         }
 
         /*3.2 get per-BSS link statistics */
         if (rStatus == WLAN_STATUS_SUCCESS) {
             /* get Bss Index from ndev */
-            prNetDevPrivate =
-                (P_NETDEV_PRIVATE_GLUE_INFO)netdev_priv(ndev);
+            prNetDevPrivate = (P_NETDEV_PRIVATE_GLUE_INFO)netdev_priv(ndev);
             ASSERT(prNetDevPrivate->prGlueInfo == prGlueInfo);
             ucBssIndex = prNetDevPrivate->ucBssIdx;
 
-            kalMemZero(&rQueryBssStatistics,
-                       sizeof(rQueryBssStatistics));
+            kalMemZero(&rQueryBssStatistics, sizeof(rQueryBssStatistics));
             rQueryBssStatistics.ucBssIndex = ucBssIndex;
 
-            rStatus = kalIoctl(prGlueInfo,
-                               wlanoidQueryBssStatistics,
+            rStatus = kalIoctl(prGlueInfo, wlanoidQueryBssStatistics,
                                &rQueryBssStatistics,
-                               sizeof(rQueryBssStatistics), true,
-                               false, true, &u4BufLen);
+                               sizeof(rQueryBssStatistics), true, false, true,
+                               &u4BufLen);
         } else {
-            DBGLOG(REQ, WARN,
-                   "unable to retrieve per-BSS link statistics\n");
+            DBGLOG(REQ, WARN, "unable to retrieve per-BSS link statistics\n");
         }
     }
 
@@ -760,8 +734,7 @@ int mtk_cfg80211_scan(struct wiphy *wiphy,
 
         for (i = 0; i < request->n_ssids; i++) {
             COPY_SSID(rScanRequest.rSsid[i].aucSsid,
-                      rScanRequest.rSsid[i].u4SsidLen,
-                      request->ssids[i].ssid,
+                      rScanRequest.rSsid[i].u4SsidLen, request->ssids[i].ssid,
                       request->ssids[i].ssid_len);
         }
     } else {
@@ -777,18 +750,15 @@ int mtk_cfg80211_scan(struct wiphy *wiphy,
     DBGLOG(REQ, WARN, "scan channel num = %d\n", request->n_channels);
 
     if (request->n_channels > MAXIMUM_OPERATION_CHANNEL_LIST) {
-        DBGLOG(REQ,
-               WARN,
+        DBGLOG(REQ, WARN,
                "scan channel num (%d) exceeds %d, do a full scan instead\n",
-               request->n_channels,
-               MAXIMUM_OPERATION_CHANNEL_LIST);
+               request->n_channels, MAXIMUM_OPERATION_CHANNEL_LIST);
         rScanRequest.ucChannelListNum = 0;
     } else {
         rScanRequest.ucChannelListNum = request->n_channels;
         for (i = 0; i < request->n_channels; i++) {
             rScanRequest.arChnlInfoList[i].eBand =
-                kalCfg80211ToMtkBand(
-                    request->channels[i]->band);
+                kalCfg80211ToMtkBand(request->channels[i]->band);
             rScanRequest.arChnlInfoList[i].u4CenterFreq1 =
                 request->channels[i]->center_freq;
             rScanRequest.arChnlInfoList[i].u4CenterFreq2 = 0;
@@ -809,9 +779,9 @@ int mtk_cfg80211_scan(struct wiphy *wiphy,
     /* 2018/04/18 frog: The point should be ready before doing IOCTL. */
     prGlueInfo->prScanRequest = request;
 
-    rStatus = kalIoctl(prGlueInfo, wlanoidSetBssidListScanAdv,
-                       &rScanRequest, sizeof(PARAM_SCAN_REQUEST_ADV_T),
-                       false, false, false, &u4BufLen);
+    rStatus = kalIoctl(prGlueInfo, wlanoidSetBssidListScanAdv, &rScanRequest,
+                       sizeof(PARAM_SCAN_REQUEST_ADV_T), false, false, false,
+                       &u4BufLen);
 
     if (rStatus != WLAN_STATUS_SUCCESS) {
         DBGLOG(REQ, WARN, "scan error:%lx\n", rStatus);
@@ -883,13 +853,13 @@ int mtk_cfg80211_auth(struct wiphy *wiphy, struct net_device *ndev,
 
 #if KERNEL_VERSION(4, 9, 113) >= CFG80211_VERSION_CODE
     if (req->sae_data_len != 0) {
-        DBGLOG(REQ, INFO, "[wlan] mtk_cfg80211_auth %p %zu\n",
-               req->sae_data, req->sae_data_len);
+        DBGLOG(REQ, INFO, "[wlan] mtk_cfg80211_auth %p %zu\n", req->sae_data,
+               req->sae_data_len);
     }
 #else
     if (req->auth_data_len != 0) {
-        DBGLOG(REQ, INFO, "[wlan] mtk_cfg80211_auth %p %zu\n",
-               req->auth_data, req->auth_data_len);
+        DBGLOG(REQ, INFO, "[wlan] mtk_cfg80211_auth %p %zu\n", req->auth_data,
+               req->auth_data_len);
     }
 #endif
     DBGLOG(REQ, STATE, "auth to  BSS [" MACSTR "]\n",
@@ -902,7 +872,7 @@ int mtk_cfg80211_auth(struct wiphy *wiphy, struct net_device *ndev,
     if (prGlueInfo->prAdapter->rWifiVar.rConnSettings.eOPMode >
         NET_TYPE_AUTO_SWITCH) {
         eOpMode = NET_TYPE_AUTO_SWITCH;
-    }else{
+    } else {
         eOpMode = prGlueInfo->prAdapter->rWifiVar.rConnSettings.eOPMode;
     }
 
@@ -910,8 +880,7 @@ int mtk_cfg80211_auth(struct wiphy *wiphy, struct net_device *ndev,
                        sizeof(eOpMode), false, false, true, &u4BufLen);
 
     if (rStatus != WLAN_STATUS_SUCCESS) {
-        DBGLOG(INIT, INFO, "wlanoidSetInfrastructureMode fail 0x%x\n",
-               rStatus);
+        DBGLOG(INIT, INFO, "wlanoidSetInfrastructureMode fail 0x%x\n", rStatus);
         return -EFAULT;
     }
 
@@ -920,8 +889,7 @@ int mtk_cfg80211_auth(struct wiphy *wiphy, struct net_device *ndev,
 #if KERNEL_VERSION(4, 9, 113) >= CFG80211_VERSION_CODE
     if (req->sae_data_len != 0) {
         if (req->sae_data_len > AUTH_DATA_MAX_LEN) {
-            DBGLOG(INIT, WARN,
-                   "request auth with unexpected length:%d\n",
+            DBGLOG(INIT, WARN, "request auth with unexpected length:%d\n",
                    req->sae_data_len);
             return -EFAULT;
         }
@@ -930,17 +898,14 @@ int mtk_cfg80211_auth(struct wiphy *wiphy, struct net_device *ndev,
                    req->sae_data_len);
         prConnSettings->ucAuthDataLen = req->sae_data_len;
 
-        DBGLOG(INIT, INFO,
-               "Dump auth data in connectSettings, auth len:%d\n",
+        DBGLOG(INIT, INFO, "Dump auth data in connectSettings, auth len:%d\n",
                prConnSettings->ucAuthDataLen);
-        DBGLOG_MEM8(REQ, INFO, prConnSettings->aucAuthData,
-                    req->sae_data_len);
+        DBGLOG_MEM8(REQ, INFO, prConnSettings->aucAuthData, req->sae_data_len);
     }
 #else
     if (req->auth_data_len != 0) {
         if (req->auth_data_len > AUTH_DATA_MAX_LEN) {
-            DBGLOG(INIT, WARN,
-                   "request auth with unexpected length:%d\n",
+            DBGLOG(INIT, WARN, "request auth with unexpected length:%d\n",
                    req->auth_data_len);
             return -EFAULT;
         }
@@ -949,17 +914,15 @@ int mtk_cfg80211_auth(struct wiphy *wiphy, struct net_device *ndev,
                    req->auth_data_len);
         prConnSettings->ucAuthDataLen = req->auth_data_len;
 
-        DBGLOG(INIT, INFO,
-               "Dump auth data in connectSettings, auth len:%d\n",
+        DBGLOG(INIT, INFO, "Dump auth data in connectSettings, auth len:%d\n",
                prConnSettings->ucAuthDataLen);
-        DBGLOG_MEM8(REQ, INFO, prConnSettings->aucAuthData,
-                    req->auth_data_len);
+        DBGLOG_MEM8(REQ, INFO, prConnSettings->aucAuthData, req->auth_data_len);
     }
 #endif
     /*<2> Set ChannelNum */
     if (req->bss->channel->center_freq) {
-        prConnSettings->ucChannelNum = nicFreq2ChannelNum(
-            req->bss->channel->center_freq * 1000);
+        prConnSettings->ucChannelNum =
+            nicFreq2ChannelNum(req->bss->channel->center_freq * 1000);
         DBGLOG(RSN, INFO, "set prConnSettings->ucChannelNum:%d\n",
                prConnSettings->ucChannelNum);
     } else {
@@ -970,8 +933,7 @@ int mtk_cfg80211_auth(struct wiphy *wiphy, struct net_device *ndev,
 #if CFG_SUPPORT_REPLAY_DETECTION
     /* reset Detect replay information */
     prBssInfo = GET_BSS_INFO_BY_INDEX(
-        prGlueInfo->prAdapter,
-        prGlueInfo->prAdapter->prAisBssInfo->ucBssIndex);
+        prGlueInfo->prAdapter, prGlueInfo->prAdapter->prAisBssInfo->ucBssIndex);
 
     prDetRplyInfo = &prBssInfo->rDetRplyInfo;
 
@@ -1007,8 +969,7 @@ int mtk_cfg80211_auth(struct wiphy *wiphy, struct net_device *ndev,
         prGlueInfo->rWpaInfo.u4AuthAlg = AUTH_TYPE_OPEN_SYSTEM;
         break;
     }
-    DBGLOG(REQ, INFO, "Auth Algorithm : %ld\n",
-           prGlueInfo->rWpaInfo.u4AuthAlg);
+    DBGLOG(REQ, INFO, "Auth Algorithm : %ld\n", prGlueInfo->rWpaInfo.u4AuthAlg);
 
     if (req->key_len != 0) {
         /* NL80211 only set the Tx wep key while connect,
@@ -1033,16 +994,13 @@ int mtk_cfg80211_auth(struct wiphy *wiphy, struct net_device *ndev,
                    prWepKey->u4KeyLength);
             return -EINVAL;
         }
-        kalMemCopy(prWepKey->aucKeyMaterial, req->key,
-                   prWepKey->u4KeyLength);
+        kalMemCopy(prWepKey->aucKeyMaterial, req->key, prWepKey->u4KeyLength);
 
         rStatus = kalIoctl(prGlueInfo, wlanoidSetAddWep, prWepKey,
-                           prWepKey->u4Length, false, false, true,
-                           &u4BufLen);
+                           prWepKey->u4Length, false, false, true, &u4BufLen);
 
         if (rStatus != WLAN_STATUS_SUCCESS) {
-            DBGLOG(INIT, INFO, "wlanoidSetAddWep fail 0x%x\n",
-                   rStatus);
+            DBGLOG(INIT, INFO, "wlanoidSetAddWep fail 0x%x\n", rStatus);
             return -EFAULT;
         }
     }
@@ -1058,8 +1016,7 @@ int mtk_cfg80211_auth(struct wiphy *wiphy, struct net_device *ndev,
            req->bss->ies->len, SSID_IE(req->bss->ies->data)->ucLength,
            SSID_IE(req->bss->ies->data)->aucSSID,
            SSID_IE(req->bss->ies->data)->ucLength);
-    if (req->bss->ies->len != 0 &&
-        IE_ID(req->bss->ies->data) == ELEM_ID_SSID) {
+    if (req->bss->ies->len != 0 && IE_ID(req->bss->ies->data) == ELEM_ID_SSID) {
         rNewSsid.pucSsid = SSID_IE(req->bss->ies->data)->aucSSID;
         rNewSsid.u4SsidLen = SSID_IE(req->bss->ies->data)->ucLength;
     }
@@ -1079,9 +1036,9 @@ int mtk_cfg80211_auth(struct wiphy *wiphy, struct net_device *ndev,
             DBGLOG(REQ, INFO, "auth param update\n");
         }
 
-        rStatus = kalIoctl(prGlueInfo, wlanoidSetConnect,
-                           (void *)&rNewSsid, sizeof(PARAM_CONNECT_T),
-                           false, false, true, &u4BufLen);
+        rStatus = kalIoctl(prGlueInfo, wlanoidSetConnect, (void *)&rNewSsid,
+                           sizeof(PARAM_CONNECT_T), false, false, true,
+                           &u4BufLen);
 
         if (rStatus != WLAN_STATUS_SUCCESS) {
             DBGLOG(REQ, WARN, "set SSID:%x\n", rStatus);
@@ -1093,14 +1050,12 @@ int mtk_cfg80211_auth(struct wiphy *wiphy, struct net_device *ndev,
          */
         prStaRec = cnmGetStaRecByAddress(
             prGlueInfo->prAdapter,
-            prGlueInfo->prAdapter->prAisBssInfo->ucBssIndex,
-            rNewSsid.pucBssid);
+            prGlueInfo->prAdapter->prAisBssInfo->ucBssIndex, rNewSsid.pucBssid);
         if (prStaRec) {
             saaSendAuthAssoc(prGlueInfo->prAdapter, prStaRec);
             DBGLOG(REQ, STATE, "Send auth \n");
         } else {
-            DBGLOG(REQ, WARN,
-                   "can't send auth since can't find StaRec\n");
+            DBGLOG(REQ, WARN, "can't send auth since can't find StaRec\n");
         }
     }
 
@@ -1150,7 +1105,7 @@ int mtk_cfg80211_connect(struct wiphy *wiphy, struct net_device *ndev,
     if (prGlueInfo->prAdapter->rWifiVar.rConnSettings.eOPMode >
         NET_TYPE_AUTO_SWITCH) {
         eOpMode = NET_TYPE_AUTO_SWITCH;
-    }else{
+    } else {
         eOpMode = prGlueInfo->prAdapter->rWifiVar.rConnSettings.eOPMode;
     }
 
@@ -1176,8 +1131,7 @@ int mtk_cfg80211_connect(struct wiphy *wiphy, struct net_device *ndev,
 #if CFG_SUPPORT_REPLAY_DETECTION
     /* reset Detect replay information */
     prBssInfo = GET_BSS_INFO_BY_INDEX(
-        prGlueInfo->prAdapter,
-        prGlueInfo->prAdapter->prAisBssInfo->ucBssIndex);
+        prGlueInfo->prAdapter, prGlueInfo->prAdapter->prAisBssInfo->ucBssIndex);
 
     prDetRplyInfo = &prBssInfo->rDetRplyInfo;
     kalMemZero(prDetRplyInfo, sizeof(struct SEC_DETECT_REPLAY_INFO));
@@ -1208,8 +1162,7 @@ int mtk_cfg80211_connect(struct wiphy *wiphy, struct net_device *ndev,
     } else if (sme->crypto.wpa_versions & NL80211_WPA_VERSION_2) {
         prGlueInfo->rWpaInfo.u4WpaVersion = IW_AUTH_WPA_VERSION_WPA2;
     } else {
-        prGlueInfo->rWpaInfo.u4WpaVersion =
-            IW_AUTH_WPA_VERSION_DISABLED;
+        prGlueInfo->rWpaInfo.u4WpaVersion = IW_AUTH_WPA_VERSION_DISABLED;
     }
 
     switch (sme->auth_type) {
@@ -1232,43 +1185,35 @@ int mtk_cfg80211_connect(struct wiphy *wiphy, struct net_device *ndev,
                sme->crypto.ciphers_pairwise[0]);
 
         prGlueInfo->prAdapter->rWifiVar.rConnSettings.rRsnInfo
-        .au4PairwiseKeyCipherSuite[0] =
-            sme->crypto.ciphers_pairwise[0];
+        .au4PairwiseKeyCipherSuite[0] = sme->crypto.ciphers_pairwise[0];
         switch (sme->crypto.ciphers_pairwise[0]) {
         case WLAN_CIPHER_SUITE_WEP40:
-            prGlueInfo->rWpaInfo.u4CipherPairwise =
-                IW_AUTH_CIPHER_WEP40;
+            prGlueInfo->rWpaInfo.u4CipherPairwise = IW_AUTH_CIPHER_WEP40;
             break;
 
         case WLAN_CIPHER_SUITE_WEP104:
-            prGlueInfo->rWpaInfo.u4CipherPairwise =
-                IW_AUTH_CIPHER_WEP104;
+            prGlueInfo->rWpaInfo.u4CipherPairwise = IW_AUTH_CIPHER_WEP104;
             break;
 
         case WLAN_CIPHER_SUITE_TKIP:
-            prGlueInfo->rWpaInfo.u4CipherPairwise =
-                IW_AUTH_CIPHER_TKIP;
+            prGlueInfo->rWpaInfo.u4CipherPairwise = IW_AUTH_CIPHER_TKIP;
             break;
 
         case WLAN_CIPHER_SUITE_CCMP:
-            prGlueInfo->rWpaInfo.u4CipherPairwise =
-                IW_AUTH_CIPHER_CCMP;
+            prGlueInfo->rWpaInfo.u4CipherPairwise = IW_AUTH_CIPHER_CCMP;
             break;
 
         case WLAN_CIPHER_SUITE_AES_CMAC:
-            prGlueInfo->rWpaInfo.u4CipherPairwise =
-                IW_AUTH_CIPHER_CCMP;
+            prGlueInfo->rWpaInfo.u4CipherPairwise = IW_AUTH_CIPHER_CCMP;
             break;
 
 #if CFG_SUPPORT_SUITB
         case WLAN_CIPHER_SUITE_BIP_GMAC_256:
-            prGlueInfo->rWpaInfo.u4CipherPairwise =
-                IW_AUTH_CIPHER_GCMP256;
+            prGlueInfo->rWpaInfo.u4CipherPairwise = IW_AUTH_CIPHER_GCMP256;
             break;
 
         case WLAN_CIPHER_SUITE_GCMP_256:
-            prGlueInfo->rWpaInfo.u4CipherPairwise =
-                IW_AUTH_CIPHER_GCMP256;
+            prGlueInfo->rWpaInfo.u4CipherPairwise = IW_AUTH_CIPHER_GCMP256;
             break;
 
 #endif
@@ -1284,39 +1229,32 @@ int mtk_cfg80211_connect(struct wiphy *wiphy, struct net_device *ndev,
         .u4GroupKeyCipherSuite = sme->crypto.cipher_group;
         switch (sme->crypto.cipher_group) {
         case WLAN_CIPHER_SUITE_WEP40:
-            prGlueInfo->rWpaInfo.u4CipherGroup =
-                IW_AUTH_CIPHER_WEP40;
+            prGlueInfo->rWpaInfo.u4CipherGroup = IW_AUTH_CIPHER_WEP40;
             break;
 
         case WLAN_CIPHER_SUITE_WEP104:
-            prGlueInfo->rWpaInfo.u4CipherGroup =
-                IW_AUTH_CIPHER_WEP104;
+            prGlueInfo->rWpaInfo.u4CipherGroup = IW_AUTH_CIPHER_WEP104;
             break;
 
         case WLAN_CIPHER_SUITE_TKIP:
-            prGlueInfo->rWpaInfo.u4CipherGroup =
-                IW_AUTH_CIPHER_TKIP;
+            prGlueInfo->rWpaInfo.u4CipherGroup = IW_AUTH_CIPHER_TKIP;
             break;
 
         case WLAN_CIPHER_SUITE_CCMP:
-            prGlueInfo->rWpaInfo.u4CipherGroup =
-                IW_AUTH_CIPHER_CCMP;
+            prGlueInfo->rWpaInfo.u4CipherGroup = IW_AUTH_CIPHER_CCMP;
             break;
 
         case WLAN_CIPHER_SUITE_AES_CMAC:
-            prGlueInfo->rWpaInfo.u4CipherGroup =
-                IW_AUTH_CIPHER_CCMP;
+            prGlueInfo->rWpaInfo.u4CipherGroup = IW_AUTH_CIPHER_CCMP;
             break;
 
 #if CFG_SUPPORT_SUITB
         case WLAN_CIPHER_SUITE_BIP_GMAC_256:
-            prGlueInfo->rWpaInfo.u4CipherGroup =
-                IW_AUTH_CIPHER_GCMP256;
+            prGlueInfo->rWpaInfo.u4CipherGroup = IW_AUTH_CIPHER_GCMP256;
             break;
 
         case WLAN_CIPHER_SUITE_GCMP_256:
-            prGlueInfo->rWpaInfo.u4CipherGroup =
-                IW_AUTH_CIPHER_GCMP256;
+            prGlueInfo->rWpaInfo.u4CipherGroup = IW_AUTH_CIPHER_GCMP256;
             break;
 
         case WLAN_CIPHER_SUITE_NO_GROUP_ADDR:
@@ -1334,8 +1272,7 @@ int mtk_cfg80211_connect(struct wiphy *wiphy, struct net_device *ndev,
     if (sme->crypto.n_akm_suites) {
         prGlueInfo->prAdapter->rWifiVar.rConnSettings.rRsnInfo
         .au4AuthKeyMgtSuite[0] = sme->crypto.akm_suites[0];
-        if (prGlueInfo->rWpaInfo.u4WpaVersion ==
-            IW_AUTH_WPA_VERSION_WPA) {
+        if (prGlueInfo->rWpaInfo.u4WpaVersion == IW_AUTH_WPA_VERSION_WPA) {
             switch (sme->crypto.akm_suites[0]) {
             case WLAN_AKM_SUITE_8021X:
                 eAuthMode = AUTH_MODE_WPA;
@@ -1406,10 +1343,10 @@ int mtk_cfg80211_connect(struct wiphy *wiphy, struct net_device *ndev,
     }
 
     if (prGlueInfo->rWpaInfo.u4WpaVersion == IW_AUTH_WPA_VERSION_DISABLED) {
-        eAuthMode = (prGlueInfo->rWpaInfo.u4AuthAlg ==
-                     IW_AUTH_ALG_OPEN_SYSTEM) ?
-                    AUTH_MODE_OPEN :
-                    AUTH_MODE_AUTO_SWITCH;
+        eAuthMode =
+            (prGlueInfo->rWpaInfo.u4AuthAlg == IW_AUTH_ALG_OPEN_SYSTEM) ?
+            AUTH_MODE_OPEN :
+            AUTH_MODE_AUTO_SWITCH;
     }
 
     prGlueInfo->rWpaInfo.fgPrivacyInvoke = sme->privacy;
@@ -1427,12 +1364,11 @@ int mtk_cfg80211_connect(struct wiphy *wiphy, struct net_device *ndev,
             prGlueInfo->fgWpsActive = true;
             fgCarryWPSIE = true;
 
-            rStatus = kalIoctl(prGlueInfo, wlanoidSetWSCAssocInfo,
-                               prDesiredIE, IE_SIZE(prDesiredIE),
-                               false, false, false, &u4BufLen);
+            rStatus = kalIoctl(prGlueInfo, wlanoidSetWSCAssocInfo, prDesiredIE,
+                               IE_SIZE(prDesiredIE), false, false, false,
+                               &u4BufLen);
             if (rStatus != WLAN_STATUS_SUCCESS) {
-                DBGLOG(SEC, WARN,
-                       "[WSC] set WSC assoc info error:%lx\n",
+                DBGLOG(SEC, WARN, "[WSC] set WSC assoc info error:%lx\n",
                        rStatus);
             }
         }
@@ -1443,25 +1379,19 @@ int mtk_cfg80211_connect(struct wiphy *wiphy, struct net_device *ndev,
             RSN_INFO_T rRsnInfo;
 
             if (rsnParseRsnIE(prGlueInfo->prAdapter,
-                              (P_RSN_INFO_ELEM_T)prDesiredIE,
-                              &rRsnInfo)) {
+                              (P_RSN_INFO_ELEM_T)prDesiredIE, &rRsnInfo)) {
 #if CFG_SUPPORT_802_11W
                 /* Fill RSNE MFP Cap */
                 if (rRsnInfo.u2RsnCap & ELEM_WPA_CAP_MFPC) {
                     prGlueInfo->rWpaInfo.u4CipherGroupMgmt =
-                        rRsnInfo.
-                        u4GroupMgmtKeyCipherSuite;
-                    prGlueInfo->rWpaInfo.ucRSNMfpCap =
-                        RSN_AUTH_MFP_OPTIONAL;
-                    if (rRsnInfo.u2RsnCap &
-                        ELEM_WPA_CAP_MFPR) {
-                        prGlueInfo->rWpaInfo
-                        .ucRSNMfpCap =
+                        rRsnInfo.u4GroupMgmtKeyCipherSuite;
+                    prGlueInfo->rWpaInfo.ucRSNMfpCap = RSN_AUTH_MFP_OPTIONAL;
+                    if (rRsnInfo.u2RsnCap & ELEM_WPA_CAP_MFPR) {
+                        prGlueInfo->rWpaInfo.ucRSNMfpCap =
                             RSN_AUTH_MFP_REQUIRED;
                     }
                 } else {
-                    prGlueInfo->rWpaInfo.ucRSNMfpCap =
-                        RSN_AUTH_MFP_DISABLED;
+                    prGlueInfo->rWpaInfo.ucRSNMfpCap = RSN_AUTH_MFP_DISABLED;
                 }
 #endif
             }
@@ -1489,10 +1419,8 @@ int mtk_cfg80211_connect(struct wiphy *wiphy, struct net_device *ndev,
          */
         if (prGlueInfo->rWpaInfo.ucRSNMfpCap == RSN_AUTH_MFP_OPTIONAL) {
             prGlueInfo->rWpaInfo.u4Mfp = IW_AUTH_MFP_OPTIONAL;
-        } else if (prGlueInfo->rWpaInfo.ucRSNMfpCap ==
-                   RSN_AUTH_MFP_REQUIRED) {
-            DBGLOG(REQ, ERROR,
-                   "param(DISABLED) conflict with cap(REQUIRED)\n");
+        } else if (prGlueInfo->rWpaInfo.ucRSNMfpCap == RSN_AUTH_MFP_REQUIRED) {
+            DBGLOG(REQ, ERROR, "param(DISABLED) conflict with cap(REQUIRED)\n");
         }
         break;
 
@@ -1518,18 +1446,16 @@ int mtk_cfg80211_connect(struct wiphy *wiphy, struct net_device *ndev,
                   .dot11RSNAConfigAuthenticationSuitesTable[i];
 
         if (prEntry->dot11RSNAConfigAuthenticationSuite == u4AkmSuite) {
-            prEntry->dot11RSNAConfigAuthenticationSuiteEnabled =
-                true;
+            prEntry->dot11RSNAConfigAuthenticationSuiteEnabled = true;
         } else {
-            prEntry->dot11RSNAConfigAuthenticationSuiteEnabled =
-                false;
+            prEntry->dot11RSNAConfigAuthenticationSuiteEnabled = false;
         }
     }
 
     cipher = prGlueInfo->rWpaInfo.u4CipherGroup |
              prGlueInfo->rWpaInfo.u4CipherPairwise;
 
-    if (1  /* prGlueInfo->rWpaInfo.fgPrivacyInvoke */ ) {
+    if (1  /* prGlueInfo->rWpaInfo.fgPrivacyInvoke */) {
 #if CFG_SUPPORT_SUITB
         if (cipher & IW_AUTH_CIPHER_GCMP256) {
             eEncStatus = ENUM_ENCRYPTION4_ENABLED;
@@ -1539,13 +1465,12 @@ int mtk_cfg80211_connect(struct wiphy *wiphy, struct net_device *ndev,
             eEncStatus = ENUM_ENCRYPTION3_ENABLED;
         } else if (cipher & IW_AUTH_CIPHER_TKIP) {
             eEncStatus = ENUM_ENCRYPTION2_ENABLED;
-        } else if (cipher &
-                   (IW_AUTH_CIPHER_WEP104 | IW_AUTH_CIPHER_WEP40)) {
+        } else if (cipher & (IW_AUTH_CIPHER_WEP104 | IW_AUTH_CIPHER_WEP40)) {
             eEncStatus = ENUM_ENCRYPTION1_ENABLED;
         } else if (cipher & IW_AUTH_CIPHER_NONE) {
             if (prGlueInfo->rWpaInfo.fgPrivacyInvoke) {
                 eEncStatus = ENUM_ENCRYPTION1_ENABLED;
-            }else{
+            } else {
                 eEncStatus = ENUM_ENCRYPTION_DISABLED;
             }
         } else {
@@ -1579,16 +1504,13 @@ int mtk_cfg80211_connect(struct wiphy *wiphy, struct net_device *ndev,
 
             return -EINVAL;
         }
-        kalMemCopy(prWepKey->aucKeyMaterial, sme->key,
-                   prWepKey->u4KeyLength);
+        kalMemCopy(prWepKey->aucKeyMaterial, sme->key, prWepKey->u4KeyLength);
 
         rStatus = kalIoctl(prGlueInfo, wlanoidSetAddWep, prWepKey,
-                           prWepKey->u4Length, false, false, true,
-                           &u4BufLen);
+                           prWepKey->u4Length, false, false, true, &u4BufLen);
 
         if (rStatus != WLAN_STATUS_SUCCESS) {
-            DBGLOG(INIT, INFO, "wlanoidSetAddWep fail 0x%lx\n",
-                   rStatus);
+            DBGLOG(INIT, INFO, "wlanoidSetAddWep fail 0x%lx\n", rStatus);
 
             return -EFAULT;
         }
@@ -1599,8 +1521,7 @@ int mtk_cfg80211_connect(struct wiphy *wiphy, struct net_device *ndev,
     rNewSsid.pucSsid = (u8 *)sme->ssid;
     rNewSsid.u4SsidLen = sme->ssid_len;
     rStatus = kalIoctl(prGlueInfo, wlanoidSetConnect, (void *)&rNewSsid,
-                       sizeof(PARAM_CONNECT_T), false, false, true,
-                       &u4BufLen);
+                       sizeof(PARAM_CONNECT_T), false, false, true, &u4BufLen);
 
     if (rStatus != WLAN_STATUS_SUCCESS) {
         DBGLOG(REQ, WARN, "set SSID:%x\n", rStatus);
@@ -1665,8 +1586,7 @@ int mtk_cfg80211_deauth(struct wiphy *wiphy, struct net_device *ndev,
 
     DBGLOG(REQ, STATE, "mtk_cfg80211_deauth\n");
 
-    kalIndicateStatusAndComplete(prGlueInfo, WLAN_STATUS_JOIN_ABORT, NULL,
-                                 0);
+    kalIndicateStatusAndComplete(prGlueInfo, WLAN_STATUS_JOIN_ABORT, NULL, 0);
 
     rStatus = kalIoctl(prGlueInfo, wlanoidSetDisassociate, NULL, 0, false,
                        false, true, &u4BufLen);
@@ -1692,8 +1612,7 @@ int mtk_cfg80211_disassoc(struct wiphy *wiphy, struct net_device *ndev,
 
     DBGLOG(REQ, STATE, "mtk_cfg80211_disassoc.\n");
 
-    kalIndicateStatusAndComplete(prGlueInfo, WLAN_STATUS_JOIN_ABORT, NULL,
-                                 0);
+    kalIndicateStatusAndComplete(prGlueInfo, WLAN_STATUS_JOIN_ABORT, NULL, 0);
 
     rStatus = kalIoctl(prGlueInfo, wlanoidSetDisassociate, NULL, 0, false,
                        false, true, &u4BufLen);
@@ -1732,16 +1651,14 @@ int mtk_cfg80211_join_ibss(struct wiphy *wiphy, struct net_device *ndev,
         u4ChnlFreq = params->chandef.center_freq1;
 
         rStatus = kalIoctl(prGlueInfo, wlanoidSetFrequency, &u4ChnlFreq,
-                           sizeof(u4ChnlFreq), false, false, false,
-                           &u4BufLen);
+                           sizeof(u4ChnlFreq), false, false, false, &u4BufLen);
         if (rStatus != WLAN_STATUS_SUCCESS) {
             return -EFAULT;
         }
     }
 
     /* set SSID */
-    u4SsidLen = (params->ssid_len > PARAM_MAX_LEN_SSID) ?
-                PARAM_MAX_LEN_SSID :
+    u4SsidLen = (params->ssid_len > PARAM_MAX_LEN_SSID) ? PARAM_MAX_LEN_SSID :
                 params->ssid_len;
     kalMemCopy(rNewSsid.aucSsid, params->ssid, u4SsidLen);
     rStatus = kalIoctl(prGlueInfo, wlanoidSetSsid, (void *)&rNewSsid,
@@ -1819,7 +1736,7 @@ int mtk_cfg80211_set_power_mgmt(struct wiphy *wiphy, struct net_device *ndev,
     if (enabled) {
         if (timeout == -1) {
             rPowerMode.ePowerMode = Param_PowerModeFast_PSP;
-        }else{
+        } else {
             rPowerMode.ePowerMode = Param_PowerModeMAX_PSP;
         }
     } else {
@@ -1834,8 +1751,7 @@ int mtk_cfg80211_set_power_mgmt(struct wiphy *wiphy, struct net_device *ndev,
          * 2. Store user's PS mode for restoring when we do not enforce
          * power mode anymore
          */
-        DBGLOG(INIT, STATE, "Store user's PS mode:%d\n",
-               rPowerMode.ePowerMode);
+        DBGLOG(INIT, STATE, "Store user's PS mode:%d\n", rPowerMode.ePowerMode);
         prBssInfo->ePowerModeFromUser = rPowerMode.ePowerMode;
     }
 
@@ -1846,17 +1762,14 @@ int mtk_cfg80211_set_power_mgmt(struct wiphy *wiphy, struct net_device *ndev,
     }
 
     if ((prBssInfo->eBand == BAND_2G4) &&
-        (prGlueInfo->prAdapter->rWifiVar.ucEnforce2G <
-         Param_PowerModeMax)) {
+        (prGlueInfo->prAdapter->rWifiVar.ucEnforce2G < Param_PowerModeMax)) {
         eEnforcePowerMode =
-            (PARAM_POWER_MODE)
-            prGlueInfo->prAdapter->rWifiVar.ucEnforce2G;
+            (PARAM_POWER_MODE)prGlueInfo->prAdapter->rWifiVar.ucEnforce2G;
     } else if ((prBssInfo->eBand == BAND_5G) &&
                (prGlueInfo->prAdapter->rWifiVar.ucEnforce5G <
                 Param_PowerModeMax)) {
         eEnforcePowerMode =
-            (PARAM_POWER_MODE)
-            prGlueInfo->prAdapter->rWifiVar.ucEnforce5G;
+            (PARAM_POWER_MODE)prGlueInfo->prAdapter->rWifiVar.ucEnforce5G;
     }
 
     if (eEnforcePowerMode < Param_PowerModeMax) {
@@ -1864,8 +1777,8 @@ int mtk_cfg80211_set_power_mgmt(struct wiphy *wiphy, struct net_device *ndev,
     }
 
     rStatus = kalIoctl(prGlueInfo, wlanoidSet802dot11PowerSaveProfile,
-                       &rPowerMode, sizeof(PARAM_POWER_MODE_T), false,
-                       false, true, &u4BufLen);
+                       &rPowerMode, sizeof(PARAM_POWER_MODE_T), false, false,
+                       true, &u4BufLen);
 
     if (rStatus != WLAN_STATUS_SUCCESS) {
         DBGLOG(REQ, WARN, "set_power_mgmt error:%lx\n", rStatus);
@@ -1903,12 +1816,11 @@ int mtk_cfg80211_set_power_mgmt(struct wiphy *wiphy, struct net_device *ndev,
         return -EFAULT;
     }
 
-    if (enabled &&
-        ((prGlueInfo->prAdapter->prAisBssInfo->eBand == BAND_5G) ||
-         (!prGlueInfo->prAdapter->rWifiVar.ucEnforceCAM2G))) {
+    if (enabled && ((prGlueInfo->prAdapter->prAisBssInfo->eBand == BAND_5G) ||
+                    (!prGlueInfo->prAdapter->rWifiVar.ucEnforceCAM2G))) {
         if (timeout == -1) {
             rPowerMode.ePowerMode = Param_PowerModeFast_PSP;
-        }else{
+        } else {
             rPowerMode.ePowerMode = Param_PowerModeMAX_PSP;
         }
     } else {
@@ -1940,16 +1852,15 @@ int mtk_cfg80211_set_power_mgmt(struct wiphy *wiphy, struct net_device *ndev,
     }
 
     eEnforcePowerMode =
-        (PARAM_POWER_MODE)
-        prGlueInfo->prAdapter->rWifiVar.ucEnforcePSMode;
+        (PARAM_POWER_MODE)prGlueInfo->prAdapter->rWifiVar.ucEnforcePSMode;
 
     if (eEnforcePowerMode < Param_PowerModeMax) {
         rPowerMode.ePowerMode = eEnforcePowerMode;
     }
 
     rStatus = kalIoctl(prGlueInfo, wlanoidSet802dot11PowerSaveProfile,
-                       &rPowerMode, sizeof(PARAM_POWER_MODE_T), false,
-                       false, true, &u4BufLen);
+                       &rPowerMode, sizeof(PARAM_POWER_MODE_T), false, false,
+                       true, &u4BufLen);
 
     if (rStatus != WLAN_STATUS_SUCCESS) {
         DBGLOG(REQ, WARN, "set_power_mgmt error:%lx\n", rStatus);
@@ -1994,8 +1905,7 @@ int mtk_cfg80211_set_pmksa(struct wiphy *wiphy, struct net_device *ndev,
     kalMemCopy(prPmkid->arBSSIDInfo->arPMKID, pmksa->pmkid, IW_PMKID_LEN);
 
     rStatus = kalIoctl(prGlueInfo, wlanoidSetPmkid, prPmkid,
-                       sizeof(PARAM_PMKID_T), false, false, false,
-                       &u4BufLen);
+                       sizeof(PARAM_PMKID_T), false, false, false, &u4BufLen);
 
     if (rStatus != WLAN_STATUS_SUCCESS) {
         DBGLOG(INIT, INFO, "add pmkid error:%lx\n", rStatus);
@@ -2051,8 +1961,7 @@ int mtk_cfg80211_flush_pmksa(struct wiphy *wiphy, struct net_device *ndev){
     prPmkid->u4BSSIDInfoCount = 0;
 
     rStatus = kalIoctl(prGlueInfo, wlanoidSetPmkid, prPmkid,
-                       sizeof(PARAM_PMKID_T), false, false, false,
-                       &u4BufLen);
+                       sizeof(PARAM_PMKID_T), false, false, false, &u4BufLen);
 
     if (rStatus != WLAN_STATUS_SUCCESS) {
         DBGLOG(INIT, INFO, "flush pmkid error:%lx\n", rStatus);
@@ -2088,12 +1997,9 @@ int mtk_cfg80211_set_rekey_data(struct wiphy *wiphy, struct net_device *dev,
     if (!prGlueInfo->prAdapter->rWifiVar.ucEapolOffload) {
         kalMemZero(prGlueInfo->rWpaInfo.aucKek, NL80211_KEK_LEN);
         kalMemZero(prGlueInfo->rWpaInfo.aucKck, NL80211_KCK_LEN);
-        kalMemZero(prGlueInfo->rWpaInfo.aucReplayCtr,
-                   NL80211_REPLAY_CTR_LEN);
-        kalMemCopy(prGlueInfo->rWpaInfo.aucKek, data->kek,
-                   NL80211_KEK_LEN);
-        kalMemCopy(prGlueInfo->rWpaInfo.aucKck, data->kck,
-                   NL80211_KCK_LEN);
+        kalMemZero(prGlueInfo->rWpaInfo.aucReplayCtr, NL80211_REPLAY_CTR_LEN);
+        kalMemCopy(prGlueInfo->rWpaInfo.aucKek, data->kek, NL80211_KEK_LEN);
+        kalMemCopy(prGlueInfo->rWpaInfo.aucKck, data->kck, NL80211_KCK_LEN);
         kalMemCopy(prGlueInfo->rWpaInfo.aucReplayCtr, data->replay_ctr,
                    NL80211_REPLAY_CTR_LEN);
 
@@ -2130,12 +2036,10 @@ int mtk_cfg80211_set_rekey_data(struct wiphy *wiphy, struct net_device *dev,
 
     if (prGlueInfo->rWpaInfo.u4CipherPairwise == IW_AUTH_CIPHER_TKIP) {
         prGtkData->u4PairwiseCipher = BIT(3);
-    } else if (prGlueInfo->rWpaInfo.u4CipherPairwise ==
-               IW_AUTH_CIPHER_CCMP) {
+    } else if (prGlueInfo->rWpaInfo.u4CipherPairwise == IW_AUTH_CIPHER_CCMP) {
         prGtkData->u4PairwiseCipher = BIT(4);
     } else {
-        kalMemFree(prGtkData, VIR_MEM_TYPE,
-                   sizeof(PARAM_GTK_REKEY_DATA));
+        kalMemFree(prGtkData, VIR_MEM_TYPE, sizeof(PARAM_GTK_REKEY_DATA));
         return WLAN_STATUS_SUCCESS;
     }
 
@@ -2144,8 +2048,7 @@ int mtk_cfg80211_set_rekey_data(struct wiphy *wiphy, struct net_device *dev,
     } else if (prGlueInfo->rWpaInfo.u4CipherGroup == IW_AUTH_CIPHER_CCMP) {
         prGtkData->u4GroupCipher = BIT(4);
     } else {
-        kalMemFree(prGtkData, VIR_MEM_TYPE,
-                   sizeof(PARAM_GTK_REKEY_DATA));
+        kalMemFree(prGtkData, VIR_MEM_TYPE, sizeof(PARAM_GTK_REKEY_DATA));
         return WLAN_STATUS_SUCCESS;
     }
 
@@ -2160,7 +2063,7 @@ int mtk_cfg80211_set_rekey_data(struct wiphy *wiphy, struct net_device *dev,
 
     if (rStatus != WLAN_STATUS_SUCCESS) {
         DBGLOG(INIT, INFO, "set GTK rekey data error:%lx\n", rStatus);
-    }else{
+    } else {
         i4Rslt = 0;
     }
 
@@ -2184,13 +2087,11 @@ void mtk_cfg80211_mgmt_frame_register(IN struct wiphy *wiphy,
             if (reg) {
                 prGlueInfo->u4OsMgmtFrameFilter |=
                     PARAM_PACKET_FILTER_PROBE_REQ;
-                DBGLOG(INIT, TRACE,
-                       "Open packet filer probe request\n");
+                DBGLOG(INIT, TRACE, "Open packet filer probe request\n");
             } else {
                 prGlueInfo->u4OsMgmtFrameFilter &=
                     ~PARAM_PACKET_FILTER_PROBE_REQ;
-                DBGLOG(INIT, TRACE,
-                       "Close packet filer probe request\n");
+                DBGLOG(INIT, TRACE, "Close packet filer probe request\n");
             }
             break;
 
@@ -2198,32 +2099,27 @@ void mtk_cfg80211_mgmt_frame_register(IN struct wiphy *wiphy,
             if (reg) {
                 prGlueInfo->u4OsMgmtFrameFilter |=
                     PARAM_PACKET_FILTER_ACTION_FRAME;
-                DBGLOG(INIT, TRACE,
-                       "Open packet filer action frame.\n");
+                DBGLOG(INIT, TRACE, "Open packet filer action frame.\n");
             } else {
                 prGlueInfo->u4OsMgmtFrameFilter &=
                     ~PARAM_PACKET_FILTER_ACTION_FRAME;
-                DBGLOG(INIT, TRACE,
-                       "Close packet filer action frame.\n");
+                DBGLOG(INIT, TRACE, "Close packet filer action frame.\n");
             }
             break;
 
         default:
-            DBGLOG(INIT, TRACE, "unsupported frame type:%x\n",
-                   frame_type);
+            DBGLOG(INIT, TRACE, "unsupported frame type:%x\n", frame_type);
             break;
         }
 
         if (prGlueInfo->prAdapter != NULL) {
-            set_bit(GLUE_FLAG_FRAME_FILTER_AIS_BIT,
-                    &prGlueInfo->ulFlag);
+            set_bit(GLUE_FLAG_FRAME_FILTER_AIS_BIT, &prGlueInfo->ulFlag);
 
             /* wake up main thread */
             wake_up_interruptible(&prGlueInfo->waitq);
 
             if (in_interrupt()) {
-                DBGLOG(INIT, TRACE,
-                       "It is in interrupt level\n");
+                DBGLOG(INIT, TRACE, "It is in interrupt level\n");
             }
         }
     } while (false);
@@ -2246,8 +2142,7 @@ int mtk_cfg80211_remain_on_channel(struct wiphy *wiphy,
                                    unsigned int duration, u64 *cookie){
     P_GLUE_INFO_T prGlueInfo = NULL;
     s32 i4Rslt = -EINVAL;
-    P_MSG_REMAIN_ON_CHANNEL_T prMsgChnlReq =
-        (P_MSG_REMAIN_ON_CHANNEL_T)NULL;
+    P_MSG_REMAIN_ON_CHANNEL_T prMsgChnlReq = (P_MSG_REMAIN_ON_CHANNEL_T)NULL;
 
     do {
         if ((wiphy == NULL) || (wdev == NULL) || (chan == NULL) ||
@@ -2294,8 +2189,8 @@ int mtk_cfg80211_remain_on_channel(struct wiphy *wiphy,
 
         prMsgChnlReq->eSco = CHNL_EXT_SCN;
 
-        mboxSendMsg(prGlueInfo->prAdapter, MBOX_ID_0,
-                    (P_MSG_HDR_T)prMsgChnlReq, MSG_SEND_METHOD_BUF);
+        mboxSendMsg(prGlueInfo->prAdapter, MBOX_ID_0, (P_MSG_HDR_T)prMsgChnlReq,
+                    MSG_SEND_METHOD_BUF);
 
         i4Rslt = 0;
     } while (false);
@@ -2330,9 +2225,8 @@ int mtk_cfg80211_cancel_remain_on_channel(struct wiphy *wiphy,
         prGlueInfo = (P_GLUE_INFO_T)wiphy_priv(wiphy);
         ASSERT(prGlueInfo);
 
-        prMsgChnlAbort =
-            cnmMemAlloc(prGlueInfo->prAdapter, RAM_TYPE_MSG,
-                        sizeof(MSG_CANCEL_REMAIN_ON_CHANNEL_T));
+        prMsgChnlAbort = cnmMemAlloc(prGlueInfo->prAdapter, RAM_TYPE_MSG,
+                                     sizeof(MSG_CANCEL_REMAIN_ON_CHANNEL_T));
 
         if (prMsgChnlAbort == NULL) {
             ASSERT(false);
@@ -2340,8 +2234,7 @@ int mtk_cfg80211_cancel_remain_on_channel(struct wiphy *wiphy,
             break;
         }
 
-        prMsgChnlAbort->rMsgHdr.eMsgId =
-            MID_MNY_AIS_CANCEL_REMAIN_ON_CHANNEL;
+        prMsgChnlAbort->rMsgHdr.eMsgId = MID_MNY_AIS_CANCEL_REMAIN_ON_CHANNEL;
         prMsgChnlAbort->u8Cookie = cookie;
 
         mboxSendMsg(prGlueInfo->prAdapter, MBOX_ID_0,
@@ -2396,8 +2289,7 @@ int mtk_cfg80211_mgmt_tx(struct wiphy *wiphy, struct wireless_dev *wdev,
         prMsgTxReq->fgIsWaitRsp = true;
 
         prMgmtFrame = cnmMgtPktAlloc(
-            prGlueInfo->prAdapter,
-            (u32)(params->len + MAC_TX_RESERVED_FIELD));
+            prGlueInfo->prAdapter, (u32)(params->len + MAC_TX_RESERVED_FIELD));
         prMsgTxReq->prMgmtMsduInfo = prMgmtFrame;
         if (prMsgTxReq->prMgmtMsduInfo == NULL) {
             ASSERT(false);
@@ -2415,16 +2307,15 @@ int mtk_cfg80211_mgmt_tx(struct wiphy *wiphy, struct wireless_dev *wdev,
 
         prMgmtFrame->u2FrameLength = params->len;
 
-        mboxSendMsg(prGlueInfo->prAdapter, MBOX_ID_0,
-                    (P_MSG_HDR_T)prMsgTxReq, MSG_SEND_METHOD_BUF);
+        mboxSendMsg(prGlueInfo->prAdapter, MBOX_ID_0, (P_MSG_HDR_T)prMsgTxReq,
+                    MSG_SEND_METHOD_BUF);
 
         i4Rslt = 0;
     } while (false);
 
     if ((i4Rslt != 0) && (prMsgTxReq != NULL)) {
         if (prMsgTxReq->prMgmtMsduInfo != NULL) {
-            cnmMgtPktFree(prGlueInfo->prAdapter,
-                          prMsgTxReq->prMgmtMsduInfo);
+            cnmMgtPktFree(prGlueInfo->prAdapter, prMsgTxReq->prMgmtMsduInfo);
         }
 
         cnmMemFree(prGlueInfo->prAdapter, prMsgTxReq);
@@ -2495,8 +2386,7 @@ int mtk_cfg80211_testmode_get_sta_statistics(IN struct wiphy *wiphy,
         wiphy, sizeof(PARAM_GET_STA_STATISTICS) + 1);
 
     if (!skb) {
-        DBGLOG(QM, ERROR, "%s allocate skb failed:%lx\n", __func__,
-               rStatus);
+        DBGLOG(QM, ERROR, "%s allocate skb failed:%lx\n", __func__, rStatus);
         return -ENOMEM;
     }
 
@@ -2505,8 +2395,8 @@ int mtk_cfg80211_testmode_get_sta_statistics(IN struct wiphy *wiphy,
     rQueryStaStatistics.ucReadClear = true;
 
     rStatus = kalIoctl(prGlueInfo, wlanoidQueryStaStatistics,
-                       &rQueryStaStatistics, sizeof(rQueryStaStatistics),
-                       true, false, true, &u4BufLen);
+                       &rQueryStaStatistics, sizeof(rQueryStaStatistics), true,
+                       false, true, &u4BufLen);
 
     /* Calcute Link Score */
     u4TxExceedThresholdCount = rQueryStaStatistics.u4TxExceedThresholdCount;
@@ -2519,8 +2409,8 @@ int mtk_cfg80211_testmode_get_sta_statistics(IN struct wiphy *wiphy,
      * threshold */
     if (u4TxTotalCount) {
         if (u4TxExceedThresholdCount <= u4TxTotalCount) {
-            u4LinkScore = (90 - ((u4TxExceedThresholdCount * 90) /
-                                 u4TxTotalCount));
+            u4LinkScore =
+                (90 - ((u4TxExceedThresholdCount * 90) / u4TxTotalCount));
         } else {
             u4LinkScore = 0;
         }
@@ -2532,8 +2422,7 @@ int mtk_cfg80211_testmode_get_sta_statistics(IN struct wiphy *wiphy,
 
     if (u4LinkScore == 10) {
         if (u4TotalError <= u4TxTotalCount) {
-            u4LinkScore =
-                (10 - ((u4TotalError * 10) / u4TxTotalCount));
+            u4LinkScore = (10 - ((u4TotalError * 10) / u4TxTotalCount));
         } else {
             u4LinkScore = 0;
         }
@@ -2546,8 +2435,7 @@ int mtk_cfg80211_testmode_get_sta_statistics(IN struct wiphy *wiphy,
     {
         u8 __tmp = 0;
 
-        if (unlikely(nla_put(skb,
-                             NL80211_TESTMODE_STA_STATISTICS_INVALID,
+        if (unlikely(nla_put(skb, NL80211_TESTMODE_STA_STATISTICS_INVALID,
                              sizeof(u8), &__tmp) < 0)) {
             goto nla_put_failure;
         }
@@ -2555,27 +2443,25 @@ int mtk_cfg80211_testmode_get_sta_statistics(IN struct wiphy *wiphy,
     {
         u8 __tmp = NL80211_DRIVER_TESTMODE_VERSION;
 
-        if (unlikely(nla_put(skb,
-                             NL80211_TESTMODE_STA_STATISTICS_VERSION,
+        if (unlikely(nla_put(skb, NL80211_TESTMODE_STA_STATISTICS_VERSION,
                              sizeof(u8), &__tmp) < 0)) {
             goto nla_put_failure;
         }
     }
-    if (unlikely(nla_put(skb, NL80211_TESTMODE_STA_STATISTICS_MAC,
-                         MAC_ADDR_LEN, prParams->aucMacAddr) < 0)) {
+    if (unlikely(nla_put(skb, NL80211_TESTMODE_STA_STATISTICS_MAC, MAC_ADDR_LEN,
+                         prParams->aucMacAddr) < 0)) {
         goto nla_put_failure;
     }
     {
         u8 __tmp = u4LinkScore;
 
-        if (unlikely(nla_put(skb,
-                             NL80211_TESTMODE_STA_STATISTICS_LINK_SCORE,
+        if (unlikely(nla_put(skb, NL80211_TESTMODE_STA_STATISTICS_LINK_SCORE,
                              sizeof(u8), &__tmp) < 0)) {
             goto nla_put_failure;
         }
     }
-    if (unlikely(nla_put(skb, NL80211_TESTMODE_STA_STATISTICS_MAC,
-                         MAC_ADDR_LEN, prParams->aucMacAddr) < 0)) {
+    if (unlikely(nla_put(skb, NL80211_TESTMODE_STA_STATISTICS_MAC, MAC_ADDR_LEN,
+                         prParams->aucMacAddr) < 0)) {
         goto nla_put_failure;
     }
     {
@@ -2607,8 +2493,7 @@ int mtk_cfg80211_testmode_get_sta_statistics(IN struct wiphy *wiphy,
     {
         u32 __tmp = rQueryStaStatistics.u4PhyMode;
 
-        if (unlikely(nla_put(skb,
-                             NL80211_TESTMODE_STA_STATISTICS_PHY_MODE,
+        if (unlikely(nla_put(skb, NL80211_TESTMODE_STA_STATISTICS_PHY_MODE,
                              sizeof(u32), &__tmp) < 0)) {
             goto nla_put_failure;
         }
@@ -2616,8 +2501,7 @@ int mtk_cfg80211_testmode_get_sta_statistics(IN struct wiphy *wiphy,
     {
         u16 __tmp = rQueryStaStatistics.u2LinkSpeed;
 
-        if (unlikely(nla_put(skb,
-                             NL80211_TESTMODE_STA_STATISTICS_TX_RATE,
+        if (unlikely(nla_put(skb, NL80211_TESTMODE_STA_STATISTICS_TX_RATE,
                              sizeof(u16), &__tmp) < 0)) {
             goto nla_put_failure;
         }
@@ -2625,8 +2509,7 @@ int mtk_cfg80211_testmode_get_sta_statistics(IN struct wiphy *wiphy,
     {
         u32 __tmp = rQueryStaStatistics.u4TxFailCount;
 
-        if (unlikely(nla_put(skb,
-                             NL80211_TESTMODE_STA_STATISTICS_FAIL_CNT,
+        if (unlikely(nla_put(skb, NL80211_TESTMODE_STA_STATISTICS_FAIL_CNT,
                              sizeof(u32), &__tmp) < 0)) {
             goto nla_put_failure;
         }
@@ -2634,21 +2517,16 @@ int mtk_cfg80211_testmode_get_sta_statistics(IN struct wiphy *wiphy,
     {
         u32 __tmp = rQueryStaStatistics.u4TxLifeTimeoutCount;
 
-        if (unlikely(
-                nla_put(skb,
-                        NL80211_TESTMODE_STA_STATISTICS_TIMEOUT_CNT,
-                        sizeof(u32), &__tmp) < 0)) {
+        if (unlikely(nla_put(skb, NL80211_TESTMODE_STA_STATISTICS_TIMEOUT_CNT,
+                             sizeof(u32), &__tmp) < 0)) {
             goto nla_put_failure;
         }
     }
     {
         u32 __tmp = rQueryStaStatistics.u4TxAverageAirTime;
 
-        if (unlikely(
-                nla_put(skb,
-                        NL80211_TESTMODE_STA_STATISTICS_AVG_AIR_TIME,
-                        sizeof(u32),
-                        &__tmp) < 0)) {
+        if (unlikely(nla_put(skb, NL80211_TESTMODE_STA_STATISTICS_AVG_AIR_TIME,
+                             sizeof(u32), &__tmp) < 0)) {
             goto nla_put_failure;
         }
     }
@@ -2657,8 +2535,7 @@ int mtk_cfg80211_testmode_get_sta_statistics(IN struct wiphy *wiphy,
     {
         u32 __tmp = rQueryStaStatistics.u4TxTotalCount;
 
-        if (unlikely(nla_put(skb,
-                             NL80211_TESTMODE_STA_STATISTICS_TOTAL_CNT,
+        if (unlikely(nla_put(skb, NL80211_TESTMODE_STA_STATISTICS_TOTAL_CNT,
                              sizeof(u32), &__tmp) < 0)) {
             goto nla_put_failure;
         }
@@ -2666,63 +2543,53 @@ int mtk_cfg80211_testmode_get_sta_statistics(IN struct wiphy *wiphy,
     {
         u32 __tmp = rQueryStaStatistics.u4TxExceedThresholdCount;
 
-        if (unlikely(
-                nla_put(skb,
-                        NL80211_TESTMODE_STA_STATISTICS_THRESHOLD_CNT,
-                        sizeof(u32),
-                        &__tmp) < 0)) {
+        if (unlikely(nla_put(skb, NL80211_TESTMODE_STA_STATISTICS_THRESHOLD_CNT,
+                             sizeof(u32), &__tmp) < 0)) {
             goto nla_put_failure;
         }
     }
     {
         u32 __tmp = rQueryStaStatistics.u4TxAverageProcessTime;
 
-        if (unlikely(
-                nla_put(skb,
-                        NL80211_TESTMODE_STA_STATISTICS_AVG_PROCESS_TIME,
-                        sizeof(u32),
-                        &__tmp) < 0)) {
+        if (unlikely(nla_put(skb,
+                             NL80211_TESTMODE_STA_STATISTICS_AVG_PROCESS_TIME,
+                             sizeof(u32), &__tmp) < 0)) {
             goto nla_put_failure;
         }
     }
 
     /* Network counter */
-    if (unlikely(
-            nla_put(skb,
-                    NL80211_TESTMODE_STA_STATISTICS_TC_EMPTY_CNT_ARRAY,
-                    sizeof(rQueryStaStatistics.au4TcResourceEmptyCount),
-                    rQueryStaStatistics.au4TcResourceEmptyCount) < 0)) {
+    if (unlikely(nla_put(skb,
+                         NL80211_TESTMODE_STA_STATISTICS_TC_EMPTY_CNT_ARRAY,
+                         sizeof(rQueryStaStatistics.au4TcResourceEmptyCount),
+                         rQueryStaStatistics.au4TcResourceEmptyCount) < 0)) {
         goto nla_put_failure;
     }
 
     /* Sta queue length */
-    if (unlikely(nla_put(skb,
-                         NL80211_TESTMODE_STA_STATISTICS_TC_QUE_LEN_ARRAY,
+    if (unlikely(nla_put(skb, NL80211_TESTMODE_STA_STATISTICS_TC_QUE_LEN_ARRAY,
                          sizeof(rQueryStaStatistics.au4TcQueLen),
                          rQueryStaStatistics.au4TcQueLen) < 0)) {
         goto nla_put_failure;
     }
 
     /* Global QM counter */
-    if (unlikely(
-            nla_put(skb,
-                    NL80211_TESTMODE_STA_STATISTICS_TC_AVG_QUE_LEN_ARRAY,
-                    sizeof(rQueryStaStatistics.au4TcAverageQueLen),
-                    rQueryStaStatistics.au4TcAverageQueLen) < 0)) {
+    if (unlikely(nla_put(skb,
+                         NL80211_TESTMODE_STA_STATISTICS_TC_AVG_QUE_LEN_ARRAY,
+                         sizeof(rQueryStaStatistics.au4TcAverageQueLen),
+                         rQueryStaStatistics.au4TcAverageQueLen) < 0)) {
         goto nla_put_failure;
     }
 
-    if (unlikely(
-            nla_put(skb,
-                    NL80211_TESTMODE_STA_STATISTICS_TC_CUR_QUE_LEN_ARRAY,
-                    sizeof(rQueryStaStatistics.au4TcCurrentQueLen),
-                    rQueryStaStatistics.au4TcCurrentQueLen) < 0)) {
+    if (unlikely(nla_put(skb,
+                         NL80211_TESTMODE_STA_STATISTICS_TC_CUR_QUE_LEN_ARRAY,
+                         sizeof(rQueryStaStatistics.au4TcCurrentQueLen),
+                         rQueryStaStatistics.au4TcCurrentQueLen) < 0)) {
         goto nla_put_failure;
     }
 
     /* Reserved field */
-    if (unlikely(nla_put(skb,
-                         NL80211_TESTMODE_STA_STATISTICS_RESERVED_ARRAY,
+    if (unlikely(nla_put(skb, NL80211_TESTMODE_STA_STATISTICS_RESERVED_ARRAY,
                          sizeof(rQueryStaStatistics.au4Reserved),
                          rQueryStaStatistics.au4Reserved) < 0)) {
         goto nla_put_failure;
@@ -2761,11 +2628,10 @@ int mtk_cfg80211_testmode_sw_cmd(IN struct wiphy *wiphy, IN void *data,
 
     if (prParams) {
         if (prParams->set == 1) {
-            rstatus = kalIoctl(
-                prGlueInfo,
-                (PFN_OID_HANDLER_FUNC)wlanoidSetSwCtrlWrite,
-                &prParams->adr, (u32)8, false, false, true,
-                &u4SetInfoLen);
+            rstatus = kalIoctl(prGlueInfo,
+                               (PFN_OID_HANDLER_FUNC)wlanoidSetSwCtrlWrite,
+                               &prParams->adr, (u32)8, false, false, true,
+                               &u4SetInfoLen);
         }
     }
 
@@ -2810,14 +2676,13 @@ static int mtk_wlan_cfg_testmode_cmd(struct wiphy *wiphy, void *data, int len){
         break;
 
     case 0x10:
-        i4Status = mtk_cfg80211_testmode_get_sta_statistics(
-            wiphy, data, len, prGlueInfo);
+        i4Status = mtk_cfg80211_testmode_get_sta_statistics(wiphy, data, len,
+                                                            prGlueInfo);
         break;
 
     case TESTMODE_CMD_ID_STR_CMD:
         i4Status = mtk_cfg80211_process_str_cmd(
-            prGlueInfo, (u8 *)(prParams + 1),
-            len - sizeof(*prParams));
+            prGlueInfo, (u8 *)(prParams + 1), len - sizeof(*prParams));
         break;
 
     default:
@@ -2826,8 +2691,8 @@ static int mtk_wlan_cfg_testmode_cmd(struct wiphy *wiphy, void *data, int len){
     }
 
     if (i4Status != 0) {
-        DBGLOG(REQ, TRACE, "prParams->index=%d, status=%d\n",
-               prParams->index, i4Status);
+        DBGLOG(REQ, TRACE, "prParams->index=%d, status=%d\n", prParams->index,
+               i4Status);
     }
 
     return i4Status;
@@ -2855,15 +2720,15 @@ int mtk_cfg80211_sched_scan_start(IN struct wiphy *wiphy,
     /* check if there is any pending scan/sched_scan not yet finished */
     if (prGlueInfo->prScanRequest != NULL ||
         prGlueInfo->prSchedScanRequest != NULL) {
-        DBGLOG(SCN,
-               INFO,
-               "(prGlueInfo->prScanRequest != NULL || prGlueInfo->prSchedScanRequest != NULL)\n");
+        DBGLOG(SCN, INFO,
+               "(prGlueInfo->prScanRequest != NULL || "
+               "prGlueInfo->prSchedScanRequest != NULL)\n");
         return -EBUSY;
     } else if (request == NULL ||
                request->n_match_sets > CFG_SCAN_SSID_MATCH_MAX_NUM) {
-        DBGLOG(SCN,
-               INFO,
-               "(request == NULL || request->n_match_sets > CFG_SCAN_SSID_MATCH_MAX_NUM)\n");
+        DBGLOG(SCN, INFO,
+               "(request == NULL || request->n_match_sets > "
+               "CFG_SCAN_SSID_MATCH_MAX_NUM)\n");
         /* invalid scheduled scan request */
         return -EINVAL;
     } else if (!request->n_ssids || !request->n_match_sets) {
@@ -2874,15 +2739,14 @@ int mtk_cfg80211_sched_scan_start(IN struct wiphy *wiphy,
     prSchedScanRequest = (P_PARAM_SCHED_SCAN_REQUEST)kalMemAlloc(
         sizeof(PARAM_SCHED_SCAN_REQUEST), VIR_MEM_TYPE);
     if (prSchedScanRequest == NULL) {
-        DBGLOG(SCN, INFO,
-               "(prSchedScanRequest == NULL) kalMemAlloc fail\n");
+        DBGLOG(SCN, INFO, "(prSchedScanRequest == NULL) kalMemAlloc fail\n");
         return -ENOMEM;
     }
 
     prSchedScanRequest->u4SsidNum = request->n_match_sets;
     for (i = 0; i < request->n_match_sets; i++) {
         if (request->match_sets ==
-            NULL  /* || &(request->match_sets[i]) == NULL >> this comparation are always false(?) */ )
+            NULL  /* || &(request->match_sets[i]) == NULL >> this comparation are always false(?) */)
         {
             prSchedScanRequest->arSsid[i].u4SsidLen = 0;
         } else {
@@ -2898,12 +2762,11 @@ int mtk_cfg80211_sched_scan_start(IN struct wiphy *wiphy,
         prSchedScanRequest->pucIE = (u8 *)(request->ie);
     }
 
-    prSchedScanRequest->u2ScanInterval =
-        (u16)(request->scan_plans->interval);
+    prSchedScanRequest->u2ScanInterval = (u16)(request->scan_plans->interval);
 
-    rStatus = kalIoctl(prGlueInfo, wlanoidSetStartSchedScan,
-                       prSchedScanRequest, sizeof(PARAM_SCHED_SCAN_REQUEST),
-                       false, false, true, &u4BufLen);
+    rStatus = kalIoctl(prGlueInfo, wlanoidSetStartSchedScan, prSchedScanRequest,
+                       sizeof(PARAM_SCHED_SCAN_REQUEST), false, false, true,
+                       &u4BufLen);
 
     kalMemFree(prSchedScanRequest, VIR_MEM_TYPE,
                sizeof(PARAM_SCHED_SCAN_REQUEST));
@@ -2976,11 +2839,8 @@ int mtk_cfg80211_assoc(struct wiphy *wiphy, struct net_device *ndev,
     ASSERT(prGlueInfo);
 
     kalMemZero(arBssid, MAC_ADDR_LEN);
-    wlanQueryInformation(prGlueInfo->prAdapter,
-                         wlanoidQueryBssid,
-                         &arBssid[0],
-                         sizeof(arBssid),
-                         &u4BufLen);
+    wlanQueryInformation(prGlueInfo->prAdapter, wlanoidQueryBssid, &arBssid[0],
+                         sizeof(arBssid), &u4BufLen);
 
     prConnSettings = &prGlueInfo->prAdapter->rWifiVar.rConnSettings;
 
@@ -2992,8 +2852,7 @@ int mtk_cfg80211_assoc(struct wiphy *wiphy, struct net_device *ndev,
      * while already associating must be rejected.
      */
     if (prConnSettings->bss) {
-        DBGLOG(REQ, WARN,
-               "Still referencing to another cfg80211_bss.\n");
+        DBGLOG(REQ, WARN, "Still referencing to another cfg80211_bss.\n");
         DBGLOG(REQ, WARN,
                "Previous auth/assoc handshake not terminate correctly\n");
         return -ENOENT;
@@ -3006,8 +2865,7 @@ int mtk_cfg80211_assoc(struct wiphy *wiphy, struct net_device *ndev,
            prGlueInfo->eParamMediaStateIndicated);
 
     kalMemZero(arBssid, MAC_ADDR_LEN);
-    if (prGlueInfo->eParamMediaStateIndicated ==
-        PARAM_MEDIA_STATE_CONNECTED) {
+    if (prGlueInfo->eParamMediaStateIndicated == PARAM_MEDIA_STATE_CONNECTED) {
         wlanQueryInformation(prGlueInfo->prAdapter, wlanoidQueryBssid,
                              &arBssid[0], sizeof(arBssid), &u4BufLen);
 
@@ -3040,8 +2898,7 @@ int mtk_cfg80211_assoc(struct wiphy *wiphy, struct net_device *ndev,
     } else if (req->crypto.wpa_versions & NL80211_WPA_VERSION_2) {
         prGlueInfo->rWpaInfo.u4WpaVersion = IW_AUTH_WPA_VERSION_WPA2;
     } else {
-        prGlueInfo->rWpaInfo.u4WpaVersion =
-            IW_AUTH_WPA_VERSION_DISABLED;
+        prGlueInfo->rWpaInfo.u4WpaVersion = IW_AUTH_WPA_VERSION_DISABLED;
     }
     DBGLOG(REQ, INFO, "wpa ver=%d\n", prGlueInfo->rWpaInfo.u4WpaVersion);
 
@@ -3051,42 +2908,34 @@ int mtk_cfg80211_assoc(struct wiphy *wiphy, struct net_device *ndev,
                req->crypto.ciphers_pairwise[0]);
 
         prGlueInfo->prAdapter->rWifiVar.rConnSettings.rRsnInfo
-        .au4PairwiseKeyCipherSuite[0] =
-            req->crypto.ciphers_pairwise[0];
+        .au4PairwiseKeyCipherSuite[0] = req->crypto.ciphers_pairwise[0];
         switch (req->crypto.ciphers_pairwise[0]) {
         case WLAN_CIPHER_SUITE_WEP40:
-            prGlueInfo->rWpaInfo.u4CipherPairwise =
-                IW_AUTH_CIPHER_WEP40;
+            prGlueInfo->rWpaInfo.u4CipherPairwise = IW_AUTH_CIPHER_WEP40;
             break;
 
         case WLAN_CIPHER_SUITE_WEP104:
-            prGlueInfo->rWpaInfo.u4CipherPairwise =
-                IW_AUTH_CIPHER_WEP104;
+            prGlueInfo->rWpaInfo.u4CipherPairwise = IW_AUTH_CIPHER_WEP104;
             break;
 
         case WLAN_CIPHER_SUITE_TKIP:
-            prGlueInfo->rWpaInfo.u4CipherPairwise =
-                IW_AUTH_CIPHER_TKIP;
+            prGlueInfo->rWpaInfo.u4CipherPairwise = IW_AUTH_CIPHER_TKIP;
             break;
 
         case WLAN_CIPHER_SUITE_CCMP:
-            prGlueInfo->rWpaInfo.u4CipherPairwise =
-                IW_AUTH_CIPHER_CCMP;
+            prGlueInfo->rWpaInfo.u4CipherPairwise = IW_AUTH_CIPHER_CCMP;
             break;
 
         case WLAN_CIPHER_SUITE_AES_CMAC:
-            prGlueInfo->rWpaInfo.u4CipherPairwise =
-                IW_AUTH_CIPHER_CCMP;
+            prGlueInfo->rWpaInfo.u4CipherPairwise = IW_AUTH_CIPHER_CCMP;
             break;
 
         case WLAN_CIPHER_SUITE_BIP_GMAC_256:
-            prGlueInfo->rWpaInfo.u4CipherPairwise =
-                IW_AUTH_CIPHER_GCMP256;
+            prGlueInfo->rWpaInfo.u4CipherPairwise = IW_AUTH_CIPHER_GCMP256;
             break;
 
         case WLAN_CIPHER_SUITE_GCMP_256:
-            prGlueInfo->rWpaInfo.u4CipherPairwise =
-                IW_AUTH_CIPHER_GCMP256;
+            prGlueInfo->rWpaInfo.u4CipherPairwise = IW_AUTH_CIPHER_GCMP256;
             break;
 
         default:
@@ -3104,38 +2953,31 @@ int mtk_cfg80211_assoc(struct wiphy *wiphy, struct net_device *ndev,
         .u4GroupKeyCipherSuite = req->crypto.cipher_group;
         switch (req->crypto.cipher_group) {
         case WLAN_CIPHER_SUITE_WEP40:
-            prGlueInfo->rWpaInfo.u4CipherGroup =
-                IW_AUTH_CIPHER_WEP40;
+            prGlueInfo->rWpaInfo.u4CipherGroup = IW_AUTH_CIPHER_WEP40;
             break;
 
         case WLAN_CIPHER_SUITE_WEP104:
-            prGlueInfo->rWpaInfo.u4CipherGroup =
-                IW_AUTH_CIPHER_WEP104;
+            prGlueInfo->rWpaInfo.u4CipherGroup = IW_AUTH_CIPHER_WEP104;
             break;
 
         case WLAN_CIPHER_SUITE_TKIP:
-            prGlueInfo->rWpaInfo.u4CipherGroup =
-                IW_AUTH_CIPHER_TKIP;
+            prGlueInfo->rWpaInfo.u4CipherGroup = IW_AUTH_CIPHER_TKIP;
             break;
 
         case WLAN_CIPHER_SUITE_CCMP:
-            prGlueInfo->rWpaInfo.u4CipherGroup =
-                IW_AUTH_CIPHER_CCMP;
+            prGlueInfo->rWpaInfo.u4CipherGroup = IW_AUTH_CIPHER_CCMP;
             break;
 
         case WLAN_CIPHER_SUITE_AES_CMAC:
-            prGlueInfo->rWpaInfo.u4CipherGroup =
-                IW_AUTH_CIPHER_CCMP;
+            prGlueInfo->rWpaInfo.u4CipherGroup = IW_AUTH_CIPHER_CCMP;
             break;
 
         case WLAN_CIPHER_SUITE_BIP_GMAC_256:
-            prGlueInfo->rWpaInfo.u4CipherGroup =
-                IW_AUTH_CIPHER_GCMP256;
+            prGlueInfo->rWpaInfo.u4CipherGroup = IW_AUTH_CIPHER_GCMP256;
             break;
 
         case WLAN_CIPHER_SUITE_GCMP_256:
-            prGlueInfo->rWpaInfo.u4CipherGroup =
-                IW_AUTH_CIPHER_GCMP256;
+            prGlueInfo->rWpaInfo.u4CipherGroup = IW_AUTH_CIPHER_GCMP256;
             break;
 
         case WLAN_CIPHER_SUITE_NO_GROUP_ADDR:
@@ -3151,7 +2993,7 @@ int mtk_cfg80211_assoc(struct wiphy *wiphy, struct net_device *ndev,
     /* 5. Fill encryption status */
     cipher = prGlueInfo->rWpaInfo.u4CipherGroup |
              prGlueInfo->rWpaInfo.u4CipherPairwise;
-    if (1  /* prGlueInfo->rWpaInfo.fgPrivacyInvoke */ ) {
+    if (1  /* prGlueInfo->rWpaInfo.fgPrivacyInvoke */) {
         if (cipher & IW_AUTH_CIPHER_CCMP) {
             eEncStatus = ENUM_ENCRYPTION3_ENABLED;
 #if CFG_SUPPORT_SUITB
@@ -3160,13 +3002,12 @@ int mtk_cfg80211_assoc(struct wiphy *wiphy, struct net_device *ndev,
 #endif
         } else if (cipher & IW_AUTH_CIPHER_TKIP) {
             eEncStatus = ENUM_ENCRYPTION2_ENABLED;
-        } else if (cipher &
-                   (IW_AUTH_CIPHER_WEP104 | IW_AUTH_CIPHER_WEP40)) {
+        } else if (cipher & (IW_AUTH_CIPHER_WEP104 | IW_AUTH_CIPHER_WEP40)) {
             eEncStatus = ENUM_ENCRYPTION1_ENABLED;
         } else if (cipher & IW_AUTH_CIPHER_NONE) {
             if (prGlueInfo->rWpaInfo.fgPrivacyInvoke) {
                 eEncStatus = ENUM_ENCRYPTION1_ENABLED;
-            }else{
+            } else {
                 eEncStatus = ENUM_ENCRYPTION_DISABLED;
             }
         } else {
@@ -3197,8 +3038,7 @@ int mtk_cfg80211_assoc(struct wiphy *wiphy, struct net_device *ndev,
         .au4AuthKeyMgtSuite[0] = req->crypto.akm_suites[0];
         DBGLOG(REQ, INFO, "Akm Suite:%d\n", req->crypto.akm_suites[0]);
 
-        if (prGlueInfo->rWpaInfo.u4WpaVersion ==
-            IW_AUTH_WPA_VERSION_WPA) {
+        if (prGlueInfo->rWpaInfo.u4WpaVersion == IW_AUTH_WPA_VERSION_WPA) {
             switch (req->crypto.akm_suites[0]) {
             case WLAN_AKM_SUITE_8021X:
                 eAuthMode = AUTH_MODE_WPA;
@@ -3274,10 +3114,10 @@ int mtk_cfg80211_assoc(struct wiphy *wiphy, struct net_device *ndev,
         }
     }
     if (prGlueInfo->rWpaInfo.u4WpaVersion == IW_AUTH_WPA_VERSION_DISABLED) {
-        eAuthMode = (prGlueInfo->rWpaInfo.u4AuthAlg ==
-                     IW_AUTH_ALG_OPEN_SYSTEM) ?
-                    AUTH_MODE_OPEN :
-                    AUTH_MODE_AUTO_SWITCH;
+        eAuthMode =
+            (prGlueInfo->rWpaInfo.u4AuthAlg == IW_AUTH_ALG_OPEN_SYSTEM) ?
+            AUTH_MODE_OPEN :
+            AUTH_MODE_AUTO_SWITCH;
     }
 
     DBGLOG(REQ, STATE, "set auth mode:%d, akm suite:0x%x\n", eAuthMode,
@@ -3296,13 +3136,10 @@ int mtk_cfg80211_assoc(struct wiphy *wiphy, struct net_device *ndev,
                   .dot11RSNAConfigAuthenticationSuitesTable[i];
 
         if (prEntry->dot11RSNAConfigAuthenticationSuite == u4AkmSuite) {
-            prEntry->dot11RSNAConfigAuthenticationSuiteEnabled =
-                true;
-            DBGLOG(REQ, INFO, "match AuthenticationSuite = 0x%x",
-                   u4AkmSuite);
+            prEntry->dot11RSNAConfigAuthenticationSuiteEnabled = true;
+            DBGLOG(REQ, INFO, "match AuthenticationSuite = 0x%x", u4AkmSuite);
         } else {
-            prEntry->dot11RSNAConfigAuthenticationSuiteEnabled =
-                false;
+            prEntry->dot11RSNAConfigAuthenticationSuiteEnabled = false;
         }
     }
 
@@ -3315,12 +3152,11 @@ int mtk_cfg80211_assoc(struct wiphy *wiphy, struct net_device *ndev,
                                  (u8 **)&prDesiredIE)) {
             prGlueInfo->fgWpsActive = true;
             fgCarryWPSIE = true;
-            rStatus = kalIoctl(prGlueInfo, wlanoidSetWSCAssocInfo,
-                               prDesiredIE, IE_SIZE(prDesiredIE),
-                               false, false, false, &u4BufLen);
+            rStatus = kalIoctl(prGlueInfo, wlanoidSetWSCAssocInfo, prDesiredIE,
+                               IE_SIZE(prDesiredIE), false, false, false,
+                               &u4BufLen);
             if (rStatus != WLAN_STATUS_SUCCESS) {
-                DBGLOG(SEC, WARN,
-                       "[WSC] set WSC assoc info error:%x\n",
+                DBGLOG(SEC, WARN, "[WSC] set WSC assoc info error:%x\n",
                        rStatus);
             }
         }
@@ -3328,38 +3164,28 @@ int mtk_cfg80211_assoc(struct wiphy *wiphy, struct net_device *ndev,
         if (wextSrchDesiredWPAIE(pucIEStart, req->ie_len, 0x30,
                                  (u8 **)&prDesiredIE)) {
             if (rsnParseRsnIE(prGlueInfo->prAdapter,
-                              (P_RSN_INFO_ELEM_T)prDesiredIE,
-                              &rRsnInfo)) {
+                              (P_RSN_INFO_ELEM_T)prDesiredIE, &rRsnInfo)) {
                 /* Fill RSNE MFP Cap */
                 if (rRsnInfo.u2RsnCap & ELEM_WPA_CAP_MFPC) {
                     prGlueInfo->rWpaInfo.u4CipherGroupMgmt =
-                        rRsnInfo.
-                        u4GroupMgmtKeyCipherSuite;
-                    prGlueInfo->rWpaInfo.ucRSNMfpCap =
-                        RSN_AUTH_MFP_OPTIONAL;
-                    if (rRsnInfo.u2RsnCap &
-                        ELEM_WPA_CAP_MFPR) {
-                        prGlueInfo->rWpaInfo
-                        .ucRSNMfpCap =
+                        rRsnInfo.u4GroupMgmtKeyCipherSuite;
+                    prGlueInfo->rWpaInfo.ucRSNMfpCap = RSN_AUTH_MFP_OPTIONAL;
+                    if (rRsnInfo.u2RsnCap & ELEM_WPA_CAP_MFPR) {
+                        prGlueInfo->rWpaInfo.ucRSNMfpCap =
                             RSN_AUTH_MFP_REQUIRED;
                     }
                 } else {
-                    prGlueInfo->rWpaInfo.ucRSNMfpCap =
-                        RSN_AUTH_MFP_DISABLED;
+                    prGlueInfo->rWpaInfo.ucRSNMfpCap = RSN_AUTH_MFP_DISABLED;
                 }
 
-                prGlueInfo->rWpaInfo.ucRsneLen =
-                    rRsnInfo.ucRsneLen;
+                prGlueInfo->rWpaInfo.ucRsneLen = rRsnInfo.ucRsneLen;
 
                 /* Fill RSNE PMKID Count and List */
-                prConnSettings->rRsnInfo.u2PmkidCnt =
-                    rRsnInfo.u2PmkidCnt;
+                prConnSettings->rRsnInfo.u2PmkidCnt = rRsnInfo.u2PmkidCnt;
                 if (rRsnInfo.u2PmkidCnt > 0) {
-                    kalMemCopy(prConnSettings->rRsnInfo
-                               .aucPmkidList,
+                    kalMemCopy(prConnSettings->rRsnInfo.aucPmkidList,
                                rRsnInfo.aucPmkidList,
-                               (rRsnInfo.u2PmkidCnt *
-                                RSN_PMKID_LEN));
+                               (rRsnInfo.u2PmkidCnt * RSN_PMKID_LEN));
                 }
             }
         }
@@ -3369,19 +3195,16 @@ int mtk_cfg80211_assoc(struct wiphy *wiphy, struct net_device *ndev,
                                  (u8 **)&prDesiredIE)) {
             u8 ucLength = (*(prDesiredIE + 1) + 2);
 
-            kalMemCopy(&prGlueInfo->prAdapter->rWifiVar
-                       .rConnSettings.rOweInfo,
+            kalMemCopy(&prGlueInfo->prAdapter->rWifiVar.rConnSettings.rOweInfo,
                        prDesiredIE, ucLength);
 
-            DBGLOG(REQ, INFO, "DUMP OWE INFO, EID %x length %x\n",
-                   *prDesiredIE, ucLength);
+            DBGLOG(REQ, INFO, "DUMP OWE INFO, EID %x length %x\n", *prDesiredIE,
+                   ucLength);
             DBGLOG_MEM8(REQ, INFO,
-                        &prGlueInfo->prAdapter->rWifiVar
-                        .rConnSettings.rOweInfo,
+                        &prGlueInfo->prAdapter->rWifiVar.rConnSettings.rOweInfo,
                         ucLength);
         } else {
-            kalMemSet(&prGlueInfo->prAdapter->rWifiVar.rConnSettings
-                      .rOweInfo,
+            kalMemSet(&prGlueInfo->prAdapter->rWifiVar.rConnSettings.rOweInfo,
                       0, sizeof(struct OWE_INFO_T));
         }
 
@@ -3391,23 +3214,19 @@ int mtk_cfg80211_assoc(struct wiphy *wiphy, struct net_device *ndev,
             u16 u2Length = (*(prDesiredIE + 1) + 2);
 
             if (u2Length <= sizeof(prConnSettings->rRsnXE)) {
-                kalMemCopy(&prConnSettings->rRsnXE, prDesiredIE,
-                           u2Length);
+                kalMemCopy(&prConnSettings->rRsnXE, prDesiredIE, u2Length);
                 fgCarryRsnxe = true;
 
-                DBGLOG(REQ, INFO,
-                       "DUMP RSNXE, EID %x length %x\n",
+                DBGLOG(REQ, INFO, "DUMP RSNXE, EID %x length %x\n",
                        *prDesiredIE, u2Length);
-                DBGLOG_MEM8(REQ, INFO, &prConnSettings->rRsnXE,
-                            u2Length);
+                DBGLOG_MEM8(REQ, INFO, &prConnSettings->rRsnXE, u2Length);
             } else {
                 DBGLOG(RSN, ERROR, "RSNXE length exceeds 2\n");
             }
         }
 
         if (fgCarryRsnxe == false) {
-            kalMemSet(&prConnSettings->rRsnXE, 0,
-                      sizeof(struct RSNXE));
+            kalMemSet(&prConnSettings->rRsnXE, 0, sizeof(struct RSNXE));
         }
 
         /* clear WSC Assoc IE buffer in case WPS IE is not detected */
@@ -3432,21 +3251,17 @@ int mtk_cfg80211_assoc(struct wiphy *wiphy, struct net_device *ndev,
          */
         if (prGlueInfo->rWpaInfo.ucRSNMfpCap == RSN_AUTH_MFP_OPTIONAL) {
             prGlueInfo->rWpaInfo.u4Mfp = IW_AUTH_MFP_OPTIONAL;
-        } else if (prGlueInfo->rWpaInfo.ucRSNMfpCap ==
-                   RSN_AUTH_MFP_REQUIRED) {
-            DBGLOG(REQ,
-                   WARN,
+        } else if (prGlueInfo->rWpaInfo.ucRSNMfpCap == RSN_AUTH_MFP_REQUIRED) {
+            DBGLOG(REQ, WARN,
                    "mfp parameter(DISABLED) conflict with mfp cap(REQUIRED)\n");
         }
     }
 
     prConnSettings->fgIsSendAssoc = true;
     if (!prConnSettings->fgIsConnInitialized) {
-        DBGLOG(REQ, WARN,
-               "Send assoc without connection initialized first\n");
-        rStatus = kalIoctl(prGlueInfo, wlanoidSetBssid,
-                           (void *)req->bss->bssid, MAC_ADDR_LEN, false,
-                           false, true, &u4BufLen);
+        DBGLOG(REQ, WARN, "Send assoc without connection initialized first\n");
+        rStatus = kalIoctl(prGlueInfo, wlanoidSetBssid, (void *)req->bss->bssid,
+                           MAC_ADDR_LEN, false, false, true, &u4BufLen);
 
         if (rStatus != WLAN_STATUS_SUCCESS) {
             DBGLOG(REQ, WARN, "set BSSID:%x\n", rStatus);
@@ -3455,15 +3270,13 @@ int mtk_cfg80211_assoc(struct wiphy *wiphy, struct net_device *ndev,
     } else {  /* skip join initial flow when it has been completed*/
         prStaRec = cnmGetStaRecByAddress(
             prGlueInfo->prAdapter,
-            prGlueInfo->prAdapter->prAisBssInfo->ucBssIndex,
-            req->bss->bssid);
+            prGlueInfo->prAdapter->prAisBssInfo->ucBssIndex, req->bss->bssid);
 
         if (prStaRec) {
             saaSendAuthAssoc(prGlueInfo->prAdapter, prStaRec);
             DBGLOG(REQ, STATE, "Send assoc.\n");
         } else {
-            DBGLOG(REQ, WARN,
-                   "can't send assoc since can't find StaRec\n");
+            DBGLOG(REQ, WARN, "can't send assoc since can't find StaRec\n");
         }
     }
 
@@ -3475,8 +3288,8 @@ int mtk_cfg80211_assoc(struct wiphy *wiphy, struct net_device *ndev,
 int mtk_cfg80211_testmode_get_scan_done(IN struct wiphy *wiphy, IN void *data,
                                         IN int len,
                                         IN P_GLUE_INFO_T prGlueInfo){
-#define NL80211_TESTMODE_P2P_SCANDONE_INVALID    0
-#define NL80211_TESTMODE_P2P_SCANDONE_STATUS     1
+#define NL80211_TESTMODE_P2P_SCANDONE_INVALID 0
+#define NL80211_TESTMODE_P2P_SCANDONE_STATUS 1
 
 #ifdef CONFIG_NL80211_TESTMODE
 #if !DBG_DISABLE_ALL_LOG
@@ -3505,8 +3318,7 @@ int mtk_cfg80211_testmode_get_scan_done(IN struct wiphy *wiphy, IN void *data,
      */
 
     if (!skb) {
-        DBGLOG(QM, TRACE, "%s allocate skb failed:%lx\n", __func__,
-               rStatus);
+        DBGLOG(QM, TRACE, "%s allocate skb failed:%lx\n", __func__, rStatus);
         return -ENOMEM;
     }
     {
@@ -3622,45 +3434,34 @@ int mtk_cfg80211_change_station(struct wiphy *wiphy, struct net_device *ndev,
     }
 
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(6, 0, 0))
-    #define HT_CAPA        params->ht_capa
-    #define VHT_CAPA       params->vht_capa
+#define HT_CAPA params->ht_capa
+#define VHT_CAPA params->vht_capa
 #else
-    #define HT_CAPA        params->link_sta_params.ht_capa
-    #define VHT_CAPA       params->link_sta_params.vht_capa
+#define HT_CAPA params->link_sta_params.ht_capa
+#define VHT_CAPA params->link_sta_params.vht_capa
 #endif
 
     if (HT_CAPA != NULL) {
         rCmdUpdate.rHtCap.u2CapInfo = HT_CAPA->cap_info;
-        rCmdUpdate.rHtCap.ucAmpduParamsInfo =
-            HT_CAPA->ampdu_params_info;
-        rCmdUpdate.rHtCap.u2ExtHtCapInfo =
-            HT_CAPA->extended_ht_cap_info;
-        rCmdUpdate.rHtCap.u4TxBfCapInfo =
-            HT_CAPA->tx_BF_cap_info;
-        rCmdUpdate.rHtCap.ucAntennaSelInfo =
-            HT_CAPA->antenna_selection_info;
-        kalMemCopy(rCmdUpdate.rHtCap.rMCS.arRxMask,
-                   HT_CAPA->mcs.rx_mask,
+        rCmdUpdate.rHtCap.ucAmpduParamsInfo = HT_CAPA->ampdu_params_info;
+        rCmdUpdate.rHtCap.u2ExtHtCapInfo = HT_CAPA->extended_ht_cap_info;
+        rCmdUpdate.rHtCap.u4TxBfCapInfo = HT_CAPA->tx_BF_cap_info;
+        rCmdUpdate.rHtCap.ucAntennaSelInfo = HT_CAPA->antenna_selection_info;
+        kalMemCopy(rCmdUpdate.rHtCap.rMCS.arRxMask, HT_CAPA->mcs.rx_mask,
                    sizeof(rCmdUpdate.rHtCap.rMCS.arRxMask));
 
-        rCmdUpdate.rHtCap.rMCS.u2RxHighest =
-            HT_CAPA->mcs.rx_highest;
-        rCmdUpdate.rHtCap.rMCS.ucTxParams =
-            HT_CAPA->mcs.tx_params;
+        rCmdUpdate.rHtCap.rMCS.u2RxHighest = HT_CAPA->mcs.rx_highest;
+        rCmdUpdate.rHtCap.rMCS.ucTxParams = HT_CAPA->mcs.tx_params;
         rCmdUpdate.fgIsSupHt = true;
     }
     /* vht */
 
     if (VHT_CAPA != NULL) {
         rCmdUpdate.rVHtCap.u4CapInfo = VHT_CAPA->vht_cap_info;
-        rCmdUpdate.rVHtCap.rVMCS.u2RxMcsMap =
-            VHT_CAPA->supp_mcs.rx_mcs_map;
-        rCmdUpdate.rVHtCap.rVMCS.u2RxHighest =
-            VHT_CAPA->supp_mcs.rx_highest;
-        rCmdUpdate.rVHtCap.rVMCS.u2TxMcsMap =
-            VHT_CAPA->supp_mcs.tx_mcs_map;
-        rCmdUpdate.rVHtCap.rVMCS.u2TxHighest =
-            VHT_CAPA->supp_mcs.tx_highest;
+        rCmdUpdate.rVHtCap.rVMCS.u2RxMcsMap = VHT_CAPA->supp_mcs.rx_mcs_map;
+        rCmdUpdate.rVHtCap.rVMCS.u2RxHighest = VHT_CAPA->supp_mcs.rx_highest;
+        rCmdUpdate.rVHtCap.rVMCS.u2TxMcsMap = VHT_CAPA->supp_mcs.tx_mcs_map;
+        rCmdUpdate.rVHtCap.rVMCS.u2TxHighest = VHT_CAPA->supp_mcs.tx_highest;
         rCmdUpdate.fgIsSupVht = true;
     }
 
@@ -3682,12 +3483,11 @@ int mtk_cfg80211_change_station(struct wiphy *wiphy, struct net_device *ndev,
     if (prAisBssInfo->fgTdlsIsChSwProhibited) {
         /* disable TDLS ch sw function */
 
-        rStatus =
-            kalIoctl(prGlueInfo, TdlsSendChSwControlCmd,
-                     &TdlsSendChSwControlCmd,
-                     sizeof(CMD_TDLS_CH_SW_T), false, false, false,
-                     /* false,    //6628 -> 6630  fgIsP2pOid-> x */
-                     &u4BufLen);
+        rStatus = kalIoctl(prGlueInfo, TdlsSendChSwControlCmd,
+                           &TdlsSendChSwControlCmd, sizeof(CMD_TDLS_CH_SW_T),
+                           false, false, false,
+                           /* false,    //6628 -> 6630  fgIsP2pOid-> x */
+                           &u4BufLen);
     }
 
     return 0;
@@ -3807,9 +3607,9 @@ int mtk_cfg80211_tdls_mgmt(struct wiphy *wiphy, struct net_device *dev,
 #if (CFG80211_VERSION_CODE >= KERNEL_VERSION(6, 5, 0))
                            int link_id,
 #endif
-                           u8 action_code, u8 dialog_token,
-                           u16 status_code, u32 peer_capability, bool initiator,
-                           const u8 *buf, size_t len){
+                           u8 action_code, u8 dialog_token, u16 status_code,
+                           u32 peer_capability, bool initiator, const u8 *buf,
+                           size_t len){
     GLUE_INFO_T *prGlueInfo;
     TDLS_CMD_LINK_MGT_T rCmdMgt;
     u32 u4BufLen;
@@ -3840,8 +3640,8 @@ int mtk_cfg80211_tdls_mgmt(struct wiphy *wiphy, struct net_device *dev,
 
     kalMemCopy(&(rCmdMgt.aucSecBuf), buf, len);
 
-    kalIoctl(prGlueInfo, TdlsexLinkMgt, &rCmdMgt,
-             sizeof(TDLS_CMD_LINK_MGT_T), false, false, false,
+    kalIoctl(prGlueInfo, TdlsexLinkMgt, &rCmdMgt, sizeof(TDLS_CMD_LINK_MGT_T),
+             false, false, false,
              /* false,    //6628 -> 6630  fgIsP2pOid-> x */
              &u4BufLen);
     return 0;
@@ -3900,12 +3700,12 @@ s32 mtk_cfg80211_process_str_cmd(P_GLUE_INFO_T prGlueInfo, u8 *cmd, s32 len){
         if (len > 16 && (strnicmp(cmd + 16, " SSID=", 6) == 0)) {
             pucSSID = cmd + 22;
             u4SSIDLen = len - 22;
-            DBGLOG(REQ, ERROR, "cmd=%s, ssid len %u, ssid=%s\n",
-                   cmd, u4SSIDLen, pucSSID);
+            DBGLOG(REQ, ERROR, "cmd=%s, ssid len %u, ssid=%s\n", cmd, u4SSIDLen,
+                   pucSSID);
         }
         rStatus = kalIoctl(prGlueInfo, wlanoidSendNeighborRequest,
-                           (void *)pucSSID, u4SSIDLen, false, false,
-                           true, &u4SetInfoLen);
+                           (void *)pucSSID, u4SSIDLen, false, false, true,
+                           &u4SetInfoLen);
     } else {
         return -EOPNOTSUPP;
     }
@@ -3918,9 +3718,8 @@ s32 mtk_cfg80211_process_str_cmd(P_GLUE_INFO_T prGlueInfo, u8 *cmd, s32 len){
         if (len > 20 && (strnicmp(cmd + 20, " reason=", 8) == 0)) {
             pucReason = cmd + 28;
         }
-        rStatus = kalIoctl(prGlueInfo, wlanoidSendBTMQuery,
-                           (void *)pucReason, 1, false, false, true,
-                           &u4SetInfoLen);
+        rStatus = kalIoctl(prGlueInfo, wlanoidSendBTMQuery, (void *)pucReason,
+                           1, false, false, true, &u4SetInfoLen);
     } else {
         return -EOPNOTSUPP;
     }
@@ -3946,8 +3745,7 @@ enum regd_state regd_state_machine(IN struct regulatory_request *pRequest){
     case NL80211_REGDOM_SET_BY_USER:
         DBGLOG(RLM, INFO, "regd_state_machine: SET_BY_USER\n");
 
-        return rlmDomainStateTransition(REGD_STATE_SET_COUNTRY_USER,
-                                        pRequest);
+        return rlmDomainStateTransition(REGD_STATE_SET_COUNTRY_USER, pRequest);
 
     case NL80211_REGDOM_SET_BY_DRIVER:
         DBGLOG(RLM, INFO, "regd_state_machine: SET_BY_DRIVER\n");
@@ -3956,17 +3754,14 @@ enum regd_state regd_state_machine(IN struct regulatory_request *pRequest){
                                         pRequest);
 
     case NL80211_REGDOM_SET_BY_CORE:
-        DBGLOG(RLM, INFO,
-               "regd_state_machine: NL80211_REGDOM_SET_BY_CORE\n");
+        DBGLOG(RLM, INFO, "regd_state_machine: NL80211_REGDOM_SET_BY_CORE\n");
 
-        return rlmDomainStateTransition(REGD_STATE_SET_WW_CORE,
-                                        pRequest);
+        return rlmDomainStateTransition(REGD_STATE_SET_WW_CORE, pRequest);
 
     case NL80211_REGDOM_SET_BY_COUNTRY_IE:
         DBGLOG(RLM, WARN, "regd_state_machine: SET_BY_COUNTRY_IE\n");
 
-        return rlmDomainStateTransition(REGD_STATE_SET_COUNTRY_IE,
-                                        pRequest);
+        return rlmDomainStateTransition(REGD_STATE_SET_COUNTRY_IE, pRequest);
 
     default:
         return rlmDomainStateTransition(REGD_STATE_INVALID, pRequest);
@@ -4025,27 +3820,21 @@ void mtk_reg_notify(IN struct wiphy *pWiphy,
 
         if (rlmDomainIsCtrlStateEqualTo(REGD_STATE_INIT)) {
             if (rlmDomainIsUsingLocalRegDomainDataBase()) {
-                DBGLOG(RLM,
-                       WARN,
+                DBGLOG(RLM, WARN,
                        "County Code is not assigned. Use default WW.\n");
                 goto DOMAIN_SEND_CMD;
             } else {
-                DBGLOG(RLM,
-                       ERROR,
-                       "Invalid REG state happened. state = 0x%x\n",
+                DBGLOG(RLM, ERROR, "Invalid REG state happened. state = 0x%x\n",
                        rlmDomainGetCtrlState());
                 return;
             }
-        } else if ((rlmDomainIsCtrlStateEqualTo(
-                        REGD_STATE_SET_WW_CORE)) ||
-                   (rlmDomainIsCtrlStateEqualTo(
-                        REGD_STATE_SET_COUNTRY_USER)) ||
+        } else if ((rlmDomainIsCtrlStateEqualTo(REGD_STATE_SET_WW_CORE)) ||
+                   (rlmDomainIsCtrlStateEqualTo(REGD_STATE_SET_COUNTRY_USER)) ||
                    (rlmDomainIsCtrlStateEqualTo(
                         REGD_STATE_SET_COUNTRY_DRIVER))) {
             goto DOMAIN_SEND_CMD;
         } else {
-            DBGLOG(RLM, ERROR,
-                   "Invalid REG state happened. state = 0x%x\n",
+            DBGLOG(RLM, ERROR, "Invalid REG state happened. state = 0x%x\n",
                    rlmDomainGetCtrlState());
             return;
         }
@@ -4079,8 +3868,7 @@ void mtk_reg_notify(IN struct wiphy *pWiphy,
             return;
         }
     } else if (rlmDomainIsCtrlStateEqualTo(REGD_STATE_INVALID)) {
-        DBGLOG(RLM, ERROR,
-               "\n%s():\n---> WARNING. Transit to invalid state.\n",
+        DBGLOG(RLM, ERROR, "\n%s():\n---> WARNING. Transit to invalid state.\n",
                __func__);
         DBGLOG(RLM, ERROR, "---> WARNING.\n ");
         rlmDomainAssert(0);
@@ -4090,32 +3878,29 @@ void mtk_reg_notify(IN struct wiphy *pWiphy,
      * Set country code
      */
     if (pRequest->initiator != NL80211_REGDOM_SET_BY_DRIVER) {
-        rlmDomainSetCountryCode(pRequest->alpha2,
-                                sizeof(pRequest->alpha2));
+        rlmDomainSetCountryCode(pRequest->alpha2, sizeof(pRequest->alpha2));
     } else {
         /*SET_BY_DRIVER*/
 
         if (rlmDomainIsEfuseUsed()) {
             if (!rlmDomainIsUsingLocalRegDomainDataBase()) {
-                DBGLOG(RLM,
-                       WARN,
-                       "[WARNING!!!] Local DB must be used if country code from efuse.\n");
+                DBGLOG(
+                    RLM, WARN,
+                    "[WARNING!!!] Local DB must be used if country code from efuse.\n");
             }
         } else {
             /* iwpriv case */
             if (rlmDomainIsUsingLocalRegDomainDataBase() &&
                 (!rlmDomainIsEfuseUsed())) {
                 /*iwpriv set country but local data base*/
-                u32 country_code =
-                    rlmDomainGetTempCountryCode();
+                u32 country_code = rlmDomainGetTempCountryCode();
 
                 rlmDomainSetCountryCode((char *)&country_code,
                                         sizeof(country_code));
             } else {
                 /*iwpriv set country but query CRDA*/
-                rlmDomainSetCountryCode(
-                    pRequest->alpha2,
-                    sizeof(pRequest->alpha2));
+                rlmDomainSetCountryCode(pRequest->alpha2,
+                                        sizeof(pRequest->alpha2));
             }
         }
     }
@@ -4142,11 +3927,10 @@ DOMAIN_SEND_CMD:
 
         pRegdom = rlmDomainSearchRegdomainFromLocalDataBase(alpha2);
         if (!pRegdom) {
-            DBGLOG(RLM,
-                   INFO,
-                   "%s(): Error, Cannot find the correct RegDomain. country = %s\n",
-                   __func__,
-                   rlmDomainGetCountryCode());
+            DBGLOG(
+                RLM, INFO,
+                "%s(): Error, Cannot find the correct RegDomain. country = %s\n",
+                __func__, rlmDomainGetCountryCode());
 
             rlmDomainAssert(0);
             return;
@@ -4189,7 +3973,6 @@ DOMAIN_SEND_CMD:
     if (!regd_is_single_sku_en()) {
         return;  /*no need to send information to firmware due to
                   * firmware is not supported*/
-
     }
     /*
      * Send commands to firmware
@@ -4225,15 +4008,14 @@ void cfg80211_regd_set_wiphy(IN struct wiphy *prWiphy){
 
     /* assigned a defautl one */
     if (rlmDomainGetLocalDefaultRegd()) {
-        wiphy_apply_custom_regulatory(prWiphy,
-                                      rlmDomainGetLocalDefaultRegd());
+        wiphy_apply_custom_regulatory(prWiphy, rlmDomainGetLocalDefaultRegd());
     }
 #endif
 
     /*
      * Initialize regd control information
      */
-    rlmDomainResetCtrlInfo();
+    rlmDomainResetCtrlInfo(false);
 }
 
 /*
@@ -4319,3 +4101,996 @@ int mtk_cfg80211_resume(struct wiphy *wiphy){
 end:
     return 0;
 }
+
+#if CFG_ENABLE_UNIFY_WIPHY
+/*----------------------------------------------------------------------------*/
+/*!
+ * @brief Check the net device is P2P net device (P2P GO/GC, AP), or not.
+ *
+ * @param prGlueInfo : the driver private data
+ *        ndev       : the net device
+ *
+ * @retval 0:  AIS device (STA/IBSS)
+ *         1:  P2P GO/GC, AP
+ */
+/*----------------------------------------------------------------------------*/
+int mtk_IsP2PNetDevice(P_GLUE_INFO_T prGlueInfo, struct net_device *ndev){
+    P_NETDEV_PRIVATE_GLUE_INFO prNetDevPrivate = NULL;
+    int iftype = 0;
+    int ret = 1;
+    if (ndev == NULL) {
+        DBGLOG(REQ, WARN, "ndev is NULL\n");
+        return -1;
+    }
+    prNetDevPrivate = (P_NETDEV_PRIVATE_GLUE_INFO)netdev_priv(ndev);
+    iftype = ndev->ieee80211_ptr->iftype;
+    /* P2P device/GO/GC always return 1 */
+    if (prNetDevPrivate->ucIsP2p == true) {
+        ret = 1;
+    }else if (iftype == NL80211_IFTYPE_STATION) {
+        ret = 0;
+    }else if (iftype == NL80211_IFTYPE_ADHOC) {
+        ret = 0;
+    }
+    DBGLOG(REQ, INFO, "cfg path select = %d\n", ret);
+    return ret;
+}
+/*----------------------------------------------------------------------------*/
+/*!
+ * @brief Initialize the AIS related FSM and data.
+ *
+ * @param prGlueInfo : the driver private data
+ *        ndev       : the net device
+ *        ucBssIdx   : the AIS BSS index adssigned by the driver (wlanProbe)
+ *
+ * @retval 0
+ *
+ */
+/*----------------------------------------------------------------------------*/
+int mtk_init_sta_role(P_ADAPTER_T prAdapter, struct net_device *ndev){
+    P_NETDEV_PRIVATE_GLUE_INFO prNdevPriv = NULL;
+    if ((prAdapter == NULL) || (ndev == NULL)) {
+        return -1;
+    }
+    /* uninit AIS FSM */
+    aisFsmInit(prAdapter);
+#if CFG_SUPPORT_ROAMING
+    /* Roaming Module - unintiailization */
+    roamingFsmInit(prAdapter);
+#endif  /* CFG_SUPPORT_ROAMING */
+    ndev->netdev_ops = wlanGetNdevOps();
+    /* set the ndev's ucBssIdx to the AIS BSS index */
+    prNdevPriv = (P_NETDEV_PRIVATE_GLUE_INFO)netdev_priv(ndev);
+    prNdevPriv->ucBssIdx = prAdapter->prAisBssInfo->ucBssIndex;
+    return 0;
+}
+/*----------------------------------------------------------------------------*/
+/*!
+ * @brief Uninitialize the AIS related FSM and data.
+ *
+ * @param prAdapter : the driver private data
+ *
+ * @retval 0
+ *
+ */
+/*----------------------------------------------------------------------------*/
+int mtk_uninit_sta_role(P_ADAPTER_T prAdapter, struct net_device *ndev){
+    P_NETDEV_PRIVATE_GLUE_INFO prNdevPriv = NULL;
+    if ((prAdapter == NULL) || (ndev == NULL)) {
+        return -1;
+    }
+#if CFG_SUPPORT_ROAMING
+    /* Roaming Module - unintiailization */
+    roamingFsmUninit(prAdapter);
+#endif  /* CFG_SUPPORT_ROAMING */
+        /* uninit AIS FSM */
+    aisFsmUninit(prAdapter);
+    /* set the ucBssIdx to the illegal value */
+    prNdevPriv = (P_NETDEV_PRIVATE_GLUE_INFO)netdev_priv(ndev);
+    prNdevPriv->ucBssIdx = 0xff;
+    return 0;
+}
+/*----------------------------------------------------------------------------*/
+/*!
+ * @brief Initialize the AP (P2P) related FSM and data.
+ *
+ * @param prGlueInfo : the driver private data
+ *        ndev       : net device
+ *
+ * @retval 0      : success
+ *         others : can't alloc and setup the AP FSM & data
+ *
+ */
+/*----------------------------------------------------------------------------*/
+int mtk_init_ap_role(P_GLUE_INFO_T prGlueInfo, struct net_device *ndev){
+    int u4Idx = 0;
+    P_ADAPTER_T prAdapter = prGlueInfo->prAdapter;
+    for (u4Idx = 0; u4Idx < KAL_P2P_NUM; u4Idx++)
+        if (gprP2pRoleWdev[u4Idx] == NULL) {
+            break;
+        }
+    if (u4Idx >= KAL_P2P_NUM) {
+        DBGLOG(INIT, ERROR, "There is no free gprP2pRoleWdev.\n");
+        return -ENOMEM;
+    }
+    if ((u4Idx == 0) || (prAdapter == NULL) ||
+        (prAdapter->rP2PNetRegState != ENUM_NET_REG_STATE_REGISTERED)) {
+        DBGLOG(INIT, ERROR, "The wlan0 can't set to AP without p2p0\n");
+        /* System will crash, if p2p0 isn't existing. */
+        return -EFAULT;
+    }
+    /* reference from the glRegisterP2P() */
+    gprP2pRoleWdev[u4Idx] = ndev->ieee80211_ptr;
+    glSetupP2P(prGlueInfo, gprP2pRoleWdev[u4Idx], ndev, u4Idx, true);
+    prGlueInfo->prAdapter->prP2pInfo->u4DeviceNum++;
+    /* reference from p2pNetRegister() */
+    /* The ndev doesn't need register_netdev, only reassign the gPrP2pDev.*/
+    gPrP2pDev[u4Idx] = ndev;
+    return 0;
+}
+/*----------------------------------------------------------------------------*/
+/*!
+ * @brief Unnitialize the AP (P2P) related FSM and data.
+ *
+ * @param prGlueInfo : the driver private data
+ *        ndev       : net device
+ *
+ * @retval 0      : success
+ *         others : can't find the AP information by the ndev
+ *
+ */
+/*----------------------------------------------------------------------------*/
+int mtk_uninit_ap_role(P_GLUE_INFO_T prGlueInfo, struct net_device *ndev){
+    unsigned char u4Idx;
+    if (mtk_Netdev_To_RoleIdx(prGlueInfo, ndev, &u4Idx) != 0) {
+        DBGLOG(INIT, WARN, "can't find the matched dev to uninit AP\n");
+        return -EFAULT;
+    }
+    glUnregisterP2P(prGlueInfo, u4Idx);
+    gPrP2pDev[u4Idx] = NULL;
+    gprP2pRoleWdev[u4Idx] = NULL;
+    return 0;
+}
+
+struct wireless_dev *mtk_cfg_add_iface(struct wiphy *wiphy, const char *name,
+                                       unsigned char name_assign_type,
+                                       enum nl80211_iftype type,
+                                       struct vif_params *params){
+    P_GLUE_INFO_T prGlueInfo = NULL;
+    prGlueInfo = (P_GLUE_INFO_T)wiphy_priv(wiphy);
+    if ((!prGlueInfo) || (prGlueInfo->u4ReadyFlag == 0)) {
+        DBGLOG(REQ, WARN, "driver is not ready\n");
+        return ERR_PTR(-EFAULT);
+    }
+    /* TODO: error handele for the non-P2P interface */
+#if (CFG_ENABLE_WIFI_DIRECT_CFG_80211 == 0)
+    DBGLOG(REQ, WARN, "P2P is not supported\n");
+    return ERR_PTR(-EINVAL);
+#else  /* CFG_ENABLE_WIFI_DIRECT_CFG_80211 */
+
+    return mtk_p2p_cfg80211_add_iface(wiphy, name, name_assign_type, type,
+                                      params);
+
+#endif  /* CFG_ENABLE_WIFI_DIRECT_CFG_80211 */
+}
+int mtk_cfg_del_iface(struct wiphy *wiphy, struct wireless_dev *wdev){
+    P_GLUE_INFO_T prGlueInfo = NULL;
+    prGlueInfo = (P_GLUE_INFO_T)wiphy_priv(wiphy);
+    if ((!prGlueInfo) || (prGlueInfo->u4ReadyFlag == 0)) {
+        DBGLOG(REQ, WARN, "driver is not ready\n");
+        return -EFAULT;
+    }
+    /* TODO: error handele for the non-P2P interface */
+#if (CFG_ENABLE_WIFI_DIRECT_CFG_80211 == 0)
+    DBGLOG(REQ, WARN, "P2P is not supported\n");
+    return -EINVAL;
+#else  /* CFG_ENABLE_WIFI_DIRECT_CFG_80211 */
+    return mtk_p2p_cfg80211_del_iface(wiphy, wdev);
+#endif  /* CFG_ENABLE_WIFI_DIRECT_CFG_80211 */
+}
+int mtk_cfg_change_iface(struct wiphy *wiphy, struct net_device *ndev,
+                         enum nl80211_iftype type,
+                         struct vif_params *params){
+    P_GLUE_INFO_T prGlueInfo = NULL;
+    P_ADAPTER_T prAdapter = NULL;
+    P_NETDEV_PRIVATE_GLUE_INFO prNetdevPriv = NULL;
+    P_P2P_INFO_T prP2pInfo = NULL;
+    struct cfg80211_scan_request *prScanRequest = NULL;
+    GLUE_SPIN_LOCK_DECLARATION();
+    prGlueInfo = (P_GLUE_INFO_T)wiphy_priv(wiphy);
+    ASSERT(prGlueInfo);
+    if ((!prGlueInfo) || (prGlueInfo->u4ReadyFlag == 0)) {
+        DBGLOG(REQ, WARN, "driver is not ready\n");
+        return -EFAULT;
+    }
+    prNetdevPriv = (P_NETDEV_PRIVATE_GLUE_INFO)netdev_priv(ndev);
+#if (CFG_ENABLE_WIFI_DIRECT_CFG_80211)
+    /* P2P Interfcace */
+    if (prNetdevPriv->ucIsP2p == true) {
+        return mtk_p2p_cfg80211_change_iface(wiphy, ndev, type, params);
+    }
+#endif  /* CFG_ENABLE_WIFI_DIRECT_CFG_80211 */
+    prAdapter = prGlueInfo->prAdapter;
+    /* mtk_cfg_change_iface is only for wlan0 to set type as STA or AP. */
+    if (!ndev || (ndev != prGlueInfo->prDevHandler)) {
+        DBGLOG(REQ, WARN, "ndev is not correct\n");
+        return -EINVAL;
+    }
+    if (ndev->ieee80211_ptr->iftype == type) {
+        DBGLOG(REQ, INFO, "ndev type is not changed (%d)\n", type);
+        return 0;
+    }
+    netif_carrier_off(ndev);
+    netif_tx_stop_all_queues(ndev);
+    /* flush scan */
+    GLUE_ACQUIRE_SPIN_LOCK(prGlueInfo, SPIN_LOCK_NET_DEV);
+    if ((prGlueInfo->prScanRequest != NULL) &&
+        (prGlueInfo->prScanRequest->wdev == ndev->ieee80211_ptr)) {
+        prScanRequest = prGlueInfo->prScanRequest;
+        prGlueInfo->prScanRequest = NULL;
+    }
+    GLUE_RELEASE_SPIN_LOCK(prGlueInfo, SPIN_LOCK_NET_DEV);
+    if (prScanRequest) {
+        kalCfg80211ScanDone(prScanRequest, true);
+    }
+    /* expect that only AP & STA will be handled here (excluding IBSS) */
+    if (type == NL80211_IFTYPE_AP) {
+        /* STA mode change to AP mode */
+        prP2pInfo = prAdapter->prP2pInfo;
+        if (prP2pInfo == NULL) {
+            DBGLOG(INIT, ERROR, "prP2pInfo is NULL\n");
+            return -EFAULT;
+        }
+        if (prP2pInfo->u4DeviceNum >= KAL_P2P_NUM) {
+            DBGLOG(INIT, ERROR, "resource invalid, u4DeviceNum=%d\n",
+                   prP2pInfo->u4DeviceNum);
+            return -EFAULT;
+        }
+        mtk_uninit_sta_role(prAdapter, ndev);
+        if (mtk_init_ap_role(prGlueInfo, ndev) != 0) {
+            DBGLOG(INIT, ERROR, "mtk_init_ap_role FAILED\n");
+            /* Only AP/P2P resource has the failure case.	*/
+            /* So, just re-init AIS.			*/
+            mtk_init_sta_role(prAdapter, ndev);
+            return -EFAULT;
+        }
+    } else {
+        /* AP mode change to STA mode */
+        if (mtk_uninit_ap_role(prGlueInfo, ndev) != 0) {
+            DBGLOG(INIT, ERROR, "mtk_uninit_ap_role FAILED\n");
+            return -EFAULT;
+        }
+        mtk_init_sta_role(prAdapter, ndev);
+        /* continue the mtk_cfg80211_change_iface() process */
+        mtk_cfg80211_change_iface(wiphy, ndev, type, params);
+    }
+    return 0;
+}
+int mtk_cfg_add_key(struct wiphy *wiphy, struct net_device *ndev,
+    #if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0))
+                    int link_id,
+#endif
+                    u8 key_index,
+                    bool pairwise, const u8 *mac_addr,
+                    struct key_params *params){
+    P_GLUE_INFO_T prGlueInfo = NULL;
+    prGlueInfo = (P_GLUE_INFO_T)wiphy_priv(wiphy);
+    if ((!prGlueInfo) || (prGlueInfo->u4ReadyFlag == 0)) {
+        DBGLOG(REQ, WARN, "driver is not ready\n");
+        return -EFAULT;
+    }
+    if (mtk_IsP2PNetDevice(prGlueInfo, ndev) > 0) {
+        return mtk_p2p_cfg80211_add_key(wiphy, ndev,
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0))
+                                        0,
+#endif
+                                        key_index, pairwise,
+                                        mac_addr, params);
+    }
+    /* STA Mode */
+    return mtk_cfg80211_add_key(wiphy, ndev,
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0))
+                                0,
+#endif
+                                key_index, pairwise, mac_addr,
+                                params);
+}
+int mtk_cfg_get_key(struct wiphy *wiphy, struct net_device *ndev,
+    #if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0))
+                    int link_id,
+#endif
+                    u8 key_index,
+                    bool pairwise, const u8 *mac_addr, void *cookie,
+                    void (*callback)(void *cookie, struct key_params *)){
+    P_GLUE_INFO_T prGlueInfo = NULL;
+    prGlueInfo = (P_GLUE_INFO_T)wiphy_priv(wiphy);
+    if ((!prGlueInfo) || (prGlueInfo->u4ReadyFlag == 0)) {
+        DBGLOG(REQ, WARN, "driver is not ready\n");
+        return -EFAULT;
+    }
+    if (mtk_IsP2PNetDevice(prGlueInfo, ndev) > 0) {
+        return mtk_p2p_cfg80211_get_key(wiphy, ndev,
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0))
+                                        0,
+#endif
+                                        key_index, pairwise,
+                                        mac_addr, cookie, callback);
+    }
+    /* STA Mode */
+    return mtk_cfg80211_get_key(wiphy, ndev,
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0))
+                                0,
+#endif
+                                key_index, pairwise, mac_addr,
+                                cookie, callback);
+}
+int mtk_cfg_del_key(struct wiphy *wiphy, struct net_device *ndev,
+    #if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0))
+                    int link_id,
+#endif
+                    u8 key_index,
+                    bool pairwise, const u8 *mac_addr){
+    P_GLUE_INFO_T prGlueInfo = NULL;
+    prGlueInfo = (P_GLUE_INFO_T)wiphy_priv(wiphy);
+    if ((!prGlueInfo) || (prGlueInfo->u4ReadyFlag == 0)) {
+        DBGLOG(REQ, WARN, "driver is not ready\n");
+        return -EFAULT;
+    }
+    if (mtk_IsP2PNetDevice(prGlueInfo, ndev) > 0) {
+        return mtk_p2p_cfg80211_del_key(wiphy, ndev,
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0))
+                                        0,
+#endif
+                                        key_index, pairwise,
+                                        mac_addr);
+    }
+    /* STA Mode */
+    return mtk_cfg80211_del_key(wiphy, ndev,
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0))
+                                0,
+#endif
+                                key_index, pairwise, mac_addr);
+}
+int mtk_cfg_set_default_key(struct wiphy *wiphy, struct net_device *ndev,
+    #if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0))
+                            int link_id,
+#endif
+                            u8 key_index, bool unicast, bool multicast){
+    P_GLUE_INFO_T prGlueInfo = NULL;
+    prGlueInfo = (P_GLUE_INFO_T)wiphy_priv(wiphy);
+    if ((!prGlueInfo) || (prGlueInfo->u4ReadyFlag == 0)) {
+        DBGLOG(REQ, WARN, "driver is not ready\n");
+        return -EFAULT;
+    }
+    if (mtk_IsP2PNetDevice(prGlueInfo, ndev) > 0) {
+        return mtk_p2p_cfg80211_set_default_key(wiphy, ndev,
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0))
+                                                0,
+#endif
+                                                key_index, unicast,
+                                                multicast);
+    }
+    /* STA Mode */
+    return mtk_cfg80211_set_default_key(wiphy, ndev,
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0))
+                                        0,
+#endif
+                                        key_index, unicast,
+                                        multicast);
+}
+#if KERNEL_VERSION(3, 16, 0) <= CFG80211_VERSION_CODE
+int mtk_cfg_get_station(struct wiphy *wiphy, struct net_device *ndev,
+                        const u8 *mac, struct station_info *sinfo)
+#else
+int mtk_cfg_get_station(struct wiphy *wiphy, struct net_device *ndev, u8 *mac,
+                        struct station_info *sinfo)
+#endif
+{
+    P_GLUE_INFO_T prGlueInfo = NULL;
+    prGlueInfo = (P_GLUE_INFO_T)wiphy_priv(wiphy);
+    if ((!prGlueInfo) || (prGlueInfo->u4ReadyFlag == 0)) {
+        DBGLOG(REQ, WARN, "driver is not ready\n");
+        return -EFAULT;
+    }
+    if (mtk_IsP2PNetDevice(prGlueInfo, ndev) > 0) {
+        return mtk_p2p_cfg80211_get_station(wiphy, ndev, mac, sinfo);
+    }
+    /* STA Mode */
+    return mtk_cfg80211_get_station(wiphy, ndev, mac, sinfo);
+}
+#if CFG_SUPPORT_TDLS
+#if KERNEL_VERSION(3, 16, 0) <= CFG80211_VERSION_CODE
+int mtk_cfg_change_station(struct wiphy *wiphy, struct net_device *ndev,
+                           const u8 *mac, struct station_parameters *params)
+#else
+int mtk_cfg_change_station(struct wiphy *wiphy, struct net_device *ndev,
+                           u8 *mac, struct station_parameters *params)
+#endif
+{
+    P_GLUE_INFO_T prGlueInfo = NULL;
+    prGlueInfo = (P_GLUE_INFO_T)wiphy_priv(wiphy);
+    if ((!prGlueInfo) || (prGlueInfo->u4ReadyFlag == 0)) {
+        DBGLOG(REQ, WARN, "driver is not ready\n");
+        return -EFAULT;
+    }
+    if (mtk_IsP2PNetDevice(prGlueInfo, ndev) > 0) {
+        DBGLOG(REQ, WARN, "P2P/AP don't support this function\n");
+        return -EFAULT;
+    }
+    /* STA Mode */
+    return mtk_cfg80211_change_station(wiphy, ndev, mac, params);
+}
+#if KERNEL_VERSION(3, 16, 0) <= CFG80211_VERSION_CODE
+int mtk_cfg_add_station(struct wiphy *wiphy, struct net_device *ndev,
+                        const u8 *mac, struct station_parameters *params)
+#else
+int mtk_cfg_add_station(struct wiphy *wiphy, struct net_device *ndev, u8 *mac,
+                        struct station_parameters *params)
+#endif
+{
+    P_GLUE_INFO_T prGlueInfo = NULL;
+    prGlueInfo = (P_GLUE_INFO_T)wiphy_priv(wiphy);
+    if ((!prGlueInfo) || (prGlueInfo->u4ReadyFlag == 0)) {
+        DBGLOG(REQ, WARN, "driver is not ready\n");
+        return -EFAULT;
+    }
+    if (mtk_IsP2PNetDevice(prGlueInfo, ndev) > 0) {
+        DBGLOG(REQ, WARN, "P2P/AP don't support this function\n");
+        return -EFAULT;
+    }
+    /* STA Mode */
+    return mtk_cfg80211_add_station(wiphy, ndev, mac, params);
+}
+#if KERNEL_VERSION(3, 16, 0) <= CFG80211_VERSION_CODE
+int mtk_cfg_tdls_oper(struct wiphy *wiphy, struct net_device *ndev,
+                      const u8 *peer, enum nl80211_tdls_operation oper)
+#else
+int mtk_cfg_tdls_oper(struct wiphy *wiphy, struct net_device *ndev, u8 *peer,
+                      enum nl80211_tdls_operation oper)
+#endif
+{
+    P_GLUE_INFO_T prGlueInfo = NULL;
+    prGlueInfo = (P_GLUE_INFO_T)wiphy_priv(wiphy);
+    if ((!prGlueInfo) || (prGlueInfo->u4ReadyFlag == 0)) {
+        DBGLOG(REQ, WARN, "driver is not ready\n");
+        return -EFAULT;
+    }
+    if (mtk_IsP2PNetDevice(prGlueInfo, ndev) > 0) {
+        DBGLOG(REQ, WARN, "P2P/AP don't support this function\n");
+        return -EFAULT;
+    }
+    /* STA Mode */
+    return mtk_cfg80211_tdls_oper(wiphy, ndev, peer, oper);
+}
+
+int mtk_cfg_tdls_mgmt(struct wiphy *wiphy, struct net_device *dev,
+                      const u8 *peer,
+#if (CFG80211_VERSION_CODE >= KERNEL_VERSION(6, 5, 0))
+                      int link_id,
+#endif
+                      u8 action_code, u8 dialog_token,
+                      u16 status_code, u32 peer_capability, bool initiator,
+                      const u8 *buf, size_t len){
+    GLUE_INFO_T *prGlueInfo;
+    prGlueInfo = (P_GLUE_INFO_T)wiphy_priv(wiphy);
+    if ((!prGlueInfo) || (prGlueInfo->u4ReadyFlag == 0)) {
+        DBGLOG(REQ, WARN, "driver is not ready\n");
+        return -EFAULT;
+    }
+    if (mtk_IsP2PNetDevice(prGlueInfo, dev) > 0) {
+        DBGLOG(REQ, WARN, "P2P/AP don't support this function\n");
+        return -EFAULT;
+    }
+
+    return mtk_cfg80211_tdls_mgmt(wiphy, dev, peer,
+        #if (CFG80211_VERSION_CODE >= KERNEL_VERSION(6, 5, 0))
+                                  link_id,
+#endif
+                                  action_code, dialog_token,
+                                  status_code, peer_capability, initiator, buf,
+                                  len);
+
+}
+#endif  /* CFG_SUPPORT_TDLS */
+#if KERNEL_VERSION(3, 19, 0) <= CFG80211_VERSION_CODE
+int mtk_cfg_del_station(struct wiphy *wiphy, struct net_device *ndev,
+                        struct station_del_parameters *params)
+#elif KERNEL_VERSION(3, 16, 0) <= CFG80211_VERSION_CODE
+int mtk_cfg_del_station(struct wiphy *wiphy, struct net_device *ndev,
+                        const u8 *mac)
+#else
+int mtk_cfg_del_station(struct wiphy *wiphy, struct net_device *ndev, u8 *mac)
+#endif
+{
+    P_GLUE_INFO_T prGlueInfo = NULL;
+    prGlueInfo = (P_GLUE_INFO_T)wiphy_priv(wiphy);
+    if ((!prGlueInfo) || (prGlueInfo->u4ReadyFlag == 0)) {
+        DBGLOG(REQ, WARN, "driver is not ready\n");
+        return -EFAULT;
+    }
+    if (mtk_IsP2PNetDevice(prGlueInfo, ndev) > 0) {
+#if KERNEL_VERSION(3, 19, 0) <= CFG80211_VERSION_CODE
+        return mtk_p2p_cfg80211_del_station(wiphy, ndev, params);
+#else
+        return mtk_p2p_cfg80211_del_station(wiphy, ndev, mac);
+#endif
+    }
+    /* STA Mode */
+#if CFG_SUPPORT_TDLS
+#if KERNEL_VERSION(3, 19, 0) <= CFG80211_VERSION_CODE
+    return mtk_cfg80211_del_station(wiphy, ndev, params);
+#else  /* CFG80211_VERSION_CODE > KERNEL_VERSION(3, 19, 0) */
+    return mtk_cfg80211_del_station(wiphy, ndev, mac);
+#endif  /* CFG80211_VERSION_CODE */
+#else  /* CFG_SUPPORT_TDLS == 0 */
+    /* AIS only support this function when CFG_SUPPORT_TDLS */
+    return -EFAULT;
+#endif  /* CFG_SUPPORT_TDLS */
+}
+int mtk_cfg_scan(struct wiphy *wiphy, struct cfg80211_scan_request *request){
+    P_GLUE_INFO_T prGlueInfo = NULL;
+    prGlueInfo = (P_GLUE_INFO_T)wiphy_priv(wiphy);
+    if ((!prGlueInfo) || (prGlueInfo->u4ReadyFlag == 0)) {
+        DBGLOG(REQ, WARN, "driver is not ready\n");
+        return -EFAULT;
+    }
+    if (mtk_IsP2PNetDevice(prGlueInfo, request->wdev->netdev) > 0) {
+        return mtk_p2p_cfg80211_scan(wiphy, request);
+    }
+    /* STA Mode */
+    return mtk_cfg80211_scan(wiphy, request);
+}
+
+void mtk_cfg_abort_scan(struct wiphy *wiphy, struct wireless_dev *wdev){
+    P_GLUE_INFO_T prGlueInfo = NULL;
+    prGlueInfo = (P_GLUE_INFO_T)wiphy_priv(wiphy);
+    if ((!prGlueInfo) || (prGlueInfo->u4ReadyFlag == 0)) {
+        DBGLOG(REQ, WARN, "driver is not ready\n");
+        return;
+    }
+    if (mtk_IsP2PNetDevice(prGlueInfo, wdev->netdev) > 0) {
+        mtk_p2p_cfg80211_abort_scan(wiphy, wdev);
+    }
+    /* STA Mode */
+    mtk_cfg80211_abort_scan(wiphy, wdev);
+}
+
+int mtk_cfg_connect(struct wiphy *wiphy, struct net_device *ndev,
+                    struct cfg80211_connect_params *sme){
+    P_GLUE_INFO_T prGlueInfo = NULL;
+    prGlueInfo = (P_GLUE_INFO_T)wiphy_priv(wiphy);
+    if ((!prGlueInfo) || (prGlueInfo->u4ReadyFlag == 0)) {
+        DBGLOG(REQ, WARN, "driver is not ready\n");
+        return -EFAULT;
+    }
+
+    // if (mtk_IsP2PNetDevice(prGlueInfo, ndev) > 0) {
+    //     return mtk_p2p_cfg80211_connect(wiphy, ndev, sme);
+    // }
+    /* STA Mode */
+    return mtk_cfg80211_connect(wiphy, ndev, sme);
+}
+int mtk_cfg_disconnect(struct wiphy *wiphy, struct net_device *ndev,
+                       u16 reason_code){
+    P_GLUE_INFO_T prGlueInfo = NULL;
+    prGlueInfo = (P_GLUE_INFO_T)wiphy_priv(wiphy);
+    if ((!prGlueInfo) || (prGlueInfo->u4ReadyFlag == 0)) {
+        DBGLOG(REQ, WARN, "driver is not ready\n");
+        return -EFAULT;
+    }
+    // if (mtk_IsP2PNetDevice(prGlueInfo, ndev) > 0) {
+    //     return mtk_p2p_cfg80211_disconnect(wiphy, ndev, reason_code);
+    // }
+    /* STA Mode */
+    return mtk_cfg80211_disconnect(wiphy, ndev, reason_code);
+}
+int mtk_cfg_join_ibss(struct wiphy *wiphy, struct net_device *ndev,
+                      struct cfg80211_ibss_params *params){
+    P_GLUE_INFO_T prGlueInfo = NULL;
+    prGlueInfo = (P_GLUE_INFO_T)wiphy_priv(wiphy);
+    if ((!prGlueInfo) || (prGlueInfo->u4ReadyFlag == 0)) {
+        DBGLOG(REQ, WARN, "driver is not ready\n");
+        return -EFAULT;
+    }
+    if (mtk_IsP2PNetDevice(prGlueInfo, ndev) > 0) {
+        return mtk_p2p_cfg80211_join_ibss(wiphy, ndev, params);
+    }
+    /* STA Mode */
+    return mtk_cfg80211_join_ibss(wiphy, ndev, params);
+}
+int mtk_cfg_leave_ibss(struct wiphy *wiphy, struct net_device *ndev){
+    P_GLUE_INFO_T prGlueInfo = NULL;
+    prGlueInfo = (P_GLUE_INFO_T)wiphy_priv(wiphy);
+    if ((!prGlueInfo) || (prGlueInfo->u4ReadyFlag == 0)) {
+        DBGLOG(REQ, WARN, "driver is not ready\n");
+        return -EFAULT;
+    }
+    if (mtk_IsP2PNetDevice(prGlueInfo, ndev) > 0) {
+        return mtk_p2p_cfg80211_leave_ibss(wiphy, ndev);
+    }
+    /* STA Mode */
+    return mtk_cfg80211_leave_ibss(wiphy, ndev);
+}
+int mtk_cfg_set_power_mgmt(struct wiphy *wiphy, struct net_device *ndev,
+                           bool enabled, int timeout){
+    P_GLUE_INFO_T prGlueInfo = NULL;
+    prGlueInfo = (P_GLUE_INFO_T)wiphy_priv(wiphy);
+    if ((!prGlueInfo) || (prGlueInfo->u4ReadyFlag == 0)) {
+        DBGLOG(REQ, WARN, "driver is not ready\n");
+        return -EFAULT;
+    }
+    if (mtk_IsP2PNetDevice(prGlueInfo, ndev) > 0) {
+        return mtk_p2p_cfg80211_set_power_mgmt(wiphy, ndev, enabled, timeout);
+    }
+    /* STA Mode */
+    return mtk_cfg80211_set_power_mgmt(wiphy, ndev, enabled, timeout);
+}
+int mtk_cfg_set_pmksa(struct wiphy *wiphy, struct net_device *ndev,
+                      struct cfg80211_pmksa *pmksa){
+    P_GLUE_INFO_T prGlueInfo = NULL;
+    prGlueInfo = (P_GLUE_INFO_T)wiphy_priv(wiphy);
+    if ((!prGlueInfo) || (prGlueInfo->u4ReadyFlag == 0)) {
+        DBGLOG(REQ, WARN, "driver is not ready\n");
+        return -EFAULT;
+    }
+    if (mtk_IsP2PNetDevice(prGlueInfo, ndev) > 0) {
+        DBGLOG(REQ, WARN, "P2P/AP don't support this function\n");
+        return -EFAULT;
+    }
+    return mtk_cfg80211_set_pmksa(wiphy, ndev, pmksa);
+}
+int mtk_cfg_del_pmksa(struct wiphy *wiphy, struct net_device *ndev,
+                      struct cfg80211_pmksa *pmksa){
+    P_GLUE_INFO_T prGlueInfo = NULL;
+    prGlueInfo = (P_GLUE_INFO_T)wiphy_priv(wiphy);
+    if ((!prGlueInfo) || (prGlueInfo->u4ReadyFlag == 0)) {
+        DBGLOG(REQ, WARN, "driver is not ready\n");
+        return -EFAULT;
+    }
+    if (mtk_IsP2PNetDevice(prGlueInfo, ndev) > 0) {
+        DBGLOG(REQ, WARN, "P2P/AP don't support this function\n");
+        return -EFAULT;
+    }
+    return mtk_cfg80211_del_pmksa(wiphy, ndev, pmksa);
+}
+int mtk_cfg_flush_pmksa(struct wiphy *wiphy, struct net_device *ndev){
+    P_GLUE_INFO_T prGlueInfo = NULL;
+    prGlueInfo = (P_GLUE_INFO_T)wiphy_priv(wiphy);
+    if ((!prGlueInfo) || (prGlueInfo->u4ReadyFlag == 0)) {
+        DBGLOG(REQ, WARN, "driver is not ready\n");
+        return -EFAULT;
+    }
+    if (mtk_IsP2PNetDevice(prGlueInfo, ndev) > 0) {
+        DBGLOG(REQ, WARN, "P2P/AP don't support this function\n");
+        return -EFAULT;
+    }
+    return mtk_cfg80211_flush_pmksa(wiphy, ndev);
+}
+#if CONFIG_SUPPORT_GTK_REKEY
+int mtk_cfg_set_rekey_data(struct wiphy *wiphy, struct net_device *dev,
+                           struct cfg80211_gtk_rekey_data *data){
+    P_GLUE_INFO_T prGlueInfo = NULL;
+    prGlueInfo = (P_GLUE_INFO_T)wiphy_priv(wiphy);
+    if ((!prGlueInfo) || (prGlueInfo->u4ReadyFlag == 0)) {
+        DBGLOG(REQ, WARN, "driver is not ready\n");
+        return -EFAULT;
+    }
+    if (mtk_IsP2PNetDevice(prGlueInfo, dev) > 0) {
+        DBGLOG(REQ, WARN, "P2P/AP don't support this function\n");
+        return -EFAULT;
+    }
+    return mtk_cfg80211_set_rekey_data(wiphy, dev, data);
+}
+#endif  /* CONFIG_SUPPORT_GTK_REKEY */
+int mtk_cfg_suspend(struct wiphy *wiphy, struct cfg80211_wowlan *wow){
+    P_GLUE_INFO_T prGlueInfo = NULL;
+    prGlueInfo = (P_GLUE_INFO_T)wiphy_priv(wiphy);
+    if ((!prGlueInfo) || (prGlueInfo->u4ReadyFlag == 0)) {
+        DBGLOG(REQ, WARN, "driver is not ready\n");
+        return -EFAULT;
+    }
+    /* TODO: AP/P2P do not support this function, should take that case. */
+    return mtk_cfg80211_suspend(wiphy, wow);
+}
+int mtk_cfg_resume(struct wiphy *wiphy){
+    P_GLUE_INFO_T prGlueInfo = NULL;
+    prGlueInfo = (P_GLUE_INFO_T)wiphy_priv(wiphy);
+    if ((!prGlueInfo) || (prGlueInfo->u4ReadyFlag == 0)) {
+        DBGLOG(REQ, WARN, "driver is not ready\n");
+        return -EFAULT;
+    }
+    /* TODO: AP/P2P do not support this function, should take that case. */
+    return mtk_cfg80211_resume(wiphy);
+}
+int mtk_cfg_assoc(struct wiphy *wiphy, struct net_device *ndev,
+                  struct cfg80211_assoc_request *req){
+    P_GLUE_INFO_T prGlueInfo = NULL;
+    prGlueInfo = (P_GLUE_INFO_T)wiphy_priv(wiphy);
+    if ((!prGlueInfo) || (prGlueInfo->u4ReadyFlag == 0)) {
+        DBGLOG(REQ, WARN, "driver is not ready\n");
+        return -EFAULT;
+    }
+    if (mtk_IsP2PNetDevice(prGlueInfo, ndev) > 0) {
+        DBGLOG(REQ, WARN, "P2P/AP don't support this function\n");
+        return -EFAULT;
+    }
+    /* STA Mode */
+    return mtk_cfg80211_assoc(wiphy, ndev, req);
+}
+int mtk_cfg_remain_on_channel(struct wiphy *wiphy, struct wireless_dev *wdev,
+                              struct ieee80211_channel *chan,
+                              unsigned int duration, u64 *cookie){
+    P_GLUE_INFO_T prGlueInfo = NULL;
+    prGlueInfo = (P_GLUE_INFO_T)wiphy_priv(wiphy);
+    if ((!prGlueInfo) || (prGlueInfo->u4ReadyFlag == 0)) {
+        DBGLOG(REQ, WARN, "driver is not ready\n");
+        return -EFAULT;
+    }
+    if (mtk_IsP2PNetDevice(prGlueInfo, wdev->netdev) > 0) {
+        return mtk_p2p_cfg80211_remain_on_channel(wiphy, wdev, chan, duration,
+                                                  cookie);
+    }
+    /* STA Mode */
+    return mtk_cfg80211_remain_on_channel(wiphy, wdev, chan, duration, cookie);
+}
+int mtk_cfg_cancel_remain_on_channel(struct wiphy *wiphy,
+                                     struct wireless_dev *wdev, u64 cookie){
+    P_GLUE_INFO_T prGlueInfo = NULL;
+    prGlueInfo = (P_GLUE_INFO_T)wiphy_priv(wiphy);
+    if ((!prGlueInfo) || (prGlueInfo->u4ReadyFlag == 0)) {
+        DBGLOG(REQ, WARN, "driver is not ready\n");
+        return -EFAULT;
+    }
+    if (mtk_IsP2PNetDevice(prGlueInfo, wdev->netdev) > 0) {
+        return mtk_p2p_cfg80211_cancel_remain_on_channel(wiphy, wdev, cookie);
+    }
+    /* STA Mode */
+    return mtk_cfg80211_cancel_remain_on_channel(wiphy, wdev, cookie);
+}
+#if KERNEL_VERSION(3, 14, 0) <= CFG80211_VERSION_CODE
+int mtk_cfg_mgmt_tx(struct wiphy *wiphy, struct wireless_dev *wdev,
+                    struct cfg80211_mgmt_tx_params *params, u64 *cookie)
+#else
+int mtk_cfg_mgmt_tx(struct wiphy *wiphy, struct wireless_dev *wdev,
+                    struct ieee80211_channel *channel, bool offscan,
+                    unsigned int wait, const u8 *buf, size_t len, bool no_cck,
+                    bool dont_wait_for_ack, u64 *cookie)
+#endif
+{
+    P_GLUE_INFO_T prGlueInfo = NULL;
+    prGlueInfo = (P_GLUE_INFO_T)wiphy_priv(wiphy);
+    if ((!prGlueInfo) || (prGlueInfo->u4ReadyFlag == 0)) {
+        DBGLOG(REQ, WARN, "driver is not ready\n");
+        return -EFAULT;
+    }
+#if KERNEL_VERSION(3, 14, 0) <= CFG80211_VERSION_CODE
+    if (mtk_IsP2PNetDevice(prGlueInfo, wdev->netdev) > 0) {
+        return mtk_p2p_cfg80211_mgmt_tx(wiphy, wdev, params, cookie);
+    }
+    /* STA Mode */
+    return mtk_cfg80211_mgmt_tx(wiphy, wdev, params, cookie);
+#else  /* KERNEL_VERSION(3, 14, 0) > CFG80211_VERSION_CODE */
+    if (mtk_IsP2PNetDevice(prGlueInfo, wdev->netdev) > 0) {
+        return mtk_p2p_cfg80211_mgmt_tx(wiphy, wdev, channel, offscan, wait,
+                                        buf, len, no_cck, dont_wait_for_ack,
+                                        cookie);
+    }
+    /* STA Mode */
+    return mtk_cfg80211_mgmt_tx(wiphy, wdev, channel, offscan, wait, buf, len,
+                                no_cck, dont_wait_for_ack, cookie);
+#endif
+}
+void mtk_cfg_mgmt_frame_register(struct wiphy *wiphy, struct wireless_dev *wdev,
+                                 u16 frame_type, bool reg){
+    P_GLUE_INFO_T prGlueInfo = NULL;
+    prGlueInfo = (P_GLUE_INFO_T)wiphy_priv(wiphy);
+    if ((!prGlueInfo) || (prGlueInfo->u4ReadyFlag == 0)) {
+        DBGLOG(REQ, WARN, "driver is not ready\n");
+        return;
+    }
+    if (mtk_IsP2PNetDevice(prGlueInfo, wdev->netdev) > 0) {
+        mtk_p2p_cfg80211_mgmt_frame_register(wiphy, wdev, frame_type, reg);
+    } else {
+        mtk_cfg80211_mgmt_frame_register(wiphy, wdev, frame_type, reg);
+    }
+}
+#ifdef CONFIG_NL80211_TESTMODE
+#if KERNEL_VERSION(3, 12, 0) <= CFG80211_VERSION_CODE
+int mtk_cfg_testmode_cmd(struct wiphy *wiphy, struct wireless_dev *wdev,
+                         void *data, int len)
+#else
+int mtk_cfg_testmode_cmd(struct wiphy *wiphy, void *data, int len)
+#endif
+{
+#if KERNEL_VERSION(3, 12, 0) <= CFG80211_VERSION_CODE
+    P_GLUE_INFO_T prGlueInfo = NULL;
+    prGlueInfo = (P_GLUE_INFO_T)wiphy_priv(wiphy);
+    if ((!prGlueInfo) || (prGlueInfo->u4ReadyFlag == 0)) {
+        DBGLOG(REQ, WARN, "driver is not ready\n");
+        return -EFAULT;
+    }
+    if (mtk_IsP2PNetDevice(prGlueInfo, wdev->netdev) > 0) {
+        DBGLOG(REQ, WARN, "P2P/AP don't support this function\n");
+        return -EFAULT;
+    }
+    return mtk_cfg80211_testmode_cmd(wiphy, wdev, data, len);
+#else
+    /* XXX: no information can to check the mtk_IsP2PNetDevice */
+    return mtk_cfg80211_testmode_cmd(wiphy, data, len);
+#endif
+}
+#endif  /* CONFIG_NL80211_TESTMODE */
+#if (CFG_ENABLE_WIFI_DIRECT_CFG_80211 != 0)
+int mtk_cfg_change_bss(struct wiphy *wiphy, struct net_device *dev,
+                       struct bss_parameters *params){
+    P_GLUE_INFO_T prGlueInfo = NULL;
+    prGlueInfo = (P_GLUE_INFO_T)wiphy_priv(wiphy);
+    if ((!prGlueInfo) || (prGlueInfo->u4ReadyFlag == 0)) {
+        DBGLOG(REQ, WARN, "driver is not ready\n");
+        return -EFAULT;
+    }
+    if (mtk_IsP2PNetDevice(prGlueInfo, dev) <= 0) {
+        // DBGLOG(REQ, WARN, "STA doesn't support this function\n");
+        return -EFAULT;
+    }
+    return mtk_p2p_cfg80211_change_bss(wiphy, dev, params);
+}
+int mtk_cfg_mgmt_tx_cancel_wait(struct wiphy *wiphy, struct wireless_dev *wdev,
+                                u64 cookie){
+    P_GLUE_INFO_T prGlueInfo = NULL;
+    prGlueInfo = (P_GLUE_INFO_T)wiphy_priv(wiphy);
+    if ((!prGlueInfo) || (prGlueInfo->u4ReadyFlag == 0)) {
+        DBGLOG(REQ, WARN, "driver is not ready\n");
+        return -EFAULT;
+    }
+    if (mtk_IsP2PNetDevice(prGlueInfo, wdev->netdev) <= 0) {
+        // DBGLOG(REQ, WARN, "STA doesn't support this function\n");
+        return -EFAULT;
+    }
+    return mtk_p2p_cfg80211_mgmt_tx_cancel_wait(wiphy, wdev, cookie);
+}
+int mtk_cfg_deauth(struct wiphy *wiphy, struct net_device *dev,
+                   struct cfg80211_deauth_request *req){
+    P_GLUE_INFO_T prGlueInfo = NULL;
+    prGlueInfo = (P_GLUE_INFO_T)wiphy_priv(wiphy);
+    if ((!prGlueInfo) || (prGlueInfo->u4ReadyFlag == 0)) {
+        DBGLOG(REQ, WARN, "driver is not ready\n");
+        return -EFAULT;
+    }
+    if (mtk_IsP2PNetDevice(prGlueInfo, dev) <= 0) {
+        // DBGLOG(REQ, WARN, "STA doesn't support this function\n");
+        return -EFAULT;
+    }
+    return mtk_p2p_cfg80211_deauth(wiphy, dev, req);
+}
+int mtk_cfg_disassoc(struct wiphy *wiphy, struct net_device *dev,
+                     struct cfg80211_disassoc_request *req){
+    P_GLUE_INFO_T prGlueInfo = NULL;
+    prGlueInfo = (P_GLUE_INFO_T)wiphy_priv(wiphy);
+    if ((!prGlueInfo) || (prGlueInfo->u4ReadyFlag == 0)) {
+        DBGLOG(REQ, WARN, "driver is not ready\n");
+        return -EFAULT;
+    }
+    if (mtk_IsP2PNetDevice(prGlueInfo, dev) <= 0) {
+        // DBGLOG(REQ, WARN, "STA doesn't support this function\n");
+        return -EFAULT;
+    }
+    return mtk_p2p_cfg80211_disassoc(wiphy, dev, req);
+}
+int mtk_cfg_start_ap(struct wiphy *wiphy, struct net_device *dev,
+                     struct cfg80211_ap_settings *settings){
+    P_GLUE_INFO_T prGlueInfo = NULL;
+    prGlueInfo = (P_GLUE_INFO_T)wiphy_priv(wiphy);
+    if ((!prGlueInfo) || (prGlueInfo->u4ReadyFlag == 0)) {
+        DBGLOG(REQ, WARN, "driver is not ready\n");
+        return -EFAULT;
+    }
+    if (mtk_IsP2PNetDevice(prGlueInfo, dev) <= 0) {
+        // DBGLOG(REQ, WARN, "STA doesn't support this function\n");
+        return -EFAULT;
+    }
+    return mtk_p2p_cfg80211_start_ap(wiphy, dev, settings);
+}
+int mtk_cfg_change_beacon(struct wiphy *wiphy, struct net_device *dev,
+    #if (LINUX_VERSION_CODE < KERNEL_VERSION(6, 7, 0))
+                          struct cfg80211_beacon_data *info
+#else
+                          struct cfg80211_ap_update *info
+#endif
+                          ){
+    P_GLUE_INFO_T prGlueInfo = NULL;
+    prGlueInfo = (P_GLUE_INFO_T)wiphy_priv(wiphy);
+    if ((!prGlueInfo) || (prGlueInfo->u4ReadyFlag == 0)) {
+        DBGLOG(REQ, WARN, "driver is not ready\n");
+        return -EFAULT;
+    }
+    if (mtk_IsP2PNetDevice(prGlueInfo, dev) <= 0) {
+        // DBGLOG(REQ, WARN, "STA doesn't support this function\n");
+        return -EFAULT;
+    }
+    return mtk_p2p_cfg80211_change_beacon(wiphy, dev, info);
+}
+int mtk_cfg_stop_ap(struct wiphy *wiphy, struct net_device *dev
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0))
+                    , unsigned int link_id
+#endif
+                    ){
+    P_GLUE_INFO_T prGlueInfo = NULL;
+    prGlueInfo = (P_GLUE_INFO_T)wiphy_priv(wiphy);
+    if ((!prGlueInfo) || (prGlueInfo->u4ReadyFlag == 0)) {
+        DBGLOG(REQ, WARN, "driver is not ready\n");
+        return -EFAULT;
+    }
+    if (mtk_IsP2PNetDevice(prGlueInfo, dev) <= 0) {
+        // DBGLOG(REQ, WARN, "STA doesn't support this function\n");
+        return -EFAULT;
+    }
+    return mtk_p2p_cfg80211_stop_ap(wiphy, dev
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0))
+                                    , link_id
+#endif
+
+                                    );
+}
+int mtk_cfg_set_wiphy_params(struct wiphy *wiphy, u32 changed){
+    P_GLUE_INFO_T prGlueInfo = NULL;
+    prGlueInfo = (P_GLUE_INFO_T)wiphy_priv(wiphy);
+    if ((!prGlueInfo) || (prGlueInfo->u4ReadyFlag == 0)) {
+        DBGLOG(REQ, WARN, "driver is not ready\n");
+        return -EFAULT;
+    }
+    /* TODO: AIS not support this function */
+    return mtk_p2p_cfg80211_set_wiphy_params(wiphy, changed);
+}
+int mtk_cfg_set_bitrate_mask(struct wiphy *wiphy, struct net_device *dev,
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0))
+                             unsigned int link_id,
+#endif
+                             const u8 *peer,
+                             const struct cfg80211_bitrate_mask *mask){
+    P_GLUE_INFO_T prGlueInfo = NULL;
+    prGlueInfo = (P_GLUE_INFO_T)wiphy_priv(wiphy);
+    if ((!prGlueInfo) || (prGlueInfo->u4ReadyFlag == 0)) {
+        DBGLOG(REQ, WARN, "driver is not ready\n");
+        return -EFAULT;
+    }
+    if (mtk_IsP2PNetDevice(prGlueInfo, dev) <= 0) {
+        // DBGLOG(REQ, WARN, "STA doesn't support this function\n");
+        return -EFAULT;
+    }
+    return mtk_p2p_cfg80211_set_bitrate_mask(wiphy, dev,
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0))
+                                             link_id,
+#endif
+                                             peer, mask);
+}
+int mtk_cfg_set_txpower(struct wiphy *wiphy, struct wireless_dev *wdev,
+                        enum nl80211_tx_power_setting type, int mbm){
+    P_GLUE_INFO_T prGlueInfo = NULL;
+    prGlueInfo = (P_GLUE_INFO_T)wiphy_priv(wiphy);
+    if ((!prGlueInfo) || (prGlueInfo->u4ReadyFlag == 0)) {
+        DBGLOG(REQ, WARN, "driver is not ready\n");
+        return -EFAULT;
+    }
+    if (mtk_IsP2PNetDevice(prGlueInfo, wdev->netdev) <= 0) {
+        // DBGLOG(REQ, WARN, "STA doesn't support this function\n");
+        return -EFAULT;
+    }
+    return mtk_p2p_cfg80211_set_txpower(wiphy, wdev, type, mbm);
+}
+int mtk_cfg_get_txpower(struct wiphy *wiphy, struct wireless_dev *wdev,
+                        int *dbm){
+    P_GLUE_INFO_T prGlueInfo = NULL;
+    prGlueInfo = (P_GLUE_INFO_T)wiphy_priv(wiphy);
+    if ((!prGlueInfo) || (prGlueInfo->u4ReadyFlag == 0)) {
+        DBGLOG(REQ, WARN, "driver is not ready\n");
+        return -EFAULT;
+    }
+    if (mtk_IsP2PNetDevice(prGlueInfo, wdev->netdev) <= 0) {
+        // DBGLOG(REQ, WARN, "STA doesn't support this function\n");
+        return -EFAULT;
+    }
+    return mtk_p2p_cfg80211_get_txpower(wiphy, wdev, dbm);
+}
+#endif  /* (CFG_ENABLE_WIFI_DIRECT_CFG_80211 != 0) */
+#endif  /* CFG_ENABLE_UNIFY_WIPHY */

@@ -168,7 +168,9 @@ struct _GL_P2P_INFO_T {
 struct _GL_P2P_DEV_INFO_T {
 #if CFG_ENABLE_WIFI_DIRECT_CFG_80211
     struct cfg80211_scan_request *prScanRequest;
+#if (CFG_ENABLE_UNIFY_WIPHY == 0)
     struct cfg80211_scan_request rBackupScanRequest;
+#endif
     u64 u8Cookie;
     u32 u4OsMgmtFrameFilter;
 #endif
@@ -269,13 +271,21 @@ u8 glRegisterP2P(P_GLUE_INFO_T prGlueInfo,
                  const char *prDevName2,
                  u8 ucApMode);
 
-u8 glUnregisterP2P(P_GLUE_INFO_T prGlueInfo);
+
+#if CFG_ENABLE_UNIFY_WIPHY
+int glSetupP2P(P_GLUE_INFO_T prGlueInfo, struct wireless_dev *prP2pWdev,
+               struct net_device *prP2pDev, int u4Idx, u8 fgIsApMode);
+#endif
+u8 glUnregisterP2P(P_GLUE_INFO_T prGlueInfo, u8 ucIdx);
 
 u8 p2pNetRegister(P_GLUE_INFO_T prGlueInfo, u8 fgIsRtnlLockAcquired);
 
 u8 p2pNetUnregister(P_GLUE_INFO_T prGlueInfo, u8 fgIsRtnlLockAcquired);
 
-u8 p2PFreeInfo(P_GLUE_INFO_T prGlueInfo);
+#if CFG_ENABLE_UNIFY_WIPHY
+u8 p2PAllocInfo(IN P_GLUE_INFO_T prGlueInfo, IN u8 ucIdex);
+#endif
+u8 p2PFreeInfo(P_GLUE_INFO_T prGlueInfo, u8 ucIdx);
 
 void p2pSetSuspendMode(P_GLUE_INFO_T prGlueInfo, u8 fgEnable);
 u8 glP2pCreateWirelessDevice(P_GLUE_INFO_T prGlueInfo);

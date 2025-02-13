@@ -173,6 +173,11 @@ extern u8 fgIsBusAccessFailed;
 extern const struct ieee80211_iface_combination *p_mtk_iface_combinations_sta;
 extern const s32 mtk_iface_combinations_sta_num;
 
+#if CFG_ENABLE_UNIFY_WIPHY
+extern const struct ieee80211_iface_combination *p_mtk_iface_combinations_p2p;
+extern const s32 mtk_iface_combinations_p2p_num;
+#endif
+
 /*******************************************************************************
  *                              C O N S T A N T S
  *******************************************************************************
@@ -615,6 +620,9 @@ typedef struct _NL80211_DRIVER_SET_KEY_EXTS {
 typedef struct _NETDEV_PRIVATE_GLUE_INFO {
     P_GLUE_INFO_T prGlueInfo;
     u8 ucBssIdx;
+#if CFG_ENABLE_UNIFY_WIPHY
+    u8 ucIsP2p;
+#endif
 } NETDEV_PRIVATE_GLUE_INFO, *P_NETDEV_PRIVATE_GLUE_INFO;
 
 typedef struct _PACKET_PRIVATE_DATA {
@@ -864,6 +872,7 @@ struct wireless_dev *wlanGetWirelessDevice(void);
 
 extern struct net_device *gPrP2pDev[KAL_P2P_NUM];
 extern struct net_device *gPrDev;
+extern struct wireless_dev *gprWdev;
 
 #ifdef CFG_DRIVER_INF_NAME_CHANGE
 extern char *gprifnameap;
@@ -902,4 +911,8 @@ void wlanUpdateDfsChannelTable(IN P_GLUE_INFO_T prGlueInfo, IN u8 ucChannel);
 int set_p2p_mode_handler(struct net_device *netdev,
                          PARAM_CUSTOM_P2P_SET_STRUCT_T p2pmode);
 
+#if CFG_ENABLE_UNIFY_WIPHY
+const struct net_device_ops *wlanGetNdevOps(void);
 #endif
+
+#endif  /* _GL_OS_H */
