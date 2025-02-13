@@ -328,6 +328,187 @@ int mtk_cfg80211_suspend(struct wiphy *wiphy, struct cfg80211_wowlan *wow);
 
 int mtk_cfg80211_resume(struct wiphy *wiphy);
 
+/* cfg80211 wrapper hooks */
+#if CFG_ENABLE_UNIFY_WIPHY
+#if KERNEL_VERSION(4, 1, 0) <= CFG80211_VERSION_CODE
+struct wireless_dev *mtk_cfg_add_iface(struct wiphy *wiphy, const char *name,
+                                       unsigned char name_assign_type,
+                                       enum nl80211_iftype type,
+                                       struct vif_params *params);
+#else
+struct wireless_dev *mtk_cfg_add_iface(struct wiphy *wiphy, const char *name,
+                                       enum nl80211_iftype type, u32 *flags,
+                                       struct vif_params *params);
+#endif
+int mtk_cfg_del_iface(struct wiphy *wiphy, struct wireless_dev *wdev);
+int mtk_cfg_change_iface(struct wiphy *wiphy, struct net_device *ndev,
+                         enum nl80211_iftype type,
+                         struct vif_params *params);
+int mtk_cfg_add_key(struct wiphy *wiphy, struct net_device *ndev,
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0))
+                    int link_id,
+#endif
+                    u8 key_index,
+                    bool pairwise, const u8 *mac_addr,
+                    struct key_params *params);
+int mtk_cfg_get_key(struct wiphy *wiphy, struct net_device *ndev,
+    #if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0))
+                    int link_id,
+#endif
+                    u8 key_index,
+                    bool pairwise, const u8 *mac_addr, void *cookie,
+                    void (*callback)(void *cookie, struct key_params *));
+int mtk_cfg_del_key(struct wiphy *wiphy, struct net_device *ndev,
+    #if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0))
+                    int link_id,
+#endif
+                    u8 key_index,
+                    bool pairwise, const u8 *mac_addr);
+
+int mtk_cfg_set_default_key(struct wiphy *wiphy, struct net_device *ndev,
+    #if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0))
+                            int link_id,
+#endif
+                            u8 key_index, bool unicast, bool multicast);
+#if KERNEL_VERSION(3, 16, 0) <= CFG80211_VERSION_CODE
+int mtk_cfg_get_station(struct wiphy *wiphy, struct net_device *ndev,
+                        const u8 *mac, struct station_info *sinfo);
+#else
+int mtk_cfg_get_station(struct wiphy *wiphy, struct net_device *ndev,
+                        u8 *mac, struct station_info *sinfo);
+#endif
+#if CFG_SUPPORT_TDLS
+#if KERNEL_VERSION(3, 16, 0) <= CFG80211_VERSION_CODE
+int mtk_cfg_change_station(struct wiphy *wiphy, struct net_device *ndev,
+                           const u8 *mac, struct station_parameters *params);
+#else
+int mtk_cfg_change_station(struct wiphy *wiphy, struct net_device *ndev,
+                           u8 *mac, struct station_parameters *params);
+#endif
+#if KERNEL_VERSION(3, 16, 0) <= CFG80211_VERSION_CODE
+int mtk_cfg_add_station(struct wiphy *wiphy, struct net_device *ndev,
+                        const u8 *mac, struct station_parameters *params);
+#else
+int mtk_cfg_add_station(struct wiphy *wiphy, struct net_device *ndev,
+                        u8 *mac, struct station_parameters *params);
+#endif
+#if KERNEL_VERSION(3, 16, 0) <= CFG80211_VERSION_CODE
+int mtk_cfg_tdls_oper(struct wiphy *wiphy, struct net_device *ndev,
+                      const u8 *peer, enum nl80211_tdls_operation oper);
+#else
+int mtk_cfg_tdls_oper(struct wiphy *wiphy, struct net_device *ndev,
+                      u8 *peer, enum nl80211_tdls_operation oper);
+#endif
+
+int mtk_cfg_tdls_mgmt(struct wiphy *wiphy, struct net_device *ndev,
+                      const u8 *peer,
+#if (CFG80211_VERSION_CODE >= KERNEL_VERSION(6, 5, 0))
+                      int link_id,
+#endif
+                      u8 action_code, u8 dialog_token,
+                      u16 status_code,
+                      u32 peer_capability, bool initiator, const u8 *buf,
+                      size_t len);
+
+#endif  /* CFG_SUPPORT_TDLS */
+#if KERNEL_VERSION(3, 19, 0) <= CFG80211_VERSION_CODE
+int mtk_cfg_del_station(struct wiphy *wiphy, struct net_device *ndev,
+                        struct station_del_parameters *params);
+#elif KERNEL_VERSION(3, 16, 0) <= CFG80211_VERSION_CODE
+int mtk_cfg_del_station(struct wiphy *wiphy, struct net_device *ndev,
+                        const u8 *mac);
+#else
+int mtk_cfg_del_station(struct wiphy *wiphy, struct net_device *ndev, u8 *mac);
+#endif
+int mtk_cfg_scan(struct wiphy *wiphy, struct cfg80211_scan_request *request);
+#if KERNEL_VERSION(4, 5, 0) <= CFG80211_VERSION_CODE
+void mtk_cfg_abort_scan(struct wiphy *wiphy, struct wireless_dev *wdev);
+#endif
+int mtk_cfg_connect(struct wiphy *wiphy, struct net_device *ndev,
+                    struct cfg80211_connect_params *sme);
+int mtk_cfg_disconnect(struct wiphy *wiphy, struct net_device *ndev,
+                       u16 reason_code);
+int mtk_cfg_join_ibss(struct wiphy *wiphy, struct net_device *ndev,
+                      struct cfg80211_ibss_params *params);
+int mtk_cfg_leave_ibss(struct wiphy *wiphy, struct net_device *ndev);
+int mtk_cfg_set_power_mgmt(struct wiphy *wiphy, struct net_device *ndev,
+                           bool enabled, int timeout);
+int mtk_cfg_set_pmksa(struct wiphy *wiphy, struct net_device *ndev,
+                      struct cfg80211_pmksa *pmksa);
+int mtk_cfg_del_pmksa(struct wiphy *wiphy, struct net_device *ndev,
+                      struct cfg80211_pmksa *pmksa);
+int mtk_cfg_flush_pmksa(struct wiphy *wiphy, struct net_device *ndev);
+#if CONFIG_SUPPORT_GTK_REKEY
+int mtk_cfg_set_rekey_data(struct wiphy *wiphy, struct net_device *dev,
+                           struct cfg80211_gtk_rekey_data *data);
+#endif  /* CONFIG_SUPPORT_GTK_REKEY */
+int mtk_cfg_suspend(struct wiphy *wiphy, struct cfg80211_wowlan *wow);
+int mtk_cfg_resume(struct wiphy *wiphy);
+int mtk_cfg_assoc(struct wiphy *wiphy, struct net_device *ndev,
+                  struct cfg80211_assoc_request *req);
+int mtk_cfg_remain_on_channel(struct wiphy *wiphy, struct wireless_dev *wdev,
+                              struct ieee80211_channel *chan,
+                              unsigned int duration, u64 *cookie);
+int mtk_cfg_cancel_remain_on_channel(struct wiphy *wiphy,
+                                     struct wireless_dev *wdev, u64 cookie);
+#if KERNEL_VERSION(3, 14, 0) <= CFG80211_VERSION_CODE
+int mtk_cfg_mgmt_tx(struct wiphy *wiphy, struct wireless_dev *wdev,
+                    struct cfg80211_mgmt_tx_params *params, u64 *cookie);
+#else
+int mtk_cfg_mgmt_tx(struct wiphy *wiphy, struct wireless_dev *wdev,
+                    struct ieee80211_channel *channel, bool offscan,
+                    unsigned int wait,
+                    const u8 *buf, size_t len, bool no_cck,
+                    bool dont_wait_for_ack,
+                    u64 *cookie);
+#endif
+void mtk_cfg_mgmt_frame_register(struct wiphy *wiphy, struct wireless_dev *wdev,
+                                 u16 frame_type, bool reg);
+#ifdef CONFIG_NL80211_TESTMODE
+#if KERNEL_VERSION(3, 12, 0) <= CFG80211_VERSION_CODE
+int mtk_cfg_testmode_cmd(struct wiphy *wiphy, struct wireless_dev *wdev,
+                         void *data, int len);
+#else
+int mtk_cfg_testmode_cmd(struct wiphy *wiphy, void *data, int len);
+#endif
+#endif  /* CONFIG_NL80211_TESTMODE */
+#if (CFG_ENABLE_WIFI_DIRECT_CFG_80211 != 0)
+int mtk_cfg_change_bss(struct wiphy *wiphy, struct net_device *dev,
+                       struct bss_parameters *params);
+int mtk_cfg_mgmt_tx_cancel_wait(struct wiphy *wiphy, struct wireless_dev *wdev,
+                                u64 cookie);
+int mtk_cfg_deauth(struct wiphy *wiphy, struct net_device *dev,
+                   struct cfg80211_deauth_request *req);
+int mtk_cfg_disassoc(struct wiphy *wiphy, struct net_device *dev,
+                     struct cfg80211_disassoc_request *req);
+int mtk_cfg_start_ap(struct wiphy *wiphy, struct net_device *dev,
+                     struct cfg80211_ap_settings *settings);
+int mtk_cfg_change_beacon(struct wiphy *wiphy, struct net_device *dev,
+    #if (LINUX_VERSION_CODE < KERNEL_VERSION(6, 7, 0))
+                          struct cfg80211_beacon_data *info
+#else
+                          struct cfg80211_ap_update *info
+#endif
+                          );
+int mtk_cfg_stop_ap(struct wiphy *wiphy, struct net_device *dev
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0))
+                    , unsigned int link_id
+#endif
+                    );
+int mtk_cfg_set_wiphy_params(struct wiphy *wiphy, u32 changed);
+int mtk_cfg_set_bitrate_mask(struct wiphy *wiphy, struct net_device *dev,
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0))
+                             unsigned int link_id,
+#endif
+                             const u8 *peer,
+                             const struct cfg80211_bitrate_mask *mask);
+int mtk_cfg_set_txpower(struct wiphy *wiphy, struct wireless_dev *wdev,
+                        enum nl80211_tx_power_setting type, int mbm);
+int mtk_cfg_get_txpower(struct wiphy *wiphy, struct wireless_dev *wdev,
+                        int *dbm);
+#endif  /* (CFG_ENABLE_WIFI_DIRECT_CFG_80211 != 0) */
+#endif  /* CFG_ENABLE_UNIFY_WIPHY */
+
 /*******************************************************************************
  *                              F U N C T I O N S
  *******************************************************************************

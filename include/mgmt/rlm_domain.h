@@ -691,7 +691,7 @@ enum regd_state rlmDomainStateTransition(enum regd_state request_state,
 void rlmDomainSetCountryCode(char *alpha2, u8 size_of_alpha2);
 void rlmDomainSetDfsRegion(enum nl80211_dfs_regions dfs_region);
 enum nl80211_dfs_regions rlmDomainGetDfsRegion(void);
-void rlmDomainResetCtrlInfo(void);
+void rlmDomainResetCtrlInfo(u8 force);
 void rlmDomainAddActiveChannel(u8 band);
 u8 rlmDomainGetActiveChannelCount(u8 band);
 void rlmDomainParsingChannel(IN struct wiphy *pWiphy);

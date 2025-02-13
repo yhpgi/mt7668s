@@ -211,7 +211,7 @@ typedef enum _ENUM_P2P_CMD_ID_T {
     P2P_CMD_ID_START_FORMATION,  /* 0x0A (Set) */
     P2P_CMD_ID_P2P_VERSION,  /* 0x0B (Set/Get) */
     P2P_CMD_ID_GET_CH_LIST = 12,  /* 0x0C (Get) */
-    P2P_CMD_ID_GET_OP_CH   = 14 /* 0x0E (Get) */
+    P2P_CMD_ID_GET_OP_CH   = 14     /* 0x0E (Get) */
 } ENUM_P2P_CMD_ID_T,
 *P_ENUM_P2P_CMD_ID_T;
 
