@@ -394,7 +394,8 @@ typedef struct _MONITOR_RADIOTAP_T {
  * struct cfg80211_scan_info, but we don't use all fields yet.
  */
 static inline void kalCfg80211ScanDone(struct cfg80211_scan_request *request,
-                                       bool aborted){
+                                       bool aborted)
+{
     struct cfg80211_scan_info info = { .aborted = aborted };
     cfg80211_scan_done(request, &info);
 }
@@ -1087,7 +1088,8 @@ u8 kalGetIPv6Address(IN struct net_device *prDev,
 #else
 static inline u8 kalGetIPv6Address(IN struct net_device *prDev,
                                    IN u32 u4MaxNumOfAddr, OUT u8 *pucIpv6Addrs,
-                                   OUT u32 *pu4NumOfIpv6Addr){
+                                   OUT u32 *pu4NumOfIpv6Addr)
+{
     /* Not support IPv6 */
     *pu4NumOfIpv6Addr = 0;
     return false;
@@ -1184,7 +1186,8 @@ int kalMetRemoveProcfs(IN P_GLUE_INFO_T prGlueInfo);
 void kalFreeTxMsduWorker(struct work_struct *work);
 void kalFreeTxMsdu(P_ADAPTER_T prAdapter, P_MSDU_INFO_T prMsduInfo);
 
-static inline void kal_skb_reset_mac_len(struct sk_buff *skb){
+static inline void kal_skb_reset_mac_len(struct sk_buff *skb)
+{
     skb_reset_mac_len(skb);
 }
 
@@ -1200,7 +1203,8 @@ WLAN_STATUS kalUpdateBssChannel(IN P_GLUE_INFO_T prGlueInfo,
                                 IN u8 ucChannelNum);
 
 static inline void kal_eth_hw_addr_set(struct net_device *dev,
-                                       const u8 *addr){
+                                       const u8 *addr)
+{
 #if KERNEL_VERSION(5, 17, 0) <= LINUX_VERSION_CODE
     // eth_hw_addr_set(dev, addr);
     dev_addr_set(dev, addr);

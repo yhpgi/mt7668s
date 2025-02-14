@@ -6,7 +6,8 @@
 
 void p2pRoleStateInit_IDLE(IN P_ADAPTER_T prAdapter,
                            IN P_P2P_ROLE_FSM_INFO_T prP2pRoleFsmInfo,
-                           IN P_BSS_INFO_T prP2pBssInfo){
+                           IN P_BSS_INFO_T prP2pBssInfo)
+{
     cnmTimerStartTimer(prAdapter,
                        &(prP2pRoleFsmInfo->rP2pRoleFsmTimeoutTimer),
                        P2P_AP_CHNL_HOLD_TIME_MS);
@@ -14,7 +15,8 @@ void p2pRoleStateInit_IDLE(IN P_ADAPTER_T prAdapter,
 
 void p2pRoleStateAbort_IDLE(IN P_ADAPTER_T prAdapter,
                             IN P_P2P_ROLE_FSM_INFO_T prP2pRoleFsmInfo,
-                            IN P_P2P_CHNL_REQ_INFO_T prP2pChnlReqInfo){
+                            IN P_P2P_CHNL_REQ_INFO_T prP2pChnlReqInfo)
+{
     /* AP mode channel hold time. */
     if (prP2pChnlReqInfo->fgIsChannelRequested) {
         p2pFuncReleaseCh(prAdapter, prP2pRoleFsmInfo->ucBssIndex,
@@ -26,7 +28,8 @@ void p2pRoleStateAbort_IDLE(IN P_ADAPTER_T prAdapter,
 }
 
 void p2pRoleStateInit_SCAN(IN P_ADAPTER_T prAdapter, IN u8 ucBssIndex,
-                           IN P_P2P_SCAN_REQ_INFO_T prScanReqInfo){
+                           IN P_P2P_SCAN_REQ_INFO_T prScanReqInfo)
+{
     P_P2P_DEV_FSM_INFO_T prP2pDevFsmInfo = (P_P2P_DEV_FSM_INFO_T)NULL;
     P_P2P_SCAN_REQ_INFO_T prDevScanReqInfo = NULL;
 
@@ -64,7 +67,8 @@ void p2pRoleStateInit_SCAN(IN P_ADAPTER_T prAdapter, IN u8 ucBssIndex,
 }
 
 void p2pRoleStateAbort_SCAN(IN P_ADAPTER_T prAdapter,
-                            IN P_P2P_ROLE_FSM_INFO_T prP2pRoleFsmInfo){
+                            IN P_P2P_ROLE_FSM_INFO_T prP2pRoleFsmInfo)
+{
     P_P2P_SCAN_REQ_INFO_T prScanInfo = (P_P2P_SCAN_REQ_INFO_T)NULL;
 
     do {
@@ -81,7 +85,8 @@ void p2pRoleStateAbort_SCAN(IN P_ADAPTER_T prAdapter,
 }
 
 void p2pRoleStateInit_REQING_CHANNEL(IN P_ADAPTER_T prAdapter, IN u8 ucBssIdx,
-                                     IN P_P2P_CHNL_REQ_INFO_T prChnlReqInfo){
+                                     IN P_P2P_CHNL_REQ_INFO_T prChnlReqInfo)
+{
     do {
         ASSERT_BREAK((prAdapter != NULL) && (prChnlReqInfo != NULL));
 
@@ -92,7 +97,8 @@ void p2pRoleStateInit_REQING_CHANNEL(IN P_ADAPTER_T prAdapter, IN u8 ucBssIdx,
 void p2pRoleStateAbort_REQING_CHANNEL(IN P_ADAPTER_T prAdapter,
                                       IN P_BSS_INFO_T prP2pRoleBssInfo,
                                       IN P_P2P_ROLE_FSM_INFO_T prP2pRoleFsmInfo,
-                                      IN ENUM_P2P_ROLE_STATE_T eNextState){
+                                      IN ENUM_P2P_ROLE_STATE_T eNextState)
+{
     do {
         ASSERT_BREAK((prAdapter != NULL) &&
                      (prP2pRoleBssInfo != NULL) &&
@@ -132,7 +138,8 @@ void p2pRoleStateAbort_REQING_CHANNEL(IN P_ADAPTER_T prAdapter,
 void p2pRoleStateInit_AP_CHNL_DETECTION(
     IN P_ADAPTER_T prAdapter, IN u8 ucBssIndex,
     IN P_P2P_SCAN_REQ_INFO_T prScanReqInfo,
-    IN P_P2P_CONNECTION_REQ_INFO_T prConnReqInfo){
+    IN P_P2P_CONNECTION_REQ_INFO_T prConnReqInfo)
+{
     P_P2P_SPECIFIC_BSS_INFO_T prP2pSpecificBssInfo =
         (P_P2P_SPECIFIC_BSS_INFO_T)NULL;
     P_BSS_INFO_T prBssInfo = NULL;
@@ -200,7 +207,8 @@ void p2pRoleStateAbort_AP_CHNL_DETECTION(
     IN P_P2P_CONNECTION_REQ_INFO_T prP2pConnReqInfo,
     IN P_P2P_CHNL_REQ_INFO_T prChnlReqInfo,
     IN P_P2P_SCAN_REQ_INFO_T prP2pScanReqInfo,
-    IN ENUM_P2P_ROLE_STATE_T eNextState){
+    IN ENUM_P2P_ROLE_STATE_T eNextState)
+{
     P_P2P_SPECIFIC_BSS_INFO_T prP2pSpecificBssInfo =
         (P_P2P_SPECIFIC_BSS_INFO_T)NULL;
     P_BSS_INFO_T prBssInfo = NULL;
@@ -256,7 +264,8 @@ void p2pRoleStateAbort_AP_CHNL_DETECTION(
 
 void p2pRoleStateInit_GC_JOIN(IN P_ADAPTER_T prAdapter,
                               IN P_P2P_ROLE_FSM_INFO_T prP2pRoleFsmInfo,
-                              IN P_P2P_CHNL_REQ_INFO_T prChnlReqInfo){
+                              IN P_P2P_CHNL_REQ_INFO_T prChnlReqInfo)
+{
     /* P_MSG_JOIN_REQ_T prJoinReqMsg = (P_MSG_JOIN_REQ_T)NULL; */
     P_BSS_INFO_T prP2pBssInfo = (P_BSS_INFO_T)NULL;
 
@@ -283,7 +292,8 @@ void p2pRoleStateInit_GC_JOIN(IN P_ADAPTER_T prAdapter,
 void p2pRoleStateAbort_GC_JOIN(IN P_ADAPTER_T prAdapter,
                                IN P_P2P_ROLE_FSM_INFO_T prP2pRoleFsmInfo,
                                IN P_P2P_JOIN_INFO_T prJoinInfo,
-                               IN ENUM_P2P_ROLE_STATE_T eNextState){
+                               IN ENUM_P2P_ROLE_STATE_T eNextState)
+{
     do {
         if (prJoinInfo->fgIsJoinComplete == false) {
             P_MSG_JOIN_ABORT_T prJoinAbortMsg =
@@ -323,7 +333,8 @@ void p2pRoleStateAbort_GC_JOIN(IN P_ADAPTER_T prAdapter,
 
 #if (CFG_SUPPORT_DFS_MASTER == 1)
 void p2pRoleStateInit_DFS_CAC(IN P_ADAPTER_T prAdapter, IN u8 ucBssIdx,
-                              IN P_P2P_CHNL_REQ_INFO_T prChnlReqInfo){
+                              IN P_P2P_CHNL_REQ_INFO_T prChnlReqInfo)
+{
     do {
         ASSERT_BREAK((prAdapter != NULL) && (prChnlReqInfo != NULL));
 
@@ -334,7 +345,8 @@ void p2pRoleStateInit_DFS_CAC(IN P_ADAPTER_T prAdapter, IN u8 ucBssIdx,
 void p2pRoleStateAbort_DFS_CAC(IN P_ADAPTER_T prAdapter,
                                IN P_BSS_INFO_T prP2pRoleBssInfo,
                                IN P_P2P_ROLE_FSM_INFO_T prP2pRoleFsmInfo,
-                               IN ENUM_P2P_ROLE_STATE_T eNextState){
+                               IN ENUM_P2P_ROLE_STATE_T eNextState)
+{
     do {
         cnmTimerStopTimer(prAdapter,
                           &(prP2pRoleFsmInfo->rP2pRoleFsmTimeoutTimer));
@@ -345,7 +357,8 @@ void p2pRoleStateAbort_DFS_CAC(IN P_ADAPTER_T prAdapter,
 }
 
 void p2pRoleStateInit_SWITCH_CHANNEL(IN P_ADAPTER_T prAdapter, IN u8 ucBssIdx,
-                                     IN P_P2P_CHNL_REQ_INFO_T prChnlReqInfo){
+                                     IN P_P2P_CHNL_REQ_INFO_T prChnlReqInfo)
+{
     do {
         ASSERT_BREAK((prAdapter != NULL) && (prChnlReqInfo != NULL));
 
@@ -356,7 +369,8 @@ void p2pRoleStateInit_SWITCH_CHANNEL(IN P_ADAPTER_T prAdapter, IN u8 ucBssIdx,
 void p2pRoleStateAbort_SWITCH_CHANNEL(IN P_ADAPTER_T prAdapter,
                                       IN P_BSS_INFO_T prP2pRoleBssInfo,
                                       IN P_P2P_ROLE_FSM_INFO_T prP2pRoleFsmInfo,
-                                      IN ENUM_P2P_ROLE_STATE_T eNextState){
+                                      IN ENUM_P2P_ROLE_STATE_T eNextState)
+{
     do
         p2pFuncReleaseCh(prAdapter, prP2pRoleFsmInfo->ucBssIndex,
                          &(prP2pRoleFsmInfo->rChnlReqInfo));
@@ -367,7 +381,8 @@ void p2pRoleStateAbort_SWITCH_CHANNEL(IN P_ADAPTER_T prAdapter,
 void p2pRoleStatePrepare_To_REQING_CHANNEL_STATE(
     IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prBssInfo,
     IN P_P2P_CONNECTION_REQ_INFO_T prConnReqInfo,
-    OUT P_P2P_CHNL_REQ_INFO_T prChnlReqInfo){
+    OUT P_P2P_CHNL_REQ_INFO_T prChnlReqInfo)
+{
     ENUM_BAND_T eBandBackup;
     u8 ucChannelBackup;
     ENUM_CHNL_EXT_T eSCOBackup;
@@ -447,7 +462,8 @@ void p2pRoleStatePrepare_To_DFS_CAC_STATE(
     IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prBssInfo,
     IN ENUM_CHANNEL_WIDTH_T rChannelWidth,
     IN P_P2P_CONNECTION_REQ_INFO_T prConnReqInfo,
-    OUT P_P2P_CHNL_REQ_INFO_T prChnlReqInfo){
+    OUT P_P2P_CHNL_REQ_INFO_T prChnlReqInfo)
+{
     ENUM_BAND_T eBandBackup;
     u8 ucChannelBackup;
     ENUM_CHNL_EXT_T eSCOBackup;

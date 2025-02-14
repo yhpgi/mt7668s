@@ -74,7 +74,8 @@
  *******************************************************************************
  */
 static int netdev_event(struct notifier_block *nb, unsigned long notification,
-                        void *ptr){
+                        void *ptr)
+{
     struct in_ifaddr *ifa = (struct in_ifaddr *)ptr;
     struct net_device *prDev = ifa->ifa_dev->dev;
     P_GLUE_INFO_T prGlueInfo = NULL;
@@ -124,13 +125,15 @@ static struct notifier_block inetaddr_notifier = {
     .notifier_call = netdev_event,
 };
 
-void wlanRegisterNotifier(void){
+void wlanRegisterNotifier(void)
+{
 #if CFG_ENABLE_NET_DEV_NOTIFY
     register_inetaddr_notifier(&inetaddr_notifier);
 #endif
 }
 
-void wlanUnregisterNotifier(void){
+void wlanUnregisterNotifier(void)
+{
 #if CFG_ENABLE_NET_DEV_NOTIFY
     unregister_inetaddr_notifier(&inetaddr_notifier);
 #endif
@@ -150,7 +153,8 @@ void wlanUnregisterNotifier(void){
 
 int glRegisterEarlySuspend(struct early_suspend *prDesc,
                            early_suspend_callback wlanSuspend,
-                           late_resume_callback wlanResume){
+                           late_resume_callback wlanResume)
+{
     int ret = 0;
 
     if (wlanSuspend != NULL) {
@@ -180,7 +184,8 @@ int glRegisterEarlySuspend(struct early_suspend *prDesc,
  */
 /*----------------------------------------------------------------------------*/
 
-int glUnregisterEarlySuspend(struct early_suspend *prDesc){
+int glUnregisterEarlySuspend(struct early_suspend *prDesc)
+{
     int ret = 0;
 
     unregister_early_suspend(prDesc);
@@ -206,7 +211,8 @@ int glUnregisterEarlySuspend(struct early_suspend *prDesc){
  *           actual length of data being read
  */
 /*----------------------------------------------------------------------------*/
-static int nvram_read(char *filename, char *buf, ssize_t len, int offset){
+static int nvram_read(char *filename, char *buf, ssize_t len, int offset)
+{
 #if CFG_SUPPORT_NVRAM
     struct file *fd;
     int retLen = -1;
@@ -277,7 +283,8 @@ static int nvram_read(char *filename, char *buf, ssize_t len, int offset){
  *           actual length of data being written
  */
 /*----------------------------------------------------------------------------*/
-static int nvram_write(char *filename, char *buf, ssize_t len, int offset){
+static int nvram_write(char *filename, char *buf, ssize_t len, int offset)
+{
 #if CFG_SUPPORT_NVRAM
     struct file *fd;
     int retLen = -1;
@@ -350,7 +357,8 @@ static int nvram_write(char *filename, char *buf, ssize_t len, int offset){
  */
 /*----------------------------------------------------------------------------*/
 u8 kalCfgDataRead16(IN P_GLUE_INFO_T prGlueInfo, IN u32 u4Offset,
-                    OUT u16 *pu2Data){
+                    OUT u16 *pu2Data)
+{
     if (pu2Data == NULL) {
         return false;
     }
@@ -377,7 +385,8 @@ u8 kalCfgDataRead16(IN P_GLUE_INFO_T prGlueInfo, IN u32 u4Offset,
  *           false
  */
 /*----------------------------------------------------------------------------*/
-u8 kalCfgDataWrite16(IN P_GLUE_INFO_T prGlueInfo, u32 u4Offset, u16 u2Data){
+u8 kalCfgDataWrite16(IN P_GLUE_INFO_T prGlueInfo, u32 u4Offset, u16 u2Data)
+{
     if (nvram_write(WIFI_NVRAM_FILE_NAME, (char *)&u2Data,
                     sizeof(unsigned short),
                     u4Offset) != sizeof(unsigned short)) {

@@ -64,7 +64,8 @@
  * \return (none)
  */
 /*----------------------------------------------------------------------------*/
-void cnmTimerInitialize(IN P_ADAPTER_T prAdapter){
+void cnmTimerInitialize(IN P_ADAPTER_T prAdapter)
+{
     P_ROOT_TIMER prRootTimer;
 
     KAL_SPIN_LOCK_DECLARATION();
@@ -90,7 +91,8 @@ void cnmTimerInitialize(IN P_ADAPTER_T prAdapter){
  * \return (none)
  */
 /*----------------------------------------------------------------------------*/
-void cnmTimerDestroy(IN P_ADAPTER_T prAdapter){
+void cnmTimerDestroy(IN P_ADAPTER_T prAdapter)
+{
     P_ROOT_TIMER prRootTimer;
 
     KAL_SPIN_LOCK_DECLARATION();
@@ -119,7 +121,8 @@ void cnmTimerDestroy(IN P_ADAPTER_T prAdapter){
 /*----------------------------------------------------------------------------*/
 void cnmTimerInitTimer(IN P_ADAPTER_T prAdapter, IN P_TIMER_T prTimer,
                        IN PFN_MGMT_TIMEOUT_FUNC pfFunc,
-                       IN unsigned long ulDataPtr){
+                       IN unsigned long ulDataPtr)
+{
     ASSERT(prAdapter);
 
     ASSERT(prTimer);
@@ -164,7 +167,8 @@ void cnmTimerInitTimer(IN P_ADAPTER_T prAdapter, IN P_TIMER_T prTimer,
 /*----------------------------------------------------------------------------*/
 static void cnmTimerStopTimer_impl(IN P_ADAPTER_T prAdapter,
                                    IN P_TIMER_T prTimer,
-                                   IN u8 fgAcquireSpinlock){
+                                   IN u8 fgAcquireSpinlock)
+{
     P_ROOT_TIMER prRootTimer;
 
     KAL_SPIN_LOCK_DECLARATION();
@@ -206,7 +210,8 @@ static void cnmTimerStopTimer_impl(IN P_ADAPTER_T prAdapter,
  * \return (none)
  */
 /*----------------------------------------------------------------------------*/
-void cnmTimerStopTimer(IN P_ADAPTER_T prAdapter, IN P_TIMER_T prTimer){
+void cnmTimerStopTimer(IN P_ADAPTER_T prAdapter, IN P_TIMER_T prTimer)
+{
     ASSERT(prAdapter);
     ASSERT(prTimer);
 
@@ -225,7 +230,8 @@ void cnmTimerStopTimer(IN P_ADAPTER_T prAdapter, IN P_TIMER_T prTimer){
  */
 /*----------------------------------------------------------------------------*/
 void cnmTimerStartTimer(IN P_ADAPTER_T prAdapter, IN P_TIMER_T prTimer,
-                        IN u32 u4TimeoutMs){
+                        IN u32 u4TimeoutMs)
+{
     P_ROOT_TIMER prRootTimer;
     P_LINK_T prTimerList;
     u32 rExpiredSysTime, rTimeoutSystime;
@@ -289,7 +295,8 @@ void cnmTimerStartTimer(IN P_ADAPTER_T prAdapter, IN P_TIMER_T prTimer,
  * \return (none)
  */
 /*----------------------------------------------------------------------------*/
-void cnmTimerDoTimeOutCheck(IN P_ADAPTER_T prAdapter){
+void cnmTimerDoTimeOutCheck(IN P_ADAPTER_T prAdapter)
+{
     P_ROOT_TIMER prRootTimer;
     P_LINK_T prTimerList;
     P_LINK_ENTRY_T prLinkEntry;

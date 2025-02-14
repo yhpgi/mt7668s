@@ -104,7 +104,8 @@ static void p2pFuncGetSpecAttriAction(IN P_IE_P2P_T prP2pIE, IN u8 ucOuiType,
  */
 /*----------------------------------------------------------------------------*/
 void p2pFuncRequestScan(IN P_ADAPTER_T prAdapter, IN u8 ucBssIndex,
-                        IN P_P2P_SCAN_REQ_INFO_T prScanReqInfo){
+                        IN P_P2P_SCAN_REQ_INFO_T prScanReqInfo)
+{
     P_MSG_SCN_SCAN_REQ_V2 prScanReqV2 = (P_MSG_SCN_SCAN_REQ_V2)NULL;
 
 #ifdef CFG_SUPPORT_BEAM_PLUS
@@ -221,7 +222,8 @@ void p2pFuncRequestScan(IN P_ADAPTER_T prAdapter, IN u8 ucBssIndex,
 }
 
 void p2pFuncCancelScan(IN P_ADAPTER_T prAdapter, IN u8 ucBssIndex,
-                       IN P_P2P_SCAN_REQ_INFO_T prScanInfo){
+                       IN P_P2P_SCAN_REQ_INFO_T prScanInfo)
+{
     P_MSG_SCN_SCAN_CANCEL prScanCancelMsg = (P_MSG_SCN_SCAN_CANCEL)NULL;
 
     do {
@@ -259,7 +261,8 @@ void p2pFuncCancelScan(IN P_ADAPTER_T prAdapter, IN u8 ucBssIndex,
 }
 
 void p2pFuncGCJoin(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prP2pBssInfo,
-                   IN P_P2P_JOIN_INFO_T prP2pJoinInfo){
+                   IN P_P2P_JOIN_INFO_T prP2pJoinInfo)
+{
     P_MSG_JOIN_REQ_T prJoinReqMsg = (P_MSG_JOIN_REQ_T)NULL;
     P_STA_RECORD_T prStaRec = (P_STA_RECORD_T)NULL;
     P_BSS_DESC_T prBssDesc = (P_BSS_DESC_T)NULL;
@@ -372,7 +375,8 @@ void p2pFuncUpdateBssInfoForJOIN(IN P_ADAPTER_T prAdapter,
                                  IN P_BSS_DESC_T prBssDesc,
                                  IN P_STA_RECORD_T prStaRec,
                                  IN P_BSS_INFO_T prP2pBssInfo,
-                                 IN P_SW_RFB_T prAssocRspSwRfb){
+                                 IN P_SW_RFB_T prAssocRspSwRfb)
+{
     P_WLAN_ASSOC_RSP_FRAME_T prAssocRspFrame = (P_WLAN_ASSOC_RSP_FRAME_T)NULL;
     u16 u2IELength;
     u8 *pucIE;
@@ -485,7 +489,8 @@ void p2pFuncUpdateBssInfoForJOIN(IN P_ADAPTER_T prAdapter,
 
 WLAN_STATUS
 p2pFunMgmtFrameTxDone(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo,
-                      IN ENUM_TX_RESULT_CODE_T rTxDoneStatus){
+                      IN ENUM_TX_RESULT_CODE_T rTxDoneStatus)
+{
     u8 fgIsSuccess = false;
 
     do {
@@ -508,7 +513,8 @@ p2pFunMgmtFrameTxDone(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo,
 
 WLAN_STATUS
 p2pFuncTxMgmtFrame(IN P_ADAPTER_T prAdapter, IN u8 ucBssIndex,
-                   IN P_MSDU_INFO_T prMgmtTxMsdu, IN u8 fgNonCckRate){
+                   IN P_MSDU_INFO_T prMgmtTxMsdu, IN u8 fgNonCckRate)
+{
     WLAN_STATUS rWlanStatus = WLAN_STATUS_SUCCESS;
     /* P_MSDU_INFO_T prTxMsduInfo = (P_MSDU_INFO_T)NULL; */
     P_WLAN_MAC_HEADER_T prWlanHdr = (P_WLAN_MAC_HEADER_T)NULL;
@@ -593,7 +599,8 @@ p2pFuncTxMgmtFrame(IN P_ADAPTER_T prAdapter, IN u8 ucBssIndex,
 }
 
 void p2pFuncStopComplete(IN P_ADAPTER_T prAdapter,
-                         IN P_BSS_INFO_T prP2pBssInfo){
+                         IN P_BSS_INFO_T prP2pBssInfo)
+{
     do {
         ASSERT_BREAK((prAdapter != NULL) && (prP2pBssInfo != NULL));
 
@@ -632,7 +639,8 @@ void p2pFuncStopComplete(IN P_ADAPTER_T prAdapter,
 /*----------------------------------------------------------------------------*/
 void p2pFuncStartGO(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prBssInfo,
                     IN P_P2P_CONNECTION_REQ_INFO_T prP2pConnReqInfo,
-                    IN P_P2P_CHNL_REQ_INFO_T prP2pChnlReqInfo){
+                    IN P_P2P_CHNL_REQ_INFO_T prP2pChnlReqInfo)
+{
 #if (CFG_SUPPORT_DFS_MASTER == 1)
     P_CMD_RDD_ON_OFF_CTRL_T prCmdRddOnOffCtrl;
 #endif
@@ -809,7 +817,8 @@ void p2pFuncStartGO(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prBssInfo,
     } while (false);
 }  /* p2pFuncStartGO() */
 
-void p2pFuncStopGO(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prP2pBssInfo){
+void p2pFuncStopGO(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prP2pBssInfo)
+{
     u32 u4ClientCount = 0;
 
     do {
@@ -839,7 +848,8 @@ void p2pFuncStopGO(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prP2pBssInfo){
 }
 
 WLAN_STATUS p2pFuncRoleToBssIdx(IN P_ADAPTER_T prAdapter, IN u8 ucRoleIdx,
-                                OUT u8 *pucBssIdx){
+                                OUT u8 *pucBssIdx)
+{
     WLAN_STATUS rWlanStatus = WLAN_STATUS_SUCCESS;
 
     do {
@@ -863,7 +873,8 @@ WLAN_STATUS p2pFuncRoleToBssIdx(IN P_ADAPTER_T prAdapter, IN u8 ucRoleIdx,
 }
 
 P_P2P_ROLE_FSM_INFO_T p2pFuncGetRoleByBssIdx(IN P_ADAPTER_T prAdapter,
-                                             IN u8 ucBssIndex){
+                                             IN u8 ucBssIndex)
+{
     s32 i = 0;
     P_P2P_ROLE_FSM_INFO_T prP2pRoleFsmInfo = (P_P2P_ROLE_FSM_INFO_T)NULL;
 
@@ -891,7 +902,8 @@ P_P2P_ROLE_FSM_INFO_T p2pFuncGetRoleByBssIdx(IN P_ADAPTER_T prAdapter,
 /* /////////////////////////////////   MT6630 CODE END
  * //////////////////////////////////////////////// */
 void p2pFuncSwitchOPMode(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prP2pBssInfo,
-                         IN ENUM_OP_MODE_T eOpMode, IN u8 fgSyncToFW){
+                         IN ENUM_OP_MODE_T eOpMode, IN u8 fgSyncToFW)
+{
     do {
         ASSERT_BREAK((prAdapter != NULL) && (prP2pBssInfo != NULL) &&
                      (eOpMode < OP_MODE_NUM));
@@ -1006,7 +1018,8 @@ void p2pFuncSwitchOPMode(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prP2pBssInfo,
  */
 /*----------------------------------------------------------------------------*/
 void p2pFuncReleaseCh(IN P_ADAPTER_T prAdapter, IN u8 ucBssIdx,
-                      IN P_P2P_CHNL_REQ_INFO_T prChnlReqInfo){
+                      IN P_P2P_CHNL_REQ_INFO_T prChnlReqInfo)
+{
     P_MSG_CH_ABORT_T prMsgChRelease = (P_MSG_CH_ABORT_T)NULL;
 
     DEBUGFUNC("p2pFuncReleaseCh()");
@@ -1052,7 +1065,8 @@ void p2pFuncReleaseCh(IN P_ADAPTER_T prAdapter, IN u8 ucBssIdx,
  */
 /*----------------------------------------------------------------------------*/
 void p2pFuncAcquireCh(IN P_ADAPTER_T prAdapter, IN u8 ucBssIdx,
-                      IN P_P2P_CHNL_REQ_INFO_T prChnlReqInfo){
+                      IN P_P2P_CHNL_REQ_INFO_T prChnlReqInfo)
+{
     P_MSG_CH_REQ_T prMsgChReq = (P_MSG_CH_REQ_T)NULL;
 
     do {
@@ -1100,7 +1114,8 @@ void p2pFuncAcquireCh(IN P_ADAPTER_T prAdapter, IN u8 ucBssIdx,
 }
 
 #if (CFG_SUPPORT_DFS_MASTER == 1)
-void p2pFuncStartRdd(IN P_ADAPTER_T prAdapter, IN u8 ucBssIdx){
+void p2pFuncStartRdd(IN P_ADAPTER_T prAdapter, IN u8 ucBssIdx)
+{
     P_CMD_RDD_ON_OFF_CTRL_T prCmdRddOnOffCtrl;
     P_P2P_ROLE_FSM_INFO_T prP2pRoleFsmInfo = (P_P2P_ROLE_FSM_INFO_T)NULL;
     u8 ucReqChnlNum;
@@ -1153,7 +1168,8 @@ void p2pFuncStartRdd(IN P_ADAPTER_T prAdapter, IN u8 ucBssIdx){
     cnmMemFree(prAdapter, prCmdRddOnOffCtrl);
 }
 
-void p2pFuncStopRdd(IN P_ADAPTER_T prAdapter, IN u8 ucBssIdx){
+void p2pFuncStopRdd(IN P_ADAPTER_T prAdapter, IN u8 ucBssIdx)
+{
     P_CMD_RDD_ON_OFF_CTRL_T prCmdRddOnOffCtrl;
 
     DEBUGFUNC("p2pFuncStopRdd()");
@@ -1190,7 +1206,8 @@ void p2pFuncStopRdd(IN P_ADAPTER_T prAdapter, IN u8 ucBssIdx){
 }
 
 void p2pFuncDfsSwitchCh(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prBssInfo,
-                        IN P2P_CHNL_REQ_INFO_T rP2pChnlReqInfo){
+                        IN P2P_CHNL_REQ_INFO_T rP2pChnlReqInfo)
+{
     P_GLUE_INFO_T prGlueInfo;
     P_P2P_ROLE_FSM_INFO_T prP2pRoleFsmInfo = (P_P2P_ROLE_FSM_INFO_T)NULL;
     P_CMD_RDD_ON_OFF_CTRL_T prCmdRddOnOffCtrl;
@@ -1308,7 +1325,8 @@ void p2pFuncDfsSwitchCh(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prBssInfo,
     prGlueInfo->prP2PInfo[prP2pRoleFsmInfo->ucRoleIndex]->chandef = NULL;
 }
 
-u8 p2pFuncCheckWeatherRadarBand(IN P_P2P_CHNL_REQ_INFO_T prChnlReqInfo){
+u8 p2pFuncCheckWeatherRadarBand(IN P_P2P_CHNL_REQ_INFO_T prChnlReqInfo)
+{
     u8 ucReqChnlNum;
     u8 ucCenterFreqS1;
     ENUM_CHANNEL_WIDTH_T eChannelWidth;
@@ -1337,7 +1355,8 @@ u8 p2pFuncCheckWeatherRadarBand(IN P_P2P_CHNL_REQ_INFO_T prChnlReqInfo){
     return false;
 }
 
-s32 p2pFuncSetDriverCacTime(IN u32 u4CacTime){
+s32 p2pFuncSetDriverCacTime(IN u32 u4CacTime)
+{
     WLAN_STATUS i4Status = WLAN_STATUS_SUCCESS;
 
     g_u4DriverCacTime = u4CacTime;
@@ -1348,23 +1367,28 @@ s32 p2pFuncSetDriverCacTime(IN u32 u4CacTime){
     return i4Status;
 }
 
-void p2pFuncEnableManualCac(void){
+void p2pFuncEnableManualCac(void)
+{
     g_fgManualCac = true;
 }
 
-u32 p2pFuncGetDriverCacTime(void){
+u32 p2pFuncGetDriverCacTime(void)
+{
     return g_u4DriverCacTime;
 }
 
-u8 p2pFuncIsManualCac(void){
+u8 p2pFuncIsManualCac(void)
+{
     return g_fgManualCac;
 }
 
-void p2pFuncRadarInfoInit(void){
+void p2pFuncRadarInfoInit(void)
+{
     kalMemZero(&g_rP2pRadarInfo, sizeof(g_rP2pRadarInfo));
 }
 
-void p2pFuncShowRadarInfo(IN P_ADAPTER_T prAdapter, IN u8 ucBssIdx){
+void p2pFuncShowRadarInfo(IN P_ADAPTER_T prAdapter, IN u8 ucBssIdx)
+{
     u8 ucCnt = 0;
     P_P2P_ROLE_FSM_INFO_T prP2pRoleFsmInfo = (P_P2P_ROLE_FSM_INFO_T)NULL;
     u8 ucReqChnlNum;
@@ -1441,11 +1465,13 @@ void p2pFuncShowRadarInfo(IN P_ADAPTER_T prAdapter, IN u8 ucBssIdx){
     }
 }
 
-void p2pFuncGetRadarInfo(IN struct P2P_RADAR_INFO *prP2pRadarInfo){
+void p2pFuncGetRadarInfo(IN struct P2P_RADAR_INFO *prP2pRadarInfo)
+{
     kalMemCopy(prP2pRadarInfo, &g_rP2pRadarInfo, sizeof(*prP2pRadarInfo));
 }
 
-u8 *p2pFuncJpW53RadarType(void){
+u8 *p2pFuncJpW53RadarType(void)
+{
     u32 u4Type1Diff;
     u32 u4Type2Diff;
 
@@ -1468,7 +1494,8 @@ u8 *p2pFuncJpW53RadarType(void){
     }
 }
 
-u8 *p2pFuncJpW56RadarType(void){
+u8 *p2pFuncJpW56RadarType(void)
+{
     u32 u4Type1Diff;
     u32 u4Type2Diff;
 
@@ -1523,37 +1550,44 @@ u8 *p2pFuncJpW56RadarType(void){
     return apucW56RadarType[0];
 }
 
-void p2pFuncSetRadarDetectMode(IN u8 ucRadarDetectMode){
+void p2pFuncSetRadarDetectMode(IN u8 ucRadarDetectMode)
+{
     g_ucRadarDetectMode = ucRadarDetectMode;
 
     DBGLOG(P2P, INFO, "p2pFuncSetRadarDetectMode: g_ucRadarDetectMode: %d\n",
            g_ucRadarDetectMode);
 }
 
-u8 p2pFuncGetRadarDetectMode(void){
+u8 p2pFuncGetRadarDetectMode(void)
+{
     return g_ucRadarDetectMode;
 }
 
-void p2pFuncSetDfsState(IN u8 ucDfsState){
+void p2pFuncSetDfsState(IN u8 ucDfsState)
+{
     DBGLOG(P2P, INFO, "[DFS_STATE] TRANSITION: [%s] -> [%s]\n",
            apucDfsState[g_ucDfsState], apucDfsState[ucDfsState]);
 
     g_ucDfsState = ucDfsState;
 }
 
-u8 p2pFuncGetDfsState(void){
+u8 p2pFuncGetDfsState(void)
+{
     return g_ucDfsState;
 }
 
-u8 *p2pFuncShowDfsState(void){
+u8 *p2pFuncShowDfsState(void)
+{
     return apucDfsState[g_ucDfsState];
 }
 
-void p2pFuncRecordCacStartBootTime(void){
+void p2pFuncRecordCacStartBootTime(void)
+{
     g_u4CacStartBootTime = kalGetBootTime();
 }
 
-u32 p2pFuncGetCacRemainingTime(void){
+u32 p2pFuncGetCacRemainingTime(void)
+{
     u32 u4CurrentBootTime;
     u32 u4CacRemainingTime;
 
@@ -1570,7 +1604,8 @@ WLAN_STATUS
 p2pFuncBeaconUpdate(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prP2pBssInfo,
                     IN P_P2P_BEACON_UPDATE_INFO_T prBcnUpdateInfo,
                     IN u8 *pucNewBcnHdr, IN u32 u4NewHdrLen,
-                    IN u8 *pucNewBcnBody, IN u32 u4NewBodyLen){
+                    IN u8 *pucNewBcnBody, IN u32 u4NewBodyLen)
+{
     WLAN_STATUS rWlanStatus = WLAN_STATUS_SUCCESS;
     P_WLAN_BEACON_FRAME_T prBcnFrame = (P_WLAN_BEACON_FRAME_T)NULL;
     P_MSDU_INFO_T prBcnMsduInfo = (P_MSDU_INFO_T)NULL;
@@ -1660,7 +1695,8 @@ p2pFuncBeaconUpdate(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prP2pBssInfo,
 
 WLAN_STATUS
 p2pFuncAssocRespUpdate(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prP2pBssInfo,
-                       IN u8 *AssocRespIE, IN u32 u4AssocRespLen){
+                       IN u8 *AssocRespIE, IN u32 u4AssocRespLen)
+{
     u8 ucOuiType = 0;
     u16 u2SubTypeVersion = 0;
 
@@ -1692,7 +1728,8 @@ p2pFuncAssocRespUpdate(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prP2pBssInfo,
 /*----------------------------------------------------------------------------*/
 void p2pFuncDissolve(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prP2pBssInfo,
                      IN u8 fgSendDeauth, IN u16 u2ReasonCode,
-                     IN u8 fgIsLocallyGenerated){
+                     IN u8 fgIsLocallyGenerated)
+{
     P_STA_RECORD_T prCurrStaRec, prStaRecNext;
     P_LINK_T prClientList;
 
@@ -1777,7 +1814,8 @@ void p2pFuncDissolve(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prP2pBssInfo,
 /*----------------------------------------------------------------------------*/
 void p2pFuncDisconnect(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prP2pBssInfo,
                        IN P_STA_RECORD_T prStaRec, IN u8 fgSendDeauth,
-                       IN u16 u2ReasonCode, IN u8 fgIsLocallyGenerated){
+                       IN u16 u2ReasonCode, IN u8 fgIsLocallyGenerated)
+{
     ENUM_PARAM_MEDIA_STATE_T eOriMediaStatus;
 
     DBGLOG(P2P, INFO, "p2pFuncDisconnect()");
@@ -1851,7 +1889,8 @@ void p2pFuncDisconnect(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prP2pBssInfo,
 }
 
 void p2pFuncSetChannel(IN P_ADAPTER_T prAdapter, IN u8 ucRoleIdx,
-                       IN P_RF_CHANNEL_INFO_T prRfChannelInfo){
+                       IN P_RF_CHANNEL_INFO_T prRfChannelInfo)
+{
     P_P2P_ROLE_FSM_INFO_T prP2pRoleFsmInfo = (P_P2P_ROLE_FSM_INFO_T)NULL;
     P_P2P_CONNECTION_REQ_INFO_T prP2pConnReqInfo =
         (P_P2P_CONNECTION_REQ_INFO_T)NULL;
@@ -1890,7 +1929,8 @@ void p2pFuncSetChannel(IN P_ADAPTER_T prAdapter, IN u8 ucRoleIdx,
  */
 /*----------------------------------------------------------------------------*/
 u8 p2pFuncRetryJOIN(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec,
-                    IN P_P2P_JOIN_INFO_T prJoinInfo){
+                    IN P_P2P_JOIN_INFO_T prJoinInfo)
+{
     P_MSG_JOIN_REQ_T prJoinReqMsg = (P_MSG_JOIN_REQ_T)NULL;
     u8 fgRetValue = false;
 
@@ -1943,7 +1983,8 @@ u8 p2pFuncRetryJOIN(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec,
     return fgRetValue;
 }
 
-P_BSS_INFO_T p2pFuncBSSIDFindBssInfo(IN P_ADAPTER_T prAdapter, IN u8 *pucBSSID){
+P_BSS_INFO_T p2pFuncBSSIDFindBssInfo(IN P_ADAPTER_T prAdapter, IN u8 *pucBSSID)
+{
     P_BSS_INFO_T prBssInfo = (P_BSS_INFO_T)NULL;
     u8 ucBssIdx = 0;
 
@@ -1986,7 +2027,8 @@ P_BSS_INFO_T p2pFuncBSSIDFindBssInfo(IN P_ADAPTER_T prAdapter, IN u8 *pucBSSID){
 /*----------------------------------------------------------------------------*/
 u8 p2pFuncValidateAuth(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prP2pBssInfo,
                        IN P_SW_RFB_T prSwRfb, IN PP_STA_RECORD_T pprStaRec,
-                       OUT u16 *pu2StatusCode){
+                       OUT u16 *pu2StatusCode)
+{
     u8 fgPmfConn = false;
     P_STA_RECORD_T prStaRec = (P_STA_RECORD_T)NULL;
     P_WLAN_AUTH_FRAME_T prAuthFrame = (P_WLAN_AUTH_FRAME_T)NULL;
@@ -2104,7 +2146,8 @@ u8 p2pFuncValidateAuth(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prP2pBssInfo,
 }
 
 void p2pFuncResetStaRecStatus(IN P_ADAPTER_T prAdapter,
-                              IN P_STA_RECORD_T prStaRec){
+                              IN P_STA_RECORD_T prStaRec)
+{
     do {
         if ((prAdapter == NULL) || (prStaRec == NULL)) {
             ASSERT(false);
@@ -2132,7 +2175,8 @@ void p2pFuncResetStaRecStatus(IN P_ADAPTER_T prAdapter,
 /*----------------------------------------------------------------------------*/
 void p2pFuncInitConnectionSettings(
     IN P_ADAPTER_T prAdapter, IN P_P2P_CONNECTION_SETTINGS_T prP2PConnSettings,
-    IN u8 fgIsApMode){
+    IN u8 fgIsApMode)
+{
     P_WIFI_VAR_T prWifiVar = NULL;
 
     ASSERT(prP2PConnSettings);
@@ -2162,7 +2206,8 @@ void p2pFuncInitConnectionSettings(
  */
 /*----------------------------------------------------------------------------*/
 u8 p2pFuncValidateAssocReq(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb,
-                           OUT u16 *pu2StatusCode){
+                           OUT u16 *pu2StatusCode)
+{
     u8 fgReplyAssocResp = true;
     P_WLAN_ASSOC_REQ_FRAME_T prAssocReqFrame = (P_WLAN_ASSOC_REQ_FRAME_T)NULL;
     P_STA_RECORD_T prStaRec = (P_STA_RECORD_T)NULL;
@@ -2229,7 +2274,8 @@ u8 p2pFuncValidateAssocReq(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb,
  * @return none
  */
 /*----------------------------------------------------------------------------*/
-u8 p2pFuncParseCheckForTKIPInfoElem(IN u8 *pucBuf){
+u8 p2pFuncParseCheckForTKIPInfoElem(IN u8 *pucBuf)
+{
     u8 aucWfaOui[] = VENDOR_OUI_WFA;
     P_WPA_INFO_ELEM_T prWpaIE = (P_WPA_INFO_ELEM_T)NULL;
     u32 u4GroupKeyCipher = 0;
@@ -2267,7 +2313,8 @@ u8 p2pFuncParseCheckForTKIPInfoElem(IN u8 *pucBuf){
  */
 /*----------------------------------------------------------------------------*/
 u8 p2pFuncParseCheckForP2PInfoElem(IN P_ADAPTER_T prAdapter, IN u8 *pucBuf,
-                                   OUT u8 *pucOuiType){
+                                   OUT u8 *pucOuiType)
+{
     u8 aucWfaOui[] = VENDOR_OUI_WFA_SPECIFIC;
     P_IE_WFA_T prWfaIE = (P_IE_WFA_T)NULL;
 
@@ -2309,7 +2356,8 @@ u8 p2pFuncParseCheckForP2PInfoElem(IN P_ADAPTER_T prAdapter, IN u8 *pucBuf,
 /*----------------------------------------------------------------------------*/
 u8 p2pFuncValidateProbeReq(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb,
                            OUT u32 *pu4ControlFlags, IN u8 fgIsDevInterface,
-                           IN u8 ucRoleIdx){
+                           IN u8 ucRoleIdx)
+{
     u8 fgIsReplyProbeRsp = false;
     u8 fgApplyp2PDevFilter = false;
     P_P2P_ROLE_FSM_INFO_T prP2pRoleFsmInfo = (P_P2P_ROLE_FSM_INFO_T)NULL;
@@ -2361,7 +2409,8 @@ u8 p2pFuncValidateProbeReq(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb,
 /*----------------------------------------------------------------------------*/
 void p2pFuncValidateRxActionFrame(IN P_ADAPTER_T prAdapter,
                                   IN P_SW_RFB_T prSwRfb, IN u8 fgIsDevInterface,
-                                  IN u8 ucRoleIdx){
+                                  IN u8 ucRoleIdx)
+{
     u32 u4PacketFilter = 0;
     DEBUGFUNC("p2pFuncValidateRxActionFrame");
 
@@ -2415,7 +2464,8 @@ void p2pFuncValidateRxActionFrame(IN P_ADAPTER_T prAdapter,
     return;
 }
 
-u8 p2pFuncIsAPMode(IN P_P2P_CONNECTION_SETTINGS_T prP2pConnSettings){
+u8 p2pFuncIsAPMode(IN P_P2P_CONNECTION_SETTINGS_T prP2pConnSettings)
+{
     if (prP2pConnSettings) {
         if (prP2pConnSettings->fgIsWPSMode == 1) {
             return false;
@@ -2431,7 +2481,8 @@ u8 p2pFuncIsAPMode(IN P_P2P_CONNECTION_SETTINGS_T prP2pConnSettings){
 
 void p2pFuncParseBeaconContent(IN P_ADAPTER_T prAdapter,
                                IN P_BSS_INFO_T prP2pBssInfo, IN u8 *pucIEInfo,
-                               IN u32 u4IELen){
+                               IN u32 u4IELen)
+{
     u8 *pucIE = (u8 *)NULL;
     u16 u2Offset = 0;
     P_P2P_SPECIFIC_BSS_INFO_T prP2pSpecificBssInfo =
@@ -2652,7 +2703,8 @@ void p2pFuncParseBeaconContent(IN P_ADAPTER_T prAdapter,
 static void
 p2pFuncParseBeaconVenderId(IN P_ADAPTER_T prAdapter, IN u8 *pucIE,
                            IN P_P2P_SPECIFIC_BSS_INFO_T prP2pSpecificBssInfo,
-                           IN u8 ucRoleIndex){
+                           IN u8 ucRoleIndex)
+{
     do {
         u8 ucOuiType;
         u16 u2SubTypeVersion;
@@ -2734,7 +2786,8 @@ P_BSS_DESC_T
 p2pFuncKeepOnConnection(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prBssInfo,
                         IN P_P2P_CONNECTION_REQ_INFO_T prConnReqInfo,
                         IN P_P2P_CHNL_REQ_INFO_T prChnlReqInfo,
-                        IN P_P2P_SCAN_REQ_INFO_T prScanReqInfo){
+                        IN P_P2P_SCAN_REQ_INFO_T prScanReqInfo)
+{
     P_BSS_DESC_T prTargetBss = (P_BSS_DESC_T)NULL;
 
     do {
@@ -2780,7 +2833,8 @@ p2pFuncKeepOnConnection(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prBssInfo,
 /* Currently Only for ASSOC Response Frame. */
 void p2pFuncStoreAssocRspIEBuffer(IN P_ADAPTER_T prAdapter,
                                   IN P_P2P_JOIN_INFO_T prP2pJoinInfo,
-                                  IN P_SW_RFB_T prSwRfb){
+                                  IN P_SW_RFB_T prSwRfb)
+{
     P_WLAN_ASSOC_RSP_FRAME_T prAssocRspFrame = (P_WLAN_ASSOC_RSP_FRAME_T)NULL;
     s16 i2IELen = 0;
 
@@ -2828,7 +2882,8 @@ void p2pFuncStoreAssocRspIEBuffer(IN P_ADAPTER_T prAdapter,
 /*----------------------------------------------------------------------------*/
 void p2pFuncMgmtFrameRegister(IN P_ADAPTER_T prAdapter, IN u16 u2FrameType,
                               IN u8 fgIsRegistered,
-                              OUT u32 *pu4P2pPacketFilter){
+                              OUT u32 *pu4P2pPacketFilter)
+{
     u32 u4NewPacketFilter = 0;
     CMD_RX_PACKET_FILTER rSetRxPacketFilter;
 
@@ -2893,7 +2948,8 @@ void p2pFuncMgmtFrameRegister(IN P_ADAPTER_T prAdapter, IN u16 u2FrameType,
 }
 
 void p2pFuncUpdateMgmtFrameRegister(IN P_ADAPTER_T prAdapter,
-                                    IN u32 u4OsFilter){
+                                    IN u32 u4OsFilter)
+{
     CMD_RX_PACKET_FILTER rSetRxPacketFilter;
 
     do {
@@ -2926,7 +2982,8 @@ void p2pFuncUpdateMgmtFrameRegister(IN P_ADAPTER_T prAdapter,
 }
 
 void p2pFuncGetStationInfo(IN P_ADAPTER_T prAdapter, IN u8 *pucMacAddr,
-                           OUT P_P2P_STATION_INFO_T prStaInfo){
+                           OUT P_P2P_STATION_INFO_T prStaInfo)
+{
     do {
         ASSERT_BREAK((prAdapter != NULL) && (pucMacAddr != NULL) &&
                      (prStaInfo != NULL));
@@ -2942,7 +2999,8 @@ void p2pFuncGetStationInfo(IN P_ADAPTER_T prAdapter, IN u8 *pucMacAddr,
 
 P_MSDU_INFO_T p2pFuncProcessP2pProbeRsp(IN P_ADAPTER_T prAdapter,
                                         IN u8 ucBssIdx,
-                                        IN P_MSDU_INFO_T prMgmtTxMsdu){
+                                        IN P_MSDU_INFO_T prMgmtTxMsdu)
+{
     P_MSDU_INFO_T prRetMsduInfo = prMgmtTxMsdu;
     P_WLAN_PROBE_RSP_FRAME_T prProbeRspFrame = (P_WLAN_PROBE_RSP_FRAME_T)NULL;
     u8 *pucIEBuf = (u8 *)NULL;
@@ -3135,7 +3193,8 @@ P_MSDU_INFO_T p2pFuncProcessP2pProbeRsp(IN P_ADAPTER_T prAdapter,
 static void p2pFuncProcessP2pProbeRspAction(
     IN P_ADAPTER_T prAdapter, IN u8 *pucIEBuf, IN u8 ucElemIdType,
     OUT u8 *ucBssIdx, OUT P_BSS_INFO_T *prP2pBssInfo, OUT u8 *fgIsWSCIE,
-    OUT u8 *fgIsP2PIE, OUT u8 *fgIsWFDIE){
+    OUT u8 *fgIsP2PIE, OUT u8 *fgIsWFDIE)
+{
     u8 ucOuiType = 0;
     u16 u2SubTypeVersion = 0;
 
@@ -3224,7 +3283,8 @@ static void p2pFuncProcessP2pProbeRspAction(
 }
 
 u32 p2pFuncCalculateP2p_IELenForBeacon(IN P_ADAPTER_T prAdapter, IN u8 ucBssIdx,
-                                       IN P_STA_RECORD_T prStaRec){
+                                       IN P_STA_RECORD_T prStaRec)
+{
     P_P2P_SPECIFIC_BSS_INFO_T prP2pSpeBssInfo = (P_P2P_SPECIFIC_BSS_INFO_T)NULL;
     u32 u4IELen = 0;
     P_BSS_INFO_T prBssInfo;
@@ -3253,7 +3313,8 @@ u32 p2pFuncCalculateP2p_IELenForBeacon(IN P_ADAPTER_T prAdapter, IN u8 ucBssIdx,
 }
 
 void p2pFuncGenerateP2p_IEForBeacon(IN P_ADAPTER_T prAdapter,
-                                    IN P_MSDU_INFO_T prMsduInfo){
+                                    IN P_MSDU_INFO_T prMsduInfo)
+{
     P_P2P_SPECIFIC_BSS_INFO_T prP2pSpeBssInfo = (P_P2P_SPECIFIC_BSS_INFO_T)NULL;
     u8 *pucIEBuf = (u8 *)NULL;
     P_BSS_INFO_T prBssInfo;
@@ -3286,7 +3347,8 @@ void p2pFuncGenerateP2p_IEForBeacon(IN P_ADAPTER_T prAdapter,
 }
 
 u32 p2pFuncCalculateWSC_IELenForBeacon(IN P_ADAPTER_T prAdapter, IN u8 ucBssIdx,
-                                       IN P_STA_RECORD_T prStaRec){
+                                       IN P_STA_RECORD_T prStaRec)
+{
     P_BSS_INFO_T prP2pBssInfo = (P_BSS_INFO_T)NULL;
 
     prP2pBssInfo = GET_BSS_INFO_BY_INDEX(prAdapter, ucBssIdx);
@@ -3300,7 +3362,8 @@ u32 p2pFuncCalculateWSC_IELenForBeacon(IN P_ADAPTER_T prAdapter, IN u8 ucBssIdx,
 }
 
 void p2pFuncGenerateWSC_IEForBeacon(IN P_ADAPTER_T prAdapter,
-                                    IN P_MSDU_INFO_T prMsduInfo){
+                                    IN P_MSDU_INFO_T prMsduInfo)
+{
     u8 *pucBuffer;
     u16 u2IELen = 0;
     P_BSS_INFO_T prP2pBssInfo = (P_BSS_INFO_T)NULL;
@@ -3341,7 +3404,8 @@ void p2pFuncGenerateWSC_IEForBeacon(IN P_ADAPTER_T prAdapter,
 /*----------------------------------------------------------------------------*/
 u32 p2pFuncCalculateP2p_IELenForAssocRsp(IN P_ADAPTER_T prAdapter,
                                          IN u8 ucBssIndex,
-                                         IN P_STA_RECORD_T prStaRec){
+                                         IN P_STA_RECORD_T prStaRec)
+{
     P_BSS_INFO_T prBssInfo = (P_BSS_INFO_T)NULL;
 
     prBssInfo = GET_BSS_INFO_BY_INDEX(prAdapter, ucBssIndex);
@@ -3365,7 +3429,8 @@ u32 p2pFuncCalculateP2p_IELenForAssocRsp(IN P_ADAPTER_T prAdapter,
  */
 /*----------------------------------------------------------------------------*/
 void p2pFuncGenerateP2p_IEForAssocRsp(IN P_ADAPTER_T prAdapter,
-                                      IN P_MSDU_INFO_T prMsduInfo){
+                                      IN P_MSDU_INFO_T prMsduInfo)
+{
     P_STA_RECORD_T prStaRec = (P_STA_RECORD_T)NULL;
 
     prStaRec = cnmGetStaRecByIndex(prAdapter, prMsduInfo->ucStaRecIndex);
@@ -3392,7 +3457,8 @@ void p2pFuncGenerateP2p_IEForAssocRsp(IN P_ADAPTER_T prAdapter,
 u32 p2pFuncCalculateP2P_IELen(IN P_ADAPTER_T prAdapter, IN u8 ucBssIndex,
                               IN P_STA_RECORD_T prStaRec,
                               IN APPEND_VAR_ATTRI_ENTRY_T arAppendAttriTable[],
-                              IN u32 u4AttriTableSize){
+                              IN u32 u4AttriTableSize)
+{
     u32 u4OverallAttriLen, u4Dummy;
     u16 u2EstimatedFixedAttriLen;
     u32 i;
@@ -3430,7 +3496,8 @@ void p2pFuncGenerateP2P_IE(IN P_ADAPTER_T prAdapter, IN u8 ucBssIndex,
                            IN u8 fgIsAssocFrame, IN u16 *pu2Offset,
                            IN u8 *pucBuf, IN u16 u2BufSize,
                            IN APPEND_VAR_ATTRI_ENTRY_T arAppendAttriTable[],
-                           IN u32 u4AttriTableSize){
+                           IN u32 u4AttriTableSize)
+{
     u8 *pucBuffer = (u8 *)NULL;
     P_IE_P2P_T prIeP2P = (P_IE_P2P_T)NULL;
     u32 u4OverallAttriLen;
@@ -3509,7 +3576,8 @@ void p2pFuncGenerateP2P_IE(IN P_ADAPTER_T prAdapter, IN u8 ucBssIndex,
 u32 p2pFuncAppendAttriStatusForAssocRsp(IN P_ADAPTER_T prAdapter,
                                         IN u8 ucBssIndex, IN u8 fgIsAssocFrame,
                                         IN u16 *pu2Offset, IN u8 *pucBuf,
-                                        IN u16 u2BufSize){
+                                        IN u16 u2BufSize)
+{
     u8 *pucBuffer;
     P_P2P_ATTRI_STATUS_T prAttriStatus;
     u32 u4AttriLen = 0;
@@ -3546,7 +3614,8 @@ u32 p2pFuncAppendAttriStatusForAssocRsp(IN P_ADAPTER_T prAdapter,
 u32 p2pFuncAppendAttriExtListenTiming(IN P_ADAPTER_T prAdapter,
                                       IN u8 ucBssIndex, IN u8 fgIsAssocFrame,
                                       IN u16 *pu2Offset, IN u8 *pucBuf,
-                                      IN u16 u2BufSize){
+                                      IN u16 u2BufSize)
+{
     u32 u4AttriLen = 0;
     P_P2P_ATTRI_EXT_LISTEN_TIMING_T prP2pExtListenTiming =
         (P_P2P_ATTRI_EXT_LISTEN_TIMING_T)NULL;
@@ -3595,7 +3664,8 @@ u32 p2pFuncAppendAttriExtListenTiming(IN P_ADAPTER_T prAdapter,
 
 P_IE_HDR_T
 p2pFuncGetSpecIE(IN P_ADAPTER_T prAdapter, IN u8 *pucIEBuf, IN u16 u2BufferLen,
-                 IN u8 ucElemID, IN u8 *pfgIsMore){
+                 IN u8 ucElemID, IN u8 *pfgIsMore)
+{
     P_IE_HDR_T prTargetIE = (P_IE_HDR_T)NULL;
     u8 *pucIE = (u8 *)NULL;
     u16 u2Offset = 0;
@@ -3629,7 +3699,8 @@ p2pFuncGetSpecIE(IN P_ADAPTER_T prAdapter, IN u8 *pucIEBuf, IN u16 u2BufferLen,
 
 P_ATTRIBUTE_HDR_T
 p2pFuncGetSpecAttri(IN P_ADAPTER_T prAdapter, IN u8 ucOuiType, IN u8 *pucIEBuf,
-                    IN u16 u2BufferLen, IN u8 ucAttriID){
+                    IN u16 u2BufferLen, IN u8 ucAttriID)
+{
     P_IE_P2P_T prP2pIE = (P_IE_P2P_T)NULL;
     P_ATTRIBUTE_HDR_T prTargetAttri = (P_ATTRIBUTE_HDR_T)NULL;
     u8 fgIsMore = false;
@@ -3679,7 +3750,8 @@ p2pFuncGetSpecAttri(IN P_ADAPTER_T prAdapter, IN u8 ucOuiType, IN u8 *pucIEBuf,
 /* Code refactoring for AOSP */
 static void p2pFuncGetSpecAttriAction(IN P_IE_P2P_T prP2pIE, IN u8 ucOuiType,
                                       IN u8 ucAttriID,
-                                      OUT P_ATTRIBUTE_HDR_T *prTargetAttri){
+                                      OUT P_ATTRIBUTE_HDR_T *prTargetAttri)
+{
     u8 *pucAttri = (u8 *)NULL;
     u16 u2OffsetAttri = 0;
     u8 aucWfaOui[] = VENDOR_OUI_WFA_SPECIFIC;
@@ -3747,7 +3819,8 @@ static void p2pFuncGetSpecAttriAction(IN P_IE_P2P_T prP2pIE, IN u8 ucOuiType,
 WLAN_STATUS
 p2pFuncGenerateBeaconProbeRsp(IN P_ADAPTER_T prAdapter,
                               IN P_BSS_INFO_T prBssInfo,
-                              IN P_MSDU_INFO_T prMsduInfo, IN u8 fgIsProbeRsp){
+                              IN P_MSDU_INFO_T prMsduInfo, IN u8 fgIsProbeRsp)
+{
     WLAN_STATUS rWlanStatus = WLAN_STATUS_SUCCESS;
     P_WLAN_BEACON_FRAME_T prBcnFrame = (P_WLAN_BEACON_FRAME_T)NULL;
     /* P_APPEND_VAR_IE_ENTRY_T prAppendIeTable =
@@ -3777,7 +3850,8 @@ WLAN_STATUS
 p2pFuncComposeBeaconProbeRspTemplate(
     IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prP2pBssInfo, IN u8 *pucBcnBuffer,
     IN u32 u4BcnBufLen, IN u8 fgIsProbeRsp,
-    IN P_P2P_PROBE_RSP_UPDATE_INFO_T prP2pProbeRspInfo, IN u8 fgSynToFW){
+    IN P_P2P_PROBE_RSP_UPDATE_INFO_T prP2pProbeRspInfo, IN u8 fgSynToFW)
+{
     WLAN_STATUS rWlanStatus = WLAN_STATUS_SUCCESS;
     P_MSDU_INFO_T prMsduInfo = (P_MSDU_INFO_T)NULL;
     P_WLAN_MAC_HEADER_T prWlanBcnFrame = (P_WLAN_MAC_HEADER_T)NULL;
@@ -3850,7 +3924,8 @@ p2pFuncComposeBeaconProbeRspTemplate(
 
 u32 wfdFuncCalculateWfdIELenForAssocRsp(IN P_ADAPTER_T prAdapter,
                                         IN u8 ucBssIndex,
-                                        IN P_STA_RECORD_T prStaRec){
+                                        IN P_STA_RECORD_T prStaRec)
+{
 #if CFG_SUPPORT_WFD_COMPOSE_IE
     u16 u2EstimatedExtraIELen = 0;
     P_WFD_CFG_SETTINGS_T prWfdCfgSettings = (P_WFD_CFG_SETTINGS_T)NULL;
@@ -3877,7 +3952,8 @@ u32 wfdFuncCalculateWfdIELenForAssocRsp(IN P_ADAPTER_T prAdapter,
 }
 
 void wfdFuncGenerateWfdIEForAssocRsp(IN P_ADAPTER_T prAdapter,
-                                     IN P_MSDU_INFO_T prMsduInfo){
+                                     IN P_MSDU_INFO_T prMsduInfo)
+{
 #if CFG_SUPPORT_WFD_COMPOSE_IE
     P_WFD_CFG_SETTINGS_T prWfdCfgSettings = (P_WFD_CFG_SETTINGS_T)NULL;
     P_STA_RECORD_T prStaRec;
@@ -3932,7 +4008,8 @@ void wfdFuncGenerateWfdIEForAssocRsp(IN P_ADAPTER_T prAdapter,
 }
 
 void p2pFuncComposeNoaAttribute(IN P_ADAPTER_T prAdapter, IN u8 ucBssIndex,
-                                OUT u8 *aucNoaAttrArray, OUT u32 *pu4Len){
+                                OUT u8 *aucNoaAttrArray, OUT u32 *pu4Len)
+{
     P_BSS_INFO_T prBssInfo = NULL;
     P_P2P_ATTRI_NOA_T prNoaAttr = NULL;
     P_P2P_SPECIFIC_BSS_INFO_T prP2pSpecificBssInfo = NULL;
@@ -3984,7 +4061,8 @@ void p2pFuncComposeNoaAttribute(IN P_ADAPTER_T prAdapter, IN u8 ucBssIndex,
 }
 
 u32 p2pFuncCalculateP2P_IE_NoA(IN P_ADAPTER_T prAdapter, IN u8 ucBssIdx,
-                               IN P_STA_RECORD_T prStaRec){
+                               IN P_STA_RECORD_T prStaRec)
+{
     P_P2P_SPECIFIC_BSS_INFO_T prP2pSpecificBssInfo = NULL;
     u8 ucIdx;
     u32 u4NumOfNoaDesc = 0;
@@ -4012,7 +4090,8 @@ u32 p2pFuncCalculateP2P_IE_NoA(IN P_ADAPTER_T prAdapter, IN u8 ucBssIdx,
 }
 
 void p2pFuncGenerateP2P_IE_NoA(IN P_ADAPTER_T prAdapter,
-                               IN P_MSDU_INFO_T prMsduInfo){
+                               IN P_MSDU_INFO_T prMsduInfo)
+{
     P_IE_P2P_T prIeP2P;
     u8 aucWfaOui[] = VENDOR_OUI_WFA_SPECIFIC;
     u32 u4AttributeLen;
@@ -4043,7 +4122,8 @@ void p2pFuncGenerateP2P_IE_NoA(IN P_ADAPTER_T prAdapter,
     prMsduInfo->u2FrameLength += (ELEM_HDR_LEN + prIeP2P->ucLength);
 }
 
-void p2pFuncClassifyAction(IN P_SW_RFB_T prSwRfb){
+void p2pFuncClassifyAction(IN P_SW_RFB_T prSwRfb)
+{
     P_P2P_PUBLIC_ACTION_FRAME_T pFrame =
         (P_P2P_PUBLIC_ACTION_FRAME_T)prSwRfb->pvHeader;
 
@@ -4096,7 +4176,8 @@ void p2pFuncClassifyAction(IN P_SW_RFB_T prSwRfb){
 #if CFG_SUPPORT_DBDC_TC6
 void p2pFuncModifyChandef(IN P_ADAPTER_T prAdapter,
                           IN P_GL_P2P_INFO_T prGlueP2pInfo,
-                          IN P_BSS_INFO_T prBssInfo){
+                          IN P_BSS_INFO_T prBssInfo)
+{
     if (!prGlueP2pInfo) {
         DBGLOG(P2P, WARN, "p2p glue info is not active\n");
         return;
@@ -4175,7 +4256,8 @@ void p2pFuncModifyChandef(IN P_ADAPTER_T prAdapter,
     }
     return;
 }
-u8 p2pFuncSwitchSapChannel(IN P_ADAPTER_T prAdapter){
+u8 p2pFuncSwitchSapChannel(IN P_ADAPTER_T prAdapter)
+{
     u8 fgDbDcModeEn = false;
     u8 fgIsSapDfs = false;
     P_BSS_INFO_T prP2pBssInfo = NULL;

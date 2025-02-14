@@ -81,7 +81,8 @@ HANDLE_IE_ENTRY_T rxAuthIETable[] = { { ELEM_ID_CHALLENGE_TEXT,
 static __KAL_INLINE__ void authComposeAuthFrameHeaderAndFF(
     IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec, IN u8 *pucBuffer,
     IN u8 aucPeerMACAddress[], IN u8 aucMACAddress[], IN u16 u2AuthAlgNum,
-    IN u16 u2TransactionSeqNum, IN u16 u2StatusCode){
+    IN u16 u2TransactionSeqNum, IN u16 u2StatusCode)
+{
     P_WLAN_AUTH_FRAME_T prAuthFrame;
     u16 u2FrameCtrl;
     P_CONNECTION_SETTINGS_T prConnSettings;
@@ -168,7 +169,8 @@ static __KAL_INLINE__ void authComposeAuthFrameHeaderAndFF(
  */
 /*----------------------------------------------------------------------------*/
 void authAddIEChallengeText(IN P_ADAPTER_T prAdapter,
-                            IN OUT P_MSDU_INFO_T prMsduInfo){
+                            IN OUT P_MSDU_INFO_T prMsduInfo)
+{
     P_WLAN_AUTH_FRAME_T prAuthFrame;
     P_STA_RECORD_T prStaRec;
     u16 u2TransactionSeqNum;
@@ -217,7 +219,8 @@ void authAddIEChallengeText(IN P_ADAPTER_T prAdapter,
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS authSendAuthFrame(IN P_ADAPTER_T prAdapter,
                               IN P_STA_RECORD_T prStaRec,
-                              IN u16 u2TransactionSeqNum){
+                              IN u16 u2TransactionSeqNum)
+{
     P_MSDU_INFO_T prMsduInfo;
     P_BSS_INFO_T prBssInfo;
     u16 u2EstimatedFrameLen;
@@ -309,7 +312,8 @@ WLAN_STATUS authSendAuthFrame(IN P_ADAPTER_T prAdapter,
 WLAN_STATUS
 authSendAuthFrame(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec,
                   IN u8 ucBssIndex, IN P_SW_RFB_T prFalseAuthSwRfb,
-                  IN u16 u2TransactionSeqNum, IN u16 u2StatusCode){
+                  IN u16 u2TransactionSeqNum, IN u16 u2StatusCode)
+{
     u8 *pucReceiveAddr;
     u8 *pucTransmitAddr;
     P_MSDU_INFO_T prMsduInfo;
@@ -481,7 +485,8 @@ authSendAuthFrame(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec,
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS authCheckTxAuthFrame(IN P_ADAPTER_T prAdapter,
                                  IN P_MSDU_INFO_T prMsduInfo,
-                                 IN u16 u2TransactionSeqNum){
+                                 IN u16 u2TransactionSeqNum)
+{
     P_WLAN_AUTH_FRAME_T prAuthFrame;
     P_STA_RECORD_T prStaRec;
     u16 u2TxFrameCtrl;
@@ -535,7 +540,8 @@ WLAN_STATUS authCheckTxAuthFrame(IN P_ADAPTER_T prAdapter,
  */
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS authCheckRxAuthFrameTransSeq(IN P_ADAPTER_T prAdapter,
-                                         IN P_SW_RFB_T prSwRfb){
+                                         IN P_SW_RFB_T prSwRfb)
+{
     P_WLAN_AUTH_FRAME_T prAuthFrame;
     u16 u2RxTransactionSeqNum;
     u16 u2MinPayloadLen;
@@ -643,7 +649,8 @@ WLAN_STATUS authCheckRxAuthFrameTransSeq(IN P_ADAPTER_T prAdapter,
     WLAN_STATUS
     authCheckRxAuthFrameStatus(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb,
                                IN u16 u2TransactionSeqNum,
-                               OUT u16 *pu2StatusCode){
+                               OUT u16 *pu2StatusCode)
+    {
         P_STA_RECORD_T prStaRec;
         P_WLAN_AUTH_FRAME_T prAuthFrame;
         u16 u2RxAuthAlgNum;
@@ -705,7 +712,8 @@ WLAN_STATUS authCheckRxAuthFrameTransSeq(IN P_ADAPTER_T prAdapter,
  */
 /*----------------------------------------------------------------------------*/
     void authHandleIEChallengeText(P_ADAPTER_T prAdapter, P_SW_RFB_T prSwRfb,
-                                   P_IE_HDR_T prIEHdr){
+                                   P_IE_HDR_T prIEHdr)
+    {
         P_WLAN_AUTH_FRAME_T prAuthFrame;
         P_STA_RECORD_T prStaRec;
         u16 u2TransactionSeqNum;
@@ -761,7 +769,8 @@ WLAN_STATUS authCheckRxAuthFrameTransSeq(IN P_ADAPTER_T prAdapter,
  */
 /*----------------------------------------------------------------------------*/
     WLAN_STATUS authProcessRxAuth2_Auth4Frame(IN P_ADAPTER_T prAdapter,
-                                              IN P_SW_RFB_T prSwRfb){
+                                              IN P_SW_RFB_T prSwRfb)
+    {
         P_WLAN_AUTH_FRAME_T prAuthFrame;
         u8 *pucIEsBuffer;
         u16 u2IEsLen;
@@ -812,7 +821,8 @@ WLAN_STATUS authCheckRxAuthFrameTransSeq(IN P_ADAPTER_T prAdapter,
     authComposeDeauthFrameHeaderAndFF(IN u8 *pucBuffer,
                                       IN u8 aucPeerMACAddress[],
                                       IN u8 aucMACAddress[], IN u8 aucBssid[],
-                                      IN u16 u2ReasonCode){
+                                      IN u16 u2ReasonCode)
+    {
         P_WLAN_DEAUTH_FRAME_T prDeauthFrame;
         u16 u2FrameCtrl;
 
@@ -871,7 +881,8 @@ WLAN_STATUS authCheckRxAuthFrameTransSeq(IN P_ADAPTER_T prAdapter,
                         IN P_STA_RECORD_T prStaRec,
                         IN P_SW_RFB_T prClassErrSwRfb,
                         IN u16 u2ReasonCode,
-                        IN PFN_TX_DONE_HANDLER pfTxDoneHandler){
+                        IN PFN_TX_DONE_HANDLER pfTxDoneHandler)
+    {
         u8 *pucReceiveAddr;
         u8 *pucTransmitAddr;
         u8 *pucBssid = NULL;
@@ -1162,7 +1173,8 @@ WLAN_STATUS authCheckRxAuthFrameTransSeq(IN P_ADAPTER_T prAdapter,
 /*----------------------------------------------------------------------------*/
     WLAN_STATUS authProcessRxDeauthFrame(IN P_SW_RFB_T prSwRfb,
                                          IN u8 aucBSSID[],
-                                         OUT u16 *pu2ReasonCode){
+                                         OUT u16 *pu2ReasonCode)
+    {
         P_WLAN_DEAUTH_FRAME_T prDeauthFrame;
         u16 u2RxReasonCode;
 
@@ -1217,7 +1229,8 @@ WLAN_STATUS authCheckRxAuthFrameTransSeq(IN P_ADAPTER_T prAdapter,
                             IN u8 aucExpectedBSSID[],
                             IN u16 u2ExpectedAuthAlgNum,
                             IN u16 u2ExpectedTransSeqNum,
-                            OUT u16 *pu2ReturnStatusCode){
+                            OUT u16 *pu2ReturnStatusCode)
+    {
         P_WLAN_AUTH_FRAME_T prAuthFrame;
         u16 u2RxStatusCode;
         u16 u2ReturnStatusCode = STATUS_CODE_SUCCESSFUL;

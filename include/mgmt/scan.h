@@ -738,7 +738,8 @@ u8 scnFsmSchedScanStopRequest(IN P_ADAPTER_T prAdapter);
 void scanReportScanResultToAgps(P_ADAPTER_T prAdapter);
 
 #if CFG_SCAN_CHANNEL_SPECIFIED
-static inline bool is_valid_scan_chnl_cnt(u8 num){
+static inline bool is_valid_scan_chnl_cnt(u8 num)
+{
     return num && num < MAXIMUM_OPERATION_CHANNEL_LIST;
 }
 #endif

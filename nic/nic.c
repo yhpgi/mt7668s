@@ -39,7 +39,7 @@ const u8 aucPhyCfg2PhyTypeSet[PHY_CONFIG_NUM] = {
     PHY_TYPE_SET_802_11BGN,  /* PHY_CONFIG_802_11BGN */
     PHY_TYPE_SET_802_11AN,  /* PHY_CONFIG_802_11AN */
     PHY_TYPE_SET_802_11GN,  /* PHY_CONFIG_802_11GN */
-    PHY_TYPE_SET_802_11AC,   PHY_TYPE_SET_802_11ANAC, PHY_TYPE_SET_802_11ABGNAC
+    PHY_TYPE_SET_802_11AC, PHY_TYPE_SET_802_11ANAC, PHY_TYPE_SET_802_11ABGNAC
 };
 
 /*******************************************************************************
@@ -121,7 +121,8 @@ ECO_INFO_T g_eco_info = { 0xFF };
  * @retval WLAN_STATUS_RESOURCES - Memory is not enough.
  */
 /*----------------------------------------------------------------------------*/
-WLAN_STATUS nicAllocateAdapterMemory(IN P_ADAPTER_T prAdapter){
+WLAN_STATUS nicAllocateAdapterMemory(IN P_ADAPTER_T prAdapter)
+{
     WLAN_STATUS status = WLAN_STATUS_RESOURCES;
     P_RX_CTRL_T prRxCtrl;
     P_TX_CTRL_T prTxCtrl;
@@ -222,7 +223,8 @@ WLAN_STATUS nicAllocateAdapterMemory(IN P_ADAPTER_T prAdapter){
  * @return (none)
  */
 /*----------------------------------------------------------------------------*/
-void nicReleaseAdapterMemory(IN P_ADAPTER_T prAdapter){
+void nicReleaseAdapterMemory(IN P_ADAPTER_T prAdapter)
+{
     P_TX_CTRL_T prTxCtrl;
     P_RX_CTRL_T prRxCtrl;
     u32 u4Idx;
@@ -319,7 +321,8 @@ void nicReleaseAdapterMemory(IN P_ADAPTER_T prAdapter){
  * @return (none)
  */
 /*----------------------------------------------------------------------------*/
-void nicDisableInterrupt(IN P_ADAPTER_T prAdapter){
+void nicDisableInterrupt(IN P_ADAPTER_T prAdapter)
+{
     halDisableInterrupt(prAdapter);
 }
 
@@ -332,7 +335,8 @@ void nicDisableInterrupt(IN P_ADAPTER_T prAdapter){
  * @return (none)
  */
 /*----------------------------------------------------------------------------*/
-void nicEnableInterrupt(IN P_ADAPTER_T prAdapter){
+void nicEnableInterrupt(IN P_ADAPTER_T prAdapter)
+{
     halEnableInterrupt(prAdapter);
 }
 
@@ -348,7 +352,8 @@ void nicEnableInterrupt(IN P_ADAPTER_T prAdapter){
  * @retval WLAN_STATUS_ADAPTER_NOT_READY
  */
 /*----------------------------------------------------------------------------*/
-WLAN_STATUS nicProcessIST(IN P_ADAPTER_T prAdapter){
+WLAN_STATUS nicProcessIST(IN P_ADAPTER_T prAdapter)
+{
     WLAN_STATUS u4Status = WLAN_STATUS_SUCCESS;
     u32 u4IntStatus = 0;
     u32 i;
@@ -399,7 +404,8 @@ WLAN_STATUS nicProcessIST(IN P_ADAPTER_T prAdapter){
  * @retval WLAN_STATUS_ADAPTER_NOT_READY
  */
 /*----------------------------------------------------------------------------*/
-WLAN_STATUS nicProcessIST_impl(IN P_ADAPTER_T prAdapter, IN u32 u4IntStatus){
+WLAN_STATUS nicProcessIST_impl(IN P_ADAPTER_T prAdapter, IN u32 u4IntStatus)
+{
     u32 u4IntCount = 0;
     P_INT_EVENT_MAP_T prIntEventMap = NULL;
 
@@ -445,7 +451,8 @@ WLAN_STATUS nicProcessIST_impl(IN P_ADAPTER_T prAdapter, IN u32 u4IntStatus){
  * @retval false         CHIP ID is different from the setting compiled
  */
 /*----------------------------------------------------------------------------*/
-u8 nicVerifyChipID(IN P_ADAPTER_T prAdapter){
+u8 nicVerifyChipID(IN P_ADAPTER_T prAdapter)
+{
     return halVerifyChipID(prAdapter);
 }
 
@@ -459,13 +466,15 @@ u8 nicVerifyChipID(IN P_ADAPTER_T prAdapter){
  * @return -
  */
 /*----------------------------------------------------------------------------*/
-void nicMCRInit(IN P_ADAPTER_T prAdapter){
+void nicMCRInit(IN P_ADAPTER_T prAdapter)
+{
     ASSERT(prAdapter);
 
     /* 4 <0> Initial value */
 }
 
-void nicHifInit(IN P_ADAPTER_T prAdapter){
+void nicHifInit(IN P_ADAPTER_T prAdapter)
+{
     ASSERT(prAdapter);
 }
 
@@ -479,7 +488,8 @@ void nicHifInit(IN P_ADAPTER_T prAdapter){
  *
  */
 /*----------------------------------------------------------------------------*/
-WLAN_STATUS nicInitializeAdapter(IN P_ADAPTER_T prAdapter){
+WLAN_STATUS nicInitializeAdapter(IN P_ADAPTER_T prAdapter)
+{
     WLAN_STATUS u4Status = WLAN_STATUS_SUCCESS;
 
     ASSERT(prAdapter);
@@ -520,7 +530,8 @@ WLAN_STATUS nicInitializeAdapter(IN P_ADAPTER_T prAdapter){
  * @return (none)
  */
 /*----------------------------------------------------------------------------*/
-void nicProcessAbnormalInterrupt(IN P_ADAPTER_T prAdapter){
+void nicProcessAbnormalInterrupt(IN P_ADAPTER_T prAdapter)
+{
     u32 u4Value;
 
     HAL_MCR_RD(prAdapter, MCR_WASR, &u4Value);
@@ -536,11 +547,13 @@ void nicProcessAbnormalInterrupt(IN P_ADAPTER_T prAdapter){
  * @return (none)
  */
 /*----------------------------------------------------------------------------*/
-void nicProcessSoftwareInterrupt(IN P_ADAPTER_T prAdapter){
+void nicProcessSoftwareInterrupt(IN P_ADAPTER_T prAdapter)
+{
     halProcessSoftwareInterrupt(prAdapter);
 }
 
-void nicSetSwIntr(IN P_ADAPTER_T prAdapter, IN u32 u4SwIntrBitmap){
+void nicSetSwIntr(IN P_ADAPTER_T prAdapter, IN u32 u4SwIntrBitmap)
+{
     /* NOTE:
      *  SW interrupt in HW bit 16 is mapping to SW bit 0 (shift 16bit in HW
      * transparancy) SW interrupt valid from b0~b15
@@ -562,7 +575,8 @@ void nicSetSwIntr(IN P_ADAPTER_T prAdapter, IN u32 u4SwIntrBitmap){
  * @retval - P_CMD_INFO_T
  */
 /*----------------------------------------------------------------------------*/
-P_CMD_INFO_T nicGetPendingCmdInfo(IN P_ADAPTER_T prAdapter, IN u8 ucSeqNum){
+P_CMD_INFO_T nicGetPendingCmdInfo(IN P_ADAPTER_T prAdapter, IN u8 ucSeqNum)
+{
     P_QUE_T prCmdQue;
     QUE_T rTempCmdQue;
     P_QUE_T prTempCmdQue = &rTempCmdQue;
@@ -611,7 +625,8 @@ P_CMD_INFO_T nicGetPendingCmdInfo(IN P_ADAPTER_T prAdapter, IN u8 ucSeqNum){
  */
 /*----------------------------------------------------------------------------*/
 P_MSDU_INFO_T nicGetPendingTxMsduInfo(IN P_ADAPTER_T prAdapter,
-                                      IN u8 ucWlanIndex, IN u8 ucPID){
+                                      IN u8 ucWlanIndex, IN u8 ucPID)
+{
     P_QUE_T prTxingQue;
     QUE_T rTempQue;
     P_QUE_T prTempQue = &rTempQue;
@@ -660,7 +675,8 @@ P_MSDU_INFO_T nicGetPendingTxMsduInfo(IN P_ADAPTER_T prAdapter,
 }
 
 void nicFreePendingTxMsduInfoByBssIdx(IN P_ADAPTER_T prAdapter,
-                                      IN u8 ucBssIndex){
+                                      IN u8 ucBssIndex)
+{
     P_QUE_T prTxingQue;
     QUE_T rTempQue;
     P_QUE_T prTempQue = &rTempQue;
@@ -724,7 +740,8 @@ void nicFreePendingTxMsduInfoByBssIdx(IN P_ADAPTER_T prAdapter,
  * @retval - u8
  */
 /*----------------------------------------------------------------------------*/
-u8 nicIncreaseCmdSeqNum(IN P_ADAPTER_T prAdapter){
+u8 nicIncreaseCmdSeqNum(IN P_ADAPTER_T prAdapter)
+{
     u8 ucRetval;
 
     KAL_SPIN_LOCK_DECLARATION();
@@ -750,7 +767,8 @@ u8 nicIncreaseCmdSeqNum(IN P_ADAPTER_T prAdapter){
  * @retval - u8
  */
 /*----------------------------------------------------------------------------*/
-u8 nicIncreaseTxSeqNum(IN P_ADAPTER_T prAdapter){
+u8 nicIncreaseTxSeqNum(IN P_ADAPTER_T prAdapter)
+{
     u8 ucRetval;
 
     KAL_SPIN_LOCK_DECLARATION();
@@ -780,7 +798,8 @@ u8 nicIncreaseTxSeqNum(IN P_ADAPTER_T prAdapter){
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS
 nicMediaStateChange(IN P_ADAPTER_T prAdapter, IN u8 ucBssIndex,
-                    IN P_EVENT_CONNECTION_STATUS prConnectionStatus){
+                    IN P_EVENT_CONNECTION_STATUS prConnectionStatus)
+{
     P_GLUE_INFO_T prGlueInfo;
 
     ASSERT(prAdapter);
@@ -866,7 +885,8 @@ nicMediaStateChange(IN P_ADAPTER_T prAdapter, IN u8 ucBssIndex,
  */
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS nicMediaJoinFailure(IN P_ADAPTER_T prAdapter, IN u8 ucBssIndex,
-                                IN WLAN_STATUS rStatus){
+                                IN WLAN_STATUS rStatus)
+{
     P_GLUE_INFO_T prGlueInfo;
 
     ASSERT(prAdapter);
@@ -897,7 +917,8 @@ WLAN_STATUS nicMediaJoinFailure(IN P_ADAPTER_T prAdapter, IN u8 ucBssIndex,
  * @retval - Frequency in unit of KHz, 0 for invalid channel number
  */
 /*----------------------------------------------------------------------------*/
-u32 nicChannelNum2Freq(u32 u4ChannelNum){
+u32 nicChannelNum2Freq(u32 u4ChannelNum)
+{
     u32 u4ChannelInMHz;
 
     if (u4ChannelNum >= 1 && u4ChannelNum <= 13) {
@@ -934,7 +955,8 @@ u32 nicChannelNum2Freq(u32 u4ChannelNum){
  * @retval - Frequency Number, 0 for invalid freqency
  */
 /*----------------------------------------------------------------------------*/
-u32 nicFreq2ChannelNum(u32 u4FreqInKHz){
+u32 nicFreq2ChannelNum(u32 u4FreqInKHz)
+{
     switch (u4FreqInKHz) {
     case 2412000:
         return 1;
@@ -1161,7 +1183,8 @@ u32 nicFreq2ChannelNum(u32 u4FreqInKHz){
     }
 }
 
-u8 nicGetVhtS1(u8 ucPrimaryChannel, u8 ucBandwidth){
+u8 nicGetVhtS1(u8 ucPrimaryChannel, u8 ucBandwidth)
+{
     /* find S1 (central channel 42, 58, 106, 122, and 155) */
 
     if ((ucBandwidth == VHT_OP_CHANNEL_WIDTH_80) ||
@@ -1205,7 +1228,8 @@ u8 nicGetVhtS1(u8 ucPrimaryChannel, u8 ucBandwidth){
  * @retval -
  */
 /*----------------------------------------------------------------------------*/
-WLAN_STATUS nicActivateNetwork(IN P_ADAPTER_T prAdapter, IN u8 ucBssIndex){
+WLAN_STATUS nicActivateNetwork(IN P_ADAPTER_T prAdapter, IN u8 ucBssIndex)
+{
     CMD_BSS_ACTIVATE_CTRL rCmdActivateCtrl;
     P_BSS_INFO_T prBssInfo;
     /* const u8 aucZeroMacAddr[] = NULL_MAC_ADDR; */
@@ -1258,7 +1282,8 @@ WLAN_STATUS nicActivateNetwork(IN P_ADAPTER_T prAdapter, IN u8 ucBssIndex){
  * @retval -
  */
 /*----------------------------------------------------------------------------*/
-WLAN_STATUS nicDeactivateNetwork(IN P_ADAPTER_T prAdapter, IN u8 ucBssIndex){
+WLAN_STATUS nicDeactivateNetwork(IN P_ADAPTER_T prAdapter, IN u8 ucBssIndex)
+{
     WLAN_STATUS u4Status;
     CMD_BSS_ACTIVATE_CTRL rCmdActivateCtrl;
     P_BSS_INFO_T prBssInfo;
@@ -1324,7 +1349,8 @@ WLAN_STATUS nicDeactivateNetwork(IN P_ADAPTER_T prAdapter, IN u8 ucBssIndex){
  * @retval -
  */
 /*----------------------------------------------------------------------------*/
-WLAN_STATUS nicUpdateBss(IN P_ADAPTER_T prAdapter, IN u8 ucBssIndex){
+WLAN_STATUS nicUpdateBss(IN P_ADAPTER_T prAdapter, IN u8 ucBssIndex)
+{
     WLAN_STATUS u4Status = WLAN_STATUS_NOT_ACCEPTED;
     P_BSS_INFO_T prBssInfo;
     CMD_SET_BSS_INFO rCmdSetBssInfo;
@@ -1510,7 +1536,8 @@ WLAN_STATUS nicUpdateBss(IN P_ADAPTER_T prAdapter, IN u8 ucBssIndex){
  * @retval -
  */
 /*----------------------------------------------------------------------------*/
-WLAN_STATUS nicPmIndicateBssCreated(IN P_ADAPTER_T prAdapter, IN u8 ucBssIndex){
+WLAN_STATUS nicPmIndicateBssCreated(IN P_ADAPTER_T prAdapter, IN u8 ucBssIndex)
+{
     P_BSS_INFO_T prBssInfo;
     CMD_INDICATE_PM_BSS_CREATED rCmdIndicatePmBssCreated;
 
@@ -1544,7 +1571,8 @@ WLAN_STATUS nicPmIndicateBssCreated(IN P_ADAPTER_T prAdapter, IN u8 ucBssIndex){
  */
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS nicPmIndicateBssConnected(IN P_ADAPTER_T prAdapter,
-                                      IN u8 ucBssIndex){
+                                      IN u8 ucBssIndex)
+{
     P_BSS_INFO_T prBssInfo;
     CMD_INDICATE_PM_BSS_CONNECTED rCmdIndicatePmBssConnected;
 
@@ -1607,7 +1635,8 @@ WLAN_STATUS nicPmIndicateBssConnected(IN P_ADAPTER_T prAdapter,
  * @retval -
  */
 /*----------------------------------------------------------------------------*/
-WLAN_STATUS nicPmIndicateBssAbort(IN P_ADAPTER_T prAdapter, IN u8 ucBssIndex){
+WLAN_STATUS nicPmIndicateBssAbort(IN P_ADAPTER_T prAdapter, IN u8 ucBssIndex)
+{
     CMD_INDICATE_PM_BSS_ABORT rCmdIndicatePmBssAbort;
 
     kalMemZero(&rCmdIndicatePmBssAbort, sizeof(CMD_INDICATE_PM_BSS_ABORT));
@@ -1625,7 +1654,8 @@ WLAN_STATUS nicPmIndicateBssAbort(IN P_ADAPTER_T prAdapter, IN u8 ucBssIndex){
 
 WLAN_STATUS
 nicConfigPowerSaveProfile(IN P_ADAPTER_T prAdapter, IN u8 ucBssIndex,
-                          IN PARAM_POWER_MODE ePwrMode, IN u8 fgEnCmdEvent){
+                          IN PARAM_POWER_MODE ePwrMode, IN u8 fgEnCmdEvent)
+{
     DEBUGFUNC("nicConfigPowerSaveProfile");
     DBGLOG(INIT, TRACE, "ucBssIndex:%d, ePwrMode:%d, fgEnCmdEvent:%d\n",
            ucBssIndex, ePwrMode, fgEnCmdEvent);
@@ -1661,7 +1691,8 @@ nicConfigPowerSaveProfile(IN P_ADAPTER_T prAdapter, IN u8 ucBssIndex,
 WLAN_STATUS
 nicConfigPowerSaveWowProfile(IN P_ADAPTER_T prAdapter, u8 ucBssIndex,
                              PARAM_POWER_MODE ePwrMode, u8 fgEnCmdEvent,
-                             u8 fgSuspend){
+                             u8 fgSuspend)
+{
     CMD_PS_PROFILE_T rPowerSaveMode;
 
     kalMemZero(&rPowerSaveMode, sizeof(CMD_PS_PROFILE_T));
@@ -1694,7 +1725,8 @@ nicConfigPowerSaveWowProfile(IN P_ADAPTER_T prAdapter, u8 ucBssIndex,
 }
 
 WLAN_STATUS nicEnterCtiaMode(IN P_ADAPTER_T prAdapter, u8 fgEnterCtia,
-                             u8 fgEnCmdEvent){
+                             u8 fgEnCmdEvent)
+{
     CMD_SW_DBG_CTRL_T rCmdSwCtrl;
     /* CMD_ACCESS_REG rCmdAccessReg; */
     WLAN_STATUS rWlanStatus;
@@ -1771,7 +1803,8 @@ WLAN_STATUS nicEnterCtiaMode(IN P_ADAPTER_T prAdapter, u8 fgEnterCtia,
     return rWlanStatus;
 }
 
-WLAN_STATUS nicEnterTPTestMode(IN P_ADAPTER_T prAdapter, IN u8 ucFuncMask){
+WLAN_STATUS nicEnterTPTestMode(IN P_ADAPTER_T prAdapter, IN u8 ucFuncMask)
+{
     CMD_SW_DBG_CTRL_T rCmdSwCtrl;
     WLAN_STATUS rWlanStatus;
     u8 ucBssIdx;
@@ -1863,7 +1896,8 @@ WLAN_STATUS
 nicUpdateBeaconIETemplate(IN P_ADAPTER_T prAdapter,
                           IN ENUM_IE_UPD_METHOD_T eIeUpdMethod,
                           IN u8 ucBssIndex, IN u16 u2Capability, IN u8 *aucIe,
-                          IN u16 u2IELen){
+                          IN u16 u2IELen)
+{
     P_CMD_BEACON_TEMPLATE_UPDATE prCmdBcnUpdate;
     u16 u2CmdBufLen = 0;
     P_GLUE_INFO_T prGlueInfo;
@@ -1952,7 +1986,8 @@ nicUpdateBeaconIETemplate(IN P_ADAPTER_T prAdapter,
  * @retval none
  */
 /*----------------------------------------------------------------------------*/
-void nicSetAvailablePhyTypeSet(IN P_ADAPTER_T prAdapter){
+void nicSetAvailablePhyTypeSet(IN P_ADAPTER_T prAdapter)
+{
     P_CONNECTION_SETTINGS_T prConnSettings;
 
     ASSERT(prAdapter);
@@ -1986,7 +2021,8 @@ void nicSetAvailablePhyTypeSet(IN P_ADAPTER_T prAdapter){
  * @retval -
  */
 /*----------------------------------------------------------------------------*/
-WLAN_STATUS nicQmUpdateWmmParms(IN P_ADAPTER_T prAdapter, IN u8 ucBssIndex){
+WLAN_STATUS nicQmUpdateWmmParms(IN P_ADAPTER_T prAdapter, IN u8 ucBssIndex)
+{
     P_BSS_INFO_T prBssInfo;
     CMD_UPDATE_WMM_PARMS_T rCmdUpdateWmmParms;
 
@@ -2028,7 +2064,8 @@ WLAN_STATUS nicQmUpdateWmmParms(IN P_ADAPTER_T prAdapter, IN u8 ucBssIndex){
  */
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS nicUpdateTxPower(IN P_ADAPTER_T prAdapter,
-                             IN P_CMD_TX_PWR_T prTxPwrParam){
+                             IN P_CMD_TX_PWR_T prTxPwrParam)
+{
     DEBUGFUNC("nicUpdateTxPower");
 
     ASSERT(prAdapter);
@@ -2050,7 +2087,8 @@ WLAN_STATUS nicUpdateTxPower(IN P_ADAPTER_T prAdapter,
  */
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS nicSetAutoTxPower(IN P_ADAPTER_T prAdapter,
-                              IN P_CMD_AUTO_POWER_PARAM_T prAutoPwrParam){
+                              IN P_CMD_AUTO_POWER_PARAM_T prAutoPwrParam)
+{
     DEBUGFUNC("nicSetAutoTxPower");
 
     ASSERT(prAdapter);
@@ -2074,7 +2112,8 @@ WLAN_STATUS nicSetAutoTxPower(IN P_ADAPTER_T prAdapter,
  */
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS nicSetAutoTxPowerControl(IN P_ADAPTER_T prAdapter,
-                                     IN P_CMD_TX_PWR_T prTxPwrParam){
+                                     IN P_CMD_TX_PWR_T prTxPwrParam)
+{
     DEBUGFUNC("nicUpdateTxPower");
 
     ASSERT(prAdapter);
@@ -2096,7 +2135,8 @@ WLAN_STATUS nicSetAutoTxPowerControl(IN P_ADAPTER_T prAdapter,
  */
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS nicUpdate5GOffset(IN P_ADAPTER_T prAdapter,
-                              IN P_CMD_5G_PWR_OFFSET_T pr5GPwrOffset){
+                              IN P_CMD_5G_PWR_OFFSET_T pr5GPwrOffset)
+{
     return 0;
 }
 
@@ -2112,7 +2152,8 @@ WLAN_STATUS nicUpdate5GOffset(IN P_ADAPTER_T prAdapter,
  */
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS nicUpdateDPD(IN P_ADAPTER_T prAdapter,
-                         IN P_CMD_PWR_PARAM_T prDpdCalResult){
+                         IN P_CMD_PWR_PARAM_T prDpdCalResult)
+{
     DEBUGFUNC("nicUpdateDPD");
 
     ASSERT(prAdapter);
@@ -2132,7 +2173,8 @@ WLAN_STATUS nicUpdateDPD(IN P_ADAPTER_T prAdapter,
  * @retval none
  */
 /*----------------------------------------------------------------------------*/
-void nicInitSystemService(IN P_ADAPTER_T prAdapter){
+void nicInitSystemService(IN P_ADAPTER_T prAdapter)
+{
     ASSERT(prAdapter);
 
     /* <1> Initialize MGMT Memory pool and STA_REC */
@@ -2157,7 +2199,8 @@ void nicInitSystemService(IN P_ADAPTER_T prAdapter){
  * @retval none
  */
 /*----------------------------------------------------------------------------*/
-void nicResetSystemService(IN P_ADAPTER_T prAdapter){
+void nicResetSystemService(IN P_ADAPTER_T prAdapter)
+{
     ASSERT(prAdapter);
 }
 
@@ -2170,7 +2213,8 @@ void nicResetSystemService(IN P_ADAPTER_T prAdapter){
  * @retval none
  */
 /*----------------------------------------------------------------------------*/
-void nicUninitSystemService(IN P_ADAPTER_T prAdapter){
+void nicUninitSystemService(IN P_ADAPTER_T prAdapter)
+{
     ASSERT(prAdapter);
 
     /* Timer Destruction */
@@ -2189,7 +2233,8 @@ void nicUninitSystemService(IN P_ADAPTER_T prAdapter){
  * @retval none
  */
 /*----------------------------------------------------------------------------*/
-void nicInitMGMT(IN P_ADAPTER_T prAdapter, IN P_REG_INFO_T prRegInfo){
+void nicInitMGMT(IN P_ADAPTER_T prAdapter, IN P_REG_INFO_T prRegInfo)
+{
     ASSERT(prAdapter);
 
     /* CNM Module - initialization */
@@ -2224,7 +2269,8 @@ void nicInitMGMT(IN P_ADAPTER_T prAdapter, IN P_REG_INFO_T prRegInfo){
  * @retval none
  */
 /*----------------------------------------------------------------------------*/
-void nicUninitMGMT(IN P_ADAPTER_T prAdapter){
+void nicUninitMGMT(IN P_ADAPTER_T prAdapter)
+{
     ASSERT(prAdapter);
 
 #if CFG_SUPPORT_SWCR
@@ -2273,7 +2319,8 @@ void nicAddScanResult(IN P_ADAPTER_T prAdapter, IN PARAM_MAC_ADDRESS rMacAddr,
                       IN P_PARAM_802_11_CONFIG_T prConfiguration,
                       IN ENUM_PARAM_OP_MODE_T eOpMode,
                       IN PARAM_RATES_EX rSupportedRates, IN u16 u2IELength,
-                      IN u8 *pucIEBuf){
+                      IN u8 *pucIEBuf)
+{
     u8 bReplace;
     u32 i;
     u32 u4IdxWeakest = 0;
@@ -2482,7 +2529,8 @@ void nicAddScanResult(IN P_ADAPTER_T prAdapter, IN PARAM_MAC_ADDRESS rMacAddr,
  * @return (none)
  */
 /*----------------------------------------------------------------------------*/
-void nicFreeScanResultIE(IN P_ADAPTER_T prAdapter, IN u32 u4Idx){
+void nicFreeScanResultIE(IN P_ADAPTER_T prAdapter, IN u32 u4Idx)
+{
     u32 i;
     u8 *pucPivot, *pucMovePivot;
     u32 u4MoveSize, u4FreeSize, u4ReserveSize;
@@ -2551,7 +2599,8 @@ nicUpdateRateParams(IN P_ADAPTER_T prAdapter,
                     IN ENUM_REGISTRY_FIXED_RATE_T eRateSetting,
                     IN u8 *pucDesiredPhyTypeSet, IN u16 *pu2DesiredNonHTRateSet,
                     IN u16 *pu2BSSBasicRateSet, IN u8 *pucMcsSet,
-                    IN u8 *pucSupMcs32, IN u16 *pu2HtCapInfo){
+                    IN u8 *pucSupMcs32, IN u16 *pu2HtCapInfo)
+{
     ASSERT(prAdapter);
     ASSERT(eRateSetting > FIXED_RATE_NONE && eRateSetting < FIXED_RATE_NUM);
 
@@ -3098,7 +3147,8 @@ nicUpdateRateParams(IN P_ADAPTER_T prAdapter,
 /*----------------------------------------------------------------------------*/
 
 WLAN_STATUS nicWriteMcr(IN P_ADAPTER_T prAdapter, IN u32 u4Address,
-                        IN u32 u4Value){
+                        IN u32 u4Value)
+{
     CMD_ACCESS_REG rCmdAccessReg;
 
     rCmdAccessReg.u4Address = u4Address;
@@ -3150,7 +3200,8 @@ WLAN_STATUS nicWriteMcr(IN P_ADAPTER_T prAdapter, IN u32 u4Address,
 WLAN_STATUS
 nicRlmArUpdateParms(IN P_ADAPTER_T prAdapter, IN u32 u4ArSysParam0,
                     IN u32 u4ArSysParam1, IN u32 u4ArSysParam2,
-                    IN u32 u4ArSysParam3){
+                    IN u32 u4ArSysParam3)
+{
     u8 ucArVer, ucAbwVer, ucAgiVer;
     u16 u2HtClrMask;
     u16 u2LegacyClrMask;
@@ -3238,7 +3289,8 @@ nicRlmArUpdateParms(IN P_ADAPTER_T prAdapter, IN u32 u4ArSysParam0,
  */
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS nicRoamingUpdateParams(IN P_ADAPTER_T prAdapter,
-                                   IN u32 u4EnableRoaming){
+                                   IN u32 u4EnableRoaming)
+{
     P_CONNECTION_SETTINGS_T prConnSettings;
 
     prConnSettings = &(prAdapter->rWifiVar.rConnSettings);
@@ -3262,7 +3314,8 @@ WLAN_STATUS nicRoamingUpdateParams(IN P_ADAPTER_T prAdapter,
  */
 /*----------------------------------------------------------------------------*/
 void nicUpdateLinkQuality(IN P_ADAPTER_T prAdapter, IN u8 ucBssIndex,
-                          IN P_EVENT_LINK_QUALITY_V2 prEventLinkQuality){
+                          IN P_EVENT_LINK_QUALITY_V2 prEventLinkQuality)
+{
     s8 cRssi;
     u16 u2AdjustRssi = 10;
 
@@ -3317,7 +3370,8 @@ void nicUpdateLinkQuality(IN P_ADAPTER_T prAdapter, IN u8 ucBssIndex,
  */
 /*----------------------------------------------------------------------------*/
 void nicUpdateRSSI(IN P_ADAPTER_T prAdapter, IN u8 ucBssIndex, IN s8 cRssi,
-                   IN s8 cLinkQuality){
+                   IN s8 cLinkQuality)
+{
     ASSERT(prAdapter);
     ASSERT(ucBssIndex <= MAX_BSS_INDEX);
 
@@ -3370,7 +3424,8 @@ void nicUpdateRSSI(IN P_ADAPTER_T prAdapter, IN u8 ucBssIndex, IN s8 cRssi,
  */
 /*----------------------------------------------------------------------------*/
 void nicUpdateLinkSpeed(IN P_ADAPTER_T prAdapter, IN u8 ucBssIndex,
-                        IN u16 u2LinkSpeed){
+                        IN u16 u2LinkSpeed)
+{
     ASSERT(prAdapter);
     ASSERT(ucBssIndex <= MAX_BSS_INDEX);
 
@@ -3393,7 +3448,8 @@ void nicUpdateLinkSpeed(IN P_ADAPTER_T prAdapter, IN u8 ucBssIndex,
 
 #if CFG_SUPPORT_RDD_TEST_MODE
 WLAN_STATUS nicUpdateRddTestMode(IN P_ADAPTER_T prAdapter,
-                                 IN P_CMD_RDD_CH_T prRddChParam){
+                                 IN P_CMD_RDD_CH_T prRddChParam)
+{
     DEBUGFUNC("nicUpdateRddTestMode.\n");
 
     ASSERT(prAdapter);
@@ -3417,7 +3473,8 @@ WLAN_STATUS nicUpdateRddTestMode(IN P_ADAPTER_T prAdapter,
  */
 /*----------------------------------------------------------------------------*/
 
-WLAN_STATUS nicApplyNetworkAddress(IN P_ADAPTER_T prAdapter){
+WLAN_STATUS nicApplyNetworkAddress(IN P_ADAPTER_T prAdapter)
+{
     u32 i;
 
     ASSERT(prAdapter);
@@ -3460,34 +3517,41 @@ WLAN_STATUS nicApplyNetworkAddress(IN P_ADAPTER_T prAdapter){
     return WLAN_STATUS_SUCCESS;
 }
 
-u8 nicGetChipHwVer(void){
+u8 nicGetChipHwVer(void)
+{
     return g_eco_info.ucHwVer;
 }
 
-u8 nicGetChipSwVer(void){
+u8 nicGetChipSwVer(void)
+{
     return g_eco_info.ucRomVer;
 }
 
-u8 nicGetChipFactoryVer(void){
+u8 nicGetChipFactoryVer(void)
+{
     return g_eco_info.ucFactoryVer;
 }
 
-u8 nicSetChipHwVer(u8 value){
+u8 nicSetChipHwVer(u8 value)
+{
     g_eco_info.ucHwVer = value;
     return 0;
 }
 
-u8 nicSetChipSwVer(u8 value){
+u8 nicSetChipSwVer(u8 value)
+{
     g_eco_info.ucRomVer = value;
     return 0;
 }
 
-u8 nicSetChipFactoryVer(u8 value){
+u8 nicSetChipFactoryVer(u8 value)
+{
     g_eco_info.ucFactoryVer = value;
     return 0;
 }
 
-u8 nicGetChipEcoVer(IN P_ADAPTER_T prAdapter){
+u8 nicGetChipEcoVer(IN P_ADAPTER_T prAdapter)
+{
     P_ECO_INFO_T prEcoInfo;
     u8 ucEcoVer;
     u8 ucCurSwVer, ucCurHwVer, ucCurFactoryVer;
@@ -3519,7 +3583,8 @@ u8 nicGetChipEcoVer(IN P_ADAPTER_T prAdapter){
     return prAdapter->chip_info->eco_info[ucEcoVer].ucEcoVer;
 }
 
-u8 nicIsEcoVerEqualTo(IN P_ADAPTER_T prAdapter, u8 ucEcoVer){
+u8 nicIsEcoVerEqualTo(IN P_ADAPTER_T prAdapter, u8 ucEcoVer)
+{
     if (ucEcoVer == prAdapter->chip_info->eco_ver) {
         return true;
     } else {
@@ -3527,7 +3592,8 @@ u8 nicIsEcoVerEqualTo(IN P_ADAPTER_T prAdapter, u8 ucEcoVer){
     }
 }
 
-u8 nicIsEcoVerEqualOrLaterTo(IN P_ADAPTER_T prAdapter, u8 ucEcoVer){
+u8 nicIsEcoVerEqualOrLaterTo(IN P_ADAPTER_T prAdapter, u8 ucEcoVer)
+{
     if (ucEcoVer <= prAdapter->chip_info->eco_ver) {
         return true;
     } else {
@@ -3535,7 +3601,8 @@ u8 nicIsEcoVerEqualOrLaterTo(IN P_ADAPTER_T prAdapter, u8 ucEcoVer){
     }
 }
 
-void nicSerStopTxRx(IN P_ADAPTER_T prAdapter){
+void nicSerStopTxRx(IN P_ADAPTER_T prAdapter)
+{
     DBGLOG(NIC, WARN, "SER: Stop HIF Tx/Rx!\n");
 
     prAdapter->ucSerState = SER_STOP_HOST_TX_RX;
@@ -3544,20 +3611,23 @@ void nicSerStopTxRx(IN P_ADAPTER_T prAdapter){
     prAdapter->fgWiFiInSleepyState = true;
 }
 
-void nicSerStopTx(IN P_ADAPTER_T prAdapter){
+void nicSerStopTx(IN P_ADAPTER_T prAdapter)
+{
     DBGLOG(NIC, WARN, "SER: Stop HIF Tx!\n");
 
     prAdapter->ucSerState = SER_STOP_HOST_TX;
 }
 
-void nicSerStartTxRx(IN P_ADAPTER_T prAdapter){
+void nicSerStartTxRx(IN P_ADAPTER_T prAdapter)
+{
     DBGLOG(NIC, WARN, "SER: Start HIF T/R!\n");
 
     halSerHifReset(prAdapter);
     prAdapter->ucSerState = SER_IDLE_DONE;
 }
 
-u8 nicSerIsWaitingReset(IN P_ADAPTER_T prAdapter){
+u8 nicSerIsWaitingReset(IN P_ADAPTER_T prAdapter)
+{
     if (prAdapter->ucSerState == SER_STOP_HOST_TX_RX) {
         return true;
     } else {
@@ -3565,7 +3635,8 @@ u8 nicSerIsWaitingReset(IN P_ADAPTER_T prAdapter){
     }
 }
 
-u8 nicSerIsTxStop(IN P_ADAPTER_T prAdapter){
+u8 nicSerIsTxStop(IN P_ADAPTER_T prAdapter)
+{
     switch (prAdapter->ucSerState) {
     case SER_STOP_HOST_TX:
     case SER_STOP_HOST_TX_RX:
@@ -3578,7 +3649,8 @@ u8 nicSerIsTxStop(IN P_ADAPTER_T prAdapter){
     }
 }
 
-u8 nicSerIsRxStop(IN P_ADAPTER_T prAdapter){
+u8 nicSerIsRxStop(IN P_ADAPTER_T prAdapter)
+{
     switch (prAdapter->ucSerState) {
     case SER_STOP_HOST_TX_RX:
     case SER_REINIT_HIF:
@@ -3591,7 +3663,8 @@ u8 nicSerIsRxStop(IN P_ADAPTER_T prAdapter){
     }
 }
 
-void nicDumpMsduInfo(IN P_MSDU_INFO_T prMsduInfo){
+void nicDumpMsduInfo(IN P_MSDU_INFO_T prMsduInfo)
+{
     struct sk_buff *prSkb;
 
     if (!prMsduInfo) {

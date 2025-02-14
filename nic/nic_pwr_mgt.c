@@ -58,7 +58,8 @@
  *                              F U N C T I O N S
  *******************************************************************************
  */
-void nicpmWakeUpWiFi(IN P_ADAPTER_T prAdapter){
+void nicpmWakeUpWiFi(IN P_ADAPTER_T prAdapter)
+{
     if (!nicVerifyChipID(prAdapter)) {
         DBGLOG(INIT, ERROR, "Chip id verify error!\n");
         return;
@@ -75,7 +76,8 @@ void nicpmWakeUpWiFi(IN P_ADAPTER_T prAdapter){
  * \return (none)
  */
 /*----------------------------------------------------------------------------*/
-void nicpmSetFWOwn(IN P_ADAPTER_T prAdapter, IN u8 fgEnableGlobalInt){
+void nicpmSetFWOwn(IN P_ADAPTER_T prAdapter, IN u8 fgEnableGlobalInt)
+{
     halSetFWOwn(prAdapter, fgEnableGlobalInt);
 }
 
@@ -88,7 +90,8 @@ void nicpmSetFWOwn(IN P_ADAPTER_T prAdapter, IN u8 fgEnableGlobalInt){
  * \return (none)
  */
 /*----------------------------------------------------------------------------*/
-u8 nicpmSetDriverOwn(IN P_ADAPTER_T prAdapter){
+u8 nicpmSetDriverOwn(IN P_ADAPTER_T prAdapter)
+{
     return halSetDriverOwn(prAdapter);
 }
 
@@ -101,7 +104,8 @@ u8 nicpmSetDriverOwn(IN P_ADAPTER_T prAdapter){
  * \return (none)
  */
 /*----------------------------------------------------------------------------*/
-u8 nicpmSetAcpiPowerD0(IN P_ADAPTER_T prAdapter){
+u8 nicpmSetAcpiPowerD0(IN P_ADAPTER_T prAdapter)
+{
     return true;
 }
 
@@ -114,7 +118,8 @@ u8 nicpmSetAcpiPowerD0(IN P_ADAPTER_T prAdapter){
  * @return (none)
  */
 /*----------------------------------------------------------------------------*/
-u8 nicpmSetAcpiPowerD3(IN P_ADAPTER_T prAdapter){
+u8 nicpmSetAcpiPowerD3(IN P_ADAPTER_T prAdapter)
+{
     ASSERT(prAdapter);
 
     return true;

@@ -66,7 +66,8 @@ static void rlmObssScanTimeout(P_ADAPTER_T prAdapter, unsigned long ulParamPtr);
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-void rlmObssInit(P_ADAPTER_T prAdapter){
+void rlmObssInit(P_ADAPTER_T prAdapter)
+{
     P_BSS_INFO_T prBssInfo;
     u8 i;
 
@@ -88,7 +89,8 @@ void rlmObssInit(P_ADAPTER_T prAdapter){
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-u8 rlmObssUpdateChnlLists(P_ADAPTER_T prAdapter, P_SW_RFB_T prSwRfb){
+u8 rlmObssUpdateChnlLists(P_ADAPTER_T prAdapter, P_SW_RFB_T prSwRfb)
+{
     return true;
 }
 
@@ -101,7 +103,8 @@ u8 rlmObssUpdateChnlLists(P_ADAPTER_T prAdapter, P_SW_RFB_T prSwRfb){
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-void rlmObssScanDone(P_ADAPTER_T prAdapter, P_MSG_HDR_T prMsgHdr){
+void rlmObssScanDone(P_ADAPTER_T prAdapter, P_MSG_HDR_T prMsgHdr)
+{
     P_MSG_SCN_SCAN_DONE prScanDoneMsg;
     P_BSS_INFO_T prBssInfo;
     P_MSDU_INFO_T prMsduInfo;
@@ -245,7 +248,8 @@ void rlmObssScanDone(P_ADAPTER_T prAdapter, P_MSG_HDR_T prMsgHdr){
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-static void rlmObssScanTimeout(P_ADAPTER_T prAdapter, unsigned long ulParamPtr){
+static void rlmObssScanTimeout(P_ADAPTER_T prAdapter, unsigned long ulParamPtr)
+{
     P_BSS_INFO_T prBssInfo;
 
     prBssInfo = (P_BSS_INFO_T)ulParamPtr;
@@ -302,7 +306,8 @@ static void rlmObssScanTimeout(P_ADAPTER_T prAdapter, unsigned long ulParamPtr){
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-void rlmObssTriggerScan(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo){
+void rlmObssTriggerScan(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo)
+{
     P_MSG_SCN_SCAN_REQ prScanReqMsg;
 
     ASSERT(prBssInfo);

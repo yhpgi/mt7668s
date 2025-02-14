@@ -74,7 +74,8 @@
  * @return (none)
  */
 /*----------------------------------------------------------------------------*/
-void cmdBufInitialize(IN P_ADAPTER_T prAdapter){
+void cmdBufInitialize(IN P_ADAPTER_T prAdapter)
+{
     P_CMD_INFO_T prCmdInfo;
     u32 i;
 
@@ -100,7 +101,8 @@ void cmdBufInitialize(IN P_ADAPTER_T prAdapter){
  * @retval !NULL     Fail to allocat CMD Packet
  */
 /*----------------------------------------------------------------------------*/
-P_CMD_INFO_T cmdBufAllocateCmdInfo(IN P_ADAPTER_T prAdapter, IN u32 u4Length){
+P_CMD_INFO_T cmdBufAllocateCmdInfo(IN P_ADAPTER_T prAdapter, IN u32 u4Length)
+{
     P_CMD_INFO_T prCmdInfo;
 
     KAL_SPIN_LOCK_DECLARATION();
@@ -164,7 +166,8 @@ P_CMD_INFO_T cmdBufAllocateCmdInfo(IN P_ADAPTER_T prAdapter, IN u32 u4Length){
  * @return (none)
  */
 /*----------------------------------------------------------------------------*/
-void cmdBufFreeCmdInfo(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo){
+void cmdBufFreeCmdInfo(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo)
+{
     KAL_SPIN_LOCK_DECLARATION();
 
     DEBUGFUNC("cmdBufFreeCmdInfo");

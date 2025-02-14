@@ -72,7 +72,8 @@
 /*----------------------------------------------------------------------------*/
 void nicRxAddP2pDevice(IN P_ADAPTER_T prAdapter,
                        IN P_EVENT_P2P_DEV_DISCOVER_RESULT_T prP2pResult,
-                       IN u8 *pucRxIEBuf, IN u16 u2RxIELength){
+                       IN u8 *pucRxIEBuf, IN u16 u2RxIELength)
+{
     P_P2P_INFO_T prP2pInfo = (P_P2P_INFO_T)NULL;
     P_EVENT_P2P_DEV_DISCOVER_RESULT_T prTargetResult =
         (P_EVENT_P2P_DEV_DISCOVER_RESULT_T)NULL;

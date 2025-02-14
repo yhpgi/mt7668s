@@ -59,7 +59,8 @@
 #if CFG_SUPPORT_AAA
 
 void aaaFsmRunEventTxReqTimeOut(IN P_ADAPTER_T prAdapter,
-                                IN unsigned long plParamPtr){
+                                IN unsigned long plParamPtr)
+{
     P_STA_RECORD_T prStaRec = (P_STA_RECORD_T)plParamPtr;
     P_BSS_INFO_T prBssInfo;
 
@@ -111,7 +112,8 @@ void aaaFsmRunEventTxReqTimeOut(IN P_ADAPTER_T prAdapter,
  * @return (none)
  */
 /*----------------------------------------------------------------------------*/
-void aaaFsmRunEventRxAuth(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb){
+void aaaFsmRunEventRxAuth(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb)
+{
     P_BSS_INFO_T prBssInfo = (P_BSS_INFO_T)NULL;
     P_STA_RECORD_T prStaRec = (P_STA_RECORD_T)NULL;
     u16 u2StatusCode;
@@ -267,7 +269,8 @@ bow_proc:
  */
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS aaaFsmRunEventRxAssoc(IN P_ADAPTER_T prAdapter,
-                                  IN P_SW_RFB_T prSwRfb){
+                                  IN P_SW_RFB_T prSwRfb)
+{
     P_BSS_INFO_T prBssInfo;
     P_STA_RECORD_T prStaRec = (P_STA_RECORD_T)NULL;
     u16 u2StatusCode = STATUS_CODE_RESERVED;
@@ -507,7 +510,8 @@ WLAN_STATUS aaaFsmRunEventRxAssoc(IN P_ADAPTER_T prAdapter,
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS
 aaaFsmRunEventTxDone(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo,
-                     IN ENUM_TX_RESULT_CODE_T rTxDoneStatus){
+                     IN ENUM_TX_RESULT_CODE_T rTxDoneStatus)
+{
     P_STA_RECORD_T prStaRec;
     P_BSS_INFO_T prBssInfo;
 

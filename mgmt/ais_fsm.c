@@ -96,7 +96,8 @@ static void aisFsmRunEventScanDoneTimeOut(IN P_ADAPTER_T prAdapter,
  */
 /*----------------------------------------------------------------------------*/
 void aisInitializeConnectionSettings(IN P_ADAPTER_T prAdapter,
-                                     IN P_REG_INFO_T prRegInfo){
+                                     IN P_REG_INFO_T prRegInfo)
+{
     P_CONNECTION_SETTINGS_T prConnSettings;
     u8 aucAnyBSSID[] = BC_BSSID;
     u8 aucZeroMacAddr[] = NULL_MAC_ADDR;
@@ -208,7 +209,8 @@ void aisInitializeConnectionSettings(IN P_ADAPTER_T prAdapter,
  * @return (none)
  */
 /*----------------------------------------------------------------------------*/
-void aisFsmInit(IN P_ADAPTER_T prAdapter){
+void aisFsmInit(IN P_ADAPTER_T prAdapter)
+{
     P_AIS_FSM_INFO_T prAisFsmInfo;
     P_BSS_INFO_T prAisBssInfo;
     P_AIS_SPECIFIC_BSS_INFO_T prAisSpecificBssInfo;
@@ -367,7 +369,8 @@ void aisFsmInit(IN P_ADAPTER_T prAdapter){
  * @return (none)
  */
 /*----------------------------------------------------------------------------*/
-void aisFsmUninit(IN P_ADAPTER_T prAdapter){
+void aisFsmUninit(IN P_ADAPTER_T prAdapter)
+{
     P_AIS_FSM_INFO_T prAisFsmInfo;
     P_BSS_INFO_T prAisBssInfo;
     P_AIS_SPECIFIC_BSS_INFO_T prAisSpecificBssInfo;
@@ -424,7 +427,8 @@ void aisFsmUninit(IN P_ADAPTER_T prAdapter){
  * @return (none)
  */
 /*----------------------------------------------------------------------------*/
-void aisFsmStateInit_JOIN(IN P_ADAPTER_T prAdapter, P_BSS_DESC_T prBssDesc){
+void aisFsmStateInit_JOIN(IN P_ADAPTER_T prAdapter, P_BSS_DESC_T prBssDesc)
+{
     P_AIS_FSM_INFO_T prAisFsmInfo;
     P_BSS_INFO_T prAisBssInfo;
     P_AIS_SPECIFIC_BSS_INFO_T prAisSpecificBssInfo;
@@ -568,7 +572,8 @@ void aisFsmStateInit_JOIN(IN P_ADAPTER_T prAdapter, P_BSS_DESC_T prBssDesc){
  * @retval false     We will not retry JOIN
  */
 /*----------------------------------------------------------------------------*/
-u8 aisFsmStateInit_RetryJOIN(IN P_ADAPTER_T prAdapter, P_STA_RECORD_T prStaRec){
+u8 aisFsmStateInit_RetryJOIN(IN P_ADAPTER_T prAdapter, P_STA_RECORD_T prStaRec)
+{
     P_AIS_FSM_INFO_T prAisFsmInfo;
     P_MSG_JOIN_REQ_T prJoinReqMsg;
 
@@ -627,7 +632,8 @@ u8 aisFsmStateInit_RetryJOIN(IN P_ADAPTER_T prAdapter, P_STA_RECORD_T prStaRec){
  * @return (none)
  */
 /*----------------------------------------------------------------------------*/
-void aisFsmStateInit_IBSS_ALONE(IN P_ADAPTER_T prAdapter){
+void aisFsmStateInit_IBSS_ALONE(IN P_ADAPTER_T prAdapter)
+{
     P_AIS_FSM_INFO_T prAisFsmInfo;
     P_CONNECTION_SETTINGS_T prConnSettings;
     P_BSS_INFO_T prAisBssInfo;
@@ -658,7 +664,8 @@ void aisFsmStateInit_IBSS_ALONE(IN P_ADAPTER_T prAdapter){
  */
 /*----------------------------------------------------------------------------*/
 void aisFsmStateInit_IBSS_MERGE(IN P_ADAPTER_T prAdapter,
-                                P_BSS_DESC_T prBssDesc){
+                                P_BSS_DESC_T prBssDesc)
+{
     P_AIS_FSM_INFO_T prAisFsmInfo;
     P_CONNECTION_SETTINGS_T prConnSettings;
     P_BSS_INFO_T prAisBssInfo;
@@ -701,7 +708,8 @@ void aisFsmStateInit_IBSS_MERGE(IN P_ADAPTER_T prAdapter,
  * @return (none)
  */
 /*----------------------------------------------------------------------------*/
-void aisFsmStateAbort_JOIN(IN P_ADAPTER_T prAdapter){
+void aisFsmStateAbort_JOIN(IN P_ADAPTER_T prAdapter)
+{
     P_AIS_FSM_INFO_T prAisFsmInfo;
     P_MSG_JOIN_ABORT_T prJoinAbortMsg;
 
@@ -744,7 +752,8 @@ void aisFsmStateAbort_JOIN(IN P_ADAPTER_T prAdapter){
  * @return (none)
  */
 /*----------------------------------------------------------------------------*/
-void aisFsmStateAbort_SCAN(IN P_ADAPTER_T prAdapter){
+void aisFsmStateAbort_SCAN(IN P_ADAPTER_T prAdapter)
+{
     P_AIS_FSM_INFO_T prAisFsmInfo;
     P_MSG_SCN_SCAN_CANCEL prScanCancelMsg;
 
@@ -782,7 +791,8 @@ void aisFsmStateAbort_SCAN(IN P_ADAPTER_T prAdapter){
  * @return (none)
  */
 /*----------------------------------------------------------------------------*/
-void aisFsmStateAbort_NORMAL_TR(IN P_ADAPTER_T prAdapter){
+void aisFsmStateAbort_NORMAL_TR(IN P_ADAPTER_T prAdapter)
+{
     P_AIS_FSM_INFO_T prAisFsmInfo;
 
     ASSERT(prAdapter);
@@ -810,7 +820,8 @@ void aisFsmStateAbort_NORMAL_TR(IN P_ADAPTER_T prAdapter){
  * @return (none)
  */
 /*----------------------------------------------------------------------------*/
-void aisFsmStateAbort_IBSS(IN P_ADAPTER_T prAdapter){
+void aisFsmStateAbort_IBSS(IN P_ADAPTER_T prAdapter)
+{
     P_AIS_FSM_INFO_T prAisFsmInfo;
     P_BSS_DESC_T prBssDesc;
 
@@ -840,7 +851,8 @@ void aisFsmStateAbort_IBSS(IN P_ADAPTER_T prAdapter){
  * @return (none)
  */
 /*----------------------------------------------------------------------------*/
-void aisFsmSteps(IN P_ADAPTER_T prAdapter, ENUM_AIS_STATE_T eNextState){
+void aisFsmSteps(IN P_ADAPTER_T prAdapter, ENUM_AIS_STATE_T eNextState)
+{
     P_AIS_FSM_INFO_T prAisFsmInfo;
     P_BSS_INFO_T prAisBssInfo;
     P_CONNECTION_SETTINGS_T prConnSettings;
@@ -1677,7 +1689,8 @@ void aisFsmSteps(IN P_ADAPTER_T prAdapter, ENUM_AIS_STATE_T eNextState){
 
     enum _ENUM_AIS_STATE_T aisFsmStateSearchAction(
         IN struct _ADAPTER_T *prAdapter,
-        u8 ucPhase){
+        u8 ucPhase)
+    {
         struct _CONNECTION_SETTINGS_T *prConnSettings;
         struct _BSS_INFO_T *prAisBssInfo;
         struct _AIS_FSM_INFO_T *prAisFsmInfo;
@@ -1767,7 +1780,8 @@ void aisFsmSteps(IN P_ADAPTER_T prAdapter, ENUM_AIS_STATE_T eNextState){
  */
 /*----------------------------------------------------------------------------*/
     void aisFsmRunEventScanDone(IN P_ADAPTER_T prAdapter,
-                                IN P_MSG_HDR_T prMsgHdr){
+                                IN P_MSG_HDR_T prMsgHdr)
+    {
         P_MSG_SCN_SCAN_DONE prScanDoneMsg;
         P_AIS_FSM_INFO_T prAisFsmInfo;
         ENUM_AIS_STATE_T eNextState;
@@ -1875,7 +1889,8 @@ void aisFsmSteps(IN P_ADAPTER_T prAdapter, ENUM_AIS_STATE_T eNextState){
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-    void aisFsmRunEventAbort(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMsgHdr){
+    void aisFsmRunEventAbort(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMsgHdr)
+    {
         P_MSG_AIS_ABORT_T prAisAbortMsg;
         P_AIS_FSM_INFO_T prAisFsmInfo;
         u8 ucReasonOfDisconnect;
@@ -1971,7 +1986,8 @@ void aisFsmSteps(IN P_ADAPTER_T prAdapter, ENUM_AIS_STATE_T eNextState){
  */
 /*----------------------------------------------------------------------------*/
     void aisFsmStateAbort(IN P_ADAPTER_T prAdapter, u8 ucReasonOfDisconnect,
-                          u8 fgDelayIndication){
+                          u8 fgDelayIndication)
+    {
         P_AIS_FSM_INFO_T prAisFsmInfo;
         P_BSS_INFO_T prAisBssInfo;
         P_CONNECTION_SETTINGS_T prConnSettings;
@@ -2132,7 +2148,8 @@ void aisFsmSteps(IN P_ADAPTER_T prAdapter, ENUM_AIS_STATE_T eNextState){
  */
 /*----------------------------------------------------------------------------*/
     void aisFsmRunEventJoinComplete(IN struct _ADAPTER_T *prAdapter,
-                                    IN struct _MSG_HDR_T *prMsgHdr){
+                                    IN struct _MSG_HDR_T *prMsgHdr)
+    {
         struct _MSG_SAA_FSM_COMP_T *prJoinCompMsg;
         struct _AIS_FSM_INFO_T *prAisFsmInfo;
         enum _ENUM_AIS_STATE_T eNextState;
@@ -2178,7 +2195,8 @@ void aisFsmSteps(IN P_ADAPTER_T prAdapter, ENUM_AIS_STATE_T eNextState){
 
     enum _ENUM_AIS_STATE_T aisFsmJoinCompleteAction(
         IN struct _ADAPTER_T *prAdapter,
-        IN struct _MSG_HDR_T *prMsgHdr){
+        IN struct _MSG_HDR_T *prMsgHdr)
+    {
         struct _MSG_SAA_FSM_COMP_T *prJoinCompMsg;
         struct _AIS_FSM_INFO_T *prAisFsmInfo;
         enum _ENUM_AIS_STATE_T eNextState;
@@ -2448,7 +2466,8 @@ void aisFsmSteps(IN P_ADAPTER_T prAdapter, ENUM_AIS_STATE_T eNextState){
  * @return (none)
  */
 /*----------------------------------------------------------------------------*/
-    void aisFsmCreateIBSS(IN P_ADAPTER_T prAdapter){
+    void aisFsmCreateIBSS(IN P_ADAPTER_T prAdapter)
+    {
         P_AIS_FSM_INFO_T prAisFsmInfo;
 
         ASSERT(prAdapter);
@@ -2474,7 +2493,8 @@ void aisFsmSteps(IN P_ADAPTER_T prAdapter, ENUM_AIS_STATE_T eNextState){
  * @return (none)
  */
 /*----------------------------------------------------------------------------*/
-    void aisFsmMergeIBSS(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec){
+    void aisFsmMergeIBSS(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec)
+    {
         P_AIS_FSM_INFO_T prAisFsmInfo;
         ENUM_AIS_STATE_T eNextState;
         P_BSS_INFO_T prAisBssInfo;
@@ -2554,7 +2574,8 @@ void aisFsmSteps(IN P_ADAPTER_T prAdapter, ENUM_AIS_STATE_T eNextState){
  */
 /*----------------------------------------------------------------------------*/
     void aisFsmRunEventFoundIBSSPeer(IN P_ADAPTER_T prAdapter,
-                                     IN P_MSG_HDR_T prMsgHdr){
+                                     IN P_MSG_HDR_T prMsgHdr)
+    {
         P_MSG_AIS_IBSS_PEER_FOUND_T prAisIbssPeerFoundMsg;
         P_AIS_FSM_INFO_T prAisFsmInfo;
         ENUM_AIS_STATE_T eNextState;
@@ -2691,7 +2712,8 @@ void aisFsmSteps(IN P_ADAPTER_T prAdapter, ENUM_AIS_STATE_T eNextState){
 /*----------------------------------------------------------------------------*/
     void aisIndicationOfMediaStateToHost(IN P_ADAPTER_T prAdapter,
                                          ENUM_PARAM_MEDIA_STATE_T eConnectionState,
-                                         u8 fgDelayIndication){
+                                         u8 fgDelayIndication)
+    {
         EVENT_CONNECTION_STATUS rEventConnStatus;
         P_CONNECTION_SETTINGS_T prConnSettings;
         P_BSS_INFO_T prAisBssInfo;
@@ -2827,7 +2849,8 @@ void aisFsmSteps(IN P_ADAPTER_T prAdapter, ENUM_AIS_STATE_T eNextState){
  */
 /*----------------------------------------------------------------------------*/
     void aisPostponedEventOfDisconnTimeout(IN P_ADAPTER_T prAdapter,
-                                           unsigned long ulParamPtr){
+                                           unsigned long ulParamPtr)
+    {
         P_BSS_INFO_T prAisBssInfo;
         P_CONNECTION_SETTINGS_T prConnSettings;
 
@@ -2866,7 +2889,8 @@ void aisFsmSteps(IN P_ADAPTER_T prAdapter, ENUM_AIS_STATE_T eNextState){
 /*----------------------------------------------------------------------------*/
     void aisUpdateBssInfoForJOIN(IN P_ADAPTER_T prAdapter,
                                  P_STA_RECORD_T prStaRec,
-                                 P_SW_RFB_T prAssocRspSwRfb){
+                                 P_SW_RFB_T prAssocRspSwRfb)
+    {
         P_AIS_FSM_INFO_T prAisFsmInfo;
         P_BSS_INFO_T prAisBssInfo;
         P_CONNECTION_SETTINGS_T prConnSettings;
@@ -3022,7 +3046,8 @@ void aisFsmSteps(IN P_ADAPTER_T prAdapter, ENUM_AIS_STATE_T eNextState){
  * @return (none)
  */
 /*----------------------------------------------------------------------------*/
-    void aisUpdateBssInfoForCreateIBSS(IN P_ADAPTER_T prAdapter){
+    void aisUpdateBssInfoForCreateIBSS(IN P_ADAPTER_T prAdapter)
+    {
         P_AIS_FSM_INFO_T prAisFsmInfo;
         P_BSS_INFO_T prAisBssInfo;
         P_CONNECTION_SETTINGS_T prConnSettings;
@@ -3120,7 +3145,8 @@ void aisFsmSteps(IN P_ADAPTER_T prAdapter, ENUM_AIS_STATE_T eNextState){
  */
 /*----------------------------------------------------------------------------*/
     void aisUpdateBssInfoForMergeIBSS(IN P_ADAPTER_T prAdapter,
-                                      IN P_STA_RECORD_T prStaRec){
+                                      IN P_STA_RECORD_T prStaRec)
+    {
         P_AIS_FSM_INFO_T prAisFsmInfo;
         P_BSS_INFO_T prAisBssInfo;
         P_CONNECTION_SETTINGS_T prConnSettings;
@@ -3251,7 +3277,8 @@ void aisFsmSteps(IN P_ADAPTER_T prAdapter, ENUM_AIS_STATE_T eNextState){
  */
 /*----------------------------------------------------------------------------*/
     u8 aisValidateProbeReq(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb,
-                           OUT u32 *pu4ControlFlags){
+                           OUT u32 *pu4ControlFlags)
+    {
         P_WLAN_MAC_MGMT_HEADER_T prMgtHdr;
         P_BSS_INFO_T prBssInfo;
         P_IE_SSID_T prIeSsid = (P_IE_SSID_T)NULL;
@@ -3315,7 +3342,8 @@ void aisFsmSteps(IN P_ADAPTER_T prAdapter, ENUM_AIS_STATE_T eNextState){
  * @retval None
  */
 /*----------------------------------------------------------------------------*/
-    void aisFsmDisconnect(IN P_ADAPTER_T prAdapter, IN u8 fgDelayIndication){
+    void aisFsmDisconnect(IN P_ADAPTER_T prAdapter, IN u8 fgDelayIndication)
+    {
         P_BSS_INFO_T prAisBssInfo;
 
         ASSERT(prAdapter);
@@ -3421,7 +3449,8 @@ void aisFsmSteps(IN P_ADAPTER_T prAdapter, ENUM_AIS_STATE_T eNextState){
     }
 
     static void aisFsmRunEventScanDoneTimeOut(IN P_ADAPTER_T prAdapter,
-                                              unsigned long ulParam){
+                                              unsigned long ulParam)
+    {
         P_AIS_FSM_INFO_T prAisFsmInfo;
         ENUM_AIS_STATE_T eNextState;
         P_CONNECTION_SETTINGS_T prConnSettings;
@@ -3485,7 +3514,8 @@ void aisFsmSteps(IN P_ADAPTER_T prAdapter, ENUM_AIS_STATE_T eNextState){
  */
 /*----------------------------------------------------------------------------*/
     void aisFsmBeaconLostTimeOut(IN P_ADAPTER_T prAdapter,
-                                 unsigned long ulParamPtr){
+                                 unsigned long ulParamPtr)
+    {
         DBGLOG(AIS, STATE, "Beacon Lost timer expires\n");
         ASSERT(prAdapter);
         aisBssBeaconTimeout(prAdapter, DISCONNECT_REASON_CODE_RADIO_LOST);
@@ -3502,7 +3532,8 @@ void aisFsmSteps(IN P_ADAPTER_T prAdapter, ENUM_AIS_STATE_T eNextState){
  */
 /*----------------------------------------------------------------------------*/
     void aisFsmRunEventBGSleepTimeOut(IN P_ADAPTER_T prAdapter,
-                                      unsigned long ulParamPtr){
+                                      unsigned long ulParamPtr)
+    {
         P_AIS_FSM_INFO_T prAisFsmInfo;
         ENUM_AIS_STATE_T eNextState;
 
@@ -3546,7 +3577,8 @@ void aisFsmSteps(IN P_ADAPTER_T prAdapter, ENUM_AIS_STATE_T eNextState){
  */
 /*----------------------------------------------------------------------------*/
     void aisFsmRunEventIbssAloneTimeOut(IN P_ADAPTER_T prAdapter,
-                                        unsigned long ulParamPtr){
+                                        unsigned long ulParamPtr)
+    {
         P_AIS_FSM_INFO_T prAisFsmInfo;
         ENUM_AIS_STATE_T eNextState;
 
@@ -3594,7 +3626,8 @@ void aisFsmSteps(IN P_ADAPTER_T prAdapter, ENUM_AIS_STATE_T eNextState){
  */
 /*----------------------------------------------------------------------------*/
     void aisFsmRunEventJoinTimeout(IN P_ADAPTER_T prAdapter,
-                                   unsigned long ulParamPtr){
+                                   unsigned long ulParamPtr)
+    {
         P_BSS_INFO_T prAisBssInfo;
         P_AIS_FSM_INFO_T prAisFsmInfo;
         ENUM_AIS_STATE_T eNextState;
@@ -3683,14 +3716,16 @@ void aisFsmSteps(IN P_ADAPTER_T prAdapter, ENUM_AIS_STATE_T eNextState){
     }
 
     void aisFsmRunEventDeauthTimeout(IN P_ADAPTER_T prAdapter,
-                                     unsigned long ulParamPtr){
+                                     unsigned long ulParamPtr)
+    {
         DBGLOG(AIS, EVENT, "aisDeauthTimeout\n");
         aisDeauthXmitComplete(prAdapter, NULL, TX_RESULT_LIFE_TIMEOUT);
     }
 
 #if CFG_SUPPORT_LAST_SEC_MCS_INFO
     void aisRxMcsCollectionTimeout(IN P_ADAPTER_T prAdapter,
-                                   unsigned long ulParamPtr){
+                                   unsigned long ulParamPtr)
+    {
         static u8 ucSmapleCnt;
         u8 ucStaIdx = 0;
 
@@ -3724,7 +3759,8 @@ out:
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-    void aisTest(void){
+    void aisTest(void)
+    {
         P_MSG_AIS_ABORT_T prAisAbortMsg;
         P_CONNECTION_SETTINGS_T prConnSettings;
         u8 aucSSID[] = "pci-11n";
@@ -3766,7 +3802,8 @@ out:
  */
 /*----------------------------------------------------------------------------*/
     void aisFsmScanRequest(IN P_ADAPTER_T prAdapter, IN P_PARAM_SSID_T prSsid,
-                           IN u8 *pucIe, IN u32 u4IeLength){
+                           IN u8 *pucIe, IN u32 u4IeLength)
+    {
         P_CONNECTION_SETTINGS_T prConnSettings;
         P_BSS_INFO_T prAisBssInfo;
         P_AIS_FSM_INFO_T prAisFsmInfo;
@@ -3849,7 +3886,8 @@ out:
                               IN P_PARAM_SSID_T prSsid, IN u8 ucChannelListNum,
                               IN P_RF_CHANNEL_INFO_T prChnlInfoList,
                               IN u8 *pucIe,
-                              IN u32 u4IeLength){
+                              IN u32 u4IeLength)
+    {
         u32 i;
         P_CONNECTION_SETTINGS_T prConnSettings;
         P_BSS_INFO_T prAisBssInfo;
@@ -3939,7 +3977,8 @@ out:
  */
 /*----------------------------------------------------------------------------*/
     void aisFsmRunEventChGrant(IN P_ADAPTER_T prAdapter,
-                               IN P_MSG_HDR_T prMsgHdr){
+                               IN P_MSG_HDR_T prMsgHdr)
+    {
         P_BSS_INFO_T prAisBssInfo;
         P_AIS_FSM_INFO_T prAisFsmInfo;
         P_MSG_CH_GRANT_T prMsgChGrant;
@@ -4027,7 +4066,8 @@ out:
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-    void aisFsmReleaseCh(IN P_ADAPTER_T prAdapter){
+    void aisFsmReleaseCh(IN P_ADAPTER_T prAdapter)
+    {
         P_AIS_FSM_INFO_T prAisFsmInfo;
         P_MSG_CH_ABORT_T prMsgChAbort;
 
@@ -4070,7 +4110,8 @@ out:
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-    void aisBssBeaconTimeout(IN P_ADAPTER_T prAdapter, IN u8 ucReasonCode){
+    void aisBssBeaconTimeout(IN P_ADAPTER_T prAdapter, IN u8 ucReasonCode)
+    {
         P_BSS_INFO_T prAisBssInfo;
         u8 fgDoAbortIndication = false;
         P_CONNECTION_SETTINGS_T prConnSettings;
@@ -4156,7 +4197,8 @@ out:
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-    void aisBssLinkDown(IN P_ADAPTER_T prAdapter){
+    void aisBssLinkDown(IN P_ADAPTER_T prAdapter)
+    {
         P_BSS_INFO_T prAisBssInfo;
         u8 fgDoAbortIndication = false;
         P_CONNECTION_SETTINGS_T prConnSettings;
@@ -4201,7 +4243,8 @@ out:
          * WLAN_STATUS_SCAN_COMPLETE, NULL, 0); */
     }
 #if CFG_SUPPORT_DBDC_TC6
-    u8 aisBssChangeNSS(IN P_ADAPTER_T prAdapter, IN u8 fgDbdcEn){
+    u8 aisBssChangeNSS(IN P_ADAPTER_T prAdapter, IN u8 fgDbdcEn)
+    {
         P_BSS_INFO_T prAisBssInfo;
 
         ASSERT(prAdapter);
@@ -4235,7 +4278,8 @@ out:
 /*----------------------------------------------------------------------------*/
     WLAN_STATUS
     aisDeauthXmitComplete(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo,
-                          IN ENUM_TX_RESULT_CODE_T rTxDoneStatus){
+                          IN ENUM_TX_RESULT_CODE_T rTxDoneStatus)
+    {
         P_AIS_FSM_INFO_T prAisFsmInfo;
         P_BSS_INFO_T prAisBssInfo;
         u8 ucBssIndex = 0;
@@ -4296,7 +4340,8 @@ out:
  */
 /*----------------------------------------------------------------------------*/
     void aisFsmRunEventRoamingDiscovery(IN P_ADAPTER_T prAdapter,
-                                        u32 u4ReqScan){
+                                        u32 u4ReqScan)
+    {
         P_AIS_FSM_INFO_T prAisFsmInfo;
         P_CONNECTION_SETTINGS_T prConnSettings;
         ENUM_AIS_REQUEST_TYPE_T eAisRequest;
@@ -4367,7 +4412,8 @@ out:
  * @return (none)
  */
 /*----------------------------------------------------------------------------*/
-    ENUM_AIS_STATE_T aisFsmRoamingScanResultsUpdate(IN P_ADAPTER_T prAdapter){
+    ENUM_AIS_STATE_T aisFsmRoamingScanResultsUpdate(IN P_ADAPTER_T prAdapter)
+    {
         P_AIS_FSM_INFO_T prAisFsmInfo;
         P_ROAMING_INFO_T prRoamingFsmInfo;
         ENUM_AIS_STATE_T eNextState;
@@ -4405,7 +4451,8 @@ out:
  */
 /*----------------------------------------------------------------------------*/
     void aisFsmRoamingDisconnectPrevAP(IN P_ADAPTER_T prAdapter,
-                                       IN P_STA_RECORD_T prTargetStaRec){
+                                       IN P_STA_RECORD_T prTargetStaRec)
+    {
         P_BSS_INFO_T prAisBssInfo;
 
         DBGLOG(AIS, EVENT, "aisFsmRoamingDisconnectPrevAP()");
@@ -4462,7 +4509,8 @@ out:
 /*----------------------------------------------------------------------------*/
     void aisUpdateBssInfoForRoamingAP(IN P_ADAPTER_T prAdapter,
                                       IN P_STA_RECORD_T prStaRec,
-                                      IN P_SW_RFB_T prAssocRspSwRfb){
+                                      IN P_SW_RFB_T prAssocRspSwRfb)
+    {
         P_BSS_INFO_T prAisBssInfo;
 
         DBGLOG(AIS, LOUD, "aisUpdateBssInfoForRoamingAP()");
@@ -4511,7 +4559,8 @@ out:
 /*----------------------------------------------------------------------------*/
     u8 aisFsmIsRequestPending(IN P_ADAPTER_T prAdapter,
                               IN ENUM_AIS_REQUEST_TYPE_T eReqType,
-                              IN u8 bRemove){
+                              IN u8 bRemove)
+    {
         P_AIS_FSM_INFO_T prAisFsmInfo;
         P_AIS_REQ_HDR_T prPendingReqHdr, prPendingReqHdrNext;
 
@@ -4548,7 +4597,8 @@ out:
  * @return P_AIS_REQ_HDR_T
  */
 /*----------------------------------------------------------------------------*/
-    P_AIS_REQ_HDR_T aisFsmGetNextRequest(IN P_ADAPTER_T prAdapter){
+    P_AIS_REQ_HDR_T aisFsmGetNextRequest(IN P_ADAPTER_T prAdapter)
+    {
         P_AIS_FSM_INFO_T prAisFsmInfo;
         P_AIS_REQ_HDR_T prPendingReqHdr;
 
@@ -4573,7 +4623,8 @@ out:
  */
 /*----------------------------------------------------------------------------*/
     u8 aisFsmInsertRequest(IN P_ADAPTER_T prAdapter,
-                           IN ENUM_AIS_REQUEST_TYPE_T eReqType){
+                           IN ENUM_AIS_REQUEST_TYPE_T eReqType)
+    {
         P_AIS_REQ_HDR_T prAisReq;
         P_AIS_FSM_INFO_T prAisFsmInfo;
 
@@ -4605,7 +4656,8 @@ out:
  * @return (none)
  */
 /*----------------------------------------------------------------------------*/
-    void aisFsmFlushRequest(IN P_ADAPTER_T prAdapter){
+    void aisFsmFlushRequest(IN P_ADAPTER_T prAdapter)
+    {
         P_AIS_REQ_HDR_T prAisReq;
 
         ASSERT(prAdapter);
@@ -4615,7 +4667,8 @@ out:
     }
 
     void aisFsmRunEventRemainOnChannel(IN P_ADAPTER_T prAdapter,
-                                       IN P_MSG_HDR_T prMsgHdr){
+                                       IN P_MSG_HDR_T prMsgHdr)
+    {
         P_MSG_REMAIN_ON_CHANNEL_T prRemainOnChannel;
         P_AIS_FSM_INFO_T prAisFsmInfo;
         P_CONNECTION_SETTINGS_T prConnSettings;
@@ -4651,7 +4704,8 @@ out:
     }
 
     void aisFsmRunEventCancelRemainOnChannel(IN P_ADAPTER_T prAdapter,
-                                             IN P_MSG_HDR_T prMsgHdr){
+                                             IN P_MSG_HDR_T prMsgHdr)
+    {
         P_AIS_FSM_INFO_T prAisFsmInfo;
         P_BSS_INFO_T prAisBssInfo;
         P_MSG_CANCEL_REMAIN_ON_CHANNEL_T prCancelRemainOnChannel;
@@ -4697,7 +4751,8 @@ out:
     }
 
     void aisFsmRunEventMgmtFrameTx(IN P_ADAPTER_T prAdapter,
-                                   IN P_MSG_HDR_T prMsgHdr){
+                                   IN P_MSG_HDR_T prMsgHdr)
+    {
         P_AIS_FSM_INFO_T prAisFsmInfo;
         P_MSG_MGMT_TX_REQUEST_T prMgmtTxMsg = (P_MSG_MGMT_TX_REQUEST_T)NULL;
 
@@ -4723,7 +4778,8 @@ out:
     }
 
     void aisFsmRunEventChannelTimeout(IN P_ADAPTER_T prAdapter,
-                                      unsigned long ulParamPtr){
+                                      unsigned long ulParamPtr)
+    {
         P_AIS_FSM_INFO_T prAisFsmInfo;
         P_BSS_INFO_T prAisBssInfo;
 
@@ -4763,7 +4819,8 @@ out:
     WLAN_STATUS
     aisFsmRunEventMgmtFrameTxDone(IN P_ADAPTER_T prAdapter,
                                   IN P_MSDU_INFO_T prMsduInfo,
-                                  IN ENUM_TX_RESULT_CODE_T rTxDoneStatus){
+                                  IN ENUM_TX_RESULT_CODE_T rTxDoneStatus)
+    {
         P_AIS_FSM_INFO_T prAisFsmInfo;
         P_AIS_MGMT_TX_REQ_INFO_T prMgmtTxReqInfo =
             (P_AIS_MGMT_TX_REQ_INFO_T)NULL;
@@ -4795,7 +4852,8 @@ out:
     WLAN_STATUS
     aisFuncTxMgmtFrame(IN P_ADAPTER_T prAdapter,
                        IN P_AIS_MGMT_TX_REQ_INFO_T prMgmtTxReqInfo,
-                       IN P_MSDU_INFO_T prMgmtTxMsdu, IN u64 u8Cookie){
+                       IN P_MSDU_INFO_T prMgmtTxMsdu, IN u64 u8Cookie)
+    {
         WLAN_STATUS rWlanStatus = WLAN_STATUS_SUCCESS;
         P_MSDU_INFO_T prTxMsduInfo = (P_MSDU_INFO_T)NULL;
         P_WLAN_MAC_HEADER_T prWlanHdr = (P_WLAN_MAC_HEADER_T)NULL;
@@ -4872,7 +4930,8 @@ out:
  */
 /*----------------------------------------------------------------------------*/
     void aisFuncValidateRxActionFrame(IN P_ADAPTER_T prAdapter,
-                                      IN P_SW_RFB_T prSwRfb){
+                                      IN P_SW_RFB_T prSwRfb)
+    {
         P_AIS_FSM_INFO_T prAisFsmInfo = (P_AIS_FSM_INFO_T)NULL;
 
         DEBUGFUNC("aisFuncValidateRxActionFrame");
@@ -4893,7 +4952,8 @@ out:
 
 #if CFG_SUPPORT_802_11V_BSS_TRANSITION_MGT
     void aisFsmRunEventBssTransition(IN P_ADAPTER_T prAdapter,
-                                     IN P_MSG_HDR_T prMsgHdr){
+                                     IN P_MSG_HDR_T prMsgHdr)
+    {
         P_MSG_AIS_BSS_TRANSITION_T prMsg = (P_MSG_AIS_BSS_TRANSITION_T)prMsgHdr;
         P_AIS_SPECIFIC_BSS_INFO_T prAisSpecificBssInfo =
             &prAdapter->rWifiVar.rAisSpecificBssInfo;
@@ -5006,7 +5066,8 @@ send_response:
 #endif
 
 #if CFG_SUPPORT_802_11K
-    void aisSendNeighborRequest(IN P_ADAPTER_T prAdapter){
+    void aisSendNeighborRequest(IN P_ADAPTER_T prAdapter)
+    {
         struct SUB_ELEMENT_LIST *prSSIDIE;
         u8 aucBuffer[sizeof(*prSSIDIE) + 31];
         P_BSS_INFO_T prBssInfo = prAdapter->prAisBssInfo;
@@ -5022,7 +5083,8 @@ send_response:
 #endif
 
 #if CFG_SUPPORT_802_11K || CFG_SUPPORT_802_11V_BSS_TRANSITION_MGT
-    static u8 aisCandPrefIEIsExist(u8 *pucSubIe, u8 ucLength){
+    static u8 aisCandPrefIEIsExist(u8 *pucSubIe, u8 ucLength)
+    {
         u16 u2Offset = 0;
 
         IE_FOR_EACH(pucSubIe, ucLength, u2Offset){
@@ -5033,7 +5095,8 @@ send_response:
         return false;
     }
 
-    static u8 aisGetNeighborApPreference(u8 *pucSubIe, u8 ucLength){
+    static u8 aisGetNeighborApPreference(u8 *pucSubIe, u8 ucLength)
+    {
         u16 u2Offset = 0;
 
         IE_FOR_EACH(pucSubIe, ucLength, u2Offset){
@@ -5047,7 +5110,8 @@ send_response:
         return 0;
     }
 
-    static u64 aisGetBssTermTsf(u8 *pucSubIe, u8 ucLength){
+    static u64 aisGetBssTermTsf(u8 *pucSubIe, u8 ucLength)
+    {
         u16 u2Offset = 0;
 
         IE_FOR_EACH(pucSubIe, ucLength, u2Offset){
@@ -5060,7 +5124,8 @@ send_response:
     }
 
     void aisCollectNeighborAP(IN P_ADAPTER_T prAdapter, u8 *pucApBuf,
-                              u16 u2ApBufLen, u8 ucValidInterval){
+                              u16 u2ApBufLen, u8 ucValidInterval)
+    {
         P_NEIGHBOR_AP_T prNeighborAP = NULL;
         P_AIS_SPECIFIC_BSS_INFO_T prAisSpecBssInfo =
             &prAdapter->rWifiVar.rAisSpecificBssInfo;
@@ -5151,7 +5216,8 @@ send_response:
 #endif
 
 #if CFG_SUPPORT_802_11K || CFG_SUPPORT_802_11V_BSS_TRANSITION_MGT
-    void aisResetNeighborApList(IN P_ADAPTER_T prAdapter){
+    void aisResetNeighborApList(IN P_ADAPTER_T prAdapter)
+    {
         P_AIS_SPECIFIC_BSS_INFO_T prAisSpecBssInfo =
             &prAdapter->rWifiVar.rAisSpecificBssInfo;
         P_LINK_MGMT_T prAPlist = &prAisSpecBssInfo->rNeighborApList;

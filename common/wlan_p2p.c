@@ -80,7 +80,8 @@ wlanoidSendSetQueryP2PCmd(IN P_ADAPTER_T prAdapter, IN u8 ucCID, IN u8 ucBssIdx,
                           IN PFN_CMD_TIMEOUT_HANDLER pfCmdTimeoutHandler,
                           IN u32 u4SetQueryInfoLen, IN u8 *pucInfoBuffer,
                           OUT void *pvSetQueryBuffer,
-                          IN u32 u4SetQueryBufferLen){
+                          IN u32 u4SetQueryBufferLen)
+{
     P_GLUE_INFO_T prGlueInfo;
     P_CMD_INFO_T prCmdInfo;
     P_WIFI_CMD_T prWifiCmd;
@@ -157,7 +158,8 @@ wlanoidSendSetQueryP2PCmd(IN P_ADAPTER_T prAdapter, IN u8 ucCID, IN u8 ucBssIdx,
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS
 wlanoidSetP2pNetworkAddress(IN P_ADAPTER_T prAdapter, IN void *pvSetBuffer,
-                            IN u32 u4SetBufferLen, OUT u32 *pu4SetInfoLen){
+                            IN u32 u4SetBufferLen, OUT u32 *pu4SetInfoLen)
+{
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
     u32 i, j;
     P_CMD_SET_NETWORK_ADDRESS_LIST prCmdNetworkAddressList;
@@ -276,7 +278,8 @@ wlanoidSetP2pNetworkAddress(IN P_ADAPTER_T prAdapter, IN void *pvSetBuffer,
 WLAN_STATUS
 wlanoidQueryP2pPowerSaveProfile(IN P_ADAPTER_T prAdapter,
                                 IN void *pvQueryBuffer, IN u32 u4QueryBufferLen,
-                                OUT u32 *pu4QueryInfoLen){
+                                OUT u32 *pu4QueryInfoLen)
+{
     DEBUGFUNC("wlanoidQueryP2pPowerSaveProfile");
 
     ASSERT(prAdapter);
@@ -312,7 +315,8 @@ wlanoidQueryP2pPowerSaveProfile(IN P_ADAPTER_T prAdapter,
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS
 wlanoidSetP2pPowerSaveProfile(IN P_ADAPTER_T prAdapter, IN void *pvSetBuffer,
-                              IN u32 u4SetBufferLen, OUT u32 *pu4SetInfoLen){
+                              IN u32 u4SetBufferLen, OUT u32 *pu4SetInfoLen)
+{
     WLAN_STATUS status;
     PARAM_POWER_MODE ePowerMode;
 
@@ -378,7 +382,8 @@ wlanoidSetP2pPowerSaveProfile(IN P_ADAPTER_T prAdapter, IN void *pvSetBuffer,
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS
 wlanoidSetP2pSetNetworkAddress(IN P_ADAPTER_T prAdapter, IN void *pvSetBuffer,
-                               IN u32 u4SetBufferLen, OUT u32 *pu4SetInfoLen){
+                               IN u32 u4SetBufferLen, OUT u32 *pu4SetInfoLen)
+{
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
     u32 i, j;
     P_CMD_SET_NETWORK_ADDRESS_LIST prCmdNetworkAddressList;
@@ -524,7 +529,8 @@ wlanoidSetP2pSetNetworkAddress(IN P_ADAPTER_T prAdapter, IN void *pvSetBuffer,
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS
 wlanoidSetP2PMulticastList(IN P_ADAPTER_T prAdapter, IN void *pvSetBuffer,
-                           IN u32 u4SetBufferLen, OUT u32 *pu4SetInfoLen){
+                           IN u32 u4SetBufferLen, OUT u32 *pu4SetInfoLen)
+{
     CMD_MAC_MCAST_ADDR rCmdMacMcastAddr;
 
     ASSERT(prAdapter);
@@ -601,7 +607,8 @@ wlanoidSetP2PMulticastList(IN P_ADAPTER_T prAdapter, IN void *pvSetBuffer,
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS
 wlanoidSendP2PSDRequest(IN P_ADAPTER_T prAdapter, IN void *pvSetBuffer,
-                        IN u32 u4SetBufferLen, OUT u32 *pu4SetInfoLen){
+                        IN u32 u4SetBufferLen, OUT u32 *pu4SetInfoLen)
+{
     WLAN_STATUS rWlanStatus = WLAN_STATUS_SUCCESS;
 
     ASSERT(prAdapter);
@@ -641,7 +648,8 @@ wlanoidSendP2PSDRequest(IN P_ADAPTER_T prAdapter, IN void *pvSetBuffer,
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS
 wlanoidSendP2PSDResponse(IN P_ADAPTER_T prAdapter, IN void *pvSetBuffer,
-                         IN u32 u4SetBufferLen, OUT u32 *pu4SetInfoLen){
+                         IN u32 u4SetBufferLen, OUT u32 *pu4SetInfoLen)
+{
     WLAN_STATUS rWlanStatus = WLAN_STATUS_SUCCESS;
 
     ASSERT(prAdapter);
@@ -683,7 +691,8 @@ wlanoidSendP2PSDResponse(IN P_ADAPTER_T prAdapter, IN void *pvSetBuffer,
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS
 wlanoidGetP2PSDRequest(IN P_ADAPTER_T prAdapter, IN void *pvQueryBuffer,
-                       IN u32 u4QueryBufferLen, OUT u32 *pu4QueryInfoLen){
+                       IN u32 u4QueryBufferLen, OUT u32 *pu4QueryInfoLen)
+{
     WLAN_STATUS rWlanStatus = WLAN_STATUS_SUCCESS;
     /* u8 * pucChannelNum = NULL; */
     /* u8 ucChannelNum = 0, ucSeqNum = 0; */
@@ -728,7 +737,8 @@ wlanoidGetP2PSDRequest(IN P_ADAPTER_T prAdapter, IN void *pvQueryBuffer,
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS
 wlanoidGetP2PSDResponse(IN P_ADAPTER_T prAdapter, IN void *pvQueryBuffer,
-                        IN u32 u4QueryBufferLen, OUT u32 *pu4QueryInfoLen){
+                        IN u32 u4QueryBufferLen, OUT u32 *pu4QueryInfoLen)
+{
     WLAN_STATUS rWlanStatus = WLAN_STATUS_SUCCESS;
     /* u8 ucSeqNum = 0, */
 
@@ -769,7 +779,8 @@ wlanoidGetP2PSDResponse(IN P_ADAPTER_T prAdapter, IN void *pvQueryBuffer,
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS
 wlanoidSetP2PTerminateSDPhase(IN P_ADAPTER_T prAdapter, IN void *pvSetBuffer,
-                              IN u32 u4SetBufferLen, OUT u32 *pu4SetInfoLen){
+                              IN u32 u4SetBufferLen, OUT u32 *pu4SetInfoLen)
+{
     WLAN_STATUS rWlanStatus = WLAN_STATUS_SUCCESS;
     P_PARAM_P2P_TERMINATE_SD_PHASE prP2pTerminateSD =
         (P_PARAM_P2P_TERMINATE_SD_PHASE)NULL;
@@ -822,7 +833,8 @@ wlanoidSetP2PTerminateSDPhase(IN P_ADAPTER_T prAdapter, IN void *pvSetBuffer,
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS
 wlanoidSetSecCheckRequest(IN P_ADAPTER_T prAdapter, IN void *pvSetBuffer,
-                          IN u32 u4SetBufferLen, OUT u32 *pu4SetInfoLen){
+                          IN u32 u4SetBufferLen, OUT u32 *pu4SetInfoLen)
+{
     ASSERT(prAdapter);
     ASSERT(pu4SetInfoLen);
 
@@ -837,7 +849,8 @@ wlanoidSetSecCheckRequest(IN P_ADAPTER_T prAdapter, IN void *pvSetBuffer,
 
 WLAN_STATUS
 wlanoidSetNoaParam(IN P_ADAPTER_T prAdapter, IN void *pvSetBuffer,
-                   IN u32 u4SetBufferLen, OUT u32 *pu4SetInfoLen){
+                   IN u32 u4SetBufferLen, OUT u32 *pu4SetInfoLen)
+{
     P_PARAM_CUSTOM_NOA_PARAM_STRUCT_T prNoaParam;
     CMD_CUSTOM_NOA_PARAM_STRUCT_T rCmdNoaParam;
 
@@ -872,7 +885,8 @@ wlanoidSetNoaParam(IN P_ADAPTER_T prAdapter, IN void *pvSetBuffer,
 
 WLAN_STATUS
 wlanoidSetOppPsParam(IN P_ADAPTER_T prAdapter, IN void *pvSetBuffer,
-                     IN u32 u4SetBufferLen, OUT u32 *pu4SetInfoLen){
+                     IN u32 u4SetBufferLen, OUT u32 *pu4SetInfoLen)
+{
     P_PARAM_CUSTOM_OPPPS_PARAM_STRUCT_T prOppPsParam;
     CMD_CUSTOM_OPPPS_PARAM_STRUCT_T rCmdOppPsParam;
 
@@ -917,7 +931,8 @@ wlanoidSetOppPsParam(IN P_ADAPTER_T prAdapter, IN void *pvSetBuffer,
 
 WLAN_STATUS
 wlanoidSetUApsdParam(IN P_ADAPTER_T prAdapter, IN void *pvSetBuffer,
-                     IN u32 u4SetBufferLen, OUT u32 *pu4SetInfoLen){
+                     IN u32 u4SetBufferLen, OUT u32 *pu4SetInfoLen)
+{
     P_PARAM_CUSTOM_UAPSD_PARAM_STRUCT_T prUapsdParam;
     CMD_CUSTOM_UAPSD_PARAM_STRUCT_T rCmdUapsdParam;
     P_PM_PROFILE_SETUP_INFO_T prPmProfSetupInfo;
@@ -972,7 +987,8 @@ wlanoidSetUApsdParam(IN P_ADAPTER_T prAdapter, IN void *pvSetBuffer,
 
 WLAN_STATUS
 wlanoidQueryP2pVersion(IN P_ADAPTER_T prAdapter, IN void *pvQueryBuffer,
-                       IN u32 u4QueryBufferLen, OUT u32 *pu4QueryInfoLen){
+                       IN u32 u4QueryBufferLen, OUT u32 *pu4QueryInfoLen)
+{
     WLAN_STATUS rResult = WLAN_STATUS_FAILURE;
     /* u8 * pucVersionNum = (u8 *)pvQueryBuffer; */
 
@@ -1015,7 +1031,8 @@ wlanoidQueryP2pVersion(IN P_ADAPTER_T prAdapter, IN void *pvQueryBuffer,
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS
 wlanoidSetP2pWPSmode(IN P_ADAPTER_T prAdapter, IN void *pvSetBuffer,
-                     IN u32 u4SetBufferLen, OUT u32 *pu4SetInfoLen){
+                     IN u32 u4SetBufferLen, OUT u32 *pu4SetInfoLen)
+{
     WLAN_STATUS status;
     u32 u4IsWPSmode = 0;
     int i = 0;
@@ -1048,7 +1065,8 @@ wlanoidSetP2pWPSmode(IN P_ADAPTER_T prAdapter, IN void *pvSetBuffer,
 
 WLAN_STATUS
 wlanoidSetP2pSupplicantVersion(IN P_ADAPTER_T prAdapter, IN void *pvSetBuffer,
-                               IN u32 u4SetBufferLen, OUT u32 *pu4SetInfoLen){
+                               IN u32 u4SetBufferLen, OUT u32 *pu4SetInfoLen)
+{
     WLAN_STATUS rResult = WLAN_STATUS_FAILURE;
     u8 ucVersionNum;
 
@@ -1081,7 +1099,8 @@ wlanoidSetP2pSupplicantVersion(IN P_ADAPTER_T prAdapter, IN void *pvSetBuffer,
 #if CFG_SUPPORT_P2P_RSSI_QUERY
 WLAN_STATUS
 wlanoidQueryP2pRssi(IN P_ADAPTER_T prAdapter, IN void *pvQueryBuffer,
-                    IN u32 u4QueryBufferLen, OUT u32 *pu4QueryInfoLen){
+                    IN u32 u4QueryBufferLen, OUT u32 *pu4QueryInfoLen)
+{
     DEBUGFUNC("wlanoidQueryP2pRssi");
 
     ASSERT(prAdapter);
@@ -1133,7 +1152,8 @@ wlanoidQueryP2pRssi(IN P_ADAPTER_T prAdapter, IN void *pvQueryBuffer,
 #endif
 
 u32 wlanoidAbortP2pScan(IN P_ADAPTER_T prAdapter, OUT void *pvQueryBuffer,
-                        IN u32 u4QueryBufferLen, OUT u32 *pu4QueryInfoLen){
+                        IN u32 u4QueryBufferLen, OUT u32 *pu4QueryInfoLen)
+{
     u8 ucBssIdx;
 
     ASSERT(prAdapter);

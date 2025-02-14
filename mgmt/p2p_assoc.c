@@ -68,7 +68,8 @@
 /*----------------------------------------------------------------------------*/
 u8 *p2pBuildReAssocReqFrameCommonIEs(IN P_ADAPTER_T prAdapter,
                                      IN P_MSDU_INFO_T prMsduInfo,
-                                     IN u8 *pucBuffer){
+                                     IN u8 *pucBuffer)
+{
     P_BSS_INFO_T prP2pBssInfo = (P_BSS_INFO_T)NULL;
 
     prP2pBssInfo = GET_BSS_INFO_BY_INDEX(prAdapter, prMsduInfo->ucBssIndex);

@@ -82,7 +82,8 @@ static u8 rlmObssChnlLevelIn5G(P_BSS_INFO_T prBssInfo,
  */
 /*----------------------------------------------------------------------------*/
 u8 rlmObssChnlLevel(P_BSS_INFO_T prBssInfo, ENUM_BAND_T eBand, u8 ucPriChannel,
-                    ENUM_CHNL_EXT_T eExtend){
+                    ENUM_CHNL_EXT_T eExtend)
+{
     u8 ucChannelLevel;
 
     ASSERT(prBssInfo);
@@ -120,7 +121,8 @@ u8 rlmObssChnlLevel(P_BSS_INFO_T prBssInfo, ENUM_BAND_T eBand, u8 ucPriChannel,
  */
 /*----------------------------------------------------------------------------*/
 static u8 rlmObssChnlLevelIn2G4(P_BSS_INFO_T prBssInfo, u8 ucPriChannel,
-                                ENUM_CHNL_EXT_T eExtend){
+                                ENUM_CHNL_EXT_T eExtend)
+{
     u8 i, ucChannelLevel;
     u8 ucSecChannel, ucCenterChannel;
     u8 ucAffectedChnl_L, ucAffectedChnl_H;
@@ -216,7 +218,8 @@ L_2G4_level_end:
  */
 /*----------------------------------------------------------------------------*/
 static u8 rlmObssChnlLevelIn5G(P_BSS_INFO_T prBssInfo, u8 ucPriChannel,
-                               ENUM_CHNL_EXT_T eExtend){
+                               ENUM_CHNL_EXT_T eExtend)
+{
     u8 i, ucChannelLevel;
     u8 ucSecChannel;
 
@@ -287,7 +290,8 @@ L_5G_level_end:
  */
 /*----------------------------------------------------------------------------*/
 void rlmObssScanExemptionRsp(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo,
-                             P_SW_RFB_T prSwRfb){
+                             P_SW_RFB_T prSwRfb)
+{
     P_MSDU_INFO_T prMsduInfo;
     P_ACTION_20_40_COEXIST_FRAME prTxFrame;
 

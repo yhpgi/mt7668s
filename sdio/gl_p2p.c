@@ -280,7 +280,8 @@ static int p2pDoIOCTL(struct net_device *prDev, struct ifreq *prIFReq,
  * \retval -ENXIO    No such device.
  */
 /*----------------------------------------------------------------------------*/
-static int p2pInit(struct net_device *prDev){
+static int p2pInit(struct net_device *prDev)
+{
     if (!prDev) {
         return -ENXIO;
     }
@@ -316,7 +317,8 @@ const struct net_device_ops p2p_netdev_ops = {
  *           false
  */
 /*----------------------------------------------------------------------------*/
-u8 p2PAllocInfo(IN P_GLUE_INFO_T prGlueInfo, IN u8 ucIdex){
+u8 p2PAllocInfo(IN P_GLUE_INFO_T prGlueInfo, IN u8 ucIdex)
+{
     P_ADAPTER_T prAdapter = NULL;
     P_WIFI_VAR_T prWifiVar = NULL;
     /* u32 u4Idx = 0; */
@@ -488,7 +490,8 @@ u8 p2PAllocInfo(IN P_GLUE_INFO_T prGlueInfo, IN u8 ucIdex){
 }
 
 static void p2pFreeMemSafe(P_GLUE_INFO_T prGlueInfo, void **pprMemInfo,
-                           u32 size){
+                           u32 size)
+{
     void *prTmpMemInfo = NULL;
 
     GLUE_SPIN_LOCK_DECLARATION();
@@ -622,7 +625,8 @@ u8 p2PFreeInfo(P_GLUE_INFO_T prGlueInfo, u8 ucIdx)
 }
 #endif
 
-u8 p2pNetRegister(P_GLUE_INFO_T prGlueInfo, u8 fgIsRtnlLockAcquired){
+u8 p2pNetRegister(P_GLUE_INFO_T prGlueInfo, u8 fgIsRtnlLockAcquired)
+{
     u8 fgDoRegister = false;
     u8 fgRollbackRtnlLock = false;
     u8 ret = false;
@@ -704,7 +708,8 @@ u8 p2pNetRegister(P_GLUE_INFO_T prGlueInfo, u8 fgIsRtnlLockAcquired){
     return ret;
 }
 
-u8 p2pNetUnregister(P_GLUE_INFO_T prGlueInfo, u8 fgIsRtnlLockAcquired){
+u8 p2pNetUnregister(P_GLUE_INFO_T prGlueInfo, u8 fgIsRtnlLockAcquired)
+{
     u8 fgDoUnregister = false;
     u8 fgRollbackRtnlLock = false;
     u8 ucRoleIdx;
@@ -918,7 +923,8 @@ u8 p2pNetUnregister(P_GLUE_INFO_T prGlueInfo, u8 fgIsRtnlLockAcquired){
 /*----------------------------------------------------------------------------*/
 #if CFG_ENABLE_UNIFY_WIPHY
 int glSetupP2P(P_GLUE_INFO_T prGlueInfo, struct wireless_dev *prP2pWdev,
-               struct net_device *prP2pDev, int u4Idx, u8 fgIsApMode){
+               struct net_device *prP2pDev, int u4Idx, u8 fgIsApMode)
+{
     P_ADAPTER_T prAdapter = NULL;
     P_GL_P2P_INFO_T prP2PInfo = NULL;
     P_GL_HIF_INFO_T prHif = NULL;
@@ -1029,7 +1035,8 @@ int glSetupP2P(P_GLUE_INFO_T prGlueInfo, struct wireless_dev *prP2pWdev,
  */
 /*---------------------------------------------------------------------------*/
 u8 glRegisterP2P(P_GLUE_INFO_T prGlueInfo, const char *prDevName,
-                 const char *prDevName2, u8 ucApMode){
+                 const char *prDevName2, u8 ucApMode)
+{
     P_ADAPTER_T prAdapter = NULL;
     PARAM_MAC_ADDRESS rMacAddr;
     u8 fgIsApMode = false;
@@ -1331,7 +1338,8 @@ err_alloc_netdev:
 }
 
 #if CFG_ENABLE_UNIFY_WIPHY
-u8 glP2pCreateWirelessDevice(P_GLUE_INFO_T prGlueInfo){
+u8 glP2pCreateWirelessDevice(P_GLUE_INFO_T prGlueInfo)
+{
     struct wiphy *prWiphy = gprWdev->wiphy;
     struct wireless_dev *prWdev = NULL;
     u8 i = 0;
@@ -1365,7 +1373,8 @@ u8 glP2pCreateWirelessDevice(P_GLUE_INFO_T prGlueInfo){
 #endif
 }
 #else  /* (CFG_ENABLE_UNIFY_WIPHY == 0) */
-u8 glP2pCreateWirelessDevice(P_GLUE_INFO_T prGlueInfo){
+u8 glP2pCreateWirelessDevice(P_GLUE_INFO_T prGlueInfo)
+{
     struct wiphy *prWiphy = NULL;
     struct wireless_dev *prWdev = NULL;
     u8 i = 0;
@@ -1480,7 +1489,8 @@ free_wdev:
 #endif  /* CFG_ENABLE_UNIFY_WIPHY */
 
 #if (CFG_ENABLE_UNIFY_WIPHY == 0)
-void glP2pDestroyWirelessDevice(void){
+void glP2pDestroyWirelessDevice(void)
+{
     int i = 0;
 
     set_wiphy_dev(gprP2pWdev->wiphy, NULL);
@@ -1682,7 +1692,8 @@ u8 glUnregisterP2P(P_GLUE_INFO_T prGlueInfo, u8 ucIdx)
  * \retval < 0   The execution failed.
  */
 /*----------------------------------------------------------------------------*/
-static int p2pOpen(IN struct net_device *prDev){
+static int p2pOpen(IN struct net_device *prDev)
+{
     ASSERT(prDev);
 
     /* 2. carrier on & start TX queue */
@@ -1710,7 +1721,8 @@ static int p2pOpen(IN struct net_device *prDev){
  * \retval < 0   The execution failed.
  */
 /*----------------------------------------------------------------------------*/
-static int p2pStop(IN struct net_device *prDev){
+static int p2pStop(IN struct net_device *prDev)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     P_ADAPTER_T prAdapter = NULL;
     P_GL_P2P_DEV_INFO_T prP2pGlueDevInfo = (P_GL_P2P_DEV_INFO_T)NULL;
@@ -1799,11 +1811,13 @@ static int p2pStop(IN struct net_device *prDev){
  * \return net_device_stats buffer pointer.
  */
 /*----------------------------------------------------------------------------*/
-struct net_device_stats *p2pGetStats(IN struct net_device *prDev){
+struct net_device_stats *p2pGetStats(IN struct net_device *prDev)
+{
     return (struct net_device_stats *)kalGetStats(prDev);
 }
 
-static void p2pSetMulticastList(IN struct net_device *prDev){
+static void p2pSetMulticastList(IN struct net_device *prDev)
+{
     P_GLUE_INFO_T prGlueInfo = (P_GLUE_INFO_T)NULL;
 
     prGlueInfo = (prDev != NULL) ? *((P_GLUE_INFO_T *)netdev_priv(prDev)) :
@@ -1835,7 +1849,8 @@ static void p2pSetMulticastList(IN struct net_device *prDev){
  * \return (none)
  */
 /*----------------------------------------------------------------------------*/
-void mtk_p2p_wext_set_Multicastlist(P_GLUE_INFO_T prGlueInfo){
+void mtk_p2p_wext_set_Multicastlist(P_GLUE_INFO_T prGlueInfo)
+{
     u32 u4SetInfoLen = 0;
     u32 u4McCount;
     struct net_device *prDev;
@@ -1918,7 +1933,8 @@ void mtk_p2p_wext_set_Multicastlist(P_GLUE_INFO_T prGlueInfo){
 ** \retval NETDEV_TX_BUSY - on failure, packet will be discarded by upper layer.
 */
 /*----------------------------------------------------------------------------*/
-int p2pHardStartXmit(IN struct sk_buff *prSkb, IN struct net_device *prDev){
+int p2pHardStartXmit(IN struct sk_buff *prSkb, IN struct net_device *prDev)
+{
     P_NETDEV_PRIVATE_GLUE_INFO prNetDevPrivate =
         (P_NETDEV_PRIVATE_GLUE_INFO)NULL;
     P_GLUE_INFO_T prGlueInfo = NULL;
@@ -2176,7 +2192,8 @@ int p2pHardStartXmit(IN struct sk_buff *prSkb, IN struct net_device *prDev){
  */
 /*----------------------------------------------------------------------------*/
 
-int p2pDoIOCTL(struct net_device *prDev, struct ifreq *prIfReq, int i4Cmd){
+int p2pDoIOCTL(struct net_device *prDev, struct ifreq *prIfReq, int i4Cmd)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     int ret = 0;
     /* char *prExtraBuf = NULL; */
@@ -2233,7 +2250,8 @@ int p2pDoIOCTL(struct net_device *prDev, struct ifreq *prIfReq, int i4Cmd){
  *
  */
 /*----------------------------------------------------------------------------*/
-int p2pSetMACAddress(IN struct net_device *prDev, void *addr){
+int p2pSetMACAddress(IN struct net_device *prDev, void *addr)
+{
     P_ADAPTER_T prAdapter = NULL;
     P_GLUE_INFO_T prGlueInfo = NULL;
 
@@ -2265,7 +2283,8 @@ int p2pSetMACAddress(IN struct net_device *prDev, void *addr){
 /*----------------------------------------------------------------------------*/
 int mtk_p2p_wext_get_priv(IN struct net_device *prDev,
                           IN struct iw_request_info *info,
-                          IN OUT union iwreq_data *wrqu, IN OUT char *extra){
+                          IN OUT union iwreq_data *wrqu, IN OUT char *extra)
+{
     struct iw_point *prData = (struct iw_point *)&wrqu->data;
     u16 u2BufferSize = 0;
 

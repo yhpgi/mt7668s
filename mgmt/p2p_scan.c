@@ -62,7 +62,8 @@
 void scanP2pProcessBeaconAndProbeResp(
     IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb,
     IN P_WLAN_STATUS prStatus, IN P_BSS_DESC_T prBssDesc,
-    IN P_WLAN_BEACON_FRAME_T prWlanBeaconFrame){
+    IN P_WLAN_BEACON_FRAME_T prWlanBeaconFrame)
+{
     u8 fgIsSkipThisBeacon = false;
     u8 fgIsP2pNetRegistered = false;
 
@@ -164,7 +165,8 @@ void scanP2pProcessBeaconAndProbeResp(
     }
 }
 
-void scnEventReturnChannel(IN P_ADAPTER_T prAdapter, IN u8 ucScnSeqNum){
+void scnEventReturnChannel(IN P_ADAPTER_T prAdapter, IN u8 ucScnSeqNum)
+{
     CMD_SCAN_CANCEL rCmdScanCancel;
 
     kalMemZero(&rCmdScanCancel, sizeof(rCmdScanCancel));
@@ -178,7 +180,8 @@ void scnEventReturnChannel(IN P_ADAPTER_T prAdapter, IN u8 ucScnSeqNum){
                         (u8 *)&rCmdScanCancel, NULL, 0);
 }
 
-void scanRemoveAllP2pBssDesc(IN P_ADAPTER_T prAdapter){
+void scanRemoveAllP2pBssDesc(IN P_ADAPTER_T prAdapter)
+{
     P_LINK_T prBSSDescList;
     P_BSS_DESC_T prBssDesc;
     P_BSS_DESC_T prBSSDescNext;
@@ -194,7 +197,8 @@ void scanRemoveAllP2pBssDesc(IN P_ADAPTER_T prAdapter){
 }
 
 P_BSS_DESC_T scanP2pSearchDesc(IN P_ADAPTER_T prAdapter,
-                               IN P_P2P_CONNECTION_REQ_INFO_T prConnReqInfo){
+                               IN P_P2P_CONNECTION_REQ_INFO_T prConnReqInfo)
+{
     P_BSS_DESC_T prCandidateBssDesc = (P_BSS_DESC_T)NULL,
                  prBssDesc = (P_BSS_DESC_T)NULL;
     P_LINK_T prBssDescList = (P_LINK_T)NULL;

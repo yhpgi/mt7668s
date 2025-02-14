@@ -63,7 +63,8 @@ static u16 mode = RUNNING_P2P_MODE;
  *                              F U N C T I O N S
  *******************************************************************************
  */
-void p2pSetSuspendMode(P_GLUE_INFO_T prGlueInfo, u8 fgEnable){
+void p2pSetSuspendMode(P_GLUE_INFO_T prGlueInfo, u8 fgEnable)
+{
     struct net_device *prDev = NULL;
 
     if (!prGlueInfo) {
@@ -95,7 +96,8 @@ void p2pSetSuspendMode(P_GLUE_INFO_T prGlueInfo, u8 fgEnable){
  * \retval 1     Success
  */
 /*----------------------------------------------------------------------------*/
-u8 p2pLaunch(P_GLUE_INFO_T prGlueInfo){
+u8 p2pLaunch(P_GLUE_INFO_T prGlueInfo)
+{
     P_ADAPTER_T prAdapter = NULL;
 
     GLUE_SPIN_LOCK_DECLARATION();
@@ -131,7 +133,8 @@ u8 p2pLaunch(P_GLUE_INFO_T prGlueInfo){
     return true;
 }
 
-void p2pSetMode(IN u8 ucAPMode){
+void p2pSetMode(IN u8 ucAPMode)
+{
     u8 *prAPInfName = AP_INF_NAME;
     u8 *prP2PInfName = P2P_INF_NAME;
 
@@ -179,7 +182,8 @@ void p2pSetMode(IN u8 ucAPMode){
  * \retval 1     Success
  */
 /*----------------------------------------------------------------------------*/
-u8 p2pRemove(P_GLUE_INFO_T prGlueInfo){
+u8 p2pRemove(P_GLUE_INFO_T prGlueInfo)
+{
     P_ADAPTER_T prAdapter = NULL;
 
     GLUE_SPIN_LOCK_DECLARATION();

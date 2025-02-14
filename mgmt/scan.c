@@ -75,7 +75,8 @@
  * @return (none)
  */
 /*----------------------------------------------------------------------------*/
-void scnInit(IN P_ADAPTER_T prAdapter){
+void scnInit(IN P_ADAPTER_T prAdapter)
+{
     P_SCAN_INFO_T prScanInfo;
     P_BSS_DESC_T prBSSDesc;
     u8 *pucBSSBuff;
@@ -148,7 +149,8 @@ void scnInit(IN P_ADAPTER_T prAdapter){
     prScanInfo->fgNloScanning = false;
 }
 
-void scnFreeAllPendingScanRquests(IN P_ADAPTER_T prAdapter){
+void scnFreeAllPendingScanRquests(IN P_ADAPTER_T prAdapter)
+{
     P_SCAN_INFO_T prScanInfo;
     P_MSG_HDR_T prMsgHdr;
     P_MSG_SCN_SCAN_REQ prScanReqMsg;
@@ -185,7 +187,8 @@ void scnFreeAllPendingScanRquests(IN P_ADAPTER_T prAdapter){
  * @return (none)
  */
 /*----------------------------------------------------------------------------*/
-void scnUninit(IN P_ADAPTER_T prAdapter){
+void scnUninit(IN P_ADAPTER_T prAdapter)
+{
     P_SCAN_INFO_T prScanInfo;
 
     ASSERT(prAdapter);
@@ -222,7 +225,8 @@ void scnUninit(IN P_ADAPTER_T prAdapter){
  */
 /*----------------------------------------------------------------------------*/
 P_BSS_DESC_T scanSearchBssDescByBssid(IN P_ADAPTER_T prAdapter,
-                                      IN u8 aucBSSID[]){
+                                      IN u8 aucBSSID[])
+{
     return scanSearchBssDescByBssidAndSsid(prAdapter, aucBSSID, false, NULL);
 }
 
@@ -241,7 +245,8 @@ P_BSS_DESC_T scanSearchBssDescByBssid(IN P_ADAPTER_T prAdapter,
 /*----------------------------------------------------------------------------*/
 P_BSS_DESC_T
 scanSearchBssDescByBssidAndSsid(IN P_ADAPTER_T prAdapter, IN u8 aucBSSID[],
-                                IN u8 fgCheckSsid, IN P_PARAM_SSID_T prSsid){
+                                IN u8 fgCheckSsid, IN P_PARAM_SSID_T prSsid)
+{
     P_SCAN_INFO_T prScanInfo;
     P_LINK_T prBSSDescList;
     P_BSS_DESC_T prBssDesc;
@@ -300,7 +305,8 @@ scanSearchBssDescByBssidAndSsid(IN P_ADAPTER_T prAdapter, IN u8 aucBSSID[],
 P_BSS_DESC_T scanSearchBssDescByBssidAndChanNum(IN P_ADAPTER_T prAdapter,
                                                 IN u8 aucBSSID[],
                                                 IN u8 fgCheckChanNum,
-                                                IN u8 ucChannelNum){
+                                                IN u8 ucChannelNum)
+{
     P_SCAN_INFO_T prScanInfo;
     P_LINK_T prBSSDescList;
     P_BSS_DESC_T prBssDesc = (P_BSS_DESC_T)NULL;
@@ -342,7 +348,8 @@ P_BSS_DESC_T scanSearchBssDescByBssidAndChanNum(IN P_ADAPTER_T prAdapter,
  */
 /*----------------------------------------------------------------------------*/
 P_BSS_DESC_T scanSearchBssDescByTA(IN P_ADAPTER_T prAdapter,
-                                   IN u8 aucSrcAddr[]){
+                                   IN u8 aucSrcAddr[])
+{
     return scanSearchBssDescByTAAndSsid(prAdapter, aucSrcAddr, false, NULL);
 }
 
@@ -362,7 +369,8 @@ P_BSS_DESC_T scanSearchBssDescByTA(IN P_ADAPTER_T prAdapter,
 /*----------------------------------------------------------------------------*/
 P_BSS_DESC_T
 scanSearchBssDescByTAAndSsid(IN P_ADAPTER_T prAdapter, IN u8 aucSrcAddr[],
-                             IN u8 fgCheckSsid, IN P_PARAM_SSID_T prSsid){
+                             IN u8 fgCheckSsid, IN P_PARAM_SSID_T prSsid)
+{
     P_SCAN_INFO_T prScanInfo;
     P_LINK_T prBSSDescList;
     P_BSS_DESC_T prBssDesc;
@@ -410,7 +418,8 @@ scanSearchBssDescByTAAndSsid(IN P_ADAPTER_T prAdapter, IN u8 aucSrcAddr[],
 /*----------------------------------------------------------------------------*/
 P_BSS_DESC_T
 scanSearchExistingBssDesc(IN P_ADAPTER_T prAdapter, IN ENUM_BSS_TYPE_T eBSSType,
-                          IN u8 aucBSSID[], IN u8 aucSrcAddr[]){
+                          IN u8 aucBSSID[], IN u8 aucSrcAddr[])
+{
     return scanSearchExistingBssDescWithSsid(prAdapter, eBSSType, aucBSSID,
                                              aucSrcAddr, false, NULL);
 }
@@ -426,7 +435,8 @@ scanSearchExistingBssDesc(IN P_ADAPTER_T prAdapter, IN ENUM_BSS_TYPE_T eBSSType,
  */
 /*----------------------------------------------------------------------------*/
 void scanRemoveRoamBssDescsByTime(IN P_ADAPTER_T prAdapter,
-                                  IN u32 u4RemoveTime){
+                                  IN u32 u4RemoveTime)
+{
     P_SCAN_INFO_T prScanInfo;
     P_LINK_T prRoamBSSDescList;
     P_LINK_T prRoamFreeBSSDescList;
@@ -463,7 +473,8 @@ void scanRemoveRoamBssDescsByTime(IN P_ADAPTER_T prAdapter,
 /*----------------------------------------------------------------------------*/
 P_ROAM_BSS_DESC_T
 scanSearchRoamBssDescBySsid(IN P_ADAPTER_T prAdapter,
-                            IN P_BSS_DESC_T prBssDesc){
+                            IN P_BSS_DESC_T prBssDesc)
+{
     P_SCAN_INFO_T prScanInfo;
     P_LINK_T prRoamBSSDescList;
     P_ROAM_BSS_DESC_T prRoamBssDesc;
@@ -495,7 +506,8 @@ scanSearchRoamBssDescBySsid(IN P_ADAPTER_T prAdapter,
  * @return
  */
 /*----------------------------------------------------------------------------*/
-P_ROAM_BSS_DESC_T scanAllocateRoamBssDesc(IN P_ADAPTER_T prAdapter){
+P_ROAM_BSS_DESC_T scanAllocateRoamBssDesc(IN P_ADAPTER_T prAdapter)
+{
     P_SCAN_INFO_T prScanInfo;
     P_LINK_T prRoamFreeBSSDescList;
     P_ROAM_BSS_DESC_T prRoamBssDesc = NULL;
@@ -529,7 +541,8 @@ P_ROAM_BSS_DESC_T scanAllocateRoamBssDesc(IN P_ADAPTER_T prAdapter){
  * @return
  */
 /*----------------------------------------------------------------------------*/
-void scanAddToRoamBssDesc(IN P_ADAPTER_T prAdapter, IN P_BSS_DESC_T prBssDesc){
+void scanAddToRoamBssDesc(IN P_ADAPTER_T prAdapter, IN P_BSS_DESC_T prBssDesc)
+{
     P_ROAM_BSS_DESC_T prRoamBssDesc;
 
     prRoamBssDesc = scanSearchRoamBssDescBySsid(prAdapter, prBssDesc);
@@ -566,7 +579,8 @@ void scanAddToRoamBssDesc(IN P_ADAPTER_T prAdapter, IN P_BSS_DESC_T prBssDesc){
  * @return
  */
 /*----------------------------------------------------------------------------*/
-void scanSearchBssDescOfRoamSsid(IN P_ADAPTER_T prAdapter){
+void scanSearchBssDescOfRoamSsid(IN P_ADAPTER_T prAdapter)
+{
 #define SSID_ONLY_EXIST_ONE_AP \
     1  /* If only exist one same ssid AP, avoid unnecessary scan */
 
@@ -624,7 +638,8 @@ P_BSS_DESC_T
 scanSearchExistingBssDescWithSsid(IN P_ADAPTER_T prAdapter,
                                   IN ENUM_BSS_TYPE_T eBSSType, IN u8 aucBSSID[],
                                   IN u8 aucSrcAddr[], IN u8 fgCheckSsid,
-                                  IN P_PARAM_SSID_T prSsid){
+                                  IN P_PARAM_SSID_T prSsid)
+{
     P_SCAN_INFO_T prScanInfo;
     P_BSS_DESC_T prBssDesc, prIBSSBssDesc;
     /* CASE III */
@@ -687,7 +702,8 @@ scanSearchExistingBssDescWithSsid(IN P_ADAPTER_T prAdapter,
  * @return (none)
  */
 /*----------------------------------------------------------------------------*/
-u8 scanByPassRemoveBssDesc(IN P_ADAPTER_T prAdapter, IN P_BSS_DESC_T prBssDesc){
+u8 scanByPassRemoveBssDesc(IN P_ADAPTER_T prAdapter, IN P_BSS_DESC_T prBssDesc)
+{
     P_SCAN_INFO_T prScanInfo;
     P_SCAN_PARAM_T prScanParam;
     u8 ucIndex = 0;
@@ -720,7 +736,8 @@ u8 scanByPassRemoveBssDesc(IN P_ADAPTER_T prAdapter, IN P_BSS_DESC_T prBssDesc){
  */
 /*----------------------------------------------------------------------------*/
 void scanRemoveBssDescsByPolicy(IN P_ADAPTER_T prAdapter,
-                                IN u32 u4RemovePolicy){
+                                IN u32 u4RemovePolicy)
+{
     P_CONNECTION_SETTINGS_T prConnSettings;
     P_SCAN_INFO_T prScanInfo;
     P_LINK_T prBSSDescList;
@@ -930,7 +947,8 @@ void scanRemoveBssDescsByPolicy(IN P_ADAPTER_T prAdapter,
  * @return (none)
  */
 /*----------------------------------------------------------------------------*/
-void scanRemoveBssDescByBssid(IN P_ADAPTER_T prAdapter, IN u8 aucBSSID[]){
+void scanRemoveBssDescByBssid(IN P_ADAPTER_T prAdapter, IN u8 aucBSSID[])
+{
     P_SCAN_INFO_T prScanInfo;
     P_LINK_T prBSSDescList;
     P_LINK_T prFreeBSSDescList;
@@ -975,7 +993,8 @@ void scanRemoveBssDescByBssid(IN P_ADAPTER_T prAdapter, IN u8 aucBSSID[]){
  */
 /*----------------------------------------------------------------------------*/
 void scanRemoveBssDescByBandAndNetwork(IN P_ADAPTER_T prAdapter,
-                                       IN ENUM_BAND_T eBand, IN u8 ucBssIndex){
+                                       IN ENUM_BAND_T eBand, IN u8 ucBssIndex)
+{
     P_SCAN_INFO_T prScanInfo;
     P_LINK_T prBSSDescList;
     P_LINK_T prFreeBSSDescList;
@@ -1047,7 +1066,8 @@ void scanRemoveBssDescByBandAndNetwork(IN P_ADAPTER_T prAdapter,
  */
 /*----------------------------------------------------------------------------*/
 void scanRemoveConnFlagOfBssDescByBssid(IN P_ADAPTER_T prAdapter,
-                                        IN u8 aucBSSID[]){
+                                        IN u8 aucBSSID[])
+{
     P_SCAN_INFO_T prScanInfo;
     P_LINK_T prBSSDescList;
     P_BSS_DESC_T prBssDesc = (P_BSS_DESC_T)NULL;
@@ -1082,7 +1102,8 @@ void scanRemoveConnFlagOfBssDescByBssid(IN P_ADAPTER_T prAdapter,
  * space.
  */
 /*----------------------------------------------------------------------------*/
-P_BSS_DESC_T scanAllocateBssDesc(IN P_ADAPTER_T prAdapter){
+P_BSS_DESC_T scanAllocateBssDesc(IN P_ADAPTER_T prAdapter)
+{
     P_SCAN_INFO_T prScanInfo;
     P_LINK_T prFreeBSSDescList;
     P_BSS_DESC_T prBssDesc;
@@ -1127,7 +1148,8 @@ P_BSS_DESC_T scanAllocateBssDesc(IN P_ADAPTER_T prAdapter){
  *           NULL if the Beacon/ProbeResp frame is invalid
  */
 /*----------------------------------------------------------------------------*/
-P_BSS_DESC_T scanAddToBssDesc(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb){
+P_BSS_DESC_T scanAddToBssDesc(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb)
+{
     P_BSS_DESC_T prBssDesc = NULL;
     u16 u2CapInfo;
     ENUM_BSS_TYPE_T eBSSType = BSS_TYPE_INFRASTRUCTURE;
@@ -1773,7 +1795,8 @@ P_BSS_DESC_T scanAddToBssDesc(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb){
  */
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS scanAddScanResult(IN P_ADAPTER_T prAdapter,
-                              IN P_BSS_DESC_T prBssDesc, IN P_SW_RFB_T prSwRfb){
+                              IN P_BSS_DESC_T prBssDesc, IN P_SW_RFB_T prSwRfb)
+{
     P_SCAN_INFO_T prScanInfo;
     u8 aucRatesEx[PARAM_MAX_LEN_RATES_EX];
     P_WLAN_BEACON_FRAME_T prWlanBeaconFrame;
@@ -1857,7 +1880,8 @@ WLAN_STATUS scanAddScanResult(IN P_ADAPTER_T prAdapter,
     return WLAN_STATUS_SUCCESS;
 }
 
-u8 scanCheckBssIsLegal(IN P_ADAPTER_T prAdapter, P_BSS_DESC_T prBssDesc){
+u8 scanCheckBssIsLegal(IN P_ADAPTER_T prAdapter, P_BSS_DESC_T prBssDesc)
+{
     u8 fgAddToScanResult = false;
     ENUM_BAND_T eBand;
     u8 ucChannel;
@@ -1891,7 +1915,8 @@ u8 scanCheckBssIsLegal(IN P_ADAPTER_T prAdapter, P_BSS_DESC_T prBssDesc){
  */
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS scanProcessBeaconAndProbeResp(IN P_ADAPTER_T prAdapter,
-                                          IN P_SW_RFB_T prSwRfb){
+                                          IN P_SW_RFB_T prSwRfb)
+{
     P_SCAN_INFO_T prScanInfo;
     P_CONNECTION_SETTINGS_T prConnSettings;
     P_BSS_DESC_T prBssDesc = (P_BSS_DESC_T)NULL;
@@ -2034,7 +2059,8 @@ WLAN_STATUS scanProcessBeaconAndProbeResp(IN P_ADAPTER_T prAdapter,
  */
 /*----------------------------------------------------------------------------*/
 P_BSS_DESC_T scanSearchBssDescByPolicy(IN P_ADAPTER_T prAdapter,
-                                       IN u8 ucBssIndex){
+                                       IN u8 ucBssIndex)
+{
     P_CONNECTION_SETTINGS_T prConnSettings;
     P_BSS_INFO_T prBssInfo;
     P_AIS_SPECIFIC_BSS_INFO_T prAisSpecBssInfo;
@@ -2474,7 +2500,8 @@ P_BSS_DESC_T scanSearchBssDescByPolicy(IN P_ADAPTER_T prAdapter,
 
 void scanReportBss2Cfg80211(IN P_ADAPTER_T prAdapter,
                             IN ENUM_BSS_TYPE_T eBSSType,
-                            IN P_BSS_DESC_T SpecificprBssDesc){
+                            IN P_BSS_DESC_T SpecificprBssDesc)
+{
     P_SCAN_INFO_T prScanInfo = NULL;
     P_LINK_T prBSSDescList = NULL;
     P_BSS_DESC_T prBssDesc = NULL;
@@ -2607,7 +2634,8 @@ void scanReportBss2Cfg80211(IN P_ADAPTER_T prAdapter,
     }
 }
 
-void scanReportScanResultToAgps(P_ADAPTER_T prAdapter){
+void scanReportScanResultToAgps(P_ADAPTER_T prAdapter)
+{
     P_LINK_T prBSSDescList = &prAdapter->rWifiVar.rScanInfo.rBSSDescList;
     P_BSS_DESC_T prBssDesc = NULL;
     P_AGPS_AP_LIST_T prAgpsApList =

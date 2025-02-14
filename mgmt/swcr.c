@@ -157,7 +157,8 @@ enum {
  *                              F U N C T I O N S
  *******************************************************************************
  */
-void dumpQueue(P_ADAPTER_T prAdapter){
+void dumpQueue(P_ADAPTER_T prAdapter)
+{
     P_TX_CTRL_T prTxCtrl;
     P_QUE_MGT_T prQM;
     P_GLUE_INFO_T prGlueInfo;
@@ -218,7 +219,8 @@ void dumpQueue(P_ADAPTER_T prAdapter){
            prAdapter->rRxCtrl.ucNumRetainedPacket);
 }
 
-void dumpSTA(P_ADAPTER_T prAdapter, P_STA_RECORD_T prStaRec){
+void dumpSTA(P_ADAPTER_T prAdapter, P_STA_RECORD_T prStaRec)
+{
     u8 ucWTEntry;
     u32 i;
     P_BSS_INFO_T prBssInfo;
@@ -291,7 +293,8 @@ void dumpSTA(P_ADAPTER_T prAdapter, P_STA_RECORD_T prStaRec){
     }
 }
 
-void dumpBss(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo){
+void dumpBss(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo)
+{
     DBGLOG(SW4, INFO, "SSID %s\n", prBssInfo->aucSSID);
     DBGLOG(SW4, INFO, "OWN " MACSTR "\n",
            MAC2STR(prBssInfo->aucOwnMacAddr));
@@ -347,7 +350,8 @@ void dumpBss(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo){
 }
 
 void swCtrlCmdCategory0(P_ADAPTER_T prAdapter, u8 ucCate, u8 ucAction,
-                        u8 ucOpt0, u8 ucOpt1){
+                        u8 ucOpt0, u8 ucOpt1)
+{
     u8 ucIndex, ucRead;
     u32 i;
     CMD_RX_PACKET_FILTER rSetRxPacketFilter;
@@ -712,7 +716,8 @@ void swCtrlCmdCategory0(P_ADAPTER_T prAdapter, u8 ucCate, u8 ucAction,
 }
 
 void swCtrlCmdCategory1(P_ADAPTER_T prAdapter, u8 ucCate, u8 ucAction,
-                        u8 ucOpt0, u8 ucOpt1){
+                        u8 ucOpt0, u8 ucOpt1)
+{
     u8 ucIndex, ucRead;
     u8 ucWTEntry;
     P_STA_RECORD_T prStaRec;
@@ -771,7 +776,8 @@ void testPsSendQoSNullFrame(IN P_ADAPTER_T prAdapter,
                             IN P_STA_RECORD_T prStaRec, IN u8 ucUP,
                             IN u8 ucBssIndex, IN u8 fgBMC, IN u8 fgIsBurstEnd,
                             IN u8 ucPacketType, IN u8 ucPsSessionID,
-                            IN u8 fgSetEOSP){
+                            IN u8 fgSetEOSP)
+{
     P_MSDU_INFO_T prMsduInfo;
     u16 u2EstimatedFrameLen;
     P_WLAN_MAC_HEADER_QOS_T prQoSNullFrame;
@@ -820,7 +826,8 @@ void testPsSendQoSNullFrame(IN P_ADAPTER_T prAdapter,
     nicTxEnqueueMsdu(prAdapter, prMsduInfo);
 }
 
-void testPsSetupBss(IN P_ADAPTER_T prAdapter, IN u8 ucBssIndex){
+void testPsSetupBss(IN P_ADAPTER_T prAdapter, IN u8 ucBssIndex)
+{
     P_BSS_INFO_T prBssInfo;
     u8 _aucZeroMacAddr[] = NULL_MAC_ADDR;
 
@@ -910,7 +917,8 @@ void testPsSetupBss(IN P_ADAPTER_T prAdapter, IN u8 ucBssIndex){
 }
 
 void testPsCmdCategory0(P_ADAPTER_T prAdapter, u8 ucCate, u8 ucAction,
-                        u8 ucOpt0, u8 ucOpt1){
+                        u8 ucOpt0, u8 ucOpt1)
+{
     u8 ucIndex, ucRead;
     P_STA_RECORD_T prStaRec;
 
@@ -981,7 +989,8 @@ void testPsCmdCategory0(P_ADAPTER_T prAdapter, u8 ucCate, u8 ucAction,
 #if TEST_PS
 
 void testPsCmdCategory1(P_ADAPTER_T prAdapter, u8 ucCate, u8 ucAction,
-                        u8 ucOpt0, u8 ucOpt1){
+                        u8 ucOpt0, u8 ucOpt1)
+{
     u8 ucIndex, ucRead;
     u8 ucWTEntry;
     P_STA_RECORD_T prStaRec;
@@ -1027,7 +1036,8 @@ void testPsCmdCategory1(P_ADAPTER_T prAdapter, u8 ucCate, u8 ucAction,
 #if CFG_SUPPORT_802_11V
 #if (CFG_SUPPORT_802_11V_TIMING_MEASUREMENT == 1) && (WNM_UNIT_TEST == 1)
 void testWNMCmdCategory0(P_ADAPTER_T prAdapter, u8 ucCate, u8 ucAction,
-                         u8 ucOpt0, u8 ucOpt1){
+                         u8 ucOpt0, u8 ucOpt1)
+{
     u8 ucIndex, ucRead;
     P_STA_RECORD_T prStaRec;
 
@@ -1054,7 +1064,8 @@ void testWNMCmdCategory0(P_ADAPTER_T prAdapter, u8 ucCate, u8 ucAction,
 #endif
 #endif
 
-void swCtrlSwCr(P_ADAPTER_T prAdapter, u8 ucRead, u16 u2Addr, u32 *pu4Data){
+void swCtrlSwCr(P_ADAPTER_T prAdapter, u8 ucRead, u16 u2Addr, u32 *pu4Data)
+{
     /* According other register STAIDX */
     u8 ucOffset;
 
@@ -1093,7 +1104,8 @@ void swCtrlSwCr(P_ADAPTER_T prAdapter, u8 ucRead, u16 u2Addr, u32 *pu4Data){
 }
 
 void swCrReadWriteCmd(P_ADAPTER_T prAdapter, u8 ucRead, u16 u2Addr,
-                      u32 *pu4Data){
+                      u32 *pu4Data)
+{
     u8 ucMod;
 
     ucMod = u2Addr >> 8;
@@ -1112,14 +1124,16 @@ void swCrReadWriteCmd(P_ADAPTER_T prAdapter, u8 ucRead, u16 u2Addr,
 }
 
 /* Debug Support */
-void swCrFrameCheckEnable(P_ADAPTER_T prAdapter, u32 u4DumpType){
+void swCrFrameCheckEnable(P_ADAPTER_T prAdapter, u32 u4DumpType)
+{
     g_u4SwcrDebugFrameDumpType = u4DumpType;
 #if CFG_RX_PKTS_DUMP
     prAdapter->rRxCtrl.u4RxPktsDumpTypeMask = u4DumpType;
 #endif
 }
 
-void swCrDebugInit(P_ADAPTER_T prAdapter){
+void swCrDebugInit(P_ADAPTER_T prAdapter)
+{
     /* frame dump */
     if (g_u4SwcrDebugFrameDumpType) {
         swCrFrameCheckEnable(prAdapter, g_u4SwcrDebugFrameDumpType);
@@ -1137,14 +1151,16 @@ void swCrDebugInit(P_ADAPTER_T prAdapter){
     }
 }
 
-void swCrDebugUninit(P_ADAPTER_T prAdapter){
+void swCrDebugUninit(P_ADAPTER_T prAdapter)
+{
     cnmTimerStopTimer(prAdapter, &g_rSwcrDebugTimer);
 
     g_fgSwcrDebugTimer = false;
 }
 
 void swCrDebugCheckEnable(P_ADAPTER_T prAdapter, u8 fgIsEnable, u8 ucType,
-                          u32 u4Timeout){
+                          u32 u4Timeout)
+{
     if (fgIsEnable) {
         g_ucSwcrDebugCheckType = ucType;
         g_u4SwcrDebugCheckTimeout = u4Timeout;
@@ -1159,7 +1175,8 @@ void swCrDebugCheckEnable(P_ADAPTER_T prAdapter, u8 fgIsEnable, u8 ucType,
     g_fgSwcrDebugTimer = fgIsEnable;
 }
 
-void swCrDebugCheck(P_ADAPTER_T prAdapter, P_CMD_SW_DBG_CTRL_T prCmdSwCtrl){
+void swCrDebugCheck(P_ADAPTER_T prAdapter, P_CMD_SW_DBG_CTRL_T prCmdSwCtrl)
+{
     P_RX_CTRL_T prRxCtrl;
     P_TX_CTRL_T prTxCtrl;
 
@@ -1326,7 +1343,8 @@ void swCrDebugCheck(P_ADAPTER_T prAdapter, P_CMD_SW_DBG_CTRL_T prCmdSwCtrl){
     }
 }
 
-void swCrDebugCheckTimeout(IN P_ADAPTER_T prAdapter, unsigned long ulParamPtr){
+void swCrDebugCheckTimeout(IN P_ADAPTER_T prAdapter, unsigned long ulParamPtr)
+{
     CMD_SW_DBG_CTRL_T rCmdSwCtrl;
     WLAN_STATUS rStatus;
 
@@ -1353,7 +1371,8 @@ void swCrDebugCheckTimeout(IN P_ADAPTER_T prAdapter, unsigned long ulParamPtr){
 }
 
 void swCrDebugQuery(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo,
-                    IN u8 *pucEventBuf, IN u32 u4EventBufLen){
+                    IN u8 *pucEventBuf, IN u32 u4EventBufLen)
+{
     ASSERT(prAdapter);
     if (u4EventBufLen < sizeof(CMD_SW_DBG_CTRL_T)) {
         DBGLOG(NIC, ERROR, "%s: Invalid event length: %d < %d\n",
@@ -1363,7 +1382,8 @@ void swCrDebugQuery(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo,
     swCrDebugCheck(prAdapter, (P_CMD_SW_DBG_CTRL_T)(pucEventBuf));
 }
 
-void swCrDebugQueryTimeout(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo){
+void swCrDebugQueryTimeout(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo)
+{
     ASSERT(prAdapter);
 
     swCrDebugCheck(prAdapter, NULL);

@@ -79,10 +79,10 @@ static P_GLUE_INFO_T g_prGlueInfo_proc;
 static u32 u4McrOffset;
 static struct proc_dir_entry *gprProcRoot;
 static u8 aucDbModuleName[][PROC_DBG_LEVEL_MAX_DISPLAY_STR_LEN] = {
-    "INIT",    "HAL",  "INTR", "REQ", "TX",  "RX",  "RFTEST", "EMU", "SW1",
-    "SW2",     "SW3",  "SW4",  "HEM", "AIS", "RLM", "MEM",    "CNM", "RSN",
-    "BSS",     "SCN",  "SAA",  "AAA", "P2P", "QM",  "SEC",    "BOW", "WAPI",
-    "ROAMING", "TDLS", "PF",   "OID", "NIC", "WNM"
+    "INIT", "HAL", "INTR", "REQ", "TX", "RX", "RFTEST", "EMU", "SW1",
+    "SW2", "SW3", "SW4", "HEM", "AIS", "RLM", "MEM", "CNM", "RSN",
+    "BSS", "SCN", "SAA", "AAA", "P2P", "QM", "SEC", "BOW", "WAPI",
+    "ROAMING", "TDLS", "PF", "OID", "NIC", "WNM"
 };
 
 /* This u32 is only for DriverCmdRead/Write, should not be used by other
@@ -98,7 +98,8 @@ static s32 g_i4NextDriverReadLen;
  *******************************************************************************
  */
 static ssize_t procDbgLevelRead(struct file *filp, char __user *buf,
-                                size_t count, loff_t *f_pos){
+                                size_t count, loff_t *f_pos)
+{
     u8 *pucProcBuf = kalMemZAlloc(PROC_MAX_BUF_SIZE, VIR_MEM_TYPE);
     u8 *temp = pucProcBuf;
     u32 u4CopySize = 0;
@@ -164,7 +165,8 @@ freeBuf:
 #if WLAN_INCLUDE_PROC
 #if CFG_SUPPORT_EASY_DEBUG
 
-static void *procEfuseDump_start(struct seq_file *s, loff_t *pos){
+static void *procEfuseDump_start(struct seq_file *s, loff_t *pos)
+{
     static unsigned long counter;
 
     if (*pos == 0) {
@@ -177,7 +179,8 @@ static void *procEfuseDump_start(struct seq_file *s, loff_t *pos){
 
     return &counter;
 }
-static void *procEfuseDump_next(struct seq_file *s, void *v, loff_t *pos){
+static void *procEfuseDump_next(struct seq_file *s, void *v, loff_t *pos)
+{
     unsigned long *tmp_v = (unsigned long *)v;
 
     (*tmp_v) += EFUSE_BLOCK_SIZE;
@@ -188,10 +191,12 @@ static void *procEfuseDump_next(struct seq_file *s, void *v, loff_t *pos){
 
     return tmp_v;
 }
-static void procEfuseDump_stop(struct seq_file *s, void *v){
+static void procEfuseDump_stop(struct seq_file *s, void *v)
+{
     /* nothing to do, we use a static value in start() */
 }
-static int procEfuseDump_show(struct seq_file *s, void *v){
+static int procEfuseDump_show(struct seq_file *s, void *v)
+{
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
     u32 u4BufLen = 0;
     P_GLUE_INFO_T prGlueInfo;
@@ -227,7 +232,8 @@ static int procEfuseDump_show(struct seq_file *s, void *v){
 
 #endif
 }
-static int procEfuseDumpOpen(struct inode *inode, struct file *file){
+static int procEfuseDumpOpen(struct inode *inode, struct file *file)
+{
     static const struct seq_operations procEfuseDump_ops = {
         .start = procEfuseDump_start,
         .next = procEfuseDump_next,
@@ -239,7 +245,8 @@ static int procEfuseDumpOpen(struct inode *inode, struct file *file){
 }
 
 static ssize_t procCfgRead(struct file *filp, char __user *buf, size_t count,
-                           loff_t *f_pos){
+                           loff_t *f_pos)
+{
     u8 *pucProcBuf = kalMemZAlloc(PROC_MAX_BUF_SIZE, VIR_MEM_TYPE);
     u8 *temp = pucProcBuf;
     u32 u4CopySize = 0;
@@ -334,7 +341,8 @@ freeBuf:
 }
 
 static ssize_t procCfgWrite(struct file *file, const char __user *buffer,
-                            size_t count, loff_t *data){
+                            size_t count, loff_t *data)
+{
     u8 *pucProcBuf = kalMemZAlloc(PROC_MAX_BUF_SIZE, VIR_MEM_TYPE);
     s32 u4CopySize = PROC_MAX_BUF_SIZE;
     P_GLUE_INFO_T prGlueInfo;
@@ -384,12 +392,14 @@ freeBuf:
 }
 
 static ssize_t procDriverCmdRead(struct file *filp, char __user *buf,
-                                 size_t count, loff_t *f_pos){
+                                 size_t count, loff_t *f_pos)
+{
     return 0;
 }
 
 static ssize_t procDriverCmdWrite(struct file *file, const char __user *buffer,
-                                  size_t count, loff_t *data){
+                                  size_t count, loff_t *data)
+{
     u8 *pucProcBuf = kalMemZAlloc(PROC_MAX_BUF_SIZE, VIR_MEM_TYPE);
     u32 u4CopySize = PROC_MAX_BUF_SIZE;
     P_GLUE_INFO_T prGlueInfo = g_prGlueInfo_proc;
@@ -426,7 +436,8 @@ freeBuf:
 #endif
 
 static ssize_t procDbgLevelWrite(struct file *file, const char __user *buffer,
-                                 size_t count, loff_t *data){
+                                 size_t count, loff_t *data)
+{
     u32 u4NewDbgModule, u4NewDbgLevel;
     u8 *pucProcBuf = kalMemZAlloc(PROC_MAX_BUF_SIZE, VIR_MEM_TYPE);
     u8 *temp = NULL;
@@ -538,9 +549,9 @@ static struct txpwr_table_entry vht[] = {
 
 static struct txpwr_table txpwr_tables[] = {
     { "Legacy", dsss, ARRAY_SIZE(dsss) }, { "11g", ofdm, ARRAY_SIZE(ofdm) },
-    { "11a", ofdm, ARRAY_SIZE(ofdm) },    { "HT20", ht, ARRAY_SIZE(ht) },
-    { "HT40", ht, ARRAY_SIZE(ht) },       { "VHT20", vht, ARRAY_SIZE(vht) },
-    { "VHT40", vht, ARRAY_SIZE(vht) },    { "VHT80", vht, ARRAY_SIZE(vht) },
+    { "11a", ofdm, ARRAY_SIZE(ofdm) }, { "HT20", ht, ARRAY_SIZE(ht) },
+    { "HT40", ht, ARRAY_SIZE(ht) }, { "VHT20", vht, ARRAY_SIZE(vht) },
+    { "VHT40", vht, ARRAY_SIZE(vht) }, { "VHT80", vht, ARRAY_SIZE(vht) },
 };
 
 #define TMP_SZ        (512)
@@ -549,7 +560,8 @@ static struct txpwr_table txpwr_tables[] = {
 void print_txpwr_tbl(struct txpwr_table *txpwr_tbl, unsigned char ch,
                      unsigned char fe_loss, unsigned char *tx_pwr[],
                      char pwr_offset[], char *stream_buf[],
-                     unsigned int stream_pos[]){
+                     unsigned int stream_pos[])
+{
     struct txpwr_table_entry *tmp_tbl = txpwr_tbl->tables;
     unsigned int idx, pwr_idx, stream_idx;
     signed char pwr[TXPWR_TBL_NUM] = { 0 }, tmp_pwr = 0;
@@ -635,7 +647,8 @@ char *g_txpwr_tbl_read_buffer = NULL;
 unsigned int g_txpwr_tbl_read_residual = 0;
 
 static ssize_t procGetTxpwrTblRead(struct file *filp, char __user *buf,
-                                   size_t count, loff_t *f_pos){
+                                   size_t count, loff_t *f_pos)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     P_ADAPTER_T prAdapter = NULL;
     P_BSS_INFO_T prBssInfo = NULL;
@@ -924,7 +937,8 @@ static const struct file_operations get_txpwr_tbl_ops = {
  */
 /*----------------------------------------------------------------------------*/
 static ssize_t procMCRRead(struct file *filp, char __user *buf, size_t count,
-                           loff_t *f_pos){
+                           loff_t *f_pos)
+{
     u8 *pucProcBuf = kalMemZAlloc(PROC_MAX_BUF_SIZE, VIR_MEM_TYPE);
     P_GLUE_INFO_T prGlueInfo;
     PARAM_CUSTOM_MCR_RW_STRUCT_T rMcrInfo;
@@ -990,7 +1004,8 @@ freeBuf:
  */
 /*----------------------------------------------------------------------------*/
 static ssize_t procMCRWrite(struct file *file, const char __user *buffer,
-                            size_t count, loff_t *data){
+                            size_t count, loff_t *data)
+{
     P_GLUE_INFO_T prGlueInfo;
     char acBuf[PROC_MCR_ACCESS_MAX_USER_INPUT_LEN + 1];  /* + 1 for "\0" */
     u32 u4CopySize = 0;
@@ -1057,7 +1072,8 @@ static const struct file_operations mcr_ops = {
 
 #if CFG_SUPPORT_DEBUG_FS
 static ssize_t procCountryRead(struct file *filp, char __user *buf,
-                               size_t count, loff_t *f_pos){
+                               size_t count, loff_t *f_pos)
+{
     u8 *pucProcBuf = kalMemZAlloc(PROC_MAX_BUF_SIZE, VIR_MEM_TYPE);
     u32 u4CopySize;
     u32 country = 0;
@@ -1114,7 +1130,8 @@ static const struct file_operations country_ops = {
 #endif
 #endif
 
-s32 procInitFs(void){
+s32 procInitFs(void)
+{
     g_i4NextDriverReadLen = 0;
 
     if (init_net.proc_net == (struct proc_dir_entry *)NULL) {
@@ -1137,7 +1154,8 @@ s32 procInitFs(void){
     return 0;
 }
 
-s32 procUninitProcFs(void){
+s32 procUninitProcFs(void)
+{
     remove_proc_subtree(PROC_ROOT_NAME, init_net.proc_net);
     return 0;
 }
@@ -1152,7 +1170,8 @@ s32 procUninitProcFs(void){
  * \return N/A
  */
 /*----------------------------------------------------------------------------*/
-s32 procRemoveProcfs(void){
+s32 procRemoveProcfs(void)
+{
     remove_proc_entry(PROC_MCR_ACCESS, gprProcRoot);
     remove_proc_entry(PROC_DRIVER_CMD, gprProcRoot);
     remove_proc_entry(PROC_DBG_LEVEL_NAME, gprProcRoot);
@@ -1168,7 +1187,8 @@ s32 procRemoveProcfs(void){
     return 0;
 }
 
-s32 procCreateFsEntry(P_GLUE_INFO_T prGlueInfo){
+s32 procCreateFsEntry(P_GLUE_INFO_T prGlueInfo)
+{
     struct proc_dir_entry *prEntry;
 
     DBGLOG(INIT, INFO, "[%s]\n", __func__);

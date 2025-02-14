@@ -158,7 +158,8 @@ static RX_EVENT_HANDLER_T arEventTable[] = {
  * @return (none)
  */
 /*----------------------------------------------------------------------------*/
-void nicRxInitialize(IN P_ADAPTER_T prAdapter){
+void nicRxInitialize(IN P_ADAPTER_T prAdapter)
+{
     P_RX_CTRL_T prRxCtrl;
     u8 *pucMemHandle;
     P_SW_RFB_T prSwRfb = (P_SW_RFB_T)NULL;
@@ -223,7 +224,8 @@ void nicRxInitialize(IN P_ADAPTER_T prAdapter){
  * @return (none)
  */
 /*----------------------------------------------------------------------------*/
-void nicRxUninitialize(IN P_ADAPTER_T prAdapter){
+void nicRxUninitialize(IN P_ADAPTER_T prAdapter)
+{
     P_RX_CTRL_T prRxCtrl;
     P_SW_RFB_T prSwRfb = (P_SW_RFB_T)NULL;
 
@@ -279,7 +281,8 @@ void nicRxUninitialize(IN P_ADAPTER_T prAdapter){
  *
  */
 /*----------------------------------------------------------------------------*/
-u8 nicRxFillRFB(IN P_ADAPTER_T prAdapter, IN OUT P_SW_RFB_T prSwRfb){
+u8 nicRxFillRFB(IN P_ADAPTER_T prAdapter, IN OUT P_SW_RFB_T prSwRfb)
+{
     P_HW_MAC_RX_DESC_T prRxStatus;
 
     u32 u4PktLen = 0;
@@ -394,7 +397,8 @@ u8 nicRxFillRFB(IN P_ADAPTER_T prAdapter, IN OUT P_SW_RFB_T prSwRfb){
  */
 /*----------------------------------------------------------------------------*/
 void nicRxFillChksumStatus(IN P_ADAPTER_T prAdapter, IN OUT P_SW_RFB_T prSwRfb,
-                           IN u32 u4TcpUdpIpCksStatus){
+                           IN u32 u4TcpUdpIpCksStatus)
+{
     ASSERT(prAdapter);
     ASSERT(prSwRfb);
 
@@ -497,7 +501,8 @@ void nicRxFillChksumStatus(IN P_ADAPTER_T prAdapter, IN OUT P_SW_RFB_T prSwRfb,
  *
  */
 /*----------------------------------------------------------------------------*/
-void nicRxClearFrag(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec){
+void nicRxClearFrag(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec)
+{
     int j;
     FRAG_INFO_T *prFragInfo;
 
@@ -525,7 +530,8 @@ void nicRxClearFrag(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec){
  */
 /*----------------------------------------------------------------------------*/
 P_SW_RFB_T incRxDefragMPDU(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSWRfb,
-                           OUT P_QUE_T prReturnedQue){
+                           OUT P_QUE_T prReturnedQue)
+{
     P_SW_RFB_T prOutputSwRfb = (P_SW_RFB_T)NULL;
 #if CFG_SUPPORT_FRAG_SUPPORT
     P_RX_CTRL_T prRxCtrl;
@@ -852,7 +858,8 @@ P_SW_RFB_T incRxDefragMPDU(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSWRfb,
  * @return true: a duplicate, false: not a duplicate
  */
 /*----------------------------------------------------------------------------*/
-u8 nicRxIsDuplicateFrame(IN OUT P_SW_RFB_T prSwRfb){
+u8 nicRxIsDuplicateFrame(IN OUT P_SW_RFB_T prSwRfb)
+{
     /* Non-QoS Unicast Data or Unicast MMPDU: SC Cache #4;
      *   QoS Unicast Data: SC Cache #0~3;
      *   Broadcast/Multicast: RetryBit == 0
@@ -1001,7 +1008,8 @@ u8 nicRxIsDuplicateFrame(IN OUT P_SW_RFB_T prSwRfb){
  */
 /*----------------------------------------------------------------------------*/
 void nicRxProcessPktWithoutReorder(IN P_ADAPTER_T prAdapter,
-                                   IN P_SW_RFB_T prSwRfb){
+                                   IN P_SW_RFB_T prSwRfb)
+{
     P_RX_CTRL_T prRxCtrl;
     P_TX_CTRL_T prTxCtrl;
     u32 u4CurrentRxBufferCount;
@@ -1084,7 +1092,8 @@ void nicRxProcessPktWithoutReorder(IN P_ADAPTER_T prAdapter,
  *
  */
 /*----------------------------------------------------------------------------*/
-void nicRxProcessForwardPkt(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb){
+void nicRxProcessForwardPkt(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb)
+{
     P_MSDU_INFO_T prMsduInfo, prRetMsduInfoList;
     P_TX_CTRL_T prTxCtrl;
     P_RX_CTRL_T prRxCtrl;
@@ -1168,7 +1177,8 @@ void nicRxProcessForwardPkt(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb){
  */
 /*----------------------------------------------------------------------------*/
 void nicRxProcessGOBroadcastPkt(IN P_ADAPTER_T prAdapter,
-                                IN P_SW_RFB_T prSwRfb){
+                                IN P_SW_RFB_T prSwRfb)
+{
     P_SW_RFB_T prSwRfbDuplicated;
     P_TX_CTRL_T prTxCtrl;
     P_RX_CTRL_T prRxCtrl;
@@ -1232,7 +1242,8 @@ void nicRxProcessGOBroadcastPkt(IN P_ADAPTER_T prAdapter,
 
 #if CFG_SUPPORT_SNIFFER
 void nicRxFillRadiotapMCS(IN OUT P_MONITOR_RADIOTAP_T prMonitorRadiotap,
-                          IN P_HW_MAC_RX_STS_GROUP_3_T prRxStatusGroup3){
+                          IN P_HW_MAC_RX_STS_GROUP_3_T prRxStatusGroup3)
+{
     u8 ucFrMode;
     u8 ucShortGI;
     u8 ucRxMode;
@@ -1269,7 +1280,8 @@ void nicRxFillRadiotapMCS(IN OUT P_MONITOR_RADIOTAP_T prMonitorRadiotap,
 }
 
 void nicRxFillRadiotapVHT(IN OUT P_MONITOR_RADIOTAP_T prMonitorRadiotap,
-                          IN P_HW_MAC_RX_STS_GROUP_3_T prRxStatusGroup3){
+                          IN P_HW_MAC_RX_STS_GROUP_3_T prRxStatusGroup3)
+{
     u8 ucSTBC;
     u8 ucTxopPsNotAllow;
     u8 ucShortGI;
@@ -1380,7 +1392,8 @@ void nicRxFillRadiotapVHT(IN OUT P_MONITOR_RADIOTAP_T prMonitorRadiotap,
  */
 /*----------------------------------------------------------------------------*/
 void nicRxProcessMonitorPacket(IN P_ADAPTER_T prAdapter,
-                               IN OUT P_SW_RFB_T prSwRfb){
+                               IN OUT P_SW_RFB_T prSwRfb)
+{
     struct sk_buff *prSkb = NULL;
     P_RX_CTRL_T prRxCtrl;
     P_HW_MAC_RX_DESC_T prRxStatus;
@@ -1596,7 +1609,8 @@ void nicRxProcessMonitorPacket(IN P_ADAPTER_T prAdapter,
  */
 /*----------------------------------------------------------------------------*/
 void nicRxProcessDataPacket(IN P_ADAPTER_T prAdapter,
-                            IN OUT P_SW_RFB_T prSwRfb){
+                            IN OUT P_SW_RFB_T prSwRfb)
+{
     P_RX_CTRL_T prRxCtrl;
     P_SW_RFB_T prRetSwRfb, prNextSwRfb;
     P_HW_MAC_RX_DESC_T prRxStatus;
@@ -1949,7 +1963,8 @@ void nicRxProcessDataPacket(IN P_ADAPTER_T prAdapter,
 }
 
 void nicRxProcessEventPacket(IN P_ADAPTER_T prAdapter,
-                             IN OUT P_SW_RFB_T prSwRfb){
+                             IN OUT P_SW_RFB_T prSwRfb)
+{
     P_CMD_INFO_T prCmdInfo;
     P_WIFI_EVENT_T prEvent;
     u32 u4Idx, u4Size;
@@ -2057,7 +2072,8 @@ done:
  */
 /*----------------------------------------------------------------------------*/
 void nicRxProcessMgmtPacket(IN P_ADAPTER_T prAdapter,
-                            IN OUT P_SW_RFB_T prSwRfb){
+                            IN OUT P_SW_RFB_T prSwRfb)
+{
     u8 ucSubtype;
 #if CFG_SUPPORT_802_11W
     /* u8   fgMfgDrop = false; */
@@ -2148,7 +2164,8 @@ void nicRxProcessMgmtPacket(IN P_ADAPTER_T prAdapter,
 }
 
 void nicRxProcessMsduReport(IN P_ADAPTER_T prAdapter,
-                            IN OUT P_SW_RFB_T prSwRfb){
+                            IN OUT P_SW_RFB_T prSwRfb)
+{
     nicRxReturnRFB(prAdapter, prSwRfb);
 }
 
@@ -2161,7 +2178,8 @@ void nicRxProcessMsduReport(IN P_ADAPTER_T prAdapter,
  * @return (none)
  */
 /*----------------------------------------------------------------------------*/
-void nicRxProcessRFBs(IN P_ADAPTER_T prAdapter){
+void nicRxProcessRFBs(IN P_ADAPTER_T prAdapter)
+{
     P_RX_CTRL_T prRxCtrl;
     P_SW_RFB_T prSwRfb = (P_SW_RFB_T)NULL;
     QUE_T rTempRfbList;
@@ -2299,7 +2317,8 @@ void nicRxProcessRFBs(IN P_ADAPTER_T prAdapter){
  * @retval WLAN_STATUS_RESOURCES
  */
 /*----------------------------------------------------------------------------*/
-WLAN_STATUS nicRxSetupRFB(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb){
+WLAN_STATUS nicRxSetupRFB(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb)
+{
     void *pvPacket;
     u8 *pucRecvBuff;
 
@@ -2340,7 +2359,8 @@ WLAN_STATUS nicRxSetupRFB(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb){
  * @return (none)
  */
 /*----------------------------------------------------------------------------*/
-void nicRxReturnRFB(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb){
+void nicRxReturnRFB(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb)
+{
     P_RX_CTRL_T prRxCtrl;
     P_QUE_ENTRY_T prQueEntry;
 
@@ -2390,7 +2410,8 @@ void nicRxReturnRFB(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb){
  * @return (none)
  */
 /*----------------------------------------------------------------------------*/
-void nicProcessRxInterrupt(IN P_ADAPTER_T prAdapter){
+void nicProcessRxInterrupt(IN P_ADAPTER_T prAdapter)
+{
     ASSERT(prAdapter);
 
     if (nicSerIsRxStop(prAdapter)) {
@@ -2417,7 +2438,8 @@ void nicProcessRxInterrupt(IN P_ADAPTER_T prAdapter){
  */
 /*----------------------------------------------------------------------------*/
 void nicRxUpdateCSUMStatistics(IN P_ADAPTER_T prAdapter,
-                               IN const ENUM_CSUM_RESULT_T aeCSUM[]){
+                               IN const ENUM_CSUM_RESULT_T aeCSUM[])
+{
     P_RX_CTRL_T prRxCtrl;
 
     ASSERT(prAdapter);
@@ -2470,7 +2492,8 @@ void nicRxUpdateCSUMStatistics(IN P_ADAPTER_T prAdapter,
  */
 /*----------------------------------------------------------------------------*/
 void nicRxQueryStatus(IN P_ADAPTER_T prAdapter, IN u8 *pucBuffer,
-                      OUT u32 *pu4Count){
+                      OUT u32 *pu4Count)
+{
     P_RX_CTRL_T prRxCtrl;
     u8 *pucCurrBuf = pucBuffer;
     u32 u4CurrCount;
@@ -2514,7 +2537,8 @@ void nicRxQueryStatus(IN P_ADAPTER_T prAdapter, IN u8 *pucBuffer,
  * @return - (none)
  */
 /*----------------------------------------------------------------------------*/
-void nicRxClearStatistics(IN P_ADAPTER_T prAdapter){
+void nicRxClearStatistics(IN P_ADAPTER_T prAdapter)
+{
     P_RX_CTRL_T prRxCtrl;
 
     ASSERT(prAdapter);
@@ -2536,7 +2560,8 @@ void nicRxClearStatistics(IN P_ADAPTER_T prAdapter){
  */
 /*----------------------------------------------------------------------------*/
 void nicRxQueryStatistics(IN P_ADAPTER_T prAdapter, IN u8 *pucBuffer,
-                          OUT u32 *pu4Count){
+                          OUT u32 *pu4Count)
+{
     P_RX_CTRL_T prRxCtrl;
     u8 *pucCurrBuf = pucBuffer;
     u32 u4CurrCount;
@@ -2596,7 +2621,8 @@ void nicRxQueryStatistics(IN P_ADAPTER_T prAdapter, IN u8 *pucBuffer,
 WLAN_STATUS
 nicRxWaitResponse(IN P_ADAPTER_T prAdapter, IN u8 ucPortIdx,
                   OUT u8 *pucRspBuffer, IN u32 u4MaxRespBufferLen,
-                  OUT u32 *pu4Length){
+                  OUT u32 *pu4Length)
+{
     P_WIFI_EVENT_T prEvent;
     WLAN_STATUS u4Status = WLAN_STATUS_SUCCESS;
 
@@ -2627,7 +2653,8 @@ nicRxWaitResponse(IN P_ADAPTER_T prAdapter, IN u8 ucPortIdx,
  * @return (none)
  */
 /*----------------------------------------------------------------------------*/
-void nicRxEnablePromiscuousMode(IN P_ADAPTER_T prAdapter){
+void nicRxEnablePromiscuousMode(IN P_ADAPTER_T prAdapter)
+{
     ASSERT(prAdapter);
 }
 
@@ -2640,7 +2667,8 @@ void nicRxEnablePromiscuousMode(IN P_ADAPTER_T prAdapter){
  * @return (none)
  */
 /*----------------------------------------------------------------------------*/
-void nicRxDisablePromiscuousMode(IN P_ADAPTER_T prAdapter){
+void nicRxDisablePromiscuousMode(IN P_ADAPTER_T prAdapter)
+{
     ASSERT(prAdapter);
 }
 
@@ -2653,7 +2681,8 @@ void nicRxDisablePromiscuousMode(IN P_ADAPTER_T prAdapter){
  * @retval WLAN_STATUS_SUCCESS   Flushed successfully
  */
 /*----------------------------------------------------------------------------*/
-WLAN_STATUS nicRxFlush(IN P_ADAPTER_T prAdapter){
+WLAN_STATUS nicRxFlush(IN P_ADAPTER_T prAdapter)
+{
     P_SW_RFB_T prSwRfb;
 
     ASSERT(prAdapter);
@@ -2686,7 +2715,8 @@ WLAN_STATUS nicRxFlush(IN P_ADAPTER_T prAdapter){
  */
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS nicRxProcessActionFrame(IN P_ADAPTER_T prAdapter,
-                                    IN P_SW_RFB_T prSwRfb){
+                                    IN P_SW_RFB_T prSwRfb)
+{
     P_WLAN_ACTION_FRAME prActFrame;
     P_BSS_INFO_T prBssInfo = NULL;
 #if CFG_SUPPORT_802_11W
@@ -2891,7 +2921,8 @@ WLAN_STATUS nicRxProcessActionFrame(IN P_ADAPTER_T prAdapter,
  * @retval
  */
 /*----------------------------------------------------------------------------*/
-u8 nicRxGetRcpiValueFromRxv(IN u8 ucRcpiMode, IN P_SW_RFB_T prSwRfb){
+u8 nicRxGetRcpiValueFromRxv(IN u8 ucRcpiMode, IN P_SW_RFB_T prSwRfb)
+{
     u8 ucRcpi0, ucRcpi1;
     u8 ucRcpiValue = 0;
     u8 ucRxNum;
