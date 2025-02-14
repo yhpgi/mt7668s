@@ -5,7 +5,8 @@
 #include "precomp.h"
 
 u32 p2pCalculate_IEForAssocReq(IN P_ADAPTER_T prAdapter, IN u8 ucBssIndex,
-                               IN P_STA_RECORD_T prStaRec){
+                               IN P_STA_RECORD_T prStaRec)
+{
     P_P2P_ROLE_FSM_INFO_T prP2pRoleFsmInfo = (P_P2P_ROLE_FSM_INFO_T)NULL;
     P_BSS_INFO_T prP2pBssInfo = (P_BSS_INFO_T)NULL;
     P_P2P_CONNECTION_REQ_INFO_T prConnReqInfo =
@@ -62,7 +63,8 @@ u32 p2pCalculate_IEForAssocReq(IN P_ADAPTER_T prAdapter, IN u8 ucBssIndex,
  */
 /*----------------------------------------------------------------------------*/
 void p2pGenerate_IEForAssocReq(IN P_ADAPTER_T prAdapter,
-                               IN P_MSDU_INFO_T prMsduInfo){
+                               IN P_MSDU_INFO_T prMsduInfo)
+{
     P_BSS_INFO_T prBssInfo = (P_BSS_INFO_T)NULL;
     P_P2P_ROLE_FSM_INFO_T prP2pRoleFsmInfo = (P_P2P_ROLE_FSM_INFO_T)NULL;
     P_P2P_CONNECTION_REQ_INFO_T prConnReqInfo =
@@ -110,7 +112,8 @@ void p2pGenerate_IEForAssocReq(IN P_ADAPTER_T prAdapter,
 
 u32 wfdFuncAppendAttriDevInfo(IN P_ADAPTER_T prAdapter, IN u8 fgIsAssocFrame,
                               IN u16 *pu2Offset, IN u8 *pucBuf,
-                              IN u16 u2BufSize){
+                              IN u16 u2BufSize)
+{
     u32 u4AttriLen = 0;
     u8 *pucBuffer = NULL;
     P_WFD_DEVICE_INFORMATION_IE_T prWfdDevInfo =

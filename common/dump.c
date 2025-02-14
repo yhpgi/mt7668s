@@ -66,7 +66,8 @@
  * \return (none)
  */
 /*----------------------------------------------------------------------------*/
-void dumpMemory8(IN u8 *pucStartAddr, IN u32 u4Length){
+void dumpMemory8(IN u8 *pucStartAddr, IN u32 u4Length)
+{
     ASSERT(pucStartAddr);
 
     LOG_FUNC("DUMP8 ADDRESS: %x, Length: %d\n", (unsigned long)pucStartAddr,
@@ -307,7 +308,8 @@ void dumpMemory8(IN u8 *pucStartAddr, IN u32 u4Length){
  * \return (none)
  */
 /*----------------------------------------------------------------------------*/
-void dumpMemory32(IN u32 *pu4StartAddr, IN u32 u4Length){
+void dumpMemory32(IN u32 *pu4StartAddr, IN u32 u4Length)
+{
     u8 *pucAddr;
 
     ASSERT(pu4StartAddr);

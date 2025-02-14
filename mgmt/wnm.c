@@ -76,7 +76,8 @@ static u8 ucBtmMgtToken = 1;
  */
 /*----------------------------------------------------------------------------*/
 #if CFG_SUPPORT_802_11V
-void wnmWNMAction(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb){
+void wnmWNMAction(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb)
+{
     P_WLAN_ACTION_FRAME prRxFrame;
 
     ASSERT(prAdapter);
@@ -105,13 +106,15 @@ void wnmWNMAction(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb){
     }
 }
 
-u8 wnmGetBtmToken(void){
+u8 wnmGetBtmToken(void)
+{
     return ucBtmMgtToken++;
 }
 
 static WLAN_STATUS wnmBTMQueryTxDone(IN P_ADAPTER_T prAdapter,
                                      IN P_MSDU_INFO_T prMsduInfo,
-                                     IN ENUM_TX_RESULT_CODE_T rTxDoneStatus){
+                                     IN ENUM_TX_RESULT_CODE_T rTxDoneStatus)
+{
     DBGLOG(WNM, INFO, "BTM: Query Frame Tx Done, Status %d\n",
            rTxDoneStatus);
     return WLAN_STATUS_SUCCESS;
@@ -119,7 +122,8 @@ static WLAN_STATUS wnmBTMQueryTxDone(IN P_ADAPTER_T prAdapter,
 
 static WLAN_STATUS wnmBTMResponseTxDone(IN P_ADAPTER_T prAdapter,
                                         IN P_MSDU_INFO_T prMsduInfo,
-                                        IN ENUM_TX_RESULT_CODE_T rTxDoneStatus){
+                                        IN ENUM_TX_RESULT_CODE_T rTxDoneStatus)
+{
     P_BSS_TRANSITION_MGT_PARAM_T prBtm =
         &prAdapter->rWifiVar.rAisSpecificBssInfo.rBTMParam;
     P_AIS_FSM_INFO_T prAisFsmInfo = &prAdapter->rWifiVar.rAisFsmInfo;
@@ -145,7 +149,8 @@ static WLAN_STATUS wnmBTMResponseTxDone(IN P_ADAPTER_T prAdapter,
  */
 /*----------------------------------------------------------------------------*/
 void wnmSendBTMResponseFrame(IN P_ADAPTER_T prAdapter,
-                             IN P_STA_RECORD_T prStaRec){
+                             IN P_STA_RECORD_T prStaRec)
+{
     P_MSDU_INFO_T prMsduInfo = NULL;
     P_BSS_INFO_T prBssInfo = NULL;
     P_ACTION_BTM_RSP_FRAME_T prTxFrame = NULL;
@@ -225,7 +230,8 @@ void wnmSendBTMResponseFrame(IN P_ADAPTER_T prAdapter,
  * @return (none)
  */
 /*----------------------------------------------------------------------------*/
-void wnmSendBTMQueryFrame(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec){
+void wnmSendBTMQueryFrame(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec)
+{
     P_MSDU_INFO_T prMsduInfo = NULL;
     P_BSS_INFO_T prBssInfo = NULL;
     P_ACTION_BTM_QUERY_FRAME_T prTxFrame = NULL;
@@ -292,7 +298,8 @@ void wnmSendBTMQueryFrame(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec){
  */
 /*----------------------------------------------------------------------------*/
 #if CFG_SUPPORT_802_11V_BSS_TRANSITION_MGT
-void wnmRecvBTMRequest(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb){
+void wnmRecvBTMRequest(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb)
+{
     P_ACTION_BTM_REQ_FRAME_T prRxFrame = NULL;
     P_BSS_TRANSITION_MGT_PARAM_T prBtmParam =
         &prAdapter->rWifiVar.rAisSpecificBssInfo.rBTMParam;

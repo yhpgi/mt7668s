@@ -44,7 +44,8 @@ ECO_INFO_T mt7668_eco_table[] = {
  */
 void mt7668ConstructFirmwarePrio(P_GLUE_INFO_T prGlueInfo, u8 **apucNameTable,
                                  u8 **apucName, u8 *pucNameIdx,
-                                 u8 ucMaxNameIdx){
+                                 u8 ucMaxNameIdx)
+{
     struct chip_info *prChipInfo = prGlueInfo->prAdapter->chip_info;
     u32 chip_id = prChipInfo->chip_id;
     u8 sub_idx = 0;

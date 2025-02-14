@@ -77,7 +77,8 @@ static u8 *apucDebugScanState[SCAN_STATE_NUM] = {
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-void scnFsmSteps(IN P_ADAPTER_T prAdapter, IN ENUM_SCAN_STATE_T eNextState){
+void scnFsmSteps(IN P_ADAPTER_T prAdapter, IN ENUM_SCAN_STATE_T eNextState)
+{
     P_SCAN_INFO_T prScanInfo;
     P_SCAN_PARAM_T prScanParam;
     P_MSG_HDR_T prMsgHdr;
@@ -159,7 +160,8 @@ void scnFsmSteps(IN P_ADAPTER_T prAdapter, IN ENUM_SCAN_STATE_T eNextState){
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-void scnSendScanReq(IN P_ADAPTER_T prAdapter){
+void scnSendScanReq(IN P_ADAPTER_T prAdapter)
+{
     P_SCAN_INFO_T prScanInfo;
     P_SCAN_PARAM_T prScanParam;
     CMD_SCAN_REQ rCmdScanReq;
@@ -232,7 +234,8 @@ void scnSendScanReq(IN P_ADAPTER_T prAdapter){
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-void scnSendScanReqV2(IN P_ADAPTER_T prAdapter){
+void scnSendScanReqV2(IN P_ADAPTER_T prAdapter)
+{
     P_SCAN_INFO_T prScanInfo;
     P_SCAN_PARAM_T prScanParam;
     CMD_SCAN_REQ_V2 rCmdScanReq;
@@ -308,7 +311,8 @@ void scnSendScanReqV2(IN P_ADAPTER_T prAdapter){
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-void scnFsmMsgStart(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMsgHdr){
+void scnFsmMsgStart(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMsgHdr)
+{
     P_SCAN_INFO_T prScanInfo;
     P_SCAN_PARAM_T prScanParam;
 
@@ -349,7 +353,8 @@ void scnFsmMsgStart(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMsgHdr){
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-void scnFsmMsgAbort(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMsgHdr){
+void scnFsmMsgAbort(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMsgHdr)
+{
     P_MSG_SCN_SCAN_CANCEL prScanCancel;
     P_SCAN_INFO_T prScanInfo;
     P_SCAN_PARAM_T prScanParam;
@@ -404,7 +409,8 @@ void scnFsmMsgAbort(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMsgHdr){
  */
 /*----------------------------------------------------------------------------*/
 void scnFsmHandleScanMsg(IN P_ADAPTER_T prAdapter,
-                         IN P_MSG_SCN_SCAN_REQ prScanReqMsg){
+                         IN P_MSG_SCN_SCAN_REQ prScanReqMsg)
+{
     P_SCAN_INFO_T prScanInfo;
     P_SCAN_PARAM_T prScanParam;
     u32 i;
@@ -483,7 +489,8 @@ void scnFsmHandleScanMsg(IN P_ADAPTER_T prAdapter,
  */
 /*----------------------------------------------------------------------------*/
 void scnFsmHandleScanMsgV2(IN P_ADAPTER_T prAdapter,
-                           IN P_MSG_SCN_SCAN_REQ_V2 prScanReqMsg){
+                           IN P_MSG_SCN_SCAN_REQ_V2 prScanReqMsg)
+{
     P_SCAN_INFO_T prScanInfo;
     P_SCAN_PARAM_T prScanParam;
     u32 i;
@@ -554,7 +561,8 @@ void scnFsmHandleScanMsgV2(IN P_ADAPTER_T prAdapter,
  */
 /*----------------------------------------------------------------------------*/
 void scnFsmRemovePendingMsg(IN P_ADAPTER_T prAdapter, IN u8 ucSeqNum,
-                            IN u8 ucBssIndex){
+                            IN u8 ucBssIndex)
+{
     P_SCAN_INFO_T prScanInfo;
     P_SCAN_PARAM_T prScanParam;
     P_MSG_HDR_T prPendingMsgHdr, prPendingMsgHdrNext, prRemoveMsgHdr = NULL;
@@ -625,7 +633,8 @@ void scnFsmRemovePendingMsg(IN P_ADAPTER_T prAdapter, IN u8 ucSeqNum,
  */
 /*----------------------------------------------------------------------------*/
 void scnEventScanDone(IN P_ADAPTER_T prAdapter, IN P_EVENT_SCAN_DONE prScanDone,
-                      u8 fgIsNewVersion){
+                      u8 fgIsNewVersion)
+{
     P_SCAN_INFO_T prScanInfo;
     P_SCAN_PARAM_T prScanParam;
     u32 u4ChCnt;
@@ -756,7 +765,8 @@ void scnEventScanDone(IN P_ADAPTER_T prAdapter, IN P_EVENT_SCAN_DONE prScanDone,
 /*----------------------------------------------------------------------------*/
 void scnFsmGenerateScanDoneMsg(IN P_ADAPTER_T prAdapter, IN u8 ucSeqNum,
                                IN u8 ucBssIndex,
-                               IN ENUM_SCAN_STATUS eScanStatus){
+                               IN ENUM_SCAN_STATUS eScanStatus)
+{
     P_SCAN_INFO_T prScanInfo;
     P_SCAN_PARAM_T prScanParam;
     P_MSG_SCN_SCAN_DONE prScanDoneMsg;
@@ -815,7 +825,8 @@ void scnFsmGenerateScanDoneMsg(IN P_ADAPTER_T prAdapter, IN u8 ucSeqNum,
  */
 /*----------------------------------------------------------------------------*/
 u8 scnQuerySparseChannel(IN P_ADAPTER_T prAdapter, P_ENUM_BAND_T prSparseBand,
-                         u8 *pucSparseChannel){
+                         u8 *pucSparseChannel)
+{
     P_SCAN_INFO_T prScanInfo;
 
     ASSERT(prAdapter);
@@ -846,7 +857,8 @@ u8 scnQuerySparseChannel(IN P_ADAPTER_T prAdapter, P_ENUM_BAND_T prSparseBand,
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-void scnEventNloDone(IN P_ADAPTER_T prAdapter, IN P_EVENT_NLO_DONE_T prNloDone){
+void scnEventNloDone(IN P_ADAPTER_T prAdapter, IN P_EVENT_NLO_DONE_T prNloDone)
+{
     P_SCAN_INFO_T prScanInfo;
     P_NLO_PARAM_T prNloParam;
     P_SCAN_PARAM_T prScanParam;
@@ -882,7 +894,8 @@ void scnEventNloDone(IN P_ADAPTER_T prAdapter, IN P_EVENT_NLO_DONE_T prNloDone){
 /*----------------------------------------------------------------------------*/
 u8 scnFsmSchedScanRequest(IN P_ADAPTER_T prAdapter, IN u8 ucSsidNum,
                           IN P_PARAM_SSID_T prSsid, IN u32 u4IeLength,
-                          IN u8 *pucIe, IN u16 u2Interval){
+                          IN u8 *pucIe, IN u16 u2Interval)
+{
     P_SCAN_INFO_T prScanInfo;
     P_NLO_PARAM_T prNloParam;
     P_SCAN_PARAM_T prScanParam;
@@ -1037,7 +1050,8 @@ u8 scnFsmSchedScanRequest(IN P_ADAPTER_T prAdapter, IN u8 ucSsidNum,
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-u8 scnFsmSchedScanStopRequest(IN P_ADAPTER_T prAdapter){
+u8 scnFsmSchedScanStopRequest(IN P_ADAPTER_T prAdapter)
+{
     P_SCAN_INFO_T prScanInfo;
     P_NLO_PARAM_T prNloParam;
     P_SCAN_PARAM_T prScanParam;
@@ -1089,7 +1103,8 @@ u8 scnFsmSchedScanStopRequest(IN P_ADAPTER_T prAdapter){
     }
 }
 
-u8 scnFsmIsScanning(IN P_ADAPTER_T prAdapter){
+u8 scnFsmIsScanning(IN P_ADAPTER_T prAdapter)
+{
     P_SCAN_INFO_T prScanInfo;
 
     prScanInfo = &(prAdapter->rWifiVar.rScanInfo);

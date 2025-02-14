@@ -163,8 +163,8 @@ const struct mtk_regdomain my_regdom_tr = { .country_code = "TR",
 
 const struct mtk_regdomain *g_prRegRuleTable[] = {
     &my_regdom_us01, &my_regdom_us, &my_regdom_cn,
-    &my_regdom_nl,   &my_regdom_cz, &my_regdom_jp,
-    &my_regdom_tr,   NULL  /* this NULL SHOULD be at the end of the array */
+    &my_regdom_nl, &my_regdom_cz, &my_regdom_jp,
+    &my_regdom_tr, NULL  /* this NULL SHOULD be at the end of the array */
 };
 
 #endif

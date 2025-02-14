@@ -275,7 +275,8 @@ static MSG_HNDL_ENTRY_T arMsgMapTable[] = {
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-void mboxInitMsgMap(void){
+void mboxInitMsgMap(void)
+{
     u32 i, idx;
     MSG_HNDL_ENTRY_T rTempEntry;
 
@@ -323,7 +324,8 @@ void mboxInitMsgMap(void){
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-void mboxSetup(IN P_ADAPTER_T prAdapter, IN ENUM_MBOX_ID_T eMboxId){
+void mboxSetup(IN P_ADAPTER_T prAdapter, IN ENUM_MBOX_ID_T eMboxId)
+{
     P_MBOX_T prMbox;
 
     KAL_SPIN_LOCK_DECLARATION();
@@ -348,7 +350,8 @@ void mboxSetup(IN P_ADAPTER_T prAdapter, IN ENUM_MBOX_ID_T eMboxId){
  */
 /*----------------------------------------------------------------------------*/
 void mboxSendMsg(IN P_ADAPTER_T prAdapter, IN ENUM_MBOX_ID_T eMboxId,
-                 IN P_MSG_HDR_T prMsg, IN EUNM_MSG_SEND_METHOD_T eMethod){
+                 IN P_MSG_HDR_T prMsg, IN EUNM_MSG_SEND_METHOD_T eMethod)
+{
     P_MBOX_T prMbox;
 
     KAL_SPIN_LOCK_DECLARATION();
@@ -398,7 +401,8 @@ void mboxSendMsg(IN P_ADAPTER_T prAdapter, IN ENUM_MBOX_ID_T eMboxId,
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-void mboxRcvAllMsg(IN P_ADAPTER_T prAdapter, ENUM_MBOX_ID_T eMboxId){
+void mboxRcvAllMsg(IN P_ADAPTER_T prAdapter, ENUM_MBOX_ID_T eMboxId)
+{
     P_MBOX_T prMbox;
     P_MSG_HDR_T prMsg;
 
@@ -432,7 +436,8 @@ void mboxRcvAllMsg(IN P_ADAPTER_T prAdapter, ENUM_MBOX_ID_T eMboxId){
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-void mboxInitialize(IN P_ADAPTER_T prAdapter){
+void mboxInitialize(IN P_ADAPTER_T prAdapter)
+{
     u32 i;
 
     ASSERT(prAdapter);
@@ -454,7 +459,8 @@ void mboxInitialize(IN P_ADAPTER_T prAdapter){
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-void mboxDestroy(IN P_ADAPTER_T prAdapter){
+void mboxDestroy(IN P_ADAPTER_T prAdapter)
+{
     P_MBOX_T prMbox;
     P_MSG_HDR_T prMsg;
     u8 i;
@@ -487,7 +493,8 @@ void mboxDestroy(IN P_ADAPTER_T prAdapter){
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-void mboxDummy(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMsgHdr){
+void mboxDummy(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMsgHdr)
+{
     ASSERT(prAdapter);
 
     cnmMemFree(prAdapter, prMsgHdr);

@@ -94,7 +94,8 @@ static struct PRE_MEM_BLOCK arMemBlocks[MEM_ID_NUM];
  * \retval void pointer to the memory address
  */
 /*----------------------------------------------------------------------------*/
-void *preallocGetMem(enum ENUM_MEM_ID memId){
+void *preallocGetMem(enum ENUM_MEM_ID memId)
+{
     struct PRE_MEM_BLOCK *block = NULL;
     u32 curr = 0, count = 0;
     u8 *name = NULL;
@@ -116,7 +117,8 @@ void *preallocGetMem(enum ENUM_MEM_ID memId){
     return block->pItemArray[curr].pvBuffer;
 }
 EXPORT_SYMBOL(preallocGetMem);
-static void preallocFree(void){
+static void preallocFree(void)
+{
     s32 i = 0, j = 0;
     struct PRE_MEM_BLOCK *block = NULL;
     struct PRE_MEM_ITEM *items = NULL;
@@ -143,7 +145,8 @@ static void preallocFree(void){
     }
 }
 
-static int preallocAlloc(void){
+static int preallocAlloc(void)
+{
     s32 i = 0, j = 0;
     struct PRE_MEM_BLOCK *block = NULL;
     struct PRE_MEM_ITEM *items = NULL;
@@ -181,7 +184,8 @@ fail:
 }
 
 static void preallocAddBlock(enum ENUM_MEM_ID memId, u8 *name, u32 count,
-                             u32 size, u32 kmallocFlags){
+                             u32 size, u32 kmallocFlags)
+{
     if (memId != blockCount) {
         MP_Err("memId %d != index %d\n", memId, blockCount);
         return;
@@ -195,7 +199,8 @@ static void preallocAddBlock(enum ENUM_MEM_ID memId, u8 *name, u32 count,
     blockCount++;
 }
 
-static int __init preallocInit(void){
+static int __init preallocInit(void)
+{
     u32 u4Size;
 
     blockCount = 0;
@@ -219,7 +224,8 @@ static int __init preallocInit(void){
     return preallocAlloc();
 }
 
-static void __exit preallocExit(void){
+static void __exit preallocExit(void)
+{
     preallocFree();
 }
 

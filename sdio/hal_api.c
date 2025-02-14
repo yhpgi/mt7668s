@@ -86,7 +86,8 @@
  * @retval false         CHIP ID is different from the setting compiled
  */
 /*----------------------------------------------------------------------------*/
-u8 halVerifyChipID(IN P_ADAPTER_T prAdapter){
+u8 halVerifyChipID(IN P_ADAPTER_T prAdapter)
+{
     u32 u4CIR = 0;
     struct chip_info *prChipInfo;
 
@@ -117,7 +118,8 @@ u8 halVerifyChipID(IN P_ADAPTER_T prAdapter){
 WLAN_STATUS
 halRxWaitResponse(IN P_ADAPTER_T prAdapter, IN u8 ucPortIdx,
                   OUT u8 *pucRspBuffer, IN u32 u4MaxRespBufferLen,
-                  OUT u32 *pu4Length){
+                  OUT u32 *pu4Length)
+{
     u32 u4Value = 0, u4PktLen = 0, i = 0, u4CpyLen;
     WLAN_STATUS u4Status = WLAN_STATUS_SUCCESS;
     u32 u4Time, u4Current;
@@ -219,7 +221,8 @@ halRxWaitResponse(IN P_ADAPTER_T prAdapter, IN u8 ucPortIdx,
  * @return (none)
  */
 /*----------------------------------------------------------------------------*/
-void halEnableInterrupt(IN P_ADAPTER_T prAdapter){
+void halEnableInterrupt(IN P_ADAPTER_T prAdapter)
+{
     u8 fgIsIntEnableCache, fgIsPendingInt;
 
     ASSERT(prAdapter);
@@ -271,7 +274,8 @@ void halEnableInterrupt(IN P_ADAPTER_T prAdapter){
  * @return (none)
  */
 /*----------------------------------------------------------------------------*/
-void halDisableInterrupt(IN P_ADAPTER_T prAdapter){
+void halDisableInterrupt(IN P_ADAPTER_T prAdapter)
+{
     ASSERT(prAdapter);
 
     HAL_BYTE_WR(prAdapter, MCR_WHLPCR, WHLPCR_INT_EN_CLR);
@@ -288,7 +292,8 @@ void halDisableInterrupt(IN P_ADAPTER_T prAdapter){
  * \return (none)
  */
 /*----------------------------------------------------------------------------*/
-u8 halSetDriverOwn(IN P_ADAPTER_T prAdapter){
+u8 halSetDriverOwn(IN P_ADAPTER_T prAdapter)
+{
     u8 fgStatus = true;
     u32 i, u4CurrTick = 0;
     u8 fgTimeout;
@@ -476,7 +481,8 @@ u8 halSetDriverOwn(IN P_ADAPTER_T prAdapter){
  * \return (none)
  */
 /*----------------------------------------------------------------------------*/
-void halSetFWOwn(IN P_ADAPTER_T prAdapter, IN u8 fgEnableGlobalInt){
+void halSetFWOwn(IN P_ADAPTER_T prAdapter, IN u8 fgEnableGlobalInt)
+{
     u8 fgResult;
 
     ASSERT(prAdapter);
@@ -526,7 +532,8 @@ void halSetFWOwn(IN P_ADAPTER_T prAdapter, IN u8 fgEnableGlobalInt){
     }
 }
 
-void halWakeUpWiFi(IN P_ADAPTER_T prAdapter){
+void halWakeUpWiFi(IN P_ADAPTER_T prAdapter)
+{
     u8 fgResult;
 
     ASSERT(prAdapter);
@@ -545,7 +552,8 @@ void halWakeUpWiFi(IN P_ADAPTER_T prAdapter){
 #endif
 }
 
-void halDevInit(IN P_ADAPTER_T prAdapter){
+void halDevInit(IN P_ADAPTER_T prAdapter)
+{
     u32 u4Value = 0;
 
     ASSERT(prAdapter);
@@ -596,7 +604,8 @@ void halDevInit(IN P_ADAPTER_T prAdapter){
  */
 /*----------------------------------------------------------------------------*/
 u8 halTxCalculateResource(IN P_ADAPTER_T prAdapter, IN u16 *au2TxRlsCnt,
-                          OUT u16 *au2FreeTcResource){
+                          OUT u16 *au2FreeTcResource)
+{
     P_TX_TCQ_STATUS_T prTcqStatus;
     u8 bStatus = false;
     u8 ucTcIdx;
@@ -766,7 +775,8 @@ u8 halTxCalculateResource(IN P_ADAPTER_T prAdapter, IN u16 *au2TxRlsCnt,
 
     return bStatus;
 }
-u8 halTxReleaseResource(IN P_ADAPTER_T prAdapter, IN u16 *au2TxRlsCnt){
+u8 halTxReleaseResource(IN P_ADAPTER_T prAdapter, IN u16 *au2TxRlsCnt)
+{
     P_TX_TCQ_STATUS_T prTcqStatus;
     u8 bStatus = false;
     u32 i;
@@ -854,7 +864,8 @@ u8 halTxReleaseResource(IN P_ADAPTER_T prAdapter, IN u16 *au2TxRlsCnt){
     return bStatus;
 }
 
-WLAN_STATUS halTxPollingResource(IN P_ADAPTER_T prAdapter, IN u8 ucTC){
+WLAN_STATUS halTxPollingResource(IN P_ADAPTER_T prAdapter, IN u8 ucTC)
+{
     P_TX_CTRL_T prTxCtrl;
     WLAN_STATUS u4Status = WLAN_STATUS_RESOURCES;
     u32 au4WTSR[8];
@@ -888,7 +899,8 @@ WLAN_STATUS halTxPollingResource(IN P_ADAPTER_T prAdapter, IN u8 ucTC){
     return u4Status;
 }
 
-void halTxInterruptSanityCheck(IN P_ADAPTER_T prAdapter, IN u16 *au2TxRlsCnt){
+void halTxInterruptSanityCheck(IN P_ADAPTER_T prAdapter, IN u16 *au2TxRlsCnt)
+{
     u8 ucIdx;
     u8 fgError = false;
 
@@ -915,7 +927,8 @@ void halTxInterruptSanityCheck(IN P_ADAPTER_T prAdapter, IN u16 *au2TxRlsCnt){
 }
 
 #if CFG_SDIO_INTR_ENHANCE
-void halProcessEnhanceInterruptStatus(IN P_ADAPTER_T prAdapter){
+void halProcessEnhanceInterruptStatus(IN P_ADAPTER_T prAdapter)
+{
     P_SDIO_CTRL_T prSDIOCtrl = prAdapter->prGlueInfo->rHifInfo.prSDIOCtrl;
 
     /* Set Tx done interrupt if there are Tx done count */
@@ -936,7 +949,8 @@ void halProcessEnhanceInterruptStatus(IN P_ADAPTER_T prAdapter){
 }
 #endif
 
-void halProcessTxInterrupt(IN P_ADAPTER_T prAdapter){
+void halProcessTxInterrupt(IN P_ADAPTER_T prAdapter)
+{
     P_TX_CTRL_T prTxCtrl;
 #if CFG_SDIO_INTR_ENHANCE
     P_SDIO_CTRL_T prSDIOCtrl;
@@ -992,7 +1006,8 @@ void halProcessTxInterrupt(IN P_ADAPTER_T prAdapter){
  */
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS halRxReadBuffer(IN P_ADAPTER_T prAdapter,
-                            IN OUT P_SW_RFB_T prSwRfb){
+                            IN OUT P_SW_RFB_T prSwRfb)
+{
     P_RX_CTRL_T prRxCtrl;
     u8 *pucBuf;
     P_HW_MAC_RX_DESC_T prRxStatus;
@@ -1098,7 +1113,8 @@ WLAN_STATUS halRxReadBuffer(IN P_ADAPTER_T prAdapter,
  * @return (none)
  */
 /*----------------------------------------------------------------------------*/
-void halRxSDIOReceiveRFBs(IN P_ADAPTER_T prAdapter){
+void halRxSDIOReceiveRFBs(IN P_ADAPTER_T prAdapter)
+{
     P_RX_CTRL_T prRxCtrl;
     P_SW_RFB_T prSwRfb = (P_SW_RFB_T)NULL;
     P_HW_MAC_RX_DESC_T prRxStatus;
@@ -1167,7 +1183,8 @@ void halRxSDIOReceiveRFBs(IN P_ADAPTER_T prAdapter){
 
 WLAN_STATUS
 halRxEnhanceReadBuffer(IN P_ADAPTER_T prAdapter, IN u32 u4DataPort,
-                       IN u16 u2RxLength, IN OUT P_SW_RFB_T prSwRfb){
+                       IN u16 u2RxLength, IN OUT P_SW_RFB_T prSwRfb)
+{
     P_RX_CTRL_T prRxCtrl;
     u8 *pucBuf;
     P_HW_MAC_RX_DESC_T prRxStatus;
@@ -1248,7 +1265,8 @@ halRxEnhanceReadBuffer(IN P_ADAPTER_T prAdapter, IN u32 u4DataPort,
  * @return (none)
  */
 /*----------------------------------------------------------------------------*/
-void halRxSDIOEnhanceReceiveRFBs(IN P_ADAPTER_T prAdapter){
+void halRxSDIOEnhanceReceiveRFBs(IN P_ADAPTER_T prAdapter)
+{
     P_SDIO_CTRL_T prSDIOCtrl;
     P_RX_CTRL_T prRxCtrl;
     P_SW_RFB_T prSwRfb = (P_SW_RFB_T)NULL;
@@ -1337,7 +1355,8 @@ void halRxSDIOEnhanceReceiveRFBs(IN P_ADAPTER_T prAdapter){
  * @return (none)
  */
 /*----------------------------------------------------------------------------*/
-void halRxSDIOAggReceiveRFBs(IN P_ADAPTER_T prAdapter){
+void halRxSDIOAggReceiveRFBs(IN P_ADAPTER_T prAdapter)
+{
     P_ENHANCE_MODE_DATA_STRUCT_T prEnhDataStr;
     P_RX_CTRL_T prRxCtrl;
     u32 u4RxLength;
@@ -1510,7 +1529,8 @@ void halRxSDIOAggReceiveRFBs(IN P_ADAPTER_T prAdapter){
 }
 #endif
 
-void halProcessRxInterrupt(IN P_ADAPTER_T prAdapter){
+void halProcessRxInterrupt(IN P_ADAPTER_T prAdapter)
+{
 #if CFG_MESON_G12A_PATCH
     halRxSDIOEnhanceReceiveRFBs(prAdapter);
 #else
@@ -1526,7 +1546,8 @@ void halProcessRxInterrupt(IN P_ADAPTER_T prAdapter){
 #endif
 }
 
-u32 halDumpHifStatus(IN P_ADAPTER_T prAdapter, IN u8 *pucBuf, IN u32 u4Max){
+u32 halDumpHifStatus(IN P_ADAPTER_T prAdapter, IN u8 *pucBuf, IN u32 u4Max)
+{
     P_GLUE_INFO_T prGlueInfo = prAdapter->prGlueInfo;
     P_GL_HIF_INFO_T prHifInfo = &prGlueInfo->rHifInfo;
     P_SDIO_STAT_COUNTER_T prStatCnt = &prHifInfo->rStatCounter;
@@ -1699,7 +1720,8 @@ u32 halDumpHifStatus(IN P_ADAPTER_T prAdapter, IN u8 *pucBuf, IN u32 u4Max){
 /*----------------------------------------------------------------------------*/
 
 u8 halReadN9RegisterByMailBox(IN P_ADAPTER_T prAdapter, IN u32 addr,
-                              IN u32 *prresult){
+                              IN u32 *prresult)
+{
     u32 ori_whlpcr, temp, counter = 0;
     u8 err = true, stop = false;
 
@@ -1772,7 +1794,8 @@ u8 halReadN9RegisterByMailBox(IN P_ADAPTER_T prAdapter, IN u32 addr,
 /*----------------------------------------------------------------------------*/
 
 u8 halWriteN9RegisterByMailBox(IN P_ADAPTER_T prAdapter, IN u32 addr,
-                               IN u32 value){
+                               IN u32 value)
+{
     u32 ori_whlpcr, temp, counter = 0;
     u8 err = true, stop = false;
 
@@ -1831,11 +1854,13 @@ u8 halWriteN9RegisterByMailBox(IN P_ADAPTER_T prAdapter, IN u32 addr,
 }
 #endif
 
-u8 halIsPendingRx(IN P_ADAPTER_T prAdapter){
+u8 halIsPendingRx(IN P_ADAPTER_T prAdapter)
+{
     return false;
 }
 
-u32 halGetValidCoalescingBufSize(IN P_ADAPTER_T prAdapter){
+u32 halGetValidCoalescingBufSize(IN P_ADAPTER_T prAdapter)
+{
     P_GL_HIF_INFO_T prHifInfo;
     u32 u4BufSize;
 
@@ -1889,7 +1914,8 @@ u32 halGetValidCoalescingBufSize(IN P_ADAPTER_T prAdapter){
     return u4BufSize;
 }
 
-WLAN_STATUS halAllocateIOBuffer(IN P_ADAPTER_T prAdapter){
+WLAN_STATUS halAllocateIOBuffer(IN P_ADAPTER_T prAdapter)
+{
     P_GL_HIF_INFO_T prHifInfo;
     u8 ucIdx;
     P_SDIO_RX_COALESCING_BUF_T prRxBuf;
@@ -1935,7 +1961,8 @@ WLAN_STATUS halAllocateIOBuffer(IN P_ADAPTER_T prAdapter){
     return WLAN_STATUS_SUCCESS;
 }
 
-WLAN_STATUS halReleaseIOBuffer(IN P_ADAPTER_T prAdapter){
+WLAN_STATUS halReleaseIOBuffer(IN P_ADAPTER_T prAdapter)
+{
     P_GL_HIF_INFO_T prHifInfo;
     u8 ucIdx;
     P_SDIO_RX_COALESCING_BUF_T prRxBuf;
@@ -1976,7 +2003,8 @@ WLAN_STATUS halReleaseIOBuffer(IN P_ADAPTER_T prAdapter){
  *           false
  */
 /*----------------------------------------------------------------------------*/
-void halPrintFirmwareAssertInfo(IN P_ADAPTER_T prAdapter){
+void halPrintFirmwareAssertInfo(IN P_ADAPTER_T prAdapter)
+{
     u32 u4MailBox0, u4MailBox1;
     u32 line = 0;
     u8 aucAssertFile[7];
@@ -2003,7 +2031,8 @@ void halPrintFirmwareAssertInfo(IN P_ADAPTER_T prAdapter){
              aucAssertFile, line);
 }
 
-void halPrintMailbox(IN P_ADAPTER_T prAdapter){
+void halPrintMailbox(IN P_ADAPTER_T prAdapter)
+{
     u32 u4MailBoxStatus0, u4MailBoxStatus1;
 
     halGetMailbox(prAdapter, 0, &u4MailBoxStatus0);
@@ -2012,7 +2041,8 @@ void halPrintMailbox(IN P_ADAPTER_T prAdapter){
            u4MailBoxStatus0, u4MailBoxStatus1);
 }
 
-void halProcessSoftwareInterrupt(IN P_ADAPTER_T prAdapter){
+void halProcessSoftwareInterrupt(IN P_ADAPTER_T prAdapter)
+{
     u32 u4IntrBits;
 
     ASSERT(prAdapter);
@@ -2049,7 +2079,8 @@ void halProcessSoftwareInterrupt(IN P_ADAPTER_T prAdapter){
 }
 
 void halPutMailbox(IN P_ADAPTER_T prAdapter, IN u32 u4MailboxNum,
-                   IN u32 u4Data){
+                   IN u32 u4Data)
+{
     switch (u4MailboxNum) {
     case 0:
         HAL_MCR_WR(prAdapter, MCR_H2DSM0R, u4Data);
@@ -2065,7 +2096,8 @@ void halPutMailbox(IN P_ADAPTER_T prAdapter, IN u32 u4MailboxNum,
 }
 
 void halGetMailbox(IN P_ADAPTER_T prAdapter, IN u32 u4MailboxNum,
-                   OUT u32 *pu4Data){
+                   OUT u32 *pu4Data)
+{
     switch (u4MailboxNum) {
     case 0:
         HAL_MCR_RD(prAdapter, MCR_D2HRM0R, pu4Data);
@@ -2090,7 +2122,8 @@ void halGetMailbox(IN P_ADAPTER_T prAdapter, IN u32 u4MailboxNum,
  * @return True if reschedule otherwise False
  */
 /*----------------------------------------------------------------------------*/
-u8 halDeAggRxPktProc(P_ADAPTER_T prAdapter, P_SDIO_RX_COALESCING_BUF_T prRxBuf){
+u8 halDeAggRxPktProc(P_ADAPTER_T prAdapter, P_SDIO_RX_COALESCING_BUF_T prRxBuf)
+{
     P_GL_HIF_INFO_T prHifInfo;
     P_RX_CTRL_T prRxCtrl;
     P_SW_RFB_T prSwRfb = (P_SW_RFB_T)NULL;
@@ -2205,7 +2238,8 @@ u8 halDeAggRxPktProc(P_ADAPTER_T prAdapter, P_SDIO_RX_COALESCING_BUF_T prRxBuf){
     return fgReschedule;
 }
 
-void halDeAggRxPktWorker(struct work_struct *work){
+void halDeAggRxPktWorker(struct work_struct *work)
+{
     P_GLUE_INFO_T prGlueInfo;
     P_GL_HIF_INFO_T prHifInfo;
     P_ADAPTER_T prAdapter;
@@ -2253,7 +2287,8 @@ void halDeAggRxPktWorker(struct work_struct *work){
     }
 }
 
-void halDeAggRxPkt(P_ADAPTER_T prAdapter, P_SDIO_RX_COALESCING_BUF_T prRxBuf){
+void halDeAggRxPkt(P_ADAPTER_T prAdapter, P_SDIO_RX_COALESCING_BUF_T prRxBuf)
+{
     P_GL_HIF_INFO_T prHifInfo;
     prHifInfo = &prAdapter->prGlueInfo->rHifInfo;
 
@@ -2288,7 +2323,8 @@ void halDeAggRxPkt(P_ADAPTER_T prAdapter, P_SDIO_RX_COALESCING_BUF_T prRxBuf){
 }
 
 /* Hif power off wifi */
-WLAN_STATUS halHifPowerOffWifi(IN P_ADAPTER_T prAdapter){
+WLAN_STATUS halHifPowerOffWifi(IN P_ADAPTER_T prAdapter)
+{
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
 
     if (prAdapter->rAcpiState == ACPI_STATE_D0 &&
@@ -2345,7 +2381,8 @@ WLAN_STATUS halHifPowerOffWifi(IN P_ADAPTER_T prAdapter){
     return rStatus;
 }
 
-void halPollDbgCr(IN P_ADAPTER_T prAdapter, IN u32 u4LoopCount){
+void halPollDbgCr(IN P_ADAPTER_T prAdapter, IN u32 u4LoopCount)
+{
     u32 u4Data = 0;
     u32 u4Loop = 0;
 
@@ -2355,7 +2392,8 @@ void halPollDbgCr(IN P_ADAPTER_T prAdapter, IN u32 u4LoopCount){
     }
 }
 
-void halSerHifReset(IN P_ADAPTER_T prAdapter){
+void halSerHifReset(IN P_ADAPTER_T prAdapter)
+{
     P_GL_HIF_INFO_T prHifInfo = &prAdapter->prGlueInfo->rHifInfo;
     u32 i;
 
@@ -2381,16 +2419,19 @@ void halSerHifReset(IN P_ADAPTER_T prAdapter){
     kalMemZero(prHifInfo->prSDIOCtrl, sizeof(ENHANCE_MODE_DATA_STRUCT_T));
 }
 
-void halPrintHifDbgInfo(IN P_ADAPTER_T prAdapter){
+void halPrintHifDbgInfo(IN P_ADAPTER_T prAdapter)
+{
     halPrintMailbox(prAdapter);
     halPollDbgCr(prAdapter, LP_OWN_BACK_FAILED_DBGCR_POLL_ROUND);
 }
 
-u8 halIsTxResourceControlEn(IN P_ADAPTER_T prAdapter){
+u8 halIsTxResourceControlEn(IN P_ADAPTER_T prAdapter)
+{
     return true;
 }
 
-void halTxResourceResetHwTQCounter(IN P_ADAPTER_T prAdapter){
+void halTxResourceResetHwTQCounter(IN P_ADAPTER_T prAdapter)
+{
     u32 *pu4WHISR = NULL;
     u16 au2TxCount[16];
 

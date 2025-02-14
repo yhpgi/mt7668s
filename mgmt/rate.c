@@ -135,7 +135,8 @@ void rateGetRateSetFromIEs(IN P_IE_SUPPORTED_RATE_IOT_T prIeSupportedRate,
                            IN P_IE_EXT_SUPPORTED_RATE_T prIeExtSupportedRate,
                            OUT u16 *pu2OperationalRateSet,
                            OUT u16 *pu2BSSBasicRateSet,
-                           OUT u8 *pfgIsUnknownBSSBasicRate){
+                           OUT u8 *pfgIsUnknownBSSBasicRate)
+{
     u16 u2OperationalRateSet = 0;
     u16 u2BSSBasicRateSet = 0;
     u8 fgIsUnknownBSSBasicRate = false;
@@ -247,7 +248,8 @@ void rateGetRateSetFromIEs(IN P_IE_SUPPORTED_RATE_IOT_T prIeSupportedRate,
 /*----------------------------------------------------------------------------*/
 void rateGetDataRatesFromRateSet(IN u16 u2OperationalRateSet,
                                  IN u16 u2BSSBasicRateSet, OUT u8 *pucDataRates,
-                                 OUT u8 *pucDataRatesLen){
+                                 OUT u8 *pucDataRatesLen)
+{
     u32 i, j;
 
     ASSERT(pucDataRates);
@@ -284,7 +286,8 @@ void rateGetDataRatesFromRateSet(IN u16 u2OperationalRateSet,
  */
 /*----------------------------------------------------------------------------*/
 u8 rateGetHighestRateIndexFromRateSet(IN u16 u2RateSet,
-                                      OUT u8 *pucHighestRateIndex){
+                                      OUT u8 *pucHighestRateIndex)
+{
     s32 i;
 
     ASSERT(pucHighestRateIndex);
@@ -311,7 +314,8 @@ u8 rateGetHighestRateIndexFromRateSet(IN u16 u2RateSet,
  */
 /*----------------------------------------------------------------------------*/
 u8 rateGetLowestRateIndexFromRateSet(IN u16 u2RateSet,
-                                     OUT u8 *pucLowestRateIndex){
+                                     OUT u8 *pucLowestRateIndex)
+{
     u32 i;
 
     ASSERT(pucLowestRateIndex);

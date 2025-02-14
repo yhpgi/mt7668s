@@ -65,7 +65,8 @@
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-void rlmBssInitForAP(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo){
+void rlmBssInitForAP(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo)
+{
     u8 i;
 
     ASSERT(prAdapter);
@@ -169,7 +170,8 @@ void rlmBssInitForAP(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo){
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-void rlmRspGenerateObssScanIE(P_ADAPTER_T prAdapter, P_MSDU_INFO_T prMsduInfo){
+void rlmRspGenerateObssScanIE(P_ADAPTER_T prAdapter, P_MSDU_INFO_T prMsduInfo)
+{
     P_BSS_INFO_T prBssInfo;
     P_IE_OBSS_SCAN_PARAM_T prObssScanIe;
     P_STA_RECORD_T prStaRec = (P_STA_RECORD_T)NULL;
@@ -232,7 +234,8 @@ void rlmRspGenerateObssScanIE(P_ADAPTER_T prAdapter, P_MSDU_INFO_T prMsduInfo){
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-u8 rlmUpdateBwByChListForAP(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo){
+u8 rlmUpdateBwByChListForAP(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo)
+{
     u8 ucLevel;
     u8 fgBwChange;
 
@@ -285,7 +288,8 @@ u8 rlmUpdateBwByChListForAP(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo){
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-void rlmProcessPublicAction(P_ADAPTER_T prAdapter, P_SW_RFB_T prSwRfb){
+void rlmProcessPublicAction(P_ADAPTER_T prAdapter, P_SW_RFB_T prSwRfb)
+{
     P_ACTION_20_40_COEXIST_FRAME prRxFrame;
     P_IE_20_40_COEXIST_T prCoexist;
     P_IE_INTOLERANT_CHNL_REPORT_T prChnlReport;
@@ -408,7 +412,8 @@ void rlmProcessPublicAction(P_ADAPTER_T prAdapter, P_SW_RFB_T prSwRfb){
  */
 /*----------------------------------------------------------------------------*/
 void rlmHandleObssStatusEventPkt(P_ADAPTER_T prAdapter,
-                                 P_EVENT_AP_OBSS_STATUS_T prObssStatus){
+                                 P_EVENT_AP_OBSS_STATUS_T prObssStatus)
+{
     P_BSS_INFO_T prBssInfo;
 
     ASSERT(prAdapter);
@@ -453,7 +458,8 @@ void rlmHandleObssStatusEventPkt(P_ADAPTER_T prAdapter,
  */
 /*----------------------------------------------------------------------------*/
 void rlmUpdateParamsForAP(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo,
-                          u8 fgUpdateBeacon){
+                          u8 fgUpdateBeacon)
+{
     P_LINK_T prStaList;
     P_STA_RECORD_T prStaRec;
     u8 fgErpProtectMode, fgSta40mIntolerant;
@@ -583,7 +589,8 @@ void rlmUpdateParamsForAP(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo,
  */
 /*----------------------------------------------------------------------------*/
 ENUM_CHNL_EXT_T rlmDecideScoForAP(P_ADAPTER_T prAdapter,
-                                  P_BSS_INFO_T prBssInfo){
+                                  P_BSS_INFO_T prBssInfo)
+{
     P_DOMAIN_SUBBAND_INFO prSubband;
     P_DOMAIN_INFO_ENTRY prDomainInfo;
     u8 ucSecondChannel, i, j;
@@ -729,7 +736,8 @@ ENUM_CHNL_EXT_T rlmDecideScoForAP(P_ADAPTER_T prAdapter,
  * \return ENUM_CHNL_EXT_T AP secondary channel offset
  */
 /*----------------------------------------------------------------------------*/
-ENUM_CHNL_EXT_T rlmGetScoForAP(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo){
+ENUM_CHNL_EXT_T rlmGetScoForAP(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo)
+{
     ENUM_BAND_T eBand;
     u8 ucChannel;
     ENUM_CHNL_EXT_T eSCO;
@@ -804,7 +812,8 @@ ENUM_CHNL_EXT_T rlmGetScoForAP(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo){
  * \return u8 AP channel number of Channel Center Frequency Segment 0
  */
 /*----------------------------------------------------------------------------*/
-u8 rlmGetVhtS1ForAP(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo){
+u8 rlmGetVhtS1ForAP(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo)
+{
     u32 ucFreq1Channel;
     u8 ucPrimaryChannel = prBssInfo->ucPrimaryChannel;
     P_P2P_ROLE_FSM_INFO_T prP2pRoleFsmInfo = (P_P2P_ROLE_FSM_INFO_T)NULL;

@@ -65,7 +65,8 @@
  * @return (none)
  */
 /*----------------------------------------------------------------------------*/
-void cnmInit(P_ADAPTER_T prAdapter){
+void cnmInit(P_ADAPTER_T prAdapter)
+{
     P_CNM_INFO_T prCnmInfo;
 
     ASSERT(prAdapter);
@@ -105,7 +106,8 @@ void cnmInit(P_ADAPTER_T prAdapter){
  * @return (none)
  */
 /*----------------------------------------------------------------------------*/
-void cnmChMngrRequestPrivilege(P_ADAPTER_T prAdapter, P_MSG_HDR_T prMsgHdr){
+void cnmChMngrRequestPrivilege(P_ADAPTER_T prAdapter, P_MSG_HDR_T prMsgHdr)
+{
     P_MSG_CH_REQ_T prMsgChReq;
     P_CMD_CH_PRIVILEGE_T prCmdBody;
     WLAN_STATUS rStatus;
@@ -208,7 +210,8 @@ void cnmChMngrRequestPrivilege(P_ADAPTER_T prAdapter, P_MSG_HDR_T prMsgHdr){
  * @return (none)
  */
 /*----------------------------------------------------------------------------*/
-void cnmChMngrAbortPrivilege(P_ADAPTER_T prAdapter, P_MSG_HDR_T prMsgHdr){
+void cnmChMngrAbortPrivilege(P_ADAPTER_T prAdapter, P_MSG_HDR_T prMsgHdr)
+{
     P_MSG_CH_ABORT_T prMsgChAbort;
     P_CMD_CH_PRIVILEGE_T prCmdBody;
     P_CNM_INFO_T prCnmInfo;
@@ -342,7 +345,8 @@ void cnmChMngrAbortPrivilege(P_ADAPTER_T prAdapter, P_MSG_HDR_T prMsgHdr){
  */
 /*----------------------------------------------------------------------------*/
 void cnmChMngrHandleChEvent(P_ADAPTER_T prAdapter, P_WIFI_EVENT_T prEvent,
-                            IN u32 u4EventBufLen){
+                            IN u32 u4EventBufLen)
+{
     P_EVENT_CH_PRIVILEGE_T prEventBody;
     P_MSG_CH_GRANT_T prChResp;
     P_BSS_INFO_T prBssInfo;
@@ -425,7 +429,8 @@ void cnmChMngrHandleChEvent(P_ADAPTER_T prAdapter, P_WIFI_EVENT_T prEvent,
 
 #if (CFG_SUPPORT_DFS_MASTER == 1)
 void cnmRadarDetectEvent(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent,
-                         IN u32 u4EventBufLen){
+                         IN u32 u4EventBufLen)
+{
     P_EVENT_RDD_REPORT_T prEventBody;
     P_BSS_INFO_T prBssInfo;
     P_MSG_P2P_RADAR_DETECT_T prP2pRddDetMsg;
@@ -495,7 +500,8 @@ void cnmRadarDetectEvent(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent,
 }
 
 void cnmCsaDoneEvent(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent,
-                     IN u32 u4EventBufLen){
+                     IN u32 u4EventBufLen)
+{
     P_BSS_INFO_T prBssInfo;
     P_MSG_P2P_CSA_DONE_T prP2pCsaDoneMsg;
     u8 ucBssIndex;
@@ -554,7 +560,8 @@ void cnmCsaDoneEvent(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent,
  */
 /*----------------------------------------------------------------------------*/
 u8 cnmPreferredChannel(P_ADAPTER_T prAdapter, P_ENUM_BAND_T prBand,
-                       u8 *pucPrimaryChannel, P_ENUM_CHNL_EXT_T prBssSCO){
+                       u8 *pucPrimaryChannel, P_ENUM_CHNL_EXT_T prBssSCO)
+{
     P_BSS_INFO_T prBssInfo;
     u8 i;
 
@@ -593,7 +600,8 @@ u8 cnmPreferredChannel(P_ADAPTER_T prAdapter, P_ENUM_BAND_T prBand,
  */
 /*----------------------------------------------------------------------------*/
 u8 cnmAisInfraChannelFixed(P_ADAPTER_T prAdapter, P_ENUM_BAND_T prBand,
-                           u8 *pucPrimaryChannel){
+                           u8 *pucPrimaryChannel)
+{
     P_BSS_INFO_T prBssInfo;
     u8 i;
     P_WIFI_VAR_T prWifiVar = &prAdapter->rWifiVar;
@@ -635,7 +643,8 @@ u8 cnmAisInfraChannelFixed(P_ADAPTER_T prAdapter, P_ENUM_BAND_T prBand,
 
 #if CFG_SUPPORT_CHNL_CONFLICT_REVISE
 u8 cnmAisDetectP2PChannel(P_ADAPTER_T prAdapter, P_ENUM_BAND_T prBand,
-                          u8 *pucPrimaryChannel){
+                          u8 *pucPrimaryChannel)
+{
     u8 i = 0;
     P_BSS_INFO_T prBssInfo;
 #if CFG_ENABLE_WIFI_DIRECT
@@ -668,7 +677,8 @@ u8 cnmAisDetectP2PChannel(P_ADAPTER_T prAdapter, P_ENUM_BAND_T prBand,
  *         false: Not permitted
  */
 /*----------------------------------------------------------------------------*/
-u8 cnmAisIbssIsPermitted(P_ADAPTER_T prAdapter){
+u8 cnmAisIbssIsPermitted(P_ADAPTER_T prAdapter)
+{
     P_BSS_INFO_T prBssInfo;
     u8 i;
 
@@ -697,7 +707,8 @@ u8 cnmAisIbssIsPermitted(P_ADAPTER_T prAdapter){
  *         false: Not permitted
  */
 /*----------------------------------------------------------------------------*/
-u8 cnmP2PIsPermitted(P_ADAPTER_T prAdapter){
+u8 cnmP2PIsPermitted(P_ADAPTER_T prAdapter)
+{
     P_BSS_INFO_T prBssInfo;
     u8 i;
     u8 fgBowIsActive;
@@ -731,7 +742,8 @@ u8 cnmP2PIsPermitted(P_ADAPTER_T prAdapter){
  *         false: Not permitted
  */
 /*----------------------------------------------------------------------------*/
-u8 cnmBowIsPermitted(P_ADAPTER_T prAdapter){
+u8 cnmBowIsPermitted(P_ADAPTER_T prAdapter)
+{
     P_BSS_INFO_T prBssInfo;
     u8 i;
 
@@ -751,7 +763,8 @@ u8 cnmBowIsPermitted(P_ADAPTER_T prAdapter){
     return true;
 }
 
-static u8 cnmGetAPBwPermitted(P_ADAPTER_T prAdapter, u8 ucBssIndex){
+static u8 cnmGetAPBwPermitted(P_ADAPTER_T prAdapter, u8 ucBssIndex)
+{
     P_BSS_INFO_T prBssInfo;
     u8 ucAPBandwidth = MAX_BW_160MHZ;
     P_BSS_DESC_T prBssDesc = NULL;
@@ -820,7 +833,8 @@ static u8 cnmGetAPBwPermitted(P_ADAPTER_T prAdapter, u8 ucBssIndex){
  *         false: Not permitted
  */
 /*----------------------------------------------------------------------------*/
-u8 cnmBss40mBwPermitted(P_ADAPTER_T prAdapter, u8 ucBssIndex){
+u8 cnmBss40mBwPermitted(P_ADAPTER_T prAdapter, u8 ucBssIndex)
+{
     ASSERT(prAdapter);
 
     /* Note: To support real-time decision instead of current
@@ -852,7 +866,8 @@ u8 cnmBss40mBwPermitted(P_ADAPTER_T prAdapter, u8 ucBssIndex){
  *         false: Not permitted
  */
 /*----------------------------------------------------------------------------*/
-u8 cnmBss80mBwPermitted(P_ADAPTER_T prAdapter, u8 ucBssIndex){
+u8 cnmBss80mBwPermitted(P_ADAPTER_T prAdapter, u8 ucBssIndex)
+{
     ASSERT(prAdapter);
 
     /* Note: To support real-time decision instead of current
@@ -879,7 +894,8 @@ u8 cnmBss80mBwPermitted(P_ADAPTER_T prAdapter, u8 ucBssIndex){
     return true;
 }
 
-u8 cnmGetBssMaxBw(P_ADAPTER_T prAdapter, u8 ucBssIndex){
+u8 cnmGetBssMaxBw(P_ADAPTER_T prAdapter, u8 ucBssIndex)
+{
     P_BSS_INFO_T prBssInfo;
     u8 ucMaxBandwidth = MAX_BW_80_80_MHZ;  /*chip capability*/
     P_BSS_DESC_T prBssDesc = NULL;
@@ -998,7 +1014,8 @@ u8 cnmGetBssMaxBw(P_ADAPTER_T prAdapter, u8 ucBssIndex){
     return ucMaxBandwidth;
 }
 
-u8 cnmGetBssMaxBwToChnlBW(P_ADAPTER_T prAdapter, u8 ucBssIndex){
+u8 cnmGetBssMaxBwToChnlBW(P_ADAPTER_T prAdapter, u8 ucBssIndex)
+{
     u8 ucMaxBandwidth = cnmGetBssMaxBw(prAdapter, ucBssIndex);
     return ucMaxBandwidth == MAX_BW_20MHZ ? ucMaxBandwidth :
            (ucMaxBandwidth - 1);
@@ -1017,7 +1034,8 @@ u8 cnmGetBssMaxBwToChnlBW(P_ADAPTER_T prAdapter, u8 ucBssIndex){
 /*----------------------------------------------------------------------------*/
 P_BSS_INFO_T cnmGetBssInfoAndInit(P_ADAPTER_T prAdapter,
                                   ENUM_NETWORK_TYPE_T eNetworkType,
-                                  u8 fgIsP2pDevice){
+                                  u8 fgIsP2pDevice)
+{
     P_BSS_INFO_T prBssInfo;
     u8 ucBssIndex, ucOwnMacIdx;
 
@@ -1134,7 +1152,8 @@ P_BSS_INFO_T cnmGetBssInfoAndInit(P_ADAPTER_T prAdapter,
  * @return
  */
 /*----------------------------------------------------------------------------*/
-void cnmFreeBssInfo(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo){
+void cnmFreeBssInfo(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo)
+{
     ASSERT(prAdapter);
     ASSERT(prBssInfo);
 
@@ -1146,7 +1165,8 @@ void cnmFreeBssInfo(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo){
 }
 
 #if CFG_SUPPORT_DBDC
-void cnmInitDbdcSetting(IN P_ADAPTER_T prAdapter){
+void cnmInitDbdcSetting(IN P_ADAPTER_T prAdapter)
+{
 #if CFG_SUPPORT_DBDC_TC6
     P_CNM_INFO_T prCnmInfo;
 
@@ -1173,7 +1193,8 @@ void cnmInitDbdcSetting(IN P_ADAPTER_T prAdapter){
     }
 }
 
-void cnmUpdateDbdcSetting(IN P_ADAPTER_T prAdapter, IN u8 fgDbdcEn){
+void cnmUpdateDbdcSetting(IN P_ADAPTER_T prAdapter, IN u8 fgDbdcEn)
+{
     u8 ucWmmSetBitmap = 0;
     CMD_DBDC_SETTING_T rDbdcSetting;
     P_CMD_DBDC_SETTING_T prCmdBody;
@@ -1336,7 +1357,8 @@ void cnmUpdateDbdcSetting(IN P_ADAPTER_T prAdapter, IN u8 fgDbdcEn){
 
 void cnmGetDbdcCapability(IN P_ADAPTER_T prAdapter, IN u8 ucBssIndex,
                           IN ENUM_BAND_T eRfBand, IN u8 ucPrimaryChannel,
-                          IN u8 ucNss, OUT P_CNM_DBDC_CAP_T prDbdcCap){
+                          IN u8 ucNss, OUT P_CNM_DBDC_CAP_T prDbdcCap)
+{
     if (!prDbdcCap) {
         return;
     }
@@ -1392,7 +1414,8 @@ void cnmGetDbdcCapability(IN P_ADAPTER_T prAdapter, IN u8 ucBssIndex,
 }
 
 void cnmDbdcEnableDecision(IN P_ADAPTER_T prAdapter, IN u8 ucChangedBssIndex,
-                           IN ENUM_BAND_T eRfBand){
+                           IN ENUM_BAND_T eRfBand)
+{
     P_BSS_INFO_T prBssInfo;
     u8 ucBssIndex;
 
@@ -1509,7 +1532,8 @@ void cnmDbdcEnableDecision(IN P_ADAPTER_T prAdapter, IN u8 ucChangedBssIndex,
     }
 }
 
-void cnmDbdcDisableDecision(IN P_ADAPTER_T prAdapter, IN u8 ucChangedBssIndex){
+void cnmDbdcDisableDecision(IN P_ADAPTER_T prAdapter, IN u8 ucChangedBssIndex)
+{
     P_BSS_INFO_T prBssInfo;
     u8 ucBssIndex;
     ENUM_BAND_T eBandCompare;
@@ -1598,7 +1622,8 @@ void cnmDbdcDisableDecision(IN P_ADAPTER_T prAdapter, IN u8 ucChangedBssIndex){
     }
 }
 
-void cnmDbdcDecision(IN P_ADAPTER_T prAdapter, IN unsigned long plParamPtr){
+void cnmDbdcDecision(IN P_ADAPTER_T prAdapter, IN unsigned long plParamPtr)
+{
     P_BSS_INFO_T prBssInfo;
     u8 ucBssIndex;
     ENUM_BAND_T eBandCompare;
@@ -1758,7 +1783,8 @@ void cnmDbdcDecision(IN P_ADAPTER_T prAdapter, IN unsigned long plParamPtr){
  * @return
  */
 /*----------------------------------------------------------------------------*/
-u8 cnmWmmIndexDecision(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prBssInfo){
+u8 cnmWmmIndexDecision(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prBssInfo)
+{
     u8 ucWmmIndex;
 
     for (ucWmmIndex = 0; ucWmmIndex < HW_WMM_NUM; ucWmmIndex++) {
@@ -1782,7 +1808,8 @@ u8 cnmWmmIndexDecision(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prBssInfo){
  * @return None
  */
 /*----------------------------------------------------------------------------*/
-void cnmFreeWmmIndex(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prBssInfo){
+void cnmFreeWmmIndex(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prBssInfo)
+{
     prAdapter->ucHwWmmEnBit &= (~BIT(prBssInfo->ucWmmQueSet));
     prBssInfo->ucWmmQueSet = DEFAULT_HW_WMM_INDEX;
     prBssInfo->fgIsWmmInited = false;
@@ -1790,7 +1817,8 @@ void cnmFreeWmmIndex(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prBssInfo){
 #endif
 
 #if CFG_SUPPORT_DBDC_TC6
-u8 cnmSapIsConcurrent(IN P_ADAPTER_T prAdapter){
+u8 cnmSapIsConcurrent(IN P_ADAPTER_T prAdapter)
+{
     if (prAdapter) {
         return prAdapter->u4P2pMode == RUNNING_P2P_AP_MODE;
     }else{
@@ -1798,11 +1826,13 @@ u8 cnmSapIsConcurrent(IN P_ADAPTER_T prAdapter){
     }
 }
 
-u8 cnmSapIsActive(IN P_ADAPTER_T prAdapter){
+u8 cnmSapIsActive(IN P_ADAPTER_T prAdapter)
+{
     return cnmGetp2pSapBssInfo(prAdapter) != NULL;
 }
 
-P_BSS_INFO_T cnmGetp2pSapBssInfo(IN P_ADAPTER_T prAdapter){
+P_BSS_INFO_T cnmGetp2pSapBssInfo(IN P_ADAPTER_T prAdapter)
+{
     P_BSS_INFO_T prBssInfo;
     u8 i;
 
@@ -1826,7 +1856,8 @@ P_BSS_INFO_T cnmGetp2pSapBssInfo(IN P_ADAPTER_T prAdapter){
 
 void cnmSapChannelSwitchReq(IN P_ADAPTER_T prAdapter,
                             IN P_RF_CHANNEL_INFO_T prRfChannelInfo,
-                            IN u8 ucRoleIdx){
+                            IN u8 ucRoleIdx)
+{
     P_GLUE_INFO_T prGlueInfo = prAdapter->prGlueInfo;
     P_GL_P2P_INFO_T prGlueP2pInfo = (P_GL_P2P_INFO_T)NULL;
     P_MSG_P2P_SET_NEW_CHANNEL_T prP2pSetNewChannelMsg =
@@ -1918,7 +1949,8 @@ void cnmSapChannelSwitchReq(IN P_ADAPTER_T prAdapter,
     bssUpdateBeaconContent(prAdapter, ucBssIdx);
 }
 
-u8 cnmIdcCsaReq(IN P_ADAPTER_T prAdapter, IN u8 ch_num, IN u8 ucRoleIdx){
+u8 cnmIdcCsaReq(IN P_ADAPTER_T prAdapter, IN u8 ch_num, IN u8 ucRoleIdx)
+{
     P_BSS_INFO_T prBssInfo = NULL;
     u8 ucBssIdx = 0;
     RF_CHANNEL_INFO_T rRfChnlInfo;

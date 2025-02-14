@@ -109,7 +109,8 @@ static void cnmStaSendRemoveCmd(P_ADAPTER_T prAdapter,
  */
 /*----------------------------------------------------------------------------*/
 P_MSDU_INFO_T cnmPktAllocWrapper(P_ADAPTER_T prAdapter, u32 u4Length,
-                                 u8 *pucStr){
+                                 u8 *pucStr)
+{
     P_MSDU_INFO_T prMsduInfo;
 
     prMsduInfo = cnmPktAlloc(prAdapter, u4Length);
@@ -129,7 +130,8 @@ P_MSDU_INFO_T cnmPktAllocWrapper(P_ADAPTER_T prAdapter, u32 u4Length,
  */
 /*----------------------------------------------------------------------------*/
 void cnmPktFreeWrapper(P_ADAPTER_T prAdapter, P_MSDU_INFO_T prMsduInfo,
-                       u8 *pucStr){
+                       u8 *pucStr)
+{
     DBGLOG(MEM, LOUD, "Free MSDU_INFO[0x%p] by [%s]\n", prMsduInfo, pucStr);
 
     cnmPktFree(prAdapter, prMsduInfo);
@@ -144,7 +146,8 @@ void cnmPktFreeWrapper(P_ADAPTER_T prAdapter, P_MSDU_INFO_T prMsduInfo,
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-P_MSDU_INFO_T cnmPktAlloc(P_ADAPTER_T prAdapter, u32 u4Length){
+P_MSDU_INFO_T cnmPktAlloc(P_ADAPTER_T prAdapter, u32 u4Length)
+{
     P_MSDU_INFO_T prMsduInfo;
     P_QUE_T prQueList;
 
@@ -206,7 +209,8 @@ P_MSDU_INFO_T cnmPktAlloc(P_ADAPTER_T prAdapter, u32 u4Length){
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-void cnmPktFree(P_ADAPTER_T prAdapter, P_MSDU_INFO_T prMsduInfo){
+void cnmPktFree(P_ADAPTER_T prAdapter, P_MSDU_INFO_T prMsduInfo)
+{
     P_QUE_T prQueList;
 
     KAL_SPIN_LOCK_DECLARATION();
@@ -239,7 +243,8 @@ void cnmPktFree(P_ADAPTER_T prAdapter, P_MSDU_INFO_T prMsduInfo){
  * \return (none)
  */
 /*----------------------------------------------------------------------------*/
-void cnmMemInit(P_ADAPTER_T prAdapter){
+void cnmMemInit(P_ADAPTER_T prAdapter)
+{
     P_BUF_INFO_T prBufInfo;
 
     /* Initialize Management buffer pool */
@@ -276,7 +281,8 @@ void cnmMemInit(P_ADAPTER_T prAdapter){
  */
 /*----------------------------------------------------------------------------*/
 void *cnmMemAlloc(IN P_ADAPTER_T prAdapter, IN ENUM_RAM_TYPE_T eRamType,
-                  IN u32 u4Length){
+                  IN u32 u4Length)
+{
     P_BUF_INFO_T prBufInfo;
     BUF_BITMAP rRequiredBitmap;
     u32 u4BlockNum;
@@ -385,7 +391,8 @@ void *cnmMemAlloc(IN P_ADAPTER_T prAdapter, IN ENUM_RAM_TYPE_T eRamType,
  * \return (none)
  */
 /*----------------------------------------------------------------------------*/
-void cnmMemFree(IN P_ADAPTER_T prAdapter, IN void *pvMemory){
+void cnmMemFree(IN P_ADAPTER_T prAdapter, IN void *pvMemory)
+{
     P_BUF_INFO_T prBufInfo;
     u32 u4BlockIndex;
     BUF_BITMAP rAllocatedBlocksBitmap;
@@ -472,7 +479,8 @@ void cnmMemFree(IN P_ADAPTER_T prAdapter, IN void *pvMemory){
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-void cnmStaRecInit(P_ADAPTER_T prAdapter){
+void cnmStaRecInit(P_ADAPTER_T prAdapter)
+{
     P_STA_RECORD_T prStaRec;
     u16 i;
 
@@ -494,7 +502,8 @@ void cnmStaRecInit(P_ADAPTER_T prAdapter){
  */
 /*----------------------------------------------------------------------------*/
 P_STA_RECORD_T cnmStaRecAlloc(P_ADAPTER_T prAdapter, ENUM_STA_TYPE_T eStaType,
-                              u8 ucBssIndex, u8 *pucMacAddr){
+                              u8 ucBssIndex, u8 *pucMacAddr)
+{
     P_STA_RECORD_T prStaRec;
     u16 i, k;
 
@@ -583,7 +592,8 @@ P_STA_RECORD_T cnmStaRecAlloc(P_ADAPTER_T prAdapter, ENUM_STA_TYPE_T eStaType,
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-void cnmStaRecFree(P_ADAPTER_T prAdapter, P_STA_RECORD_T prStaRec){
+void cnmStaRecFree(P_ADAPTER_T prAdapter, P_STA_RECORD_T prStaRec)
+{
     u8 ucStaRecIndex, ucBssIndex;
 
     ASSERT(prAdapter);
@@ -613,7 +623,8 @@ void cnmStaRecFree(P_ADAPTER_T prAdapter, P_STA_RECORD_T prStaRec){
  */
 /*----------------------------------------------------------------------------*/
 static void cnmStaRoutinesForAbort(P_ADAPTER_T prAdapter,
-                                   P_STA_RECORD_T prStaRec){
+                                   P_STA_RECORD_T prStaRec)
+{
     ASSERT(prAdapter);
 
     if (!prStaRec) {
@@ -658,7 +669,8 @@ static void cnmStaRoutinesForAbort(P_ADAPTER_T prAdapter,
  */
 /*----------------------------------------------------------------------------*/
 void cnmStaFreeAllStaByNetwork(P_ADAPTER_T prAdapter, u8 ucBssIndex,
-                               u8 ucStaRecIndexExcluded){
+                               u8 ucStaRecIndexExcluded)
+{
 #if CFG_ENABLE_WIFI_DIRECT
     P_BSS_INFO_T prBssInfo;
 #endif
@@ -708,7 +720,8 @@ void cnmStaFreeAllStaByNetwork(P_ADAPTER_T prAdapter, u8 ucBssIndex,
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-P_STA_RECORD_T cnmGetStaRecByIndex(P_ADAPTER_T prAdapter, u8 ucIndex){
+P_STA_RECORD_T cnmGetStaRecByIndex(P_ADAPTER_T prAdapter, u8 ucIndex)
+{
     P_STA_RECORD_T prStaRec;
 
     ASSERT(prAdapter);
@@ -733,7 +746,8 @@ P_STA_RECORD_T cnmGetStaRecByIndex(P_ADAPTER_T prAdapter, u8 ucIndex){
  */
 /*----------------------------------------------------------------------------*/
 P_STA_RECORD_T cnmGetStaRecByAddress(P_ADAPTER_T prAdapter, u8 ucBssIndex,
-                                     u8 *pucPeerMacAddr){
+                                     u8 *pucPeerMacAddr)
+{
     P_STA_RECORD_T prStaRec;
     u16 i;
 
@@ -765,7 +779,8 @@ P_STA_RECORD_T cnmGetStaRecByAddress(P_ADAPTER_T prAdapter, u8 ucBssIndex,
  */
 /*----------------------------------------------------------------------------*/
 P_STA_RECORD_T cnmGetAnyStaRecByAddress(P_ADAPTER_T prAdapter,
-                                        u8 *pucPeerMacAddr){
+                                        u8 *pucPeerMacAddr)
+{
     P_STA_RECORD_T prStaRec;
     u16 i;
 
@@ -799,7 +814,8 @@ P_STA_RECORD_T cnmGetAnyStaRecByAddress(P_ADAPTER_T prAdapter,
  */
 /*----------------------------------------------------------------------------*/
 void cnmStaRecChangeState(P_ADAPTER_T prAdapter, P_STA_RECORD_T prStaRec,
-                          u8 ucNewState){
+                          u8 ucNewState)
+{
     u8 fgNeedResp;
 
     if (!prAdapter) {
@@ -875,7 +891,8 @@ void cnmStaRecChangeState(P_ADAPTER_T prAdapter, P_STA_RECORD_T prStaRec,
 /*----------------------------------------------------------------------------*/
 static void cnmStaRecHandleEventPkt(P_ADAPTER_T prAdapter,
                                     P_CMD_INFO_T prCmdInfo, u8 *pucEventBuf,
-                                    IN u32 u4EventBufLen){
+                                    IN u32 u4EventBufLen)
+{
     P_EVENT_ACTIVATE_STA_REC_T prEventContent;
     P_STA_RECORD_T prStaRec;
     if (u4EventBufLen < sizeof(EVENT_ACTIVATE_STA_REC_T)) {
@@ -904,7 +921,8 @@ static void cnmStaRecHandleEventPkt(P_ADAPTER_T prAdapter,
  */
 /*----------------------------------------------------------------------------*/
 void cnmStaSendUpdateCmd(P_ADAPTER_T prAdapter, P_STA_RECORD_T prStaRec,
-                         P_TXBF_PFMU_STA_INFO prTxBfPfmuStaInfo, u8 fgNeedResp){
+                         P_TXBF_PFMU_STA_INFO prTxBfPfmuStaInfo, u8 fgNeedResp)
+{
     P_CMD_UPDATE_STA_RECORD_T prCmdContent;
     WLAN_STATUS rStatus;
 
@@ -1115,7 +1133,8 @@ void cnmStaSendUpdateCmd(P_ADAPTER_T prAdapter, P_STA_RECORD_T prStaRec,
 /*----------------------------------------------------------------------------*/
 static void cnmStaSendRemoveCmd(P_ADAPTER_T prAdapter,
                                 ENUM_STA_REC_CMD_ACTION_T eActionType,
-                                u8 ucStaRecIndex, u8 ucBssIndex){
+                                u8 ucStaRecIndex, u8 ucBssIndex)
+{
     CMD_REMOVE_STA_RECORD_T rCmdContent;
     WLAN_STATUS rStatus;
 
@@ -1148,7 +1167,8 @@ static void cnmStaSendRemoveCmd(P_ADAPTER_T prAdapter,
     }
 }
 
-u8 *cnmStaRecGetTypeString(ENUM_STA_TYPE_T eStaType){
+u8 *cnmStaRecGetTypeString(ENUM_STA_TYPE_T eStaType)
+{
     u8 *pucTypeString = NULL;
 
     if (eStaType & STA_TYPE_LEGACY_MASK) {
@@ -1164,7 +1184,8 @@ u8 *cnmStaRecGetTypeString(ENUM_STA_TYPE_T eStaType){
     return pucTypeString;
 }
 
-u8 *cnmStaRecGetRoleString(ENUM_STA_TYPE_T eStaType){
+u8 *cnmStaRecGetRoleString(ENUM_STA_TYPE_T eStaType)
+{
     u8 *pucRoleString = NULL;
 
     if (eStaType & STA_TYPE_ADHOC_MASK) {
@@ -1197,7 +1218,8 @@ u8 *cnmStaRecGetRoleString(ENUM_STA_TYPE_T eStaType){
  * @return (none)
  */
 /*----------------------------------------------------------------------------*/
-void cnmDumpStaRec(IN P_ADAPTER_T prAdapter, IN u8 ucStaRecIdx){
+void cnmDumpStaRec(IN P_ADAPTER_T prAdapter, IN u8 ucStaRecIdx)
+{
     u8 ucWTEntry;
     u32 i;
     P_BSS_INFO_T prBssInfo;
@@ -1318,7 +1340,8 @@ void cnmDumpStaRec(IN P_ADAPTER_T prAdapter, IN u8 ucStaRecIdx){
     DBGLOG(SW4, INFO, "============= DUMP END ===========\n");
 }
 
-u32 cnmDumpMemoryStatus(IN P_ADAPTER_T prAdapter, IN u8 *pucBuf, IN u32 u4Max){
+u32 cnmDumpMemoryStatus(IN P_ADAPTER_T prAdapter, IN u8 *pucBuf, IN u32 u4Max)
+{
     u32 u4Len = 0;
 #if CFG_DBG_MGT_BUF
     P_BUF_INFO_T prBufInfo;
@@ -1370,7 +1393,8 @@ u32 cnmDumpMemoryStatus(IN P_ADAPTER_T prAdapter, IN u8 *pucBuf, IN u32 u4Max){
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS  /* TDLS_STATUS  //prStaRec->ucNetTypeIndex */
 cnmPeerAdd(P_ADAPTER_T prAdapter, void *pvSetBuffer, u32 u4SetBufferLen,
-           u32 *pu4SetInfoLen){
+           u32 *pu4SetInfoLen)
+{
     CMD_PEER_ADD_T *prCmd;
     BSS_INFO_T *prAisBssInfo;
     STA_RECORD_T *prStaRec;
@@ -1452,7 +1476,8 @@ cnmPeerAdd(P_ADAPTER_T prAdapter, void *pvSetBuffer, u32 u4SetBufferLen,
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS  /* TDLS_STATUS */
 cnmPeerUpdate(P_ADAPTER_T prAdapter, void *pvSetBuffer, u32 u4SetBufferLen,
-              u32 *pu4SetInfoLen){
+              u32 *pu4SetInfoLen)
+{
     CMD_PEER_UPDATE_T *prCmd;
     BSS_INFO_T *prAisBssInfo;
     STA_RECORD_T *prStaRec;
@@ -1735,7 +1760,8 @@ cnmPeerUpdate(P_ADAPTER_T prAdapter, void *pvSetBuffer, u32 u4SetBufferLen,
  */
 /*----------------------------------------------------------------------------*/
 P_STA_RECORD_T cnmGetTdlsPeerByAddress(P_ADAPTER_T prAdapter, u8 ucBssIndex,
-                                       u8 aucPeerMACAddress[]){
+                                       u8 aucPeerMACAddress[])
+{
     P_STA_RECORD_T prStaRec;
     u16 i;
 

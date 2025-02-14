@@ -197,7 +197,8 @@ static WLAN_REQ_ENTRY arWlanOidReqTable[] = {
  */
 /*----------------------------------------------------------------------------*/
 int priv_support_ioctl(IN struct net_device *prNetDev,
-                       IN OUT struct ifreq *prIfReq, IN int i4Cmd){
+                       IN OUT struct ifreq *prIfReq, IN int i4Cmd)
+{
     /* prIfReq is verified in the caller function wlanDoIOCTL() */
     struct iwreq *prIwReq = (struct iwreq *)prIfReq;
     struct iw_request_info rIwReqInfo;
@@ -249,7 +250,8 @@ int priv_support_ioctl(IN struct net_device *prNetDev,
 
 EVENT_BATCH_RESULT_T g_rEventBatchResult[CFG_BATCH_MAX_MSCAN];
 
-u32 batchChannelNum2Freq(u32 u4ChannelNum){
+u32 batchChannelNum2Freq(u32 u4ChannelNum)
+{
     u32 u4ChannelInMHz;
 
     if (u4ChannelNum >= 1 && u4ChannelNum <= 13) {
@@ -279,7 +281,8 @@ static u8 text1[TMP_TEXT_LEN_S], text2[TMP_TEXT_LEN_L],
 WLAN_STATUS
 batchConvertResult(IN P_EVENT_BATCH_RESULT_T prEventBatchResult,
                    OUT void *pvBuffer, IN u32 u4MaxBufferLen,
-                   OUT u32 *pu4RetLen){
+                   OUT u32 *pu4RetLen)
+{
     s8 *p = pvBuffer;
     s8 ssid[ELEM_MAX_LEN_SSID + 1];
     s32 nsize, nsize1, nsize2, nsize3, scancount;
@@ -413,7 +416,8 @@ short_buf:
 
 void parseNoiseHistogramReport(s32 *i4BytesWritten, s8 *pcCommand,
                                int *i4TotalLen,
-                               IN struct CMD_NOISE_HISTOGRAM_REPORT *cmd){
+                               IN struct CMD_NOISE_HISTOGRAM_REPORT *cmd)
+{
     if (cmd->ucAction == CMD_NOISE_HISTOGRAM_GET) {
         *i4BytesWritten += snprintf(pcCommand + *i4BytesWritten,
                                     *i4TotalLen - *i4BytesWritten,
@@ -476,7 +480,8 @@ void parseNoiseHistogramReport(s32 *i4BytesWritten, s8 *pcCommand,
 /*----------------------------------------------------------------------------*/
 int priv_set_int(IN struct net_device *prNetDev,
                  IN struct iw_request_info *prIwReqInfo,
-                 IN union iwreq_data *prIwReqData, IN char *pcExtra){
+                 IN union iwreq_data *prIwReqData, IN char *pcExtra)
+{
     u32 u4SubCmd;
     u32 *pu4IntBuf;
     P_NDIS_TRANSPORT_STRUCT prNdisReq;
@@ -757,7 +762,8 @@ int priv_set_int(IN struct net_device *prNetDev,
 /*----------------------------------------------------------------------------*/
 int priv_get_int(IN struct net_device *prNetDev,
                  IN struct iw_request_info *prIwReqInfo,
-                 IN union iwreq_data *prIwReqData, IN OUT char *pcExtra){
+                 IN union iwreq_data *prIwReqData, IN OUT char *pcExtra)
+{
     u32 u4SubCmd;
     u32 *pu4IntBuf;
     P_GLUE_INFO_T prGlueInfo;
@@ -943,7 +949,8 @@ int priv_get_int(IN struct net_device *prNetDev,
 /*----------------------------------------------------------------------------*/
 int priv_set_ints(IN struct net_device *prNetDev,
                   IN struct iw_request_info *prIwReqInfo,
-                  IN union iwreq_data *prIwReqData, IN char *pcExtra){
+                  IN union iwreq_data *prIwReqData, IN char *pcExtra)
+{
     u32 u4SubCmd, u4BufLen, u4CmdLen;
     P_GLUE_INFO_T prGlueInfo;
     int status = 0;
@@ -1078,7 +1085,8 @@ int priv_set_ints(IN struct net_device *prNetDev,
 /*----------------------------------------------------------------------------*/
 int priv_get_ints(IN struct net_device *prNetDev,
                   IN struct iw_request_info *prIwReqInfo,
-                  IN union iwreq_data *prIwReqData, IN OUT char *pcExtra){
+                  IN union iwreq_data *prIwReqData, IN OUT char *pcExtra)
+{
     u32 u4SubCmd;
     P_GLUE_INFO_T prGlueInfo;
     int status = 0;
@@ -1150,7 +1158,8 @@ int priv_get_ints(IN struct net_device *prNetDev,
 /*----------------------------------------------------------------------------*/
 int priv_set_struct(IN struct net_device *prNetDev,
                     IN struct iw_request_info *prIwReqInfo,
-                    IN union iwreq_data *prIwReqData, IN char *pcExtra){
+                    IN union iwreq_data *prIwReqData, IN char *pcExtra)
+{
     u32 u4SubCmd = 0;
     int status = 0;
     /* WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS; */
@@ -1334,7 +1343,8 @@ int priv_set_struct(IN struct net_device *prNetDev,
 /*----------------------------------------------------------------------------*/
 int priv_get_struct(IN struct net_device *prNetDev,
                     IN struct iw_request_info *prIwReqInfo,
-                    IN union iwreq_data *prIwReqData, IN OUT char *pcExtra){
+                    IN union iwreq_data *prIwReqData, IN OUT char *pcExtra)
+{
     u32 u4SubCmd = 0;
     P_NDIS_TRANSPORT_STRUCT prNdisReq = NULL;
 
@@ -1471,7 +1481,8 @@ int priv_get_struct(IN struct net_device *prNetDev,
 /*----------------------------------------------------------------------------*/
 static int priv_set_ndis(IN struct net_device *prNetDev,
                          IN NDIS_TRANSPORT_STRUCT *prNdisReq,
-                         OUT u32 *pu4OutputLen){
+                         OUT u32 *pu4OutputLen)
+{
     P_WLAN_REQ_ENTRY prWlanReqEntry = NULL;
     WLAN_STATUS status = WLAN_STATUS_SUCCESS;
     P_GLUE_INFO_T prGlueInfo = NULL;
@@ -1599,7 +1610,8 @@ static int priv_set_ndis(IN struct net_device *prNetDev,
 /*----------------------------------------------------------------------------*/
 static int priv_get_ndis(IN struct net_device *prNetDev,
                          IN NDIS_TRANSPORT_STRUCT *prNdisReq,
-                         OUT u32 *pu4OutputLen){
+                         OUT u32 *pu4OutputLen)
+{
     P_WLAN_REQ_ENTRY prWlanReqEntry = NULL;
     u32 u4BufLen = 0;
     WLAN_STATUS status = WLAN_STATUS_SUCCESS;
@@ -1726,7 +1738,8 @@ static int priv_get_ndis(IN struct net_device *prNetDev,
 /*----------------------------------------------------------------------------*/
 int priv_ate_set(IN struct net_device *prNetDev,
                  IN struct iw_request_info *prIwReqInfo,
-                 IN union iwreq_data *prIwReqData, IN char *pcExtra){
+                 IN union iwreq_data *prIwReqData, IN char *pcExtra)
+{
     P_GLUE_INFO_T GlueInfo;
     s32 i4Status;
     u8 *InBuf;
@@ -1798,7 +1811,8 @@ int priv_ate_set(IN struct net_device *prNetDev,
  */
 /*----------------------------------------------------------------------------*/
 static u8 reqSearchSupportedOidEntry(IN u32 rOid,
-                                     OUT P_WLAN_REQ_ENTRY *ppWlanReqEntry){
+                                     OUT P_WLAN_REQ_ENTRY *ppWlanReqEntry)
+{
     s32 i, j, k;
 
     i = 0;
@@ -1836,7 +1850,8 @@ static u8 reqSearchSupportedOidEntry(IN u32 rOid,
 /*----------------------------------------------------------------------------*/
 int priv_set_driver(IN struct net_device *prNetDev,
                     IN struct iw_request_info *prIwReqInfo,
-                    IN union iwreq_data *prIwReqData, IN OUT char *pcExtra){
+                    IN union iwreq_data *prIwReqData, IN OUT char *pcExtra)
+{
     u32 u4SubCmd = 0;
     u16 u2Cmd = 0;
 
@@ -1955,7 +1970,8 @@ int priv_set_driver(IN struct net_device *prNetDev,
 static WLAN_STATUS reqExtSetAcpiDevicePowerState(IN P_GLUE_INFO_T prGlueInfo,
                                                  IN void *pvSetBuffer,
                                                  IN u32 u4SetBufferLen,
-                                                 OUT u32 *pu4SetInfoLen){
+                                                 OUT u32 *pu4SetInfoLen)
+{
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
 
     ASSERT(prGlueInfo);
@@ -2212,7 +2228,8 @@ struct android_wifi_priv_cmd {
 #endif
 
 int priv_driver_get_dbg_level(IN struct net_device *prNetDev,
-                              IN char *pcCommand, IN int i4TotalLen){
+                              IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     s32 i4BytesWritten = 0;
     s32 i4Argc = 0;
@@ -2261,7 +2278,8 @@ int priv_driver_get_dbg_level(IN struct net_device *prNetDev,
 #if CFG_SUPPORT_QA_TOOL
 #if CFG_SUPPORT_BUFFER_MODE
 static int priv_driver_set_eeprom_mode(IN struct net_device *prNetDev,
-                                       IN char *pcCommand, IN int i4TotalLen){
+                                       IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     P_ADAPTER_T prAdapter = NULL;
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
@@ -2304,7 +2322,8 @@ static int priv_driver_set_eeprom_mode(IN struct net_device *prNetDev,
 }
 static int priv_driver_set_efuse_buffer_mode(IN struct net_device *prNetDev,
                                              IN char *pcCommand,
-                                             IN int i4TotalLen){
+                                             IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     P_ADAPTER_T prAdapter = NULL;
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
@@ -2396,7 +2415,8 @@ out:
 #endif
 
 static int priv_driver_get_rx_statistics(IN struct net_device *prNetDev,
-                                         IN char *pcCommand, IN int i4TotalLen){
+                                         IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
     u32 u4BufLen = 0;
@@ -2451,7 +2471,8 @@ static int priv_driver_get_rx_statistics(IN struct net_device *prNetDev,
 
 static int priv_driver_get_sta_statistics(IN struct net_device *prNetDev,
                                           IN char *pcCommand,
-                                          IN int i4TotalLen){
+                                          IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
     u32 u4BufLen = 0;
@@ -2581,7 +2602,8 @@ static int priv_driver_get_sta_statistics(IN struct net_device *prNetDev,
 
 static int priv_driver_get_bss_statistics(IN struct net_device *prNetDev,
                                           IN char *pcCommand,
-                                          IN int i4TotalLen){
+                                          IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     WLAN_STATUS rStatus;
     PARAM_MAC_ADDRESS arBssid;
@@ -2698,7 +2720,7 @@ static int priv_driver_get_bss_statistics(IN struct net_device *prNetDev,
 
 static char *HW_TX_MODE_STR[] = { "CCK", "OFDM", "MM", "GF", "VHT", "N/A" };
 static char *HW_TX_RATE_CCK_STR[] = { "1M", "2M", "5.5M", "11M", "N/A" };
-static char *HW_TX_RATE_OFDM_STR[] = { "6M",  "9M",  "12M", "18M", "24M",
+static char *HW_TX_RATE_OFDM_STR[] = { "6M", "9M", "12M", "18M", "24M",
                                        "36M", "48M", "54M", "N/A" };
 static char *HW_TX_RATE_BW[] = { "BW20", "BW40", "BW80", "BW160/BW8080",
                                  "N/A" };
@@ -2713,9 +2735,9 @@ enum {
 };
 
 static char *RATE_TBLE[] = {
-    [RATE_TBL_B] = "B",    [RATE_TBL_G] = "G",
-    [RATE_TBL_N] = "N",    [RATE_TBL_N_2SS] = "N_2SS",
-    [RATE_TBL_AC] = "AC",  [RATE_TBL_AC_2SS] = "AC_2SS",
+    [RATE_TBL_B] = "B", [RATE_TBL_G] = "G",
+    [RATE_TBL_N] = "N", [RATE_TBL_N_2SS] = "N_2SS",
+    [RATE_TBL_AC] = "AC", [RATE_TBL_AC_2SS] = "AC_2SS",
     [RATE_TBL_MAX] = "N/A"
 };
 
@@ -2728,7 +2750,8 @@ static char *RATE_TBLE[] = {
 #define BW_8080    7
 #define BW_ALL     0xFF
 
-static char *hw_rate_ofdm_str(u16 ofdm_idx){
+static char *hw_rate_ofdm_str(u16 ofdm_idx)
+{
     switch (ofdm_idx) {
     case 11:  /* 6M */
         return HW_TX_RATE_OFDM_STR[0];
@@ -2759,7 +2782,8 @@ static char *hw_rate_ofdm_str(u16 ofdm_idx){
     }
 }
 
-static u8 priv_driver_get_sgi_info(IN P_PARAM_PEER_CAP_T prWtblPeerCap){
+static u8 priv_driver_get_sgi_info(IN P_PARAM_PEER_CAP_T prWtblPeerCap)
+{
     if (!prWtblPeerCap) {
         return false;
     }
@@ -2782,7 +2806,8 @@ static u8 priv_driver_get_sgi_info(IN P_PARAM_PEER_CAP_T prWtblPeerCap){
     }
 }
 
-static u8 priv_driver_get_ldpc_info(IN P_PARAM_TX_CONFIG_T prWtblTxConfig){
+static u8 priv_driver_get_ldpc_info(IN P_PARAM_TX_CONFIG_T prWtblTxConfig)
+{
     if (!prWtblTxConfig) {
         return false;
     }
@@ -2795,7 +2820,8 @@ static u8 priv_driver_get_ldpc_info(IN P_PARAM_TX_CONFIG_T prWtblTxConfig){
 }
 
 s32 priv_driver_rate_to_string(IN char *pcCommand, IN int i4TotalLen, u8 TxRx,
-                               P_PARAM_HW_WLAN_INFO_T prHwWlanInfo){
+                               P_PARAM_HW_WLAN_INFO_T prHwWlanInfo)
+{
     u8 i, txmode, rate, stbc;
     u8 nss;
     s32 i4BytesWritten = 0;
@@ -2891,7 +2917,8 @@ s32 priv_driver_rate_to_string(IN char *pcCommand, IN int i4TotalLen, u8 TxRx,
 
 static s32
 priv_driver_dump_helper_wtbl_info(IN char *pcCommand, IN int i4TotalLen,
-                                  P_PARAM_HW_WLAN_INFO_T prHwWlanInfo){
+                                  P_PARAM_HW_WLAN_INFO_T prHwWlanInfo)
+{
     u8 i;
     s32 i4BytesWritten = 0;
 
@@ -3039,7 +3066,8 @@ priv_driver_dump_helper_wtbl_info(IN char *pcCommand, IN int i4TotalLen,
 }
 
 static int priv_driver_get_wtbl_info(IN struct net_device *prNetDev,
-                                     IN char *pcCommand, IN int i4TotalLen){
+                                     IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
     u32 u4BufLen = 0;
@@ -3104,7 +3132,8 @@ static int priv_driver_get_wtbl_info(IN struct net_device *prNetDev,
 }
 
 static int priv_driver_get_sta_info(IN struct net_device *prNetDev,
-                                    IN char *pcCommand, IN int i4TotalLen){
+                                    IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
     u32 u4BufLen = 0;
@@ -3277,7 +3306,8 @@ out:
 }
 
 static int priv_driver_get_mib_info(IN struct net_device *prNetDev,
-                                    IN char *pcCommand, IN int i4TotalLen){
+                                    IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
     u32 u4BufLen = 0;
@@ -3650,7 +3680,8 @@ static int priv_driver_get_mib_info(IN struct net_device *prNetDev,
 /* Private Coex Ctrl Subcmd for Isolation Detection */
 static int priv_driver_iso_detect(IN P_GLUE_INFO_T prGlueInfo,
                                   IN struct CMD_COEX_CTRL *prCmdCoexCtrl,
-                                  IN signed char *argv[]){
+                                  IN signed char *argv[])
+{
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
     u32 u4BufLen = 0;
     u32 u4Ret = 0;
@@ -3697,7 +3728,8 @@ static int priv_driver_iso_detect(IN P_GLUE_INFO_T prGlueInfo,
 
 /* Private Command for Coex Ctrl */
 static int priv_driver_coex_ctrl(IN struct net_device *prNetDev,
-                                 IN char *pcCommand, IN int i4TotalLen){
+                                 IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     s32 i4BytesWritten = 0;
     s32 i4Argc = 0;
@@ -3768,7 +3800,8 @@ static int priv_driver_coex_ctrl(IN struct net_device *prNetDev,
 }
 
 static int priv_driver_set_fw_log(IN struct net_device *prNetDev,
-                                  IN char *pcCommand, IN int i4TotalLen){
+                                  IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
     u32 u4BufLen = 0;
@@ -3876,7 +3909,8 @@ out:
 
 static int priv_driver_get_magic_pkt_info(IN struct net_device *prNetDev,
                                           IN char *pcCommand,
-                                          IN int i4TotalLen){
+                                          IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
     u32 u4BufLen = 0;
@@ -3945,7 +3979,8 @@ get_info_invalid:
 }
 
 static int priv_driver_get_mcr(IN struct net_device *prNetDev,
-                               IN char *pcCommand, IN int i4TotalLen){
+                               IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
     u32 u4BufLen = 0;
@@ -4001,7 +4036,8 @@ static int priv_driver_get_mcr(IN struct net_device *prNetDev,
 }
 
 int priv_driver_set_mcr(IN struct net_device *prNetDev, IN char *pcCommand,
-                        IN int i4TotalLen){
+                        IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
     u32 u4BufLen = 0;
@@ -4056,7 +4092,8 @@ int priv_driver_set_mcr(IN struct net_device *prNetDev, IN char *pcCommand,
 }
 
 static int priv_driver_set_test_mode(IN struct net_device *prNetDev,
-                                     IN char *pcCommand, IN int i4TotalLen){
+                                     IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
     u32 u4BufLen = 0;
@@ -4109,7 +4146,8 @@ static int priv_driver_set_test_mode(IN struct net_device *prNetDev,
 }
 
 static int priv_driver_set_test_cmd(IN struct net_device *prNetDev,
-                                    IN char *pcCommand, IN int i4TotalLen){
+                                    IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
     u32 u4BufLen = 0;
@@ -4165,7 +4203,8 @@ static int priv_driver_set_test_cmd(IN struct net_device *prNetDev,
 }
 
 static int priv_driver_get_test_result(IN struct net_device *prNetDev,
-                                       IN char *pcCommand, IN int i4TotalLen){
+                                       IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
     u32 u4BufLen = 0;
@@ -4231,7 +4270,8 @@ static int priv_driver_get_test_result(IN struct net_device *prNetDev,
 s32 priv_driver_last_sec_mcs_info(IN P_ADAPTER_T prAdapter, IN char *pcCommand,
                                   IN int i4TotalLen,
                                   P_PARAM_HW_WLAN_INFO_T prHwWlanInfo,
-                                  struct PARAM_TX_MCS_INFO *prTxMcsInfo){
+                                  struct PARAM_TX_MCS_INFO *prTxMcsInfo)
+{
     u8 i, j, txmode, rate, stbc;
     u8 nsts;
     s32 i4BytesWritten = 0;
@@ -4508,7 +4548,8 @@ s32 priv_driver_last_sec_mcs_info(IN P_ADAPTER_T prAdapter, IN char *pcCommand,
 
 s32 priv_driver_tx_rate_info(IN char *pcCommand, IN int i4TotalLen,
                              u8 fgDumpAll, P_PARAM_HW_WLAN_INFO_T prHwWlanInfo,
-                             P_PARAM_GET_STA_STATISTICS prQueryStaStatistics){
+                             P_PARAM_GET_STA_STATISTICS prQueryStaStatistics)
+{
     u8 i, txmode, rate, stbc;
     u8 nsts;
     s32 i4BytesWritten = 0;
@@ -4703,7 +4744,8 @@ s32 priv_driver_tx_rate_info(IN char *pcCommand, IN int i4TotalLen,
 }
 
 s32 priv_driver_last_rx_rssi(P_ADAPTER_T prAdapter, IN char *pcCommand,
-                             IN int i4TotalLen, IN u8 ucWlanIdx){
+                             IN int i4TotalLen, IN u8 ucWlanIdx)
+{
     s32 i4RSSI0 = 0, i4RSSI1 = 0, i4RSSI2 = 0, i4RSSI3;
     s32 i4BytesWritten = 0;
     u32 u4RxVector3 = 0;
@@ -4779,7 +4821,8 @@ s32 priv_driver_last_rx_rssi(P_ADAPTER_T prAdapter, IN char *pcCommand,
 }
 
 s32 priv_driver_rx_rate_info(P_ADAPTER_T prAdapter, IN char *pcCommand,
-                             IN int i4TotalLen, IN u8 ucWlanIdx){
+                             IN int i4TotalLen, IN u8 ucWlanIdx)
+{
     u32 txmode, rate, frmode, sgi, nsts, ldpc, stbc, groupid, mu;
     s32 i4BytesWritten = 0;
     u32 u4RxVector0 = 0, u4RxVector1 = 0;
@@ -4880,7 +4923,8 @@ s32 priv_driver_rx_rate_info(P_ADAPTER_T prAdapter, IN char *pcCommand,
 }
 
 s32 priv_driver_tx_vector_info(IN char *pcCommand, IN int i4TotalLen,
-                               IN P_TX_VECTOR_BBP_LATCH_T prTxV){
+                               IN P_TX_VECTOR_BBP_LATCH_T prTxV)
+{
     u8 rate, txmode, frmode, sgi, ldpc, nsts, stbc, txpwr;
     s32 i4BytesWritten = 0;
 
@@ -4961,7 +5005,8 @@ priv_driver_dump_stat_info(P_ADAPTER_T prAdapter, IN char *pcCommand,
                            IN int i4TotalLen,
                            P_PARAM_HW_WLAN_INFO_T prHwWlanInfo,
                            P_PARAM_GET_STA_STATISTICS prQueryStaStatistics,
-                           u8 fgResetCnt, u32 u4StatGroup){
+                           u8 fgResetCnt, u32 u4StatGroup)
+{
     s32 i4BytesWritten = 0;
     PARAM_RSSI rRssi = 0;
     u16 u2LinkSpeed;
@@ -5548,7 +5593,8 @@ priv_driver_dump_stat_info(P_ADAPTER_T prAdapter, IN char *pcCommand,
 }
 
 static int priv_driver_get_sta_stat(IN struct net_device *prNetDev,
-                                    IN char *pcCommand, IN int i4TotalLen){
+                                    IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     P_ADAPTER_T prAdapter = NULL;
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
@@ -5768,7 +5814,8 @@ static s32
 priv_driver_dump_stat2_info(P_ADAPTER_T prAdapter, IN char *pcCommand,
                             IN int i4TotalLen,
                             P_UMAC_STAT2_GET_T prUmacStat2GetInfo,
-                            P_PARAM_GET_DRV_STATISTICS prQueryDrvStatistics){
+                            P_PARAM_GET_DRV_STATISTICS prQueryDrvStatistics)
+{
     s32 i4BytesWritten = 0;
     u16 u2PleTotalRevPage = 0;
     u16 u2PleTotalSrcPage = 0;
@@ -6030,7 +6077,8 @@ priv_driver_dump_stat2_info(P_ADAPTER_T prAdapter, IN char *pcCommand,
 }
 
 static int priv_driver_get_sta_stat2(IN struct net_device *prNetDev,
-                                     IN char *pcCommand, IN int i4TotalLen){
+                                     IN char *pcCommand, IN int i4TotalLen)
+{
     s32 i4BytesWritten = 0;
     P_GLUE_INFO_T prGlueInfo = NULL;
     P_ADAPTER_T prAdapter = NULL;
@@ -6136,7 +6184,8 @@ out:
 
 static s32 priv_driver_dump_rx_stat_info(P_ADAPTER_T prAdapter,
                                          IN char *pcCommand, IN int i4TotalLen,
-                                         IN u8 fgResetCnt){
+                                         IN u8 fgResetCnt)
+{
     s32 i4BytesWritten = 0;
     u32 u4RxVector0 = 0, u4RxVector2 = 0, u4RxVector3 = 0, u4RxVector4 = 0;
     u8 ucStaIdx, ucWlanIndex, cbw;
@@ -6482,7 +6531,8 @@ static s32 priv_driver_dump_rx_stat_info(P_ADAPTER_T prAdapter,
 }
 
 static int priv_driver_show_rx_stat(IN struct net_device *prNetDev,
-                                    IN char *pcCommand, IN int i4TotalLen){
+                                    IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     P_ADAPTER_T prAdapter = NULL;
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
@@ -6574,7 +6624,8 @@ static int priv_driver_show_rx_stat(IN struct net_device *prNetDev,
 /*----------------------------------------------------------------------------*/
 static int priv_driver_get_sta_curr_ar_rate(IN struct net_device *prNetDev,
                                             IN char *pcCommand,
-                                            IN int i4TotalLen){
+                                            IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     P_ADAPTER_T prAdapter = NULL;
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
@@ -6781,7 +6832,8 @@ out_get_curr_ar_rate:
  */
 /*----------------------------------------------------------------------------*/
 static int priv_driver_set_acl_policy(IN struct net_device *prNetDev,
-                                      IN char *pcCommand, IN int i4TotalLen){
+                                      IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     P_ADAPTER_T prAdapter = NULL;
     P_BSS_INFO_T prBssInfo = NULL;
@@ -6855,7 +6907,8 @@ static int priv_driver_set_acl_policy(IN struct net_device *prNetDev,
     return i4BytesWritten;
 }
 
-static s32 priv_driver_inspect_mac_addr(IN char *pcMacAddr){
+static s32 priv_driver_inspect_mac_addr(IN char *pcMacAddr)
+{
     s32 i = 0;
 
     if (pcMacAddr == NULL) {
@@ -6890,7 +6943,8 @@ static s32 priv_driver_inspect_mac_addr(IN char *pcMacAddr){
  */
 /*----------------------------------------------------------------------------*/
 static int priv_driver_add_acl_entry(IN struct net_device *prNetDev,
-                                     IN char *pcCommand, IN int i4TotalLen){
+                                     IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     P_ADAPTER_T prAdapter = NULL;
     P_BSS_INFO_T prBssInfo = NULL;
@@ -6988,7 +7042,8 @@ static int priv_driver_add_acl_entry(IN struct net_device *prNetDev,
  */
 /*----------------------------------------------------------------------------*/
 static int priv_driver_del_acl_entry(IN struct net_device *prNetDev,
-                                     IN char *pcCommand, IN int i4TotalLen){
+                                     IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     P_ADAPTER_T prAdapter = NULL;
     P_BSS_INFO_T prBssInfo = NULL;
@@ -7089,7 +7144,8 @@ static int priv_driver_del_acl_entry(IN struct net_device *prNetDev,
  */
 /*----------------------------------------------------------------------------*/
 static int priv_driver_show_acl_entry(IN struct net_device *prNetDev,
-                                      IN char *pcCommand, IN int i4TotalLen){
+                                      IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     P_ADAPTER_T prAdapter = NULL;
     P_BSS_INFO_T prBssInfo = NULL;
@@ -7149,7 +7205,8 @@ static int priv_driver_show_acl_entry(IN struct net_device *prNetDev,
  */
 /*----------------------------------------------------------------------------*/
 static int priv_driver_clear_acl_entry(IN struct net_device *prNetDev,
-                                       IN char *pcCommand, IN int i4TotalLen){
+                                       IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     P_ADAPTER_T prAdapter = NULL;
     P_BSS_INFO_T prBssInfo = NULL;
@@ -7205,7 +7262,8 @@ static int priv_driver_clear_acl_entry(IN struct net_device *prNetDev,
 }
 
 static int priv_driver_get_drv_mcr(IN struct net_device *prNetDev,
-                                   IN char *pcCommand, IN int i4TotalLen){
+                                   IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
     u32 u4BufLen = 0;
@@ -7263,7 +7321,8 @@ static int priv_driver_get_drv_mcr(IN struct net_device *prNetDev,
 }
 
 int priv_driver_set_drv_mcr(IN struct net_device *prNetDev, IN char *pcCommand,
-                            IN int i4TotalLen){
+                            IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
     u32 u4BufLen = 0;
@@ -7318,7 +7377,8 @@ int priv_driver_set_drv_mcr(IN struct net_device *prNetDev, IN char *pcCommand,
 }
 
 static int priv_driver_get_sw_ctrl(IN struct net_device *prNetDev,
-                                   IN char *pcCommand, IN int i4TotalLen){
+                                   IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
     u32 u4BufLen = 0;
@@ -7372,7 +7432,8 @@ static int priv_driver_get_sw_ctrl(IN struct net_device *prNetDev,
 }
 
 int priv_driver_set_sw_ctrl(IN struct net_device *prNetDev, IN char *pcCommand,
-                            IN int i4TotalLen){
+                            IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
     u32 u4BufLen = 0;
@@ -7425,7 +7486,8 @@ int priv_driver_set_sw_ctrl(IN struct net_device *prNetDev, IN char *pcCommand,
 }
 
 int priv_driver_set_fixed_rate(IN struct net_device *prNetDev,
-                               IN char *pcCommand, IN int i4TotalLen){
+                               IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
     u32 u4BufLen = 0;
@@ -7663,7 +7725,8 @@ int priv_driver_set_fixed_rate(IN struct net_device *prNetDev,
 
 #ifdef CFG_SUPPORT_MULTICAST_ENHANCEMENT
 int priv_driver_set_fixed_mrate(IN struct net_device *prNetDev,
-                                IN char *pcCommand, IN int i4TotalLen){
+                                IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     P_ADAPTER_T prAdapter = NULL;
     s32 i4BytesWritten = 0;
@@ -7824,7 +7887,8 @@ int priv_driver_set_fixed_mrate(IN struct net_device *prNetDev,
 }
 
 int priv_driver_set_dup_mpacket(IN struct net_device *prNetDev,
-                                IN char *pcCommand, IN int i4TotalLen){
+                                IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     P_ADAPTER_T prAdapter = NULL;
     s32 i4Argc = 0;
@@ -7865,7 +7929,8 @@ int priv_driver_set_dup_mpacket(IN struct net_device *prNetDev,
     return i4BytesWritten;
 }
 int priv_driver_get_dup_mpacket(IN struct net_device *prNetDev,
-                                IN char *pcCommand, IN int i4TotalLen){
+                                IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     P_ADAPTER_T prAdapter = NULL;
     s32 i4BytesWritten = 0;
@@ -7880,7 +7945,8 @@ int priv_driver_get_dup_mpacket(IN struct net_device *prNetDev,
 }
 
 int priv_driver_set_mcast_burst(IN struct net_device *prNetDev,
-                                IN char *pcCommand, IN int i4TotalLen){
+                                IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     P_ADAPTER_T prAdapter = NULL;
     s32 i4Argc = 0;
@@ -7952,7 +8018,8 @@ int priv_driver_set_mcast_burst(IN struct net_device *prNetDev,
     return 0;
 }
 int priv_driver_get_mcast_burst(IN struct net_device *prNetDev,
-                                IN char *pcCommand, IN int i4TotalLen){
+                                IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     P_ADAPTER_T prAdapter = NULL;
     s32 i4BytesWritten = 0;
@@ -7978,7 +8045,8 @@ int priv_driver_get_mcast_burst(IN struct net_device *prNetDev,
     return i4BytesWritten;
 }
 int priv_driver_set_txop(IN struct net_device *prNetDev, IN char *pcCommand,
-                         IN int i4TotalLen){
+                         IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     P_ADAPTER_T prAdapter = NULL;
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
@@ -8130,7 +8198,8 @@ int priv_driver_set_txop(IN struct net_device *prNetDev, IN char *pcCommand,
     return i4BytesWritten;
 }
 int priv_driver_get_txop(IN struct net_device *prNetDev, IN char *pcCommand,
-                         IN int i4TotalLen){
+                         IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     P_ADAPTER_T prAdapter = NULL;
     s32 i4BytesWritten = 0;
@@ -8147,7 +8216,8 @@ int priv_driver_get_txop(IN struct net_device *prNetDev, IN char *pcCommand,
 
 #ifdef CFG_SUPPORT_MULTICAST_ENHANCEMENT_LOOKBACK
 int priv_driver_set_look_back(IN struct net_device *prNetDev,
-                              IN char *pcCommand, IN int i4TotalLen){
+                              IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     P_ADAPTER_T prAdapter = NULL;
     s32 i4Argc = 0;
@@ -8190,7 +8260,8 @@ int priv_driver_set_look_back(IN struct net_device *prNetDev,
     return i4BytesWritten;
 }
 int priv_driver_get_look_back(IN struct net_device *prNetDev,
-                              IN char *pcCommand, IN int i4TotalLen){
+                              IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     P_ADAPTER_T prAdapter = NULL;
     s32 i4BytesWritten = 0;
@@ -8205,7 +8276,8 @@ int priv_driver_get_look_back(IN struct net_device *prNetDev,
 }
 #endif
 int priv_driver_set_11mc_type(IN struct net_device *prNetDev,
-                              IN char *pcCommand, IN int i4TotalLen){
+                              IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     P_ADAPTER_T prAdapter = NULL;
     s32 i4Argc = 0;
@@ -8243,7 +8315,8 @@ int priv_driver_set_11mc_type(IN struct net_device *prNetDev,
     return i4BytesWritten;
 }
 int priv_driver_get_11mc_type(IN struct net_device *prNetDev,
-                              IN char *pcCommand, IN int i4TotalLen){
+                              IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     P_ADAPTER_T prAdapter = NULL;
     s32 i4BytesWritten = 0;
@@ -8258,7 +8331,8 @@ int priv_driver_get_11mc_type(IN struct net_device *prNetDev,
 }
 
 int priv_driver_set_unicast_burst(IN struct net_device *prNetDev,
-                                  IN char *pcCommand, IN int i4TotalLen){
+                                  IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     P_ADAPTER_T prAdapter = NULL;
     s32 i4Argc = 0;
@@ -8295,7 +8369,8 @@ int priv_driver_set_unicast_burst(IN struct net_device *prNetDev,
     return i4BytesWritten;
 }
 int priv_driver_get_unicast_burst(IN struct net_device *prNetDev,
-                                  IN char *pcCommand, IN int i4TotalLen){
+                                  IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     P_ADAPTER_T prAdapter = NULL;
     s32 i4BytesWritten = 0;
@@ -8312,7 +8387,8 @@ int priv_driver_get_unicast_burst(IN struct net_device *prNetDev,
 
 int priv_driver_set_unicast_burst_timeout(IN struct net_device *prNetDev,
                                           IN char *pcCommand,
-                                          IN int i4TotalLen){
+                                          IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     P_ADAPTER_T prAdapter = NULL;
     s32 i4Argc = 0;
@@ -8347,7 +8423,8 @@ int priv_driver_set_unicast_burst_timeout(IN struct net_device *prNetDev,
 }
 int priv_driver_get_unicast_burst_timeout(IN struct net_device *prNetDev,
                                           IN char *pcCommand,
-                                          IN int i4TotalLen){
+                                          IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     P_ADAPTER_T prAdapter = NULL;
     s32 i4BytesWritten = 0;
@@ -8362,7 +8439,8 @@ int priv_driver_get_unicast_burst_timeout(IN struct net_device *prNetDev,
 }
 
 int priv_driver_set_mrm_clinet(IN struct net_device *prNetDev,
-                               IN char *pcCommand, IN int i4TotalLen){
+                               IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     P_ADAPTER_T prAdapter = NULL;
     s32 i4Argc = 0;
@@ -8411,7 +8489,8 @@ int priv_driver_set_mrm_clinet(IN struct net_device *prNetDev,
 }
 
 int priv_driver_get_mrm_client(IN struct net_device *prNetDev,
-                               IN char *pcCommand, IN int i4TotalLen){
+                               IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     P_ADAPTER_T prAdapter = NULL;
     s32 i4BytesWritten = 0;
@@ -8432,7 +8511,8 @@ int priv_driver_get_mrm_client(IN struct net_device *prNetDev,
 }
 
 int priv_driver_set_audio_tos(IN struct net_device *prNetDev,
-                              IN char *pcCommand, IN int i4TotalLen){
+                              IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     P_ADAPTER_T prAdapter = NULL;
     s32 i4Argc = 0;
@@ -8466,7 +8546,8 @@ int priv_driver_set_audio_tos(IN struct net_device *prNetDev,
     return i4BytesWritten;
 }
 int priv_driver_get_audio_tos(IN struct net_device *prNetDev,
-                              IN char *pcCommand, IN int i4TotalLen){
+                              IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     P_ADAPTER_T prAdapter = NULL;
     s32 i4BytesWritten = 0;
@@ -8482,7 +8563,8 @@ int priv_driver_get_audio_tos(IN struct net_device *prNetDev,
 #endif
 
 int priv_driver_set_cfg(IN struct net_device *prNetDev, IN char *pcCommand,
-                        IN int i4TotalLen){
+                        IN int i4TotalLen)
+{
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
     P_GLUE_INFO_T prGlueInfo = NULL;
     P_ADAPTER_T prAdapter = NULL;
@@ -8553,7 +8635,8 @@ int priv_driver_set_cfg(IN struct net_device *prNetDev, IN char *pcCommand,
 }  /* priv_driver_set_cfg  */
 
 int priv_driver_get_cfg(IN struct net_device *prNetDev, IN char *pcCommand,
-                        IN int i4TotalLen){
+                        IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     P_ADAPTER_T prAdapter = NULL;
     s32 i4BytesWritten = 0;
@@ -8589,7 +8672,8 @@ int priv_driver_get_cfg(IN struct net_device *prNetDev, IN char *pcCommand,
 }  /* priv_driver_get_cfg  */
 
 int priv_driver_set_chip_config(IN struct net_device *prNetDev,
-                                IN char *pcCommand, IN int i4TotalLen){
+                                IN char *pcCommand, IN int i4TotalLen)
+{
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
     P_GLUE_INFO_T prGlueInfo = NULL;
     P_ADAPTER_T prAdapter = NULL;
@@ -8680,7 +8764,8 @@ int priv_driver_set_chip_config(IN struct net_device *prNetDev,
 
 void priv_driver_get_chip_config_16(u8 *pucStartAddr, u32 u4Length, u32 u4Line,
                                     int i4TotalLen, s32 i4BytesWritten,
-                                    char *pcCommand){
+                                    char *pcCommand)
+{
     while (u4Length >= 16) {
         if (i4TotalLen > i4BytesWritten) {
             i4BytesWritten += snprintf(
@@ -8714,7 +8799,8 @@ void priv_driver_get_chip_config_16(u8 *pucStartAddr, u32 u4Length, u32 u4Line,
 
 void priv_driver_get_chip_config_4(u32 *pu4StartAddr, u32 u4Length, u32 u4Line,
                                    int i4TotalLen, s32 i4BytesWritten,
-                                   char *pcCommand){
+                                   char *pcCommand)
+{
     while (u4Length >= 16) {
         if (i4TotalLen > i4BytesWritten) {
             i4BytesWritten += snprintf(
@@ -8732,7 +8818,8 @@ void priv_driver_get_chip_config_4(u32 *pu4StartAddr, u32 u4Length, u32 u4Line,
 }
 
 int priv_driver_get_chip_config(IN struct net_device *prNetDev,
-                                IN char *pcCommand, IN int i4TotalLen){
+                                IN char *pcCommand, IN int i4TotalLen)
+{
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
     P_GLUE_INFO_T prGlueInfo = NULL;
     P_ADAPTER_T prAdapter = NULL;
@@ -8856,7 +8943,8 @@ int priv_driver_get_chip_config(IN struct net_device *prNetDev,
 }  /* priv_driver_get_chip_config  */
 
 int priv_driver_set_ap_start(IN struct net_device *prNetDev, IN char *pcCommand,
-                             IN int i4TotalLen){
+                             IN int i4TotalLen)
+{
     PARAM_CUSTOM_P2P_SET_STRUCT_T rSetP2P;
     s32 i4Argc = 0;
     s8 *apcArgv[WLAN_CFG_ARGV_MAX] = { 0 };
@@ -8898,7 +8986,8 @@ int priv_driver_set_ap_start(IN struct net_device *prNetDev, IN char *pcCommand,
 }
 
 int priv_driver_get_linkspeed(IN struct net_device *prNetDev,
-                              IN char *pcCommand, IN int i4TotalLen){
+                              IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
     u32 u4BufLen = 0;
@@ -8932,7 +9021,8 @@ int priv_driver_get_linkspeed(IN struct net_device *prNetDev,
 }
 
 int priv_driver_set_band(IN struct net_device *prNetDev, IN char *pcCommand,
-                         IN int i4TotalLen){
+                         IN int i4TotalLen)
+{
     P_ADAPTER_T prAdapter = NULL;
     P_GLUE_INFO_T prGlueInfo = NULL;
     s32 i4Argc = 0;
@@ -8980,7 +9070,8 @@ int priv_driver_set_band(IN struct net_device *prNetDev, IN char *pcCommand,
 }
 
 int priv_driver_set_txpower(IN struct net_device *prNetDev, IN char *pcCommand,
-                            IN int i4TotalLen){
+                            IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
     u32 u4BufLen = 0;
@@ -9115,7 +9206,8 @@ int priv_driver_set_txpower(IN struct net_device *prNetDev, IN char *pcCommand,
 }
 #if CFG_SUPPORT_DBDC_TC6
 int priv_driver_set_csa(IN struct net_device *prNetDev, IN char *pcCommand,
-                        IN int i4TotalLen){
+                        IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     s32 i4Argc = 0;
     s8 *apcArgv[WLAN_CFG_ARGV_MAX];
@@ -9165,7 +9257,8 @@ int priv_driver_set_csa(IN struct net_device *prNetDev, IN char *pcCommand,
 }
 #endif
 int priv_driver_set_country(IN struct net_device *prNetDev, IN char *pcCommand,
-                            IN int i4TotalLen){
+                            IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
     u32 u4BufLen = 0;
@@ -9220,7 +9313,8 @@ int priv_driver_set_country(IN struct net_device *prNetDev, IN char *pcCommand,
 }
 
 int priv_driver_get_country(IN struct net_device *prNetDev, IN char *pcCommand,
-                            IN int i4TotalLen){
+                            IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     s32 i4Argc = 0;
     s8 *apcArgv[WLAN_CFG_ARGV_MAX];
@@ -9252,7 +9346,8 @@ int priv_driver_get_country(IN struct net_device *prNetDev, IN char *pcCommand,
 }
 
 int priv_driver_get_channels(IN struct net_device *prNetDev, IN char *pcCommand,
-                             IN int i4TotalLen){
+                             IN int i4TotalLen)
+{
     u32 i4BytesWritten = 0;
     s32 i4Argc = 0;
     s8 *apcArgv[WLAN_CFG_ARGV_MAX];
@@ -9352,7 +9447,8 @@ int priv_driver_get_channels(IN struct net_device *prNetDev, IN char *pcCommand,
 }
 
 int priv_driver_get_ap_channels(IN struct net_device *prNetDev,
-                                IN char *pcCommand, IN int i4TotalLen){
+                                IN char *pcCommand, IN int i4TotalLen)
+{
     u32 i4BytesWritten = 0;
     s32 i4Argc = 0;
     s8 *apcArgv[WLAN_CFG_ARGV_MAX];
@@ -9501,7 +9597,8 @@ int priv_driver_get_ap_channels(IN struct net_device *prNetDev,
 
 #if (CFG_SUPPORT_DFS_MASTER == 1)
 int priv_driver_show_dfs_state(IN struct net_device *prNetDev,
-                               IN char *pcCommand, IN int i4TotalLen){
+                               IN char *pcCommand, IN int i4TotalLen)
+{
     s32 i4Argc = 0;
     s8 *apcArgv[WLAN_CFG_ARGV_MAX];
     s32 i4BytesWritten = 0;
@@ -9522,7 +9619,8 @@ int priv_driver_show_dfs_state(IN struct net_device *prNetDev,
 }
 
 int priv_driver_show_dfs_abd123_param(IN struct net_device *prNetDev,
-                                      IN char *pcCommand, IN int i4TotalLen){
+                                      IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     s32 i4Argc = 0;
     s8 *apcArgv[WLAN_CFG_ARGV_MAX];
@@ -9618,7 +9716,8 @@ int priv_driver_show_dfs_abd123_param(IN struct net_device *prNetDev,
 }
 
 int priv_driver_show_dfs_help(IN struct net_device *prNetDev,
-                              IN char *pcCommand, IN int i4TotalLen){
+                              IN char *pcCommand, IN int i4TotalLen)
+{
     s32 i4Argc = 0;
     s8 *apcArgv[WLAN_CFG_ARGV_MAX];
     s32 i4BytesWritten = 0;
@@ -9682,7 +9781,8 @@ int priv_driver_show_dfs_help(IN struct net_device *prNetDev,
 }
 
 int priv_driver_show_dfs_cac_time(IN struct net_device *prNetDev,
-                                  IN char *pcCommand, IN int i4TotalLen){
+                                  IN char *pcCommand, IN int i4TotalLen)
+{
     s32 i4Argc = 0;
     s8 *apcArgv[WLAN_CFG_ARGV_MAX];
     s32 i4BytesWritten = 0;
@@ -9709,7 +9809,8 @@ int priv_driver_show_dfs_cac_time(IN struct net_device *prNetDev,
 }
 
 int priv_driver_set_rdd_report(IN struct net_device *prNetDev,
-                               IN char *pcCommand, IN int i4TotalLen){
+                               IN char *pcCommand, IN int i4TotalLen)
+{
     s32 i4Argc = 0;
     s8 *apcArgv[WLAN_CFG_ARGV_MAX] = { 0 };
     // u32 u4Ret;
@@ -9732,7 +9833,8 @@ int priv_driver_set_rdd_report(IN struct net_device *prNetDev,
 }
 
 int priv_driver_clean_dfs_abd123_param(IN struct net_device *prNetDev,
-                                       IN char *pcCommand, IN int i4TotalLen){
+                                       IN char *pcCommand, IN int i4TotalLen)
+{
     s32 i4Argc = 0;
     s8 *apcArgv[WLAN_CFG_ARGV_MAX];
     s32 i4BytesWritten = 0;
@@ -9754,7 +9856,8 @@ int priv_driver_clean_dfs_abd123_param(IN struct net_device *prNetDev,
 }
 
 int priv_driver_set_abd123_detect_mode(IN struct net_device *prNetDev,
-                                       IN char *pcCommand, IN int i4TotalLen){
+                                       IN char *pcCommand, IN int i4TotalLen)
+{
     s32 i4Argc = 0;
     s8 *apcArgv[WLAN_CFG_ARGV_MAX] = { 0 };
     u32 u4Ret;
@@ -9806,7 +9909,8 @@ int priv_driver_set_abd123_detect_mode(IN struct net_device *prNetDev,
 #endif
 #ifdef CFG_SUPPORT_ADJUST_MCC_STAY_TIME
 int priv_driver_set_mcc_time(IN struct net_device *prNetDev, IN char *pcCommand,
-                             IN int i4TotalLen){
+                             IN int i4TotalLen)
+{
     P_ADAPTER_T prAdapter = NULL;
     P_GLUE_INFO_T prGlueInfo = NULL;
     s32 i4Argc = 0;
@@ -9858,7 +9962,8 @@ out:
 }
 #endif
 int priv_driver_set_miracast(IN struct net_device *prNetDev, IN char *pcCommand,
-                             IN int i4TotalLen){
+                             IN int i4TotalLen)
+{
     P_ADAPTER_T prAdapter = NULL;
     P_GLUE_INFO_T prGlueInfo = NULL;
     u32 i4BytesWritten = 0;
@@ -9946,7 +10051,8 @@ int priv_driver_set_miracast(IN struct net_device *prNetDev, IN char *pcCommand,
 
 #if CFG_WOW_SUPPORT
 static int priv_driver_set_wow(IN struct net_device *prNetDev,
-                               IN char *pcCommand, IN int i4TotalLen){
+                               IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     P_WOW_CTRL_T pWOW_CTRL = NULL;
     s32 i4Argc = 0;
@@ -9989,7 +10095,8 @@ static int priv_driver_set_wow(IN struct net_device *prNetDev,
 }
 
 static int priv_driver_set_wow_enable(IN struct net_device *prNetDev,
-                                      IN char *pcCommand, IN int i4TotalLen){
+                                      IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     P_WOW_CTRL_T pWOW_CTRL = NULL;
     s32 i4Argc = 0;
@@ -10028,7 +10135,8 @@ static int priv_driver_set_wow_enable(IN struct net_device *prNetDev,
 }
 
 static int priv_driver_set_wow_par(IN struct net_device *prNetDev,
-                                   IN char *pcCommand, IN int i4TotalLen){
+                                   IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     P_WOW_CTRL_T pWOW_CTRL = NULL;
     s32 i4Argc = 0;
@@ -10108,7 +10216,8 @@ static int priv_driver_set_wow_par(IN struct net_device *prNetDev,
 }
 
 static int priv_driver_set_wow_udpport(IN struct net_device *prNetDev,
-                                       IN char *pcCommand, IN int i4TotalLen){
+                                       IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     P_WOW_CTRL_T pWOW_CTRL = NULL;
     s32 i4Argc = 0;
@@ -10194,7 +10303,8 @@ static int priv_driver_set_wow_udpport(IN struct net_device *prNetDev,
 }
 
 static int priv_driver_set_wow_tcpport(IN struct net_device *prNetDev,
-                                       IN char *pcCommand, IN int i4TotalLen){
+                                       IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     P_WOW_CTRL_T pWOW_CTRL = NULL;
     s32 i4Argc = 0;
@@ -10280,7 +10390,8 @@ static int priv_driver_set_wow_tcpport(IN struct net_device *prNetDev,
 }
 
 static int priv_driver_get_wow_port(IN struct net_device *prNetDev,
-                                    IN char *pcCommand, IN int i4TotalLen){
+                                    IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     P_WOW_CTRL_T pWOW_CTRL = NULL;
     s32 i4Argc = 0;
@@ -10369,7 +10480,8 @@ static int priv_driver_get_wow_port(IN struct net_device *prNetDev,
 }
 
 static int priv_driver_get_wow_reason(IN struct net_device *prNetDev,
-                                      IN char *pcCommand, IN int i4TotalLen){
+                                      IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     s32 i4Argc = 0;
     s32 i4BytesWritten = 0;
@@ -10395,7 +10507,8 @@ static int priv_driver_get_wow_reason(IN struct net_device *prNetDev,
 
 #if CFG_STR_DHCP_RENEW_OFFLOAD
 static int priv_driver_set_dhcp_info(IN struct net_device *prNetDev,
-                                     IN char *pcCommand, IN int i4TotalLen){
+                                     IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     P_BSS_INFO_T prBssInfo;
     s32 i4BytesWritten = 0;
@@ -10531,7 +10644,8 @@ out:
 #endif
 
 static int priv_driver_set_adv_pws(IN struct net_device *prNetDev,
-                                   IN char *pcCommand, IN int i4TotalLen){
+                                   IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     s32 i4Argc = 0;
     s8 *apcArgv[WLAN_CFG_ARGV_MAX] = { 0 };
@@ -10568,7 +10682,8 @@ static int priv_driver_set_adv_pws(IN struct net_device *prNetDev,
 }
 
 static int priv_driver_set_mdtim(IN struct net_device *prNetDev,
-                                 IN char *pcCommand, IN int i4TotalLen){
+                                 IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     s32 i4Argc = 0;
     s8 *apcArgv[WLAN_CFG_ARGV_MAX] = { 0 };
@@ -10615,7 +10730,8 @@ static int priv_driver_set_mdtim(IN struct net_device *prNetDev,
 
 static int priv_driver_set_listen_dtim_interval(IN struct net_device *prNetDev,
                                                 IN char *pcCommand,
-                                                IN int i4TotalLen){
+                                                IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     s32 i4Argc = 0;
     s8 *apcArgv[WLAN_CFG_ARGV_MAX] = { 0 };
@@ -10647,7 +10763,8 @@ static int priv_driver_set_listen_dtim_interval(IN struct net_device *prNetDev,
 }
 
 int priv_driver_set_suspend_mode(IN struct net_device *prNetDev,
-                                 IN char *pcCommand, IN int i4TotalLen){
+                                 IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     s32 i4Argc = 0;
     s8 *apcArgv[WLAN_CFG_ARGV_MAX];
@@ -10703,7 +10820,8 @@ int priv_driver_set_suspend_mode(IN struct net_device *prNetDev,
 
 #if CFG_SUPPORT_SNIFFER
 int priv_driver_set_monitor(IN struct net_device *prNetDev, IN char *pcCommand,
-                            IN int i4TotalLen){
+                            IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     P_ADAPTER_T prAdapter = NULL;
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
@@ -10880,7 +10998,8 @@ int priv_driver_set_monitor(IN struct net_device *prNetDev, IN char *pcCommand,
 #endif
 
 static int priv_driver_get_version(IN struct net_device *prNetDev,
-                                   IN char *pcCommand, IN int i4TotalLen){
+                                   IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     P_ADAPTER_T prAdapter;
     s32 i4BytesWritten = 0;
@@ -11005,7 +11124,8 @@ static int priv_driver_get_version(IN struct net_device *prNetDev,
 
 #if CFG_SUPPORT_DBDC
 int priv_driver_set_dbdc(IN struct net_device *prNetDev, IN char *pcCommand,
-                         IN int i4TotalLen){
+                         IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
     u32 u4BufLen = 0;
@@ -11075,7 +11195,8 @@ int priv_driver_set_dbdc(IN struct net_device *prNetDev, IN char *pcCommand,
 #endif
 
 static int priv_driver_get_que_info(IN struct net_device *prNetDev,
-                                    IN char *pcCommand, IN int i4TotalLen){
+                                    IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
 
     ASSERT(prNetDev);
@@ -11085,7 +11206,8 @@ static int priv_driver_get_que_info(IN struct net_device *prNetDev,
 }
 
 static int priv_driver_get_mem_info(IN struct net_device *prNetDev,
-                                    IN char *pcCommand, IN int i4TotalLen){
+                                    IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
 
     ASSERT(prNetDev);
@@ -11096,7 +11218,8 @@ static int priv_driver_get_mem_info(IN struct net_device *prNetDev,
 }
 
 static int priv_driver_get_hif_info(IN struct net_device *prNetDev,
-                                    IN char *pcCommand, IN int i4TotalLen){
+                                    IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
 
     ASSERT(prNetDev);
@@ -11106,7 +11229,8 @@ static int priv_driver_get_hif_info(IN struct net_device *prNetDev,
 }
 
 int priv_driver_set_p2p_ps(IN struct net_device *prNetDev, IN char *pcCommand,
-                           IN int i4TotalLen){
+                           IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
     u32 u4BufLen = 0;
@@ -11196,7 +11320,8 @@ int priv_driver_set_p2p_ps(IN struct net_device *prNetDev, IN char *pcCommand,
 
 #if CFG_SUPPORT_LAST_SEC_MCS_INFO
 static int priv_driver_get_mcs_info(IN struct net_device *prNetDev,
-                                    IN char *pcCommand, IN int i4TotalLen){
+                                    IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
     u32 u4BufLen = 0;
@@ -11327,7 +11452,8 @@ out:
 
 static int priv_driver_get_deep_sleep_cnt(IN struct net_device *prNetDev,
                                           IN char *pcCommand,
-                                          IN int i4TotalLen){
+                                          IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
     u32 u4BufLen = 0;
@@ -11376,7 +11502,8 @@ static int priv_driver_get_deep_sleep_cnt(IN struct net_device *prNetDev,
 }
 
 static int priv_driver_get_cnm_info(IN struct net_device *prNetDev,
-                                    IN char *pcCommand, IN int i4TotalLen){
+                                    IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
     u32 u4BufLen = 0;
@@ -11470,7 +11597,8 @@ static int priv_driver_get_cnm_info(IN struct net_device *prNetDev,
 
 #if CFG_AUTO_CHANNEL_SEL_SUPPORT
 static int priv_driver_get_ch_rank_list(IN struct net_device *prNetDev,
-                                        IN char *pcCommand, IN int i4TotalLen){
+                                        IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     u32 i4BytesWritten = 0;
     s8 ucIdx = 0, ucIdx2 = 0, ucChannelNum = 0, ucNumOf2gChannel = 0,
@@ -11521,7 +11649,8 @@ static int priv_driver_get_ch_rank_list(IN struct net_device *prNetDev,
 }
 
 static int priv_driver_get_ch_dirtiness(IN struct net_device *prNetDev,
-                                        IN char *pcCommand, IN int i4TotalLen){
+                                        IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     s8 cIdx = 0;
     u8 ucNumOf2gChannel = 0;
@@ -11583,7 +11712,8 @@ static int priv_driver_get_ch_dirtiness(IN struct net_device *prNetDev,
 #endif
 
 static int priv_driver_efuse_ops(IN struct net_device *prNetDev,
-                                 IN char *pcCommand, IN int i4TotalLen){
+                                 IN char *pcCommand, IN int i4TotalLen)
+{
     enum EFUSE_OP_MODE {
         EFUSE_READ,
         EFUSE_WRITE,
@@ -11714,7 +11844,8 @@ efuse_op_invalid:
 
 #if CFG_SUPPORT_ADVANCE_CONTROL
 static int priv_driver_set_noise(IN struct net_device *prNetDev,
-                                 IN char *pcCommand, IN int i4TotalLen){
+                                 IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
     u32 u4BufLen = 0;
@@ -11764,7 +11895,8 @@ static int priv_driver_set_noise(IN struct net_device *prNetDev,
 }
 
 static int priv_driver_get_noise(IN struct net_device *prNetDev,
-                                 IN char *pcCommand, IN int i4TotalLen){
+                                 IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
     u32 u4BufLen = 0;
@@ -11815,7 +11947,8 @@ static int priv_driver_get_noise(IN struct net_device *prNetDev,
 
 #ifdef CFG_SUPPORT_ADMINCTRL
 static int priv_driver_admin_ctrl_config(IN struct net_device *prNetDev,
-                                         IN char *pcCommand, IN int i4TotalLen){
+                                         IN char *pcCommand, IN int i4TotalLen)
+{
     struct CMD_ADMIN_CTRL_CONFIG *cmd = NULL;
     struct ADMIN_CTRL_PARAM *content = NULL;
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
@@ -12169,7 +12302,8 @@ admin_ctrl_invalid:
 
 static int priv_driver_get_traffic_report(IN struct net_device *prNetDev,
                                           IN char *pcCommand,
-                                          IN int i4TotalLen){
+                                          IN int i4TotalLen)
+{
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
     P_GLUE_INFO_T prGlueInfo;
     s32 i4BytesWritten = 0;
@@ -12414,7 +12548,8 @@ get_report_invalid:
 
 static int priv_driver_pta_config(IN struct net_device *prNetDev,
                                   IN char *pcCommand,
-                                  IN int i4TotalLen){
+                                  IN int i4TotalLen)
+{
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
     P_GLUE_INFO_T prGlueInfo;
     s32 i4BytesWritten = 0;
@@ -12891,7 +13026,8 @@ set_pta_invalid:
 
 #ifdef CFG_SUPPORT_EXT_PTA_DEBUG_COMMAND
 static int priv_driver_ext_pta_config(IN struct net_device *prNetDev,
-                                      IN char *pcCommand, IN int i4TotalLen){
+                                      IN char *pcCommand, IN int i4TotalLen)
+{
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
     P_GLUE_INFO_T prGlueInfo;
     s32 i4Argc = 0;
@@ -13277,7 +13413,8 @@ set_ext_pta_invalid:
 }
 #endif
 static int priv_driver_set_pop(IN struct net_device *prNetDev,
-                               IN char *pcCommand, IN int i4TotalLen){
+                               IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
     u32 u4BufLen = 0;
@@ -13342,7 +13479,8 @@ static int priv_driver_set_pop(IN struct net_device *prNetDev,
 }
 
 static int priv_driver_get_pop(IN struct net_device *prNetDev,
-                               IN char *pcCommand, IN int i4TotalLen){
+                               IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
     u32 u4BufLen = 0;
@@ -13392,7 +13530,8 @@ static int priv_driver_get_pop(IN struct net_device *prNetDev,
 }
 
 static int priv_driver_set_ed(IN struct net_device *prNetDev,
-                              IN char *pcCommand, IN int i4TotalLen){
+                              IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     P_ADAPTER_T prAdapter = NULL;
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
@@ -13455,7 +13594,8 @@ static int priv_driver_set_ed(IN struct net_device *prNetDev,
 }
 
 static int priv_driver_get_ed(IN struct net_device *prNetDev,
-                              IN char *pcCommand, IN int i4TotalLen){
+                              IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
     u32 u4BufLen = 0;
@@ -13505,7 +13645,8 @@ static int priv_driver_get_ed(IN struct net_device *prNetDev,
 }
 
 static int priv_driver_set_pd(IN struct net_device *prNetDev,
-                              IN char *pcCommand, IN int i4TotalLen){
+                              IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
     u32 u4BufLen = 0;
@@ -13580,7 +13721,8 @@ static int priv_driver_set_pd(IN struct net_device *prNetDev,
 }
 
 static int priv_driver_get_pd(IN struct net_device *prNetDev,
-                              IN char *pcCommand, IN int i4TotalLen){
+                              IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
     u32 u4BufLen = 0;
@@ -13629,14 +13771,16 @@ static int priv_driver_get_pd(IN struct net_device *prNetDev,
 }
 
 static int priv_cmd_not_support(IN struct net_device *prNetDev,
-                                IN char *pcCommand, IN int i4TotalLen){
+                                IN char *pcCommand, IN int i4TotalLen)
+{
     DBGLOG(REQ, WARN, "not support priv command: %s\n", pcCommand);
 
     return -EOPNOTSUPP;
 }
 
 static int priv_driver_set_maxrfgain(IN struct net_device *prNetDev,
-                                     IN char *pcCommand, IN int i4TotalLen){
+                                     IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
     u32 u4BufLen = 0;
@@ -13712,7 +13856,8 @@ static int priv_driver_set_maxrfgain(IN struct net_device *prNetDev,
 }
 
 static int priv_driver_get_maxrfgain(IN struct net_device *prNetDev,
-                                     IN char *pcCommand, IN int i4TotalLen){
+                                     IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
     u32 u4BufLen = 0;
@@ -13762,7 +13907,8 @@ static int priv_driver_get_maxrfgain(IN struct net_device *prNetDev,
 }
 
 static int priv_driver_noise_histogram(IN struct net_device *prNetDev,
-                                       IN char *pcCommand, IN int i4TotalLen){
+                                       IN char *pcCommand, IN int i4TotalLen)
+{
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
     P_GLUE_INFO_T prGlueInfo;
     s32 i4BytesWritten = 0;
@@ -13883,7 +14029,8 @@ noise_histogram_invalid:
 }
 
 static int priv_driver_set_adm_ctrl(IN struct net_device *prNetDev,
-                                    IN char *pcCommand, IN int i4TotalLen){
+                                    IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
     u32 u4BufLen = 0;
@@ -13957,7 +14104,8 @@ static int priv_driver_set_adm_ctrl(IN struct net_device *prNetDev,
 
 #if CFG_ENABLE_PS_INTV_CTRL
 static int priv_driver_set_act_intv(IN struct net_device *prNetDev,
-                                    IN char *pcCommand, IN int i4TotalLen){
+                                    IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
     u32 u4BufLen = 0;
@@ -14030,7 +14178,8 @@ static int priv_driver_set_act_intv(IN struct net_device *prNetDev,
 
 #if CFG_ENABLE_1RPD_MMPS_CTRL
 static int priv_driver_set_1rpd(IN struct net_device *prNetDev,
-                                IN char *pcCommand, IN int i4TotalLen){
+                                IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
     u32 u4BufLen = 0;
@@ -14085,7 +14234,8 @@ static int priv_driver_set_1rpd(IN struct net_device *prNetDev,
 }
 
 static int priv_driver_get_1rpd(IN struct net_device *prNetDev,
-                                IN char *pcCommand, IN int i4TotalLen){
+                                IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
     u32 u4BufLen = 0;
@@ -14130,7 +14280,8 @@ static int priv_driver_get_1rpd(IN struct net_device *prNetDev,
     return i4BytesWritten;
 }
 static int priv_driver_set_mmps(IN struct net_device *prNetDev,
-                                IN char *pcCommand, IN int i4TotalLen){
+                                IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
     u32 u4BufLen = 0;
@@ -14185,7 +14336,8 @@ static int priv_driver_set_mmps(IN struct net_device *prNetDev,
 }
 
 static int priv_driver_get_mmps(IN struct net_device *prNetDev,
-                                IN char *pcCommand, IN int i4TotalLen){
+                                IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
     u32 u4BufLen = 0;
@@ -14233,7 +14385,8 @@ static int priv_driver_get_mmps(IN struct net_device *prNetDev,
 #if CFG_ENABLE_DEWEIGHTING_CTRL
 static int priv_driver_set_deweighting_th(IN struct net_device *prNetDev,
                                           IN char *pcCommand,
-                                          IN int i4TotalLen){
+                                          IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
     u32 u4BufLen = 0;
@@ -14297,7 +14450,8 @@ static int priv_driver_set_deweighting_th(IN struct net_device *prNetDev,
 
 static int priv_driver_get_deweighting_th(IN struct net_device *prNetDev,
                                           IN char *pcCommand,
-                                          IN int i4TotalLen){
+                                          IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
     u32 u4BufLen = 0;
@@ -14344,7 +14498,8 @@ static int priv_driver_get_deweighting_th(IN struct net_device *prNetDev,
 
 static int priv_driver_get_deweighting_noise(IN struct net_device *prNetDev,
                                              IN char *pcCommand,
-                                             IN int i4TotalLen){
+                                             IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
     u32 u4BufLen = 0;
@@ -14394,7 +14549,8 @@ static int priv_driver_get_deweighting_noise(IN struct net_device *prNetDev,
 
 static int priv_driver_get_deweighting_weight(IN struct net_device *prNetDev,
                                               IN char *pcCommand,
-                                              IN int i4TotalLen){
+                                              IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
     u32 u4BufLen = 0;
@@ -14450,7 +14606,8 @@ static int priv_driver_get_deweighting_weight(IN struct net_device *prNetDev,
 #endif
 #if CFG_RX_SINGLE_CHAIN_SUPPORT
 static int priv_driver_set_rxchain(IN struct net_device *prNetDev,
-                                   IN char *pcCommand, IN int i4TotalLen){
+                                   IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
     u32 u4BufLen = 0;
@@ -14553,7 +14710,8 @@ out:
 }
 
 static int priv_driver_get_rxchain(IN struct net_device *prNetDev,
-                                   IN char *pcCommand, IN int i4TotalLen){
+                                   IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
     u32 u4BufLen = 0;
@@ -14623,7 +14781,8 @@ static int priv_driver_get_rxchain(IN struct net_device *prNetDev,
 #endif
 
 static int priv_driver_set_bcn_th(IN struct net_device *prNetDev,
-                                  IN char *pcCommand, IN int i4TotalLen){
+                                  IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
     u32 u4BufLen = 0;
@@ -14683,7 +14842,8 @@ static int priv_driver_set_bcn_th(IN struct net_device *prNetDev,
 }
 
 static int priv_driver_get_bcn_th(IN struct net_device *prNetDev,
-                                  IN char *pcCommand, IN int i4TotalLen){
+                                  IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
     u32 u4BufLen = 0;
@@ -14736,7 +14896,8 @@ static int priv_driver_get_bcn_th(IN struct net_device *prNetDev,
 
 static int priv_driver_get_bcntimeout_num(IN struct net_device *prNetDev,
                                           IN char *pcCommand,
-                                          IN int i4TotalLen){
+                                          IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
     u32 u4BufLen = 0;
@@ -14784,7 +14945,8 @@ static int priv_driver_get_bcntimeout_num(IN struct net_device *prNetDev,
 }
 
 static int priv_driver_set_every_tbtt(IN struct net_device *prNetDev,
-                                      IN char *pcCommand, IN int i4TotalLen){
+                                      IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     P_ADAPTER_T prAdapter = NULL;
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
@@ -14859,7 +15021,8 @@ static int priv_driver_set_every_tbtt(IN struct net_device *prNetDev,
 }
 
 static int priv_driver_get_every_tbtt(IN struct net_device *prNetDev,
-                                      IN char *pcCommand, IN int i4TotalLen){
+                                      IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
     u32 u4BufLen = 0;
@@ -14905,7 +15068,8 @@ static int priv_driver_get_every_tbtt(IN struct net_device *prNetDev,
 #endif
 
 static int priv_driver_set_csi(IN struct net_device *prNetDev,
-                               IN char *pcCommand, IN int i4TotalLen){
+                               IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
     u32 u4BufLen = 0;
@@ -15026,7 +15190,8 @@ out:
 }
 
 static int priv_driver_get_csi(IN struct net_device *prNetDev,
-                               IN char *pcCommand, IN int i4TotalLen){
+                               IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     s32 i4BytesWritten = 0;
     P_ADAPTER_T prAdapter = NULL;
@@ -15113,7 +15278,8 @@ out:
 #ifdef CFG_SUPPORT_ANT_DIV
 static int priv_driver_ant_diversity_config(IN struct net_device *prNetDev,
                                             IN char *pcCommand,
-                                            IN int i4TotalLen){
+                                            IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
     u32 u4BufLen = 0;
@@ -15269,7 +15435,8 @@ static int priv_driver_ant_diversity_config(IN struct net_device *prNetDev,
 
 static int priv_driver_enforce_power_mode(IN struct net_device *prNetDev,
                                           IN char *pcCommand,
-                                          IN int i4TotalLen){
+                                          IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
     u32 u4BufLen = 0;
@@ -15385,7 +15552,8 @@ static int priv_driver_enforce_power_mode(IN struct net_device *prNetDev,
 }
 
 static int priv_driver_get_power_mode(IN struct net_device *prNetDev,
-                                      IN char *pcCommand, IN int i4TotalLen){
+                                      IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     P_ADAPTER_T prAdapter = NULL;
 #ifdef SUPPORT_ENFORCE_PWR_MODE
@@ -15439,7 +15607,8 @@ static int priv_driver_get_power_mode(IN struct net_device *prNetDev,
 
 static int priv_driver_send_beacon_timeout(IN struct net_device *prNetDev,
                                            IN char *pcCommand,
-                                           IN int i4TotalLen){
+                                           IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     P_ADAPTER_T prAdapter = NULL;
     s32 i4Argc = 0;
@@ -15472,7 +15641,8 @@ static int priv_driver_send_beacon_timeout(IN struct net_device *prNetDev,
 
 static int priv_driver_get_disconnect_reason(IN struct net_device *prNetDev,
                                              IN char *pcCommand,
-                                             IN int i4TotalLen){
+                                             IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     P_ADAPTER_T prAdapter = NULL;
     s32 i4BytesWritten = 0, temp;
@@ -15507,7 +15677,8 @@ static int priv_driver_get_disconnect_reason(IN struct net_device *prNetDev,
 #if CFG_SUPPORT_802_11V_BSS_TRANSITION_MGT
 static int priv_driver_bss_transition_query(IN struct net_device *prNetDev,
                                             IN char *pcCommand,
-                                            IN int i4TotalLen){
+                                            IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
     u32 u4BufLen = 0;
@@ -15554,7 +15725,8 @@ static int priv_driver_bss_transition_query(IN struct net_device *prNetDev,
 #endif
 
 static int priv_driver_get_1xtx_status(IN struct net_device *prNetDev,
-                                       IN char *pcCommand, IN int i4TotalLen){
+                                       IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     P_ADAPTER_T prAdapter = NULL;
 
@@ -15579,7 +15751,8 @@ static int priv_driver_get_1xtx_status(IN struct net_device *prNetDev,
 }
 
 static int priv_driver_test_1xtx_status(IN struct net_device *prNetDev,
-                                        IN char *pcCommand, IN int i4TotalLen){
+                                        IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     s32 i4BytesWritten = 0;
     s32 i4Argc = 0;
@@ -15624,7 +15797,8 @@ static int priv_driver_test_1xtx_status(IN struct net_device *prNetDev,
 #if CFG_SUPPORT_802_11K
 
 static int priv_driver_neighbor_request(IN struct net_device *prNetDev,
-                                        IN char *pcCommand, IN int i4TotalLen){
+                                        IN char *pcCommand, IN int i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
     u32 u4BufLen = 0;
@@ -15674,7 +15848,8 @@ static int priv_driver_neighbor_request(IN struct net_device *prNetDev,
 #endif
 
 s32 priv_driver_cmds(IN struct net_device *prNetDev, IN s8 *pcCommand,
-                     IN s32 i4TotalLen){
+                     IN s32 i4TotalLen)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     s32 i4BytesWritten = 0;
 
@@ -16404,7 +16579,8 @@ s32 priv_driver_cmds(IN struct net_device *prNetDev, IN s8 *pcCommand,
 }
 
 int priv_support_driver_cmd(IN struct net_device *prNetDev,
-                            IN OUT struct ifreq *prReq, IN int i4Cmd){
+                            IN OUT struct ifreq *prReq, IN int i4Cmd)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     int ret = 0;
     char *pcCommand = NULL;
@@ -16493,7 +16669,8 @@ exit:
 #ifdef CFG_ANDROID_AOSP_PRIV_CMD
 int android_private_support_driver_cmd(IN struct net_device *prNetDev,
                                        IN OUT struct ifreq *prReq,
-                                       IN int i4Cmd){
+                                       IN int i4Cmd)
+{
     struct android_wifi_priv_cmd priv_cmd;
     char *command = NULL;
     int ret = 0, bytes_written = 0;

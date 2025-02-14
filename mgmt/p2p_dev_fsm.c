@@ -19,7 +19,8 @@ static u8 *apucDebugP2pDevState[P2P_DEV_STATE_NUM] = {
 /*lint -restore */
 #endif
 
-u8 p2pDevFsmInit(IN P_ADAPTER_T prAdapter){
+u8 p2pDevFsmInit(IN P_ADAPTER_T prAdapter)
+{
     P_P2P_DEV_FSM_INFO_T prP2pDevFsmInfo = (P_P2P_DEV_FSM_INFO_T)NULL;
     P_P2P_CHNL_REQ_INFO_T prP2pChnlReqInfo = (P_P2P_CHNL_REQ_INFO_T)NULL;
     P_P2P_MGMT_TX_REQ_INFO_T prP2pMgmtTxReqInfo =
@@ -112,7 +113,8 @@ u8 p2pDevFsmInit(IN P_ADAPTER_T prAdapter){
     }
 }
 
-void p2pDevFsmUninit(IN P_ADAPTER_T prAdapter){
+void p2pDevFsmUninit(IN P_ADAPTER_T prAdapter)
+{
     P_P2P_DEV_FSM_INFO_T prP2pDevFsmInfo = (P_P2P_DEV_FSM_INFO_T)NULL;
     P_BSS_INFO_T prP2pBssInfo = (P_BSS_INFO_T)NULL;
 
@@ -157,7 +159,8 @@ void p2pDevFsmUninit(IN P_ADAPTER_T prAdapter){
 
 void p2pDevFsmStateTransition(IN P_ADAPTER_T prAdapter,
                               IN P_P2P_DEV_FSM_INFO_T prP2pDevFsmInfo,
-                              IN ENUM_P2P_DEV_STATE_T eNextState){
+                              IN ENUM_P2P_DEV_STATE_T eNextState)
+{
     u8 fgIsLeaveState = (u8)false;
 
     ASSERT(prP2pDevFsmInfo);
@@ -281,7 +284,8 @@ void p2pDevFsmStateTransition(IN P_ADAPTER_T prAdapter,
 }
 
 void p2pDevFsmRunEventAbort(IN P_ADAPTER_T prAdapter,
-                            IN P_P2P_DEV_FSM_INFO_T prP2pDevFsmInfo){
+                            IN P_P2P_DEV_FSM_INFO_T prP2pDevFsmInfo)
+{
     do {
         ASSERT_BREAK((prAdapter != NULL) && (prP2pDevFsmInfo != NULL));
 
@@ -297,7 +301,8 @@ void p2pDevFsmRunEventAbort(IN P_ADAPTER_T prAdapter,
 }
 
 void p2pDevFsmRunEventTimeout(IN P_ADAPTER_T prAdapter,
-                              IN unsigned long ulParamPtr){
+                              IN unsigned long ulParamPtr)
+{
     P_P2P_DEV_FSM_INFO_T prP2pDevFsmInfo = (P_P2P_DEV_FSM_INFO_T)ulParamPtr;
 
     do {
@@ -326,7 +331,8 @@ void p2pDevFsmRunEventTimeout(IN P_ADAPTER_T prAdapter,
 
 /*================ Message Event =================*/
 void p2pDevFsmRunEventScanRequest(IN P_ADAPTER_T prAdapter,
-                                  IN P_MSG_HDR_T prMsgHdr){
+                                  IN P_MSG_HDR_T prMsgHdr)
+{
     P_MSG_P2P_SCAN_REQUEST_T prP2pScanReqMsg =
         (P_MSG_P2P_SCAN_REQUEST_T)NULL;
     P_P2P_DEV_FSM_INFO_T prP2pDevFsmInfo = (P_P2P_DEV_FSM_INFO_T)NULL;
@@ -426,7 +432,8 @@ void p2pDevFsmRunEventScanRequest(IN P_ADAPTER_T prAdapter,
     }
 }
 
-void p2pDevFsmRunEventScanAbort(IN P_ADAPTER_T prAdapter, IN u8 ucBssIdx){
+void p2pDevFsmRunEventScanAbort(IN P_ADAPTER_T prAdapter, IN u8 ucBssIdx)
+{
     P_P2P_DEV_FSM_INFO_T prP2pDevFsmInfo = (P_P2P_DEV_FSM_INFO_T)NULL;
 
     do {
@@ -450,7 +457,8 @@ void p2pDevFsmRunEventScanAbort(IN P_ADAPTER_T prAdapter, IN u8 ucBssIdx){
 
 void p2pDevFsmRunEventScanDone(IN P_ADAPTER_T prAdapter,
                                IN P_MSG_HDR_T prMsgHdr,
-                               IN P_P2P_DEV_FSM_INFO_T prP2pDevFsmInfo){
+                               IN P_P2P_DEV_FSM_INFO_T prP2pDevFsmInfo)
+{
     P_MSG_SCN_SCAN_DONE prScanDoneMsg = (P_MSG_SCN_SCAN_DONE)prMsgHdr;
     P_P2P_SCAN_REQ_INFO_T prP2pScanReqInfo = (P_P2P_SCAN_REQ_INFO_T)NULL;
 
@@ -493,7 +501,8 @@ void p2pDevFsmRunEventScanDone(IN P_ADAPTER_T prAdapter,
 }
 
 void p2pDevFsmRunEventChannelRequest(IN P_ADAPTER_T prAdapter,
-                                     IN P_MSG_HDR_T prMsgHdr){
+                                     IN P_MSG_HDR_T prMsgHdr)
+{
     P_P2P_DEV_FSM_INFO_T prP2pDevFsmInfo = (P_P2P_DEV_FSM_INFO_T)NULL;
     P_P2P_CHNL_REQ_INFO_T prChnlReqInfo = (P_P2P_CHNL_REQ_INFO_T)NULL;
     u8 fgIsChnlFound = false;
@@ -574,7 +583,8 @@ void p2pDevFsmRunEventChannelRequest(IN P_ADAPTER_T prAdapter,
 }
 
 void p2pDevFsmRunEventChannelAbort(IN P_ADAPTER_T prAdapter,
-                                   IN P_MSG_HDR_T prMsgHdr){
+                                   IN P_MSG_HDR_T prMsgHdr)
+{
     P_P2P_DEV_FSM_INFO_T prP2pDevFsmInfo = (P_P2P_DEV_FSM_INFO_T)NULL;
     P_MSG_P2P_CHNL_ABORT_T prChnlAbortMsg = (P_MSG_P2P_CHNL_ABORT_T)NULL;
     P_P2P_CHNL_REQ_INFO_T prChnlReqInfo = (P_P2P_CHNL_REQ_INFO_T)NULL;
@@ -646,7 +656,8 @@ void p2pDevFsmRunEventChannelAbort(IN P_ADAPTER_T prAdapter,
 
 void p2pDevFsmRunEventChnlGrant(IN P_ADAPTER_T prAdapter,
                                 IN P_MSG_HDR_T prMsgHdr,
-                                IN P_P2P_DEV_FSM_INFO_T prP2pDevFsmInfo){
+                                IN P_P2P_DEV_FSM_INFO_T prP2pDevFsmInfo)
+{
     P_MSG_CH_GRANT_T prMsgChGrant = (P_MSG_CH_GRANT_T)NULL;
     P_P2P_CHNL_REQ_INFO_T prChnlReqInfo = (P_P2P_CHNL_REQ_INFO_T)NULL;
 
@@ -690,7 +701,8 @@ void p2pDevFsmRunEventChnlGrant(IN P_ADAPTER_T prAdapter,
     }
 }
 
-void p2pDevFsmRunEventMgmtTx(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMsgHdr){
+void p2pDevFsmRunEventMgmtTx(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMsgHdr)
+{
     P_P2P_DEV_FSM_INFO_T prP2pDevFsmInfo = (P_P2P_DEV_FSM_INFO_T)NULL;
     P_MSG_P2P_MGMT_TX_REQUEST_T prMgmtTxMsg =
         (P_MSG_P2P_MGMT_TX_REQUEST_T)NULL;
@@ -801,7 +813,8 @@ error:
 WLAN_STATUS
 p2pDevFsmRunEventMgmtFrameTxDone(IN P_ADAPTER_T prAdapter,
                                  IN P_MSDU_INFO_T prMsduInfo,
-                                 IN ENUM_TX_RESULT_CODE_T rTxDoneStatus){
+                                 IN ENUM_TX_RESULT_CODE_T rTxDoneStatus)
+{
     u8 fgIsSuccess = false;
     P_P2P_DEV_FSM_INFO_T prP2pDevFsmInfo = (P_P2P_DEV_FSM_INFO_T)NULL;
 
@@ -832,7 +845,8 @@ p2pDevFsmRunEventMgmtFrameTxDone(IN P_ADAPTER_T prAdapter,
 }
 
 void p2pDevFsmRunEventMgmtFrameRegister(IN P_ADAPTER_T prAdapter,
-                                        IN P_MSG_HDR_T prMsgHdr){
+                                        IN P_MSG_HDR_T prMsgHdr)
+{
     /* TODO: RX Filter Management. */
 
     if (prMsgHdr) {
@@ -841,7 +855,8 @@ void p2pDevFsmRunEventMgmtFrameRegister(IN P_ADAPTER_T prAdapter,
 }
 
 void p2pDevFsmRunEventActiveDevBss(IN P_ADAPTER_T prAdapter,
-                                   IN P_MSG_HDR_T prMsgHdr){
+                                   IN P_MSG_HDR_T prMsgHdr)
+{
     P_P2P_DEV_FSM_INFO_T prP2pDevFsmInfo = (P_P2P_DEV_FSM_INFO_T)NULL;
 
     do {
@@ -863,7 +878,8 @@ void p2pDevFsmRunEventActiveDevBss(IN P_ADAPTER_T prAdapter,
 
 #endif
 
-void p2pRoleFsmRunEventScanAbort(IN P_ADAPTER_T prAdapter, IN u8 ucBssIdx){
+void p2pRoleFsmRunEventScanAbort(IN P_ADAPTER_T prAdapter, IN u8 ucBssIdx)
+{
     P_P2P_ROLE_FSM_INFO_T prP2pRoleFsmInfo = NULL;
     P_BSS_INFO_T prP2pBssInfo = NULL;
 
