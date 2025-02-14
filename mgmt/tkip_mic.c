@@ -169,7 +169,8 @@ const u16 tkipSBOX2[256] = {
  * \return (none)
  */
 /*----------------------------------------------------------------------------*/
-void tkipMicB(IN OUT u32 *pu4L, IN OUT u32 *pu4R){
+void tkipMicB(IN OUT u32 *pu4L, IN OUT u32 *pu4R)
+{
     ASSERT(pu4L);
     ASSERT(pu4R);
 
@@ -199,7 +200,8 @@ void tkipMicB(IN OUT u32 *pu4L, IN OUT u32 *pu4R){
  */
 /*----------------------------------------------------------------------------*/
 void tkipMicGen(IN u8 *pucMickey, IN u8 *pucData, IN u32 u4DataLen,
-                IN u8 *pucSa, IN u8 *pucDa, IN u8 ucPriority, OUT u8 *pucMic){
+                IN u8 *pucSa, IN u8 *pucDa, IN u8 ucPriority, OUT u8 *pucMic)
+{
     u32 i;
     u32 l, r;
     u32 au4Msg[3];
@@ -290,7 +292,8 @@ void tkipMicGen(IN u8 *pucMickey, IN u8 *pucData, IN u32 u4DataLen,
 /*----------------------------------------------------------------------------*/
 void tkipMicEncapsulate(IN u8 *pucDa, IN u8 *pucSa, IN u8 ucPriority,
                         IN u16 u2PayloadLen, IN u8 *pucPayload, IN u8 *pucMic,
-                        IN u8 *pucMicKey){
+                        IN u8 *pucMicKey)
+{
     u8 aucMic[8];  /* MIC' */
 
     DEBUGFUNC("tkipSwMsduEncapsulate");
@@ -342,7 +345,8 @@ void tkipMicEncapsulate(IN u8 *pucDa, IN u8 *pucSa, IN u8 ucPriority,
  *          frame body's format is: MSDU + MIC
  */
 /*----------------------------------------------------------------------------*/
-u8 tkipMicDecapsulate(IN P_SW_RFB_T prSwRfb, IN u8 *pucMicKey){
+u8 tkipMicDecapsulate(IN P_SW_RFB_T prSwRfb, IN u8 *pucMicKey)
+{
     u8 *pucMic1;  /* MIC  */
     u8 aucMic2[8];  /* MIC' */
     u8 ucPriority;
@@ -458,7 +462,8 @@ u8 tkipMicDecapsulate(IN P_SW_RFB_T prSwRfb, IN u8 *pucMicKey){
  *          frame body's format is: MSDU + MIC
  */
 /*----------------------------------------------------------------------------*/
-u8 tkipMicDecapsulateInRxHdrTransMode(IN P_SW_RFB_T prSwRfb, IN u8 *pucMicKey){
+u8 tkipMicDecapsulateInRxHdrTransMode(IN P_SW_RFB_T prSwRfb, IN u8 *pucMicKey)
+{
     u8 *pucMic1;  /* MIC  */
     u8 aucMic2[8];  /* MIC' */
     u8 fgStatus = false;

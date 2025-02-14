@@ -158,17 +158,20 @@ const u8 aucHwRate2PhyRate[] = {
  *                              F U N C T I O N S
  *******************************************************************************
  */
-u32 nicGetPhyRateByMcsRate(IN u8 ucIdx, IN u8 ucBw, IN u8 ucGI){
+u32 nicGetPhyRateByMcsRate(IN u8 ucIdx, IN u8 ucBw, IN u8 ucGI)
+{
     return arMcsRate2PhyRate[ucIdx].u4PhyRate[ucBw][ucGI];
 }
 
-u32 nicGetHwRateByPhyRate(IN u8 ucIdx){
+u32 nicGetHwRateByPhyRate(IN u8 ucIdx)
+{
     return aucHwRate2PhyRate[ucIdx];  /* uint : 500 kbps */
 }
 
 WLAN_STATUS
 nicSwIndex2RateIndex(IN u8 ucRateSwIndex, OUT u8 *pucRateIndex,
-                     OUT u8 *pucPreambleOption){
+                     OUT u8 *pucPreambleOption)
+{
     ASSERT(pucRateIndex);
     ASSERT(pucPreambleOption);
 
@@ -183,7 +186,8 @@ nicSwIndex2RateIndex(IN u8 ucRateSwIndex, OUT u8 *pucRateIndex,
 }
 
 WLAN_STATUS nicRateIndex2RateCode(IN u8 ucPreambleOption, IN u8 ucRateIndex,
-                                  OUT u16 *pu2RateCode){
+                                  OUT u16 *pu2RateCode)
+{
     switch (ucPreambleOption) {
     case PREAMBLE_DEFAULT_LONG_NONE:
         if (ucRateIndex >= CCK_RATE_NUM) {
@@ -241,7 +245,8 @@ WLAN_STATUS nicRateIndex2RateCode(IN u8 ucPreambleOption, IN u8 ucRateIndex,
 }
 
 u32 nicRateCode2PhyRate(IN u16 u2RateCode, IN u8 ucBandwidth, IN u8 ucGI,
-                        IN u8 ucRateNss){
+                        IN u8 ucRateNss)
+{
     u8 ucPhyRate;
     u16 u2TxMode;
     u32 u4PhyRateBy1SS, u4PhyRateIn100Kbps = 0;
@@ -271,7 +276,8 @@ u32 nicRateCode2PhyRate(IN u16 u2RateCode, IN u8 ucBandwidth, IN u8 ucGI,
     return u4PhyRateIn100Kbps;
 }
 
-u32 nicRateCode2DataRate(IN u16 u2RateCode, IN u8 ucBandwidth, IN u8 ucGI){
+u32 nicRateCode2DataRate(IN u16 u2RateCode, IN u8 ucBandwidth, IN u8 ucGI)
+{
     u8 ucPhyRate, ucIdx, ucBw = 0;
     u32 u4PhyRateIn100Kbps = 0;
     u16 u2TxMode;
@@ -315,7 +321,8 @@ u32 nicRateCode2DataRate(IN u16 u2RateCode, IN u8 ucBandwidth, IN u8 ucGI){
 
 u8 nicGetRateIndexFromRateSetWithLimit(IN u16 u2RateSet, IN u32 u4PhyRateLimit,
                                        IN u8 fgGetLowest,
-                                       OUT u8 *pucRateSwIndex){
+                                       OUT u8 *pucRateSwIndex)
+{
     u32 i;
     u32 u4CurPhyRate, u4TarPhyRate, u4HighestPhyRate, u4LowestPhyRate;
     u8 ucRateIndex, ucRatePreamble, ucTarRateSwIndex, ucHighestPhyRateSwIdx,

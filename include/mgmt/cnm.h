@@ -307,7 +307,8 @@ void cnmDbdcDecision(IN P_ADAPTER_T prAdapter, IN unsigned long plParamPtr);
  * We'll need this to guarantee the same member order in different structures
  * to simply handling effort in some functions.
  */
-static __KAL_INLINE__ void cnmMsgDataTypeCheck(void){
+static __KAL_INLINE__ void cnmMsgDataTypeCheck(void)
+{
     DATA_STRUCT_INSPECTING_ASSERT(OFFSET_OF(MSG_CH_GRANT_T, rMsgHdr) == 0);
 
     DATA_STRUCT_INSPECTING_ASSERT(OFFSET_OF(MSG_CH_GRANT_T, rMsgHdr) ==

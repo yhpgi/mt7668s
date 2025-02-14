@@ -146,7 +146,8 @@ APPEND_VAR_IE_ENTRY_T txAssocRespIETable[] = {
 /*----------------------------------------------------------------------------*/
 
 u16 assocBuildCapabilityInfo(IN P_ADAPTER_T prAdapter,
-                             IN P_STA_RECORD_T prStaRec){
+                             IN P_STA_RECORD_T prStaRec)
+{
     u32 u4NonHTPhyType;
     u16 u2CapInfo;
     P_BSS_INFO_T prBssInfo;
@@ -221,7 +222,8 @@ u16 assocBuildCapabilityInfo(IN P_ADAPTER_T prAdapter,
 /*----------------------------------------------------------------------------*/
 static __KAL_INLINE__ void
 assocBuildReAssocReqFrameCommonIEs(IN P_ADAPTER_T prAdapter,
-                                   IN P_MSDU_INFO_T prMsduInfo){
+                                   IN P_MSDU_INFO_T prMsduInfo)
+{
     P_CONNECTION_SETTINGS_T prConnSettings;
     P_STA_RECORD_T prStaRec;
     u8 *pucBuffer;
@@ -349,7 +351,8 @@ void assocComposeReAssocReqFrameHeaderAndFF(IN P_ADAPTER_T prAdapter,
                                             IN P_STA_RECORD_T prStaRec,
                                             IN u8 *pucBuffer,
                                             IN u8 aucMACAddress[],
-                                            IN OUT u16 *pu2PayloadLen){
+                                            IN OUT u16 *pu2PayloadLen)
+{
     P_WLAN_ASSOC_REQ_FRAME_T prAssocFrame;
     u8 fgIsReAssoc;
 
@@ -445,7 +448,8 @@ void assocComposeReAssocReqFrameHeaderAndFF(IN P_ADAPTER_T prAdapter,
  */
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS assocSendReAssocReqFrame(IN P_ADAPTER_T prAdapter,
-                                     IN P_STA_RECORD_T prStaRec){
+                                     IN P_STA_RECORD_T prStaRec)
+{
     P_MSDU_INFO_T prMsduInfo;
     P_BSS_INFO_T prBssInfo;
 
@@ -631,7 +635,8 @@ WLAN_STATUS assocSendReAssocReqFrame(IN P_ADAPTER_T prAdapter,
  */
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS assocCheckTxReAssocReqFrame(IN P_ADAPTER_T prAdapter,
-                                        IN P_MSDU_INFO_T prMsduInfo){
+                                        IN P_MSDU_INFO_T prMsduInfo)
+{
     P_WLAN_ASSOC_REQ_FRAME_T prAssocReqFrame;
     P_STA_RECORD_T prStaRec;
     u16 u2TxFrameCtrl;
@@ -679,7 +684,8 @@ WLAN_STATUS assocCheckTxReAssocReqFrame(IN P_ADAPTER_T prAdapter,
  */
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS assocCheckTxReAssocRespFrame(IN P_ADAPTER_T prAdapter,
-                                         IN P_MSDU_INFO_T prMsduInfo){
+                                         IN P_MSDU_INFO_T prMsduInfo)
+{
     P_WLAN_ASSOC_RSP_FRAME_T prAssocRspFrame;
     P_STA_RECORD_T prStaRec;
     u16 u2TxFrameCtrl;
@@ -731,7 +737,8 @@ WLAN_STATUS assocCheckTxReAssocRespFrame(IN P_ADAPTER_T prAdapter,
 WLAN_STATUS
 assocCheckRxReAssocRspFrameStatus(IN P_ADAPTER_T prAdapter,
                                   IN P_SW_RFB_T prSwRfb,
-                                  OUT u16 *pu2StatusCode){
+                                  OUT u16 *pu2StatusCode)
+{
     P_STA_RECORD_T prStaRec;
     P_WLAN_ASSOC_RSP_FRAME_T prAssocRspFrame;
     u16 u2RxFrameCtrl;
@@ -974,7 +981,8 @@ assocCheckRxReAssocRspFrameStatus(IN P_ADAPTER_T prAdapter,
 static __KAL_INLINE__ void assocComposeDisassocFrame(IN P_STA_RECORD_T prStaRec,
                                                      IN u8 *pucBuffer,
                                                      IN u8 aucMACAddress[],
-                                                     IN u16 u2ReasonCode){
+                                                     IN u16 u2ReasonCode)
+{
     P_WLAN_DISASSOC_FRAME_T prDisAssocFrame;
     u16 u2FrameCtrl;
 
@@ -1022,7 +1030,8 @@ static __KAL_INLINE__ void assocComposeDisassocFrame(IN P_STA_RECORD_T prStaRec,
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS assocSendDisAssocFrame(IN P_ADAPTER_T prAdapter,
                                    IN P_STA_RECORD_T prStaRec,
-                                   IN u16 u2ReasonCode){
+                                   IN u16 u2ReasonCode)
+{
     u8 *pucMacAddress;
     P_MSDU_INFO_T prMsduInfo;
     u16 u2PayloadLen;
@@ -1192,7 +1201,8 @@ WLAN_STATUS assocSendDisAssocFrame(IN P_ADAPTER_T prAdapter,
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS
 assocProcessRxDisassocFrame(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb,
-                            IN u8 aucBSSID[], OUT u16 *pu2ReasonCode){
+                            IN u8 aucBSSID[], OUT u16 *pu2ReasonCode)
+{
     P_WLAN_DISASSOC_FRAME_T prDisassocFrame;
     u16 u2RxReasonCode;
 
@@ -1245,7 +1255,8 @@ assocProcessRxDisassocFrame(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb,
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS assocProcessRxAssocReqFrame(IN P_ADAPTER_T prAdapter,
                                         IN P_SW_RFB_T prSwRfb,
-                                        OUT u16 *pu2StatusCode){
+                                        OUT u16 *pu2StatusCode)
+{
     P_WLAN_ASSOC_REQ_FRAME_T prAssocReqFrame;
     P_STA_RECORD_T prStaRec;
     P_BSS_INFO_T prBssInfo;
@@ -1591,7 +1602,8 @@ WLAN_STATUS assocProcessRxAssocReqFrame(IN P_ADAPTER_T prAdapter,
 static __KAL_INLINE__ void
 assocBuildReAssocRespFrameCommonIEs(IN P_ADAPTER_T prAdapter,
                                     IN P_MSDU_INFO_T prMsduInfo,
-                                    IN P_BSS_INFO_T prBssInfo){
+                                    IN P_BSS_INFO_T prBssInfo)
+{
     u8 *pucBuffer;
     P_STA_RECORD_T prStaRec;
     u8 ucSupRatesLen;
@@ -1656,7 +1668,8 @@ assocBuildReAssocRespFrameCommonIEs(IN P_ADAPTER_T prAdapter,
 /*----------------------------------------------------------------------------*/
 static __KAL_INLINE__ void assocComposeReAssocRespFrameHeaderAndFF(
     IN P_STA_RECORD_T prStaRec, IN u8 *pucBuffer, IN u8 aucBSSID[],
-    IN u16 u2CapInfo, IN OUT u16 *pu2PayloadLen){
+    IN u16 u2CapInfo, IN OUT u16 *pu2PayloadLen)
+{
     P_WLAN_ASSOC_RSP_FRAME_T prAssocRspFrame;
     u8 fgIsReAssoc;
 
@@ -1729,7 +1742,8 @@ static __KAL_INLINE__ void assocComposeReAssocRespFrameHeaderAndFF(
  */
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS assocSendReAssocRespFrame(IN P_ADAPTER_T prAdapter,
-                                      IN P_STA_RECORD_T prStaRec){
+                                      IN P_STA_RECORD_T prStaRec)
+{
     P_BSS_INFO_T prBssInfo;
     P_MSDU_INFO_T prMsduInfo;
 

@@ -43,11 +43,11 @@
 
 #if !DBG_DISABLE_ALL_LOG
 static u8 *apucDebugAAState[AA_STATE_NUM] = {
-    (u8 *)DISP_STRING("AA_IDLE"),         (u8 *)DISP_STRING("SAA_SEND_AUTH1"),
-    (u8 *)DISP_STRING("SAA_WAIT_AUTH2"),  (u8 *)DISP_STRING("SAA_SEND_AUTH3"),
-    (u8 *)DISP_STRING("SAA_WAIT_AUTH4"),  (u8 *)DISP_STRING("SAA_SEND_ASSOC1"),
+    (u8 *)DISP_STRING("AA_IDLE"), (u8 *)DISP_STRING("SAA_SEND_AUTH1"),
+    (u8 *)DISP_STRING("SAA_WAIT_AUTH2"), (u8 *)DISP_STRING("SAA_SEND_AUTH3"),
+    (u8 *)DISP_STRING("SAA_WAIT_AUTH4"), (u8 *)DISP_STRING("SAA_SEND_ASSOC1"),
     (u8 *)DISP_STRING("SAA_WAIT_ASSOC2"), (u8 *)DISP_STRING("AAA_SEND_AUTH2"),
-    (u8 *)DISP_STRING("AAA_SEND_AUTH4"),  (u8 *)DISP_STRING("AAA_SEND_ASSOC2"),
+    (u8 *)DISP_STRING("AAA_SEND_AUTH4"), (u8 *)DISP_STRING("AAA_SEND_ASSOC2"),
     (u8 *)DISP_STRING("AA_RESOURCE")
 };
 #endif
@@ -75,7 +75,8 @@ static u8 *apucDebugAAState[AA_STATE_NUM] = {
  * @return (none)
  */
 /*----------------------------------------------------------------------------*/
-void saaSendAuthAssoc(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec){
+void saaSendAuthAssoc(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec)
+{
     /* This function do the things like
      * "case SAA_STATE_SEND_AUTH1/ASSOC1" in SAA FSM steps
      */
@@ -227,7 +228,8 @@ void saaSendAuthAssoc(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec){
     }
 }
 
-void saaSendAuthSeq3(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec){
+void saaSendAuthSeq3(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec)
+{
     u32 rStatus = WLAN_STATUS_FAILURE;
 
     ASSERT(prAdapter);
@@ -277,7 +279,8 @@ void saaSendAuthSeq3(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec){
  */
 /*----------------------------------------------------------------------------*/
 void saaFsmSteps(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec,
-                 IN ENUM_AA_STATE_T eNextState, IN P_SW_RFB_T prRetainedSwRfb){
+                 IN ENUM_AA_STATE_T eNextState, IN P_SW_RFB_T prRetainedSwRfb)
+{
     WLAN_STATUS rStatus = WLAN_STATUS_FAILURE;
     ENUM_AA_STATE_T ePreviousState;
     u8 fgIsTransition;
@@ -478,7 +481,8 @@ void saaFsmSteps(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec,
 WLAN_STATUS
 saaFsmSendEventJoinComplete(IN P_ADAPTER_T prAdapter,
                             IN WLAN_STATUS rJoinStatus,
-                            IN P_STA_RECORD_T prStaRec, IN P_SW_RFB_T prSwRfb){
+                            IN P_STA_RECORD_T prStaRec, IN P_SW_RFB_T prSwRfb)
+{
     P_BSS_INFO_T prBssInfo;
 
     ASSERT(prStaRec);
@@ -580,7 +584,8 @@ saaFsmSendEventJoinComplete(IN P_ADAPTER_T prAdapter,
  * @return (none)
  */
 /*----------------------------------------------------------------------------*/
-void saaFsmRunEventStart(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMsgHdr){
+void saaFsmRunEventStart(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMsgHdr)
+{
     P_MSG_SAA_FSM_START_T prSaaFsmStartMsg;
     P_STA_RECORD_T prStaRec;
     P_BSS_INFO_T prBssInfo;
@@ -694,7 +699,8 @@ void saaFsmRunEventStart(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMsgHdr){
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS
 saaFsmRunEventTxDone(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo,
-                     IN ENUM_TX_RESULT_CODE_T rTxDoneStatus){
+                     IN ENUM_TX_RESULT_CODE_T rTxDoneStatus)
+{
     P_STA_RECORD_T prStaRec;
     ENUM_AA_STATE_T eNextState;
 
@@ -880,7 +886,8 @@ saaFsmRunEventTxDone(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo,
  */
 /*----------------------------------------------------------------------------*/
 void saaFsmRunEventTxReqTimeOut(IN P_ADAPTER_T prAdapter,
-                                IN unsigned long plParamPtr){
+                                IN unsigned long plParamPtr)
+{
     P_STA_RECORD_T prStaRec = (P_STA_RECORD_T)plParamPtr;
 
     ASSERT(prStaRec);
@@ -920,7 +927,8 @@ void saaFsmRunEventTxReqTimeOut(IN P_ADAPTER_T prAdapter,
  */
 /*----------------------------------------------------------------------------*/
 void saaFsmRunEventRxRespTimeOut(IN P_ADAPTER_T prAdapter,
-                                 IN unsigned long ulParamPtr){
+                                 IN unsigned long ulParamPtr)
+{
     P_STA_RECORD_T prStaRec = (P_STA_RECORD_T)ulParamPtr;
     ENUM_AA_STATE_T eNextState;
     DBGLOG(SAA, LOUD, "EVENT-TIMER: RX RESP TIMEOUT, Current Time = %d\n",
@@ -984,7 +992,8 @@ void saaFsmRunEventRxRespTimeOut(IN P_ADAPTER_T prAdapter,
  * @return (none)
  */
 /*----------------------------------------------------------------------------*/
-void saaFsmRunEventRxAuth(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb){
+void saaFsmRunEventRxAuth(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb)
+{
     P_STA_RECORD_T prStaRec;
     u16 u2StatusCode;
     ENUM_AA_STATE_T eNextState;
@@ -1195,7 +1204,8 @@ void saaFsmRunEventRxAuth(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb){
  */
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS saaFsmRunEventRxAssoc(IN P_ADAPTER_T prAdapter,
-                                  IN P_SW_RFB_T prSwRfb){
+                                  IN P_SW_RFB_T prSwRfb)
+{
     P_STA_RECORD_T prStaRec;
     u16 u2StatusCode;
     ENUM_AA_STATE_T eNextState;
@@ -1363,7 +1373,8 @@ WLAN_STATUS saaFsmRunEventRxAssoc(IN P_ADAPTER_T prAdapter,
  */
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS saaFsmRunEventRxDeauth(IN P_ADAPTER_T prAdapter,
-                                   IN P_SW_RFB_T prSwRfb){
+                                   IN P_SW_RFB_T prSwRfb)
+{
     P_STA_RECORD_T prStaRec;
     P_WLAN_DEAUTH_FRAME_T prDeauthFrame;
     u8 ucWlanIdx;
@@ -1524,7 +1535,8 @@ WLAN_STATUS saaFsmRunEventRxDeauth(IN P_ADAPTER_T prAdapter,
 
 void saaChkDeauthfrmParamHandler(IN P_ADAPTER_T prAdapter,
                                  IN P_SW_RFB_T prSwRfb,
-                                 IN P_STA_RECORD_T prStaRec){
+                                 IN P_STA_RECORD_T prStaRec)
+{
     P_WLAN_DEAUTH_FRAME_T prDeauthFrame;
 
     do {
@@ -1561,7 +1573,8 @@ void saaChkDeauthfrmParamHandler(IN P_ADAPTER_T prAdapter,
 void saaSendDisconnectMsgHandler(IN P_ADAPTER_T prAdapter,
                                  IN P_STA_RECORD_T prStaRec,
                                  IN P_BSS_INFO_T prAisBssInfo,
-                                 IN ENUM_AA_FRM_TYPE_T eFrmType){
+                                 IN ENUM_AA_FRM_TYPE_T eFrmType)
+{
     do {
         if (eFrmType == FRM_DEAUTH) {
             if (prStaRec->ucStaState == STA_STATE_3) {
@@ -1646,7 +1659,8 @@ void saaSendDisconnectMsgHandler(IN P_ADAPTER_T prAdapter,
  */
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS saaFsmRunEventRxDisassoc(IN P_ADAPTER_T prAdapter,
-                                     IN P_SW_RFB_T prSwRfb){
+                                     IN P_SW_RFB_T prSwRfb)
+{
     P_STA_RECORD_T prStaRec;
     P_WLAN_DISASSOC_FRAME_T prDisassocFrame;
     u8 ucWlanIdx;
@@ -1814,7 +1828,8 @@ WLAN_STATUS saaFsmRunEventRxDisassoc(IN P_ADAPTER_T prAdapter,
 void saaChkDisassocfrmParamHandler(IN P_ADAPTER_T prAdapter,
                                    IN P_WLAN_DISASSOC_FRAME_T prDisassocFrame,
                                    IN P_STA_RECORD_T prStaRec,
-                                   IN P_SW_RFB_T prSwRfb){
+                                   IN P_SW_RFB_T prSwRfb)
+{
     if (!IS_BMCAST_MAC_ADDR(prDisassocFrame->aucDestAddr) &&
         (prStaRec->u2ReasonCode == REASON_CODE_CLASS_2_ERR ||
          prStaRec->u2ReasonCode == REASON_CODE_CLASS_3_ERR)) {
@@ -1841,7 +1856,8 @@ void saaChkDisassocfrmParamHandler(IN P_ADAPTER_T prAdapter,
  * @return none
  */
 /*----------------------------------------------------------------------------*/
-void saaFsmRunEventAbort(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMsgHdr){
+void saaFsmRunEventAbort(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMsgHdr)
+{
     P_MSG_SAA_FSM_ABORT_T prSaaFsmAbortMsg;
     P_STA_RECORD_T prStaRec;
 

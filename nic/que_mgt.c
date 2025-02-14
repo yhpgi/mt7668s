@@ -242,7 +242,8 @@ const u8 aucWmmAC2TcResourceSet2[WMM_AC_INDEX_NUM] = { TC7_INDEX, TC6_INDEX,
  * \return (none)
  */
 /*----------------------------------------------------------------------------*/
-void qmInit(IN P_ADAPTER_T prAdapter, IN u8 isTxResrouceControlEn){
+void qmInit(IN P_ADAPTER_T prAdapter, IN u8 isTxResrouceControlEn)
+{
     u32 u4Idx;
 #if QM_ADAPTIVE_TC_RESOURCE_CTRL
     u32 u4TotalMinReservedTcResource = 0;
@@ -390,7 +391,8 @@ void qmInit(IN P_ADAPTER_T prAdapter, IN u8 isTxResrouceControlEn){
 }
 
 #if QM_TEST_MODE
-void qmTestCases(IN P_ADAPTER_T prAdapter){
+void qmTestCases(IN P_ADAPTER_T prAdapter)
+{
     P_QUE_MGT_T prQM = &prAdapter->rQM;
 
     DbgPrint("QM: ** TEST MODE **\n");
@@ -457,7 +459,8 @@ void qmTestCases(IN P_ADAPTER_T prAdapter){
  * \return (none)
  */
 /*----------------------------------------------------------------------------*/
-void qmUpdateStaRec(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec){
+void qmUpdateStaRec(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec)
+{
     P_BSS_INFO_T prBssInfo;
     u8 fgIsTxAllowed = false;
 
@@ -496,7 +499,8 @@ void qmUpdateStaRec(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec){
  * \return (none)
  */
 /*----------------------------------------------------------------------------*/
-void qmActivateStaRec(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec){
+void qmActivateStaRec(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec)
+{
     /* 4 <1> Deactivate first */
     if (!prStaRec) {
         return;
@@ -546,7 +550,8 @@ void qmActivateStaRec(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec){
  * \return (none)
  */
 /*----------------------------------------------------------------------------*/
-void qmDeactivateStaRec(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec){
+void qmDeactivateStaRec(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec)
+{
     u32 i;
 
     if (!prStaRec) {
@@ -603,7 +608,8 @@ void qmDeactivateStaRec(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec){
  * \return (none)
  */
 /*----------------------------------------------------------------------------*/
-void qmFreeAllByBssIdx(IN P_ADAPTER_T prAdapter, IN u8 ucBssIndex){
+void qmFreeAllByBssIdx(IN P_ADAPTER_T prAdapter, IN u8 ucBssIndex)
+{
     P_QUE_MGT_T prQM;
     P_QUE_T prQue;
     QUE_T rNeedToFreeQue;
@@ -652,7 +658,8 @@ void qmFreeAllByBssIdx(IN P_ADAPTER_T prAdapter, IN u8 ucBssIndex){
  * \return The flushed packets (in a list of MSDU_INFOs)
  */
 /*----------------------------------------------------------------------------*/
-P_MSDU_INFO_T qmFlushTxQueues(IN P_ADAPTER_T prAdapter){
+P_MSDU_INFO_T qmFlushTxQueues(IN P_ADAPTER_T prAdapter)
+{
     u8 ucStaArrayIdx;
     u8 ucQueArrayIdx;
 
@@ -700,7 +707,8 @@ P_MSDU_INFO_T qmFlushTxQueues(IN P_ADAPTER_T prAdapter){
  * \return The flushed packets (in a list of MSDU_INFOs)
  */
 /*----------------------------------------------------------------------------*/
-P_MSDU_INFO_T qmFlushStaTxQueues(IN P_ADAPTER_T prAdapter, IN u32 u4StaRecIdx){
+P_MSDU_INFO_T qmFlushStaTxQueues(IN P_ADAPTER_T prAdapter, IN u32 u4StaRecIdx)
+{
     u8 ucQueArrayIdx;
     P_STA_RECORD_T prStaRec;
     P_QUE_T prQue;
@@ -737,7 +745,8 @@ P_MSDU_INFO_T qmFlushStaTxQueues(IN P_ADAPTER_T prAdapter, IN u32 u4StaRecIdx){
  * \return The flushed packets (in a list of SW_RFBs)
  */
 /*----------------------------------------------------------------------------*/
-P_SW_RFB_T qmFlushRxQueues(IN P_ADAPTER_T prAdapter){
+P_SW_RFB_T qmFlushRxQueues(IN P_ADAPTER_T prAdapter)
+{
     u32 i;
     P_SW_RFB_T prSwRfbListHead;
     P_SW_RFB_T prSwRfbListTail;
@@ -800,7 +809,8 @@ P_SW_RFB_T qmFlushRxQueues(IN P_ADAPTER_T prAdapter){
  */
 /*----------------------------------------------------------------------------*/
 P_SW_RFB_T qmFlushStaRxQueue(IN P_ADAPTER_T prAdapter, IN u32 u4StaRecIdx,
-                             IN u32 u4Tid){
+                             IN u32 u4Tid)
+{
     /* u32 i; */
     P_SW_RFB_T prSwRfbListHead = NULL;
     P_SW_RFB_T prSwRfbListTail = NULL;
@@ -848,7 +858,8 @@ P_SW_RFB_T qmFlushStaRxQueue(IN P_ADAPTER_T prAdapter, IN u32 u4StaRecIdx,
 }
 
 P_QUE_T qmDetermineStaTxQueue(IN P_ADAPTER_T prAdapter,
-                              IN P_MSDU_INFO_T prMsduInfo, OUT u8 *pucTC){
+                              IN P_MSDU_INFO_T prMsduInfo, OUT u8 *pucTC)
+{
     P_QUE_T prTxQue = NULL;
     P_STA_RECORD_T prStaRec;
     ENUM_WMM_ACI_T eAci = WMM_AC_BE_INDEX;
@@ -948,7 +959,8 @@ P_QUE_T qmDetermineStaTxQueue(IN P_ADAPTER_T prAdapter,
 }
 
 void qmSetTxPacketDescTemplate(IN P_ADAPTER_T prAdapter,
-                               IN P_MSDU_INFO_T prMsduInfo){
+                               IN P_MSDU_INFO_T prMsduInfo)
+{
     P_STA_RECORD_T prStaRec = QM_GET_STA_REC_PTR_FROM_INDEX(
         prAdapter, prMsduInfo->ucStaRecIndex);
 
@@ -979,7 +991,8 @@ void qmSetTxPacketDescTemplate(IN P_ADAPTER_T prAdapter,
  */
 /*----------------------------------------------------------------------------*/
 void qmSetStaRecTxAllowed(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec,
-                          IN u8 fgIsTxAllowed){
+                          IN u8 fgIsTxAllowed)
+{
     u8 ucIdx;
     P_QUE_T prSrcQ, prDstQ;
 
@@ -1022,7 +1035,8 @@ void qmSetStaRecTxAllowed(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec,
  */
 /*----------------------------------------------------------------------------*/
 P_MSDU_INFO_T qmEnqueueTxPackets(IN P_ADAPTER_T prAdapter,
-                                 IN P_MSDU_INFO_T prMsduInfoListHead){
+                                 IN P_MSDU_INFO_T prMsduInfoListHead)
+{
     P_MSDU_INFO_T prMsduInfoReleaseList;
     P_MSDU_INFO_T prCurrentMsduInfo;
     P_MSDU_INFO_T prNextMsduInfo;
@@ -1243,7 +1257,8 @@ P_MSDU_INFO_T qmEnqueueTxPackets(IN P_ADAPTER_T prAdapter,
  */
 /*----------------------------------------------------------------------------*/
 void qmDetermineStaRecIndex(IN P_ADAPTER_T prAdapter,
-                            IN P_MSDU_INFO_T prMsduInfo){
+                            IN P_MSDU_INFO_T prMsduInfo)
+{
     u32 i;
 
     P_STA_RECORD_T prTempStaRec;
@@ -1345,11 +1360,13 @@ void qmDetermineStaRecIndex(IN P_ADAPTER_T prAdapter,
 }
 
 P_STA_RECORD_T qmDetermineStaToBeDequeued(IN P_ADAPTER_T prAdapter,
-                                          IN u32 u4StartStaRecIndex){
+                                          IN u32 u4StartStaRecIndex)
+{
     return NULL;
 }
 
-P_QUE_T qmDequeueStaTxPackets(IN P_ADAPTER_T prAdapter){
+P_QUE_T qmDequeueStaTxPackets(IN P_ADAPTER_T prAdapter)
+{
     return NULL;
 }
 
@@ -1367,7 +1384,8 @@ P_QUE_T qmDequeueStaTxPackets(IN P_ADAPTER_T prAdapter){
 u32 qmDequeueTxPacketsFromPerStaQueues(IN P_ADAPTER_T prAdapter,
                                        OUT P_QUE_T prQue, IN u8 ucTC,
                                        IN u32 u4CurrentQuota,
-                                       IN u32 u4TotalQuota){
+                                       IN u32 u4TotalQuota)
+{
     u32 ucLoop;  /* Loop for */
 
     u32 u4CurStaIndex = 0;
@@ -1797,7 +1815,8 @@ NEXT:
 void qmDequeueTxPacketsFromPerTypeQueues(IN P_ADAPTER_T prAdapter,
                                          OUT P_QUE_T prQue, IN u8 ucTC,
                                          IN u32 u4CurrentQuota,
-                                         IN u32 u4TotalQuota){
+                                         IN u32 u4TotalQuota)
+{
     u32 u4AvaliableResource, u4LeftResource;
     u32 u4MaxResourceLimit;
     u32 u4TotalUsedResource = 0;
@@ -1882,7 +1901,8 @@ void qmDequeueTxPacketsFromPerTypeQueues(IN P_ADAPTER_T prAdapter,
 u32 qmDequeueTxPacketsFromGlobalQueue(IN P_ADAPTER_T prAdapter,
                                       OUT P_QUE_T prQue, IN u8 ucTC,
                                       IN u32 u4CurrentQuota,
-                                      IN u32 u4TotalQuota){
+                                      IN u32 u4TotalQuota)
+{
     P_BSS_INFO_T prBssInfo;
     P_QUE_T prCurrQueue;
     u32 u4AvaliableResource;
@@ -1995,7 +2015,8 @@ u32 qmDequeueTxPacketsFromGlobalQueue(IN P_ADAPTER_T prAdapter,
  */
 /*----------------------------------------------------------------------------*/
 P_MSDU_INFO_T qmDequeueTxPackets(IN P_ADAPTER_T prAdapter,
-                                 IN P_TX_TCQ_STATUS_T prTcqStatus){
+                                 IN P_TX_TCQ_STATUS_T prTcqStatus)
+{
     s32 i;
     P_MSDU_INFO_T prReturnedPacketListHead;
     QUE_T rReturnedQue;
@@ -2097,7 +2118,8 @@ P_MSDU_INFO_T qmDequeueTxPackets(IN P_ADAPTER_T prAdapter,
  */
 /*----------------------------------------------------------------------------*/
 P_MSDU_INFO_T qmDequeueTxPacketsMthread(IN P_ADAPTER_T prAdapter,
-                                        IN P_TX_TCQ_STATUS_T prTcqStatus){
+                                        IN P_TX_TCQ_STATUS_T prTcqStatus)
+{
     /* s32 i; */
     P_MSDU_INFO_T prReturnedPacketListHead;
     /* QUE_T rReturnedQue; */
@@ -2136,7 +2158,8 @@ P_MSDU_INFO_T qmDequeueTxPacketsMthread(IN P_ADAPTER_T prAdapter,
 /*----------------------------------------------------------------------------*/
 u8 qmAdjustTcQuotasMthread(IN P_ADAPTER_T prAdapter,
                            OUT P_TX_TCQ_ADJUST_T prTcqAdjust,
-                           IN P_TX_TCQ_STATUS_T prTcqStatus){
+                           IN P_TX_TCQ_STATUS_T prTcqStatus)
+{
 #if QM_ADAPTIVE_TC_RESOURCE_CTRL
     u32 i;
     P_QUE_MGT_T prQM = &prAdapter->rQM;
@@ -2299,7 +2322,8 @@ u8 qmAdjustTcQuotasMthread(IN P_ADAPTER_T prAdapter,
  */
 /*----------------------------------------------------------------------------*/
 u8 qmAdjustTcQuotas(IN P_ADAPTER_T prAdapter, OUT P_TX_TCQ_ADJUST_T prTcqAdjust,
-                    IN P_TX_TCQ_STATUS_T prTcqStatus){
+                    IN P_TX_TCQ_STATUS_T prTcqStatus)
+{
 #if QM_ADAPTIVE_TC_RESOURCE_CTRL
     u32 i;
     P_QUE_MGT_T prQM = &prAdapter->rQM;
@@ -2398,7 +2422,8 @@ u8 qmAdjustTcQuotas(IN P_ADAPTER_T prAdapter, OUT P_TX_TCQ_ADJUST_T prTcqAdjust,
  */
 /*----------------------------------------------------------------------------*/
 #if (HIF_TX_RSRC_WMM_ENHANCE == 1)
-void qmCalAveQLen(P_QUE_MGT_T prQM, u8 u4Tc, u32 u4CurrQueLen){
+void qmCalAveQLen(P_QUE_MGT_T prQM, u8 u4Tc, u32 u4CurrQueLen)
+{
     if (prQM->au4AverageQueLen[u4Tc] == 0) {
         prQM->au4AverageQueLen[u4Tc] =
             (u4CurrQueLen << prQM->u4QueLenMovingAverage);
@@ -2415,7 +2440,8 @@ void qmCalAveQLen(P_QUE_MGT_T prQM, u8 u4Tc, u32 u4CurrQueLen){
 }
 #endif
 
-void qmUpdateAverageTxQueLen(IN P_ADAPTER_T prAdapter){
+void qmUpdateAverageTxQueLen(IN P_ADAPTER_T prAdapter)
+{
     s32 u4Tc, u4StaRecIdx;
     P_STA_RECORD_T prStaRec;
     P_QUE_MGT_T prQM = &prAdapter->rQM;
@@ -2531,7 +2557,8 @@ void qmUpdateAverageTxQueLen(IN P_ADAPTER_T prAdapter){
 void qmAllocateResidualTcResource(IN P_ADAPTER_T prAdapter,
                                   IN s32 *ai4TcResDemand,
                                   IN u32 *pu4ResidualResource,
-                                  IN u32 *pu4ShareCount){
+                                  IN u32 *pu4ShareCount)
+{
     P_QUE_MGT_T prQM = &prAdapter->rQM;
     u32 u4Share = 0;
     u32 u4TcIdx;
@@ -2652,7 +2679,8 @@ void qmAllocateResidualTcResource(IN P_ADAPTER_T prAdapter,
  * \return (none)
  */
 /*----------------------------------------------------------------------------*/
-    void qmReassignTcResource(IN P_ADAPTER_T prAdapter){
+    void qmReassignTcResource(IN P_ADAPTER_T prAdapter)
+    {
         s32 i4TotalResourceDemand = 0;
         u32 u4ResidualResource = 0;
         u32 u4TcIdx;
@@ -2844,7 +2872,8 @@ void qmAllocateResidualTcResource(IN P_ADAPTER_T prAdapter,
  * \return (none)
  */
 /*----------------------------------------------------------------------------*/
-    void qmDoAdaptiveTcResourceCtrl(IN P_ADAPTER_T prAdapter){
+    void qmDoAdaptiveTcResourceCtrl(IN P_ADAPTER_T prAdapter)
+    {
         P_QUE_MGT_T prQM = &prAdapter->rQM;
 
         /* 4 <0> Check to update queue length or not */
@@ -2910,7 +2939,8 @@ void qmAllocateResidualTcResource(IN P_ADAPTER_T prAdapter,
     }
 
 #if QM_FAST_TC_RESOURCE_CTRL
-    void qmCheckForFastTcResourceCtrl(IN P_ADAPTER_T prAdapter, IN u8 ucTc){
+    void qmCheckForFastTcResourceCtrl(IN P_ADAPTER_T prAdapter, IN u8 ucTc)
+    {
         P_QUE_MGT_T prQM = &prAdapter->rQM;
         u8 fgTrigger = false;
 
@@ -2939,7 +2969,8 @@ void qmAllocateResidualTcResource(IN P_ADAPTER_T prAdapter,
 #endif
 
 u32 gmGetDequeueQuota(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec,
-                      IN P_BSS_INFO_T prBssInfo, IN u32 u4TotalQuota){
+                      IN P_BSS_INFO_T prBssInfo, IN u32 u4TotalQuota)
+{
     u32 u4Weight = 100;
     u32 u4Quota;
 
@@ -2992,7 +3023,8 @@ u32 gmGetDequeueQuota(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec,
  * \return (none)
  */
 /*----------------------------------------------------------------------------*/
-void qmInitRxQueues(IN P_ADAPTER_T prAdapter){
+void qmInitRxQueues(IN P_ADAPTER_T prAdapter)
+{
     /* DbgPrint("QM: Enter qmInitRxQueues()\n"); */
     /* TODO */
 }
@@ -3007,7 +3039,8 @@ void qmInitRxQueues(IN P_ADAPTER_T prAdapter){
  */
 /*----------------------------------------------------------------------------*/
 P_SW_RFB_T qmHandleRxPackets(IN P_ADAPTER_T prAdapter,
-                             IN P_SW_RFB_T prSwRfbListHead){
+                             IN P_SW_RFB_T prSwRfbListHead)
+{
 #if CFG_RX_REORDERING_ENABLED
     /* u32 i; */
     P_SW_RFB_T prCurrSwRfb;
@@ -3463,7 +3496,8 @@ P_SW_RFB_T qmHandleRxPackets(IN P_ADAPTER_T prAdapter,
  * \return true when we need to drop it
  */
 /*----------------------------------------------------------------------------*/
-u8 qmDetectRxInvalidEAPOL(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb){
+u8 qmDetectRxInvalidEAPOL(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb)
+{
     u8 *pucPkt = NULL;
     u8 ucBssIndex;
     BSS_INFO_T *prBssInfo;
@@ -3637,7 +3671,8 @@ u8 qmDetectRxInvalidEAPOL(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb){
  * \return true when we find an amsdu attack
  */
 /*----------------------------------------------------------------------------*/
-u8 qmAmsduAttackDetection(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb){
+u8 qmAmsduAttackDetection(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb)
+{
     u8 fgDrop = false;
     u8 aucTaAddr[MAC_ADDR_LEN];
     u8 *pucTaAddr = NULL, *pucRaAddr = NULL;
@@ -3780,7 +3815,8 @@ u8 qmAmsduAttackDetection(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb){
  */
 /*----------------------------------------------------------------------------*/
 void qmProcessPktWithReordering(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb,
-                                OUT P_QUE_T prReturnedQue){
+                                OUT P_QUE_T prReturnedQue)
+{
     P_STA_RECORD_T prStaRec;
     P_HW_MAC_RX_DESC_T prRxStatus;
     P_HW_MAC_RX_STS_GROUP_4_T prRxStatusGroup4 = NULL;
@@ -3929,7 +3965,8 @@ void qmProcessPktWithReordering(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb,
 }
 
 void qmProcessBarFrame(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb,
-                       OUT P_QUE_T prReturnedQue){
+                       OUT P_QUE_T prReturnedQue)
+{
     P_STA_RECORD_T prStaRec;
     P_HW_MAC_RX_DESC_T prRxStatus;
     P_RX_BA_ENTRY_T prReorderQueParm;
@@ -4036,7 +4073,8 @@ void qmProcessBarFrame(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb,
 
 void qmInsertReorderPkt(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb,
                         IN P_RX_BA_ENTRY_T prReorderQueParm,
-                        OUT P_QUE_T prReturnedQue){
+                        OUT P_QUE_T prReturnedQue)
+{
     u32 u4SeqNo;
     u32 u4WinStart;
     u32 u4WinEnd;
@@ -4182,7 +4220,8 @@ void qmInsertReorderPkt(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb,
 void qmInsertFallWithinReorderPkt(IN P_ADAPTER_T prAdapter,
                                   IN P_SW_RFB_T prSwRfb,
                                   IN P_RX_BA_ENTRY_T prReorderQueParm,
-                                  OUT P_QUE_T prReturnedQue){
+                                  OUT P_QUE_T prReturnedQue)
+{
     P_SW_RFB_T prExaminedQueuedSwRfb;
     P_QUE_T prReorderQue;
     P_HW_MAC_RX_DESC_T prRxStatus;
@@ -4302,7 +4341,8 @@ void qmInsertFallWithinReorderPkt(IN P_ADAPTER_T prAdapter,
 void qmInsertFallAheadReorderPkt(IN P_ADAPTER_T prAdapter,
                                  IN P_SW_RFB_T prSwRfb,
                                  IN P_RX_BA_ENTRY_T prReorderQueParm,
-                                 OUT P_QUE_T prReturnedQue){
+                                 OUT P_QUE_T prReturnedQue)
+{
     P_QUE_T prReorderQue;
 
     ASSERT(prSwRfb);
@@ -4330,7 +4370,8 @@ void qmInsertFallAheadReorderPkt(IN P_ADAPTER_T prAdapter,
 
 void qmPopOutReorderPkt(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb,
                         OUT P_QUE_T prReturnedQue,
-                        IN ENUM_RX_STATISTIC_COUNTER_T eRxCounter){
+                        IN ENUM_RX_STATISTIC_COUNTER_T eRxCounter)
+{
     u32 u4PktCnt = 0;
     /* RX reorder for one MSDU in AMSDU issue */
 
@@ -4342,7 +4383,8 @@ void qmPopOutReorderPkt(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb,
 
 void qmPopOutDueToFallWithin(IN P_ADAPTER_T prAdapter,
                              IN P_RX_BA_ENTRY_T prReorderQueParm,
-                             OUT P_QUE_T prReturnedQue){
+                             OUT P_QUE_T prReturnedQue)
+{
     P_SW_RFB_T prReorderedSwRfb;
     P_QUE_T prReorderQue;
     u8 fgDequeuHead, fgMissing;
@@ -4498,7 +4540,8 @@ void qmPopOutDueToFallWithin(IN P_ADAPTER_T prAdapter,
 
 void qmPopOutDueToFallAhead(IN P_ADAPTER_T prAdapter,
                             IN P_RX_BA_ENTRY_T prReorderQueParm,
-                            OUT P_QUE_T prReturnedQue){
+                            OUT P_QUE_T prReturnedQue)
+{
     P_SW_RFB_T prReorderedSwRfb;
     P_QUE_T prReorderQue;
     u8 fgDequeuHead;
@@ -4621,7 +4664,8 @@ void qmPopOutDueToFallAhead(IN P_ADAPTER_T prAdapter,
 }
 
 void qmHandleReorderBubbleTimeout(IN P_ADAPTER_T prAdapter,
-                                  IN unsigned long ulParamPtr){
+                                  IN unsigned long ulParamPtr)
+{
     P_RX_BA_ENTRY_T prReorderQueParm = (P_RX_BA_ENTRY_T)ulParamPtr;
     P_SW_RFB_T prSwRfb = (P_SW_RFB_T)NULL;
     P_WIFI_EVENT_T prEvent = NULL;
@@ -4713,7 +4757,8 @@ void qmHandleReorderBubbleTimeout(IN P_ADAPTER_T prAdapter,
 
 void qmHandleEventCheckReorderBubble(IN P_ADAPTER_T prAdapter,
                                      IN P_WIFI_EVENT_T prEvent,
-                                     IN u32 u4EventBufLen){
+                                     IN u32 u4EventBufLen)
+{
     P_EVENT_CHECK_REORDER_BUBBLE_T prCheckReorderEvent;
     P_RX_BA_ENTRY_T prReorderQueParm;
     P_QUE_T prReorderQue;
@@ -4873,7 +4918,8 @@ void qmHandleEventCheckReorderBubble(IN P_ADAPTER_T prAdapter,
     }
 }
 
-u8 qmCompareSnIsLessThan(IN u32 u4SnLess, IN u32 u4SnGreater){
+u8 qmCompareSnIsLessThan(IN u32 u4SnLess, IN u32 u4SnGreater)
+{
     /* 0 <--->  SnLess   <--(gap>2048)--> SnGreater : SnLess > SnGreater */
     if ((u4SnLess + HALF_SEQ_NO_COUNT) <= u4SnGreater) {  /* Shall be <= */
         return false;
@@ -4898,7 +4944,8 @@ u8 qmCompareSnIsLessThan(IN u32 u4SnLess, IN u32 u4SnGreater){
  * \return (none)
  */
 /*----------------------------------------------------------------------------*/
-void qmHandleMailboxRxMessage(IN MAILBOX_MSG_T prMailboxRxMsg){
+void qmHandleMailboxRxMessage(IN MAILBOX_MSG_T prMailboxRxMsg)
+{
     /* DbgPrint("QM: Enter qmHandleMailboxRxMessage()\n"); */
     /* TODO */
 }
@@ -4914,7 +4961,8 @@ void qmHandleMailboxRxMessage(IN MAILBOX_MSG_T prMailboxRxMsg){
  */
 /*----------------------------------------------------------------------------*/
 void qmHandleEventRxAddBa(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent,
-                          IN u32 u4EventBufLen){
+                          IN u32 u4EventBufLen)
+{
     P_EVENT_RX_ADDBA_T prEventRxAddBa;
     P_STA_RECORD_T prStaRec;
     u32 u4Tid;
@@ -4967,7 +5015,8 @@ void qmHandleEventRxAddBa(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent,
  */
 /*----------------------------------------------------------------------------*/
 void qmHandleEventRxDelBa(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent,
-                          IN u32 u4EventBufLen){
+                          IN u32 u4EventBufLen)
+{
     P_EVENT_RX_DELBA_T prEventRxDelBa;
     P_STA_RECORD_T prStaRec;
 
@@ -4989,7 +5038,8 @@ void qmHandleEventRxDelBa(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent,
 }
 
 P_RX_BA_ENTRY_T qmLookupRxBaEntry(IN P_ADAPTER_T prAdapter, u8 ucStaRecIdx,
-                                  u8 ucTid){
+                                  u8 ucTid)
+{
     int i;
     P_QUE_MGT_T prQM = &prAdapter->rQM;
 
@@ -5007,7 +5057,8 @@ P_RX_BA_ENTRY_T qmLookupRxBaEntry(IN P_ADAPTER_T prAdapter, u8 ucStaRecIdx,
 }
 
 u8 qmAddRxBaEntry(IN P_ADAPTER_T prAdapter, IN u8 ucStaRecIdx, IN u8 ucTid,
-                  IN u16 u2WinStart, IN u16 u2WinSize){
+                  IN u16 u2WinStart, IN u16 u2WinSize)
+{
     int i;
     P_RX_BA_ENTRY_T prRxBaEntry = NULL;
     P_STA_RECORD_T prStaRec;
@@ -5104,7 +5155,8 @@ u8 qmAddRxBaEntry(IN P_ADAPTER_T prAdapter, IN u8 ucStaRecIdx, IN u8 ucTid,
 }
 
 void qmDelRxBaEntry(IN P_ADAPTER_T prAdapter, IN u8 ucStaRecIdx, IN u8 ucTid,
-                    IN u8 fgFlushToHost){
+                    IN u8 fgFlushToHost)
+{
     P_RX_BA_ENTRY_T prRxBaEntry = NULL;
     P_STA_RECORD_T prStaRec;
     P_SW_RFB_T prFlushedPacketList = NULL;
@@ -5186,7 +5238,8 @@ void qmDelRxBaEntry(IN P_ADAPTER_T prAdapter, IN u8 ucStaRecIdx, IN u8 ucTid,
 }
 
 void mqmParseAssocReqWmmIe(IN P_ADAPTER_T prAdapter, IN u8 *pucIE,
-                           IN P_STA_RECORD_T prStaRec){
+                           IN P_STA_RECORD_T prStaRec)
+{
     P_IE_WMM_INFO_T prIeWmmInfo;
     u8 ucQosInfo;
     u8 ucQosInfoAC;
@@ -5258,7 +5311,8 @@ void mqmParseAssocReqWmmIe(IN P_ADAPTER_T prAdapter, IN u8 *pucIE,
  */
 /*----------------------------------------------------------------------------*/
 void mqmProcessAssocReq(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb,
-                        IN u8 *pucIE, IN u16 u2IELength){
+                        IN u8 *pucIE, IN u16 u2IELength)
+{
     P_STA_RECORD_T prStaRec;
     u16 u2Offset;
     u8 *pucIEStart;
@@ -5322,7 +5376,8 @@ void mqmProcessAssocReq(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb,
     }
 }
 
-void mqmParseAssocRspWmmIe(IN u8 *pucIE, IN P_STA_RECORD_T prStaRec){
+void mqmParseAssocRspWmmIe(IN u8 *pucIE, IN P_STA_RECORD_T prStaRec)
+{
     u8 aucWfaOui[] = VENDOR_OUI_WFA;
 
     if ((WMM_IE_OUI_TYPE(pucIE) == VENDOR_OUI_TYPE_WMM) &&
@@ -5362,7 +5417,8 @@ void mqmParseAssocRspWmmIe(IN u8 *pucIE, IN P_STA_RECORD_T prStaRec){
  */
 /*----------------------------------------------------------------------------*/
 void mqmProcessAssocRsp(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb,
-                        IN u8 *pucIE, IN u16 u2IELength){
+                        IN u8 *pucIE, IN u16 u2IELength)
+{
     P_STA_RECORD_T prStaRec;
     u16 u2Offset;
     u8 *pucIEStart;
@@ -5450,7 +5506,8 @@ void mqmProcessAssocRsp(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb,
  */
 /*----------------------------------------------------------------------------*/
 void mqmProcessBcn(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb,
-                   IN u8 *pucIE, IN u16 u2IELength){
+                   IN u8 *pucIE, IN u16 u2IELength)
+{
     P_BSS_INFO_T prBssInfo;
     u8 fgNewParameter;
     u8 i;
@@ -5497,7 +5554,8 @@ void mqmProcessBcn(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb,
 }
 
 u8 mqmUpdateEdcaParameters(IN P_BSS_INFO_T prBssInfo, IN u8 *pucIE,
-                           IN u8 fgForceOverride){
+                           IN u8 fgForceOverride)
+{
     P_AC_QUE_PARMS_T prAcQueParams;
     P_IE_WMM_PARAM_T prIeWmmParam;
     ENUM_WMM_ACI_T eAci;
@@ -5560,7 +5618,8 @@ u8 mqmUpdateEdcaParameters(IN P_BSS_INFO_T prBssInfo, IN u8 *pucIE,
 /*----------------------------------------------------------------------------*/
 u8 mqmParseEdcaParameters(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb,
                           IN u8 *pucIE, IN u16 u2IELength,
-                          IN u8 fgForceOverride){
+                          IN u8 fgForceOverride)
+{
     P_STA_RECORD_T prStaRec;
     u16 u2Offset;
     u8 aucWfaOui[] = VENDOR_OUI_WFA;
@@ -5627,7 +5686,8 @@ u8 mqmParseEdcaParameters(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb,
 }
 
 u8 mqmCompareEdcaParameters(IN P_IE_WMM_PARAM_T prIeWmmParam,
-                            IN P_BSS_INFO_T prBssInfo){
+                            IN P_BSS_INFO_T prBssInfo)
+{
     P_AC_QUE_PARMS_T prAcQueParams;
     P_WMM_AC_PARAM_T prWmmAcParams;
     ENUM_WMM_ACI_T eAci;
@@ -5694,7 +5754,8 @@ u8 mqmCompareEdcaParameters(IN P_IE_WMM_PARAM_T prIeWmmParam,
  */
 /*----------------------------------------------------------------------------*/
 void mqmFillAcQueParam(IN P_IE_WMM_PARAM_T prIeWmmParam, IN u32 u4AcOffset,
-                       OUT P_AC_QUE_PARMS_T prAcQueParams){
+                       OUT P_AC_QUE_PARMS_T prAcQueParams)
+{
     P_WMM_AC_PARAM_T prAcParam = &prIeWmmParam->arAcParam[u4AcOffset];
 
     prAcQueParams->ucIsACMSet =
@@ -5727,7 +5788,8 @@ void mqmFillAcQueParam(IN P_IE_WMM_PARAM_T prIeWmmParam, IN u32 u4AcOffset,
 /*----------------------------------------------------------------------------*/
 void mqmProcessScanResult(IN P_ADAPTER_T prAdapter,
                           IN P_BSS_DESC_T prScanResult,
-                          OUT P_STA_RECORD_T prStaRec){
+                          OUT P_STA_RECORD_T prStaRec)
+{
     u8 *pucIE;
     u16 u2IELength;
     u16 u2Offset;
@@ -5840,7 +5902,8 @@ void mqmProcessScanResult(IN P_ADAPTER_T prAdapter,
  */
 /*----------------------------------------------------------------------------*/
 u32 mqmFillWmmInfoIE(u8 *pucOutBuf, u8 fgSupportUAPSD, u8 ucBmpDeliveryAC,
-                     u8 ucBmpTriggerAC, u8 ucUapsdSp){
+                     u8 ucBmpTriggerAC, u8 ucUapsdSp)
+{
     P_IE_WMM_INFO_T prIeWmmInfo;
     u32 ucUapsd[] = { WMM_QOS_INFO_BE_UAPSD, WMM_QOS_INFO_BK_UAPSD,
                       WMM_QOS_INFO_VI_UAPSD, WMM_QOS_INFO_VO_UAPSD };
@@ -5917,7 +5980,8 @@ u32 mqmFillWmmInfoIE(u8 *pucOutBuf, u8 fgSupportUAPSD, u8 ucBmpDeliveryAC,
  */
 /*----------------------------------------------------------------------------*/
 u32 mqmGenerateWmmInfoIEByStaRec(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo,
-                                 P_STA_RECORD_T prStaRec, u8 *pucOutBuf){
+                                 P_STA_RECORD_T prStaRec, u8 *pucOutBuf)
+{
     P_PM_PROFILE_SETUP_INFO_T prPmProfSetupInfo;
     u8 fgSupportUapsd;
 
@@ -5958,7 +6022,8 @@ u32 mqmGenerateWmmInfoIEByStaRec(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo,
  */
 /*----------------------------------------------------------------------------*/
 void mqmGenerateWmmInfoIE(IN P_ADAPTER_T prAdapter,
-                          IN P_MSDU_INFO_T prMsduInfo){
+                          IN P_MSDU_INFO_T prMsduInfo)
+{
     P_BSS_INFO_T prBssInfo;
     P_STA_RECORD_T prStaRec;
     u32 u4Length;
@@ -6003,7 +6068,8 @@ void mqmGenerateWmmInfoIE(IN P_ADAPTER_T prAdapter,
  */
 /*----------------------------------------------------------------------------*/
 void mqmGenerateWmmParamIE(IN P_ADAPTER_T prAdapter,
-                           IN P_MSDU_INFO_T prMsduInfo){
+                           IN P_MSDU_INFO_T prMsduInfo)
+{
     P_IE_WMM_PARAM_T prIeWmmParam;
 
     u8 aucWfaOui[] = VENDOR_OUI_WFA;
@@ -6117,7 +6183,8 @@ void mqmGenerateWmmParamIE(IN P_ADAPTER_T prAdapter,
  */
 /*----------------------------------------------------------------------------*/
 u32 mqmGenerateWmmParamIEByParam(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo,
-                                 u8 *pOutBuf){
+                                 u8 *pOutBuf)
+{
     P_IE_WMM_PARAM_T prIeWmmParam;
 
     u8 aucWfaOui[] = VENDOR_OUI_WFA;
@@ -6253,7 +6320,8 @@ u32 mqmGenerateWmmParamIEByParam(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo,
 
 #endif
 
-u8 isProbeResponse(IN P_MSDU_INFO_T prMgmtTxMsdu){
+u8 isProbeResponse(IN P_MSDU_INFO_T prMgmtTxMsdu)
+{
     P_WLAN_MAC_HEADER_T prWlanHdr = (P_WLAN_MAC_HEADER_T)NULL;
 
     prWlanHdr =
@@ -6270,7 +6338,8 @@ ENUM_FRAME_ACTION_T
 qmGetFrameAction(IN P_ADAPTER_T prAdapter, IN u8 ucBssIndex, IN u8 ucStaRecIdx,
                  IN P_MSDU_INFO_T prMsduInfo,
                  IN ENUM_FRAME_TYPE_IN_CMD_Q_T eFrameType,
-                 IN u16 u2FrameLength){
+                 IN u16 u2FrameLength)
+{
     ENUM_FRAME_ACTION_T eFrameAction = FRAME_ACTION_TX_PKT;
     P_BSS_INFO_T prBssInfo;
     P_STA_RECORD_T prStaRec;
@@ -6406,7 +6475,8 @@ qmGetFrameAction(IN P_ADAPTER_T prAdapter, IN u8 ucBssIndex, IN u8 ucStaRecIdx,
 /*----------------------------------------------------------------------------*/
 void qmHandleEventBssAbsencePresence(IN P_ADAPTER_T prAdapter,
                                      IN P_WIFI_EVENT_T prEvent,
-                                     IN u32 u4EventBufLen){
+                                     IN u32 u4EventBufLen)
+{
     P_EVENT_BSS_ABSENCE_PRESENCE_T prEventBssStatus;
     P_BSS_INFO_T prBssInfo;
     u8 fgIsNetAbsentOld;
@@ -6469,7 +6539,8 @@ void qmHandleEventBssAbsencePresence(IN P_ADAPTER_T prAdapter,
 /*----------------------------------------------------------------------------*/
 void qmHandleEventStaChangePsMode(IN P_ADAPTER_T prAdapter,
                                   IN P_WIFI_EVENT_T prEvent,
-                                  IN u32 u4EventBufLen){
+                                  IN u32 u4EventBufLen)
+{
     P_EVENT_STA_CHANGE_PS_MODE_T prEventStaChangePsMode;
     P_STA_RECORD_T prStaRec;
     u8 fgIsInPSOld;
@@ -6525,7 +6596,8 @@ void qmHandleEventStaChangePsMode(IN P_ADAPTER_T prAdapter,
 /*----------------------------------------------------------------------------*/
 void qmHandleEventStaUpdateFreeQuota(IN P_ADAPTER_T prAdapter,
                                      IN P_WIFI_EVENT_T prEvent,
-                                     IN u32 u4EventBufLen){
+                                     IN u32 u4EventBufLen)
+{
     P_EVENT_STA_UPDATE_FREE_QUOTA_T prEventStaUpdateFreeQuota;
     P_STA_RECORD_T prStaRec;
     if (u4EventBufLen < sizeof(EVENT_STA_UPDATE_FREE_QUOTA_T)) {
@@ -6576,7 +6648,8 @@ void qmHandleEventStaUpdateFreeQuota(IN P_ADAPTER_T prAdapter,
  */
 /*----------------------------------------------------------------------------*/
 void qmUpdateFreeQuota(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec,
-                       IN u8 ucUpdateMode, IN u8 ucFreeQuota){
+                       IN u8 ucUpdateMode, IN u8 ucFreeQuota)
+{
     u8 ucFreeQuotaForNonDelivery;
     u8 ucFreeQuotaForDelivery;
 
@@ -6680,7 +6753,8 @@ void qmUpdateFreeQuota(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec,
  * \return The number of queued RX packets
  */
 /*----------------------------------------------------------------------------*/
-u32 qmGetRxReorderQueuedBufferCount(IN P_ADAPTER_T prAdapter){
+u32 qmGetRxReorderQueuedBufferCount(IN P_ADAPTER_T prAdapter)
+{
     u32 i, u4Total;
     P_QUE_MGT_T prQM = &prAdapter->rQM;
 
@@ -6701,7 +6775,8 @@ u32 qmGetRxReorderQueuedBufferCount(IN P_ADAPTER_T prAdapter){
  * \return (none)
  */
 /*----------------------------------------------------------------------------*/
-u32 qmDumpQueueStatus(IN P_ADAPTER_T prAdapter, IN u8 *pucBuf, IN u32 u4Max){
+u32 qmDumpQueueStatus(IN P_ADAPTER_T prAdapter, IN u8 *pucBuf, IN u32 u4Max)
+{
     P_TX_CTRL_T prTxCtrl;
     P_QUE_MGT_T prQM;
     P_GLUE_INFO_T prGlueInfo;
@@ -6843,7 +6918,8 @@ u32 qmDumpQueueStatus(IN P_ADAPTER_T prAdapter, IN u8 *pucBuf, IN u32 u4Max){
 }
 
 #if QM_ADAPTIVE_TC_RESOURCE_CTRL
-void qmResetTcControlResource(IN P_ADAPTER_T prAdapter){
+void qmResetTcControlResource(IN P_ADAPTER_T prAdapter)
+{
     u32 u4Idx;
     u32 u4TotalMinReservedTcResource = 0;
     u32 u4TotalTcResource = 0;
@@ -6904,7 +6980,8 @@ void qmResetTcControlResource(IN P_ADAPTER_T prAdapter){
 #if CFG_SUPPORT_REPLAY_DETECTION
 /* To change PN number to UINT64 */
 #define CCMPTSCPNNUM    6
-u8 qmRxPNtoU64(u8 *pucPN, u8 uPNNum, u64 *pu8Rets){
+u8 qmRxPNtoU64(u8 *pucPN, u8 uPNNum, u64 *pu8Rets)
+{
     u8 ucCount = 0;
     u64 u8Data = 0;
     u64 ucTmp = 0;
@@ -6930,7 +7007,8 @@ u8 qmRxPNtoU64(u8 *pucPN, u8 uPNNum, u64 *pu8Rets){
 
 /* To check PN/TSC between RxStatus and local record. return true if PNS is not
  * bigger than PNT */
-u8 qmRxDetectReplay(u8 *pucPNS, u8 *pucPNT){
+u8 qmRxDetectReplay(u8 *pucPNS, u8 *pucPNT)
+{
     u64 u8RxNum = 0;
     u64 u8LocalRec = 0;
 
@@ -6951,7 +7029,8 @@ u8 qmRxDetectReplay(u8 *pucPNS, u8 *pucPNT){
 }
 
 /* TO filter broadcast and multicast data packet replay issue. */
-u8 qmHandleRxReplay(P_ADAPTER_T prAdapter, P_SW_RFB_T prSwRfb){
+u8 qmHandleRxReplay(P_ADAPTER_T prAdapter, P_SW_RFB_T prSwRfb)
+{
     u8 *pucPN = NULL;
     u8 ucKeyID = 0;  /* 0~4 */
     u8 ucSecMode = CIPHER_SUITE_NONE;  /* CIPHER_SUITE_NONE~CIPHER_SUITE_GCMP
@@ -7052,7 +7131,8 @@ u8 qmHandleRxReplay(P_ADAPTER_T prAdapter, P_SW_RFB_T prSwRfb){
 }
 
 #ifdef CFG_SUPPORT_MULTICAST_ENHANCEMENT
-void qmFuncChangeBmcTcIdx(u8 ucAc){
+void qmFuncChangeBmcTcIdx(u8 ucAc)
+{
     u8 i;
     for (i = 0; i < (MAX_BSSID_NUM); i++) {
         arNetwork2TcResource[i][NET_TC_BMC_INDEX] = ucAc;
@@ -7062,7 +7142,8 @@ void qmFuncChangeBmcTcIdx(u8 ucAc){
     return;
 }
 
-u8 qmFuncGetBmcTcIdx(u8 ucWmmIdx){
+u8 qmFuncGetBmcTcIdx(u8 ucWmmIdx)
+{
     return arNetwork2TcResource[ucWmmIdx][NET_TC_BMC_INDEX];
 }
 #endif

@@ -76,7 +76,8 @@ kalP2pFuncGetChannelEntry(IN P_GL_P2P_INFO_T prP2pInfo,
 /*----------------------------------------------------------------------------*/
 void kalP2PUpdateAssocInfo(IN P_GLUE_INFO_T prGlueInfo, IN u8 *pucFrameBody,
                            IN u32 u4FrameBodyLen, IN u8 fgReassocRequest,
-                           IN u8 ucBssIndex){
+                           IN u8 ucBssIndex)
+{
     P_BSS_INFO_T prBssInfo;
     union iwreq_data wrqu;
     unsigned char *pucExtraInfo = NULL;
@@ -163,7 +164,8 @@ void kalP2PUpdateAssocInfo(IN P_GLUE_INFO_T prGlueInfo, IN u8 *pucFrameBody,
  *           2: Group Owner
  */
 /*----------------------------------------------------------------------------*/
-u8 kalP2PGetRole(IN P_GLUE_INFO_T prGlueInfo, IN u8 ucRoleIdx){
+u8 kalP2PGetRole(IN P_GLUE_INFO_T prGlueInfo, IN u8 ucRoleIdx)
+{
     ASSERT(prGlueInfo);
 
     return prGlueInfo->prP2PInfo[ucRoleIdx]->ucRole;
@@ -187,7 +189,8 @@ u8 kalP2PGetRole(IN P_GLUE_INFO_T prGlueInfo, IN u8 ucRoleIdx){
  *           none
  */
 /*----------------------------------------------------------------------------*/
-void kalP2PSetRole(IN P_GLUE_INFO_T prGlueInfo, IN u8 ucRole, IN u8 ucRoleIdx){
+void kalP2PSetRole(IN P_GLUE_INFO_T prGlueInfo, IN u8 ucRole, IN u8 ucRoleIdx)
+{
     ASSERT(prGlueInfo);
     ASSERT(ucRole <= 2);
 
@@ -207,7 +210,8 @@ void kalP2PSetRole(IN P_GLUE_INFO_T prGlueInfo, IN u8 ucRole, IN u8 ucRoleIdx){
  */
 /*----------------------------------------------------------------------------*/
 void kalP2PSetCipher(IN P_GLUE_INFO_T prGlueInfo, IN u32 u4Cipher,
-                     IN u8 ucRoleIdx){
+                     IN u8 ucRoleIdx)
+{
     ASSERT(prGlueInfo);
     ASSERT(prGlueInfo->prP2PInfo[ucRoleIdx]);
 
@@ -227,7 +231,8 @@ void kalP2PSetCipher(IN P_GLUE_INFO_T prGlueInfo, IN u32 u4Cipher,
  *           false: cipher is none
  */
 /*----------------------------------------------------------------------------*/
-u8 kalP2PGetCipher(IN P_GLUE_INFO_T prGlueInfo, IN u8 ucRoleIdx){
+u8 kalP2PGetCipher(IN P_GLUE_INFO_T prGlueInfo, IN u8 ucRoleIdx)
+{
     ASSERT(prGlueInfo);
     ASSERT(prGlueInfo->prP2PInfo[ucRoleIdx]);
 
@@ -249,7 +254,8 @@ u8 kalP2PGetCipher(IN P_GLUE_INFO_T prGlueInfo, IN u8 ucRoleIdx){
     return false;
 }
 
-u8 kalP2PGetWepCipher(IN P_GLUE_INFO_T prGlueInfo, IN u8 ucRoleIdx){
+u8 kalP2PGetWepCipher(IN P_GLUE_INFO_T prGlueInfo, IN u8 ucRoleIdx)
+{
     ASSERT(prGlueInfo);
     ASSERT(prGlueInfo->prP2PInfo[ucRoleIdx]);
 
@@ -267,7 +273,8 @@ u8 kalP2PGetWepCipher(IN P_GLUE_INFO_T prGlueInfo, IN u8 ucRoleIdx){
 }
 
 #if CFG_SUPPORT_SUITB
-u8 kalP2PGetGcmp256Cipher(IN P_GLUE_INFO_T prGlueInfo, IN u8 ucRoleIdx){
+u8 kalP2PGetGcmp256Cipher(IN P_GLUE_INFO_T prGlueInfo, IN u8 ucRoleIdx)
+{
     ASSERT(prGlueInfo);
     ASSERT(prGlueInfo->prP2PInfo[ucRoleIdx]);
 
@@ -280,7 +287,8 @@ u8 kalP2PGetGcmp256Cipher(IN P_GLUE_INFO_T prGlueInfo, IN u8 ucRoleIdx){
 }
 #endif
 
-u8 kalP2PGetCcmpCipher(IN P_GLUE_INFO_T prGlueInfo, IN u8 ucRoleIdx){
+u8 kalP2PGetCcmpCipher(IN P_GLUE_INFO_T prGlueInfo, IN u8 ucRoleIdx)
+{
     ASSERT(prGlueInfo);
     ASSERT(prGlueInfo->prP2PInfo[ucRoleIdx]);
 
@@ -297,7 +305,8 @@ u8 kalP2PGetCcmpCipher(IN P_GLUE_INFO_T prGlueInfo, IN u8 ucRoleIdx){
     return false;
 }
 
-u8 kalP2PGetTkipCipher(IN P_GLUE_INFO_T prGlueInfo, IN u8 ucRoleIdx){
+u8 kalP2PGetTkipCipher(IN P_GLUE_INFO_T prGlueInfo, IN u8 ucRoleIdx)
+{
     ASSERT(prGlueInfo);
     ASSERT(prGlueInfo->prP2PInfo[ucRoleIdx]);
 
@@ -324,7 +333,8 @@ u8 kalP2PGetTkipCipher(IN P_GLUE_INFO_T prGlueInfo, IN u8 ucRoleIdx){
  * \return
  */
 /*----------------------------------------------------------------------------*/
-void kalP2PSetWscMode(IN P_GLUE_INFO_T prGlueInfo, IN u8 ucWscMode){
+void kalP2PSetWscMode(IN P_GLUE_INFO_T prGlueInfo, IN u8 ucWscMode)
+{
     ASSERT(prGlueInfo);
     ASSERT(prGlueInfo->prP2PDevInfo);
 
@@ -341,7 +351,8 @@ void kalP2PSetWscMode(IN P_GLUE_INFO_T prGlueInfo, IN u8 ucWscMode){
  * \return
  */
 /*----------------------------------------------------------------------------*/
-u8 kalP2PGetWscMode(IN P_GLUE_INFO_T prGlueInfo){
+u8 kalP2PGetWscMode(IN P_GLUE_INFO_T prGlueInfo)
+{
     ASSERT(prGlueInfo);
     ASSERT(prGlueInfo->prP2PDevInfo);
 
@@ -361,7 +372,8 @@ u8 kalP2PGetWscMode(IN P_GLUE_INFO_T prGlueInfo){
  */
 /*----------------------------------------------------------------------------*/
 u16 kalP2PCalWSC_IELen(IN P_GLUE_INFO_T prGlueInfo, IN u8 ucType,
-                       IN u8 ucRoleIdx){
+                       IN u8 ucRoleIdx)
+{
     ASSERT(prGlueInfo);
 
     ASSERT(ucType < 4);
@@ -381,7 +393,8 @@ u16 kalP2PCalWSC_IELen(IN P_GLUE_INFO_T prGlueInfo, IN u8 ucType,
  */
 /*----------------------------------------------------------------------------*/
 void kalP2PGenWSC_IE(IN P_GLUE_INFO_T prGlueInfo, IN u8 ucType,
-                     IN u8 *pucBuffer, IN u8 ucRoleIdx){
+                     IN u8 *pucBuffer, IN u8 ucRoleIdx)
+{
     P_GL_P2P_INFO_T prGlP2pInfo = (P_GL_P2P_INFO_T)NULL;
 
     do {
@@ -398,7 +411,8 @@ void kalP2PGenWSC_IE(IN P_GLUE_INFO_T prGlueInfo, IN u8 ucType,
 
 void kalP2PUpdateWSC_IE(IN P_GLUE_INFO_T prGlueInfo, IN u8 ucType,
                         IN u8 *pucBuffer, IN u16 u2BufferLength,
-                        IN u8 ucRoleIdx){
+                        IN u8 ucRoleIdx)
+{
     P_GL_P2P_INFO_T prGlP2pInfo = (P_GL_P2P_INFO_T)NULL;
 
     do {
@@ -435,7 +449,8 @@ void kalP2PUpdateWSC_IE(IN P_GLUE_INFO_T prGlueInfo, IN u8 ucType,
  */
 /*----------------------------------------------------------------------------*/
 void kalP2PIndicateSDRequest(IN P_GLUE_INFO_T prGlueInfo,
-                             IN PARAM_MAC_ADDRESS rPeerAddr, IN u8 ucSeqNum){
+                             IN PARAM_MAC_ADDRESS rPeerAddr, IN u8 ucSeqNum)
+{
     union iwreq_data evt;
     u8 aucBuffer[IW_CUSTOM_MAX];
 
@@ -462,7 +477,8 @@ void kalP2PIndicateSDRequest(IN P_GLUE_INFO_T prGlueInfo,
  */
 /*----------------------------------------------------------------------------*/
 void kalP2PIndicateSDResponse(IN P_GLUE_INFO_T prGlueInfo,
-                              IN PARAM_MAC_ADDRESS rPeerAddr, IN u8 ucSeqNum){
+                              IN PARAM_MAC_ADDRESS rPeerAddr, IN u8 ucSeqNum)
+{
     union iwreq_data evt;
     u8 aucBuffer[IW_CUSTOM_MAX];
 
@@ -491,7 +507,8 @@ void kalP2PIndicateSDResponse(IN P_GLUE_INFO_T prGlueInfo,
  */
 /*----------------------------------------------------------------------------*/
 void kalP2PIndicateTXDone(IN P_GLUE_INFO_T prGlueInfo, IN u8 ucSeqNum,
-                          IN u8 ucStatus){
+                          IN u8 ucStatus)
+{
     union iwreq_data evt;
     u8 aucBuffer[IW_CUSTOM_MAX];
 
@@ -508,7 +525,8 @@ void kalP2PIndicateTXDone(IN P_GLUE_INFO_T prGlueInfo, IN u8 ucSeqNum,
                         &evt, aucBuffer);
 }
 
-struct net_device *kalP2PGetDevHdlr(P_GLUE_INFO_T prGlueInfo){
+struct net_device *kalP2PGetDevHdlr(P_GLUE_INFO_T prGlueInfo)
+{
     ASSERT(prGlueInfo);
     ASSERT(prGlueInfo->prP2PInfo[0]);
     return prGlueInfo->prP2PInfo[0]->prDevHandler;
@@ -525,7 +543,8 @@ struct net_device *kalP2PGetDevHdlr(P_GLUE_INFO_T prGlueInfo){
 /*----------------------------------------------------------------------------*/
 void kalGetChnlList(IN P_GLUE_INFO_T prGlueInfo, IN ENUM_BAND_T eSpecificBand,
                     IN u8 ucMaxChannelNum, IN u8 *pucNumOfChannel,
-                    IN P_RF_CHANNEL_INFO_T paucChannelList){
+                    IN P_RF_CHANNEL_INFO_T paucChannelList)
+{
     rlmDomainGetChnlList(prGlueInfo->prAdapter, eSpecificBand, false,
                          ucMaxChannelNum, pucNumOfChannel, paucChannelList);
 }
@@ -534,7 +553,8 @@ void kalGetChnlList(IN P_GLUE_INFO_T prGlueInfo, IN ENUM_BAND_T eSpecificBand,
  * SUPPORT////////////////////////////////////// */
 void kalP2PIndicateChannelReady(IN P_GLUE_INFO_T prGlueInfo, IN u64 u8SeqNum,
                                 IN u32 u4ChannelNum, IN ENUM_BAND_T eBand,
-                                IN ENUM_CHNL_EXT_T eSco, IN u32 u4Duration){
+                                IN ENUM_CHNL_EXT_T eSco, IN u32 u4Duration)
+{
     struct ieee80211_channel *prIEEE80211ChnlStruct =
         (struct ieee80211_channel *)NULL;
     RF_CHANNEL_INFO_T rChannelInfo;
@@ -569,7 +589,8 @@ void kalP2PIndicateChannelReady(IN P_GLUE_INFO_T prGlueInfo, IN u64 u8SeqNum,
 
 void kalP2PIndicateChannelExpired(IN P_GLUE_INFO_T prGlueInfo, IN u64 u8SeqNum,
                                   IN u32 u4ChannelNum, IN ENUM_BAND_T eBand,
-                                  IN ENUM_CHNL_EXT_T eSco){
+                                  IN ENUM_CHNL_EXT_T eSco)
+{
     P_GL_P2P_INFO_T prGlueP2pInfo = (P_GL_P2P_INFO_T)NULL;
     struct ieee80211_channel *prIEEE80211ChnlStruct =
         (struct ieee80211_channel *)NULL;
@@ -606,7 +627,8 @@ void kalP2PIndicateChannelExpired(IN P_GLUE_INFO_T prGlueInfo, IN u64 u8SeqNum,
 }
 
 void kalP2PIndicateScanDone(IN P_GLUE_INFO_T prGlueInfo, IN u8 ucRoleIndex,
-                            IN u8 fgIsAbort){
+                            IN u8 fgIsAbort)
+{
     P_GL_P2P_DEV_INFO_T prP2pGlueDevInfo = (P_GL_P2P_DEV_INFO_T)NULL;
     P_GL_P2P_INFO_T prGlueP2pInfo = (P_GL_P2P_INFO_T)NULL;
     struct cfg80211_scan_request *prScanRequest = NULL;
@@ -656,7 +678,8 @@ void kalP2PIndicateScanDone(IN P_GLUE_INFO_T prGlueInfo, IN u8 ucRoleIndex,
 void kalP2PIndicateBssInfo(IN P_GLUE_INFO_T prGlueInfo, IN u8 *pucFrameBuf,
                            IN u32 u4BufLen,
                            IN P_RF_CHANNEL_INFO_T prChannelInfo,
-                           IN s32 i4SignalStrength){
+                           IN s32 i4SignalStrength)
+{
     P_GL_P2P_INFO_T prGlueP2pInfo = (P_GL_P2P_INFO_T)NULL;
     struct ieee80211_channel *prChannelEntry = (struct ieee80211_channel *)NULL;
     struct ieee80211_mgmt *prBcnProbeRspFrame =
@@ -703,7 +726,8 @@ void kalP2PIndicateBssInfo(IN P_GLUE_INFO_T prGlueInfo, IN u8 *pucFrameBuf,
 }
 
 void kalP2PIndicateMgmtTxStatus(IN P_GLUE_INFO_T prGlueInfo,
-                                IN P_MSDU_INFO_T prMsduInfo, IN u8 fgIsAck){
+                                IN P_MSDU_INFO_T prMsduInfo, IN u8 fgIsAck)
+{
     P_GL_P2P_INFO_T prGlueP2pInfo = (P_GL_P2P_INFO_T)NULL;
     u64 *pu8GlCookie = (u64 *)NULL;
     struct net_device *prNetdevice = (struct net_device *)NULL;
@@ -751,7 +775,8 @@ void kalP2PIndicateMgmtTxStatus(IN P_GLUE_INFO_T prGlueInfo,
 
 void kalP2PIndicateRxMgmtFrame(IN P_GLUE_INFO_T prGlueInfo,
                                IN P_SW_RFB_T prSwRfb, IN u8 fgIsDevInterface,
-                               IN u8 ucRoleIdx){
+                               IN u8 ucRoleIdx)
+{
 #define DBG_P2P_MGMT_FRAME_INDICATION 1
     P_GL_P2P_INFO_T prGlueP2pInfo = (P_GL_P2P_INFO_T)NULL;
     s32 i4Freq = 0;
@@ -823,7 +848,8 @@ void kalP2PIndicateRxMgmtFrame(IN P_GLUE_INFO_T prGlueInfo,
 void kalP2PGCIndicateConnectionStatus(
     IN P_GLUE_INFO_T prGlueInfo, IN u8 ucRoleIndex,
     IN P_P2P_CONNECTION_REQ_INFO_T prP2pConnInfo, IN u8 *pucRxIEBuf,
-    IN u16 u2RxIELen, IN u16 u2StatusReason, IN WLAN_STATUS eStatus){
+    IN u16 u2RxIELen, IN u16 u2StatusReason, IN WLAN_STATUS eStatus)
+{
     P_GL_P2P_INFO_T prGlueP2pInfo = (P_GL_P2P_INFO_T)NULL;
 
     do {
@@ -873,7 +899,8 @@ void kalP2PGCIndicateConnectionStatus(
 }
 
 void kalP2PGOStationUpdate(IN P_GLUE_INFO_T prGlueInfo, IN u8 ucRoleIndex,
-                           IN P_STA_RECORD_T prCliStaRec, IN u8 fgIsNew){
+                           IN P_STA_RECORD_T prCliStaRec, IN u8 fgIsNew)
+{
     P_GL_P2P_INFO_T prP2pGlueInfo = (P_GL_P2P_INFO_T)NULL;
 
     do {
@@ -922,7 +949,8 @@ void kalP2PGOStationUpdate(IN P_GLUE_INFO_T prGlueInfo, IN u8 ucRoleIndex,
 }
 
 #if (CFG_SUPPORT_DFS_MASTER == 1)
-void kalP2PRddDetectUpdate(IN P_GLUE_INFO_T prGlueInfo, IN u8 ucRoleIndex){
+void kalP2PRddDetectUpdate(IN P_GLUE_INFO_T prGlueInfo, IN u8 ucRoleIndex)
+{
     DBGLOG(INIT, INFO, "Radar Detection event\n");
 
     do {
@@ -975,7 +1003,8 @@ void kalP2PRddDetectUpdate(IN P_GLUE_INFO_T prGlueInfo, IN u8 ucRoleIndex){
     } while (false);
 }
 
-void kalP2PCacFinishedUpdate(IN P_GLUE_INFO_T prGlueInfo, IN u8 ucRoleIndex){
+void kalP2PCacFinishedUpdate(IN P_GLUE_INFO_T prGlueInfo, IN u8 ucRoleIndex)
+{
     DBGLOG(INIT, INFO, "CAC Finished event\n");
 
     if (prGlueInfo == NULL) {
@@ -1008,7 +1037,8 @@ void kalP2PCacFinishedUpdate(IN P_GLUE_INFO_T prGlueInfo, IN u8 ucRoleIndex){
 #endif
 
 u8 kalP2pFuncGetChannelType(IN ENUM_CHNL_EXT_T rChnlSco,
-                            OUT enum nl80211_channel_type *channel_type){
+                            OUT enum nl80211_channel_type *channel_type)
+{
     u8 fgIsValid = false;
 
     do {
@@ -1041,7 +1071,8 @@ u8 kalP2pFuncGetChannelType(IN ENUM_CHNL_EXT_T rChnlSco,
 
 struct ieee80211_channel *
 kalP2pFuncGetChannelEntry(IN P_GL_P2P_INFO_T prP2pInfo,
-                          IN P_RF_CHANNEL_INFO_T prChannelInfo){
+                          IN P_RF_CHANNEL_INFO_T prChannelInfo)
+{
     struct ieee80211_channel *prTargetChannelEntry =
         (struct ieee80211_channel *)NULL;
     struct wiphy *wiphy = (struct wiphy *)NULL;
@@ -1101,7 +1132,8 @@ kalP2pFuncGetChannelEntry(IN P_GL_P2P_INFO_T prP2pInfo,
  */
 /*----------------------------------------------------------------------------*/
 u8 kalP2PSetBlackList(IN P_GLUE_INFO_T prGlueInfo, IN PARAM_MAC_ADDRESS rbssid,
-                      IN u8 fgIsblock, IN u8 ucRoleIndex){
+                      IN u8 fgIsblock, IN u8 ucRoleIndex)
+{
     u8 aucNullAddr[] = NULL_MAC_ADDR;
     u8 fgIsValid = false;
     u32 i;
@@ -1160,7 +1192,8 @@ u8 kalP2PSetBlackList(IN P_GLUE_INFO_T prGlueInfo, IN PARAM_MAC_ADDRESS rbssid,
  */
 /*----------------------------------------------------------------------------*/
 u8 kalP2PCmpBlackList(IN P_GLUE_INFO_T prGlueInfo, IN PARAM_MAC_ADDRESS rbssid,
-                      IN u8 ucRoleIndex){
+                      IN u8 ucRoleIndex)
+{
     u8 aucNullAddr[] = NULL_MAC_ADDR;
     u8 fgIsExsit = false;
     u32 i;
@@ -1193,7 +1226,8 @@ u8 kalP2PCmpBlackList(IN P_GLUE_INFO_T prGlueInfo, IN PARAM_MAC_ADDRESS rbssid,
  */
 /*----------------------------------------------------------------------------*/
 void kalP2PSetMaxClients(IN P_GLUE_INFO_T prGlueInfo, IN u32 u4MaxClient,
-                         IN u8 ucRoleIndex){
+                         IN u8 ucRoleIndex)
+{
     ASSERT(prGlueInfo);
     ASSERT(prGlueInfo->prP2PInfo[ucRoleIndex]);
 
@@ -1217,7 +1251,8 @@ void kalP2PSetMaxClients(IN P_GLUE_INFO_T prGlueInfo, IN u32 u4MaxClient,
  */
 /*----------------------------------------------------------------------------*/
 u8 kalP2PMaxClients(IN P_GLUE_INFO_T prGlueInfo, IN u32 u4NumClient,
-                    IN u8 ucRoleIndex){
+                    IN u8 ucRoleIndex)
+{
     ASSERT(prGlueInfo);
     ASSERT(prGlueInfo->prP2PInfo[ucRoleIndex]);
 

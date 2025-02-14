@@ -189,7 +189,8 @@ void cnmTimerDoTimeOutCheck(IN P_ADAPTER_T prAdapter);
  *                              F U N C T I O N S
  *******************************************************************************
  */
-static __KAL_INLINE__ s32 timerPendingTimer(IN P_TIMER_T prTimer){
+static __KAL_INLINE__ s32 timerPendingTimer(IN P_TIMER_T prTimer)
+{
     ASSERT(prTimer);
 
     return prTimer->rLinkEntry.prNext != NULL;

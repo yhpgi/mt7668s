@@ -122,7 +122,8 @@ const UMAC_PG_INFO_AND_RESERVE_CNT_CR_OFFSET_MAP_T
 /*----------------------------------------------------------------------------*/
 
 OUT u8 halUmacWrapSourcePortSanityCheck(IN u8 fgPsePleFlag,
-                                        IN u8 ucPageGroupID){
+                                        IN u8 ucPageGroupID)
+{
     if (fgPsePleFlag == UMAC_PSE_CFG_POOL_INDEX) {
         if (ucPageGroupID > UMAC_PG_PLE_GROUP_6) {
             return false;
@@ -151,7 +152,8 @@ OUT u8 halUmacWrapSourcePortSanityCheck(IN u8 fgPsePleFlag,
 /*----------------------------------------------------------------------------*/
 
 OUT u16 halUmacWrapRsvPgCnt(IN P_ADAPTER_T prAdapter, IN u8 fgPsePleFlag,
-                            IN u8 ucPageGroupID){
+                            IN u8 ucPageGroupID)
+{
     u32 u4RegAddr = 0;
     u32 u4Value = 0;
 
@@ -185,7 +187,8 @@ OUT u16 halUmacWrapRsvPgCnt(IN P_ADAPTER_T prAdapter, IN u8 fgPsePleFlag,
 /*----------------------------------------------------------------------------*/
 
 OUT u16 halUmacWrapSrcPgCnt(IN P_ADAPTER_T prAdapter, IN u8 fgPsePleFlag,
-                            IN u8 ucPageGroupID){
+                            IN u8 ucPageGroupID)
+{
     u32 u4RegAddr = 0;
     u32 u4Value = 0;
 
@@ -218,7 +221,8 @@ OUT u16 halUmacWrapSrcPgCnt(IN P_ADAPTER_T prAdapter, IN u8 fgPsePleFlag,
 /*----------------------------------------------------------------------------*/
 
 OUT u16 halUmacPbufCtrlTotalPageNum(IN P_ADAPTER_T prAdapter,
-                                    IN u16 fgPsePleFlag){
+                                    IN u16 fgPsePleFlag)
+{
     u32 u4Value = 0;
 
     HAL_MCR_RD(prAdapter, UMAC_PBUF_CTRL(fgPsePleFlag), &u4Value);
@@ -236,7 +240,8 @@ OUT u16 halUmacPbufCtrlTotalPageNum(IN P_ADAPTER_T prAdapter,
  */
 /*----------------------------------------------------------------------------*/
 
-OUT u16 halUmacWrapFrePageCnt(IN P_ADAPTER_T prAdapter, IN u8 fgPsePleFlag){
+OUT u16 halUmacWrapFrePageCnt(IN P_ADAPTER_T prAdapter, IN u8 fgPsePleFlag)
+{
     u32 u4Value = 0;
 
     HAL_MCR_RD(prAdapter, UMAC_FREEPG_CNT(fgPsePleFlag), &u4Value);
@@ -254,7 +259,8 @@ OUT u16 halUmacWrapFrePageCnt(IN P_ADAPTER_T prAdapter, IN u8 fgPsePleFlag){
  */
 /*----------------------------------------------------------------------------*/
 
-OUT u16 halUmacWrapFfaCnt(IN P_ADAPTER_T prAdapter, IN u8 fgPsePleFlag){
+OUT u16 halUmacWrapFfaCnt(IN P_ADAPTER_T prAdapter, IN u8 fgPsePleFlag)
+{
     u32 u4Value = 0;
 
     HAL_MCR_RD(prAdapter, UMAC_FREEPG_CNT(fgPsePleFlag), &u4Value);
@@ -273,7 +279,8 @@ OUT u16 halUmacWrapFfaCnt(IN P_ADAPTER_T prAdapter, IN u8 fgPsePleFlag){
 /*----------------------------------------------------------------------------*/
 
 OUT u8 halUmacInfoGetMiscStatus(IN P_ADAPTER_T prAdapter,
-                                IN P_UMAC_STAT2_GET_T pUmacStat2Get){
+                                IN P_UMAC_STAT2_GET_T pUmacStat2Get)
+{
     pUmacStat2Get->u2PleRevPgHif0Group0 = halUmacWrapRsvPgCnt(
         prAdapter, UMAC_PLE_CFG_POOL_INDEX, UMAC_PG_HIF0_GROUP_0);
 

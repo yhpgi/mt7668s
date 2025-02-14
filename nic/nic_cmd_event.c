@@ -55,7 +55,8 @@ const NIC_CAPABILITY_V2_REF_TABLE_T gNicCapabilityV2InfoTable[] = {
  */
 void nicCmdEventQueryMcrRead(IN P_ADAPTER_T prAdapter,
                              IN P_CMD_INFO_T prCmdInfo, IN u8 *pucEventBuf,
-                             IN u32 u4EventBufLen){
+                             IN u32 u4EventBufLen)
+{
     u32 u4QueryInfoLen;
     P_PARAM_CUSTOM_MCR_RW_STRUCT_T prMcrRdInfo;
     P_GLUE_INFO_T prGlueInfo;
@@ -91,7 +92,8 @@ void nicCmdEventQueryMcrRead(IN P_ADAPTER_T prAdapter,
 
 void nicCmdEventQueryCoexIso(IN P_ADAPTER_T prAdapter,
                              IN P_CMD_INFO_T prCmdInfo, IN u8 *pucEventBuf,
-                             IN u32 u4EventBufLen){
+                             IN u32 u4EventBufLen)
+{
     u32 u4QueryInfoLen;
     P_GLUE_INFO_T prGlueInfo;
 
@@ -135,7 +137,8 @@ void nicCmdEventQueryCoexIso(IN P_ADAPTER_T prAdapter,
 #if CFG_SUPPORT_QA_TOOL
 void nicCmdEventQueryRxStatistics(IN P_ADAPTER_T prAdapter,
                                   IN P_CMD_INFO_T prCmdInfo, IN u8 *pucEventBuf,
-                                  IN u32 u4EventBufLen){
+                                  IN u32 u4EventBufLen)
+{
     P_PARAM_CUSTOM_ACCESS_RX_STAT prRxStatistics;
     P_EVENT_ACCESS_RX_STAT prEventAccessRxStat;
     u32 u4QueryInfoLen, i;
@@ -208,7 +211,8 @@ void nicCmdEventQueryRxStatistics(IN P_ADAPTER_T prAdapter,
 #if CFG_SUPPORT_TX_BF
 void nicCmdEventPfmuDataRead(IN P_ADAPTER_T prAdapter,
                              IN P_CMD_INFO_T prCmdInfo, IN u8 *pucEventBuf,
-                             IN u32 u4EventBufLen){
+                             IN u32 u4EventBufLen)
+{
     u32 u4QueryInfoLen;
     P_GLUE_INFO_T prGlueInfo;
     P_PFMU_DATA prEventPfmuDataRead = NULL;
@@ -273,7 +277,8 @@ void nicCmdEventPfmuDataRead(IN P_ADAPTER_T prAdapter,
 }
 
 void nicCmdEventPfmuTagRead(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo,
-                            IN u8 *pucEventBuf, IN u32 u4EventBufLen){
+                            IN u8 *pucEventBuf, IN u32 u4EventBufLen)
+{
     u32 u4QueryInfoLen;
     P_GLUE_INFO_T prGlueInfo;
     P_EVENT_PFMU_TAG_READ_T prEventPfmuTagRead = NULL;
@@ -405,7 +410,8 @@ void nicCmdEventPfmuTagRead(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo,
 #endif
 #if CFG_SUPPORT_MU_MIMO
 void nicCmdEventGetQd(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo,
-                      IN u8 *pucEventBuf, IN u32 u4EventBufLen){
+                      IN u8 *pucEventBuf, IN u32 u4EventBufLen)
+{
     u32 u4QueryInfoLen;
     P_GLUE_INFO_T prGlueInfo;
     P_EVENT_HQA_GET_QD prEventHqaGetQd;
@@ -456,7 +462,8 @@ void nicCmdEventGetQd(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo,
 }
 
 void nicCmdEventGetCalcLq(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo,
-                          IN u8 *pucEventBuf, IN u32 u4EventBufLen){
+                          IN u8 *pucEventBuf, IN u32 u4EventBufLen)
+{
     u32 u4QueryInfoLen;
     P_GLUE_INFO_T prGlueInfo;
     P_EVENT_HQA_GET_MU_CALC_LQ prEventHqaGetMuCalcLq;
@@ -512,7 +519,8 @@ void nicCmdEventGetCalcLq(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo,
 
 void nicCmdEventGetCalcInitMcs(IN P_ADAPTER_T prAdapter,
                                IN P_CMD_INFO_T prCmdInfo, IN u8 *pucEventBuf,
-                               IN u32 u4EventBufLen){
+                               IN u32 u4EventBufLen)
+{
     u32 u4QueryInfoLen;
     P_GLUE_INFO_T prGlueInfo;
     P_EVENT_SHOW_GROUP_TBL_ENTRY prEventShowGroupTblEntry = NULL;
@@ -585,7 +593,8 @@ void nicCmdEventGetCalcInitMcs(IN P_ADAPTER_T prAdapter,
 
 void nicCmdEventQuerySwCtrlRead(IN P_ADAPTER_T prAdapter,
                                 IN P_CMD_INFO_T prCmdInfo, IN u8 *pucEventBuf,
-                                IN u32 u4EventBufLen){
+                                IN u32 u4EventBufLen)
+{
     u32 u4QueryInfoLen;
     P_PARAM_CUSTOM_SW_CTRL_STRUCT_T prSwCtrlInfo;
     P_GLUE_INFO_T prGlueInfo;
@@ -621,7 +630,8 @@ void nicCmdEventQuerySwCtrlRead(IN P_ADAPTER_T prAdapter,
 
 void nicCmdEventQueryChipConfig(IN P_ADAPTER_T prAdapter,
                                 IN P_CMD_INFO_T prCmdInfo, IN u8 *pucEventBuf,
-                                IN u32 u4EventBufLen){
+                                IN u32 u4EventBufLen)
+{
     u32 u4QueryInfoLen;
     P_PARAM_CUSTOM_CHIP_CONFIG_STRUCT_T prChipConfigInfo;
     P_GLUE_INFO_T prGlueInfo;
@@ -673,7 +683,8 @@ void nicCmdEventQueryChipConfig(IN P_ADAPTER_T prAdapter,
 }
 
 void nicCmdEventSetCommon(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo,
-                          IN u8 *pucEventBuf, IN u32 u4EventBufLen){
+                          IN u8 *pucEventBuf, IN u32 u4EventBufLen)
+{
     ASSERT(prAdapter);
     ASSERT(prCmdInfo);
 
@@ -687,7 +698,8 @@ void nicCmdEventSetCommon(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo,
 
 void nicCmdEventSetDisassociate(IN P_ADAPTER_T prAdapter,
                                 IN P_CMD_INFO_T prCmdInfo, IN u8 *pucEventBuf,
-                                IN u32 u4EventBufLen){
+                                IN u32 u4EventBufLen)
+{
     ASSERT(prAdapter);
     ASSERT(prCmdInfo);
 
@@ -703,7 +715,8 @@ void nicCmdEventSetDisassociate(IN P_ADAPTER_T prAdapter,
 
 void nicCmdEventSetIpAddress(IN P_ADAPTER_T prAdapter,
                              IN P_CMD_INFO_T prCmdInfo, IN u8 *pucEventBuf,
-                             IN u32 u4EventBufLen){
+                             IN u32 u4EventBufLen)
+{
     u32 u4Count;
 
     ASSERT(prAdapter);
@@ -726,7 +739,8 @@ void nicCmdEventSetIpAddress(IN P_ADAPTER_T prAdapter,
 
 void nicCmdEventQueryRfTestATInfo(IN P_ADAPTER_T prAdapter,
                                   IN P_CMD_INFO_T prCmdInfo, IN u8 *pucEventBuf,
-                                  IN u32 u4EventBufLen){
+                                  IN u32 u4EventBufLen)
+{
     P_EVENT_TEST_STATUS prTestStatus, prQueryBuffer;
     P_GLUE_INFO_T prGlueInfo;
     u32 u4QueryInfoLen;
@@ -756,7 +770,8 @@ void nicCmdEventQueryRfTestATInfo(IN P_ADAPTER_T prAdapter,
 
 void nicCmdEventQueryLinkQuality(IN P_ADAPTER_T prAdapter,
                                  IN P_CMD_INFO_T prCmdInfo, IN u8 *pucEventBuf,
-                                 IN u32 u4EventBufLen){
+                                 IN u32 u4EventBufLen)
+{
     PARAM_RSSI rRssi, *prRssi;
     P_EVENT_LINK_QUALITY prLinkQuality;
     P_GLUE_INFO_T prGlueInfo;
@@ -812,7 +827,8 @@ void nicCmdEventQueryLinkQuality(IN P_ADAPTER_T prAdapter,
 /*----------------------------------------------------------------------------*/
 void nicCmdEventQueryLinkSpeed(IN P_ADAPTER_T prAdapter,
                                IN P_CMD_INFO_T prCmdInfo, IN u8 *pucEventBuf,
-                               IN u32 u4EventBufLen){
+                               IN u32 u4EventBufLen)
+{
     P_EVENT_LINK_QUALITY prLinkQuality;
     P_GLUE_INFO_T prGlueInfo;
     u32 u4QueryInfoLen;
@@ -844,7 +860,8 @@ void nicCmdEventQueryLinkSpeed(IN P_ADAPTER_T prAdapter,
 
 void nicCmdEventQueryStatistics(IN P_ADAPTER_T prAdapter,
                                 IN P_CMD_INFO_T prCmdInfo, IN u8 *pucEventBuf,
-                                IN u32 u4EventBufLen){
+                                IN u32 u4EventBufLen)
+{
     P_PARAM_802_11_STATISTICS_STRUCT_T prStatistics;
     P_EVENT_STATISTICS prEventStatistics;
     P_GLUE_INFO_T prGlueInfo;
@@ -906,7 +923,8 @@ void nicCmdEventQueryStatistics(IN P_ADAPTER_T prAdapter,
 }
 
 void nicCmdEventEnterRfTest(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo,
-                            IN u8 *pucEventBuf, IN u32 u4EventBufLen){
+                            IN u8 *pucEventBuf, IN u32 u4EventBufLen)
+{
     ASSERT(prAdapter);
     ASSERT(prCmdInfo);
 
@@ -958,7 +976,8 @@ void nicCmdEventEnterRfTest(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo,
 }
 
 void nicCmdEventLeaveRfTest(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo,
-                            IN u8 *pucEventBuf, IN u32 u4EventBufLen){
+                            IN u8 *pucEventBuf, IN u32 u4EventBufLen)
+{
     /* 6. set driver-land variable */
     prAdapter->fgTestMode = false;
     prAdapter->fgIcapMode = false;
@@ -994,7 +1013,8 @@ void nicCmdEventLeaveRfTest(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo,
 
 void nicCmdEventQueryMcastAddr(IN P_ADAPTER_T prAdapter,
                                IN P_CMD_INFO_T prCmdInfo, IN u8 *pucEventBuf,
-                               IN u32 u4EventBufLen){
+                               IN u32 u4EventBufLen)
+{
     u32 u4QueryInfoLen;
     P_GLUE_INFO_T prGlueInfo;
     P_EVENT_MAC_MCAST_ADDR prEventMacMcastAddr;
@@ -1034,7 +1054,8 @@ void nicCmdEventQueryMcastAddr(IN P_ADAPTER_T prAdapter,
 
 void nicCmdEventQueryEepromRead(IN P_ADAPTER_T prAdapter,
                                 IN P_CMD_INFO_T prCmdInfo, IN u8 *pucEventBuf,
-                                IN u32 u4EventBufLen){
+                                IN u32 u4EventBufLen)
+{
     u32 u4QueryInfoLen;
     P_PARAM_CUSTOM_EEPROM_RW_STRUCT_T prEepromRdInfo;
     P_GLUE_INFO_T prGlueInfo;
@@ -1068,7 +1089,8 @@ void nicCmdEventQueryEepromRead(IN P_ADAPTER_T prAdapter,
 
 void nicCmdEventSetMediaStreamMode(IN P_ADAPTER_T prAdapter,
                                    IN P_CMD_INFO_T prCmdInfo,
-                                   IN u8 *pucEventBuf, IN u32 u4EventBufLen){
+                                   IN u8 *pucEventBuf, IN u32 u4EventBufLen)
+{
     PARAM_MEDIA_STREAMING_INDICATION rParamMediaStreamIndication;
 
     ASSERT(prAdapter);
@@ -1095,7 +1117,8 @@ void nicCmdEventSetMediaStreamMode(IN P_ADAPTER_T prAdapter,
 
 void nicCmdEventSetStopSchedScan(IN P_ADAPTER_T prAdapter,
                                  IN P_CMD_INFO_T prCmdInfo, IN u8 *pucEventBuf,
-                                 IN u32 u4EventBufLen){
+                                 IN u32 u4EventBufLen)
+{
     /*
      *  DBGLOG(SCN, INFO, "--->nicCmdEventSetStopSchedScan\n" ));
      */
@@ -1122,7 +1145,8 @@ void nicCmdEventSetStopSchedScan(IN P_ADAPTER_T prAdapter,
 
 /* Statistics responder */
 void nicCmdEventQueryXmitOk(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo,
-                            IN u8 *pucEventBuf, IN u32 u4EventBufLen){
+                            IN u8 *pucEventBuf, IN u32 u4EventBufLen)
+{
     P_EVENT_STATISTICS prEventStatistics;
     P_GLUE_INFO_T prGlueInfo;
     u32 u4QueryInfoLen;
@@ -1162,7 +1186,8 @@ void nicCmdEventQueryXmitOk(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo,
 }
 
 void nicCmdEventQueryRecvOk(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo,
-                            IN u8 *pucEventBuf, IN u32 u4EventBufLen){
+                            IN u8 *pucEventBuf, IN u32 u4EventBufLen)
+{
     P_EVENT_STATISTICS prEventStatistics;
     P_GLUE_INFO_T prGlueInfo;
     u32 u4QueryInfoLen;
@@ -1202,7 +1227,8 @@ void nicCmdEventQueryRecvOk(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo,
 
 void nicCmdEventQueryXmitError(IN P_ADAPTER_T prAdapter,
                                IN P_CMD_INFO_T prCmdInfo, IN u8 *pucEventBuf,
-                               IN u32 u4EventBufLen){
+                               IN u32 u4EventBufLen)
+{
     P_EVENT_STATISTICS prEventStatistics;
     P_GLUE_INFO_T prGlueInfo;
     u32 u4QueryInfoLen;
@@ -1242,7 +1268,8 @@ void nicCmdEventQueryXmitError(IN P_ADAPTER_T prAdapter,
 
 void nicCmdEventQueryRecvError(IN P_ADAPTER_T prAdapter,
                                IN P_CMD_INFO_T prCmdInfo, IN u8 *pucEventBuf,
-                               IN u32 u4EventBufLen){
+                               IN u32 u4EventBufLen)
+{
     P_EVENT_STATISTICS prEventStatistics;
     P_GLUE_INFO_T prGlueInfo;
     u32 u4QueryInfoLen;
@@ -1286,7 +1313,8 @@ void nicCmdEventQueryRecvError(IN P_ADAPTER_T prAdapter,
 
 void nicCmdEventQueryRecvNoBuffer(IN P_ADAPTER_T prAdapter,
                                   IN P_CMD_INFO_T prCmdInfo, IN u8 *pucEventBuf,
-                                  IN u32 u4EventBufLen){
+                                  IN u32 u4EventBufLen)
+{
     P_EVENT_STATISTICS prEventStatistics;
     P_GLUE_INFO_T prGlueInfo;
     u32 u4QueryInfoLen;
@@ -1326,7 +1354,8 @@ void nicCmdEventQueryRecvNoBuffer(IN P_ADAPTER_T prAdapter,
 
 void nicCmdEventQueryRecvCrcError(IN P_ADAPTER_T prAdapter,
                                   IN P_CMD_INFO_T prCmdInfo, IN u8 *pucEventBuf,
-                                  IN u32 u4EventBufLen){
+                                  IN u32 u4EventBufLen)
+{
     P_EVENT_STATISTICS prEventStatistics;
     P_GLUE_INFO_T prGlueInfo;
     u32 u4QueryInfoLen;
@@ -1367,7 +1396,8 @@ void nicCmdEventQueryRecvCrcError(IN P_ADAPTER_T prAdapter,
 void nicCmdEventQueryRecvErrorAlignment(IN P_ADAPTER_T prAdapter,
                                         IN P_CMD_INFO_T prCmdInfo,
                                         IN u8 *pucEventBuf,
-                                        IN u32 u4EventBufLen){
+                                        IN u32 u4EventBufLen)
+{
     P_EVENT_STATISTICS prEventStatistics;
     P_GLUE_INFO_T prGlueInfo;
     u32 u4QueryInfoLen;
@@ -1407,7 +1437,8 @@ void nicCmdEventQueryRecvErrorAlignment(IN P_ADAPTER_T prAdapter,
 
 void nicCmdEventQueryXmitOneCollision(IN P_ADAPTER_T prAdapter,
                                       IN P_CMD_INFO_T prCmdInfo,
-                                      IN u8 *pucEventBuf, IN u32 u4EventBufLen){
+                                      IN u8 *pucEventBuf, IN u32 u4EventBufLen)
+{
     P_EVENT_STATISTICS prEventStatistics;
     P_GLUE_INFO_T prGlueInfo;
     u32 u4QueryInfoLen;
@@ -1450,7 +1481,8 @@ void nicCmdEventQueryXmitOneCollision(IN P_ADAPTER_T prAdapter,
 void nicCmdEventQueryXmitMoreCollisions(IN P_ADAPTER_T prAdapter,
                                         IN P_CMD_INFO_T prCmdInfo,
                                         IN u8 *pucEventBuf,
-                                        IN u32 u4EventBufLen){
+                                        IN u32 u4EventBufLen)
+{
     P_EVENT_STATISTICS prEventStatistics;
     P_GLUE_INFO_T prGlueInfo;
     u32 u4QueryInfoLen;
@@ -1491,7 +1523,8 @@ void nicCmdEventQueryXmitMoreCollisions(IN P_ADAPTER_T prAdapter,
 void nicCmdEventQueryXmitMaxCollisions(IN P_ADAPTER_T prAdapter,
                                        IN P_CMD_INFO_T prCmdInfo,
                                        IN u8 *pucEventBuf,
-                                       IN u32 u4EventBufLen){
+                                       IN u32 u4EventBufLen)
+{
     P_EVENT_STATISTICS prEventStatistics;
     P_GLUE_INFO_T prGlueInfo;
     u32 u4QueryInfoLen;
@@ -1541,7 +1574,8 @@ void nicCmdEventQueryXmitMaxCollisions(IN P_ADAPTER_T prAdapter,
  */
 /*----------------------------------------------------------------------------*/
 void nicOidCmdTimeoutCommon(IN P_ADAPTER_T prAdapter,
-                            IN P_CMD_INFO_T prCmdInfo){
+                            IN P_CMD_INFO_T prCmdInfo)
+{
     ASSERT(prAdapter);
 
     if (prCmdInfo->fgIsOid) {
@@ -1559,7 +1593,8 @@ void nicOidCmdTimeoutCommon(IN P_ADAPTER_T prAdapter,
  * @return none
  */
 /*----------------------------------------------------------------------------*/
-void nicCmdTimeoutCommon(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo){
+void nicCmdTimeoutCommon(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo)
+{
     ASSERT(prAdapter);
 }
 
@@ -1576,7 +1611,8 @@ void nicCmdTimeoutCommon(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo){
  */
 /*----------------------------------------------------------------------------*/
 void nicOidCmdEnterRFTestTimeout(IN P_ADAPTER_T prAdapter,
-                                 IN P_CMD_INFO_T prCmdInfo){
+                                 IN P_CMD_INFO_T prCmdInfo)
+{
     ASSERT(prAdapter);
 
     /* 1. Remove pending TX frames */
@@ -1609,7 +1645,8 @@ void nicOidCmdEnterRFTestTimeout(IN P_ADAPTER_T prAdapter,
  *
  */
 /*----------------------------------------------------------------------------*/
-s32 GetIQData(s32 **prIQAry, u32 *prDataLen, u32 u4IQ, u32 u4GetWf1){
+s32 GetIQData(s32 **prIQAry, u32 *prDataLen, u32 u4IQ, u32 u4GetWf1)
+{
     u8 aucPath[50];  /* the path for iq data dump out */
     u8 aucData[50];  /* iq data in string format */
     u32 i = 0, j = 0, count = 0;
@@ -1681,7 +1718,8 @@ s32 GetIQData(s32 **prIQAry, u32 *prDataLen, u32 u4IQ, u32 u4GetWf1){
  */
 /*----------------------------------------------------------------------------*/
 
-u32 TsfRawData2IqFmt(P_EVENT_DUMP_MEM_T prEventDumpMem){
+u32 TsfRawData2IqFmt(P_EVENT_DUMP_MEM_T prEventDumpMem)
+{
     static u8 aucPathWF0[40];  /* the path for iq data dump out */
     static u8 aucPathWF1[40];  /* the path for iq data dump out */
     static u8 aucPathRAWWF0[40];  /* the path for iq data dump out */
@@ -1951,7 +1989,8 @@ u32 TsfRawData2IqFmt(P_EVENT_DUMP_MEM_T prEventDumpMem){
 /*----------------------------------------------------------------------------*/
 
 void nicEventQueryMemDump(IN P_ADAPTER_T prAdapter, IN u8 *pucEventBuf,
-                          IN u32 u4EventBufLen){
+                          IN u32 u4EventBufLen)
+{
     P_EVENT_DUMP_MEM_T prEventDumpMem;
     static u8 aucPath[256] = { 0 };  // initialized all zeros
     static u8 aucPath_done[300];
@@ -2051,7 +2090,8 @@ void nicEventQueryMemDump(IN P_ADAPTER_T prAdapter, IN u8 *pucEventBuf,
 /*----------------------------------------------------------------------------*/
 void nicCmdEventQueryMemDump(IN P_ADAPTER_T prAdapter,
                              IN P_CMD_INFO_T prCmdInfo, IN u8 *pucEventBuf,
-                             IN u32 u4EventBufLen){
+                             IN u32 u4EventBufLen)
+{
     u32 u4QueryInfoLen;
     P_GLUE_INFO_T prGlueInfo;
     P_EVENT_DUMP_MEM_T prEventDumpMem;
@@ -2176,7 +2216,8 @@ write_file_done:
 /*----------------------------------------------------------------------------*/
 void nicCmdEventBatchScanResult(IN P_ADAPTER_T prAdapter,
                                 IN P_CMD_INFO_T prCmdInfo, IN u8 *pucEventBuf,
-                                IN u32 u4EventBufLen){
+                                IN u32 u4EventBufLen)
+{
     u32 u4QueryInfoLen;
     P_EVENT_BATCH_RESULT_T prEventBatchResult;
     P_GLUE_INFO_T prGlueInfo;
@@ -2225,7 +2266,8 @@ void nicCmdEventBatchScanResult(IN P_ADAPTER_T prAdapter,
 /*----------------------------------------------------------------------------*/
 void nicCmdEventBuildDateCode(IN P_ADAPTER_T prAdapter,
                               IN P_CMD_INFO_T prCmdInfo, IN u8 *pucEventBuf,
-                              IN u32 u4EventBufLen){
+                              IN u32 u4EventBufLen)
+{
     u32 u4QueryInfoLen;
     P_EVENT_BUILD_DATE_CODE prEvent;
     P_GLUE_INFO_T prGlueInfo;
@@ -2269,7 +2311,8 @@ void nicCmdEventBuildDateCode(IN P_ADAPTER_T prAdapter,
 /*----------------------------------------------------------------------------*/
 void nicCmdEventQueryStaStatistics(IN P_ADAPTER_T prAdapter,
                                    IN P_CMD_INFO_T prCmdInfo,
-                                   IN u8 *pucEventBuf, IN u32 u4EventBufLen){
+                                   IN u8 *pucEventBuf, IN u32 u4EventBufLen)
+{
     u32 u4QueryInfoLen;
     P_EVENT_STA_STATISTICS_T prEvent;
     P_GLUE_INFO_T prGlueInfo;
@@ -2405,7 +2448,8 @@ void nicCmdEventQueryStaStatistics(IN P_ADAPTER_T prAdapter,
 /*----------------------------------------------------------------------------*/
 void nicCmdEventQueryLteSafeChn(IN P_ADAPTER_T prAdapter,
                                 IN P_CMD_INFO_T prCmdInfo, IN u8 *pucEventBuf,
-                                IN u32 u4EventBufLen){
+                                IN u32 u4EventBufLen)
+{
     u32 u4QueryInfoLen;
     P_EVENT_LTE_SAFE_CHN_T prEvent;
     P_GLUE_INFO_T prGlueInfo;
@@ -2454,7 +2498,8 @@ void nicCmdEventQueryLteSafeChn(IN P_ADAPTER_T prAdapter,
 #endif
 
 void nicEventRddPulseDump(IN P_ADAPTER_T prAdapter, IN u8 *pucEventBuf,
-                          IN u32 u4EventBufLen){
+                          IN u32 u4EventBufLen)
+{
     u16 u2Idx, u2PulseCnt;
     P_EVENT_WIFI_RDD_TEST_T prRddPulseEvent;
 
@@ -2509,7 +2554,8 @@ void nicEventRddPulseDump(IN P_ADAPTER_T prAdapter, IN u8 *pucEventBuf,
 #if CFG_SUPPORT_ADVANCE_CONTROL
 void nicCmdEventQueryAdvCtrl(IN P_ADAPTER_T prAdapter,
                              IN P_CMD_INFO_T prCmdInfo, IN u8 *pucEventBuf,
-                             IN u32 u4EventBufLen){
+                             IN u32 u4EventBufLen)
+{
     u8 *query;
     P_GLUE_INFO_T prGlueInfo;
     u32 query_len;
@@ -2552,7 +2598,8 @@ void nicCmdEventQueryAdvCtrl(IN P_ADAPTER_T prAdapter,
 #if CFG_SUPPORT_MSP
 void nicCmdEventQueryWlanInfo(IN P_ADAPTER_T prAdapter,
                               IN P_CMD_INFO_T prCmdInfo, IN u8 *pucEventBuf,
-                              IN u32 u4EventBufLen){
+                              IN u32 u4EventBufLen)
+{
     P_PARAM_HW_WLAN_INFO_T prWlanInfo;
     P_EVENT_WLAN_INFO prEventWlanInfo;
     P_GLUE_INFO_T prGlueInfo;
@@ -2611,7 +2658,8 @@ void nicCmdEventQueryWlanInfo(IN P_ADAPTER_T prAdapter,
 
 void nicCmdEventQueryMibInfo(IN P_ADAPTER_T prAdapter,
                              IN P_CMD_INFO_T prCmdInfo, IN u8 *pucEventBuf,
-                             IN u32 u4EventBufLen){
+                             IN u32 u4EventBufLen)
+{
     P_PARAM_HW_MIB_INFO_T prMibInfo;
     P_EVENT_MIB_INFO prEventMibInfo;
     P_GLUE_INFO_T prGlueInfo;
@@ -2650,7 +2698,8 @@ void nicCmdEventQueryMibInfo(IN P_ADAPTER_T prAdapter,
 
 #if CFG_SUPPORT_LAST_SEC_MCS_INFO
 void nicCmdEventTxMcsInfo(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo,
-                          IN u8 *pucEventBuf, IN u32 u4EventBufLen){
+                          IN u8 *pucEventBuf, IN u32 u4EventBufLen)
+{
     u32 u4QueryInfoLen;
     P_GLUE_INFO_T prGlueInfo;
     struct EVENT_TX_MCS_INFO *prTxMcsEvent;
@@ -2688,7 +2737,8 @@ void nicCmdEventTxMcsInfo(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo,
 #if CFG_TCP_IP_CHKSUM_OFFLOAD
 WLAN_STATUS nicCmdEventQueryNicCsumOffload(IN P_ADAPTER_T prAdapter,
                                            IN u8 *pucEventBuf,
-                                           IN u32 u4EventBufLen){
+                                           IN u32 u4EventBufLen)
+{
     P_NIC_CSUM_OFFLOAD_T prChecksumOffload = (P_NIC_CSUM_OFFLOAD_T)pucEventBuf;
     if (u4EventBufLen < sizeof(NIC_CSUM_OFFLOAD_T)) {
         DBGLOG(NIC, ERROR, "%s: Invalid event length: %d < %d\n", __func__,
@@ -2708,7 +2758,8 @@ WLAN_STATUS nicCmdEventQueryNicCsumOffload(IN P_ADAPTER_T prAdapter,
 
 WLAN_STATUS nicCmdEventQueryNicCoexFeature(IN P_ADAPTER_T prAdapter,
                                            IN u8 *pucEventBuf,
-                                           IN u32 u4EventBufLen){
+                                           IN u32 u4EventBufLen)
+{
     P_NIC_COEX_FEATURE_T prCoexFeature = (P_NIC_COEX_FEATURE_T)pucEventBuf;
     if (u4EventBufLen < sizeof(NIC_COEX_FEATURE_T)) {
         DBGLOG(NIC, ERROR, "%s: Invalid event length: %d < %d\n", __func__,
@@ -2725,7 +2776,8 @@ WLAN_STATUS nicCmdEventQueryNicCoexFeature(IN P_ADAPTER_T prAdapter,
 
 WLAN_STATUS nicCmdEventQueryNicEfuseAddr(IN P_ADAPTER_T prAdapter,
                                          IN u8 *pucEventBuf,
-                                         IN u32 u4EventBufLen){
+                                         IN u32 u4EventBufLen)
+{
     P_NIC_EFUSE_ADDRESS_T prTxResource = (P_NIC_EFUSE_ADDRESS_T)pucEventBuf;
     if (u4EventBufLen < sizeof(NIC_EFUSE_ADDRESS_T)) {
         DBGLOG(NIC, ERROR, "%s: Invalid event length: %d < %d\n", __func__,
@@ -2747,7 +2799,8 @@ WLAN_STATUS nicCmdEventQueryNicEfuseAddr(IN P_ADAPTER_T prAdapter,
 
 WLAN_STATUS nicCmdEventQueryEfuseOffset(IN P_ADAPTER_T prAdapter,
                                         IN u8 *pucEventBuf,
-                                        IN u32 u4EventBufLen){
+                                        IN u32 u4EventBufLen)
+{
     struct _NIC_EFUSE_OFFSET_T *prEfuseOffset =
         (struct _NIC_EFUSE_OFFSET_T *)pucEventBuf;
     if (u4EventBufLen < sizeof(struct _NIC_EFUSE_OFFSET_T)) {
@@ -2764,7 +2817,8 @@ WLAN_STATUS nicCmdEventQueryEfuseOffset(IN P_ADAPTER_T prAdapter,
 
 WLAN_STATUS nicCmdEventQueryNicTxResource(IN P_ADAPTER_T prAdapter,
                                           IN u8 *pucEventBuf,
-                                          IN u32 u4EventBufLen){
+                                          IN u32 u4EventBufLen)
+{
     P_NIC_TX_RESOURCE_T prTxResource = (P_NIC_TX_RESOURCE_T)pucEventBuf;
     if (u4EventBufLen < sizeof(NIC_TX_RESOURCE_T)) {
         DBGLOG(NIC, ERROR, "%s: Invalid event length: %d < %d\n", __func__,
@@ -2798,7 +2852,8 @@ WLAN_STATUS nicCmdEventQueryNicTxResource(IN P_ADAPTER_T prAdapter,
 }
 
 void nicCmdEventQueryNicCapabilityV2(IN P_ADAPTER_T prAdapter,
-                                     IN u8 *pucEventBuf, IN u32 u4EventBufLen){
+                                     IN u8 *pucEventBuf, IN u32 u4EventBufLen)
+{
     P_EVENT_NIC_CAPABILITY_V2_T prEventNicV2 =
         (P_EVENT_NIC_CAPABILITY_V2_T)pucEventBuf;
     P_NIC_CAPABILITY_V2_ELEMENT prElement;
@@ -2846,7 +2901,8 @@ void nicCmdEventQueryNicCapabilityV2(IN P_ADAPTER_T prAdapter,
 }
 
 void nicEventLinkQuality(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent,
-                         IN u32 u4EventBufLen){
+                         IN u32 u4EventBufLen)
+{
     P_CMD_INFO_T prCmdInfo;
 
 #if CFG_ENABLE_WIFI_DIRECT && CFG_SUPPORT_P2P_RSSI_QUERY
@@ -2925,7 +2981,8 @@ void nicEventLinkQuality(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent,
 }
 
 void nicEventLayer0ExtMagic(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent,
-                            IN u32 u4EventBufLen){
+                            IN u32 u4EventBufLen)
+{
     u32 u4QueryInfoLen;
     P_CMD_INFO_T prCmdInfo;
     P_EVENT_ACCESS_EFUSE prEventEfuseAccess;
@@ -3009,7 +3066,8 @@ void nicEventLayer0ExtMagic(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent,
 }
 
 void nicEventMicErrorInfo(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent,
-                          IN u32 u4EventBufLen){
+                          IN u32 u4EventBufLen)
+{
     P_EVENT_MIC_ERR_INFO prMicError;
     /* P_PARAM_AUTH_EVENT_T prAuthEvent; */
     P_STA_RECORD_T prStaRec;
@@ -3034,7 +3092,8 @@ void nicEventMicErrorInfo(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent,
 }
 
 void nicEventScanDone(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent,
-                      IN u32 u4EventBufLen){
+                      IN u32 u4EventBufLen)
+{
     if (u4EventBufLen < sizeof(EVENT_SCAN_DONE)) {
         DBGLOG(NIC, ERROR, "%s: Invalid event length: %d < %d\n", __func__,
                u4EventBufLen, sizeof(EVENT_SCAN_DONE));
@@ -3044,7 +3103,8 @@ void nicEventScanDone(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent,
 }
 
 void nicEventNloDone(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent,
-                     IN u32 u4EventBufLen){
+                     IN u32 u4EventBufLen)
+{
     DBGLOG(INIT, INFO, "EVENT_ID_NLO_DONE\n");
     if (u4EventBufLen < sizeof(EVENT_NLO_DONE_T)) {
         DBGLOG(NIC, ERROR, "%s: Invalid event length: %d < %d\n", __func__,
@@ -3065,7 +3125,8 @@ void nicEventNloDone(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent,
 }
 
 void nicEventSleepyNotify(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent,
-                          IN u32 u4EventBufLen){
+                          IN u32 u4EventBufLen)
+{
     P_EVENT_SLEEPY_INFO_T prEventSleepyNotify;
     if (u4EventBufLen < sizeof(EVENT_SLEEPY_INFO_T)) {
         DBGLOG(NIC, ERROR, "%s: Invalid event length: %d < %d\n", __func__,
@@ -3081,7 +3142,8 @@ void nicEventSleepyNotify(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent,
 }
 
 void nicEventStatistics(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent,
-                        IN u32 u4EventBufLen){
+                        IN u32 u4EventBufLen)
+{
     P_CMD_INFO_T prCmdInfo;
 
     /* buffer statistics for further query */
@@ -3111,7 +3173,8 @@ void nicEventStatistics(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent,
     }
 }
 void nicEventWlanInfo(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent,
-                      IN u32 u4EventBufLen){
+                      IN u32 u4EventBufLen)
+{
     P_CMD_INFO_T prCmdInfo;
 
     /* buffer statistics for further query */
@@ -3143,7 +3206,8 @@ void nicEventWlanInfo(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent,
 }
 
 void nicEventMibInfo(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent,
-                     IN u32 u4EventBufLen){
+                     IN u32 u4EventBufLen)
+{
     P_CMD_INFO_T prCmdInfo;
 
     /* buffer statistics for further query */
@@ -3169,7 +3233,8 @@ void nicEventMibInfo(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent,
 
 #if CFG_SUPPORT_LAST_SEC_MCS_INFO
 void nicEventTxMcsInfo(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent,
-                       IN u32 u4EventBufLen){
+                       IN u32 u4EventBufLen)
+{
     P_CMD_INFO_T prCmdInfo;
 
     DBGLOG(RSN, INFO, "EVENT_ID_TX_MCS_INFO");
@@ -3191,7 +3256,8 @@ void nicEventTxMcsInfo(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent,
 #endif
 
 void nicEventBeaconTimeout(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent,
-                           IN u32 u4EventBufLen){
+                           IN u32 u4EventBufLen)
+{
     DBGLOG(NIC, INFO, "EVENT_ID_BSS_BEACON_TIMEOUT\n");
 
     if (prAdapter->fgDisBcnLostDetection == false) {
@@ -3252,7 +3318,8 @@ void nicEventBeaconTimeout(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent,
 }
 
 void nicEventUpdateNoaParams(IN P_ADAPTER_T prAdapter,
-                             IN P_WIFI_EVENT_T prEvent, IN u32 u4EventBufLen){
+                             IN P_WIFI_EVENT_T prEvent, IN u32 u4EventBufLen)
+{
 #if CFG_ENABLE_WIFI_DIRECT
     if (prAdapter->fgIsP2PRegistered) {
         P_EVENT_UPDATE_NOA_PARAMS_T prEventUpdateNoaParam;
@@ -3284,7 +3351,8 @@ void nicEventUpdateNoaParams(IN P_ADAPTER_T prAdapter,
 }
 
 void nicEventStaAgingTimeout(IN P_ADAPTER_T prAdapter,
-                             IN P_WIFI_EVENT_T prEvent, IN u32 u4EventBufLen){
+                             IN P_WIFI_EVENT_T prEvent, IN u32 u4EventBufLen)
+{
     if (prAdapter->fgDisStaAgingTimeoutDetection == false) {
         P_EVENT_STA_AGING_TIMEOUT_T prEventStaAgingTimeout;
         P_STA_RECORD_T prStaRec;
@@ -3326,7 +3394,8 @@ void nicEventStaAgingTimeout(IN P_ADAPTER_T prAdapter,
 }
 
 void nicEventApObssStatus(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent,
-                          IN u32 u4EventBufLen){
+                          IN u32 u4EventBufLen)
+{
 #if CFG_ENABLE_WIFI_DIRECT
     if (prAdapter->fgIsP2PRegistered) {
         if (u4EventBufLen < sizeof(EVENT_AP_OBSS_STATUS_T)) {
@@ -3341,7 +3410,8 @@ void nicEventApObssStatus(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent,
 }
 
 void nicEventRoamingStatus(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent,
-                           IN u32 u4EventBufLen){
+                           IN u32 u4EventBufLen)
+{
 #if CFG_SUPPORT_ROAMING
     P_CMD_ROAMING_TRANSIT_T prTransit;
     if (u4EventBufLen < sizeof(CMD_ROAMING_TRANSIT_T)) {
@@ -3356,7 +3426,8 @@ void nicEventRoamingStatus(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent,
 }
 
 void nicEventSendDeauth(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent,
-                        IN u32 u4EventBufLen){
+                        IN u32 u4EventBufLen)
+{
     SW_RFB_T rSwRfb;
 
 #if DBG
@@ -3385,7 +3456,8 @@ void nicEventSendDeauth(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent,
 }
 
 void nicEventUpdateRddStatus(IN P_ADAPTER_T prAdapter,
-                             IN P_WIFI_EVENT_T prEvent, IN u32 u4EventBufLen){
+                             IN P_WIFI_EVENT_T prEvent, IN u32 u4EventBufLen)
+{
 #if CFG_SUPPORT_RDD_TEST_MODE
     P_EVENT_RDD_STATUS_T prEventRddStatus;
     if (u4EventBufLen < sizeof(EVENT_RDD_STATUS_T)) {
@@ -3400,7 +3472,8 @@ void nicEventUpdateRddStatus(IN P_ADAPTER_T prAdapter,
 }
 
 void nicEventUpdateBwcsStatus(IN P_ADAPTER_T prAdapter,
-                              IN P_WIFI_EVENT_T prEvent, IN u32 u4EventBufLen){
+                              IN P_WIFI_EVENT_T prEvent, IN u32 u4EventBufLen)
+{
     P_PTA_IPC_T prEventBwcsStatus;
     if (u4EventBufLen < sizeof(PTA_IPC_T)) {
         DBGLOG(NIC, ERROR, "%s: Invalid event length: %d < %d\n", __func__,
@@ -3422,7 +3495,8 @@ void nicEventUpdateBwcsStatus(IN P_ADAPTER_T prAdapter,
 }
 
 void nicEventUpdateBcmDebug(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent,
-                            IN u32 u4EventBufLen){
+                            IN u32 u4EventBufLen)
+{
     P_PTA_IPC_T prEventBwcsStatus;
     if (u4EventBufLen < sizeof(PTA_IPC_T)) {
         DBGLOG(NIC, ERROR, "%s: Invalid event length: %d < %d\n", __func__,
@@ -3441,7 +3515,8 @@ void nicEventUpdateBcmDebug(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent,
 }
 
 void nicEventAddPkeyDone(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent,
-                         IN u32 u4EventBufLen){
+                         IN u32 u4EventBufLen)
+{
     P_EVENT_ADD_KEY_DONE_INFO prAddKeyDone;
     P_STA_RECORD_T prStaRec;
     if (u4EventBufLen < sizeof(EVENT_ADD_KEY_DONE_INFO)) {
@@ -3466,7 +3541,8 @@ void nicEventAddPkeyDone(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent,
 }
 
 void nicEventIcapDone(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent,
-                      IN u32 u4EventBufLen){
+                      IN u32 u4EventBufLen)
+{
     P_EVENT_ICAP_STATUS_T prEventIcapStatus;
     PARAM_CUSTOM_MEM_DUMP_STRUCT_T rMemDumpInfo;
     u32 u4QueryInfo;
@@ -3488,7 +3564,8 @@ void nicEventIcapDone(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent,
 }
 
 void nicEventDebugMsg(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent,
-                      IN u32 u4EventBufLen){
+                      IN u32 u4EventBufLen)
+{
     P_EVENT_DEBUG_MSG_T prEventDebugMsg;
     u16 u2DebugMsgId;
     u8 ucMsgType;
@@ -3551,7 +3628,8 @@ void nicEventDebugMsg(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent,
 }
 
 void nicEventTdls(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent,
-                  IN u32 u4EventBufLen){
+                  IN u32 u4EventBufLen)
+{
 #if CFG_SUPPORT_TDLS
     /* [TDLS  Event Format]
      * FW:   FW_EVT_HDR   + 8 + evt_payload
@@ -3578,7 +3656,8 @@ void nicEventTdls(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent,
 }
 
 void nicEventDumpMem(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent,
-                     IN u32 u4EventBufLen){
+                     IN u32 u4EventBufLen)
+{
     P_CMD_INFO_T prCmdInfo;
 
     DBGLOG(SW4, INFO, "%s: EVENT_ID_DUMP_MEM\n", __func__);
@@ -3604,7 +3683,8 @@ void nicEventDumpMem(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent,
 }
 
 void nicEventAssertDump(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent,
-                        IN u32 u4EventBufLen){
+                        IN u32 u4EventBufLen)
+{
 #if CFG_ASSERT_DUMP
     if (wlanIsChipRstRecEnabled(prAdapter)) {
         wlanChipRstPreAct(prAdapter);
@@ -3688,14 +3768,16 @@ void nicEventAssertDump(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent,
 }
 
 void nicEventRddSendPulse(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent,
-                          IN u32 u4EventBufLen){
+                          IN u32 u4EventBufLen)
+{
     DBGLOG(RLM, INFO, "%s: EVENT_ID_RDD_SEND_PULSE\n", __func__);
 
     nicEventRddPulseDump(prAdapter, prEvent->aucBuffer, u4EventBufLen);
 }
 
 void nicEventUpdateCoexPhyrate(IN P_ADAPTER_T prAdapter,
-                               IN P_WIFI_EVENT_T prEvent, IN u32 u4EventBufLen){
+                               IN P_WIFI_EVENT_T prEvent, IN u32 u4EventBufLen)
+{
     u8 i;
     P_EVENT_UPDATE_COEX_PHYRATE_T prEventUpdateCoexPhyrate;
 
@@ -3718,7 +3800,8 @@ void nicEventUpdateCoexPhyrate(IN P_ADAPTER_T prAdapter,
 
 #if (CFG_WOW_SUPPORT == 1)
 void nicEventWakeUpReason(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent,
-                          IN u32 u4EventBufLen){
+                          IN u32 u4EventBufLen)
+{
     struct _EVENT_WAKEUP_REASON_INFO *prWakeUpReason;
     P_GLUE_INFO_T prGlueInfo;
 
@@ -3744,7 +3827,8 @@ void nicEventWakeUpReason(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent,
 #endif
 
 void nicEventCSIData(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent,
-                     IN u32 u4EventBufLen){
+                     IN u32 u4EventBufLen)
+{
     struct EVENT_CSI_DATA_T *prCsiData;
 
     DBGLOG(NIC, INFO, "nicEventCSIData\n");
@@ -3783,7 +3867,8 @@ void nicEventCSIData(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent,
 
 #if CFG_SUPPORT_REPLAY_DETECTION
 void nicCmdEventSetAddKey(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo,
-                          IN u8 *pucEventBuf, IN u32 u4EventBufLen){
+                          IN u8 *pucEventBuf, IN u32 u4EventBufLen)
+{
     P_WIFI_CMD_T prWifiCmd = NULL;
     P_CMD_802_11_KEY prCmdKey = NULL;
     struct SEC_DETECT_REPLAY_INFO *prDetRplyInfo = NULL;
@@ -3837,7 +3922,8 @@ void nicCmdEventSetAddKey(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo,
 }
 
 void nicOidCmdTimeoutSetAddKey(IN P_ADAPTER_T prAdapter,
-                               IN P_CMD_INFO_T prCmdInfo){
+                               IN P_CMD_INFO_T prCmdInfo)
+{
     ASSERT(prAdapter);
 
     DBGLOG(NIC, WARN, "Wlan setaddkey timeout.\n");
@@ -3848,7 +3934,8 @@ void nicOidCmdTimeoutSetAddKey(IN P_ADAPTER_T prAdapter,
 }
 
 void nicEventGetGtkDataSync(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent,
-                            IN u32 u4EventBufLen){
+                            IN u32 u4EventBufLen)
+{
     P_PARAM_GTK_REKEY_DATA prGtkData = NULL;
     struct SEC_DETECT_REPLAY_INFO *prDetRplyInfo = NULL;
     P_BSS_INFO_T prBssInfo = NULL;
@@ -3892,7 +3979,8 @@ void nicEventGetGtkDataSync(IN P_ADAPTER_T prAdapter, IN P_WIFI_EVENT_T prEvent,
 
 #ifdef CFG_SUPPORT_ANT_DIV
 void nicCmdEventAntDiv(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo,
-                       IN u8 *pucEventBuf, IN u32 u4EventBufLen){
+                       IN u8 *pucEventBuf, IN u32 u4EventBufLen)
+{
     P_GLUE_INFO_T prGlueInfo;
     struct CMD_ANT_DIV_CTRL *prAntDivInfo;
     u32 u4QueryInfoLen;
@@ -3928,7 +4016,8 @@ void nicCmdEventAntDiv(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo,
 
 #ifdef CFG_DUMP_TXPOWR_TABLE
 void nicCmdEventGetTxPwrTbl(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo,
-                            IN u8 *pucEventBuf, IN u32 u4EventBufLen){
+                            IN u8 *pucEventBuf, IN u32 u4EventBufLen)
+{
     u32 u4QueryInfoLen;
     P_GLUE_INFO_T prGlueInfo;
     struct EVENT_GET_TXPWR_TBL *prTxPwrTblEvent = NULL;

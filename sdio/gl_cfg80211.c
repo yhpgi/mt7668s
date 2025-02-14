@@ -146,7 +146,8 @@ int mtk_cfg80211_add_key(struct wiphy *wiphy, struct net_device *ndev,
                          int link_id,
 #endif
                          u8 key_index, bool pairwise, const u8 *mac_addr,
-                         struct key_params *params){
+                         struct key_params *params)
+{
     PARAM_KEY_T rKey;
     P_GLUE_INFO_T prGlueInfo = NULL;
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
@@ -318,7 +319,8 @@ int mtk_cfg80211_get_key(struct wiphy *wiphy, struct net_device *ndev,
 #endif
                          u8 key_index, bool pairwise, const u8 *mac_addr,
                          void *cookie,
-                         void (*callback)(void *cookie, struct key_params *)){
+                         void (*callback)(void *cookie, struct key_params *))
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
 
     prGlueInfo = (P_GLUE_INFO_T)wiphy_priv(wiphy);
@@ -345,7 +347,8 @@ int mtk_cfg80211_del_key(struct wiphy *wiphy, struct net_device *ndev,
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0))
                          int link_id,
 #endif
-                         u8 key_index, bool pairwise, const u8 *mac_addr){
+                         u8 key_index, bool pairwise, const u8 *mac_addr)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
     u32 u4BufLen = 0;
@@ -426,7 +429,8 @@ int mtk_cfg80211_set_default_key(struct wiphy *wiphy, struct net_device *ndev,
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0))
                                  int link_id,
 #endif
-                                 u8 key_index, bool unicast, bool multicast){
+                                 u8 key_index, bool unicast, bool multicast)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     PARAM_DEFAULT_KEY_T rDefaultKey;
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
@@ -483,7 +487,8 @@ int mtk_cfg80211_set_default_key(struct wiphy *wiphy, struct net_device *ndev,
  */
 /*----------------------------------------------------------------------------*/
 int mtk_cfg80211_get_station(struct wiphy *wiphy, struct net_device *ndev,
-                             const u8 *mac, struct station_info *sinfo){
+                             const u8 *mac, struct station_info *sinfo)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     WLAN_STATUS rStatus;
     PARAM_MAC_ADDRESS arBssid;
@@ -618,7 +623,8 @@ int mtk_cfg80211_get_station(struct wiphy *wiphy, struct net_device *ndev,
 /*------------------------------------------------------------------------*/
 int mtk_cfg80211_get_link_statistics(struct wiphy *wiphy,
                                      struct net_device *ndev, u8 *mac,
-                                     struct station_info *sinfo){
+                                     struct station_info *sinfo)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     WLAN_STATUS rStatus;
     PARAM_MAC_ADDRESS arBssid;
@@ -712,7 +718,8 @@ int mtk_cfg80211_get_link_statistics(struct wiphy *wiphy,
  */
 /*----------------------------------------------------------------------------*/
 int mtk_cfg80211_scan(struct wiphy *wiphy,
-                      struct cfg80211_scan_request *request){
+                      struct cfg80211_scan_request *request)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     WLAN_STATUS rStatus;
     u32 i, u4BufLen;
@@ -804,7 +811,8 @@ int mtk_cfg80211_scan(struct wiphy *wiphy,
  *
  */
 /*----------------------------------------------------------------------------*/
-void mtk_cfg80211_abort_scan(struct wiphy *wiphy, struct wireless_dev *wdev){
+void mtk_cfg80211_abort_scan(struct wiphy *wiphy, struct wireless_dev *wdev)
+{
     u32 u4SetInfoLen = 0;
     WLAN_STATUS rStatus;
     P_GLUE_INFO_T prGlueInfo = NULL;
@@ -831,7 +839,8 @@ void mtk_cfg80211_abort_scan(struct wiphy *wiphy, struct wireless_dev *wdev){
  */
 /*----------------------------------------------------------------------------*/
 int mtk_cfg80211_auth(struct wiphy *wiphy, struct net_device *ndev,
-                      struct cfg80211_auth_request *req){
+                      struct cfg80211_auth_request *req)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     u32 rStatus;
     u32 u4BufLen;
@@ -1074,7 +1083,8 @@ int mtk_cfg80211_auth(struct wiphy *wiphy, struct net_device *ndev,
  */
 /*----------------------------------------------------------------------------*/
 int mtk_cfg80211_connect(struct wiphy *wiphy, struct net_device *ndev,
-                         struct cfg80211_connect_params *sme){
+                         struct cfg80211_connect_params *sme)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     WLAN_STATUS rStatus;
     u32 u4BufLen;
@@ -1544,7 +1554,8 @@ int mtk_cfg80211_connect(struct wiphy *wiphy, struct net_device *ndev,
  */
 /*----------------------------------------------------------------------------*/
 int mtk_cfg80211_disconnect(struct wiphy *wiphy, struct net_device *ndev,
-                            u16 reason_code){
+                            u16 reason_code)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
     u32 u4BufLen;
@@ -1576,7 +1587,8 @@ int mtk_cfg80211_disconnect(struct wiphy *wiphy, struct net_device *ndev,
  */
 /*----------------------------------------------------------------------------*/
 int mtk_cfg80211_deauth(struct wiphy *wiphy, struct net_device *ndev,
-                        struct cfg80211_deauth_request *req){
+                        struct cfg80211_deauth_request *req)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     u32 rStatus;
     u32 u4BufLen;
@@ -1600,7 +1612,8 @@ int mtk_cfg80211_deauth(struct wiphy *wiphy, struct net_device *ndev,
 }
 
 int mtk_cfg80211_disassoc(struct wiphy *wiphy, struct net_device *ndev,
-                          struct cfg80211_disassoc_request *req){
+                          struct cfg80211_disassoc_request *req)
+{
     P_GLUE_INFO_T prGlueInfo = (P_GLUE_INFO_T)NULL;
     u32 rStatus;
     u32 u4BufLen;
@@ -1636,7 +1649,8 @@ int mtk_cfg80211_disassoc(struct wiphy *wiphy, struct net_device *ndev,
  */
 /*----------------------------------------------------------------------------*/
 int mtk_cfg80211_join_ibss(struct wiphy *wiphy, struct net_device *ndev,
-                           struct cfg80211_ibss_params *params){
+                           struct cfg80211_ibss_params *params)
+{
     PARAM_SSID_T rNewSsid;
     P_GLUE_INFO_T prGlueInfo = NULL;
     u32 u4ChnlFreq;  /* Store channel or frequency information */
@@ -1682,7 +1696,8 @@ int mtk_cfg80211_join_ibss(struct wiphy *wiphy, struct net_device *ndev,
  *         others:  failure
  */
 /*----------------------------------------------------------------------------*/
-int mtk_cfg80211_leave_ibss(struct wiphy *wiphy, struct net_device *ndev){
+int mtk_cfg80211_leave_ibss(struct wiphy *wiphy, struct net_device *ndev)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     WLAN_STATUS rStatus;
     u32 u4BufLen;
@@ -1714,7 +1729,8 @@ int mtk_cfg80211_leave_ibss(struct wiphy *wiphy, struct net_device *ndev){
  */
 /*----------------------------------------------------------------------------*/
 int mtk_cfg80211_set_power_mgmt(struct wiphy *wiphy, struct net_device *ndev,
-                                bool enabled, int timeout){
+                                bool enabled, int timeout)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     WLAN_STATUS rStatus;
     u32 u4BufLen;
@@ -1800,7 +1816,8 @@ int mtk_cfg80211_set_power_mgmt(struct wiphy *wiphy, struct net_device *ndev,
  */
 /*----------------------------------------------------------------------------*/
 int mtk_cfg80211_set_power_mgmt(struct wiphy *wiphy, struct net_device *ndev,
-                                bool enabled, int timeout){
+                                bool enabled, int timeout)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     WLAN_STATUS rStatus;
     u32 u4BufLen;
@@ -1883,7 +1900,8 @@ int mtk_cfg80211_set_power_mgmt(struct wiphy *wiphy, struct net_device *ndev,
  */
 /*----------------------------------------------------------------------------*/
 int mtk_cfg80211_set_pmksa(struct wiphy *wiphy, struct net_device *ndev,
-                           struct cfg80211_pmksa *pmksa){
+                           struct cfg80211_pmksa *pmksa)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     WLAN_STATUS rStatus;
     u32 u4BufLen;
@@ -1927,7 +1945,8 @@ int mtk_cfg80211_set_pmksa(struct wiphy *wiphy, struct net_device *ndev,
  */
 /*----------------------------------------------------------------------------*/
 int mtk_cfg80211_del_pmksa(struct wiphy *wiphy, struct net_device *ndev,
-                           struct cfg80211_pmksa *pmksa){
+                           struct cfg80211_pmksa *pmksa)
+{
     return 0;
 }
 
@@ -1942,7 +1961,8 @@ int mtk_cfg80211_del_pmksa(struct wiphy *wiphy, struct net_device *ndev,
  *         others:  failure
  */
 /*----------------------------------------------------------------------------*/
-int mtk_cfg80211_flush_pmksa(struct wiphy *wiphy, struct net_device *ndev){
+int mtk_cfg80211_flush_pmksa(struct wiphy *wiphy, struct net_device *ndev)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     WLAN_STATUS rStatus;
     u32 u4BufLen;
@@ -1982,7 +2002,8 @@ int mtk_cfg80211_flush_pmksa(struct wiphy *wiphy, struct net_device *ndev){
  */
 /*----------------------------------------------------------------------------*/
 int mtk_cfg80211_set_rekey_data(struct wiphy *wiphy, struct net_device *dev,
-                                struct cfg80211_gtk_rekey_data *data){
+                                struct cfg80211_gtk_rekey_data *data)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     u32 u4BufLen;
     P_PARAM_GTK_REKEY_DATA prGtkData;
@@ -2074,7 +2095,8 @@ int mtk_cfg80211_set_rekey_data(struct wiphy *wiphy, struct net_device *dev,
 
 void mtk_cfg80211_mgmt_frame_register(IN struct wiphy *wiphy,
                                       IN struct wireless_dev *wdev,
-                                      IN u16 frame_type, IN bool reg){
+                                      IN u16 frame_type, IN bool reg)
+{
     P_GLUE_INFO_T prGlueInfo = (P_GLUE_INFO_T)NULL;
 
     do {
@@ -2139,7 +2161,8 @@ void mtk_cfg80211_mgmt_frame_register(IN struct wiphy *wiphy,
 int mtk_cfg80211_remain_on_channel(struct wiphy *wiphy,
                                    struct wireless_dev *wdev,
                                    struct ieee80211_channel *chan,
-                                   unsigned int duration, u64 *cookie){
+                                   unsigned int duration, u64 *cookie)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     s32 i4Rslt = -EINVAL;
     P_MSG_REMAIN_ON_CHANNEL_T prMsgChnlReq = (P_MSG_REMAIN_ON_CHANNEL_T)NULL;
@@ -2211,7 +2234,8 @@ int mtk_cfg80211_remain_on_channel(struct wiphy *wiphy,
 /*----------------------------------------------------------------------------*/
 int mtk_cfg80211_cancel_remain_on_channel(struct wiphy *wiphy,
                                           struct wireless_dev *wdev,
-                                          u64 cookie){
+                                          u64 cookie)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     s32 i4Rslt = -EINVAL;
     P_MSG_CANCEL_REMAIN_ON_CHANNEL_T prMsgChnlAbort =
@@ -2257,7 +2281,8 @@ int mtk_cfg80211_cancel_remain_on_channel(struct wiphy *wiphy,
  */
 /*----------------------------------------------------------------------------*/
 int mtk_cfg80211_mgmt_tx(struct wiphy *wiphy, struct wireless_dev *wdev,
-                         struct cfg80211_mgmt_tx_params *params, u64 *cookie){
+                         struct cfg80211_mgmt_tx_params *params, u64 *cookie)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     s32 i4Rslt = -EINVAL;
     P_MSG_MGMT_TX_REQUEST_T prMsgTxReq = (P_MSG_MGMT_TX_REQUEST_T)NULL;
@@ -2336,7 +2361,8 @@ int mtk_cfg80211_mgmt_tx(struct wiphy *wiphy, struct wireless_dev *wdev,
  */
 /*----------------------------------------------------------------------------*/
 int mtk_cfg80211_mgmt_tx_cancel_wait(struct wiphy *wiphy,
-                                     struct wireless_dev *wdev, u64 cookie){
+                                     struct wireless_dev *wdev, u64 cookie)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
 
     prGlueInfo = (P_GLUE_INFO_T)wiphy_priv(wiphy);
@@ -2353,7 +2379,8 @@ int mtk_cfg80211_mgmt_tx_cancel_wait(struct wiphy *wiphy,
 
 int mtk_cfg80211_testmode_get_sta_statistics(IN struct wiphy *wiphy,
                                              IN void *data, IN int len,
-                                             IN P_GLUE_INFO_T prGlueInfo){
+                                             IN P_GLUE_INFO_T prGlueInfo)
+{
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
     u32 u4BufLen;
     u32 u4LinkScore;
@@ -2604,7 +2631,8 @@ nla_put_failure:
 }
 
 int mtk_cfg80211_testmode_sw_cmd(IN struct wiphy *wiphy, IN void *data,
-                                 IN int len){
+                                 IN int len)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     P_NL80211_DRIVER_SW_CMD_PARAMS prParams =
         (P_NL80211_DRIVER_SW_CMD_PARAMS)NULL;
@@ -2642,7 +2670,8 @@ int mtk_cfg80211_testmode_sw_cmd(IN struct wiphy *wiphy, IN void *data,
     return fgIsValid;
 }
 
-static int mtk_wlan_cfg_testmode_cmd(struct wiphy *wiphy, void *data, int len){
+static int mtk_wlan_cfg_testmode_cmd(struct wiphy *wiphy, void *data, int len)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     P_NL80211_DRIVER_TEST_MODE_PARAMS prParams = NULL;
     s32 i4Status;
@@ -2699,7 +2728,8 @@ static int mtk_wlan_cfg_testmode_cmd(struct wiphy *wiphy, void *data, int len){
 }
 
 int mtk_cfg80211_testmode_cmd(struct wiphy *wiphy, struct wireless_dev *wdev,
-                              void *data, int len){
+                              void *data, int len)
+{
     ASSERT(wdev);
     return mtk_wlan_cfg_testmode_cmd(wiphy, data, len);
 }
@@ -2782,7 +2812,8 @@ int mtk_cfg80211_sched_scan_start(IN struct wiphy *wiphy,
 }
 
 int mtk_cfg80211_sched_scan_stop(IN struct wiphy *wiphy,
-                                 IN struct net_device *ndev, IN u64 reqid){
+                                 IN struct net_device *ndev, IN u64 reqid)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     WLAN_STATUS rStatus;
     u32 u4BufLen;
@@ -2817,7 +2848,8 @@ int mtk_cfg80211_sched_scan_stop(IN struct wiphy *wiphy,
  */
 /*----------------------------------------------------------------------------*/
 int mtk_cfg80211_assoc(struct wiphy *wiphy, struct net_device *ndev,
-                       struct cfg80211_assoc_request *req){
+                       struct cfg80211_assoc_request *req)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     u8 arBssid[PARAM_MAC_ADDR_LEN];
     u32 rStatus;
@@ -3287,7 +3319,8 @@ int mtk_cfg80211_assoc(struct wiphy *wiphy, struct net_device *ndev,
 
 int mtk_cfg80211_testmode_get_scan_done(IN struct wiphy *wiphy, IN void *data,
                                         IN int len,
-                                        IN P_GLUE_INFO_T prGlueInfo){
+                                        IN P_GLUE_INFO_T prGlueInfo)
+{
 #define NL80211_TESTMODE_P2P_SCANDONE_INVALID 0
 #define NL80211_TESTMODE_P2P_SCANDONE_STATUS 1
 
@@ -3368,7 +3401,8 @@ nla_put_failure:
 /*----------------------------------------------------------------------------*/
 int mtk_cfg80211_change_station(struct wiphy *wiphy, struct net_device *ndev,
                                 const u8 *mac,
-                                struct station_parameters *params){
+                                struct station_parameters *params)
+{
     /* return 0; */
 
     /* from supplicant -- wpa_supplicant_tdls_peer_addset() */
@@ -3504,7 +3538,8 @@ int mtk_cfg80211_change_station(struct wiphy *wiphy, struct net_device *ndev,
  */
 /*----------------------------------------------------------------------------*/
 int mtk_cfg80211_add_station(struct wiphy *wiphy, struct net_device *ndev,
-                             const u8 *mac, struct station_parameters *params){
+                             const u8 *mac, struct station_parameters *params)
+{
     /* return 0; */
 
     /* from supplicant -- wpa_supplicant_tdls_peer_addset() */
@@ -3557,7 +3592,8 @@ int mtk_cfg80211_add_station(struct wiphy *wiphy, struct net_device *ndev,
 /*----------------------------------------------------------------------------*/
 static const u8 bcast_addr[ETH_ALEN] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
 int mtk_cfg80211_del_station(struct wiphy *wiphy, struct net_device *ndev,
-                             struct station_del_parameters *params){
+                             struct station_del_parameters *params)
+{
     /* fgIsTDLSlinkEnable = 0; */
 
     /* return 0; */
@@ -3609,7 +3645,8 @@ int mtk_cfg80211_tdls_mgmt(struct wiphy *wiphy, struct net_device *dev,
 #endif
                            u8 action_code, u8 dialog_token, u16 status_code,
                            u32 peer_capability, bool initiator, const u8 *buf,
-                           size_t len){
+                           size_t len)
+{
     GLUE_INFO_T *prGlueInfo;
     TDLS_CMD_LINK_MGT_T rCmdMgt;
     u32 u4BufLen;
@@ -3661,7 +3698,8 @@ int mtk_cfg80211_tdls_mgmt(struct wiphy *wiphy, struct net_device *dev,
  */
 /*----------------------------------------------------------------------------*/
 int mtk_cfg80211_tdls_oper(struct wiphy *wiphy, struct net_device *dev,
-                           const u8 *peer, enum nl80211_tdls_operation oper){
+                           const u8 *peer, enum nl80211_tdls_operation oper)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     u32 u4BufLen;
     ADAPTER_T *prAdapter;
@@ -3685,7 +3723,8 @@ int mtk_cfg80211_tdls_oper(struct wiphy *wiphy, struct net_device *dev,
 
 #endif
 
-s32 mtk_cfg80211_process_str_cmd(P_GLUE_INFO_T prGlueInfo, u8 *cmd, s32 len){
+s32 mtk_cfg80211_process_str_cmd(P_GLUE_INFO_T prGlueInfo, u8 *cmd, s32 len)
+{
     u32 rStatus = WLAN_STATUS_SUCCESS;
 
 #if CFG_SUPPORT_802_11K || CFG_SUPPORT_802_11V_BSS_TRANSITION_MGT
@@ -3732,7 +3771,8 @@ s32 mtk_cfg80211_process_str_cmd(P_GLUE_INFO_T prGlueInfo, u8 *cmd, s32 len){
     return -EINVAL;
 }
 
-bool is_world_regdom(char *alpha2){
+bool is_world_regdom(char *alpha2)
+{
     if (!alpha2) {
         return false;
     }
@@ -3740,7 +3780,8 @@ bool is_world_regdom(char *alpha2){
     return (alpha2[0] == '0') && (alpha2[1] == '0');
 }
 
-enum regd_state regd_state_machine(IN struct regulatory_request *pRequest){
+enum regd_state regd_state_machine(IN struct regulatory_request *pRequest)
+{
     switch (pRequest->initiator) {
     case NL80211_REGDOM_SET_BY_USER:
         DBGLOG(RLM, INFO, "regd_state_machine: SET_BY_USER\n");
@@ -3769,7 +3810,8 @@ enum regd_state regd_state_machine(IN struct regulatory_request *pRequest){
 }
 
 void mtk_apply_custom_regulatory(IN struct wiphy *pWiphy,
-                                 IN const struct ieee80211_regdomain *pRegdom){
+                                 IN const struct ieee80211_regdomain *pRegdom)
+{
     u32 band_idx, ch_idx;
     struct ieee80211_supported_band *sband;
     struct ieee80211_channel *chan;
@@ -3796,7 +3838,8 @@ void mtk_apply_custom_regulatory(IN struct wiphy *pWiphy,
 }
 
 void mtk_reg_notify(IN struct wiphy *pWiphy,
-                    IN struct regulatory_request *pRequest){
+                    IN struct regulatory_request *pRequest)
+{
     P_GLUE_INFO_T prGlueInfo;
     P_ADAPTER_T prAdapter;
     enum regd_state old_state;
@@ -3982,7 +4025,8 @@ DOMAIN_SEND_CMD:
     rlmDomainSendCmd(prAdapter, false);
 }
 
-void cfg80211_regd_set_wiphy(IN struct wiphy *prWiphy){
+void cfg80211_regd_set_wiphy(IN struct wiphy *prWiphy)
+{
     /*
      * register callback
      */
@@ -4023,7 +4067,8 @@ void cfg80211_regd_set_wiphy(IN struct wiphy *prWiphy){
  * iw phy0 wowlan disable
  * iw phy0 wowlan enable any
  */
-void mtk_cfg80211_set_wakeup(struct wiphy *wiphy, bool enabled){
+void mtk_cfg80211_set_wakeup(struct wiphy *wiphy, bool enabled)
+{
     P_GLUE_INFO_T prGlueInfo = (P_GLUE_INFO_T)wiphy_priv(wiphy);
 
     DBGLOG(REQ, WARN, "%s\n", enabled ? "enabled" : "disalbed");
@@ -4036,7 +4081,8 @@ void mtk_cfg80211_set_wakeup(struct wiphy *wiphy, bool enabled){
     }
 }
 
-int mtk_cfg80211_suspend(struct wiphy *wiphy, struct cfg80211_wowlan *wow){
+int mtk_cfg80211_suspend(struct wiphy *wiphy, struct cfg80211_wowlan *wow)
+{
     P_GLUE_INFO_T prGlueInfo;
     ADAPTER_T *prAdapter;
     WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
@@ -4077,7 +4123,8 @@ int mtk_cfg80211_suspend(struct wiphy *wiphy, struct cfg80211_wowlan *wow){
  *         others:  failure
  */
 /*----------------------------------------------------------------------------*/
-int mtk_cfg80211_resume(struct wiphy *wiphy){
+int mtk_cfg80211_resume(struct wiphy *wiphy)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     P_ADAPTER_T prAdapter = NULL;
     u32 rStatus, u4InfoLen;
@@ -4114,7 +4161,8 @@ end:
  *         1:  P2P GO/GC, AP
  */
 /*----------------------------------------------------------------------------*/
-int mtk_IsP2PNetDevice(P_GLUE_INFO_T prGlueInfo, struct net_device *ndev){
+int mtk_IsP2PNetDevice(P_GLUE_INFO_T prGlueInfo, struct net_device *ndev)
+{
     P_NETDEV_PRIVATE_GLUE_INFO prNetDevPrivate = NULL;
     int iftype = 0;
     int ret = 1;
@@ -4151,7 +4199,8 @@ int mtk_IsP2PNetDevice(P_GLUE_INFO_T prGlueInfo, struct net_device *ndev){
  *
  */
 /*----------------------------------------------------------------------------*/
-int mtk_init_sta_role(P_ADAPTER_T prAdapter, struct net_device *ndev){
+int mtk_init_sta_role(P_ADAPTER_T prAdapter, struct net_device *ndev)
+{
     P_NETDEV_PRIVATE_GLUE_INFO prNdevPriv = NULL;
 
     if ((prAdapter == NULL) || (ndev == NULL)) {
@@ -4185,7 +4234,8 @@ int mtk_init_sta_role(P_ADAPTER_T prAdapter, struct net_device *ndev){
  *
  */
 /*----------------------------------------------------------------------------*/
-int mtk_uninit_sta_role(P_ADAPTER_T prAdapter, struct net_device *ndev){
+int mtk_uninit_sta_role(P_ADAPTER_T prAdapter, struct net_device *ndev)
+{
     P_NETDEV_PRIVATE_GLUE_INFO prNdevPriv = NULL;
 
     if ((prAdapter == NULL) || (ndev == NULL)) {
@@ -4217,7 +4267,8 @@ int mtk_uninit_sta_role(P_ADAPTER_T prAdapter, struct net_device *ndev){
  *
  */
 /*----------------------------------------------------------------------------*/
-int mtk_init_ap_role(P_GLUE_INFO_T prGlueInfo, struct net_device *ndev){
+int mtk_init_ap_role(P_GLUE_INFO_T prGlueInfo, struct net_device *ndev)
+{
     int u4Idx = 0;
     P_ADAPTER_T prAdapter = prGlueInfo->prAdapter;
 
@@ -4266,7 +4317,8 @@ int mtk_init_ap_role(P_GLUE_INFO_T prGlueInfo, struct net_device *ndev){
  *
  */
 /*----------------------------------------------------------------------------*/
-int mtk_uninit_ap_role(P_GLUE_INFO_T prGlueInfo, struct net_device *ndev){
+int mtk_uninit_ap_role(P_GLUE_INFO_T prGlueInfo, struct net_device *ndev)
+{
     unsigned char u4Idx;
 
     if (mtk_Netdev_To_RoleIdx(prGlueInfo, ndev, &u4Idx) != 0) {
@@ -4290,7 +4342,8 @@ int mtk_cfg_start_radar_detection(struct wiphy *wiphy,
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 9, 0)
                                   , int link_id
 #endif
-                                  ){
+                                  )
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     uint8_t state = 0;
 
@@ -4316,7 +4369,8 @@ int mtk_cfg_start_radar_detection(struct wiphy *wiphy,
 
 int mtk_cfg_channel_switch(struct wiphy *wiphy,
                            struct net_device *dev,
-                           struct cfg80211_csa_settings *params){
+                           struct cfg80211_csa_settings *params)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     uint8_t state = 0;
 
@@ -4339,7 +4393,8 @@ int mtk_cfg_channel_switch(struct wiphy *wiphy,
 struct wireless_dev *mtk_cfg_add_iface(struct wiphy *wiphy, const char *name,
                                        unsigned char name_assign_type,
                                        enum nl80211_iftype type,
-                                       struct vif_params *params){
+                                       struct vif_params *params)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     u8 state = 0;
 
@@ -4362,7 +4417,8 @@ struct wireless_dev *mtk_cfg_add_iface(struct wiphy *wiphy, const char *name,
 
 #endif  /* CFG_ENABLE_WIFI_DIRECT_CFG_80211 */
 }
-int mtk_cfg_del_iface(struct wiphy *wiphy, struct wireless_dev *wdev){
+int mtk_cfg_del_iface(struct wiphy *wiphy, struct wireless_dev *wdev)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     u8 state = 0;
 
@@ -4385,7 +4441,8 @@ int mtk_cfg_del_iface(struct wiphy *wiphy, struct wireless_dev *wdev){
 
 int mtk_cfg_change_iface(struct wiphy *wiphy, struct net_device *ndev,
                          enum nl80211_iftype type,
-                         struct vif_params *params){
+                         struct vif_params *params)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     P_ADAPTER_T prAdapter = NULL;
     P_NETDEV_PRIVATE_GLUE_INFO prNetdevPriv = NULL;
@@ -4491,7 +4548,8 @@ int mtk_cfg_add_key(struct wiphy *wiphy, struct net_device *ndev,
 #endif
                     u8 key_index,
                     bool pairwise, const u8 *mac_addr,
-                    struct key_params *params){
+                    struct key_params *params)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     u8 state = 0;
 
@@ -4526,7 +4584,8 @@ int mtk_cfg_get_key(struct wiphy *wiphy, struct net_device *ndev,
 #endif
                     u8 key_index,
                     bool pairwise, const u8 *mac_addr, void *cookie,
-                    void (*callback)(void *cookie, struct key_params *)){
+                    void (*callback)(void *cookie, struct key_params *))
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     u8 state = 0;
 
@@ -4560,7 +4619,8 @@ int mtk_cfg_del_key(struct wiphy *wiphy, struct net_device *ndev,
                     int link_id,
 #endif
                     u8 key_index,
-                    bool pairwise, const u8 *mac_addr){
+                    bool pairwise, const u8 *mac_addr)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     u8 state = 0;
 
@@ -4591,7 +4651,8 @@ int mtk_cfg_set_default_key(struct wiphy *wiphy, struct net_device *ndev,
     #if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0))
                             int link_id,
 #endif
-                            u8 key_index, bool unicast, bool multicast){
+                            u8 key_index, bool unicast, bool multicast)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     u8 state = 0;
 
@@ -4652,7 +4713,8 @@ int mtk_cfg_set_default_mgmt_key(struct wiphy *wiphy,
 
 
 int mtk_cfg_get_station(struct wiphy *wiphy, struct net_device *ndev,
-                        const u8 *mac, struct station_info *sinfo){
+                        const u8 *mac, struct station_info *sinfo)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     u8 state = 0;
 
@@ -4674,7 +4736,8 @@ int mtk_cfg_get_station(struct wiphy *wiphy, struct net_device *ndev,
 #if CFG_SUPPORT_TDLS
 int mtk_cfg_change_station(struct wiphy *wiphy,
                            struct net_device *ndev,
-                           const u8 *mac, struct station_parameters *params){
+                           const u8 *mac, struct station_parameters *params)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     u8 state = 0;
 
@@ -4695,7 +4758,8 @@ int mtk_cfg_change_station(struct wiphy *wiphy,
 }
 
 int mtk_cfg_add_station(struct wiphy *wiphy, struct net_device *ndev,
-                        const u8 *mac, struct station_parameters *params){
+                        const u8 *mac, struct station_parameters *params)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     u8 state = 0;
 
@@ -4716,7 +4780,8 @@ int mtk_cfg_add_station(struct wiphy *wiphy, struct net_device *ndev,
 
 
 int mtk_cfg_tdls_oper(struct wiphy *wiphy, struct net_device *ndev,
-                      const u8 *peer, enum nl80211_tdls_operation oper){
+                      const u8 *peer, enum nl80211_tdls_operation oper)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     u8 state = 0;
 
@@ -4743,7 +4808,8 @@ int mtk_cfg_tdls_mgmt(struct wiphy *wiphy, struct net_device *dev,
                       u8 action_code, u8 dialog_token,
                       u16 status_code, u32 peer_capability, bool initiator,
                       const u8 *buf, size_t len
-                      ){
+                      )
+{
     GLUE_INFO_T *prGlueInfo;
     u8 state = 0;
 
@@ -4760,7 +4826,7 @@ int mtk_cfg_tdls_mgmt(struct wiphy *wiphy, struct net_device *dev,
     }
 
     return mtk_cfg80211_tdls_mgmt(wiphy, dev, peer,
-        #if (CFG80211_VERSION_CODE >= KERNEL_VERSION(6, 5, 0))
+#if (CFG80211_VERSION_CODE >= KERNEL_VERSION(6, 5, 0))
                                   link_id,
 #endif
                                   action_code, dialog_token,
@@ -4772,7 +4838,8 @@ int mtk_cfg_tdls_mgmt(struct wiphy *wiphy, struct net_device *dev,
 
 
 int mtk_cfg_del_station(struct wiphy *wiphy, struct net_device *ndev,
-                        struct station_del_parameters *params){
+                        struct station_del_parameters *params)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     u8 state = 0;
 
@@ -4795,7 +4862,8 @@ int mtk_cfg_del_station(struct wiphy *wiphy, struct net_device *ndev,
 #endif  /* CFG_SUPPORT_TDLS */
 }
 
-int mtk_cfg_scan(struct wiphy *wiphy, struct cfg80211_scan_request *request){
+int mtk_cfg_scan(struct wiphy *wiphy, struct cfg80211_scan_request *request)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     u8 state = 0;
 
@@ -4814,7 +4882,8 @@ int mtk_cfg_scan(struct wiphy *wiphy, struct cfg80211_scan_request *request){
     return mtk_cfg80211_scan(wiphy, request);
 }
 
-void mtk_cfg_abort_scan(struct wiphy *wiphy, struct wireless_dev *wdev){
+void mtk_cfg_abort_scan(struct wiphy *wiphy, struct wireless_dev *wdev)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     u8 state = 0;
 
@@ -4834,7 +4903,8 @@ void mtk_cfg_abort_scan(struct wiphy *wiphy, struct wireless_dev *wdev){
 
 int mtk_cfg_sched_scan_start(IN struct wiphy *wiphy,
                              IN struct net_device *ndev,
-                             IN struct cfg80211_sched_scan_request *request){
+                             IN struct cfg80211_sched_scan_request *request)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     u8 state = 0;
 
@@ -4857,7 +4927,8 @@ int mtk_cfg_sched_scan_start(IN struct wiphy *wiphy,
 
 int mtk_cfg_sched_scan_stop(IN struct wiphy *wiphy,
                             IN struct net_device *ndev,
-                            IN u64 reqid){
+                            IN u64 reqid)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     u8 state = 0;
 
@@ -4877,7 +4948,8 @@ int mtk_cfg_sched_scan_stop(IN struct wiphy *wiphy,
 }
 
 int mtk_cfg_connect(struct wiphy *wiphy, struct net_device *ndev,
-                    struct cfg80211_connect_params *sme){
+                    struct cfg80211_connect_params *sme)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     u8 state = 0;
 
@@ -4896,7 +4968,8 @@ int mtk_cfg_connect(struct wiphy *wiphy, struct net_device *ndev,
 }
 
 int mtk_cfg_disconnect(struct wiphy *wiphy, struct net_device *ndev,
-                       u16 reason_code){
+                       u16 reason_code)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     u8 state = 0;
 
@@ -4915,7 +4988,8 @@ int mtk_cfg_disconnect(struct wiphy *wiphy, struct net_device *ndev,
 }
 
 int mtk_cfg_join_ibss(struct wiphy *wiphy, struct net_device *ndev,
-                      struct cfg80211_ibss_params *params){
+                      struct cfg80211_ibss_params *params)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     u8 state = 0;
 
@@ -4934,7 +5008,8 @@ int mtk_cfg_join_ibss(struct wiphy *wiphy, struct net_device *ndev,
 }
 
 int mtk_cfg_leave_ibss(struct wiphy *wiphy,
-                       struct net_device *ndev){
+                       struct net_device *ndev)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     u8 state = 0;
 
@@ -4954,7 +5029,8 @@ int mtk_cfg_leave_ibss(struct wiphy *wiphy,
 
 int mtk_cfg_set_power_mgmt(struct wiphy *wiphy,
                            struct net_device *ndev,
-                           bool enabled, int timeout){
+                           bool enabled, int timeout)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     u8 state = 0;
 
@@ -4976,7 +5052,8 @@ int mtk_cfg_set_power_mgmt(struct wiphy *wiphy,
 
 int mtk_cfg_set_pmksa(struct wiphy *wiphy,
                       struct net_device *ndev,
-                      struct cfg80211_pmksa *pmksa){
+                      struct cfg80211_pmksa *pmksa)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     u8 state = 0;
 
@@ -4997,7 +5074,8 @@ int mtk_cfg_set_pmksa(struct wiphy *wiphy,
 
 int mtk_cfg_del_pmksa(struct wiphy *wiphy,
                       struct net_device *ndev,
-                      struct cfg80211_pmksa *pmksa){
+                      struct cfg80211_pmksa *pmksa)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     u8 state = 0;
 
@@ -5017,7 +5095,8 @@ int mtk_cfg_del_pmksa(struct wiphy *wiphy,
 }
 
 int mtk_cfg_flush_pmksa(struct wiphy *wiphy,
-                        struct net_device *ndev){
+                        struct net_device *ndev)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     u8 state = 0;
 
@@ -5039,7 +5118,8 @@ int mtk_cfg_flush_pmksa(struct wiphy *wiphy,
 #if CONFIG_SUPPORT_GTK_REKEY
 int mtk_cfg_set_rekey_data(struct wiphy *wiphy,
                            struct net_device *dev,
-                           struct cfg80211_gtk_rekey_data *data){
+                           struct cfg80211_gtk_rekey_data *data)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     u8 state = 0;
 
@@ -5060,7 +5140,8 @@ int mtk_cfg_set_rekey_data(struct wiphy *wiphy,
 #endif  /* CONFIG_SUPPORT_GTK_REKEY */
 
 int mtk_cfg_suspend(struct wiphy *wiphy,
-                    struct cfg80211_wowlan *wow){
+                    struct cfg80211_wowlan *wow)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     u8 state = 0;
 
@@ -5075,7 +5156,8 @@ int mtk_cfg_suspend(struct wiphy *wiphy,
     return mtk_cfg80211_suspend(wiphy, wow);
 }
 
-int mtk_cfg_resume(struct wiphy *wiphy){
+int mtk_cfg_resume(struct wiphy *wiphy)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     u8 state = 0;
 
@@ -5091,7 +5173,8 @@ int mtk_cfg_resume(struct wiphy *wiphy){
 }
 
 int mtk_cfg_auth(struct wiphy *wiphy, struct net_device *ndev,
-                 struct cfg80211_auth_request *req){
+                 struct cfg80211_auth_request *req)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
 
     prGlueInfo = (P_GLUE_INFO_T )wiphy_priv(wiphy);
@@ -5111,7 +5194,8 @@ int mtk_cfg_auth(struct wiphy *wiphy, struct net_device *ndev,
 
 int mtk_cfg_assoc(struct wiphy *wiphy,
                   struct net_device *ndev,
-                  struct cfg80211_assoc_request *req){
+                  struct cfg80211_assoc_request *req)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     u8 state = 0;
 
@@ -5133,7 +5217,8 @@ int mtk_cfg_assoc(struct wiphy *wiphy,
 int mtk_cfg_remain_on_channel(struct wiphy *wiphy,
                               struct wireless_dev *wdev,
                               struct ieee80211_channel *chan,
-                              unsigned int duration, u64 *cookie){
+                              unsigned int duration, u64 *cookie)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     u8 state = 0;
 
@@ -5154,7 +5239,8 @@ int mtk_cfg_remain_on_channel(struct wiphy *wiphy,
 }
 
 int mtk_cfg_cancel_remain_on_channel(struct wiphy *wiphy,
-                                     struct wireless_dev *wdev, u64 cookie){
+                                     struct wireless_dev *wdev, u64 cookie)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     u8 state = 0;
 
@@ -5177,7 +5263,8 @@ int mtk_cfg_cancel_remain_on_channel(struct wiphy *wiphy,
 
 int mtk_cfg_mgmt_tx(struct wiphy *wiphy,
                     struct wireless_dev *wdev,
-                    struct cfg80211_mgmt_tx_params *params, u64 *cookie){
+                    struct cfg80211_mgmt_tx_params *params, u64 *cookie)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     u8 state = 0;
 
@@ -5200,7 +5287,8 @@ int mtk_cfg_mgmt_tx(struct wiphy *wiphy,
 #if KERNEL_VERSION(5, 8, 0) > CFG80211_VERSION_CODE
 void mtk_cfg_mgmt_frame_register(struct wiphy *wiphy,
                                  struct wireless_dev *wdev,
-                                 u16 frame_type, bool reg){
+                                 u16 frame_type, bool reg)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     u8 state = 0;
 
@@ -5224,7 +5312,8 @@ void mtk_cfg_mgmt_frame_register(struct wiphy *wiphy,
 #else
 void mtk_cfg_mgmt_frame_update(struct wiphy *wiphy,
                                struct wireless_dev *wdev,
-                               struct mgmt_frame_regs *upd){
+                               struct mgmt_frame_regs *upd)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     u_int8_t fgIsP2pNetDevice = false;
     u32 *pu4PacketFilter = NULL;
@@ -5302,7 +5391,8 @@ void mtk_cfg_mgmt_frame_update(struct wiphy *wiphy,
 #if (CFG_ENABLE_WIFI_DIRECT_CFG_80211 != 0)
 int mtk_cfg_change_bss(struct wiphy *wiphy,
                        struct net_device *dev,
-                       struct bss_parameters *params){
+                       struct bss_parameters *params)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     u8 state = 0;
 
@@ -5323,7 +5413,8 @@ int mtk_cfg_change_bss(struct wiphy *wiphy,
 
 int mtk_cfg_mgmt_tx_cancel_wait(struct wiphy *wiphy,
                                 struct wireless_dev *wdev,
-                                u64 cookie){
+                                u64 cookie)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     u8 state = 0;
 
@@ -5345,7 +5436,8 @@ int mtk_cfg_mgmt_tx_cancel_wait(struct wiphy *wiphy,
 
 int mtk_cfg_deauth(struct wiphy *wiphy,
                    struct net_device *dev,
-                   struct cfg80211_deauth_request *req){
+                   struct cfg80211_deauth_request *req)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     u8 state = 0;
     int ret = 0;
@@ -5368,7 +5460,8 @@ int mtk_cfg_deauth(struct wiphy *wiphy,
 
 int mtk_cfg_disassoc(struct wiphy *wiphy,
                      struct net_device *dev,
-                     struct cfg80211_disassoc_request *req){
+                     struct cfg80211_disassoc_request *req)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     u8 state = 0;
 
@@ -5389,7 +5482,8 @@ int mtk_cfg_disassoc(struct wiphy *wiphy,
 
 int mtk_cfg_start_ap(struct wiphy *wiphy,
                      struct net_device *dev,
-                     struct cfg80211_ap_settings *settings){
+                     struct cfg80211_ap_settings *settings)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     u8 state = 0;
 
@@ -5415,7 +5509,8 @@ int mtk_cfg_change_beacon(struct wiphy *wiphy,
 #else
                           struct cfg80211_ap_update *info
 #endif
-                          ){
+                          )
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     u8 state = 0;
 
@@ -5465,7 +5560,8 @@ int mtk_cfg_stop_ap(struct wiphy *wiphy,
 }
 
 int mtk_cfg_set_wiphy_params(struct wiphy *wiphy,
-                             u32 changed){
+                             u32 changed)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     u8 state = 0;
 
@@ -5486,7 +5582,8 @@ int mtk_cfg_set_bitrate_mask(struct wiphy *wiphy,
                              unsigned int link_id,
 #endif
                              const u8 *peer,
-                             const struct cfg80211_bitrate_mask *mask){
+                             const struct cfg80211_bitrate_mask *mask)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     u8 state = 0;
 
@@ -5513,7 +5610,8 @@ int mtk_cfg_set_bitrate_mask(struct wiphy *wiphy,
 
 int mtk_cfg_set_txpower(struct wiphy *wiphy,
                         struct wireless_dev *wdev,
-                        enum nl80211_tx_power_setting type, int mbm){
+                        enum nl80211_tx_power_setting type, int mbm)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     u8 state = 0;
 
@@ -5534,7 +5632,8 @@ int mtk_cfg_set_txpower(struct wiphy *wiphy,
 
 int mtk_cfg_get_txpower(struct wiphy *wiphy,
                         struct wireless_dev *wdev,
-                        int *dbm){
+                        int *dbm)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     u8 state = 0;
 

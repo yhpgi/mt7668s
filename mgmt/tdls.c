@@ -76,7 +76,8 @@ u8 g_arTdlsLink[MAXNUM_TDLS_PEER] = { 0, 0, 0, 0 };
  */
 /*----------------------------------------------------------------------------*/
 u32 TdlsexLinkMgt(P_ADAPTER_T prAdapter, void *pvSetBuffer, u32 u4SetBufferLen,
-                  u32 *pu4SetInfoLen){
+                  u32 *pu4SetInfoLen)
+{
     /* from supplicant -- wpa_supplicant_tdls_peer_addset() */
 
     STA_RECORD_T *prStaRec;
@@ -208,7 +209,8 @@ u32 TdlsexLinkMgt(P_ADAPTER_T prAdapter, void *pvSetBuffer, u32 u4SetBufferLen,
  */
 /*----------------------------------------------------------------------------*/
 u32 TdlsexLinkOper(P_ADAPTER_T prAdapter, void *pvSetBuffer, u32 u4SetBufferLen,
-                   u32 *pu4SetInfoLen){
+                   u32 *pu4SetInfoLen)
+{
     /* from supplicant -- wpa_supplicant_tdls_peer_addset() */
     u16 i;
     STA_RECORD_T *prStaRec;
@@ -265,7 +267,8 @@ u32 TdlsexLinkOper(P_ADAPTER_T prAdapter, void *pvSetBuffer, u32 u4SetBufferLen,
  */
 /*----------------------------------------------------------------------------*/
 u32 TdlsFrameGeneralIeAppend(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec,
-                             u8 *pPkt){
+                             u8 *pPkt)
+{
     GLUE_INFO_T *prGlueInfo;
     BSS_INFO_T *prBssInfo;
     PM_PROFILE_SETUP_INFO_T *prPmProfSetupInfo;
@@ -369,7 +372,8 @@ u32 TdlsFrameGeneralIeAppend(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec,
 WLAN_STATUS
 TdlsDataFrameSend_TearDown(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec,
                            u8 *pPeerMac, u8 ucActionCode, u8 ucDialogToken,
-                           u16 u2StatusCode, u8 *pAppendIe, u32 AppendIeLen){
+                           u16 u2StatusCode, u8 *pAppendIe, u32 AppendIeLen)
+{
     GLUE_INFO_T *prGlueInfo;
     BSS_INFO_T *prBssInfo;
     PM_PROFILE_SETUP_INFO_T *prPmProfSetupInfo;
@@ -488,7 +492,8 @@ TdlsDataFrameSend_TearDown(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec,
 WLAN_STATUS  /* TDLS_STATUS */
 TdlsDataFrameSend_SETUP_REQ(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec,
                             u8 *pPeerMac, u8 ucActionCode, u8 ucDialogToken,
-                            u16 u2StatusCode, u8 *pAppendIe, u32 AppendIeLen){
+                            u16 u2StatusCode, u8 *pAppendIe, u32 AppendIeLen)
+{
     GLUE_INFO_T *prGlueInfo;
     BSS_INFO_T *prBssInfo;
     PM_PROFILE_SETUP_INFO_T *prPmProfSetupInfo;
@@ -707,7 +712,8 @@ TdlsDataFrameSend_SETUP_REQ(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec,
 WLAN_STATUS
 TdlsDataFrameSend_SETUP_RSP(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec,
                             u8 *pPeerMac, u8 ucActionCode, u8 ucDialogToken,
-                            u16 u2StatusCode, u8 *pAppendIe, u32 AppendIeLen){
+                            u16 u2StatusCode, u8 *pAppendIe, u32 AppendIeLen)
+{
     GLUE_INFO_T *prGlueInfo;
     BSS_INFO_T *prBssInfo;
     PM_PROFILE_SETUP_INFO_T *prPmProfSetupInfo;
@@ -929,7 +935,8 @@ TdlsDataFrameSend_SETUP_RSP(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec,
 WLAN_STATUS
 TdlsDataFrameSend_CONFIRM(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec,
                           u8 *pPeerMac, u8 ucActionCode, u8 ucDialogToken,
-                          u16 u2StatusCode, u8 *pAppendIe, u32 AppendIeLen){
+                          u16 u2StatusCode, u8 *pAppendIe, u32 AppendIeLen)
+{
     GLUE_INFO_T *prGlueInfo;
     BSS_INFO_T *prBssInfo;
     PM_PROFILE_SETUP_INFO_T *prPmProfSetupInfo;
@@ -1104,7 +1111,8 @@ WLAN_STATUS  /* TDLS_STATUS */
 TdlsDataFrameSend_DISCOVERY_REQ(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec,
                                 u8 *pPeerMac, u8 ucActionCode, u8 ucDialogToken,
                                 u16 u2StatusCode, u8 *pAppendIe,
-                                u32 AppendIeLen){
+                                u32 AppendIeLen)
+{
     GLUE_INFO_T *prGlueInfo;
     BSS_INFO_T *prBssInfo;
     PM_PROFILE_SETUP_INFO_T *prPmProfSetupInfo;
@@ -1366,7 +1374,8 @@ WLAN_STATUS
 TdlsDataFrameSend_DISCOVERY_RSP(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec,
                                 u8 *pPeerMac, u8 ucActionCode, u8 ucDialogToken,
                                 u16 u2StatusCode, u8 *pAppendIe,
-                                u32 AppendIeLen){
+                                u32 AppendIeLen)
+{
     GLUE_INFO_T *prGlueInfo;
     BSS_INFO_T *prBssInfo;
     PM_PROFILE_SETUP_INFO_T *prPmProfSetupInfo;
@@ -1612,7 +1621,8 @@ TdlsDataFrameSend_DISCOVERY_RSP(ADAPTER_T *prAdapter, STA_RECORD_T *prStaRec,
  * \retval None
  */
 /*----------------------------------------------------------------------------*/
-void TdlsexEventHandle(GLUE_INFO_T *prGlueInfo, u8 *prInBuf, u32 u4InBufLen){
+void TdlsexEventHandle(GLUE_INFO_T *prGlueInfo, u8 *prInBuf, u32 u4InBufLen)
+{
     u32 u4EventId;
 
     DBGLOG(TDLS, INFO, "TdlsexEventHandle\n");
@@ -1650,7 +1660,8 @@ void TdlsexEventHandle(GLUE_INFO_T *prGlueInfo, u8 *prInBuf, u32 u4InBufLen){
  *
  */
 /*----------------------------------------------------------------------------*/
-void TdlsEventTearDown(GLUE_INFO_T *prGlueInfo, u8 *prInBuf, u32 u4InBufLen){
+void TdlsEventTearDown(GLUE_INFO_T *prGlueInfo, u8 *prInBuf, u32 u4InBufLen)
+{
     STA_RECORD_T *prStaRec;
     u16 u2ReasonCode;
     u32 u4TearDownSubId;
@@ -1715,7 +1726,8 @@ void TdlsEventTearDown(GLUE_INFO_T *prGlueInfo, u8 *prInBuf, u32 u4InBufLen){
      */
 }
 
-void TdlsBssExtCapParse(P_STA_RECORD_T prStaRec, u8 *pucIE){
+void TdlsBssExtCapParse(P_STA_RECORD_T prStaRec, u8 *pucIE)
+{
     u8 *pucIeExtCap;
 
     /* sanity check */
@@ -1765,7 +1777,8 @@ void TdlsBssExtCapParse(P_STA_RECORD_T prStaRec, u8 *pucIE){
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS
 TdlsSendChSwControlCmd(P_ADAPTER_T prAdapter, void *pvSetBuffer,
-                       u32 u4SetBufferLen, u32 *pu4SetInfoLen){
+                       u32 u4SetBufferLen, u32 *pu4SetInfoLen)
+{
     CMD_TDLS_CH_SW_T rCmdTdlsChSwCtrl;
 
     ASSERT(prAdapter);
@@ -1783,7 +1796,8 @@ TdlsSendChSwControlCmd(P_ADAPTER_T prAdapter, void *pvSetBuffer,
 }
 
 WLAN_STATUS
-TdlsTxCtrl(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo, u8 fgEnable){
+TdlsTxCtrl(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo, u8 fgEnable)
+{
     int i;
     P_STA_RECORD_T prStaRec;
 

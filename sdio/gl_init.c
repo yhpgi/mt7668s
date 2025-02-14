@@ -144,16 +144,16 @@ static u8 *apucEepromName[] = { (u8 *)CFG_EEPRM_FILENAME "_MT", NULL };
     }
 
 static struct ieee80211_channel mtk_2ghz_channels[] = {
-    CHAN2G(1, 2412),  CHAN2G(2, 2417),  CHAN2G(3, 2422),  CHAN2G(4, 2427),
-    CHAN2G(5, 2432),  CHAN2G(6, 2437),  CHAN2G(7, 2442),  CHAN2G(8, 2447),
-    CHAN2G(9, 2452),  CHAN2G(10, 2457), CHAN2G(11, 2462), CHAN2G(12, 2467),
+    CHAN2G(1, 2412), CHAN2G(2, 2417), CHAN2G(3, 2422), CHAN2G(4, 2427),
+    CHAN2G(5, 2432), CHAN2G(6, 2437), CHAN2G(7, 2442), CHAN2G(8, 2447),
+    CHAN2G(9, 2452), CHAN2G(10, 2457), CHAN2G(11, 2462), CHAN2G(12, 2467),
     CHAN2G(13, 2472), CHAN2G(14, 2484),
 };
 
 static struct ieee80211_channel mtk_5ghz_channels[] = {
-    CHAN5G(36, 5180),  CHAN5G(40, 5200),  CHAN5G(44, 5220),  CHAN5G(48, 5240),
+    CHAN5G(36, 5180), CHAN5G(40, 5200), CHAN5G(44, 5220), CHAN5G(48, 5240),
 
-    CHAN5G(52, 5260),  CHAN5G(56, 5280),  CHAN5G(60, 5300),  CHAN5G(64, 5320),
+    CHAN5G(52, 5260), CHAN5G(56, 5280), CHAN5G(60, 5300), CHAN5G(64, 5320),
 
     CHAN5G(100, 5500), CHAN5G(104, 5520), CHAN5G(108, 5540), CHAN5G(112, 5560),
     CHAN5G(116, 5580), CHAN5G(120, 5600), CHAN5G(124, 5620), CHAN5G(128, 5640),
@@ -164,10 +164,10 @@ static struct ieee80211_channel mtk_5ghz_channels[] = {
 };
 
 static struct ieee80211_rate mtk_rates[] = {
-    CCK_RATE(0, 10),    CCK_RATE(1, 20),    CCK_RATE(2, 55),
-    CCK_RATE(3, 110),   OFDM_RATE(11, 60),  OFDM_RATE(15, 90),
+    CCK_RATE(0, 10), CCK_RATE(1, 20), CCK_RATE(2, 55),
+    CCK_RATE(3, 110), OFDM_RATE(11, 60), OFDM_RATE(15, 90),
     OFDM_RATE(10, 120), OFDM_RATE(14, 180), OFDM_RATE(9, 240),
-    OFDM_RATE(13, 360), OFDM_RATE(8, 480),  OFDM_RATE(12, 540),
+    OFDM_RATE(13, 360), OFDM_RATE(8, 480), OFDM_RATE(12, 540),
 };
 
 #define mtk_a_rates (mtk_rates + 4)
@@ -470,7 +470,8 @@ u16 wlanSelectQueue(struct net_device *dev, struct sk_buff *skb,
  */
 /*----------------------------------------------------------------------------*/
 static void glLoadNvram(IN P_GLUE_INFO_T prGlueInfo,
-                        OUT P_REG_INFO_T prRegInfo){
+                        OUT P_REG_INFO_T prRegInfo)
+{
     u32 i, j;
     u8 aucTmp[2];
     u8 *pucDest;
@@ -627,7 +628,8 @@ static void glLoadNvram(IN P_GLUE_INFO_T prGlueInfo,
  * \return (none)
  */
 /*----------------------------------------------------------------------------*/
-static void wlanClearDevIdx(struct net_device *prDev){
+static void wlanClearDevIdx(struct net_device *prDev)
+{
     int i;
 
     ASSERT(prDev);
@@ -652,7 +654,8 @@ static void wlanClearDevIdx(struct net_device *prDev){
  * \retval -1        Fail to get index.
  */
 /*----------------------------------------------------------------------------*/
-static int wlanGetDevIdx(struct net_device *prDev){
+static int wlanGetDevIdx(struct net_device *prDev)
+{
     int i;
 
     ASSERT(prDev);
@@ -689,7 +692,8 @@ static int wlanGetDevIdx(struct net_device *prDev){
  * \retval OTHER The execution of IOCTL command is failed.
  */
 /*----------------------------------------------------------------------------*/
-int wlanDoIOCTL(struct net_device *prDev, struct ifreq *prIfReq, int i4Cmd){
+int wlanDoIOCTL(struct net_device *prDev, struct ifreq *prIfReq, int i4Cmd)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     int ret = 0;
 
@@ -741,7 +745,8 @@ int wlanDoIOCTL(struct net_device *prDev, struct ifreq *prIfReq, int i4Cmd){
  *            false: wlan is not started yet
  */
 /*---------------------------------------------------------------------------*/
-P_GLUE_INFO_T wlanGetGlueInfo(void){
+P_GLUE_INFO_T wlanGetGlueInfo(void)
+{
     struct net_device *prDev = NULL;
     P_GLUE_INFO_T prGlueInfo = NULL;
 
@@ -772,7 +777,8 @@ P_GLUE_INFO_T wlanGetGlueInfo(void){
 static struct delayed_work workq;
 struct net_device *gPrDev;
 
-static void wlanSetMulticastList(struct net_device *prDev){
+static void wlanSetMulticastList(struct net_device *prDev)
+{
     /* Allow to receive all multicast for WOW */
     DBGLOG(INIT, INFO, "wlanSetMulticastList\n");
     prDev->flags |= (IFF_MULTICAST | IFF_ALLMULTI);
@@ -784,7 +790,8 @@ static void wlanSetMulticastList(struct net_device *prDev){
  * another workqueue for sleeping. We don't want to block
  * main_thread, so we can't let tx_thread to do this
  */
-static void wlanSetMulticastListWorkQueue(struct work_struct *work){
+static void wlanSetMulticastListWorkQueue(struct work_struct *work)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     u32 u4PacketFilter = 0;
     u32 u4SetInfoLen;
@@ -878,7 +885,8 @@ static void wlanSetMulticastListWorkQueue(struct work_struct *work){
  *           None
  */
 /*----------------------------------------------------------------------------*/
-void wlanSchedScanStoppedWorkQueue(struct work_struct *work){
+void wlanSchedScanStoppedWorkQueue(struct work_struct *work)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     struct net_device *prDev = gPrDev;
 
@@ -906,7 +914,8 @@ void wlanSchedScanStoppedWorkQueue(struct work_struct *work){
     return;
 }
 
-void wlanSchedWDevLockWorkQueue(struct work_struct *work){
+void wlanSchedWDevLockWorkQueue(struct work_struct *work)
+{
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 7, 0))
     struct cfg80211_rx_assoc_resp_data resp = {
         .uapsd_queues = -1,
@@ -1049,7 +1058,8 @@ void wlanSchedWDevLockWorkQueue(struct work_struct *work){
  * another workqueue for sleeping. We don't want to block
  * main_thread, so we can't let tx_thread to do this
  */
-void p2pSetMulticastListWorkQueueWrapper(P_GLUE_INFO_T prGlueInfo){
+void p2pSetMulticastListWorkQueueWrapper(P_GLUE_INFO_T prGlueInfo)
+{
     ASSERT(prGlueInfo);
 
     if (!prGlueInfo) {
@@ -1074,7 +1084,8 @@ void p2pSetMulticastListWorkQueueWrapper(P_GLUE_INFO_T prGlueInfo){
  * \retval NETDEV_TX_BUSY - on failure, packet will be discarded by upper layer.
  */
 /*----------------------------------------------------------------------------*/
-int wlanHardStartXmit(struct sk_buff *prSkb, struct net_device *prDev){
+int wlanHardStartXmit(struct sk_buff *prSkb, struct net_device *prDev)
+{
     P_NETDEV_PRIVATE_GLUE_INFO prNetDevPrivate =
         (P_NETDEV_PRIVATE_GLUE_INFO)NULL;
     P_GLUE_INFO_T prGlueInfo = *((P_GLUE_INFO_T *)netdev_priv(prDev));
@@ -1115,11 +1126,13 @@ int wlanHardStartXmit(struct sk_buff *prSkb, struct net_device *prDev){
  * \return net_device_stats buffer pointer.
  */
 /*----------------------------------------------------------------------------*/
-struct net_device_stats *wlanGetStats(IN struct net_device *prDev){
+struct net_device_stats *wlanGetStats(IN struct net_device *prDev)
+{
     return (struct net_device_stats *)kalGetStats(prDev);
 }
 
-void wlanDebugInit(void){
+void wlanDebugInit(void)
+{
     u8 i;
     /* Set the initial debug level of each module */
 #if DBG
@@ -1151,7 +1164,8 @@ void wlanDebugInit(void){
     DBGLOG(INIT, INFO, "Reset ALL DBG module log level to DEFAULT!\n");
 }
 
-WLAN_STATUS wlanSetDebugLevel(IN u32 u4DbgIdx, IN u32 u4DbgMask){
+WLAN_STATUS wlanSetDebugLevel(IN u32 u4DbgIdx, IN u32 u4DbgMask)
+{
     u32 u4Idx;
     WLAN_STATUS fgStatus = WLAN_STATUS_SUCCESS;
 
@@ -1171,7 +1185,8 @@ WLAN_STATUS wlanSetDebugLevel(IN u32 u4DbgIdx, IN u32 u4DbgMask){
     return fgStatus;
 }
 
-WLAN_STATUS wlanGetDebugLevel(IN u32 u4DbgIdx, OUT u32 *pu4DbgMask){
+WLAN_STATUS wlanGetDebugLevel(IN u32 u4DbgIdx, OUT u32 *pu4DbgMask)
+{
     if (u4DbgIdx < DBG_MODULE_NUM) {
         *pu4DbgMask = aucDebugModule[u4DbgIdx];
         return WLAN_STATUS_SUCCESS;
@@ -1190,7 +1205,8 @@ WLAN_STATUS wlanGetDebugLevel(IN u32 u4DbgIdx, OUT u32 *pu4DbgMask){
  * \retval -ENXIO    No such device.
  */
 /*----------------------------------------------------------------------------*/
-static int wlanInit(struct net_device *prDev){
+static int wlanInit(struct net_device *prDev)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
 
     if (!prDev) {
@@ -1225,7 +1241,8 @@ static int wlanInit(struct net_device *prDev){
  * \return int.
  */
 /*----------------------------------------------------------------------------*/
-static int wlanSetMacAddress(struct net_device *ndev, void *addr){
+static int wlanSetMacAddress(struct net_device *ndev, void *addr)
+{
     P_ADAPTER_T prAdapter = NULL;
     P_GLUE_INFO_T prGlueInfo = NULL;
     struct sockaddr *sa = NULL;
@@ -1303,7 +1320,8 @@ static int wlanSetMacAddress(struct net_device *ndev, void *addr){
  * \retval < 0   The execution of wlanOpen failed.
  */
 /*----------------------------------------------------------------------------*/
-static int wlanOpen(struct net_device *prDev){
+static int wlanOpen(struct net_device *prDev)
+{
     ASSERT(prDev);
 
     netif_tx_start_all_queues(prDev);
@@ -1321,7 +1339,8 @@ static int wlanOpen(struct net_device *prDev){
  * \retval < 0   The execution of wlanStop failed.
  */
 /*----------------------------------------------------------------------------*/
-static int wlanStop(struct net_device *prDev){
+static int wlanStop(struct net_device *prDev)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     struct cfg80211_scan_request *prScanRequest = NULL;
 
@@ -1360,7 +1379,8 @@ static int wlanStop(struct net_device *prDev){
 }
 
 #if CFG_SUPPORT_SNIFFER
-static int wlanMonOpen(struct net_device *prDev){
+static int wlanMonOpen(struct net_device *prDev)
+{
     ASSERT(prDev);
 
     netif_tx_start_all_queues(prDev);
@@ -1368,7 +1388,8 @@ static int wlanMonOpen(struct net_device *prDev){
     return 0;
 }
 
-static int wlanMonStop(struct net_device *prDev){
+static int wlanMonStop(struct net_device *prDev)
+{
     ASSERT(prDev);
 
     netif_tx_stop_all_queues(prDev);
@@ -1381,7 +1402,8 @@ static const struct net_device_ops wlan_mon_netdev_ops = {
     .ndo_stop = wlanMonStop,
 };
 
-void wlanMonWorkHandler(struct work_struct *work){
+void wlanMonWorkHandler(struct work_struct *work)
+{
     P_GLUE_INFO_T prGlueInfo;
 
     prGlueInfo = container_of(work, GLUE_INFO_T, monWork);
@@ -1442,7 +1464,8 @@ void wlanMonWorkHandler(struct work_struct *work){
  * \return   none
  */
 /*----------------------------------------------------------------------------*/
-void wlanUpdateChannelTable(P_GLUE_INFO_T prGlueInfo){
+void wlanUpdateChannelTable(P_GLUE_INFO_T prGlueInfo)
+{
     u8 i, j;
     u8 ucNumOfChannel;
     RF_CHANNEL_INFO_T aucChannelList[ARRAY_SIZE(mtk_2ghz_channels) +
@@ -1497,7 +1520,8 @@ void wlanUpdateChannelTable(P_GLUE_INFO_T prGlueInfo){
     }
 }
 #if CFG_SUPPORT_SAP_DFS_CHANNEL
-void wlanUpdateDfsChannelTable(IN P_GLUE_INFO_T prGlueInfo, IN u8 ucChannel){
+void wlanUpdateDfsChannelTable(IN P_GLUE_INFO_T prGlueInfo, IN u8 ucChannel)
+{
     u8 i, j;
     u8 ucNumOfChannel;
     RF_CHANNEL_INFO_T aucChannelList[ARRAY_SIZE(mtk_5ghz_channels)];
@@ -1543,7 +1567,8 @@ void wlanUpdateDfsChannelTable(IN P_GLUE_INFO_T prGlueInfo, IN u8 ucChannel){
  * \retval < 0   The execution of wlanNetRegister failed.
  */
 /*----------------------------------------------------------------------------*/
-static s32 wlanNetRegister(struct wireless_dev *prWdev){
+static s32 wlanNetRegister(struct wireless_dev *prWdev)
+{
     P_GLUE_INFO_T prGlueInfo;
     s32 i4DevIdx = -1;
     P_NETDEV_PRIVATE_GLUE_INFO prNetDevPrivate =
@@ -1597,7 +1622,8 @@ static s32 wlanNetRegister(struct wireless_dev *prWdev){
  * \return (none)
  */
 /*----------------------------------------------------------------------------*/
-static void wlanNetUnregister(struct wireless_dev *prWdev){
+static void wlanNetUnregister(struct wireless_dev *prWdev)
+{
     P_GLUE_INFO_T prGlueInfo;
 
     if (!prWdev) {
@@ -1635,12 +1661,14 @@ static const struct net_device_ops wlan_netdev_ops = {
 };
 
 #if CFG_ENABLE_UNIFY_WIPHY
-const struct net_device_ops *wlanGetNdevOps(void){
+const struct net_device_ops *wlanGetNdevOps(void)
+{
     return &wlan_netdev_ops;
 }
 #endif
 
-static void wlanCreateWirelessDevice(void){
+static void wlanCreateWirelessDevice(void)
+{
     struct wiphy *prWiphy = NULL;
     struct wireless_dev *prWdev = NULL;
 
@@ -1750,7 +1778,8 @@ free_wdev:
 }
 
 #if (CFG_ENABLE_UNIFY_WIPHY == 0)
-static void wlanDestroyWirelessDevice(void){
+static void wlanDestroyWirelessDevice(void)
+{
     set_wiphy_dev(gprWdev->wiphy, NULL);
     wiphy_unregister(gprWdev->wiphy);
     wiphy_free(gprWdev->wiphy);
@@ -1770,7 +1799,8 @@ static void wlanDestroyWirelessDevice(void){
  */
 /*----------------------------------------------------------------------------*/
 #if CFG_ENABLE_UNIFY_WIPHY
-static void wlanDestroyAllWdev(void){
+static void wlanDestroyAllWdev(void)
+{
     struct wiphy *wiphy = NULL;
     int i = 0;
     /* There is only one wiphy, avoid the double free the wiphy */
@@ -1821,7 +1851,8 @@ static void wlanDestroyAllWdev(void){
 }
 #endif  /* CFG_ENABLE_UNIFY_WIPHY */
 
-struct wireless_dev *wlanGetWirelessDevice(void){
+struct wireless_dev *wlanGetWirelessDevice(void)
+{
     return gprWdev;
 }
 
@@ -1838,7 +1869,8 @@ struct wireless_dev *wlanGetWirelessDevice(void){
  */
 /*----------------------------------------------------------------------------*/
 static struct lock_class_key rSpinKey[SPIN_LOCK_NUM];
-static struct wireless_dev *wlanNetCreate(void *pvData, void *pvDriverData){
+static struct wireless_dev *wlanNetCreate(void *pvData, void *pvDriverData)
+{
     struct wireless_dev *prWdev = gprWdev;
     P_GLUE_INFO_T prGlueInfo = NULL;
     P_ADAPTER_T prAdapter = NULL;
@@ -2027,7 +2059,8 @@ netcreate_err:
  * \return (none)
  */
 /*----------------------------------------------------------------------------*/
-static void wlanNetDestroy(struct wireless_dev *prWdev){
+static void wlanNetDestroy(struct wireless_dev *prWdev)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
 
     ASSERT(prWdev);
@@ -2055,7 +2088,8 @@ static void wlanNetDestroy(struct wireless_dev *prWdev){
     free_netdev(prWdev->netdev);
 }
 
-void wlanSetSuspendMode(P_GLUE_INFO_T prGlueInfo, u8 fgEnable){
+void wlanSetSuspendMode(P_GLUE_INFO_T prGlueInfo, u8 fgEnable)
+{
     struct net_device *prDev = NULL;
 
     if (!prGlueInfo) {
@@ -2080,7 +2114,8 @@ static struct early_suspend wlan_early_suspend_desc = {
     .level = EARLY_SUSPEND_LEVEL_BLANK_SCREEN,
 };
 
-static void wlan_early_suspend(struct early_suspend *h){
+static void wlan_early_suspend(struct early_suspend *h)
+{
     struct net_device *prDev = NULL;
     P_GLUE_INFO_T prGlueInfo = NULL;
 
@@ -2113,7 +2148,8 @@ static void wlan_early_suspend(struct early_suspend *h){
     p2pSetSuspendMode(prGlueInfo, true);
 }
 
-static void wlan_late_resume(struct early_suspend *h){
+static void wlan_late_resume(struct early_suspend *h)
+{
     struct net_device *prDev = NULL;
     P_GLUE_INFO_T prGlueInfo = NULL;
 
@@ -2149,7 +2185,8 @@ static void wlan_late_resume(struct early_suspend *h){
 #endif
 
 int set_p2p_mode_handler(struct net_device *netdev,
-                         PARAM_CUSTOM_P2P_SET_STRUCT_T p2pmode){
+                         PARAM_CUSTOM_P2P_SET_STRUCT_T p2pmode)
+{
     P_GLUE_INFO_T prGlueInfo = *((P_GLUE_INFO_T *)netdev_priv(netdev));
     PARAM_CUSTOM_P2P_SET_STRUCT_T rSetP2P;
     WLAN_STATUS rWlanStatus = WLAN_STATUS_SUCCESS;
@@ -2204,7 +2241,8 @@ int set_p2p_mode_handler(struct net_device *netdev,
  * \retval void
  */
 /*----------------------------------------------------------------------------*/
-void wlanGetParseConfig(P_ADAPTER_T prAdapter){
+void wlanGetParseConfig(P_ADAPTER_T prAdapter)
+{
     s32 ret;
     u8 *pucConfigBuf;
     u32 u4ConfigReadLen;
@@ -2240,7 +2278,8 @@ void wlanGetParseConfig(P_ADAPTER_T prAdapter){
  * \retval void
  */
 /*----------------------------------------------------------------------------*/
-void wlanGetConfig(P_ADAPTER_T prAdapter){
+void wlanGetConfig(P_ADAPTER_T prAdapter)
+{
     s32 ret;
     u8 *pucConfigBuf;
     u32 u4ConfigReadLen;
@@ -2275,7 +2314,8 @@ void wlanGetConfig(P_ADAPTER_T prAdapter){
  * \retval WLAN_STATUS_FAILURE Failed
  */
 /*----------------------------------------------------------------------------*/
-WLAN_STATUS wlanExtractBufferBin(P_ADAPTER_T prAdapter){
+WLAN_STATUS wlanExtractBufferBin(P_ADAPTER_T prAdapter)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
     u32 u4ContentLen;
     u8 *pucConfigBuf = NULL;
@@ -2353,7 +2393,8 @@ label_exit:
  * \retval WLAN_STATUS_FAILURE Failed
  */
 /*----------------------------------------------------------------------------*/
-WLAN_STATUS wlanDownloadBufferBin(P_ADAPTER_T prAdapter){
+WLAN_STATUS wlanDownloadBufferBin(P_ADAPTER_T prAdapter)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
 #if (CFG_FW_Report_Efuse_Address)
     u16 u2InitAddr = prAdapter->u4EfuseStartAddress;
@@ -2481,7 +2522,8 @@ label_exit:
  * \retval negative value Failed
  */
 /*----------------------------------------------------------------------------*/
-s32 wlanProbe(struct sdio_func *pvData, void *pvDriverData){
+s32 wlanProbe(struct sdio_func *pvData, void *pvDriverData)
+{
     enum ENUM_PROBE_FAIL_REASON {
         BUS_INIT_FAIL,
         NET_CREATE_FAIL,
@@ -2965,7 +3007,8 @@ s32 wlanProbe(struct sdio_func *pvData, void *pvDriverData){
  * \return (none)
  */
 /*----------------------------------------------------------------------------*/
-void wlanRemove(void){
+void wlanRemove(void)
+{
     struct net_device *prDev = NULL;
     P_WLANDEV_INFO_T prWlandevInfo = NULL;
     P_GLUE_INFO_T prGlueInfo = NULL;
@@ -3137,7 +3180,8 @@ void wlanRemove(void){
     DBGLOG(INIT, STATE, "Remove wlan done\n");
 }
 
-static int mt76x8_wireless_init(void){
+static int mt76x8_wireless_init(void)
+{
     int ret = 0;
     P_GLUE_INFO_T prGlueInfo = NULL;
 
@@ -3175,7 +3219,8 @@ static int mt76x8_wireless_init(void){
     return ret;
 }
 
-static void mt76x8_wireless_exit(void){
+static void mt76x8_wireless_exit(void)
+{
     DBGLOG(INIT, STATE, "wireless Device exit\n");
 
     glUnregisterBus(wlanRemove);
@@ -3203,7 +3248,8 @@ static void mt76x8_wireless_exit(void){
  */
 /*----------------------------------------------------------------------------*/
 /* 1 Module Entry Point */
-static int initWlan(void){
+static int initWlan(void)
+{
     int ret = 0;
 
 #ifdef CFG_DRIVER_INF_NAME_CHANGE
@@ -3235,7 +3281,8 @@ static int initWlan(void){
  */
 /*----------------------------------------------------------------------------*/
 /* 1 Module Leave Point */
-static void exitWlan(void){
+static void exitWlan(void)
+{
     DBGLOG(INIT, STATE, "exitWlan\n");
 
     if (prWaitForResetComp) {
@@ -3248,7 +3295,8 @@ static void exitWlan(void){
 }
 
 static int mt7668s_reboot_notify(struct notifier_block *nb, unsigned long event,
-                                 void *unused){
+                                 void *unused)
+{
     if (event == SYS_DOWN || event == SYS_RESTART || event == SYS_POWER_OFF) {
         DBGLOG(HAL, STATE,
                "Power down is detected. Cleaning MT7668S WiFi driver...\n");
@@ -3256,15 +3304,15 @@ static int mt7668s_reboot_notify(struct notifier_block *nb, unsigned long event,
         glUnregisterBus(wlanRemove);
         /* free pre-allocated memory */
         kalUninitIOBuffer();
-           #if CFG_ENABLE_UNIFY_WIPHY
+#if CFG_ENABLE_UNIFY_WIPHY
         wlanDestroyAllWdev();
-           #else
+#else
         wlanDestroyWirelessDevice();
         glP2pDestroyWirelessDevice();
-           #endif
-           #if WLAN_INCLUDE_PROC
+#endif
+#if WLAN_INCLUDE_PROC
         procUninitProcFs();
-           #endif
+#endif
 
         DBGLOG(HAL, STATE, "Cleaning MT7668S WiFi driver Finish!\n");
     }
@@ -3277,11 +3325,13 @@ static struct notifier_block mt7668s_reboot_notifier = {
     .priority = __INT_MAX__,
 };
 
-void wlanRegisterRebootNotifier(void){
+void wlanRegisterRebootNotifier(void)
+{
     register_reboot_notifier(&mt7668s_reboot_notifier);
 }
 
-void wlanUnregisterRebootNotifier(void){
+void wlanUnregisterRebootNotifier(void)
+{
     unregister_reboot_notifier(&mt7668s_reboot_notifier);
 }
 

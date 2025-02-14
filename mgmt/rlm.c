@@ -115,7 +115,8 @@ static void rlmFillVhtOpNotificationIE(P_ADAPTER_T prAdapter,
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-void rlmFsmEventInit(P_ADAPTER_T prAdapter){
+void rlmFsmEventInit(P_ADAPTER_T prAdapter)
+{
 #if CFG_SUPPORT_QUIET
     P_BSS_INFO_T prBssInfo;
     u8 i;
@@ -157,7 +158,8 @@ void rlmFsmEventInit(P_ADAPTER_T prAdapter){
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-void rlmFsmEventUninit(P_ADAPTER_T prAdapter){
+void rlmFsmEventUninit(P_ADAPTER_T prAdapter)
+{
     P_BSS_INFO_T prBssInfo;
     u8 i;
 
@@ -182,7 +184,8 @@ void rlmFsmEventUninit(P_ADAPTER_T prAdapter){
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-void rlmReqGeneratePowerCapIE(P_ADAPTER_T prAdapter, P_MSDU_INFO_T prMsduInfo){
+void rlmReqGeneratePowerCapIE(P_ADAPTER_T prAdapter, P_MSDU_INFO_T prMsduInfo)
+{
     u8 *pucBuffer;
     P_BSS_INFO_T prBssInfo;
 
@@ -223,7 +226,8 @@ void rlmReqGeneratePowerCapIE(P_ADAPTER_T prAdapter, P_MSDU_INFO_T prMsduInfo){
  */
 /*----------------------------------------------------------------------------*/
 void rlmReqGenerateSupportedChIE(P_ADAPTER_T prAdapter,
-                                 P_MSDU_INFO_T prMsduInfo){
+                                 P_MSDU_INFO_T prMsduInfo)
+{
     u8 *pucBuffer;
     P_BSS_INFO_T prBssInfo;
     RF_CHANNEL_INFO_T auc2gChannelList[MAX_2G_BAND_CHN_NUM];
@@ -285,7 +289,8 @@ void rlmReqGenerateSupportedChIE(P_ADAPTER_T prAdapter,
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-void rlmReqGenerateHtCapIE(P_ADAPTER_T prAdapter, P_MSDU_INFO_T prMsduInfo){
+void rlmReqGenerateHtCapIE(P_ADAPTER_T prAdapter, P_MSDU_INFO_T prMsduInfo)
+{
     P_BSS_INFO_T prBssInfo;
     P_STA_RECORD_T prStaRec;
 
@@ -323,7 +328,8 @@ void rlmReqGenerateHtCapIE(P_ADAPTER_T prAdapter, P_MSDU_INFO_T prMsduInfo){
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-void rlmReqGenerateExtCapIE(P_ADAPTER_T prAdapter, P_MSDU_INFO_T prMsduInfo){
+void rlmReqGenerateExtCapIE(P_ADAPTER_T prAdapter, P_MSDU_INFO_T prMsduInfo)
+{
     P_BSS_INFO_T prBssInfo;
     P_STA_RECORD_T prStaRec;
 
@@ -353,7 +359,8 @@ void rlmReqGenerateExtCapIE(P_ADAPTER_T prAdapter, P_MSDU_INFO_T prMsduInfo){
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-void rlmRspGenerateHtCapIE(P_ADAPTER_T prAdapter, P_MSDU_INFO_T prMsduInfo){
+void rlmRspGenerateHtCapIE(P_ADAPTER_T prAdapter, P_MSDU_INFO_T prMsduInfo)
+{
     P_BSS_INFO_T prBssInfo;
     P_STA_RECORD_T prStaRec;
     u8 ucPhyTypeSet;
@@ -397,7 +404,8 @@ void rlmRspGenerateHtCapIE(P_ADAPTER_T prAdapter, P_MSDU_INFO_T prMsduInfo){
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-void rlmRspGenerateExtCapIE(P_ADAPTER_T prAdapter, P_MSDU_INFO_T prMsduInfo){
+void rlmRspGenerateExtCapIE(P_ADAPTER_T prAdapter, P_MSDU_INFO_T prMsduInfo)
+{
     P_BSS_INFO_T prBssInfo;
     P_STA_RECORD_T prStaRec;
     u8 ucPhyTypeSet;
@@ -439,7 +447,8 @@ void rlmRspGenerateExtCapIE(P_ADAPTER_T prAdapter, P_MSDU_INFO_T prMsduInfo){
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-void rlmRspGenerateHtOpIE(P_ADAPTER_T prAdapter, P_MSDU_INFO_T prMsduInfo){
+void rlmRspGenerateHtOpIE(P_ADAPTER_T prAdapter, P_MSDU_INFO_T prMsduInfo)
+{
     P_BSS_INFO_T prBssInfo;
     P_STA_RECORD_T prStaRec;
     u8 ucPhyTypeSet;
@@ -483,7 +492,8 @@ void rlmRspGenerateHtOpIE(P_ADAPTER_T prAdapter, P_MSDU_INFO_T prMsduInfo){
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-void rlmRspGenerateErpIE(P_ADAPTER_T prAdapter, P_MSDU_INFO_T prMsduInfo){
+void rlmRspGenerateErpIE(P_ADAPTER_T prAdapter, P_MSDU_INFO_T prMsduInfo)
+{
     P_BSS_INFO_T prBssInfo;
     P_STA_RECORD_T prStaRec;
     P_IE_ERP_T prErpIe;
@@ -551,7 +561,8 @@ void rlmRspGenerateErpIE(P_ADAPTER_T prAdapter, P_MSDU_INFO_T prMsduInfo){
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-void rlmGenerateMTKOuiIE(P_ADAPTER_T prAdapter, P_MSDU_INFO_T prMsduInfo){
+void rlmGenerateMTKOuiIE(P_ADAPTER_T prAdapter, P_MSDU_INFO_T prMsduInfo)
+{
     P_BSS_INFO_T prBssInfo;
     u8 *pucBuffer;
     u8 aucMtkOui[] = VENDOR_OUI_MTK;
@@ -599,7 +610,8 @@ void rlmGenerateMTKOuiIE(P_ADAPTER_T prAdapter, P_MSDU_INFO_T prMsduInfo){
  */
 /*----------------------------------------------------------------------------*/
 u8 rlmParseCheckMTKOuiIE(IN P_ADAPTER_T prAdapter, IN u8 *pucBuf,
-                         IN u32 *pu4Cap){
+                         IN u32 *pu4Cap)
+{
     u8 aucMtkOui[] = VENDOR_OUI_MTK;
     P_IE_MTK_OUI_T prMtkOuiIE = (P_IE_MTK_OUI_T)NULL;
 
@@ -650,7 +662,8 @@ u8 rlmParseCheckMTKOuiIE(IN P_ADAPTER_T prAdapter, IN u8 *pucBuf,
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-void rlmGenerateCsaIE(P_ADAPTER_T prAdapter, P_MSDU_INFO_T prMsduInfo){
+void rlmGenerateCsaIE(P_ADAPTER_T prAdapter, P_MSDU_INFO_T prMsduInfo)
+{
     u8 *pucBuffer;
 
     ASSERT(prAdapter);
@@ -684,7 +697,8 @@ void rlmGenerateCsaIE(P_ADAPTER_T prAdapter, P_MSDU_INFO_T prMsduInfo){
  */
 /*----------------------------------------------------------------------------*/
 static void rlmFillHtCapIE(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo,
-                           P_MSDU_INFO_T prMsduInfo){
+                           P_MSDU_INFO_T prMsduInfo)
+{
     P_IE_HT_CAP_T prHtCap;
     P_SUP_MCS_SET_FIELD prSupMcsSet;
     u8 fg40mAllowed;
@@ -821,7 +835,8 @@ static void rlmFillHtCapIE(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo,
  */
 /*----------------------------------------------------------------------------*/
 static void rlmFillExtCapIE(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo,
-                            P_MSDU_INFO_T prMsduInfo){
+                            P_MSDU_INFO_T prMsduInfo)
+{
     P_EXT_CAP_T prExtCap;
     u8 fg40mAllowed, fgAppendVhtCap;
     P_STA_RECORD_T prStaRec;
@@ -912,7 +927,8 @@ static void rlmFillExtCapIE(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo,
  */
 /*----------------------------------------------------------------------------*/
 static void rlmFillHtOpIE(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo,
-                          P_MSDU_INFO_T prMsduInfo){
+                          P_MSDU_INFO_T prMsduInfo)
+{
     P_IE_HT_OP_T prHtOp;
     u16 i;
 
@@ -979,7 +995,8 @@ static void rlmFillHtOpIE(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo,
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-void rlmReqGenerateVhtCapIE(P_ADAPTER_T prAdapter, P_MSDU_INFO_T prMsduInfo){
+void rlmReqGenerateVhtCapIE(P_ADAPTER_T prAdapter, P_MSDU_INFO_T prMsduInfo)
+{
     P_BSS_INFO_T prBssInfo;
     P_STA_RECORD_T prStaRec;
 
@@ -1009,7 +1026,8 @@ void rlmReqGenerateVhtCapIE(P_ADAPTER_T prAdapter, P_MSDU_INFO_T prMsduInfo){
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-void rlmRspGenerateVhtCapIE(P_ADAPTER_T prAdapter, P_MSDU_INFO_T prMsduInfo){
+void rlmRspGenerateVhtCapIE(P_ADAPTER_T prAdapter, P_MSDU_INFO_T prMsduInfo)
+{
     P_BSS_INFO_T prBssInfo;
     P_STA_RECORD_T prStaRec;
     u8 ucPhyTypeSet;
@@ -1052,7 +1070,8 @@ void rlmRspGenerateVhtCapIE(P_ADAPTER_T prAdapter, P_MSDU_INFO_T prMsduInfo){
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-void rlmRspGenerateVhtOpIE(P_ADAPTER_T prAdapter, P_MSDU_INFO_T prMsduInfo){
+void rlmRspGenerateVhtOpIE(P_ADAPTER_T prAdapter, P_MSDU_INFO_T prMsduInfo)
+{
     P_BSS_INFO_T prBssInfo;
     P_STA_RECORD_T prStaRec;
     u8 ucPhyTypeSet;
@@ -1096,7 +1115,8 @@ void rlmRspGenerateVhtOpIE(P_ADAPTER_T prAdapter, P_MSDU_INFO_T prMsduInfo){
  */
 /*----------------------------------------------------------------------------*/
 void rlmReqGenerateVhtOpNotificationIE(P_ADAPTER_T prAdapter,
-                                       P_MSDU_INFO_T prMsduInfo){
+                                       P_MSDU_INFO_T prMsduInfo)
+{
     P_BSS_INFO_T prBssInfo;
     P_STA_RECORD_T prStaRec;
 
@@ -1137,7 +1157,8 @@ void rlmReqGenerateVhtOpNotificationIE(P_ADAPTER_T prAdapter,
  */
 /*----------------------------------------------------------------------------*/
 void rlmRspGenerateVhtOpNotificationIE(P_ADAPTER_T prAdapter,
-                                       P_MSDU_INFO_T prMsduInfo){
+                                       P_MSDU_INFO_T prMsduInfo)
+{
     P_BSS_INFO_T prBssInfo;
     P_STA_RECORD_T prStaRec;
     u8 ucPhyTypeSet;
@@ -1183,7 +1204,8 @@ void rlmRspGenerateVhtOpNotificationIE(P_ADAPTER_T prAdapter,
 /*----------------------------------------------------------------------------*/
 static void rlmFillVhtOpNotificationIE(P_ADAPTER_T prAdapter,
                                        P_BSS_INFO_T prBssInfo,
-                                       P_MSDU_INFO_T prMsduInfo, u8 fgIsMaxCap){
+                                       P_MSDU_INFO_T prMsduInfo, u8 fgIsMaxCap)
+{
     P_IE_VHT_OP_MODE_NOTIFICATION_T prVhtOpMode;
     u8 ucMaxBw;
 
@@ -1261,7 +1283,8 @@ static void rlmFillVhtOpNotificationIE(P_ADAPTER_T prAdapter,
  */
 /*----------------------------------------------------------------------------*/
 static void rlmFillVhtCapIE(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo,
-                            P_MSDU_INFO_T prMsduInfo){
+                            P_MSDU_INFO_T prMsduInfo)
+{
     P_IE_VHT_CAP_T prVhtCap;
     P_VHT_SUPPORTED_MCS_FIELD prVhtSupportedMcsSet;
     u8 i;
@@ -1417,7 +1440,8 @@ static void rlmFillVhtCapIE(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo,
  */
 /*----------------------------------------------------------------------------*/
 void rlmFillVhtOpIE(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo,
-                    P_MSDU_INFO_T prMsduInfo){
+                    P_MSDU_INFO_T prMsduInfo)
+{
     P_IE_VHT_OP_T prVhtOp;
 
     ASSERT(prAdapter);
@@ -1447,7 +1471,8 @@ void rlmFillVhtOpIE(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo,
 #endif
 
 void rlmModifyVhtBwPara(u8 *pucVhtChannelFrequencyS1,
-                        u8 *pucVhtChannelFrequencyS2, u8 *pucVhtChannelWidth){
+                        u8 *pucVhtChannelFrequencyS2, u8 *pucVhtChannelWidth)
+{
     u8 i = 0, ucTempS = 0;
 
     if ((*pucVhtChannelFrequencyS1 != 0) &&
@@ -1498,7 +1523,8 @@ void rlmModifyVhtBwPara(u8 *pucVhtChannelFrequencyS1,
 }
 
 void rlmRevisePreferBandwidthNss(P_ADAPTER_T prAdapter, u8 ucBssIndex,
-                                 P_STA_RECORD_T prStaRec){
+                                 P_STA_RECORD_T prStaRec)
+{
     ENUM_CHANNEL_WIDTH_T eChannelWidth = CW_20_40MHZ;
     P_BSS_INFO_T prBssInfo;
 
@@ -1542,7 +1568,8 @@ void rlmRevisePreferBandwidthNss(P_ADAPTER_T prAdapter, u8 ucBssIndex,
 void rlmReviseMaxBw(P_ADAPTER_T prAdapter, u8 ucBssIndex,
                     P_ENUM_CHNL_EXT_T peExtend,
                     // P_ENUM_CHANNEL_WIDTH_P peChannelWidth,
-                    u8 *peChannelWidth, u8 *pucS1, u8 *pucPrimaryCh){
+                    u8 *peChannelWidth, u8 *pucS1, u8 *pucPrimaryCh)
+{
     u8 ucMaxBandwidth = MAX_BW_80MHZ;
     u8 ucCurrentBandwidth = MAX_BW_20MHZ;
     u8 ucOffset = (MAX_BW_80MHZ - CW_80MHZ);
@@ -1636,7 +1663,8 @@ void rlmReviseMaxBw(P_ADAPTER_T prAdapter, u8 ucBssIndex,
  */
 /*----------------------------------------------------------------------------*/
 void rlmChangeVhtOpBwPara(P_ADAPTER_T prAdapter, u8 ucBssIndex,
-                          u8 ucChannelWidth){
+                          u8 ucChannelWidth)
+{
     P_BSS_INFO_T prBssInfo;
     u8 ucVhtLowerChannelFrequency, ucVhtUpperChannelFrequency = 0;
 
@@ -1701,7 +1729,8 @@ void rlmChangeVhtOpBwPara(P_ADAPTER_T prAdapter, u8 ucBssIndex,
  */
 /*----------------------------------------------------------------------------*/
 static u8 rlmRecIeInfoForClient(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo,
-                                u8 *pucIE, u16 u2IELength){
+                                u8 *pucIE, u16 u2IELength)
+{
     u16 u2Offset;
     P_STA_RECORD_T prStaRec;
     P_IE_HT_CAP_T prHtCap;
@@ -2475,7 +2504,8 @@ static u8 rlmRecIeInfoForClient(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo,
 /*----------------------------------------------------------------------------*/
 static void rlmRecAssocRespIeInfoForClient(P_ADAPTER_T prAdapter,
                                            P_BSS_INFO_T prBssInfo, u8 *pucIE,
-                                           u16 u2IELength){
+                                           u16 u2IELength)
+{
     u16 u2Offset;
     P_STA_RECORD_T prStaRec;
     u8 fgIsHasHtCap = false;
@@ -2558,7 +2588,8 @@ static void rlmRecAssocRespIeInfoForClient(P_ADAPTER_T prAdapter,
 static u8 rlmRecBcnFromNeighborForClient(P_ADAPTER_T prAdapter,
                                          P_BSS_INFO_T prBssInfo,
                                          P_SW_RFB_T prSwRfb, u8 *pucIE,
-                                         u16 u2IELength){
+                                         u16 u2IELength)
+{
     u16 u2Offset, i;
     u8 ucPriChannel, ucSecChannel;
     ENUM_CHNL_EXT_T eSCO;
@@ -2739,7 +2770,8 @@ static u8 rlmRecBcnFromNeighborForClient(P_ADAPTER_T prAdapter,
  */
 /*----------------------------------------------------------------------------*/
 static u8 rlmRecBcnInfoForClient(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo,
-                                 P_SW_RFB_T prSwRfb, u8 *pucIE, u16 u2IELength){
+                                 P_SW_RFB_T prSwRfb, u8 *pucIE, u16 u2IELength)
+{
     ASSERT(prAdapter);
     ASSERT(prBssInfo && prSwRfb);
     ASSERT(pucIE);
@@ -2773,7 +2805,8 @@ static u8 rlmRecBcnInfoForClient(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo,
  */
 /*----------------------------------------------------------------------------*/
 void rlmProcessBcn(P_ADAPTER_T prAdapter, P_SW_RFB_T prSwRfb, u8 *pucIE,
-                   u16 u2IELength){
+                   u16 u2IELength)
+{
     P_BSS_INFO_T prBssInfo;
     u8 fgNewParameter;
     u8 i;
@@ -2859,7 +2892,8 @@ void rlmProcessBcn(P_ADAPTER_T prAdapter, P_SW_RFB_T prSwRfb, u8 *pucIE,
  */
 /*----------------------------------------------------------------------------*/
 void rlmProcessAssocRsp(P_ADAPTER_T prAdapter, P_SW_RFB_T prSwRfb, u8 *pucIE,
-                        u16 u2IELength){
+                        u16 u2IELength)
+{
     P_BSS_INFO_T prBssInfo;
     P_STA_RECORD_T prStaRec;
     u8 ucPriChannel;
@@ -2931,7 +2965,8 @@ void rlmProcessAssocRsp(P_ADAPTER_T prAdapter, P_SW_RFB_T prSwRfb, u8 *pucIE,
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-void rlmProcessHtAction(P_ADAPTER_T prAdapter, P_SW_RFB_T prSwRfb){
+void rlmProcessHtAction(P_ADAPTER_T prAdapter, P_SW_RFB_T prSwRfb)
+{
     P_ACTION_NOTIFY_CHNL_WIDTH_FRAME prRxFrame;
     P_ACTION_SM_POWER_SAVE_FRAME prRxSmpsFrame;
     P_STA_RECORD_T prStaRec;
@@ -3030,7 +3065,8 @@ void rlmProcessHtAction(P_ADAPTER_T prAdapter, P_SW_RFB_T prSwRfb){
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-void rlmProcessVhtAction(P_ADAPTER_T prAdapter, P_SW_RFB_T prSwRfb){
+void rlmProcessVhtAction(P_ADAPTER_T prAdapter, P_SW_RFB_T prSwRfb)
+{
     P_ACTION_OP_MODE_NOTIFICATION_FRAME prRxFrame;
     P_STA_RECORD_T prStaRec;
     P_BSS_INFO_T prBssInfo;
@@ -3088,7 +3124,8 @@ void rlmProcessVhtAction(P_ADAPTER_T prAdapter, P_SW_RFB_T prSwRfb){
  */
 /*----------------------------------------------------------------------------*/
 void rlmFillSyncCmdParam(P_CMD_SET_BSS_RLM_PARAM_T prCmdBody,
-                         P_BSS_INFO_T prBssInfo){
+                         P_BSS_INFO_T prBssInfo)
+{
     ASSERT(prCmdBody && prBssInfo);
     if (!prCmdBody || !prBssInfo) {
         return;
@@ -3146,7 +3183,8 @@ void rlmFillSyncCmdParam(P_CMD_SET_BSS_RLM_PARAM_T prCmdBody,
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-void rlmSyncOperationParams(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo){
+void rlmSyncOperationParams(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo)
+{
     P_CMD_SET_BSS_RLM_PARAM_T prCmdBody;
     WLAN_STATUS rStatus;
 
@@ -3202,7 +3240,8 @@ void rlmSyncOperationParams(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo){
  */
 /*----------------------------------------------------------------------------*/
 void rlmProcessAssocReq(P_ADAPTER_T prAdapter, P_SW_RFB_T prSwRfb, u8 *pucIE,
-                        u16 u2IELength){
+                        u16 u2IELength)
+{
     P_BSS_INFO_T prBssInfo;
     P_STA_RECORD_T prStaRec;
     u16 u2Offset;
@@ -3453,7 +3492,8 @@ void rlmProcessAssocReq(P_ADAPTER_T prAdapter, P_SW_RFB_T prSwRfb, u8 *pucIE,
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-void rlmBssInitForAPandIbss(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo){
+void rlmBssInitForAPandIbss(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo)
+{
     ASSERT(prAdapter);
     ASSERT(prBssInfo);
 
@@ -3474,7 +3514,8 @@ void rlmBssInitForAPandIbss(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo){
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-void rlmBssAborted(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo){
+void rlmBssAborted(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo)
+{
     ASSERT(prAdapter);
     ASSERT(prBssInfo);
 
@@ -3497,7 +3538,8 @@ void rlmBssAborted(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo){
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-static void rlmBssReset(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo){
+static void rlmBssReset(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo)
+{
     ASSERT(prAdapter);
     ASSERT(prBssInfo);
 
@@ -3553,7 +3595,8 @@ static void rlmBssReset(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo){
  */
 /*----------------------------------------------------------------------------*/
 u32 rlmFillVhtCapIEByAdapter(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo,
-                             u8 *pOutBuf){
+                             u8 *pOutBuf)
+{
     P_IE_VHT_CAP_T prVhtCap;
     P_VHT_SUPPORTED_MCS_FIELD prVhtSupportedMcsSet;
     u8 i;
@@ -3669,7 +3712,8 @@ u32 rlmFillVhtCapIEByAdapter(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo,
 u32 rlmFillHtCapIEByParams(u8 fg40mAllowed, u8 fgShortGIDisabled,
                            u8 u8SupportRxSgi20, u8 u8SupportRxSgi40,
                            u8 u8SupportRxGf, ENUM_OP_MODE_T eCurrentOPMode,
-                           u8 *pOutBuf){
+                           u8 *pOutBuf)
+{
     P_IE_HT_CAP_T prHtCap;
     P_SUP_MCS_SET_FIELD prSupMcsSet;
 
@@ -3741,7 +3785,8 @@ u32 rlmFillHtCapIEByParams(u8 fg40mAllowed, u8 fgShortGIDisabled,
  */
 /*----------------------------------------------------------------------------*/
 u32 rlmFillHtCapIEByAdapter(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo,
-                            u8 *pOutBuf){
+                            u8 *pOutBuf)
+{
     P_IE_HT_CAP_T prHtCap;
     P_SUP_MCS_SET_FIELD prSupMcsSet;
     u8 fg40mAllowed;
@@ -3865,7 +3910,8 @@ u32 rlmFillHtCapIEByAdapter(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo,
 /*----------------------------------------------------------------------------*/
 static void tpcComposeReportFrame(IN P_ADAPTER_T prAdapter,
                                   IN P_STA_RECORD_T prStaRec,
-                                  IN PFN_TX_DONE_HANDLER pfTxDoneHandler){
+                                  IN PFN_TX_DONE_HANDLER pfTxDoneHandler)
+{
     P_MSDU_INFO_T prMsduInfo;
     P_BSS_INFO_T prBssInfo;
     P_ACTION_TPC_REPORT_FRAME prTxFrame;
@@ -3937,7 +3983,8 @@ static void tpcComposeReportFrame(IN P_ADAPTER_T prAdapter,
 /*----------------------------------------------------------------------------*/
 static void msmtComposeReportFrame(IN P_ADAPTER_T prAdapter,
                                    IN P_STA_RECORD_T prStaRec,
-                                   IN PFN_TX_DONE_HANDLER pfTxDoneHandler){
+                                   IN PFN_TX_DONE_HANDLER pfTxDoneHandler)
+{
     P_MSDU_INFO_T prMsduInfo;
     P_BSS_INFO_T prBssInfo;
     P_ACTION_SM_REPORT_FRAME prTxFrame;
@@ -4013,7 +4060,8 @@ static void msmtComposeReportFrame(IN P_ADAPTER_T prAdapter,
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-void rlmProcessSpecMgtAction(P_ADAPTER_T prAdapter, P_SW_RFB_T prSwRfb){
+void rlmProcessSpecMgtAction(P_ADAPTER_T prAdapter, P_SW_RFB_T prSwRfb)
+{
     u8 *pucIE;
     P_STA_RECORD_T prStaRec;
     P_BSS_INFO_T prBssInfo;
@@ -4302,7 +4350,8 @@ void rlmProcessSpecMgtAction(P_ADAPTER_T prAdapter, P_SW_RFB_T prSwRfb){
 /*----------------------------------------------------------------------------*/
 u32 rlmSendChannelSwitchTxDone(IN P_ADAPTER_T prAdapter,
                                IN P_MSDU_INFO_T prMsduInfo,
-                               IN ENUM_TX_RESULT_CODE_T rTxDoneStatus){
+                               IN ENUM_TX_RESULT_CODE_T rTxDoneStatus)
+{
     do {
         ASSERT_BREAK((prAdapter != NULL) && (prMsduInfo != NULL));
 
@@ -4313,7 +4362,8 @@ u32 rlmSendChannelSwitchTxDone(IN P_ADAPTER_T prAdapter,
     return WLAN_STATUS_SUCCESS;
 }
 
-void rlmSendChannelSwitchFrame(IN P_ADAPTER_T prAdapter, u8 ucBssIndex){
+void rlmSendChannelSwitchFrame(IN P_ADAPTER_T prAdapter, u8 ucBssIndex)
+{
     P_MSDU_INFO_T prMsduInfo;
     P_ACTION_CHANNEL_SWITCH_FRAME prTxFrame;
     P_BSS_INFO_T prBssInfo;
@@ -4368,7 +4418,8 @@ void rlmSendChannelSwitchFrame(IN P_ADAPTER_T prAdapter, u8 ucBssIndex){
 }
 #endif
 
-void rlmResetCSAParams(P_BSS_INFO_T prBssInfo){
+void rlmResetCSAParams(P_BSS_INFO_T prBssInfo)
+{
     P_SWITCH_CH_AND_BAND_PARAMS_T prCSAParams;
 
     if (!prBssInfo) {
@@ -4387,7 +4438,8 @@ void rlmResetCSAParams(P_BSS_INFO_T prBssInfo){
     prBssInfo->fgHasStopTx = false;
 }
 
-void rlmCsaTimeout(IN P_ADAPTER_T prAdapter, unsigned long ulParamPtr){
+void rlmCsaTimeout(IN P_ADAPTER_T prAdapter, unsigned long ulParamPtr)
+{
     u8 ucBssIndex = (u8)ulParamPtr;
     P_BSS_INFO_T prBssInfo;
     P_SWITCH_CH_AND_BAND_PARAMS_T prCSAParams;
@@ -4555,7 +4607,8 @@ void rlmCsaTimeout(IN P_ADAPTER_T prAdapter, unsigned long ulParamPtr){
 /*----------------------------------------------------------------------------*/
 void rlmSendOpModeNotificationFrame(P_ADAPTER_T prAdapter,
                                     P_STA_RECORD_T prStaRec, u8 ucChannelWidth,
-                                    u8 ucNss){
+                                    u8 ucNss)
+{
     P_MSDU_INFO_T prMsduInfo;
     P_ACTION_OP_MODE_NOTIFICATION_FRAME prTxFrame;
     P_BSS_INFO_T prBssInfo;
@@ -4628,7 +4681,8 @@ void rlmSendOpModeNotificationFrame(P_ADAPTER_T prAdapter,
  */
 /*----------------------------------------------------------------------------*/
 void rlmSendSmPowerSaveFrame(P_ADAPTER_T prAdapter, P_STA_RECORD_T prStaRec,
-                             u8 ucNss){
+                             u8 ucNss)
+{
     P_MSDU_INFO_T prMsduInfo;
     P_ACTION_SM_POWER_SAVE_FRAME prTxFrame;
     P_BSS_INFO_T prBssInfo;
@@ -4712,7 +4766,8 @@ void rlmSendSmPowerSaveFrame(P_ADAPTER_T prAdapter, P_STA_RECORD_T prStaRec,
  */
 /*----------------------------------------------------------------------------*/
 void rlmSendNotifyChannelWidthFrame(P_ADAPTER_T prAdapter,
-                                    P_STA_RECORD_T prStaRec, u8 ucChannelWidth){
+                                    P_STA_RECORD_T prStaRec, u8 ucChannelWidth)
+{
     P_MSDU_INFO_T prMsduInfo;
     P_ACTION_NOTIFY_CHANNEL_WIDTH_FRAME prTxFrame;
     P_BSS_INFO_T prBssInfo;
@@ -4778,7 +4833,8 @@ void rlmSendNotifyChannelWidthFrame(P_ADAPTER_T prAdapter,
  */
 /*----------------------------------------------------------------------------*/
 u8 rlmChangeOperationMode(P_ADAPTER_T prAdapter, u8 ucBssIndex,
-                          u8 ucChannelWidth, u8 ucNss){
+                          u8 ucChannelWidth, u8 ucNss)
+{
     P_BSS_INFO_T prBssInfo;
     P_STA_RECORD_T prStaRec = (P_STA_RECORD_T)NULL;
     /*u8 fgIsSuccess = false;*/
@@ -5058,7 +5114,8 @@ u8 rlmChangeOperationMode(P_ADAPTER_T prAdapter, u8 ucBssIndex,
 
 #if CFG_SUPPORT_802_11K
 void rlmReqGenerateRRMEnabledCapIE(P_ADAPTER_T prAdapter,
-                                   P_MSDU_INFO_T prMsduInfo){
+                                   P_MSDU_INFO_T prMsduInfo)
+{
     P_IE_RRM_ENABLED_CAP_T prRrmEnabledCap = NULL;
 
     ASSERT(prAdapter);
@@ -5074,7 +5131,8 @@ void rlmReqGenerateRRMEnabledCapIE(P_ADAPTER_T prAdapter,
     prMsduInfo->u2FrameLength += IE_SIZE(prRrmEnabledCap);
 }
 
-void rlmFillRrmCapa(u8 *pucCapa){
+void rlmFillRrmCapa(u8 *pucCapa)
+{
     u8 ucIndex = 0;
     u8 aucEnabledBits[] = { RRM_CAP_INFO_LINK_MEASURE_BIT,
                             RRM_CAP_INFO_NEIGHBOR_REPORT_BIT,
@@ -5090,7 +5148,8 @@ void rlmFillRrmCapa(u8 *pucCapa){
 }
 
 void rlmTxNeighborReportRequest(P_ADAPTER_T prAdapter, P_STA_RECORD_T prStaRec,
-                                struct SUB_ELEMENT_LIST *prSubIEs){
+                                struct SUB_ELEMENT_LIST *prSubIEs)
+{
     static u8 ucDialogToken = 1;
     P_MSDU_INFO_T prMsduInfo = NULL;
     P_BSS_INFO_T prBssInfo = NULL;
@@ -5145,7 +5204,8 @@ void rlmTxNeighborReportRequest(P_ADAPTER_T prAdapter, P_STA_RECORD_T prStaRec,
 
 void rlmProcessNeighborReportResponse(P_ADAPTER_T prAdapter,
                                       P_WLAN_ACTION_FRAME prAction,
-                                      u16 u2PacketLen){
+                                      u16 u2PacketLen)
+{
     P_ACTION_NEIGHBOR_REPORT_FRAME_T prNeighborResponse =
         (P_ACTION_NEIGHBOR_REPORT_FRAME_T)prAction;
 
@@ -5163,7 +5223,8 @@ void rlmProcessNeighborReportResponse(P_ADAPTER_T prAdapter,
 #endif
 
 #if CFG_SUPPORT_QUIET
-void rrmQuietIeNotExist(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo){
+void rrmQuietIeNotExist(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo)
+{
     P_STA_RECORD_T prStaRec;
     u32 u4QuietDuration = TU_TO_MSEC(prBssInfo->u2QuietDuration);
     /* connected to AP */
@@ -5200,7 +5261,8 @@ void rrmQuietIeNotExist(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo){
 }
 
 void rrmQuietHandleQuietIE(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo,
-                           P_IE_QUIET_T pucQUIE){
+                           P_IE_QUIET_T pucQUIE)
+{
     u32 u4NextQuietTime;
     cnmTimerStopTimer(prAdapter, &prBssInfo->rTxQuietTimer);
     prBssInfo->u2QuietDuration = pucQUIE->u2Duration;
@@ -5223,7 +5285,8 @@ void rrmQuietHandleQuietIE(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo,
     }
 }
 
-void rrmTxQuietTimeout(P_ADAPTER_T prAdapter, unsigned long ulParamPtr){
+void rrmTxQuietTimeout(P_ADAPTER_T prAdapter, unsigned long ulParamPtr)
+{
     P_BSS_INFO_T prBssInfo;
     P_STA_RECORD_T prStaRec;
     u32 u4QuietPeriod;
@@ -5275,7 +5338,8 @@ void rrmTxQuietTimeout(P_ADAPTER_T prAdapter, unsigned long ulParamPtr){
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-void rlmBfStaRecPfmuUpdate(P_ADAPTER_T prAdapter, P_STA_RECORD_T prStaRec){
+void rlmBfStaRecPfmuUpdate(P_ADAPTER_T prAdapter, P_STA_RECORD_T prStaRec)
+{
     u8 ucBFerMaxNr, ucBFeeMaxNr, ucMode;
     P_BSS_INFO_T prBssInfo;
     P_CMD_STAREC_BF prStaRecBF;
@@ -5483,7 +5547,8 @@ void rlmBfStaRecPfmuUpdate(P_ADAPTER_T prAdapter, P_STA_RECORD_T prStaRec){
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-void rlmETxBfTriggerPeriodicSounding(P_ADAPTER_T prAdapter){
+void rlmETxBfTriggerPeriodicSounding(P_ADAPTER_T prAdapter)
+{
     u32 u4SetBufferLen = sizeof(PARAM_CUSTOM_TXBF_ACTION_STRUCT_T);
     PARAM_CUSTOM_TXBF_ACTION_STRUCT_T rTxBfActionInfo;
     CMD_TXBF_ACTION_T rCmdTxBfActionInfo;
@@ -5522,7 +5587,8 @@ void rlmETxBfTriggerPeriodicSounding(P_ADAPTER_T prAdapter){
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-u8 rlmClientSupportsVhtETxBF(P_STA_RECORD_T prStaRec){
+u8 rlmClientSupportsVhtETxBF(P_STA_RECORD_T prStaRec)
+{
     u8 ucVhtCapSuBfeeCap;
 
     ucVhtCapSuBfeeCap =
@@ -5541,7 +5607,8 @@ u8 rlmClientSupportsVhtETxBF(P_STA_RECORD_T prStaRec){
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-u8 rlmClientSupportsVhtBfeeStsCap(P_STA_RECORD_T prStaRec){
+u8 rlmClientSupportsVhtBfeeStsCap(P_STA_RECORD_T prStaRec)
+{
     u8 ucVhtCapBfeeStsCap;
 
     ucVhtCapBfeeStsCap =
@@ -5561,7 +5628,8 @@ u8 rlmClientSupportsVhtBfeeStsCap(P_STA_RECORD_T prStaRec){
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-u8 rlmClientSupportsHtETxBF(P_STA_RECORD_T prStaRec){
+u8 rlmClientSupportsHtETxBF(P_STA_RECORD_T prStaRec)
+{
     u32 u4RxNDPCap, u4ComBfFbkCap;
 
     u4RxNDPCap = (prStaRec->u4TxBeamformingCap & TXBF_RX_NDP_CAPABLE) >>
@@ -5586,7 +5654,8 @@ u8 rlmClientSupportsHtETxBF(P_STA_RECORD_T prStaRec){
  *
  */
 /*----------------------------------------------------------------------------*/
-u8 rlmGetBssOpBwByVhtAndHtOpInfo(P_BSS_INFO_T prBssInfo){
+u8 rlmGetBssOpBwByVhtAndHtOpInfo(P_BSS_INFO_T prBssInfo)
+{
     u8 ucBssOpBw = MAX_BW_20MHZ;
 
     ASSERT(prBssInfo);
@@ -5635,7 +5704,8 @@ u8 rlmGetBssOpBwByVhtAndHtOpInfo(P_BSS_INFO_T prBssInfo){
  *
  */
 /*----------------------------------------------------------------------------*/
-u8 rlmGetVhtOpBwByBssOpBw(u8 ucBssOpBw){
+u8 rlmGetVhtOpBwByBssOpBw(u8 ucBssOpBw)
+{
     u8 ucVhtOpBw = VHT_OP_CHANNEL_WIDTH_80;  /*VHT default should support BW
                                               * 80*/
 

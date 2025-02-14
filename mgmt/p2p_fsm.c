@@ -58,7 +58,8 @@
  *******************************************************************************
  */
 void p2pFsmRunEventScanRequest(IN P_ADAPTER_T prAdapter,
-                               IN P_MSG_HDR_T prMsgHdr){
+                               IN P_MSG_HDR_T prMsgHdr)
+{
     P_MSG_P2P_SCAN_REQUEST_T prP2pScanReqMsg =
         (P_MSG_P2P_SCAN_REQUEST_T)NULL;
 
@@ -98,7 +99,8 @@ void p2pFsmRunEventScanRequest(IN P_ADAPTER_T prAdapter,
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-void p2pFsmRunEventChGrant(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMsgHdr){
+void p2pFsmRunEventChGrant(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMsgHdr)
+{
     P_MSG_CH_GRANT_T prMsgChGrant = (P_MSG_CH_GRANT_T)NULL;
     P_BSS_INFO_T prP2pBssInfo = (P_BSS_INFO_T)NULL;
 
@@ -156,7 +158,8 @@ void p2pFsmRunEventChGrant(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMsgHdr){
 }
 
 void p2pFsmRunEventNetDeviceRegister(IN P_ADAPTER_T prAdapter,
-                                     IN P_MSG_HDR_T prMsgHdr){
+                                     IN P_MSG_HDR_T prMsgHdr)
+{
     P_MSG_P2P_NETDEV_REGISTER_T prNetDevRegisterMsg =
         (P_MSG_P2P_NETDEV_REGISTER_T)NULL;
 
@@ -179,7 +182,8 @@ void p2pFsmRunEventNetDeviceRegister(IN P_ADAPTER_T prAdapter,
 }
 
 void p2pFsmRunEventUpdateMgmtFrame(IN P_ADAPTER_T prAdapter,
-                                   IN P_MSG_HDR_T prMsgHdr){
+                                   IN P_MSG_HDR_T prMsgHdr)
+{
     P_MSG_P2P_MGMT_FRAME_UPDATE_T prP2pMgmtFrameUpdateMsg =
         (P_MSG_P2P_MGMT_FRAME_UPDATE_T)NULL;
 
@@ -212,7 +216,8 @@ void p2pFsmRunEventUpdateMgmtFrame(IN P_ADAPTER_T prAdapter,
 
 #if CFG_SUPPORT_WFD
 void p2pFsmRunEventWfdSettingUpdate(IN P_ADAPTER_T prAdapter,
-                                    IN P_MSG_HDR_T prMsgHdr){
+                                    IN P_MSG_HDR_T prMsgHdr)
+{
     P_WFD_CFG_SETTINGS_T prWfdCfgSettings = (P_WFD_CFG_SETTINGS_T)NULL;
     P_MSG_WFD_CONFIG_SETTINGS_CHANGED_T prMsgWfdCfgSettings =
         (P_MSG_WFD_CONFIG_SETTINGS_CHANGED_T)NULL;
@@ -272,7 +277,8 @@ void p2pFsmRunEventWfdSettingUpdate(IN P_ADAPTER_T prAdapter,
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-void p2pFsmRunEventScanDone(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMsgHdr){
+void p2pFsmRunEventScanDone(IN P_ADAPTER_T prAdapter, IN P_MSG_HDR_T prMsgHdr)
+{
     P_MSG_SCN_SCAN_DONE prScanDoneMsg = (P_MSG_SCN_SCAN_DONE)NULL;
     P_BSS_INFO_T prP2pBssInfo = (P_BSS_INFO_T)NULL;
 

@@ -72,7 +72,8 @@
  */
 /*----------------------------------------------------------------------------*/
 u8 rsnParseRsnIE(IN P_ADAPTER_T prAdapter, IN P_RSN_INFO_ELEM_T prInfoElem,
-                 OUT P_RSN_INFO_T prRsnInfo){
+                 OUT P_RSN_INFO_T prRsnInfo)
+{
     u32 i;
     s32 u4RemainRsnIeLen;
     u16 u2Version;
@@ -393,7 +394,8 @@ u8 rsnParseRsnIE(IN P_ADAPTER_T prAdapter, IN P_RSN_INFO_ELEM_T prInfoElem,
  */
 /*----------------------------------------------------------------------------*/
 u8 rsnParseWpaIE(IN P_ADAPTER_T prAdapter, IN P_WPA_INFO_ELEM_T prInfoElem,
-                 OUT P_RSN_INFO_T prWpaInfo){
+                 OUT P_RSN_INFO_T prWpaInfo)
+{
     u32 i;
     s32 u4RemainWpaIeLen;
     u16 u2Version;
@@ -656,7 +658,8 @@ u8 rsnParseWpaIE(IN P_ADAPTER_T prAdapter, IN P_WPA_INFO_ELEM_T prInfoElem,
  */
 /*----------------------------------------------------------------------------*/
 u8 rsnSearchSupportedCipher(IN P_ADAPTER_T prAdapter, IN u32 u4Cipher,
-                            OUT u32 *pu4Index){
+                            OUT u32 *pu4Index)
+{
     u8 i;
     P_DOT11_RSNA_CONFIG_PAIRWISE_CIPHERS_ENTRY prEntry;
 
@@ -684,7 +687,8 @@ u8 rsnSearchSupportedCipher(IN P_ADAPTER_T prAdapter, IN u32 u4Cipher,
  * \retval u8
  */
 /*----------------------------------------------------------------------------*/
-u8 rsnIsSuitableBSS(IN P_ADAPTER_T prAdapter, IN P_RSN_INFO_T prBssRsnInfo){
+u8 rsnIsSuitableBSS(IN P_ADAPTER_T prAdapter, IN P_RSN_INFO_T prBssRsnInfo)
+{
     u8 i = 0;
 
     DEBUGFUNC("rsnIsSuitableBSS");
@@ -740,7 +744,8 @@ u8 rsnIsSuitableBSS(IN P_ADAPTER_T prAdapter, IN P_RSN_INFO_T prBssRsnInfo){
  */
 /*----------------------------------------------------------------------------*/
 u8 rsnSearchAKMSuite(IN P_ADAPTER_T prAdapter, IN u32 u4AkmSuite,
-                     OUT u32 *pu4Index){
+                     OUT u32 *pu4Index)
+{
     u8 i;
     P_DOT11_RSNA_CONFIG_AUTHENTICATION_SUITES_ENTRY prEntry;
 
@@ -775,7 +780,8 @@ u8 rsnSearchAKMSuite(IN P_ADAPTER_T prAdapter, IN u32 u4AkmSuite,
  * \note The Encrypt status matched score will save to bss for final ap select.
  */
 /*----------------------------------------------------------------------------*/
-u8 rsnPerformPolicySelection(IN P_ADAPTER_T prAdapter, IN P_BSS_DESC_T prBss){
+u8 rsnPerformPolicySelection(IN P_ADAPTER_T prAdapter, IN P_BSS_DESC_T prBss)
+{
 #if CFG_SUPPORT_802_11W
     s32 i;
     u32 j;
@@ -1166,7 +1172,8 @@ u8 rsnPerformPolicySelection(IN P_ADAPTER_T prAdapter, IN P_BSS_DESC_T prBss){
  */
 /*----------------------------------------------------------------------------*/
 void rsnGenerateWpaNoneIE(IN P_ADAPTER_T prAdapter,
-                          IN P_MSDU_INFO_T prMsduInfo){
+                          IN P_MSDU_INFO_T prMsduInfo)
+{
     u32 i;
     P_WPA_INFO_ELEM_T prWpaIE;
     u32 u4Suite;
@@ -1292,7 +1299,8 @@ void rsnGenerateWpaNoneIE(IN P_ADAPTER_T prAdapter,
  *      Called by: AIS module, Associate request
  */
 /*----------------------------------------------------------------------------*/
-void rsnGenerateWPAIE(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo){
+void rsnGenerateWPAIE(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo)
+{
     u8 *cp;
     u8 *pucBuffer;
     u8 ucBssIndex;
@@ -1407,7 +1415,8 @@ void rsnGenerateWPAIE(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo){
  *      Called by: AIS module, P2P module, BOW module Associate request
  */
 /*----------------------------------------------------------------------------*/
-void rsnGenerateRSNIE(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo){
+void rsnGenerateRSNIE(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo)
+{
     u8 *cp;
     /* u8                ucExpendedLen = 0; */
     u8 *pucBuffer;
@@ -1583,7 +1592,8 @@ void rsnGenerateRSNIE(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo){
  */
 /*----------------------------------------------------------------------------*/
 u8 rsnParseCheckForWFAInfoElem(IN P_ADAPTER_T prAdapter, IN u8 *pucBuf,
-                               OUT u8 *pucOuiType, OUT u16 *pu2SubTypeVersion){
+                               OUT u8 *pucOuiType, OUT u16 *pu2SubTypeVersion)
+{
     u8 aucWfaOui[] = VENDOR_OUI_WFA;
     P_IE_WFA_T prWfaIE;
 
@@ -1624,7 +1634,8 @@ u8 rsnParseCheckForWFAInfoElem(IN P_ADAPTER_T prAdapter, IN u8 *pucBuf,
  */
 /*----------------------------------------------------------------------------*/
 void rsnParserCheckForRSNCCMPPSK(P_ADAPTER_T prAdapter, P_RSN_INFO_ELEM_T prIe,
-                                 P_STA_RECORD_T prStaRec, u16 *pu2StatusCode){
+                                 P_STA_RECORD_T prStaRec, u16 *pu2StatusCode)
+{
     RSN_INFO_T rRsnIe;
     P_BSS_INFO_T prBssInfo;
     u8 i;
@@ -1716,7 +1727,8 @@ void rsnParserCheckForRSNCCMPPSK(P_ADAPTER_T prAdapter, P_RSN_INFO_ELEM_T prIe,
  * \return (none)
  */
 /*----------------------------------------------------------------------------*/
-void rsnGenMicErrorEvent(IN P_ADAPTER_T prAdapter, IN u8 fgFlags){
+void rsnGenMicErrorEvent(IN P_ADAPTER_T prAdapter, IN u8 fgFlags)
+{
     P_PARAM_AUTH_EVENT_T prAuthEvent;
 
     DEBUGFUNC("rsnGenMicErrorEvent");
@@ -1755,7 +1767,8 @@ void rsnGenMicErrorEvent(IN P_ADAPTER_T prAdapter, IN u8 fgFlags){
  */
 /*----------------------------------------------------------------------------*/
 void rsnTkipHandleMICFailure(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prSta,
-                             IN u8 fgErrorKeyType){
+                             IN u8 fgErrorKeyType)
+{
     DEBUGFUNC("rsnTkipHandleMICFailure");
 
     ASSERT(prAdapter);
@@ -1781,7 +1794,8 @@ void rsnTkipHandleMICFailure(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prSta,
  */
 /*----------------------------------------------------------------------------*/
 void rsnSelectPmkidCandidateList(IN P_ADAPTER_T prAdapter,
-                                 IN P_BSS_DESC_T prBssDesc){
+                                 IN P_BSS_DESC_T prBssDesc)
+{
     P_CONNECTION_SETTINGS_T prConnSettings;
     P_BSS_INFO_T prAisBssInfo;
 
@@ -1817,7 +1831,8 @@ void rsnSelectPmkidCandidateList(IN P_ADAPTER_T prAdapter,
  */
 /*----------------------------------------------------------------------------*/
 void rsnUpdatePmkidCandidateList(IN P_ADAPTER_T prAdapter,
-                                 IN P_BSS_DESC_T prBssDesc){
+                                 IN P_BSS_DESC_T prBssDesc)
+{
     u32 i;
     P_CONNECTION_SETTINGS_T prConnSettings;
     P_AIS_SPECIFIC_BSS_INFO_T prAisSpecBssInfo;
@@ -1881,7 +1896,8 @@ void rsnUpdatePmkidCandidateList(IN P_ADAPTER_T prAdapter,
  */
 /*----------------------------------------------------------------------------*/
 u8 rsnSearchPmkidEntry(IN P_ADAPTER_T prAdapter, IN u8 *pucBssid,
-                       OUT u32 *pu4EntryIndex){
+                       OUT u32 *pu4EntryIndex)
+{
     u32 i;
     P_AIS_SPECIFIC_BSS_INFO_T prAisSpecBssInfo;
 
@@ -1928,7 +1944,8 @@ u8 rsnSearchPmkidEntry(IN P_ADAPTER_T prAdapter, IN u8 *pucBssid,
  * \retval FALSe, if no new member in the PMKID candicate list
  */
 /*----------------------------------------------------------------------------*/
-u8 rsnCheckPmkidCandicate(IN P_ADAPTER_T prAdapter){
+u8 rsnCheckPmkidCandicate(IN P_ADAPTER_T prAdapter)
+{
     P_AIS_SPECIFIC_BSS_INFO_T prAisSpecBssInfo;
     u32 i;  /* Index for PMKID candicate */
     u32 j;  /* Indix for PMKID cache */
@@ -1983,7 +2000,8 @@ u8 rsnCheckPmkidCandicate(IN P_ADAPTER_T prAdapter){
  */
 /*----------------------------------------------------------------------------*/
 void rsnIndicatePmkidCand(IN P_ADAPTER_T prAdapter,
-                          IN unsigned long ulParamPtr){
+                          IN unsigned long ulParamPtr)
+{
     DBGLOG(RSN, EVENT, "Security - Time to indicate the PMKID cand.\n");
 
     /* If the authentication mode is WPA2 and indication PMKID flag
@@ -2011,7 +2029,8 @@ void rsnIndicatePmkidCand(IN P_ADAPTER_T prAdapter,
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-void rsnCheckPmkidCache(IN P_ADAPTER_T prAdapter, IN P_BSS_DESC_T prBss){
+void rsnCheckPmkidCache(IN P_ADAPTER_T prAdapter, IN P_BSS_DESC_T prBss)
+{
     P_BSS_INFO_T prAisBssInfo;
     P_AIS_SPECIFIC_BSS_INFO_T prAisSpecBssInfo;
     P_CONNECTION_SETTINGS_T prConnSettings;
@@ -2055,7 +2074,8 @@ void rsnCheckPmkidCache(IN P_ADAPTER_T prAdapter, IN P_BSS_DESC_T prBss){
  * \retval none
  */
 /*----------------------------------------------------------------------------*/
-void rsnGeneratePmkidIndication(IN P_ADAPTER_T prAdapter){
+void rsnGeneratePmkidIndication(IN P_ADAPTER_T prAdapter)
+{
     P_PARAM_STATUS_INDICATION_T prStatusEvent;
     P_PARAM_PMKID_CANDIDATE_LIST_T prPmkidEvent;
     P_AIS_SPECIFIC_BSS_INFO_T prAisSpecificBssInfo;
@@ -2138,7 +2158,8 @@ void rsnGeneratePmkidIndication(IN P_ADAPTER_T prAdapter){
  *      Called by: AIS module, Associate request
  */
 /*----------------------------------------------------------------------------*/
-void rsnGenerateWSCIE(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo){
+void rsnGenerateWSCIE(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo)
+{
     u8 *pucBuffer;
 
     ASSERT(prAdapter);
@@ -2175,7 +2196,8 @@ void rsnGenerateWSCIE(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo){
  */
 /*----------------------------------------------------------------------------*/
 u32 rsnCheckBipKeyInstalled(IN P_ADAPTER_T prAdapter,
-                            IN P_STA_RECORD_T prStaRec){
+                            IN P_STA_RECORD_T prStaRec)
+{
     /* caution: prStaRec might be null ! */
     if (prStaRec) {
         if (GET_BSS_INFO_BY_INDEX(prAdapter, prStaRec->ucBssIndex)
@@ -2206,7 +2228,8 @@ u32 rsnCheckBipKeyInstalled(IN P_ADAPTER_T prAdapter,
  *      Called by: AIS module, Handle by Sa Quert timeout
  */
 /*----------------------------------------------------------------------------*/
-u8 rsnCheckSaQueryTimeout(IN P_ADAPTER_T prAdapter){
+u8 rsnCheckSaQueryTimeout(IN P_ADAPTER_T prAdapter)
+{
     P_AIS_SPECIFIC_BSS_INFO_T prBssSpecInfo;
     u32 now;
 
@@ -2263,7 +2286,8 @@ u8 rsnCheckSaQueryTimeout(IN P_ADAPTER_T prAdapter){
  */
 /*----------------------------------------------------------------------------*/
 void rsnStartSaQueryTimer(IN P_ADAPTER_T prAdapter,
-                          IN unsigned long ulParamPtr){
+                          IN unsigned long ulParamPtr)
+{
     P_BSS_INFO_T prBssInfo;
     P_AIS_SPECIFIC_BSS_INFO_T prBssSpecInfo;
     P_MSDU_INFO_T prMsduInfo;
@@ -2406,7 +2430,8 @@ void rsnStartSaQueryTimer(IN P_ADAPTER_T prAdapter,
  *      Called by: AIS module, Handle Rx mgmt request
  */
 /*----------------------------------------------------------------------------*/
-void rsnStartSaQuery(IN P_ADAPTER_T prAdapter){
+void rsnStartSaQuery(IN P_ADAPTER_T prAdapter)
+{
     P_AIS_SPECIFIC_BSS_INFO_T prBssSpecInfo;
 
     prBssSpecInfo = &prAdapter->rWifiVar.rAisSpecificBssInfo;
@@ -2429,7 +2454,8 @@ void rsnStartSaQuery(IN P_ADAPTER_T prAdapter){
  *      Called by: AIS module, Handle Rx mgmt request
  */
 /*----------------------------------------------------------------------------*/
-void rsnStopSaQuery(IN P_ADAPTER_T prAdapter){
+void rsnStopSaQuery(IN P_ADAPTER_T prAdapter)
+{
     P_AIS_SPECIFIC_BSS_INFO_T prBssSpecInfo;
 
     prBssSpecInfo = &prAdapter->rWifiVar.rAisSpecificBssInfo;
@@ -2454,7 +2480,8 @@ void rsnStopSaQuery(IN P_ADAPTER_T prAdapter){
  *      Called by: AIS module, Handle Rx mgmt request
  */
 /*----------------------------------------------------------------------------*/
-void rsnSaQueryRequest(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb){
+void rsnSaQueryRequest(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb)
+{
     P_BSS_INFO_T prBssInfo;
     P_MSDU_INFO_T prMsduInfo;
     P_ACTION_SA_QUERY_FRAME prRxFrame = NULL;
@@ -2550,7 +2577,8 @@ void rsnSaQueryRequest(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb){
  *      Called by: AIS module, Handle Rx mgmt request
  */
 /*----------------------------------------------------------------------------*/
-void rsnSaQueryAction(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb){
+void rsnSaQueryAction(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb)
+{
     P_AIS_SPECIFIC_BSS_INFO_T prBssSpecInfo;
     P_ACTION_SA_QUERY_FRAME prRxFrame;
     P_STA_RECORD_T prStaRec;
@@ -2618,7 +2646,8 @@ void rsnSaQueryAction(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb){
 #define WPS_VENDOR_ID_WFA 14122
 
 void rsnGenerateWSCIEForAssocRsp(P_ADAPTER_T prAdapter,
-                                 P_MSDU_INFO_T prMsduInfo){
+                                 P_MSDU_INFO_T prMsduInfo)
+{
     P_WIFI_VAR_T prWifiVar = NULL;
     P_BSS_INFO_T prP2pBssInfo = (P_BSS_INFO_T)NULL;
     u16 u2IELen = 0;
@@ -2662,7 +2691,8 @@ void rsnGenerateWSCIEForAssocRsp(P_ADAPTER_T prAdapter,
  */
 /*----------------------------------------------------------------------------*/
 u16 rsnPmfCapableValidation(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prBssInfo,
-                            IN P_STA_RECORD_T prStaRec){
+                            IN P_STA_RECORD_T prStaRec)
+{
     u8 selfMfpc, selfMfpr, peerMfpc, peerMfpr;
 
     selfMfpc = prBssInfo->rApPmfCfg.fgMfpc;
@@ -2702,7 +2732,8 @@ u16 rsnPmfCapableValidation(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prBssInfo,
  * \return (none)
  */
 /*----------------------------------------------------------------------------*/
-void rsnPmfGenerateTimeoutIE(P_ADAPTER_T prAdapter, P_MSDU_INFO_T prMsduInfo){
+void rsnPmfGenerateTimeoutIE(P_ADAPTER_T prAdapter, P_MSDU_INFO_T prMsduInfo)
+{
     IE_TIMEOUT_INTERVAL_T *prTimeout;
     P_STA_RECORD_T prStaRec = NULL;
 
@@ -2742,7 +2773,8 @@ void rsnPmfGenerateTimeoutIE(P_ADAPTER_T prAdapter, P_MSDU_INFO_T prMsduInfo){
  */
 /*----------------------------------------------------------------------------*/
 u8 rsnApCheckSaQueryTimeout(IN P_ADAPTER_T prAdapter,
-                            IN P_STA_RECORD_T prStaRec){
+                            IN P_STA_RECORD_T prStaRec)
+{
     P_BSS_INFO_T prBssInfo;
     u32 now;
 
@@ -2796,7 +2828,8 @@ u8 rsnApCheckSaQueryTimeout(IN P_ADAPTER_T prAdapter,
 /*----------------------------------------------------------------------------*/
 void rsnApStartSaQueryTimer(IN P_ADAPTER_T prAdapter,
                             IN P_STA_RECORD_T prStaRec,
-                            IN unsigned long ulParamPtr){
+                            IN unsigned long ulParamPtr)
+{
     P_BSS_INFO_T prBssInfo;
     P_MSDU_INFO_T prMsduInfo;
     P_ACTION_SA_QUERY_FRAME prTxFrame;
@@ -2892,7 +2925,8 @@ void rsnApStartSaQueryTimer(IN P_ADAPTER_T prAdapter,
  *      Called by: AAA module, Handle Tx action frame request
  */
 /*----------------------------------------------------------------------------*/
-void rsnApStartSaQuery(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec){
+void rsnApStartSaQuery(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec)
+{
     ASSERT(prStaRec);
 
     DBGLOG(RSN, INFO, "rsnApStartSaQuery\n");
@@ -2919,7 +2953,8 @@ void rsnApStartSaQuery(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec){
  *      Called by: AAA module, stop TX SAQ if receive correct SAQ response
  */
 /*----------------------------------------------------------------------------*/
-void rsnApStopSaQuery(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec){
+void rsnApStopSaQuery(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec)
+{
     ASSERT(prStaRec);
 
     cnmTimerStopTimer(prAdapter, &prStaRec->rPmfCfg.rSAQueryTimer);
@@ -2938,7 +2973,8 @@ void rsnApStopSaQuery(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec){
  *      Called by: AAA module, Handle Rx action request
  */
 /*----------------------------------------------------------------------------*/
-void rsnApSaQueryRequest(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb){
+void rsnApSaQueryRequest(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb)
+{
     P_BSS_INFO_T prBssInfo;
     P_MSDU_INFO_T prMsduInfo;
     P_ACTION_SA_QUERY_FRAME prRxFrame = NULL;
@@ -3044,7 +3080,8 @@ void rsnApSaQueryRequest(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb){
  *      Called by: AAA module, Handle Rx action request
  */
 /*----------------------------------------------------------------------------*/
-void rsnApSaQueryAction(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb){
+void rsnApSaQueryAction(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb)
+{
     P_ACTION_SA_QUERY_FRAME prRxFrame;
     P_STA_RECORD_T prStaRec;
     u16 u2SwapTrID;
@@ -3116,7 +3153,8 @@ void rsnApSaQueryAction(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb){
  */
 /*----------------------------------------------------------------------------*/
 void rsnGenerateRSNXE(IN P_ADAPTER_T prAdapter,
-                      IN OUT P_MSDU_INFO_T prMsduInfo){
+                      IN OUT P_MSDU_INFO_T prMsduInfo)
+{
     u8 *pucBuffer;
     u8 ucLength;
     P_CONNECTION_SETTINGS_T prConnSettings;
@@ -3166,7 +3204,8 @@ void rsnGenerateRSNXE(IN P_ADAPTER_T prAdapter,
  */
 /*----------------------------------------------------------------------------*/
 u32 rsnCalRSNXELen(IN P_ADAPTER_T prAdapter, IN u8 ucBssIndex,
-                   P_STA_RECORD_T prStaRec){
+                   P_STA_RECORD_T prStaRec)
+{
     P_CONNECTION_SETTINGS_T prConnSettings;
 
     prConnSettings = &(prAdapter->rWifiVar.rConnSettings);

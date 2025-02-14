@@ -165,7 +165,8 @@ APPEND_VAR_IE_ENTRY_T txProbRspIETable[] = {
 /*----------------------------------------------------------------------------*/
 void bssDetermineStaRecPhyTypeSet(IN P_ADAPTER_T prAdapter,
                                   IN P_BSS_DESC_T prBssDesc,
-                                  OUT P_STA_RECORD_T prStaRec){
+                                  OUT P_STA_RECORD_T prStaRec)
+{
     P_WIFI_VAR_T prWifiVar = &prAdapter->rWifiVar;
     u8 ucHtOption = FEATURE_ENABLED;
     u8 ucVhtOption = FEATURE_ENABLED;
@@ -232,7 +233,8 @@ void bssDetermineStaRecPhyTypeSet(IN P_ADAPTER_T prAdapter,
  */
 /*----------------------------------------------------------------------------*/
 void bssDetermineApBssInfoPhyTypeSet(IN P_ADAPTER_T prAdapter, IN u8 fgIsPureAp,
-                                     OUT P_BSS_INFO_T prBssInfo){
+                                     OUT P_BSS_INFO_T prBssInfo)
+{
     P_WIFI_VAR_T prWifiVar = &prAdapter->rWifiVar;
     u8 ucHtOption = FEATURE_ENABLED;
     u8 ucVhtOption = FEATURE_ENABLED;
@@ -283,7 +285,8 @@ void bssDetermineApBssInfoPhyTypeSet(IN P_ADAPTER_T prAdapter, IN u8 fgIsPureAp,
 P_STA_RECORD_T
 bssCreateStaRecFromBssDesc(IN P_ADAPTER_T prAdapter,
                            IN ENUM_STA_TYPE_T eStaType, IN u8 ucBssIndex,
-                           IN P_BSS_DESC_T prBssDesc){
+                           IN P_BSS_DESC_T prBssDesc)
+{
     P_STA_RECORD_T prStaRec;
     u8 ucNonHTPhyTypeSet;
     P_CONNECTION_SETTINGS_T prConnSettings;
@@ -393,7 +396,8 @@ bssCreateStaRecFromBssDesc(IN P_ADAPTER_T prAdapter,
  */
 /*----------------------------------------------------------------------------*/
 void bssComposeNullFrame(IN P_ADAPTER_T prAdapter, IN u8 *pucBuffer,
-                         IN P_STA_RECORD_T prStaRec){
+                         IN P_STA_RECORD_T prStaRec)
+{
     P_WLAN_MAC_HEADER_T prNullFrame;
     P_BSS_INFO_T prBssInfo;
     u16 u2FrameCtrl;
@@ -467,7 +471,8 @@ void bssComposeNullFrame(IN P_ADAPTER_T prAdapter, IN u8 *pucBuffer,
 /*----------------------------------------------------------------------------*/
 void bssComposeQoSNullFrame(IN P_ADAPTER_T prAdapter, IN u8 *pucBuffer,
                             IN P_STA_RECORD_T prStaRec, IN u8 ucUP,
-                            IN u8 fgSetEOSP){
+                            IN u8 fgSetEOSP)
+{
     P_WLAN_MAC_HEADER_QOS_T prQoSNullFrame;
     P_BSS_INFO_T prBssInfo;
     u16 u2FrameCtrl;
@@ -551,7 +556,8 @@ void bssComposeQoSNullFrame(IN P_ADAPTER_T prAdapter, IN u8 *pucBuffer,
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS
 bssSendNullFrame(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec,
-                 IN PFN_TX_DONE_HANDLER pfTxDoneHandler){
+                 IN PFN_TX_DONE_HANDLER pfTxDoneHandler)
+{
     P_MSDU_INFO_T prMsduInfo;
     u16 u2EstimatedFrameLen;
 
@@ -595,7 +601,8 @@ bssSendNullFrame(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec,
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS
 bssSendQoSNullFrame(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec,
-                    IN u8 ucUP, IN PFN_TX_DONE_HANDLER pfTxDoneHandler){
+                    IN u8 ucUP, IN PFN_TX_DONE_HANDLER pfTxDoneHandler)
+{
     P_MSDU_INFO_T prMsduInfo;
     u16 u2EstimatedFrameLen;
 
@@ -642,7 +649,8 @@ bssSendQoSNullFrame(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec,
  */
 /*----------------------------------------------------------------------------*/
 void bssGenerateExtSuppRate_IE(IN P_ADAPTER_T prAdapter,
-                               IN P_MSDU_INFO_T prMsduInfo){
+                               IN P_MSDU_INFO_T prMsduInfo)
+{
     P_BSS_INFO_T prBssInfo;
     u8 *pucBuffer;
     u8 ucExtSupRatesLen;
@@ -692,7 +700,8 @@ void bssGenerateExtSuppRate_IE(IN P_ADAPTER_T prAdapter,
 /*----------------------------------------------------------------------------*/
 void bssBuildBeaconProbeRespFrameCommonIEs(IN P_MSDU_INFO_T prMsduInfo,
                                            IN P_BSS_INFO_T prBssInfo,
-                                           IN u8 *pucDestAddr){
+                                           IN u8 *pucDestAddr)
+{
     u8 *pucBuffer;
     u8 ucSupRatesLen;
 
@@ -823,7 +832,8 @@ void bssBuildBeaconProbeRespFrameCommonIEs(IN P_MSDU_INFO_T prMsduInfo,
 /*----------------------------------------------------------------------------*/
 void bssComposeBeaconProbeRespFrameHeaderAndFF(
     IN u8 *pucBuffer, IN u8 *pucDestAddr, IN u8 *pucOwnMACAddress,
-    IN u8 *pucBSSID, IN u16 u2BeaconInterval, IN u16 u2CapInfo){
+    IN u8 *pucBSSID, IN u16 u2BeaconInterval, IN u16 u2CapInfo)
+{
     P_WLAN_BEACON_FRAME_T prBcnProbRspFrame;
     u8 aucBCAddr[] = BC_MAC_ADDR;
     u16 u2FrameCtrl;
@@ -889,7 +899,8 @@ void bssComposeBeaconProbeRespFrameHeaderAndFF(
  * @retval WLAN_STATUS_SUCCESS   Success.
  */
 /*----------------------------------------------------------------------------*/
-WLAN_STATUS bssUpdateBeaconContent(IN P_ADAPTER_T prAdapter, IN u8 ucBssIndex){
+WLAN_STATUS bssUpdateBeaconContent(IN P_ADAPTER_T prAdapter, IN u8 ucBssIndex)
+{
     P_BSS_INFO_T prBssInfo;
     P_MSDU_INFO_T prMsduInfo;
     P_WLAN_BEACON_FRAME_T prBcnFrame;
@@ -965,7 +976,8 @@ WLAN_STATUS bssUpdateBeaconContent(IN P_ADAPTER_T prAdapter, IN u8 ucBssIndex){
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS
 bssSendBeaconProbeResponse(IN P_ADAPTER_T prAdapter, IN u8 ucBssIndex,
-                           IN u8 *pucDestAddr, IN u32 u4ControlFlags){
+                           IN u8 *pucDestAddr, IN u32 u4ControlFlags)
+{
     P_BSS_INFO_T prBssInfo;
     P_MSDU_INFO_T prMsduInfo;
     u16 u2EstimatedFrameLen;
@@ -1102,7 +1114,8 @@ bssSendBeaconProbeResponse(IN P_ADAPTER_T prAdapter, IN u8 ucBssIndex,
  */
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS bssProcessProbeRequest(IN P_ADAPTER_T prAdapter,
-                                   IN P_SW_RFB_T prSwRfb){
+                                   IN P_SW_RFB_T prSwRfb)
+{
     P_WLAN_MAC_MGMT_HEADER_T prMgtHdr;
     P_BSS_INFO_T prBssInfo;
     u8 ucBssIndex;
@@ -1195,7 +1208,8 @@ WLAN_STATUS bssProcessProbeRequest(IN P_ADAPTER_T prAdapter,
  */
 /*----------------------------------------------------------------------------*/
 void bssInitializeClientList(IN P_ADAPTER_T prAdapter,
-                             IN P_BSS_INFO_T prBssInfo){
+                             IN P_BSS_INFO_T prBssInfo)
+{
     P_LINK_T prStaRecOfClientList;
 
     ASSERT(prBssInfo);
@@ -1224,7 +1238,8 @@ void bssInitializeClientList(IN P_ADAPTER_T prAdapter,
  */
 /*----------------------------------------------------------------------------*/
 void bssAddClient(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prBssInfo,
-                  IN P_STA_RECORD_T prStaRec){
+                  IN P_STA_RECORD_T prStaRec)
+{
     P_LINK_T prClientList;
     P_STA_RECORD_T prCurrStaRec;
 
@@ -1262,7 +1277,8 @@ void bssAddClient(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prBssInfo,
  */
 /*----------------------------------------------------------------------------*/
 u8 bssRemoveClient(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prBssInfo,
-                   IN P_STA_RECORD_T prStaRec){
+                   IN P_STA_RECORD_T prStaRec)
+{
     P_LINK_T prClientList;
     P_STA_RECORD_T prCurrStaRec;
 
@@ -1291,7 +1307,8 @@ u8 bssRemoveClient(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prBssInfo,
 }
 
 P_STA_RECORD_T bssRemoveClientByMac(IN P_ADAPTER_T prAdapter,
-                                    IN P_BSS_INFO_T prBssInfo, IN u8 *pucMac){
+                                    IN P_BSS_INFO_T prBssInfo, IN u8 *pucMac)
+{
     P_LINK_T prClientList;
     P_STA_RECORD_T prCurrStaRec;
 
@@ -1320,7 +1337,8 @@ P_STA_RECORD_T bssRemoveClientByMac(IN P_ADAPTER_T prAdapter,
 }
 
 P_STA_RECORD_T bssGetClientByMac(IN P_ADAPTER_T prAdapter,
-                                 IN P_BSS_INFO_T prBssInfo, IN u8 *pucMac){
+                                 IN P_BSS_INFO_T prBssInfo, IN u8 *pucMac)
+{
     P_LINK_T prClientList;
     P_STA_RECORD_T prCurrStaRec;
 
@@ -1346,7 +1364,8 @@ P_STA_RECORD_T bssGetClientByMac(IN P_ADAPTER_T prAdapter,
 }
 
 P_STA_RECORD_T bssRemoveHeadClient(IN P_ADAPTER_T prAdapter,
-                                   IN P_BSS_INFO_T prBssInfo){
+                                   IN P_BSS_INFO_T prBssInfo)
+{
     P_LINK_T prStaRecOfClientList;
     P_STA_RECORD_T prStaRec = NULL;
 
@@ -1364,11 +1383,13 @@ P_STA_RECORD_T bssRemoveHeadClient(IN P_ADAPTER_T prAdapter,
     return prStaRec;
 }
 
-u32 bssGetClientCount(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prBssInfo){
+u32 bssGetClientCount(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prBssInfo)
+{
     return prBssInfo->rStaRecOfClientList.u4NumElem;
 }
 
-void bssDumpClientList(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prBssInfo){
+void bssDumpClientList(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prBssInfo)
+{
     P_LINK_T prClientList;
     P_STA_RECORD_T prCurrStaRec;
     u8 ucCount = 0;
@@ -1394,7 +1415,8 @@ void bssDumpClientList(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prBssInfo){
     }
 }
 
-void bssCheckClientList(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prBssInfo){
+void bssCheckClientList(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prBssInfo)
+{
     P_LINK_T prClientList;
     P_STA_RECORD_T prCurrStaRec;
     u8 ucCount = 0;
@@ -1478,7 +1500,8 @@ void bssCheckClientList(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prBssInfo){
 /*----------------------------------------------------------------------------*/
 void ibssProcessMatchedBeacon(IN P_ADAPTER_T prAdapter,
                               IN P_BSS_INFO_T prBssInfo,
-                              IN P_BSS_DESC_T prBssDesc, IN u8 ucRCPI){
+                              IN P_BSS_DESC_T prBssDesc, IN u8 ucRCPI)
+{
     P_STA_RECORD_T prStaRec = NULL;
 
     u8 fgIsCheckCapability = false;
@@ -1709,7 +1732,8 @@ void ibssProcessMatchedBeacon(IN P_ADAPTER_T prAdapter,
  */
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS ibssCheckCapabilityForAdHocMode(IN P_ADAPTER_T prAdapter,
-                                            IN P_BSS_DESC_T prBssDesc){
+                                            IN P_BSS_DESC_T prBssDesc)
+{
     P_CONNECTION_SETTINGS_T prConnSettings;
     WLAN_STATUS rStatus = WLAN_STATUS_FAILURE;
 
@@ -1753,7 +1777,8 @@ WLAN_STATUS ibssCheckCapabilityForAdHocMode(IN P_ADAPTER_T prAdapter,
  * @return (none)
  */
 /*----------------------------------------------------------------------------*/
-void ibssInitForAdHoc(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prBssInfo){
+void ibssInitForAdHoc(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prBssInfo)
+{
     u8 aucBSSID[MAC_ADDR_LEN];
     u16 *pu2BSSID = (u16 *)&aucBSSID[0];
     u32 i;
@@ -1844,7 +1869,8 @@ void ibssInitForAdHoc(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prBssInfo){
  */
 /*----------------------------------------------------------------------------*/
 void bssInitForAP(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prBssInfo,
-                  IN u8 fgIsRateUpdate){
+                  IN u8 fgIsRateUpdate)
+{
     P_AC_QUE_PARMS_T prACQueParms;
 
     ENUM_WMM_ACI_T eAci;
@@ -1987,7 +2013,8 @@ void bssInitForAP(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prBssInfo,
 
 #endif
 
-void bssDumpBssInfo(IN P_ADAPTER_T prAdapter, IN u8 ucBssIndex){
+void bssDumpBssInfo(IN P_ADAPTER_T prAdapter, IN u8 ucBssIndex)
+{
     P_BSS_INFO_T prBssInfo;
     /* P_LINK_T prStaRecOfClientList = (P_LINK_T) NULL; */
     /* P_STA_RECORD_T prCurrStaRec = (P_STA_RECORD_T) NULL; */

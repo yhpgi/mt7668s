@@ -109,7 +109,8 @@ typedef enum _ENUM_HIF_OOB_CTRL_PKT_TYPE_T {
  */
 static __KAL_INLINE__ void hif_txDataTypeCheck(void);
 
-static __KAL_INLINE__ void hif_txDataTypeCheck(void){
+static __KAL_INLINE__ void hif_txDataTypeCheck(void)
+{
     DATA_STRUCT_INSPECTING_ASSERT(sizeof(HIF_TX_HEADER_T) == 16);
 }
 

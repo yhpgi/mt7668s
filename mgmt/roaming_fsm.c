@@ -73,7 +73,8 @@ static u8 *apucDebugRoamingState[ROAMING_STATE_NUM] = {
  * @return (none)
  */
 /*----------------------------------------------------------------------------*/
-void roamingFsmInit(IN P_ADAPTER_T prAdapter){
+void roamingFsmInit(IN P_ADAPTER_T prAdapter)
+{
     P_ROAMING_INFO_T prRoamingFsmInfo;
     P_CONNECTION_SETTINGS_T prConnSettings;
 
@@ -99,7 +100,8 @@ void roamingFsmInit(IN P_ADAPTER_T prAdapter){
  * @return (none)
  */
 /*----------------------------------------------------------------------------*/
-void roamingFsmUninit(IN P_ADAPTER_T prAdapter){
+void roamingFsmUninit(IN P_ADAPTER_T prAdapter)
+{
     P_ROAMING_INFO_T prRoamingFsmInfo;
 
     DBGLOG(ROAMING, LOUD, "->roamingFsmUninit(): Current Time = %ld\n",
@@ -122,7 +124,8 @@ void roamingFsmUninit(IN P_ADAPTER_T prAdapter){
  */
 /*----------------------------------------------------------------------------*/
 void roamingFsmSendCmd(IN P_ADAPTER_T prAdapter,
-                       IN P_CMD_ROAMING_TRANSIT_T prTransit){
+                       IN P_CMD_ROAMING_TRANSIT_T prTransit)
+{
     P_ROAMING_INFO_T prRoamingFsmInfo;
     WLAN_STATUS rStatus;
 
@@ -159,7 +162,8 @@ void roamingFsmSendCmd(IN P_ADAPTER_T prAdapter,
  * @return none
  */
 /*----------------------------------------------------------------------------*/
-void roamingFsmScanResultsUpdate(IN P_ADAPTER_T prAdapter){
+void roamingFsmScanResultsUpdate(IN P_ADAPTER_T prAdapter)
+{
     P_ROAMING_INFO_T prRoamingFsmInfo;
 
     prRoamingFsmInfo = (P_ROAMING_INFO_T)&
@@ -188,7 +192,8 @@ void roamingFsmScanResultsUpdate(IN P_ADAPTER_T prAdapter){
  * @return
  */
 /*----------------------------------------------------------------------------*/
-static u8 roamingFsmIsNeedScan(IN P_ADAPTER_T prAdapter){
+static u8 roamingFsmIsNeedScan(IN P_ADAPTER_T prAdapter)
+{
     P_SCAN_INFO_T prScanInfo;
     P_LINK_T prRoamBSSDescList;
     P_ROAM_BSS_DESC_T prRoamBssDesc;
@@ -306,7 +311,8 @@ static u8 roamingFsmIsNeedScan(IN P_ADAPTER_T prAdapter){
  */
 /*----------------------------------------------------------------------------*/
 void roamingFsmSteps(IN P_ADAPTER_T prAdapter,
-                     IN ENUM_ROAMING_STATE_T eNextState){
+                     IN ENUM_ROAMING_STATE_T eNextState)
+{
     P_ROAMING_INFO_T prRoamingFsmInfo;
     ENUM_ROAMING_STATE_T ePreviousState;
     u8 fgIsTransition = (u8)false;
@@ -388,7 +394,8 @@ void roamingFsmSteps(IN P_ADAPTER_T prAdapter,
  * @return none
  */
 /*----------------------------------------------------------------------------*/
-void roamingFsmRunEventStart(IN P_ADAPTER_T prAdapter){
+void roamingFsmRunEventStart(IN P_ADAPTER_T prAdapter)
+{
     P_ROAMING_INFO_T prRoamingFsmInfo;
     ENUM_ROAMING_STATE_T eNextState;
     P_BSS_INFO_T prAisBssInfo;
@@ -441,7 +448,8 @@ void roamingFsmRunEventStart(IN P_ADAPTER_T prAdapter){
  */
 /*----------------------------------------------------------------------------*/
 void roamingFsmRunEventDiscovery(IN P_ADAPTER_T prAdapter,
-                                 IN P_CMD_ROAMING_TRANSIT_T prTransit){
+                                 IN P_CMD_ROAMING_TRANSIT_T prTransit)
+{
     P_ROAMING_INFO_T prRoamingFsmInfo;
     ENUM_ROAMING_STATE_T eNextState;
 
@@ -489,7 +497,8 @@ void roamingFsmRunEventDiscovery(IN P_ADAPTER_T prAdapter,
  * @return none
  */
 /*----------------------------------------------------------------------------*/
-void roamingFsmRunEventRoam(IN P_ADAPTER_T prAdapter){
+void roamingFsmRunEventRoam(IN P_ADAPTER_T prAdapter)
+{
     P_ROAMING_INFO_T prRoamingFsmInfo;
     ENUM_ROAMING_STATE_T eNextState;
     CMD_ROAMING_TRANSIT_T rTransit;
@@ -534,7 +543,8 @@ void roamingFsmRunEventRoam(IN P_ADAPTER_T prAdapter){
  * @return none
  */
 /*----------------------------------------------------------------------------*/
-void roamingFsmRunEventFail(IN P_ADAPTER_T prAdapter, IN u32 u4Param){
+void roamingFsmRunEventFail(IN P_ADAPTER_T prAdapter, IN u32 u4Param)
+{
     P_ROAMING_INFO_T prRoamingFsmInfo;
     ENUM_ROAMING_STATE_T eNextState;
     CMD_ROAMING_TRANSIT_T rTransit;
@@ -580,7 +590,8 @@ void roamingFsmRunEventFail(IN P_ADAPTER_T prAdapter, IN u32 u4Param){
  * @return none
  */
 /*----------------------------------------------------------------------------*/
-void roamingFsmRunEventAbort(IN P_ADAPTER_T prAdapter){
+void roamingFsmRunEventAbort(IN P_ADAPTER_T prAdapter)
+{
     P_ROAMING_INFO_T prRoamingFsmInfo;
     ENUM_ROAMING_STATE_T eNextState;
     CMD_ROAMING_TRANSIT_T rTransit;
@@ -620,7 +631,8 @@ void roamingFsmRunEventAbort(IN P_ADAPTER_T prAdapter){
  */
 /*----------------------------------------------------------------------------*/
 WLAN_STATUS roamingFsmProcessEvent(IN P_ADAPTER_T prAdapter,
-                                   IN P_CMD_ROAMING_TRANSIT_T prTransit){
+                                   IN P_CMD_ROAMING_TRANSIT_T prTransit)
+{
     DBGLOG(ROAMING, LOUD, "ROAMING Process Events: Current Time = %ld\n",
            kalGetTimeTick());
 

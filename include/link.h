@@ -281,7 +281,8 @@ typedef struct _LINK_MGMT_T {
 /*----------------------------------------------------------------------------*/
 static __KAL_INLINE__ void __linkAdd(IN P_LINK_ENTRY_T prNew,
                                      IN P_LINK_ENTRY_T prPrev,
-                                     IN P_LINK_ENTRY_T prNext){
+                                     IN P_LINK_ENTRY_T prNext)
+{
     prNext->prPrev = prNew;
     prNew->prNext = prNext;
     prNew->prPrev = prPrev;
@@ -298,7 +299,8 @@ static __KAL_INLINE__ void __linkAdd(IN P_LINK_ENTRY_T prNew,
  * \return (none)
  */
 /*----------------------------------------------------------------------------*/
-static __KAL_INLINE__ void linkAdd(IN P_LINK_ENTRY_T prNew, IN P_LINK_T prLink){
+static __KAL_INLINE__ void linkAdd(IN P_LINK_ENTRY_T prNew, IN P_LINK_T prLink)
+{
     __linkAdd(prNew, (P_LINK_ENTRY_T)prLink, prLink->prNext);
 }
 
@@ -313,7 +315,8 @@ static __KAL_INLINE__ void linkAdd(IN P_LINK_ENTRY_T prNew, IN P_LINK_T prLink){
  */
 /*----------------------------------------------------------------------------*/
 static __KAL_INLINE__ void linkAddTail(IN P_LINK_ENTRY_T prNew,
-                                       IN P_LINK_T prLink){
+                                       IN P_LINK_T prLink)
+{
     __linkAdd(prNew, prLink->prPrev, (P_LINK_ENTRY_T)prLink);
 }
 
@@ -328,7 +331,8 @@ static __KAL_INLINE__ void linkAddTail(IN P_LINK_ENTRY_T prNew,
  */
 /*----------------------------------------------------------------------------*/
 static __KAL_INLINE__ void __linkDel(IN P_LINK_ENTRY_T prPrev,
-                                     IN P_LINK_ENTRY_T prNext){
+                                     IN P_LINK_ENTRY_T prNext)
+{
     prNext->prPrev = prPrev;
     prPrev->prNext = prNext;
 }
@@ -343,7 +347,8 @@ static __KAL_INLINE__ void __linkDel(IN P_LINK_ENTRY_T prPrev,
  * \return (none)
  */
 /*----------------------------------------------------------------------------*/
-static __KAL_INLINE__ void linkDel(IN P_LINK_ENTRY_T prEntry){
+static __KAL_INLINE__ void linkDel(IN P_LINK_ENTRY_T prEntry)
+{
     __linkDel(prEntry->prPrev, prEntry->prNext);
 
     LINK_ENTRY_INITIALIZE(prEntry);
@@ -361,7 +366,8 @@ static __KAL_INLINE__ void linkDel(IN P_LINK_ENTRY_T prEntry){
  */
 /*----------------------------------------------------------------------------*/
 static __KAL_INLINE__ void linkMove(IN P_LINK_ENTRY_T prEntry,
-                                    IN P_LINK_T prLink){
+                                    IN P_LINK_T prLink)
+{
     __linkDel(prEntry->prPrev, prEntry->prNext);
     linkAdd(prEntry, prLink);
 }
@@ -378,7 +384,8 @@ static __KAL_INLINE__ void linkMove(IN P_LINK_ENTRY_T prEntry,
  */
 /*----------------------------------------------------------------------------*/
 static __KAL_INLINE__ void linkMoveTail(IN P_LINK_ENTRY_T prEntry,
-                                        IN P_LINK_T prLink){
+                                        IN P_LINK_T prLink)
+{
     __linkDel(prEntry->prPrev, prEntry->prNext);
     linkAddTail(prEntry, prLink);
 }
@@ -393,7 +400,8 @@ static __KAL_INLINE__ void linkMoveTail(IN P_LINK_ENTRY_T prEntry,
  * \return (none)
  */
 /*----------------------------------------------------------------------------*/
-static __KAL_INLINE__ void linkMergeToTail(P_LINK_T prDst, P_LINK_T prSrc){
+static __KAL_INLINE__ void linkMergeToTail(P_LINK_T prDst, P_LINK_T prSrc)
+{
     prSrc->prNext->prPrev = prDst->prPrev;
     prSrc->prPrev->prNext = (P_LINK_ENTRY_T)prDst;
     prDst->prPrev->prNext = prSrc->prNext;
@@ -411,7 +419,8 @@ static __KAL_INLINE__ void linkMergeToTail(P_LINK_T prDst, P_LINK_T prSrc){
  * \return (none)
  */
 /*----------------------------------------------------------------------------*/
-static __KAL_INLINE__ void linkMergeToHead(P_LINK_T prDst, P_LINK_T prSrc){
+static __KAL_INLINE__ void linkMergeToHead(P_LINK_T prDst, P_LINK_T prSrc)
+{
     prSrc->prNext->prPrev = (P_LINK_ENTRY_T)prDst;
     prSrc->prPrev->prNext = prDst->prNext;
     prDst->prNext->prPrev = prSrc->prPrev;

@@ -259,7 +259,8 @@ typedef struct _MT6620_CFG_PARAM_STRUCT {
  * We'll need this to guarantee the same member order in different structures
  * to simply handling effort in some functions.
  */
-static __KAL_INLINE__ void nvramOffsetCheck(void){
+static __KAL_INLINE__ void nvramOffsetCheck(void)
+{
     DATA_STRUCT_INSPECTING_ASSERT(
         OFFSET_OF(WIFI_CFG_PARAM_STRUCT, u2Part2OwnVersion) == 256);
 

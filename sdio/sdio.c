@@ -127,7 +127,8 @@ static struct sdio_driver mtk_sdio_driver = {  /* Mediatek SDIO Driver */
  * \return void
  */
 /*----------------------------------------------------------------------------*/
-static void mtk_sdio_interrupt(struct sdio_func *func){
+static void mtk_sdio_interrupt(struct sdio_func *func)
+{
     P_GLUE_INFO_T prGlueInfo = NULL;
 
     int ret = 0;
@@ -162,7 +163,8 @@ static void mtk_sdio_interrupt(struct sdio_func *func){
  * \return void
  */
 /*----------------------------------------------------------------------------*/
-int mtk_sdio_probe(struct sdio_func *func, const struct sdio_device_id *id){
+int mtk_sdio_probe(struct sdio_func *func, const struct sdio_device_id *id)
+{
     int ret;
 
     ASSERT(func);
@@ -187,7 +189,8 @@ int mtk_sdio_probe(struct sdio_func *func, const struct sdio_device_id *id){
     return WLAN_STATUS_SUCCESS;
 }
 
-void mtk_sdio_remove(struct sdio_func *func){
+void mtk_sdio_remove(struct sdio_func *func)
+{
     ASSERT(func);
 
     pfWlanRemove();
@@ -198,7 +201,8 @@ void mtk_sdio_remove(struct sdio_func *func){
     sdio_release_host(func);
 }
 
-static int mtk_sdio_pm_suspend(struct device *pDev){
+static int mtk_sdio_pm_suspend(struct device *pDev)
+{
     int ret = 0, wait = 0;
     int pm_caps, set_flag;
     const char *func_id;
@@ -282,7 +286,8 @@ static int mtk_sdio_pm_suspend(struct device *pDev){
     return 0;
 }
 
-static int mtk_sdio_pm_resume(struct device *pDev){
+static int mtk_sdio_pm_resume(struct device *pDev)
+{
     struct sdio_func *func;
     P_GLUE_INFO_T prGlueInfo = NULL;
 
@@ -310,15 +315,18 @@ static int mtk_sdio_pm_resume(struct device *pDev){
     return 0;
 }
 
-static int mtk_sdio_suspend(struct device *pDev, pm_message_t state){
+static int mtk_sdio_suspend(struct device *pDev, pm_message_t state)
+{
     return mtk_sdio_pm_suspend(pDev);
 }
 
-int mtk_sdio_resume(struct device *pDev){
+int mtk_sdio_resume(struct device *pDev)
+{
     return mtk_sdio_pm_resume(pDev);
 }
 #if (CFG_SDIO_ASYNC_IRQ_AUTO_ENABLE == 1)
-int mtk_sdio_async_irq_enable(struct sdio_func *func){
+int mtk_sdio_async_irq_enable(struct sdio_func *func)
+{
 #define SDIO_CCCR_IRQ_EXT    0x16
 #define SDIO_IRQ_EXT_SAI     BIT(0)
 #define SDIO_IRQ_EXT_EAI     BIT(1)
@@ -379,7 +387,8 @@ int mtk_sdio_async_irq_enable(struct sdio_func *func){
  * \return The result of registering sdio bus
  */
 /*----------------------------------------------------------------------------*/
-WLAN_STATUS glRegisterBus(probe_card pfProbe, remove_card pfRemove){
+WLAN_STATUS glRegisterBus(probe_card pfProbe, remove_card pfRemove)
+{
     int ret = 0;
 
     ASSERT(pfProbe);
@@ -410,7 +419,8 @@ WLAN_STATUS glRegisterBus(probe_card pfProbe, remove_card pfRemove){
  * \return (none)
  */
 /*----------------------------------------------------------------------------*/
-void glUnregisterBus(remove_card pfRemove){
+void glUnregisterBus(remove_card pfRemove)
+{
     ASSERT(pfRemove);
     pfRemove();
 
@@ -427,7 +437,8 @@ void glUnregisterBus(remove_card pfRemove){
  * \return (none)
  */
 /*----------------------------------------------------------------------------*/
-void glSetHifInfo(P_GLUE_INFO_T prGlueInfo, unsigned long ulCookie){
+void glSetHifInfo(P_GLUE_INFO_T prGlueInfo, unsigned long ulCookie)
+{
     P_GL_HIF_INFO_T prHif = NULL;
     u8 ucIdx;
 
@@ -462,7 +473,8 @@ void glSetHifInfo(P_GLUE_INFO_T prGlueInfo, unsigned long ulCookie){
  * \return (none)
  */
 /*----------------------------------------------------------------------------*/
-void glClearHifInfo(P_GLUE_INFO_T prGlueInfo){
+void glClearHifInfo(P_GLUE_INFO_T prGlueInfo)
+{
     /* P_GL_HIF_INFO_T prHif = NULL; */
     /* ASSERT(prGlueInfo); */
     /* prHif = &prGlueInfo->rHifInfo; */
@@ -480,7 +492,8 @@ void glClearHifInfo(P_GLUE_INFO_T prGlueInfo){
  * \return (none)
  */
 /*----------------------------------------------------------------------------*/
-u8 glBusInit(void *pvData){
+u8 glBusInit(void *pvData)
+{
     int ret = 0;
     struct sdio_func *func = NULL;
 
@@ -517,7 +530,8 @@ u8 glBusInit(void *pvData){
  *         NEGATIVE_VALUE   if fail
  */
 /*----------------------------------------------------------------------------*/
-s32 glBusSetIrq(void *pvData, void *pfnIsr, void *pvCookie){
+s32 glBusSetIrq(void *pvData, void *pfnIsr, void *pvCookie)
+{
     int ret = 0;
 
     struct net_device *prNetDevice = NULL;
@@ -557,7 +571,8 @@ s32 glBusSetIrq(void *pvData, void *pfnIsr, void *pvCookie){
  * \return (none)
  */
 /*----------------------------------------------------------------------------*/
-void glBusFreeIrq(void *pvData, void *pvCookie){
+void glBusFreeIrq(void *pvData, void *pvCookie)
+{
     struct net_device *prNetDevice = NULL;
     P_GLUE_INFO_T prGlueInfo = NULL;
     P_GL_HIF_INFO_T prHifInfo = NULL;
@@ -580,7 +595,8 @@ void glBusFreeIrq(void *pvData, void *pvCookie){
     sdio_release_host(prHifInfo->func);
 }
 
-u8 glIsReadClearReg(u32 u4Address){
+u8 glIsReadClearReg(u32 u4Address)
+{
     switch (u4Address) {
     case MCR_WHISR:
     case MCR_WASR:
@@ -614,7 +630,8 @@ u8 glIsReadClearReg(u32 u4Address){
  */
 /*----------------------------------------------------------------------------*/
 u8 kalDevRegRead(IN P_GLUE_INFO_T prGlueInfo, IN u32 u4Register,
-                 OUT u32 *pu4Value){
+                 OUT u32 *pu4Value)
+{
     int ret = 0;
     u8 ucRetryCount = 0;
 
@@ -661,7 +678,8 @@ u8 kalDevRegRead(IN P_GLUE_INFO_T prGlueInfo, IN u32 u4Register,
  */
 /*----------------------------------------------------------------------------*/
 u8 kalDevRegRead_mac(IN P_GLUE_INFO_T prGlueInfo, IN u32 u4Register,
-                     OUT u32 *pu4Value){
+                     OUT u32 *pu4Value)
+{
     u32 value;
     u32 u4Time, u4Current;
 
@@ -738,7 +756,8 @@ u8 kalDevRegRead_mac(IN P_GLUE_INFO_T prGlueInfo, IN u32 u4Register,
  */
 /*----------------------------------------------------------------------------*/
 u8 kalDevRegWrite(IN P_GLUE_INFO_T prGlueInfo, IN u32 u4Register,
-                  IN u32 u4Value){
+                  IN u32 u4Value)
+{
     int ret = 0;
     u8 ucRetryCount = 0;
 
@@ -778,7 +797,8 @@ u8 kalDevRegWrite(IN P_GLUE_INFO_T prGlueInfo, IN u32 u4Register,
  */
 /*----------------------------------------------------------------------------*/
 u8 kalDevRegWrite_mac(IN P_GLUE_INFO_T prGlueInfo, IN u32 u4Register,
-                      IN u32 u4Value){
+                      IN u32 u4Value)
+{
     u32 value;
     u32 u4Time, u4Current;
 
@@ -857,7 +877,8 @@ u8 kalDevRegWrite_mac(IN P_GLUE_INFO_T prGlueInfo, IN u32 u4Register,
  */
 /*----------------------------------------------------------------------------*/
 u8 kalDevPortRead(IN P_GLUE_INFO_T prGlueInfo, IN u16 u2Port, IN u32 u4Len,
-                  OUT u8 *pucBuf, IN u32 u4ValidOutBufSize){
+                  OUT u8 *pucBuf, IN u32 u4ValidOutBufSize)
+{
     P_GL_HIF_INFO_T prHifInfo = NULL;
     u8 *pucDst = NULL;
     int count = u4Len;
@@ -936,7 +957,8 @@ u8 kalDevPortRead(IN P_GLUE_INFO_T prGlueInfo, IN u16 u2Port, IN u32 u4Len,
  */
 /*----------------------------------------------------------------------------*/
 u8 kalDevPortWrite(IN P_GLUE_INFO_T prGlueInfo, IN u16 u2Port, IN u32 u4Len,
-                   IN u8 *pucBuf, IN u32 u4ValidInBufSize){
+                   IN u8 *pucBuf, IN u32 u4ValidInBufSize)
+{
     P_GL_HIF_INFO_T prHifInfo = NULL;
     u8 *pucSrc = NULL;
     int count = u4Len;
@@ -1001,7 +1023,8 @@ u8 kalDevPortWrite(IN P_GLUE_INFO_T prGlueInfo, IN u16 u2Port, IN u32 u4Len,
  *
  */
 /*----------------------------------------------------------------------------*/
-void kalDevReadIntStatus(IN P_ADAPTER_T prAdapter, OUT u32 *pu4IntStatus){
+void kalDevReadIntStatus(IN P_ADAPTER_T prAdapter, OUT u32 *pu4IntStatus)
+{
 #if CFG_SDIO_INTR_ENHANCE
     P_SDIO_CTRL_T prSDIOCtrl;
     P_SDIO_STAT_COUNTER_T prStatCounter;
@@ -1069,7 +1092,8 @@ void kalDevReadIntStatus(IN P_ADAPTER_T prAdapter, OUT u32 *pu4IntStatus){
  */
 /*----------------------------------------------------------------------------*/
 u8 kalDevWriteWithSdioCmd52(IN P_GLUE_INFO_T prGlueInfo, IN u32 u4Addr,
-                            IN u8 ucData){
+                            IN u8 ucData)
+{
     int ret = 0;
 
     sdio_claim_host(prGlueInfo->rHifInfo.func);
@@ -1094,7 +1118,8 @@ u8 kalDevWriteWithSdioCmd52(IN P_GLUE_INFO_T prGlueInfo, IN u32 u4Addr,
  * \retval false         operation fail
  */
 /*----------------------------------------------------------------------------*/
-u8 kalDevWriteData(IN P_GLUE_INFO_T prGlueInfo, IN P_MSDU_INFO_T prMsduInfo){
+u8 kalDevWriteData(IN P_GLUE_INFO_T prGlueInfo, IN P_MSDU_INFO_T prMsduInfo)
+{
     P_ADAPTER_T prAdapter = prGlueInfo->prAdapter;
     P_GL_HIF_INFO_T prHifInfo = &prGlueInfo->rHifInfo;
     P_TX_CTRL_T prTxCtrl;
@@ -1185,7 +1210,8 @@ u8 kalDevWriteData(IN P_GLUE_INFO_T prGlueInfo, IN P_MSDU_INFO_T prMsduInfo){
  * \retval false         operation fail
  */
 /*----------------------------------------------------------------------------*/
-u8 kalDevKickData(IN P_GLUE_INFO_T prGlueInfo){
+u8 kalDevKickData(IN P_GLUE_INFO_T prGlueInfo)
+{
     P_ADAPTER_T prAdapter = prGlueInfo->prAdapter;
     P_GL_HIF_INFO_T prHifInfo = &prGlueInfo->rHifInfo;
     P_TX_CTRL_T prTxCtrl;
@@ -1311,15 +1337,18 @@ u8 kalDevWriteCmd(IN P_GLUE_INFO_T prGlueInfo, IN P_CMD_INFO_T prCmdInfo,
 #endif
 }
 
-void glGetDev(void *ctx, struct device **dev){
+void glGetDev(void *ctx, struct device **dev)
+{
     *dev = &((struct sdio_func *)ctx)->dev;
 }
 
-void glGetHifDev(P_GL_HIF_INFO_T prHif, struct device **dev){
+void glGetHifDev(P_GL_HIF_INFO_T prHif, struct device **dev)
+{
     *dev = &(prHif->func->dev);
 }
 
-u8 glWakeupSdio(P_GLUE_INFO_T prGlueInfo){
+u8 glWakeupSdio(P_GLUE_INFO_T prGlueInfo)
+{
     u8 fgSuccess = true;
 
     return fgSuccess;
@@ -1334,7 +1363,8 @@ u8 glWakeupSdio(P_GLUE_INFO_T prGlueInfo){
  * @return (TRUE: ready, FALSE: not ready)
  */
 /*----------------------------------------------------------------------------*/
-bool halIsHifStateReady(IN P_ADAPTER_T prAdapter, u8 *pucState){
+bool halIsHifStateReady(IN P_ADAPTER_T prAdapter, u8 *pucState)
+{
     if (!prAdapter) {
         return false;
     }
@@ -1368,7 +1398,8 @@ bool halIsHifStateReady(IN P_ADAPTER_T prAdapter, u8 *pucState){
  * @return (TRUE: suspend, reject the caller action. FALSE: not suspend)
  */
 /*----------------------------------------------------------------------------*/
-bool halIsHifStateSuspend(IN P_ADAPTER_T prAdapter){
+bool halIsHifStateSuspend(IN P_ADAPTER_T prAdapter)
+{
     // enum sdio_state state;
 
     if (!prAdapter) {

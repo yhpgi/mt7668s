@@ -69,7 +69,8 @@
  * \retval NONE
  */
 /*----------------------------------------------------------------------------*/
-void secInit(IN P_ADAPTER_T prAdapter, IN u8 ucBssIndex){
+void secInit(IN P_ADAPTER_T prAdapter, IN u8 ucBssIndex)
+{
     u8 i;
     P_CONNECTION_SETTINGS_T prConnSettings;
     P_BSS_INFO_T prBssInfo;
@@ -174,7 +175,8 @@ void secInit(IN P_ADAPTER_T prAdapter, IN u8 ucBssIndex){
  */
 /*----------------------------------------------------------------------------*/
 u8 secCheckClassError(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb,
-                      IN P_STA_RECORD_T prStaRec){
+                      IN P_STA_RECORD_T prStaRec)
+{
     P_HW_MAC_RX_DESC_T prRxStatus;
 
     ASSERT(prAdapter);
@@ -211,7 +213,8 @@ u8 secCheckClassError(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb,
  * \retval false Refuse the MSDU packet due port control
  */
 /*----------------------------------------------------------------------------*/
-u8 secRxPortControlCheck(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSWRfb){
+u8 secRxPortControlCheck(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSWRfb)
+{
     ASSERT(prSWRfb);
     return true;
 }
@@ -226,7 +229,8 @@ u8 secRxPortControlCheck(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSWRfb){
  * \retval none
  */
 /*----------------------------------------------------------------------------*/
-void secSetCipherSuite(IN P_ADAPTER_T prAdapter, IN u32 u4CipherSuitesFlags){
+void secSetCipherSuite(IN P_ADAPTER_T prAdapter, IN u32 u4CipherSuitesFlags)
+{
     u32 i;
     P_DOT11_RSNA_CONFIG_PAIRWISE_CIPHERS_ENTRY prEntry;
     P_IEEE_802_11_MIB_T prMib;
@@ -351,7 +355,8 @@ void secSetCipherSuite(IN P_ADAPTER_T prAdapter, IN u32 u4CipherSuitesFlags){
  * \retval NONE
  */
 /*----------------------------------------------------------------------------*/
-void secClearPmkid(IN P_ADAPTER_T prAdapter){
+void secClearPmkid(IN P_ADAPTER_T prAdapter)
+{
     P_AIS_SPECIFIC_BSS_INFO_T prAisSpecBssInfo;
 
     DEBUGFUNC("secClearPmkid");
@@ -375,7 +380,8 @@ void secClearPmkid(IN P_ADAPTER_T prAdapter){
  * \retval u8
  */
 /*----------------------------------------------------------------------------*/
-u8 secEnabledInAis(IN P_ADAPTER_T prAdapter){
+u8 secEnabledInAis(IN P_ADAPTER_T prAdapter)
+{
     DEBUGFUNC("secEnabledInAis");
 
     ASSERT(prAdapter->rWifiVar.rConnSettings.eEncStatus <
@@ -401,7 +407,8 @@ u8 secEnabledInAis(IN P_ADAPTER_T prAdapter){
     return false;
 }
 
-u8 secIsProtected1xFrame(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec){
+u8 secIsProtected1xFrame(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec)
+{
     P_BSS_INFO_T prBssInfo;
 
     ASSERT(prAdapter);
@@ -429,7 +436,8 @@ u8 secIsProtected1xFrame(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec){
  */
 /*----------------------------------------------------------------------------*/
 u8 secIsProtectedFrame(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsdu,
-                       IN P_STA_RECORD_T prStaRec){
+                       IN P_STA_RECORD_T prStaRec)
+{
     ASSERT(prAdapter);
     ASSERT(prMsdu);
 
@@ -442,7 +450,8 @@ u8 secIsProtectedFrame(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsdu,
                                                    prMsdu->ucBssIndex));
 }
 
-u8 secIsProtectedBss(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prBssInfo){
+u8 secIsProtectedBss(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prBssInfo)
+{
     ASSERT(prBssInfo);
 
     if (prBssInfo->eNetworkType == NETWORK_TYPE_AIS) {
@@ -476,7 +485,8 @@ u8 secIsProtectedBss(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prBssInfo){
  * \note
  */
 /*----------------------------------------------------------------------------*/
-u8 secPrivacySeekForEntry(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prSta){
+u8 secPrivacySeekForEntry(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prSta)
+{
     P_BSS_INFO_T prP2pBssInfo;
     u8 ucEntry = WTBL_RESERVED_ENTRY;
     u8 i;
@@ -590,7 +600,8 @@ u8 secPrivacySeekForEntry(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prSta){
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-void secPrivacyFreeForEntry(IN P_ADAPTER_T prAdapter, IN u8 ucEntry){
+void secPrivacyFreeForEntry(IN P_ADAPTER_T prAdapter, IN u8 ucEntry)
+{
     P_WLAN_TABLE_T prWtbl;
 
     ASSERT(prAdapter);
@@ -623,7 +634,8 @@ void secPrivacyFreeForEntry(IN P_ADAPTER_T prAdapter, IN u8 ucEntry){
  * \return none
  */
 /*----------------------------------------------------------------------------*/
-void secPrivacyFreeSta(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec){
+void secPrivacyFreeSta(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec)
+{
     u32 entry;
     P_WLAN_TABLE_T prWtbl;
 
@@ -661,7 +673,8 @@ void secPrivacyFreeSta(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec){
 /*----------------------------------------------------------------------------*/
 
 static inline u32 secRemoveBmcWepKey(IN P_ADAPTER_T prAdapter, IN u8 ucBssIndex,
-                                     IN u32 u4KeyId){
+                                     IN u32 u4KeyId)
+{
     PARAM_REMOVE_KEY_T rRemoveKey;
     u32 u4SetLen = 0;
     u32 u4Ret;
@@ -710,7 +723,8 @@ static inline u32 secRemoveBmcWepKey(IN P_ADAPTER_T prAdapter, IN u8 ucBssIndex,
  */
 /*----------------------------------------------------------------------------*/
 void secRemoveBssBcEntry(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prBssInfo,
-                         IN u8 fgRoam){
+                         IN u8 fgRoam)
+{
     int i;
     P_CONNECTION_SETTINGS_T prConnSettings =
         &(prAdapter->rWifiVar.rConnSettings);
@@ -786,7 +800,8 @@ void secRemoveBssBcEntry(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prBssInfo,
 /*----------------------------------------------------------------------------*/
 u8 secPrivacySeekForBcEntry(IN P_ADAPTER_T prAdapter, IN u8 ucBssIndex,
                             IN u8 *pucAddr, IN u8 ucStaIdx, IN u8 ucAlg,
-                            IN u8 ucKeyId){
+                            IN u8 ucKeyId)
+{
     u8 ucEntry = WTBL_ALLOC_FAIL;
     u8 ucStartIDX = 0, ucMaxIDX = 0;
     u8 i = 0;
@@ -899,7 +914,8 @@ u8 secPrivacySeekForBcEntry(IN P_ADAPTER_T prAdapter, IN u8 ucBssIndex,
  * \note
  */
 /*----------------------------------------------------------------------------*/
-u8 secCheckWTBLAssign(IN P_ADAPTER_T prAdapter){
+u8 secCheckWTBLAssign(IN P_ADAPTER_T prAdapter)
+{
     u8 fgCheckFail = false;
 
     secPrivacyDumpWTBL(prAdapter);
@@ -923,7 +939,8 @@ u8 secCheckWTBLAssign(IN P_ADAPTER_T prAdapter){
  * \return The STA record index, 0xff for invalid sta index
  */
 /*----------------------------------------------------------------------------*/
-u8 secGetStaIdxByWlanIdx(P_ADAPTER_T prAdapter, u8 ucWlanIdx){
+u8 secGetStaIdxByWlanIdx(P_ADAPTER_T prAdapter, u8 ucWlanIdx)
+{
     P_WLAN_TABLE_T prWtbl;
 
     ASSERT(prAdapter);
@@ -956,7 +973,8 @@ u8 secGetStaIdxByWlanIdx(P_ADAPTER_T prAdapter, u8 ucWlanIdx){
  * \return The BSS index, 0xff for invalid bss index
  */
 /*----------------------------------------------------------------------------*/
-u8 secGetBssIdxByWlanIdx(P_ADAPTER_T prAdapter, u8 ucWlanIdx){
+u8 secGetBssIdxByWlanIdx(P_ADAPTER_T prAdapter, u8 ucWlanIdx)
+{
     P_WLAN_TABLE_T prWtbl;
 
     ASSERT(prAdapter);
@@ -984,7 +1002,8 @@ u8 secGetBssIdxByWlanIdx(P_ADAPTER_T prAdapter, u8 ucWlanIdx){
  * \return The STA record index, 0xff for invalid sta index
  */
 /*----------------------------------------------------------------------------*/
-u8 secLookupStaRecIndexFromTA(P_ADAPTER_T prAdapter, u8 *pucMacAddress){
+u8 secLookupStaRecIndexFromTA(P_ADAPTER_T prAdapter, u8 *pucMacAddress)
+{
     int i;
     P_WLAN_TABLE_T prWtbl;
 
@@ -1013,7 +1032,8 @@ u8 secLookupStaRecIndexFromTA(P_ADAPTER_T prAdapter, u8 *pucMacAddress){
  * \note
  */
 /*----------------------------------------------------------------------------*/
-void secPrivacyDumpWTBL(IN P_ADAPTER_T prAdapter){
+void secPrivacyDumpWTBL(IN P_ADAPTER_T prAdapter)
+{
     P_WLAN_TABLE_T prWtbl;
     u8 i;
 
@@ -1048,7 +1068,8 @@ void secPrivacyDumpWTBL(IN P_ADAPTER_T prAdapter){
  * \note
  */
 /*----------------------------------------------------------------------------*/
-void secPostUpdateAddr(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prBssInfo){
+void secPostUpdateAddr(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prBssInfo)
+{
     P_CONNECTION_SETTINGS_T prConnSettings =
         &(prAdapter->rWifiVar.rConnSettings);
     P_WLAN_TABLE_T prWtbl;
