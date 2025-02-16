@@ -69,6 +69,7 @@
 #define DBG                 0
 #endif
 
+#define CFG_ANDROID_AOSP_PRIV_CMD
 #define STA_P2P_MCC
 #define WLAN_INCLUDE_PROC           1
 
