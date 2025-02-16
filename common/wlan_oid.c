@@ -9622,7 +9622,6 @@ wlanoidSetP2pMode(IN P_ADAPTER_T prAdapter, IN void *pvSetBuffer,
      *    enable = 1, mode = 3  => init AP+P2P network
      */
 
-    prSetP2P->u4Mode = 3;
     DBGLOG(P2P, INFO, "P2P Compile as (%d)p2p-like interface\n", KAL_P2P_NUM);
 
     if (prSetP2P->u4Mode >= RUNNING_P2P_MODE_NUM) {
