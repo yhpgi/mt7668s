@@ -77,7 +77,7 @@
 #define CFG_MESON_G12A_PATCH            1
 #endif
 
-#define CFG_ENABLE_UNIFY_WIPHY          1
+#define CFG_ENABLE_UNIFY_WIPHY          0
 
 /* 2 Flags for OS capability */
 
@@ -810,7 +810,7 @@
 #define RUNNING_P2P_AP_MODE             3
 #define RUNNING_P2P_MODE_NUM                4
 
-#define CFG_DRIVER_INITIAL_RUNNING_MODE     RUNNING_AP_MODE
+#define CFG_DRIVER_INITIAL_RUNNING_MODE     RUNNING_P2P_AP_MODE
 /*------------------------------------------------------------------------------
  * Flags of MSP SUPPORT
  *------------------------------------------------------------------------------
