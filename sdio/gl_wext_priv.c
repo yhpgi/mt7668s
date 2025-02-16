@@ -2214,7 +2214,7 @@ typedef struct cmd_tlv {
 } cmd_tlv_t;
 
 typedef struct priv_driver_cmd_s {
-    char buf[PRIV_CMD_SIZE];
+    char *buf;
     int used_len;
     int total_len;
 } priv_driver_cmd_t;
@@ -15876,8 +15876,22 @@ s32 priv_driver_cmds(IN struct net_device *prNetDev, IN s8 *pcCommand,
     } else if (strnicmp(pcCommand, CMD_PNOSETUP_SET,
                         strlen(CMD_PNOSETUP_SET)) == 0) {
         /* ToDo:: Nothing */
+    } else if (strnicmp(pcCommand, CMD_RXFILTER_START,
+                        strlen(CMD_RXFILTER_START)) == 0) {
+        /* ToDo:: Nothing */
+    } else if (strnicmp(pcCommand, CMD_RXFILTER_STOP,
+                        strlen(CMD_RXFILTER_STOP)) == 0) {
+    } else if (strnicmp(pcCommand, CMD_SET_AP_WPS_P2P_IE,
+                        strlen(CMD_SET_AP_WPS_P2P_IE)) == 0) {
+        /* ToDo:: Nothing */
+    } else if (strnicmp(pcCommand, CMD_RXFILTER_ADD,
+                        strlen(CMD_RXFILTER_ADD)) == 0) {
+        /* ToDo:: Nothing */
     } else if (strnicmp(pcCommand, CMD_PNOENABLE_SET,
                         strlen(CMD_PNOENABLE_SET)) == 0) {
+        /* ToDo:: Nothing */
+    } else if (strnicmp(pcCommand, CMD_BTCOEXSCAN_STOP,
+                        strlen(CMD_BTCOEXSCAN_STOP)) == 0) {
         /* ToDo:: Nothing */
     } else if (strnicmp(pcCommand, CMD_SETSUSPENDOPT,
                         strlen(CMD_SETSUSPENDOPT)) == 0) {
