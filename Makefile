@@ -75,13 +75,6 @@ mt7668s-objs := \
     sdio/platform.o \
     sdio/sdio.o
 
-ifeq ($(CONFIG_MT7668S_WIFI_PREALLOC), y)
-    ccflags-y += -DCFG_PREALLOC_MEMORY \
-                 -I$(src)/prealloc/include
-    mt7668s_prealloc-objs := prealloc/prealloc.o
-    obj-$(CONFIG_MT7668S_WIFI) += mt7668s_prealloc.o
-endif
-
 ifeq ($(CONFIG_MT7668S_WIFI_MESON_G12A_PATCH),y)
     ccflags-y += -DCFG_MESON_G12A_PATCH=1
 else
@@ -89,7 +82,6 @@ else
 endif
 
 obj-$(CONFIG_MT7668S_WIFI) := mt7668s.o
-obj-y += reinit/
 
 default:
 	$(MAKE) -C $(KERNELDIR) M=$(PWD) modules

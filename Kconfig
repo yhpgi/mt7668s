@@ -14,17 +14,6 @@ config MT7668S_WIFI
 	  To compile this driver as a loadable kernel module, choose 'M'
 	  here. This will create a module named 'mt7668s.ko'.
 
-config MT7668S_WIFI_PREALLOC
-	bool "MT7668S WiFi Pre-alloc memory"
-	depends on MT7668S_WIFI
-	default n
-	help
-	  Enable this option to pre-allocate memory for MT7668S WiFi
-	  operations. Pre-allocating memory can improve performance
-	  by reducing dynamic memory allocation overhead during runtime.
-	  This is useful in memory-constrained environments or for
-	  improving latency.
-
 config MT7668S_WIFI_MESON_G12A_PATCH
 	bool "MT7668S WiFi Meson G12A workaround"
 	depends on MT7668S_WIFI
@@ -39,6 +28,3 @@ config MT7668S_WIFI_MESON_G12A_PATCH
 	  Select 'y' to enable the workaround, ensuring stable
 	  performance on the Meson G12A platform. Select 'n' to
 	  disable the workaround if it is not needed.
-
-source "drivers/mt7668s/reinit/Kconfig"
-# FIXME: Use the actual path
