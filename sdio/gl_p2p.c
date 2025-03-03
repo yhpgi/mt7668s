@@ -978,7 +978,7 @@ int glSetupP2P(P_GLUE_INFO_T prGlueInfo, struct wireless_dev *prP2pWdev,
         44  /* yhpgi: prChipInfo->txd_append_size */;
 
     prP2pDev->netdev_ops = &p2p_netdev_ops;
-#if 0
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(6, 6, 0))
     prP2PInfo->prDevHandler->wireless_handlers = &mtk_p2p_wext_handler_def;
 #endif
     // #if defined(_HIF_SDIO)
@@ -1256,8 +1256,10 @@ u8 glRegisterP2P(P_GLUE_INFO_T prGlueInfo, const char *prDevName,
         prGlueInfo->prP2PInfo[i]->prDevHandler->needed_headroom +=
             NIC_TX_HEAD_ROOM;
         prGlueInfo->prP2PInfo[i]->prDevHandler->netdev_ops = &p2p_netdev_ops;
-        /* prGlueInfo->prP2PInfo->prDevHandler->wireless_handlers    =
-         * &mtk_p2p_wext_handler_def; */
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(6, 6, 0))
+        prGlueInfo->prP2PInfo->prDevHandler->wireless_handlers =
+            &mtk_p2p_wext_handler_def;
+#endif
 
         SET_NETDEV_DEV(prGlueInfo->prP2PInfo[i]->prDevHandler,
                        &(prHif->func->dev));
