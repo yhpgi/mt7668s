@@ -14,16 +14,16 @@
 
 echo "Cleaning..."
 
-find -name "*.ko" | xargs rm 2>/dev/null
-find -name "*.o" | xargs rm 2>/dev/null
-find -name "*.o.*" | xargs rm 2>/dev/null
-find -name "*.order.cmd" | xargs rm 2>/dev/null
-find -name "*.mod.cmd" | xargs rm 2>/dev/null
-find -name "*.mod" | xargs rm 2>/dev/null
-find -name "*.order" | xargs rm 2>/dev/null
-find -name "*.cmd" | xargs rm 2>/dev/null
-find -name "*.symvers" | xargs rm 2>/dev/null
-find -name "*.mod.c" | xargs rm 2>/dev/null
-find -name ".tmp_*" | xargs rm -rf 2>/dev/null
+find . -name "*.ko" -exec rm -rf {} \; 2>/dev/null
+find . -name "*.o" -exec rm -rf {} \; 2>/dev/null
+find . -name "*.o.*" -exec rm -rf {} \; 2>/dev/null
+find . -name "*.order.cmd" -exec rm -rf {} \; 2>/dev/null
+find . -name "*.mod.cmd" -exec rm -rf {} \; 2>/dev/null
+find . -name "*.mod" -exec rm -rf {} \; 2>/dev/null
+find . -name "*.order" -exec rm -rf {} \; 2>/dev/null
+find . -name "*.cmd" -exec rm -rf {} \; 2>/dev/null
+find . -name "*.symvers" -exec rm -rf {} \; 2>/dev/null
+find . -name "*.mod.c" -exec rm -rf {} \; 2>/dev/null
+find . -name ".tmp_*" -exec rm -rf {} \; 2>/dev/null
 
 echo "Clean finished"

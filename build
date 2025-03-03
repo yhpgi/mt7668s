@@ -18,17 +18,10 @@ export CROSS_COMPILE="aarch64-none-linux-gnu-"
 export INSTALL_MOD_STRIP=1
 
 export CONFIG_MT7668S_WIFI=m
-export CONFIG_MT7668S_WIFI_PREALLOC=n
-
-# replace with n if your taget device isn't meson_g12a
 export CONFIG_MT7668S_WIFI_MESON_G12A_PATCH=y
 
-# disable if compiling with mainline kernel!
-export CONFIG_MT7668S_WIFI_REINIT=n
-
 # replace KERNELDIR with your kernel path
-# export KERNELDIR=$HOME/project/linux-4.9.337/out
-export KERNELDIR=$HOME/projects/kcompiler/compile-kernel/kernel/linux-6.13.y
+export KERNELDIR="$HOME/projects/kcompiler/compile-kernel/kernel/linux-6.13.y"
 
 ./clean
-make -j8 KERNELDIR=${KERNELDIR}
+make -j8 KERNELDIR="${KERNELDIR}"
