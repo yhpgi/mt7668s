@@ -1,8 +1,6 @@
 # MT7668S WiFi Driver for Linux
 
-## Overview
-
-This repository is an initiative to port the Android MT7668S driver into Linux.
+an initiative to port the Android MT7668S driver into Linux (OpenWrt).
 
 <!-- ## Current State
 
@@ -26,7 +24,7 @@ This repository is an initiative to port the Android MT7668S driver into Linux.
 
 - [ ] Untested -->
 
-## Installation
+<!-- ## Installation
 
 To install the MT7668S driver on your Linux system (as an external module), follow these steps:
 
@@ -107,11 +105,14 @@ To install the MT7668S driver on your Linux system (as an external module), foll
    ```
 
    Enable this driver in the `Device Driver` section.
+-->
 
-> [!NOTE]
-> You must check the `MT7668S WiFi Meson G12A workaround` if your target device is Amlogic g12a. DO NOT CHECK FOR OTHER TARGETS as it will degrade WiFi performance.
+> [!IMPORTANT]
+> You must enable the `MT7668S WiFi Meson G12A workaround` at compile time if your target device is Amlogic g12a.
+>
+> DO NOT ENABLE FOR OTHER TARGETS as it will degrade WiFi performance.
 
-5. **Compile the kernel as usual.**
+<!-- 5. **Compile the kernel as usual.**
 
 ## Usage
 
@@ -123,6 +124,7 @@ If you encounter any issues, please check the following:
 
 - Ensure that your kernel version is compatible with the driver.
 - Check the system logs for any error messages related to the driver.
+-->
 
 ## Contributing
 
@@ -136,7 +138,6 @@ Special thanks to:
 - Amazon Inc.
 - [DBAI](https://github.com/armarchindo)
 - Everyone who is contributing to porting this driver to Linux
-- Everyone who is also trying to port this driver to Linux
 
 ## License
 
